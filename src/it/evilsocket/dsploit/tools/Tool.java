@@ -30,6 +30,7 @@ public class Tool {
 	private static final String TAG = "Tool";
 	
 	private String  mName 		 = null;
+	private String  mDirName	 = null;
 	private String  mFileName    = null;
 	private String  mLibPath     = null;
 	private Context mAppContext  = null;
@@ -46,6 +47,7 @@ public class Tool {
 		mAppContext  = context;
 		mName        = name.substring( name.lastIndexOf('/') + 1 );
 		mFileName    = mAppContext.getFilesDir().getAbsolutePath() + "/tools/" + name;
+		mDirName	 = mFileName.substring( 0, mFileName.lastIndexOf('/') );
 		mLibPath     = mAppContext.getFilesDir().getAbsolutePath() + "/tools/libs";
 	}
 	
@@ -53,7 +55,7 @@ public class Tool {
 	{
 		final OutputReceiver outputReceiver = receiver;
 		
-		String  commandLine = "LD_LIBRARY_PATH=" + mLibPath + ":$LD_LIBRARY_PATH && " + mFileName + " " + args;		
+		String  commandLine = "LD_LIBRARY_PATH=" + mLibPath + ":$LD_LIBRARY_PATH && cd " + mDirName + " && ./" + mName + " " + args;		
 		Command command     = new Command( 0, commandLine )
 		{
 	        @Override
