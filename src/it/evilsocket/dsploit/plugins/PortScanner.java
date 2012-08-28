@@ -167,4 +167,10 @@ public class PortScanner extends Plugin
 		mListAdapter = new ArrayAdapter<String>( this, android.R.layout.simple_list_item_1, mPortList );
 		mScanList.setAdapter( mListAdapter );
 	}
+	
+	@Override
+	public void onBackPressed() {
+		setStoppedState();	
+	    super.onBackPressed();
+	}
 }

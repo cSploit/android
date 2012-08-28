@@ -16,11 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with dSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.evilsocket.dsploit.plugins;
+package it.evilsocket.dsploit.plugins.mitm;
 
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,19 +29,23 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import it.evilsocket.dsploit.ActionActivity;
+import it.evilsocket.dsploit.MainActivity;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.system.Environment;
 import it.evilsocket.dsploit.system.Plugin;
 import it.evilsocket.dsploit.tools.Ettercap;
-import it.evilsocket.dsploit.tools.Ettercap.SnifferOutputReceiver;
+import it.evilsocket.dsploit.tools.NMap;
+import it.evilsocket.dsploit.tools.NMap.SynScanOutputReceiver;
 
 public class MITM extends Plugin 
 {
 	private ListView      	  mActionListView = null;
 	private ActionAdapter 	  mActionAdapter  = null;
-	private ArrayList<Action> mActions  	  = new ArrayList<Action>();
+	private ArrayList<Action> mActions  	  = new ArrayList<Action>();	
 	private Ettercap		  mEttercap		  = null;
 	
 	class Action
@@ -64,8 +69,9 @@ public class MITM extends Plugin
 		
 		class ActionHolder
 		{		
-			TextView  name;
-			TextView  description;
+			TextView    name;
+			TextView    description;
+			ProgressBar activity;
 		}
 		
 		public ActionAdapter( int layoutId, ArrayList<Action> actions ) {
@@ -89,7 +95,8 @@ public class MITM extends Plugin
 	            
 	            holder.name        = ( TextView )row.findViewById( R.id.itemName );
 	            holder.description = ( TextView )row.findViewById( R.id.itemDescription );
-
+	            holder.activity    = ( ProgressBar )row.findViewById( R.id.itemActivity );
+	            
 	            row.setTag(holder);
 	        }
 	        else
@@ -127,15 +134,37 @@ public class MITM extends Plugin
         
         mActions.add( new Action( "Simple Sniff", "Only redirect target's traffic through this device, useful when using a network sniffer like 'Sharp' for android.", new OnClickListener(){
 			@Override
-			public void onClick(View v) {
-				// mEttercap.sniff( Environment.getTarget(), new SnifferOutputReceiver(){} );				
-			}
-		}));
-        
-        mActions.add( new Action( "Monitor Connections", "Show live connections of your current target.", new OnClickListener(){
-			@Override
-			public void onClick(View v) {
-								
+			public void onClick(View v) 
+			{
+				ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
+				
+				if( activity.getVisibility() == View.INVISIBLE )
+				{
+					activity.setVisibility( View.VISIBLE );
+					
+					new Thread( new Runnable(){
+						@Override
+						public void run() {
+							mEttercap.sniff( Environment.getTarget() );							
+						}} 
+					).start();									
+				}
+				else
+				{
+					mEttercap.kill();
+					activity.setVisibility( View.INVISIBLE );
+				}
+				/*
+				startActivity
+                ( 
+                  new Intent
+                  ( 
+                	MITM.this, 
+                	Sniffer.class
+                  ) 
+                );
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+                */
 			}
 		}));
         
