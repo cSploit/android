@@ -21,6 +21,7 @@ package it.evilsocket.dsploit.tools;
 import java.io.IOException;
 
 import it.evilsocket.dsploit.net.Target;
+import it.evilsocket.dsploit.system.Environment;
 
 import android.content.Context;
 import android.util.Log;
@@ -32,30 +33,41 @@ public class Ettercap extends Tool
 	public Ettercap( Context context ){
 		super( "ettercap/ettercap", context );		
 	}
-	
-	public static abstract class SnifferOutputReceiver implements Tool.OutputReceiver
-	{		
-		public void OnStart( String commandLine) {
-			Log.d( TAG, "sniff OnStart( " + commandLine + " )" );
-		}
 		
-		public void OnNewLine( String line ) {			
-			Log.d( TAG, "sniff OnNewLine( " + line + " )" );			
-		}
-		
-		public void OnEnd( int exitCode ) {
-			// TODO: check exit code
-			Log.d( TAG, "sniff OnEnd( " + exitCode +" )" );
-		}		
-	}
-	
-	public void sniff( Target target, SnifferOutputReceiver receiver )
+	public void sniff( Target target )
 	{
 		try
 		{
-			String address = target.getType() == Target.Type.NETWORK ? "//" : "/" + target.getCommandLineRepresentation() + "/";
+			String targetCommand;
 			
-			super.run( "-T -M ARP " + address, receiver );
+			// poison the entire network
+			if( target.getType() == Target.Type.NETWORK )
+				targetCommand = "// //";
+			// router -> target poison
+			else
+				targetCommand = "/" + target.getCommandLineRepresentation() + "/ //"; 
+			
+			super.run( "-T -M ARP " + targetCommand, new Tool.OutputReceiver() {
+				
+				@Override
+				public void OnStart(String commandLine) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void OnNewLine(String line) {
+					// TODO Auto-generated method stub
+					Log.d( TAG, line );
+					
+				}
+				
+				@Override
+				public void OnEnd(int exitCode) {
+					// TODO Auto-generated method stub
+					
+				}
+			} );
 		}
 		catch( InterruptedException ie )
 		{

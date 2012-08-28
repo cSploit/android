@@ -34,7 +34,12 @@
         </activity>
         
         <activity
-            android:name=".plugins.MITM" 
+            android:name=".plugins.mitm.MITM" 
+            android:label="@string/title_activity_main"> 
+        </activity>
+        
+        <activity
+            android:name=".plugins.mitm.Sniffer" 
             android:label="@string/title_activity_main"> 
         </activity>
         
