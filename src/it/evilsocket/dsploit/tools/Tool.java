@@ -71,7 +71,6 @@ public class Tool {
 	}
 	
 	public boolean kill() {
-		Log.d( TAG, "RootTools.killProcess( " + mName + " )" );
 		return RootTools.killProcess( mName );
 	}
 }

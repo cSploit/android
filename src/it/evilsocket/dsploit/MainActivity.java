@@ -27,6 +27,7 @@ import it.evilsocket.dsploit.gui.dialogs.InputDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
 import it.evilsocket.dsploit.net.Endpoint;
 import it.evilsocket.dsploit.net.Target;
+import it.evilsocket.dsploit.plugins.LoginCracker;
 import it.evilsocket.dsploit.plugins.MITM;
 import it.evilsocket.dsploit.plugins.PortScanner;
 import it.evilsocket.dsploit.system.Environment;
@@ -283,6 +284,7 @@ public class MainActivity extends Activity
         // TODO: Implement automatic loading
         Environment.registerPlugin( new PortScanner( ) );
         Environment.registerPlugin( new MITM( ) );
+        Environment.registerPlugin( new LoginCracker( ) );
         
         mListView = ( ListView )findViewById( R.id.listView );
 	    
