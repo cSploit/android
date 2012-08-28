@@ -126,6 +126,13 @@ public class MITM extends Plugin
 			}
 		}));
         
+        mActions.add( new Action( "Monitor Connections", "Show live connections of your current target.", new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+								
+			}
+		}));
+        
         mActions.add( new Action( "Kill Connections", "Kill target connections preventing him to reach any website or server.", new OnClickListener(){
 			@Override
 			public void onClick(View v) {
