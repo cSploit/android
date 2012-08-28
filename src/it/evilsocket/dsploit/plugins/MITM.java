@@ -31,13 +31,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.net.Target;
+import it.evilsocket.dsploit.system.Environment;
 import it.evilsocket.dsploit.system.Plugin;
+import it.evilsocket.dsploit.tools.Ettercap;
+import it.evilsocket.dsploit.tools.Ettercap.SnifferOutputReceiver;
 
 public class MITM extends Plugin 
 {
 	private ListView      	  mActionListView = null;
 	private ActionAdapter 	  mActionAdapter  = null;
 	private ArrayList<Action> mActions  	  = new ArrayList<Action>();
+	private Ettercap		  mEttercap		  = null;
 	
 	class Action
 	{
@@ -119,10 +123,12 @@ public class MITM extends Plugin
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);   
                 
+        mEttercap = new Ettercap( this );
+        
         mActions.add( new Action( "Simple Sniff", "Only redirect target's traffic through this device, useful when using a network sniffer like 'Sharp' for android.", new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-								
+				// mEttercap.sniff( Environment.getTarget(), new SnifferOutputReceiver(){} );				
 			}
 		}));
         

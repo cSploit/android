@@ -18,7 +18,12 @@
  */
 package it.evilsocket.dsploit.tools;
 
+import java.io.IOException;
+
+import it.evilsocket.dsploit.net.Target;
+
 import android.content.Context;
+import android.util.Log;
 
 public class Ettercap extends Tool
 {
@@ -26,5 +31,39 @@ public class Ettercap extends Tool
 	
 	public Ettercap( Context context ){
 		super( "ettercap/ettercap", context );		
+	}
+	
+	public static abstract class SnifferOutputReceiver implements Tool.OutputReceiver
+	{		
+		public void OnStart( String commandLine) {
+			Log.d( TAG, "sniff OnStart( " + commandLine + " )" );
+		}
+		
+		public void OnNewLine( String line ) {			
+			Log.d( TAG, "sniff OnNewLine( " + line + " )" );			
+		}
+		
+		public void OnEnd( int exitCode ) {
+			// TODO: check exit code
+			Log.d( TAG, "sniff OnEnd( " + exitCode +" )" );
+		}		
+	}
+	
+	public void sniff( Target target, SnifferOutputReceiver receiver )
+	{
+		try
+		{
+			String address = target.getType() == Target.Type.NETWORK ? "//" : "/" + target.getCommandLineRepresentation() + "/";
+			
+			super.run( "-T -M ARP " + address, receiver );
+		}
+		catch( InterruptedException ie )
+		{
+			Log.e( TAG, ie.toString() );
+		}
+		catch( IOException ioe )
+		{
+			Log.e( TAG, ioe.toString() );
+		}		
 	}
 }
