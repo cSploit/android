@@ -278,6 +278,10 @@ public class Target {
 		return mPorts;
 	}
 	
+	public boolean hasOpenPorts() {
+		return !mPorts.isEmpty();
+	}
+	
 	public boolean hasOpenPort( int port ) {
 		for( Port p : mPorts ) {
 			if( p.port == port )
