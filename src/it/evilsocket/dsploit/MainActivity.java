@@ -21,6 +21,8 @@ package it.evilsocket.dsploit;
 import java.net.NoRouteToHostException;
 import java.util.ArrayList;
 
+import com.stericson.RootTools.RootTools;
+
 import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
 import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog;
@@ -33,8 +35,6 @@ import it.evilsocket.dsploit.plugins.mitm.MITM;
 import it.evilsocket.dsploit.system.Environment;
 import it.evilsocket.dsploit.system.ToolsInstaller;
 import it.evilsocket.dsploit.tools.NMap;
-
-import com.stericson.RootTools.RootTools;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -256,29 +256,32 @@ public class MainActivity extends Activity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        
         setContentView( LAYOUT );
-        
+       
         new Thread( new Runnable(){
 			@Override
 			public void run() 
-			{
+			{						
 		        mToolsInstaller = new ToolsInstaller( MainActivity.this.getApplicationContext() );
-		        
+		       
 				if( RootTools.isAccessGiven() == false )  
+				{
 					MainActivity.this.runOnUiThread( new Runnable() {
 				       public void run() {
 				    	   new FatalDialog( "Error", "This application can run only on rooted devices.", MainActivity.this ).show();
 				       }
 				    });
-						        							                
+				}		        							                
 		        else if( mToolsInstaller.needed() && mToolsInstaller.install() == false )
+		        {
 					MainActivity.this.runOnUiThread( new Runnable() {
 				       public void run() {
 				    	   new FatalDialog( "Error", "Error during files installation!", MainActivity.this ).show();
 				       }
 				    });
+		        }
 			}
 		}).start();
-                       
+        
         Environment.init( getApplicationContext() );
         
         // TODO: Implement automatic loading
@@ -299,7 +302,7 @@ public class MainActivity extends Activity
     		
     		mListView.setAdapter( mTargetAdapter );
     	}
-    	catch( NoRouteToHostException e )
+    	catch( Exception e )
     	{
     		new FatalDialog( "Error", e.getMessage(), this ).show();
     	}

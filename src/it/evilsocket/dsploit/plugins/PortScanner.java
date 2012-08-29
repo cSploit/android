@@ -51,8 +51,8 @@ public class PortScanner extends Plugin
 	private class Receiver extends SynScanOutputReceiver
 	{
 		@Override 
-		public void OnStart( String commandLine ) {
-			super.OnStart( commandLine );
+		public void onStart( String commandLine ) {
+			super.onStart( commandLine );
 			
 			PortScanner.this.runOnUiThread(new Runnable() {
                 @Override
@@ -64,8 +64,8 @@ public class PortScanner extends Plugin
 		}
 		
 		@Override
-		public void OnEnd( int exitCode ) {
-			super.OnEnd(exitCode);
+		public void onEnd( int exitCode ) {
+			super.onEnd(exitCode);
 			
 			PortScanner.this.runOnUiThread(new Runnable() {
                 @Override
@@ -76,7 +76,7 @@ public class PortScanner extends Plugin
 		}
 		
 		@Override
-		public void OnPortFound( String port, String protocol ) {
+		public void onPortFound( String port, String protocol ) {
 			final String openPort  = port;
 			final String portProto = protocol;
 			
