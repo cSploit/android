@@ -19,14 +19,12 @@
 package it.evilsocket.dsploit.tools;
 
 import java.io.IOException;
-
+import android.content.Context;
 import com.stericson.RootTools.Command;
 import com.stericson.RootTools.RootTools;
 
-import android.content.Context;
-import android.util.Log;
-
-public class Tool {
+public class Tool 
+{
 	private static final String TAG = "Tool";
 	
 	private String  mName 		 = null;
@@ -37,13 +35,13 @@ public class Tool {
 	
 	public interface OutputReceiver
 	{
-		public void OnStart( String commandLine );
-		public void OnNewLine( String line );
-		public void OnEnd( int exitCode );
+		public void onStart( String commandLine );
+		public void onNewLine( String line );
+		public void onEnd( int exitCode );
 	}
 	
-	public Tool( String name, Context context )
-	{
+	public Tool( String name, Context context ) {
+		// TODO: Add better file name & dir name handling with File class
 		mAppContext  = context;
 		mName        = name.substring( name.lastIndexOf('/') + 1 );
 		mFileName    = mAppContext.getFilesDir().getAbsolutePath() + "/tools/" + name;
@@ -51,28 +49,37 @@ public class Tool {
 		mLibPath     = mAppContext.getFilesDir().getAbsolutePath() + "/tools/libs";
 	}
 	
-	public void run( String args, OutputReceiver receiver ) throws IOException, InterruptedException
-	{
+	public Tool( String name ){
+		mName = name;
+	}
+	
+	public void run( String args, OutputReceiver receiver ) throws IOException, InterruptedException {
 		final OutputReceiver outputReceiver = receiver;
 		
-		String  commandLine = "LD_LIBRARY_PATH=" + mLibPath + ":$LD_LIBRARY_PATH && cd " + mDirName + " && ./" + mName + " " + args;		
-		Command command     = new Command( 0, commandLine )
+		String  commandLine = null;
+		
+		if( mAppContext != null )
+			commandLine = "LD_LIBRARY_PATH=" + mLibPath + ":$LD_LIBRARY_PATH && cd " + mDirName + " && ./" + mName + " " + args;		
+		else
+			commandLine =  mName + " " + args;
+		
+		Command command = new Command( 0, commandLine )
 		{
 	        @Override
 	        public void output(int id, String line)
 	        {
-	        	outputReceiver.OnNewLine(line);
+	        	outputReceiver.onNewLine(line);
 	        }
 		};
-		
-		outputReceiver.OnStart( commandLine );
+				
+		outputReceiver.onStart( commandLine );
 		
 		int code = RootTools.getShell(true).add( command ).exitCode();
 		
-		outputReceiver.OnEnd( code );
+		outputReceiver.onEnd( code );
 	}
 	
-	public boolean kill() {
+	public boolean kill(){
 		return RootTools.killProcess( mName );
 	}
 }

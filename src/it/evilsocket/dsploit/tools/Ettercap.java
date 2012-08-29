@@ -47,23 +47,23 @@ public class Ettercap extends Tool
 			else
 				targetCommand = "/" + target.getCommandLineRepresentation() + "/ //"; 
 			
-			super.run( "-T -M ARP " + targetCommand, new Tool.OutputReceiver() {
+			super.run( "-T -M arp:remote -i " + Environment.getNetwork().getInterface().getDisplayName() + " " + targetCommand, new Tool.OutputReceiver() {
 				
 				@Override
-				public void OnStart(String commandLine) {
+				public void onStart(String commandLine) {
 					// TODO Auto-generated method stub
-					
+					Log.d( TAG, commandLine );
 				}
 				
 				@Override
-				public void OnNewLine(String line) {
+				public void onNewLine(String line) {
 					// TODO Auto-generated method stub
 					Log.d( TAG, line );
 					
 				}
 				
 				@Override
-				public void OnEnd(int exitCode) {
+				public void onEnd(int exitCode) {
 					// TODO Auto-generated method stub
 					
 				}

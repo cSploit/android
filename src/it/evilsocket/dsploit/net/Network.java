@@ -19,7 +19,9 @@
 package it.evilsocket.dsploit.net;
 
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.NoRouteToHostException;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 
 import android.content.Context;
@@ -63,14 +65,18 @@ public class Network
 	private ConnectivityManager mConnectivityManager = null;
 	private WifiManager 		mWifiManager 		 = null;	
 	private DhcpInfo   			mInfo        		 = null;
-
-	public Network( Context context ) throws NoRouteToHostException {
+	private NetworkInterface    mInterface			 = null;
+	
+	public Network( Context context ) throws NoRouteToHostException, SocketException {
 		mWifiManager		 = ( WifiManager )context.getSystemService( Context.WIFI_SERVICE );
 		mConnectivityManager = ( ConnectivityManager )context.getSystemService( Context.CONNECTIVITY_SERVICE );
 		mInfo		 		 = mWifiManager.getDhcpInfo();
-		
+				
 		if( isConnected() == false)
 			throw new NoRouteToHostException("Not connected to any WiFi access point.");
+		
+		else
+			mInterface = NetworkInterface.getByInetAddress( getLoacalAddress() );		
 	}
 			
 	private int countBits( int n ){
@@ -162,5 +168,9 @@ public class Network
 		}
 		
 		return null;
+	}
+	
+	public NetworkInterface getInterface(){
+		return mInterface;
 	}
 }

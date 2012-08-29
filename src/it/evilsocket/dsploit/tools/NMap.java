@@ -45,11 +45,11 @@ public class NMap extends Tool {
 		private String				mLastAddress = null;
 		private String				mLastMac     = null;
 		
-		public void OnStart( String commandLine) {
+		public void onStart( String commandLine) {
 			Log.d( TAG, "findAliveEndpoints OnStart( " + commandLine + " )" );
 		}
 		
-		public void OnNewLine( String line ) {			
+		public void onNewLine( String line ) {			
 			Matcher matcher;
 			
 			if( ( matcher = IP_PATTERN.matcher( line ) ) != null && matcher.find() )
@@ -69,7 +69,7 @@ public class NMap extends Tool {
 			}
 		}
 		
-		public void OnEnd( int exitCode ) {
+		public void onEnd( int exitCode ) {
 			// TODO: check exit code
 			Log.d( TAG, "findAliveEndpoints OnEnd( " + exitCode +" )" );
 		}
@@ -103,25 +103,25 @@ public class NMap extends Tool {
 	{
 		private final Pattern PORT_PATTERN = Pattern.compile( "^discovered open port (\\d+)/([^\\s]+).+", Pattern.CASE_INSENSITIVE );
 		
-		public void OnStart( String commandLine) {
+		public void onStart( String commandLine) {
 			Log.d( TAG, "synScan OnStart( " + commandLine + " )" );
 		}
 		
-		public void OnNewLine( String line ) {			
+		public void onNewLine( String line ) {			
 			Matcher matcher;
 			
 			if( ( matcher = PORT_PATTERN.matcher( line ) ) != null && matcher.find() )
 			{
-				OnPortFound( matcher.group( 1 ), matcher.group( 2 ) );
+				onPortFound( matcher.group( 1 ), matcher.group( 2 ) );
 			}				
 		}
 		
-		public void OnEnd( int exitCode ) {
+		public void onEnd( int exitCode ) {
 			// TODO: check exit code
 			Log.d( TAG, "synScan OnEnd( " + exitCode +" )" );
 		}
 		
-		public abstract void OnPortFound( String port, String protocol );
+		public abstract void onPortFound( String port, String protocol );
 	}
 	
 	public void synScan( Target target, SynScanOutputReceiver receiver ) {		

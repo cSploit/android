@@ -23,6 +23,7 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.NoRouteToHostException;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +37,8 @@ import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Network.Protocol;
 import it.evilsocket.dsploit.net.Target.Port;
 
-public class Environment {	
+public class Environment 
+{	
 	private static final String TAG = "Environment";
 	
 	private static Context 			  mContext  	 = null;
@@ -52,9 +54,8 @@ public class Environment {
 		mContext  = context;		
 		mPlugins  = new ArrayList<Plugin>();
 	}
-	
-	public static String getProtocolByPort( String port )
-	{
+
+	public static String getProtocolByPort( String port ){
 		if( mPorts == null )
 		{
 			mPorts = new HashMap<String,String>();
@@ -91,8 +92,7 @@ public class Environment {
 		return mPorts.containsKey(port) ? mPorts.get(port) : null;
 	}
 	
-	public static int getPortByProtocol( String protocol )
-	{
+	public static int getPortByProtocol( String protocol ){
 		if( mServices == null )
 		{
 			mServices = new HashMap<String,String>();
@@ -136,7 +136,7 @@ public class Environment {
 		return mContext;
 	}
 	
-	public static Network getNetwork() throws NoRouteToHostException{
+	public static Network getNetwork() throws NoRouteToHostException, SocketException {
 		if( mNetwork == null )
 			mNetwork = new Network( mContext );
 		
