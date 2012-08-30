@@ -18,56 +18,39 @@
  */
 package it.evilsocket.dsploit.tools;
 
-import java.io.IOException;
-
 import it.evilsocket.dsploit.net.Target;
+import it.evilsocket.dsploit.net.Target.Type;
 import it.evilsocket.dsploit.system.Environment;
+import it.evilsocket.dsploit.system.Shell.OutputReceiver;
+
+import java.io.IOException;
 
 import android.content.Context;
 import android.util.Log;
 
-public class Ettercap extends Tool
+public class ArpSpoof extends Tool 
 {
-	private static final String TAG = "ETTERCAP";
+	private static final String TAG = "ARPSPOOF";
 	
-	public Ettercap( Context context ){
-		super( "ettercap/ettercap", context );		
+	// TODO: Update arpspoof binary, this sometimes just goes to seg fault :(
+	public ArpSpoof( Context context ){
+		super( "arpspoof/arpspoof", context );			
+		// arpspoof is statically linked
+		setCustomLibsUse(false);
 	}
-		
-	public void sniff( Target target )
-	{
+	
+	public void spoof( Target target, OutputReceiver receiver ) {		
 		try
 		{
-			String targetCommand;
+			String commandLine = "";
 			
-			// poison the entire network
-			if( target.getType() == Target.Type.NETWORK )
-				targetCommand = "// //";
-			// router -> target poison
+			if( target.getType() == Type.NETWORK )
+				commandLine = "-i " + Environment.getNetwork().getInterface().getDisplayName() + " " + Environment.getGatewayAddress();
+			
 			else
-				targetCommand = "/" + target.getCommandLineRepresentation() + "/ //"; 
+				commandLine = "-i " + Environment.getNetwork().getInterface().getDisplayName() + " -t " + target.getCommandLineRepresentation() + " " + Environment.getGatewayAddress();
 			
-			super.run( "-T -M arp:remote -i " + Environment.getNetwork().getInterface().getDisplayName() + " " + targetCommand, new Tool.OutputReceiver() {
-				
-				@Override
-				public void onStart(String commandLine) {
-					// TODO Auto-generated method stub
-					Log.d( TAG, commandLine );
-				}
-				
-				@Override
-				public void onNewLine(String line) {
-					// TODO Auto-generated method stub
-					Log.d( TAG, line );
-					
-				}
-				
-				@Override
-				public void onEnd(int exitCode) {
-					// TODO Auto-generated method stub
-					
-				}
-			} );
+			super.run( commandLine, receiver );
 		}
 		catch( InterruptedException ie )
 		{

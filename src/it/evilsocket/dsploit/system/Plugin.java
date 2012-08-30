@@ -20,7 +20,6 @@ package it.evilsocket.dsploit.system;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.Window;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.net.Target;
 

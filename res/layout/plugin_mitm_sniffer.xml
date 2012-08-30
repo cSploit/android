@@ -30,8 +30,11 @@
         android:layout_alignRight="@+id/sniffActivity"
         android:layout_below="@+id/sniffActivity"
         android:ems="10"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
         android:gravity="top|left"
-        android:scrollbars="vertical" >
+        android:scrollbars="vertical"
+        android:textSize="15dp" >
 
         <requestFocus />
     </EditText>

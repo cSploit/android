@@ -18,11 +18,40 @@
  */
 package it.evilsocket.dsploit.tools;
 
-import android.content.Context;
+import it.evilsocket.dsploit.system.Shell.OutputReceiver;
 
-public class Hydra extends Tool
-{	
-	public Hydra( Context context ){
-		super( "hydra/hydra", context );		
+import java.io.IOException;
+
+import android.content.Context;
+import android.util.Log;
+
+public class TcpDump extends Tool
+{
+	private static final String TAG = "TCPDUMP";
+	
+	public TcpDump( Context context ){
+		super( "tcpdump/tcpdump", context );		
+		// tcpdump is statically linked
+		setCustomLibsUse(false);
+	}
+	
+	public void sniff( String filter, OutputReceiver receiver ) {
+	
+		try
+		{
+			super.run( "-l -vv -s 0 " + ( filter == null ? "" : filter ), receiver );
+		}
+		catch( InterruptedException ie )
+		{
+			Log.e( TAG, ie.toString() );
+		}
+		catch( IOException ioe )
+		{
+			Log.e( TAG, ioe.toString() );
+		}		
+	}	
+	
+	public void sniff( OutputReceiver receiver ) {
+		sniff( null, receiver );
 	}
 }

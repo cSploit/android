@@ -27,27 +27,18 @@ import java.io.FileOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import com.stericson.RootTools.CommandCapture;
-import com.stericson.RootTools.RootTools;
-
-public class ToolsInstaller {
+public class ToolsInstaller 
+{
 	private final static String   TOOLS_FILENAME   = "tools.zip";
 	private final static int      BUFFER_SIZE      = 4096;
 	private final static String[] INSTALL_COMMANDS = {
-		"chmod 755 {PATH}/utils/busybox",
 		"chmod 777 {PATH}/*/",
-		"chmod 777 {PATH}/ettercap/share",
-		"chmod 777 {PATH}/ettercap/share/*",
-		"chmod 777 {PATH}/ettercap/filters",
-		"chmod 777 {PATH}/ettercap/filters/*",
 		"chmod 755 {PATH}/nmap/nmap",
-		"chmod 755 {PATH}/ettercap/ettercap",
-		"chmod 755 {PATH}/ettercap/etterfilter",
-		"chmod 755 {PATH}/ettercap/etterlog",
+		"chmod 755 {PATH}/arpspoof/arpspoof",
+		"chmod 755 {PATH}/tcpdump/tcpdump",
 		"chmod 755 {PATH}/driftnet/*",
 		"chmod 666 {PATH}/hydra/*",
 		"chmod 755 {PATH}/hydra/hydra",
-		"chmod 755 {PATH}/utils/*",
 		"mount -o remount,rw /system /system && (chmod 6755 /system/*/su; mount -o remount,ro /system /system)"
 	};
 	
@@ -108,10 +99,8 @@ public class ToolsInstaller {
 	    	{
 	    		cmd += install_cmd.replace( "{PATH}", mDestPath + "/tools" ) + "; ";
 	    	}
-	    	
-	    	CommandCapture command = new CommandCapture( 0, cmd );
-        	
-        	RootTools.getShell(true).add(command).waitForFinish();
+	    	        	
+        	Shell.exec( cmd );
 	    	
 	    	return true;
 	    }
