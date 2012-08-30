@@ -31,22 +31,19 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import it.evilsocket.dsploit.ActionActivity;
-import it.evilsocket.dsploit.MainActivity;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.system.Environment;
 import it.evilsocket.dsploit.system.Plugin;
-import it.evilsocket.dsploit.tools.Ettercap;
-import it.evilsocket.dsploit.tools.NMap;
-import it.evilsocket.dsploit.tools.NMap.SynScanOutputReceiver;
+import it.evilsocket.dsploit.system.Shell.OutputReceiver;
+import it.evilsocket.dsploit.tools.ArpSpoof;
 
 public class MITM extends Plugin 
 {
 	private ListView      	  mActionListView = null;
 	private ActionAdapter 	  mActionAdapter  = null;
 	private ArrayList<Action> mActions  	  = new ArrayList<Action>();	
-	private Ettercap		  mEttercap		  = null;
+	private ArpSpoof		  mArpSpoof		  = null;
 	
 	class Action
 	{
@@ -129,32 +126,13 @@ public class MITM extends Plugin
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);   
-                
-        mEttercap = new Ettercap( this );
+        
+        mArpSpoof = new ArpSpoof( this );
         
         mActions.add( new Action( "Simple Sniff", "Only redirect target's traffic through this device, useful when using a network sniffer like 'Sharp' for android.", new OnClickListener(){
 			@Override
-			public void onClick(View v) 
+			public void onClick( View v ) 
 			{
-				ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
-				
-				if( activity.getVisibility() == View.INVISIBLE )
-				{
-					activity.setVisibility( View.VISIBLE );
-					
-					new Thread( new Runnable(){
-						@Override
-						public void run() {
-							mEttercap.sniff( Environment.getTarget() );							
-						}} 
-					).start();									
-				}
-				else
-				{
-					mEttercap.kill();
-					activity.setVisibility( View.INVISIBLE );
-				}
-				/*
 				startActivity
                 ( 
                   new Intent
@@ -164,14 +142,52 @@ public class MITM extends Plugin
                   ) 
                 );
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-                */
 			}
 		}));
         
-        mActions.add( new Action( "Kill Connections", "Kill target connections preventing him to reach any website or server.", new OnClickListener(){
+        mActions.add( new Action( "Kill Connections", "Kill connections preventing everyone to reach any website or server.", new OnClickListener(){
 			@Override
 			public void onClick(View v) {
+				ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
+
+				if( activity.getVisibility() == View.INVISIBLE )
+				{
+					activity.setVisibility( View.VISIBLE );
+
+					new Thread( new Runnable(){
+						@Override
+						public void run() {
+							Environment.setForwarding( false );
+							mArpSpoof.spoof( Environment.getTarget(), new OutputReceiver(){
+
+								@Override
+								public void onStart(String command) {
+									// TODO Auto-generated method stub
+									
+								}
+
+								@Override
+								public void onNewLine(String line) {
+									// TODO Auto-generated method stub
+									
+								}
+
+								@Override
+								public void onEnd(int exitCode) {
+									// TODO Auto-generated method stub
+									
+								}} );							
+						}} 
+					).start();									
+				}
+				else
+				{
+	
+					Environment.setForwarding( true );
+					mArpSpoof.kill();
 								
+					activity.setVisibility( View.INVISIBLE );
+				}
 			}
 		}));
         
@@ -188,7 +204,9 @@ public class MITM extends Plugin
 								
 			}
 		}));
-        
+/*        
+ TODO:
+ 
         mActions.add( new Action( "Replace Images", "Replace all images on webpages with the specified one.", new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -202,7 +220,7 @@ public class MITM extends Plugin
 								
 			}
 		}));
-        
+*/        
         mActionListView = ( ListView )findViewById( R.id.actionListView );
         mActionAdapter  = new ActionAdapter( R.layout.plugin_mitm_list_item, mActions );
         

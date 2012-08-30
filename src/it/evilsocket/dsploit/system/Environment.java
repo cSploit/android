@@ -21,6 +21,8 @@ package it.evilsocket.dsploit.system;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.NoRouteToHostException;
 import java.net.SocketException;
@@ -39,8 +41,9 @@ import it.evilsocket.dsploit.net.Target.Port;
 
 public class Environment 
 {	
-	private static final String TAG = "Environment";
-	
+	private static final String TAG 		  		  = "Environment";
+	public  static final String IPV4_FORWARD_FILEPATH = "/proc/sys/net/ipv4/ip_forward";
+
 	private static Context 			  mContext  	 = null;
 	private static Network 			  mNetwork  	 = null;
 	private static Target  			  mTarget   	 = null;
@@ -49,10 +52,10 @@ public class Environment
 	
 	private static ArrayList<Plugin>  mPlugins  	 = null;
 	private static Plugin			  mCurrentPlugin = null;
-	
+		
 	public static void init( Context context ){
-		mContext  = context;		
-		mPlugins  = new ArrayList<Plugin>();
+		mContext = context;		
+		mPlugins = new ArrayList<Plugin>();
 	}
 
 	public static String getProtocolByPort( String port ){
@@ -200,4 +203,53 @@ public class Environment
 			plugin.onTargetNewOpenPort( mTarget, p );
 		}
 	}
+
+	public static String getGatewayAddress() {
+		return mNetwork.getGatewayAddress().toString().substring( 1 );
+	}
+		
+	public static boolean isForwardingEnabled( ) {
+		boolean 	   forwarding = false;
+		BufferedReader reader;
+		String		   line;
+		
+		try 
+		{
+			reader 	   = new BufferedReader( new FileReader( IPV4_FORWARD_FILEPATH ) );
+			line   	   = reader.readLine().trim();			
+			forwarding = line.equals("1");
+
+			reader.close();
+			
+		} 
+		catch( IOException e ) 
+		{
+			Log.w( TAG, e.toString() );
+		}
+		
+		return forwarding;
+	}
+	
+	public static void setForwarding( boolean enabled )
+	{
+		Log.d( TAG, "Setting ipv4 forwarding to " + enabled );
+		
+
+		String status = ( enabled ? "1" : "0" ),
+			   cmd    = "echo " + status + " > " + IPV4_FORWARD_FILEPATH;
+		    	
+		try
+		{
+			Shell.exec(cmd);
+		}
+		catch( Exception e )
+		{
+			Log.e( TAG, e.toString() );
+		}
+	}
+		
+	public static void clean() {
+		setForwarding( false );
+	}
+	
 }

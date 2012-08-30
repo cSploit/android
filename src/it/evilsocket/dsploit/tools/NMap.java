@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import it.evilsocket.dsploit.net.Endpoint;
 import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.Target;
+import it.evilsocket.dsploit.system.Shell.OutputReceiver;
 import android.content.Context;
 import android.util.Log;
 
@@ -36,7 +37,7 @@ public class NMap extends Tool {
 		super( "nmap/nmap", context );		
 	}
 	
-	private class FindAliveEndpointsOutputReceiver implements Tool.OutputReceiver
+	private class FindAliveEndpointsOutputReceiver implements OutputReceiver
 	{		
 		private final Pattern IP_PATTERN  = Pattern.compile( "^nmap scan report for ([\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}).*", 			  Pattern.CASE_INSENSITIVE );
 		private final Pattern MAC_PATTERN = Pattern.compile( "^mac address: ([a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}).*", Pattern.CASE_INSENSITIVE );
@@ -49,7 +50,7 @@ public class NMap extends Tool {
 			Log.d( TAG, "findAliveEndpoints OnStart( " + commandLine + " )" );
 		}
 		
-		public void onNewLine( String line ) {			
+		public void onNewLine( String line ) {						
 			Matcher matcher;
 			
 			if( ( matcher = IP_PATTERN.matcher( line ) ) != null && matcher.find() )
@@ -99,7 +100,7 @@ public class NMap extends Tool {
 		return receiver.getEndpoints();
 	}
 	
-	public static abstract class SynScanOutputReceiver implements Tool.OutputReceiver
+	public static abstract class SynScanOutputReceiver implements OutputReceiver
 	{
 		private final Pattern PORT_PATTERN = Pattern.compile( "^discovered open port (\\d+)/([^\\s]+).+", Pattern.CASE_INSENSITIVE );
 		

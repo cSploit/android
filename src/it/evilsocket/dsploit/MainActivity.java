@@ -18,10 +18,7 @@
  */
 package it.evilsocket.dsploit;
 
-import java.net.NoRouteToHostException;
 import java.util.ArrayList;
-
-import com.stericson.RootTools.RootTools;
 
 import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
 import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
@@ -33,6 +30,7 @@ import it.evilsocket.dsploit.plugins.LoginCracker;
 import it.evilsocket.dsploit.plugins.PortScanner;
 import it.evilsocket.dsploit.plugins.mitm.MITM;
 import it.evilsocket.dsploit.system.Environment;
+import it.evilsocket.dsploit.system.Shell;
 import it.evilsocket.dsploit.system.ToolsInstaller;
 import it.evilsocket.dsploit.tools.NMap;
 
@@ -45,7 +43,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -263,7 +260,7 @@ public class MainActivity extends Activity
 			{						
 		        mToolsInstaller = new ToolsInstaller( MainActivity.this.getApplicationContext() );
 		       
-				if( RootTools.isAccessGiven() == false )  
+				if( Shell.isRootGranted() == false )  
 				{
 					MainActivity.this.runOnUiThread( new Runnable() {
 				       public void run() {
@@ -296,15 +293,24 @@ public class MainActivity extends Activity
     		ArrayList<Target> targets = new ArrayList<Target>();
     		
     		targets.add( new Target( Environment.getNetwork() ) );
+    		targets.add( new Target( Environment.getNetwork().getLoacalAddress(), null ) );
     		targets.add( null );
     		    		
     		mTargetAdapter = new TargetAdapter( R.layout.target_list_item, targets );
-    		
+	    	
     		mListView.setAdapter( mTargetAdapter );
     	}
     	catch( Exception e )
     	{
     		new FatalDialog( "Error", e.getMessage(), this ).show();
     	}
+	}
+	
+	@Override
+	public void onDestroy() {		
+		// make sure no zombie process is running before destroying the activity
+		Environment.clean();
+		
+		super.onDestroy();
 	}
 }

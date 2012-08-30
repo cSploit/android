@@ -27,7 +27,7 @@
         android:layout_toRightOf="@id/itemIcon"
         android:gravity="center_vertical"
         android:textColor="#FFFFFF"
-        android:textSize="22dp" />
+        android:textSize="15dp" />
 
     <Button
         android:id="@+id/scanButton"

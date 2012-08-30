@@ -20,11 +20,12 @@ package it.evilsocket.dsploit.plugins.mitm;
 
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.system.Environment;
-import it.evilsocket.dsploit.tools.Ettercap;
+import it.evilsocket.dsploit.system.Shell.OutputReceiver;
+import it.evilsocket.dsploit.tools.ArpSpoof;
+import it.evilsocket.dsploit.tools.TcpDump;
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ProgressBar;
@@ -33,12 +34,14 @@ import android.widget.ToggleButton;
 
 public class Sniffer extends Activity 
 {
+	private static final String  PCAP_FILTER 	 = "not '(src host localhost or dst host localhost or arp)'";
+
 	private ToggleButton mSniffToggleButton = null;
 	private ProgressBar	 mSniffProgress     = null;
 	private TextView	 mSniffText			= null;		
-	private Ettercap	 mEttercap			= null;
-	private boolean	     mRunning			= false;
-	private Handler		 mHandler			= null;
+	private boolean	     mRunning			= false;	
+	private ArpSpoof     mArpSpoof			= null;
+	private TcpDump	     mTcpDump			= null;
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        
@@ -48,8 +51,12 @@ public class Sniffer extends Activity
         mSniffToggleButton = ( ToggleButton )findViewById( R.id.sniffToggleButton );
         mSniffProgress	   = ( ProgressBar )findViewById( R.id.sniffActivity );
         mSniffText		   = ( TextView )findViewById( R.id.sniffData );
-        mEttercap		   = new Ettercap( this );
         
+        mSniffText.setEnabled(false);
+        
+        mArpSpoof = new ArpSpoof( this );
+        mTcpDump  = new TcpDump( this );
+                
         mSniffToggleButton.setOnClickListener( new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -63,30 +70,92 @@ public class Sniffer extends Activity
 				}
 			}} 
 		);        
-        
-        mHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-            	String text = msg.obj.toString();
-
-            	if( mSniffText.getText().length() > 50 )
-            		mSniffText.setText("");
-            	
-            	mSniffText.append( text + "\n" );
-            }
-        };
 	}
 
-	private void setStoppedState( ) {
-		mEttercap.kill();
+	private void setStoppedState( ) {		
+		mArpSpoof.kill();
+		mTcpDump.kill();
+
 		mSniffProgress.setVisibility( View.INVISIBLE );
+		
 		mRunning = false;
-		mSniffToggleButton.setChecked( false );                	
+		mSniffToggleButton.setChecked( false );                			
 	}
 
 	private void setStartedState( ) {		
-		final Ettercap ettercap = mEttercap;
+		// never say never :)
+		mArpSpoof.kill();
+		mTcpDump.kill();
+		
+		final ArpSpoof spoof = mArpSpoof;
+		final TcpDump  dump  = mTcpDump;
+		
+		Environment.setForwarding( true );
+		
+		new Thread( new Runnable(){
+			@Override
+			public void run() {
+				OutputReceiver receiver = new OutputReceiver(){
+					@Override
+					public void onStart(String command) {
+						// TODO Auto-generated method stub						
+					}
 
+					@Override
+					public void onNewLine(String line) {
+						// arpspoof sometimes goes segfault, restart it just in case :P
+						if( line.trim().toLowerCase().contains("segmentation fault") )
+						{
+							Log.w( "ARPSPOOF", "Restarting arpspoof after SEGFAULT" );
+							spoof.spoof( Environment.getTarget(), this );
+						}
+					}
+
+					@Override
+					public void onEnd(int exitCode) {
+						// TODO Auto-generated method stub						
+					}
+				};
+					
+				spoof.spoof( Environment.getTarget(), receiver );
+			} 
+		}).start();
+		
+		new Thread( new Runnable(){
+			@Override
+			public void run() {
+				dump.sniff( PCAP_FILTER, new OutputReceiver(){
+					@Override
+					public void onStart(String command) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void onNewLine(String line) {
+						// TODO: Parse the line for a better output displaying
+						final String entry = line;
+						
+						Sniffer.this.runOnUiThread( new Runnable() {
+							@Override
+							public void run(){
+								
+								if( mSniffText.getText().length() > 4096 )
+									mSniffText.setText("");
+								
+				            	mSniffText.append( entry + "\n" );
+							}							
+						});									
+					}
+
+					@Override
+					public void onEnd(int exitCode) {
+						// TODO Auto-generated method stub						
+					}});
+			} 
+		}).start();
+
+		mSniffProgress.setVisibility( View.VISIBLE );
 		mRunning = true;
 	}
 	

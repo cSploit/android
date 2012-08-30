@@ -21,9 +21,7 @@ package it.evilsocket.dsploit.tools;
 import android.content.Context;
 
 public class Hydra extends Tool
-{
-	private static final String TAG = "HYDRA";
-	
+{	
 	public Hydra( Context context ){
 		super( "hydra/hydra", context );		
 	}

@@ -18,10 +18,12 @@
  */
 package it.evilsocket.dsploit.tools;
 
+import it.evilsocket.dsploit.system.Shell;
+import it.evilsocket.dsploit.system.Shell.OutputReceiver;
+
 import java.io.IOException;
 import android.content.Context;
-import com.stericson.RootTools.Command;
-import com.stericson.RootTools.RootTools;
+import android.util.Log;
 
 public class Tool 
 {
@@ -32,14 +34,8 @@ public class Tool
 	private String  mFileName    = null;
 	private String  mLibPath     = null;
 	private Context mAppContext  = null;
-	
-	public interface OutputReceiver
-	{
-		public void onStart( String commandLine );
-		public void onNewLine( String line );
-		public void onEnd( int exitCode );
-	}
-	
+	private boolean mCustomLibs  = true;
+
 	public Tool( String name, Context context ) {
 		// TODO: Add better file name & dir name handling with File class
 		mAppContext  = context;
@@ -53,33 +49,37 @@ public class Tool
 		mName = name;
 	}
 	
-	public void run( String args, OutputReceiver receiver ) throws IOException, InterruptedException {
-		final OutputReceiver outputReceiver = receiver;
-		
-		String  commandLine = null;
+	public void setCustomLibsUse( boolean use ){
+		mCustomLibs = use;
+	}
+	
+	public void run( String args, OutputReceiver receiver ) throws IOException, InterruptedException {		
+		String cmd = null;
 		
 		if( mAppContext != null )
-			commandLine = "LD_LIBRARY_PATH=" + mLibPath + ":$LD_LIBRARY_PATH && cd " + mDirName + " && ./" + mName + " " + args;		
+			if( mCustomLibs )
+				cmd = "LD_LIBRARY_PATH=" + mLibPath + ":$LD_LIBRARY_PATH && cd " + mDirName + " && ./" + mName + " " + args;		
+			else
+				cmd = "cd " + mDirName + " && ./" + mName + " " + args;
 		else
-			commandLine =  mName + " " + args;
-		
-		Command command = new Command( 0, commandLine )
-		{
-	        @Override
-	        public void output(int id, String line)
-	        {
-	        	outputReceiver.onNewLine(line);
-	        }
-		};
-				
-		outputReceiver.onStart( commandLine );
-		
-		int code = RootTools.getShell(true).add( command ).exitCode();
-		
-		outputReceiver.onEnd( code );
+			cmd = mName + " " + args;
+
+		Shell.exec( cmd, receiver );
 	}
 	
 	public boolean kill(){
-		return RootTools.killProcess( mName );
+		try
+		{
+			// TODO: Kill process by pid instead that by name
+			Shell.exec( "killall -9 " + mName );
+			
+			return true;
+		}
+		catch( Exception e )
+		{ 
+			Log.e( TAG, e.toString() );
+		}
+		
+		return false;
 	}
 }
