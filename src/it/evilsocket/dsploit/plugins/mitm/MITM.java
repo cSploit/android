@@ -171,7 +171,7 @@ public class MITM extends Plugin
 							{
 								Log.w( "ARPSPOOF", "Restarting arpspoof after SEGFAULT" );
 								mArpSpoof.kill();
-								mArpSpoof.spoof( Environment.getTarget(), this );
+								mArpSpoof.spoof( Environment.getTarget(), this ).start();
 							}
 						}
 
@@ -207,15 +207,15 @@ public class MITM extends Plugin
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
 			}
 		}));
-
+ /*        
+	TODO:
         mActions.add( new Action( "Traffic Redirect", "Redirect every http request to a specific website.", new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 								
 			}
 		}));
-/*        
- TODO:
+
  
         mActions.add( new Action( "Replace Images", "Replace all images on webpages with the specified one.", new OnClickListener(){
 			@Override

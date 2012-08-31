@@ -80,6 +80,8 @@ public class Sniffer extends Activity
 		mArpSpoof.kill();
 		mTcpDump.kill();
 
+		Environment.setForwarding( false );
+		
 		mSniffProgress.setVisibility( View.INVISIBLE );
 		
 		mRunning = false;
@@ -107,7 +109,7 @@ public class Sniffer extends Activity
 				{
 					Log.w( "ARPSPOOF", "Restarting arpspoof after SEGFAULT" );
 					spoof.kill();
-					spoof.spoof( Environment.getTarget(), this );
+					spoof.spoof( Environment.getTarget(), this ).start();
 				}
 			}
 

