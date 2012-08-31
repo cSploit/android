@@ -67,6 +67,24 @@ public class Tool
 		Shell.exec( cmd, receiver );
 	}
 	
+	public void run( String args ) throws IOException, InterruptedException {
+		run( args, null );
+	}
+	
+	public Thread async( String args, OutputReceiver receiver ) {
+		String cmd = null;
+		
+		if( mAppContext != null )
+			if( mCustomLibs )
+				cmd = "LD_LIBRARY_PATH=" + mLibPath + ":$LD_LIBRARY_PATH && cd " + mDirName + " && ./" + mName + " " + args;		
+			else
+				cmd = "cd " + mDirName + " && ./" + mName + " " + args;
+		else
+			cmd = mName + " " + args;
+
+		return Shell.async( cmd, receiver );
+	}
+	
 	public boolean kill(){
 		try
 		{

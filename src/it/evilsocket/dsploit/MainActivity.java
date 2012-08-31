@@ -40,10 +40,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -250,10 +255,12 @@ public class MainActivity extends Activity
 	}
 	
 	@Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);        
         setContentView( LAYOUT );
        
+        Log.d( "MAIN", "onCreate" );
+        
         new Thread( new Runnable(){
 			@Override
 			public void run() 
@@ -305,6 +312,7 @@ public class MainActivity extends Activity
     		new FatalDialog( "Error", e.getMessage(), this ).show();
     	}
 	}
+	
 	
 	@Override
 	public void onDestroy() {		
