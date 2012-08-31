@@ -18,8 +18,6 @@
  */
 package it.evilsocket.dsploit.tools;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,17 +35,16 @@ public class NMap extends Tool {
 		super( "nmap/nmap", context );		
 	}
 	
-	private class FindAliveEndpointsOutputReceiver implements OutputReceiver
+	public static abstract class FindAliveEndpointsOutputReceiver implements OutputReceiver
 	{		
 		private final Pattern IP_PATTERN  = Pattern.compile( "^nmap scan report for ([\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}).*", 			  Pattern.CASE_INSENSITIVE );
 		private final Pattern MAC_PATTERN = Pattern.compile( "^mac address: ([a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}).*", Pattern.CASE_INSENSITIVE );
 		
-		private ArrayList<Endpoint> mEndpoints   = new ArrayList<Endpoint>();
-		private String				mLastAddress = null;
-		private String				mLastMac     = null;
+		private String		  mLastAddress = null;
+		private String		  mLastMac     = null;
 		
 		public void onStart( String commandLine) {
-			Log.d( TAG, "findAliveEndpoints OnStart( " + commandLine + " )" );
+
 		}
 		
 		public void onNewLine( String line ) {						
@@ -56,14 +53,12 @@ public class NMap extends Tool {
 			if( ( matcher = IP_PATTERN.matcher( line ) ) != null && matcher.find() )
 			{
 				mLastAddress = matcher.group( 1 );
-				Log.d( TAG, "  found ip " + mLastAddress );
 			}
 			else if( ( matcher = MAC_PATTERN.matcher( line ) ) != null && matcher.find() && mLastAddress != null )
 			{
 				mLastMac = matcher.group( 1 );
-				Log.d( TAG, "  found mac " + mLastMac );
-				
-				mEndpoints.add( new Endpoint( mLastAddress, mLastMac ) );
+
+				onEndpointFound( new Endpoint( mLastAddress, mLastMac ) );
 				
 				mLastAddress = null;
 				mLastMac	 = null;
@@ -72,32 +67,13 @@ public class NMap extends Tool {
 		
 		public void onEnd( int exitCode ) {
 			// TODO: check exit code
-			Log.d( TAG, "findAliveEndpoints OnEnd( " + exitCode +" )" );
 		}
-		
-		public ArrayList<Endpoint> getEndpoints() {
-			return mEndpoints;
-		}
+
+		public abstract void onEndpointFound( Endpoint endpoint );
 	}
 	
-	public ArrayList<Endpoint> findAliveEndpoints( Network network ) {
-		
-		FindAliveEndpointsOutputReceiver receiver = new FindAliveEndpointsOutputReceiver();
-		
-		try
-		{
-			super.run( "-n -sP --system-dns " + network.getNetworkRepresentation() , receiver );
-		}
-		catch( InterruptedException ie )
-		{
-			Log.e( TAG, ie.toString() );
-		}
-		catch( IOException ioe )
-		{
-			Log.e( TAG, ioe.toString() );
-		}
-		
-		return receiver.getEndpoints();
+	public Thread findAliveEndpoints( Network network, FindAliveEndpointsOutputReceiver receiver ) {	
+		return super.async( "-n -sP --system-dns " + network.getNetworkRepresentation() , receiver );
 	}
 	
 	public static abstract class SynScanOutputReceiver implements OutputReceiver
@@ -125,18 +101,7 @@ public class NMap extends Tool {
 		public abstract void onPortFound( String port, String protocol );
 	}
 	
-	public void synScan( Target target, SynScanOutputReceiver receiver ) {		
-		try
-		{
-			super.run( "-sS -P0 --system-dns -vvv " + target.getCommandLineRepresentation() , receiver );
-		}
-		catch( InterruptedException ie )
-		{
-			Log.e( TAG, ie.toString() );
-		}
-		catch( IOException ioe )
-		{
-			Log.e( TAG, ioe.toString() );
-		}		
+	public Thread synScan( Target target, SynScanOutputReceiver receiver ) {		
+		return super.async( "-sS -P0 --system-dns -vvv " + target.getCommandLineRepresentation() , receiver );
 	}
 }

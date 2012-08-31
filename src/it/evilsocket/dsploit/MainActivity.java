@@ -33,6 +33,7 @@ import it.evilsocket.dsploit.system.Environment;
 import it.evilsocket.dsploit.system.Shell;
 import it.evilsocket.dsploit.system.ToolsInstaller;
 import it.evilsocket.dsploit.tools.NMap;
+import it.evilsocket.dsploit.tools.NMap.FindAliveEndpointsOutputReceiver;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -41,14 +42,10 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -63,6 +60,7 @@ public class MainActivity extends Activity
 	private ToolsInstaller mToolsInstaller = null;
 	private TargetAdapter  mTargetAdapter  = null;
 	private ListView	   mListView	   = null;
+	private NMap		   mNmap		   = null;
 	
 	public class TargetAdapter extends ArrayAdapter<Target> 
 	{
@@ -98,39 +96,36 @@ public class MainActivity extends Activity
 		private class TargetScanClickListener implements OnClickListener 
 		{					
 			public void onClick( View v ) {
-				final Target target = ( Target )v.getTag();
+				Target 				 target = ( Target )v.getTag();
+				final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Scanning alive endpoints ...", true, false );
 				
 				if( target.getType() == Target.Type.NETWORK ) {
-					final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Scanning alive endpoints ...", true, false );
-					final NMap 		     nmap   = new NMap( Environment.getContext() );
 					
-					new Thread(new Runnable() {
-			            public void run() {		            	
-			            	ArrayList<Endpoint> endpoints = nmap.findAliveEndpoints( target.getNetwork() );
+					mNmap.findAliveEndpoints( target.getNetwork(), new FindAliveEndpointsOutputReceiver(){						
+						@Override
+						public void onEndpointFound( Endpoint endpoint ) {
+							Target target = new Target( endpoint );
+							
+							if( hasTarget( target ) == false )
+							{
+								mTargets.add( 1, target );
+								// refresh the target listview
+		                    	MainActivity.this.runOnUiThread(new Runnable() {
+				                    @Override
+				                    public void run() {
+				                    	notifyDataSetChanged();
+				                    }
+				                });
+							}
+						}
+					
+						@Override
+						public void onEnd( int code ) {
+							dialog.dismiss();
 			            	
-			            	for( Endpoint e : endpoints )
-			            	{
-			            		Target target = new Target( e );
-			            		
-			            		if( hasTarget(target) == false )
-			            			mTargets.add( 1, target );
-			            	}
-			            			         
-			            	dialog.dismiss();
-			            	
-	                    	mSubnetScanned = true;
-	                    	
-			            	// refresh the target listview
-	                    	MainActivity.this.runOnUiThread(new Runnable() {
-			                    @Override
-			                    public void run() {
-			                    	notifyDataSetChanged();
-			                    }
-			                });
-			            }
-			        }).start();
-					
-					
+	                    	mSubnetScanned = true;	                    				            	
+						}
+					}).start();
 				}
 			}
 		}
@@ -293,6 +288,7 @@ public class MainActivity extends Activity
         Environment.registerPlugin( new MITM( ) );
         Environment.registerPlugin( new LoginCracker( ) );
         
+        mNmap	  = new NMap( this );
         mListView = ( ListView )findViewById( R.id.listView );
 	    
 	    try

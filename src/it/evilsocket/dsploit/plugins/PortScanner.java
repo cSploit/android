@@ -80,7 +80,7 @@ public class PortScanner extends Plugin
 			final String openPort  = port;
 			final String portProto = protocol;
 			
-			PortScanner.this.runOnUiThread(new Runnable() {
+			PortScanner.this.runOnUiThread( new Runnable() {
                 @Override
                 public void run() {
                 	String proto = Environment.getProtocolByPort( openPort ),
@@ -129,15 +129,8 @@ public class PortScanner extends Plugin
 	
 	private void setStartedState( ) {
 		mPortList.clear();
-		
-		final NMap 					nmap		 = mNmap;
-		final SynScanOutputReceiver scanReceiver = mScanReceiver;
-		
-		new Thread(new Runnable() {
-            public void run() {	
-            	nmap.synScan( Environment.getTarget(), scanReceiver );
-            }
-        }).start();
+
+		mNmap.synScan( Environment.getTarget(), mScanReceiver ).start();
 		
 		mRunning = true;
 	}
