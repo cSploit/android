@@ -101,7 +101,7 @@ public class Shell
 		
 		process = builder.start();
 		
-		receiver.onStart( command );
+		if( receiver != null ) receiver.onStart( command );
 		
 		writer = new DataOutputStream(process.getOutputStream());
 		reader = new BufferedReader( new InputStreamReader( process.getInputStream() ) );
@@ -113,35 +113,40 @@ public class Shell
 		
 		while( ( line = reader.readLine() ) != null )
 		{
-			receiver.onNewLine( line );
+			if( receiver != null ) receiver.onNewLine( line );
 		}
 		
 		int exit = process.waitFor();
 		
-		receiver.onEnd( exit );
+		if( receiver != null ) receiver.onEnd( exit );
 		
 		return exit;
 	}
 	
 	public static int exec( String command ) throws IOException, InterruptedException {
-		return exec( command, new OutputReceiver(){
+		return exec( command, null );
+	}
+	
+	public static Thread async( String command, OutputReceiver receiver ) {
+		final String 		 fCommand  = command;
+		final OutputReceiver fReceiver = receiver;
+		
+		return new Thread( new Runnable(){
 			@Override
-			public void onStart(String command) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void onNewLine(String line) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void onEnd(int exitCode) {
-				// TODO Auto-generated method stub
-				
+			public void run() {
+				try
+				{
+					exec( fCommand, fReceiver );
+				}
+				catch( Exception e )
+				{
+					Log.e( TAG, e.toString() );
+				}
 			}} 
 		);
+	}
+	
+	public static Thread async( String command ) {
+		return async( command, null );
 	}
 }

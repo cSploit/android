@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,6 +32,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.system.Environment;
@@ -153,32 +155,31 @@ public class MITM extends Plugin
 				if( activity.getVisibility() == View.INVISIBLE )
 				{
 					activity.setVisibility( View.VISIBLE );
+					
+					Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
 
-					new Thread( new Runnable(){
+					Environment.setForwarding( false );
+
+					OutputReceiver receiver = new OutputReceiver(){
 						@Override
-						public void run() {
-							Environment.setForwarding( false );
-							mArpSpoof.spoof( Environment.getTarget(), new OutputReceiver(){
+						public void onStart(String command) { }
 
-								@Override
-								public void onStart(String command) {
-									// TODO Auto-generated method stub
-									
-								}
+						@Override
+						public void onNewLine( String line ) {
+							// arpspoof sometimes goes segfault, restart it just in case :P
+							if( line.trim().toLowerCase().contains("segmentation fault") )
+							{
+								Log.w( "ARPSPOOF", "Restarting arpspoof after SEGFAULT" );
+								mArpSpoof.kill();
+								mArpSpoof.spoof( Environment.getTarget(), this );
+							}
+						}
 
-								@Override
-								public void onNewLine(String line) {
-									// TODO Auto-generated method stub
-									
-								}
-
-								@Override
-								public void onEnd(int exitCode) {
-									// TODO Auto-generated method stub
-									
-								}} );							
-						}} 
-					).start();									
+						@Override
+						public void onEnd(int exitCode) { }
+					};
+					
+					mArpSpoof.spoof( Environment.getTarget(), receiver ).start();											
 				}
 				else
 				{
@@ -192,9 +193,18 @@ public class MITM extends Plugin
 		}));
         
         mActions.add( new Action( "Password & Cookies", "Sniff cookies, http, ftp and web passwords from the target.", new OnClickListener(){
-			@Override
-			public void onClick(View v) {
-								
+        	@Override
+			public void onClick( View v ) 
+			{
+				startActivity
+                ( 
+                  new Intent
+                  ( 
+                	MITM.this, 
+                	PasswordSniffer.class
+                  ) 
+                );
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
 			}
 		}));
 
