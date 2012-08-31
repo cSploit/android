@@ -22,6 +22,8 @@ import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import android.util.Log;
+
 public class Endpoint 
 {
 	private InetAddress mAddress  = null;
@@ -41,6 +43,10 @@ public class Endpoint
         return parsed;
     }
 	
+	public Endpoint( String address ){
+		this( address, null );
+	}
+	
 	public Endpoint( InetAddress address, byte[] hardware ) {
 		mAddress  = address;
 		mHardware = hardware;
@@ -54,6 +60,7 @@ public class Endpoint
 		}
 		catch( UnknownHostException e )
 		{
+			Log.e( "ENDPOINT", e.toString() );
 			mAddress = null;
 		}
 	}
@@ -76,5 +83,9 @@ public class Endpoint
 	
 	public void setHardware( byte[] hardware ) {
 		this.mHardware = hardware;
+	}
+	
+	public String toString(){
+		return mAddress.toString().substring(1);
 	}
 }

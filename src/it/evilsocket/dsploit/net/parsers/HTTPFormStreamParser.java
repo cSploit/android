@@ -68,7 +68,7 @@ public class HTTPFormStreamParser extends StreamParser
 	
 	@Override
 	public String getCredentials(){
-		return "POST : " + mHostname + mPage + " > '" + mData + "'";
+		return mStream.endpoint.getAddress().toString().substring(1) + " -> " + mStream + " POST :\nhttp://" + mHostname + mPage + " > '" + mData + "'";
 	}
 	
 	@Override

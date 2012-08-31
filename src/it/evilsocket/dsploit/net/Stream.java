@@ -47,14 +47,16 @@ public class Stream
 		}
 	}
 	
-	public String        address = "";
-	public Type    	     type    = Type.UNKNOWN;
-	public StringBuilder data    = null;
+	public Endpoint		 endpoint = null;
+	public String        address  = "";
+	public Type    	     type     = Type.UNKNOWN;
+	public StringBuilder data     = null;
 	
-	public Stream( String address, Type type ){
-		this.address = address;
-		this.type	 = type;
-		this.data	 = new StringBuilder();
+	public Stream( Endpoint endpoint, String address, Type type ){
+		this.endpoint = endpoint;
+		this.address  = address;
+		this.type	  = type;
+		this.data	  = new StringBuilder();
 	}
 
 	public String toString(){
