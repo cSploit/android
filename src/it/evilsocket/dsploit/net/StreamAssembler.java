@@ -73,11 +73,12 @@ public class StreamAssembler
 			// get or create the corresponding stream
 			if( ( mMatch = TYPE_PATTERN.matcher( line ) ) != null && mMatch.find() )
 			{				
-				String source = mMatch.group( 1 ),
-					   sport  = mMatch.group( 2 ),
-					   dest   = mMatch.group( 3 ),
-					   dport  = mMatch.group( 4 ),
-					   server = null;
+				String source   = mMatch.group( 1 ),
+					   sport    = mMatch.group( 2 ),
+					   dest     = mMatch.group( 3 ),
+					   dport    = mMatch.group( 4 ),
+					   server   = null,
+					   endpoint = null;
 				
 				Stream.Type type = Stream.Type.UNKNOWN;
 				
@@ -85,13 +86,15 @@ public class StreamAssembler
 				{
 					if( Environment.getNetwork().isInternal( source ) )
 					{
-						server = dest;
-						type   = Stream.Type.fromString( dport );			
+						endpoint = source;
+						server   = dest;
+						type     = Stream.Type.fromString( dport );			
 					}
 					else
 					{
-						server = source;
-						type   = Stream.Type.fromString( sport );		
+						endpoint = dest;
+						server   = source;
+						type     = Stream.Type.fromString( sport );		
 					}
 				}
 				catch( SocketException e )
@@ -116,7 +119,7 @@ public class StreamAssembler
 					{
 						List<StreamParser> streamParsers = new ArrayList<StreamParser>();
 						
-						mCurrent = new Stream( server, type );
+						mCurrent = new Stream( new Endpoint( endpoint ), server, type );
 						mStreams.put( key, mCurrent );
 						
 						for( StreamParser parser : mAvailableParsers )

@@ -61,7 +61,7 @@ public class HTTPCookieStreamParser extends StreamParser
 	
 	@Override
 	public String getCredentials(){
-		return "COOKIES : " + mHostname + " > '" + mCookie + "'";
+		return mStream.endpoint.getAddress().toString().substring(1) + " -> " + mStream + " COOKIES :\nhttp://" + mHostname + " > '" + mCookie + "'";
 	}
 	
 	@Override
