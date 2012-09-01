@@ -20,9 +20,6 @@ package it.evilsocket.dsploit.plugins.mitm;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.net.Stream;
@@ -31,23 +28,18 @@ import it.evilsocket.dsploit.system.Shell.OutputReceiver;
 import it.evilsocket.dsploit.tools.ArpSpoof;
 import it.evilsocket.dsploit.tools.TcpDump;
 import it.evilsocket.dsploit.tools.TcpDump.PasswordReceiver;
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
-import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 public class PasswordSniffer extends Activity 
