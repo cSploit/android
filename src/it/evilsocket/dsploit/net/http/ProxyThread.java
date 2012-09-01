@@ -79,6 +79,7 @@ public class ProxyThread extends Thread
 	}
 	
 	public void run() {
+		Log.d( TAG, "New connection from " + mSocket.getLocalAddress() );
 		
 		try 
 		{						

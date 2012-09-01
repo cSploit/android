@@ -25,14 +25,17 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.util.Log;
 
 public class StreamThread implements Runnable
 {
-	private final static String TAG         = "STREAMTHREAD";
-    private final static int    BUFFER_SIZE = 1024;
-    private final static int    TIMEOUT     = 20;
+	private final static String  TAG            = "PROXYSTREAMTHREAD";
+	private final static Pattern LENGTH_PATTERN = Pattern.compile( "Content-Length:\\s+(\\d+)", Pattern.CASE_INSENSITIVE );
+    private final static int     BUFFER_SIZE    = 1024;
+    private final static int     TIMEOUT        = 20;
     
     private Socket			  mSocket = null;
     private InputStream       mReader = null;
@@ -91,20 +94,26 @@ public class StreamThread implements Runnable
 			byte[] response = data.getBytes();
 						
 			// do we have html ?
-			if( data.toLowerCase().contains( "content-type: text/html" ) )
+			if( data.toLowerCase().contains( "content-type: text/html" ) && mFilter != null )
 			{
 				String[] split   = data.split( "<", 2 );
 				String   headers = split[ 0 ],
 						 body	 = ( split.length > 1 ? split[ 1 ] : "" );
-				int      length  = body.length();
+				int      length  = body.length(),
+						 clength = 0;				
+				Matcher	 match   = LENGTH_PATTERN.matcher( headers );
 				
-				if( mFilter != null )
-    				body = mFilter.onHtmlReceived( body );
+				body = mFilter.onHtmlReceived( body );
+				
+				if( match != null && match.find() )				
+					clength = Integer.parseInt( match.group( 1 ) );
+				else
+					clength = length;
 				
 				// patch content-length
-				if( body.length() != length )
-				{
-					headers = headers.replace( "" + length, "" + body.length() );
+				if( body.length() != clength )
+				{					
+					headers = headers.replaceAll( "Content-Length: \\d+", "Content-Length: " + clength );					
 				}
 				
 				response = ( headers + "<" + body ).getBytes();

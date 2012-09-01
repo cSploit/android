@@ -43,11 +43,20 @@ public class Proxy implements Runnable
 		public String onHtmlReceived( String html );
 	}
 	
-	public Proxy( String address, int port ) throws UnknownHostException, IOException {
-		mAddress = InetAddress.getByName( address );
+	public Proxy( InetAddress address, int port ) throws UnknownHostException, IOException {
+		mAddress = address;
 		mPort	 = port;
 		mSocket  = new ServerSocket( mPort, BACKLOG, mAddress );		
 		mFilters = new ArrayList<ProxyFilter>();
+	}
+	
+	public Proxy( String address, int port ) throws UnknownHostException, IOException {
+		this( InetAddress.getByName( address ), port );
+	}
+	
+	public void setFilter( ProxyFilter filter ){
+		mFilters.clear();
+		mFilters.add( filter );
 	}
 	
 	public void addFilter( ProxyFilter filter ){
@@ -59,6 +68,8 @@ public class Proxy implements Runnable
 	}
 	
 	public void run() {
+		
+		Log.d( TAG, "Proxy started on " + mAddress + ":" + mPort );
 		
 		mRunning = true;
 		

