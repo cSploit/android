@@ -43,7 +43,7 @@ public class StreamAssembler
 	
 	public static abstract class NewCredentialHandler
 	{
-		public abstract void onNewCredentials( String data );
+		public abstract void onNewCredentials( Stream stream, String data );
 	}
 		
 	private ArrayList<StreamParser> 	   mAvailableParsers = null;
@@ -156,7 +156,7 @@ public class StreamAssembler
 				    // last data line the parser needs ?
 				    if( parser.isComplete() )
 				    {
-				    	mHandler.onNewCredentials( parser.getCredentials() );
+				    	mHandler.onNewCredentials( parser.getStream(), parser.getData() );
 				    }
 				}
 			}

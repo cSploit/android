@@ -26,7 +26,6 @@ public class HTTPFormStreamParser extends StreamParser
 	private static final String HTTP_TOKEN      = "HTTP/1.";
 	private static final String HOST_TOKEN	    = "Host: ";
 	
-	@SuppressWarnings("unused")
 	private Stream  mStream   = null;
 	private String  mPage	  = null;
 	private String  mHostname = null;
@@ -65,10 +64,15 @@ public class HTTPFormStreamParser extends StreamParser
 	public boolean isComplete(){
 		return mComplete;
 	}
+
+	@Override
+	public Stream getStream(){
+		return mStream;
+	}
 	
 	@Override
-	public String getCredentials(){
-		return mStream.endpoint.getAddress().toString().substring(1) + " -> " + mStream + " POST :\nhttp://" + mHostname + mPage + " > '" + mData + "'";
+	public String getData(){
+		return "POST http://" + mHostname + mPage + " > '" + mData + "'";
 	}
 	
 	@Override

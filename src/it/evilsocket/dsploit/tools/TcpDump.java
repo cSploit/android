@@ -18,6 +18,7 @@
  */
 package it.evilsocket.dsploit.tools;
 
+import it.evilsocket.dsploit.net.Stream;
 import it.evilsocket.dsploit.net.StreamAssembler;
 import it.evilsocket.dsploit.net.parsers.FTPStreamParser;
 import it.evilsocket.dsploit.net.parsers.HTTPCookieStreamParser;
@@ -28,9 +29,7 @@ import android.content.Context;
 import android.util.Log;
 
 public class TcpDump extends Tool
-{
-	private static final String TAG = "TCPDUMP";
-	
+{	
 	public TcpDump( Context context ){
 		super( "tcpdump/tcpdump", context );		
 		// tcpdump is statically linked
@@ -47,7 +46,6 @@ public class TcpDump extends Tool
 
 	public static abstract class PasswordReceiver implements OutputReceiver
 	{		
-		@SuppressWarnings("unused")
 		private StreamAssembler mAssembler = null;
 		
 		public void onStart( String commandLine ) { 
@@ -55,8 +53,8 @@ public class TcpDump extends Tool
 			
 			mAssembler = new StreamAssembler( new StreamAssembler.NewCredentialHandler(){
 				@Override
-				public void onNewCredentials(String data) {
-					onAccountFound( data );
+				public void onNewCredentials( Stream stream, String data ) {
+					onAccountFound( stream, data );
 				}} 
 			);
 			
@@ -73,7 +71,7 @@ public class TcpDump extends Tool
 			Log.d( "PasswordReceiver", "Ended with exit code '" + exitCode +"'" );
 		}
 		
-		public abstract void onAccountFound( String data );
+		public abstract void onAccountFound( Stream stream, String data );
 	}
 	
 	public Thread sniffPasswords( String filter, PasswordReceiver receiver ) {

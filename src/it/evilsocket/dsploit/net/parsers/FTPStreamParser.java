@@ -58,8 +58,13 @@ public class FTPStreamParser extends StreamParser
 	}
 	
 	@Override
-	public String getCredentials(){
-		return mStream.endpoint.getAddress().toString().substring(1) + " -> " + mStream + " :\n" + mStream + " > USERNAME='" + mUsername + "' PASSWORD='" + mPassword + "'";
+	public Stream getStream(){
+		return mStream;
+	}
+	
+	@Override
+	public String getData(){
+		return mStream + " > USERNAME='" + mUsername + "' PASSWORD='" + mPassword + "'";
 	}
 	
 	@Override

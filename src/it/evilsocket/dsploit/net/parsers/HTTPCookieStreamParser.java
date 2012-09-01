@@ -26,7 +26,6 @@ public class HTTPCookieStreamParser extends StreamParser
 	private static final String HOST_TOKEN	    = "Host: ";
 	private static final String COOKIE_TOKEN    = "Cookie: ";
 	
-	@SuppressWarnings("unused")
 	private Stream  mStream   = null;
 	private String  mHostname = null;
 	private String  mCookie   = "";
@@ -60,8 +59,13 @@ public class HTTPCookieStreamParser extends StreamParser
 	}
 	
 	@Override
-	public String getCredentials(){
-		return mStream.endpoint.getAddress().toString().substring(1) + " -> " + mStream + " COOKIES :\nhttp://" + mHostname + " > '" + mCookie + "'";
+	public Stream getStream(){
+		return mStream;
+	}
+	
+	@Override
+	public String getData(){
+		return "COOKIES http://" + mHostname + " > '" + mCookie + "'";
 	}
 	
 	@Override
