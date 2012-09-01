@@ -28,8 +28,9 @@ public abstract class StreamParser
 	public abstract boolean canParseStream( Stream stream );
 	
 	public abstract boolean isComplete();
-	
-	public abstract String getCredentials();
-		
+			
 	public abstract StreamParser clone();	
+	
+	public abstract Stream getStream();
+	public abstract String getData();
 }
