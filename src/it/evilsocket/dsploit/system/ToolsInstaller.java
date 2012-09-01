@@ -29,10 +29,18 @@ import java.util.zip.ZipInputStream;
 
 public class ToolsInstaller 
 {
+	private final static String   TAG			   = "TOOLSINSTALLER";
 	private final static String   TOOLS_FILENAME   = "tools.zip";
 	private final static int      BUFFER_SIZE      = 4096;
 	private final static String[] INSTALL_COMMANDS = {
 		"chmod 777 {PATH}/*/",
+		"chmod 777 {PATH}/ettercap/share",
+		"chmod 777 {PATH}/ettercap/share/*",
+		"chmod 777 {PATH}/ettercap/filters",
+		"chmod 777 {PATH}/ettercap/filters/*",
+		"chmod 755 {PATH}/ettercap/ettercap",
+		"chmod 755 {PATH}/ettercap/etterfilter",
+		"chmod 755 {PATH}/ettercap/etterlog",
 		"chmod 755 {PATH}/nmap/nmap",
 		"chmod 755 {PATH}/arpspoof/arpspoof",
 		"chmod 755 {PATH}/tcpdump/tcpdump",
@@ -57,6 +65,8 @@ public class ToolsInstaller
 	
 	public boolean install( )
 	{
+		Log.d( TAG, "Installing tools ..." );
+		
 		ZipInputStream   zipInput;
 		ZipEntry 		 zipEntry;
 	    byte[] 		     buffer = new byte[ BUFFER_SIZE ];
