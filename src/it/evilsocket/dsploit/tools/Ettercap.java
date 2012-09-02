@@ -38,7 +38,6 @@ public class Ettercap extends Tool
 	{
 		@Override
 		public void onStart(String command) {
-			// TODO Auto-generated method stub
 			
 		}
 
@@ -50,7 +49,6 @@ public class Ettercap extends Tool
 
 		@Override
 		public void onEnd(int exitCode) {
-			// TODO Auto-generated method stub
 			
 		}
 		

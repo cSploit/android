@@ -25,15 +25,12 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import android.util.Log;
 
 public class StreamThread implements Runnable
 {
 	private final static String  TAG            = "PROXYSTREAMTHREAD";
-	private final static Pattern LENGTH_PATTERN = Pattern.compile( "Content-Length:\\s+(\\d+)", Pattern.CASE_INSENSITIVE );
     private final static int     BUFFER_SIZE    = 1024;
     private final static int     TIMEOUT        = 20;
     
@@ -60,15 +57,55 @@ public class StreamThread implements Runnable
     	new Thread( this ).start();
     }
     
-    public StreamThread( Socket socket, InputStream reader, OutputStream writer ){
-    	this( socket, reader, writer, null );
+    // return first + second[ 0..length ]
+    private static byte[] streamAppend( byte[] first, byte[] second, int length ){
+		byte[] stream = null,
+			   chunk  = Arrays.copyOfRange( second, 0, length );
+		int    i, j;
+		
+		if( first == null )
+			stream = chunk;
+		
+		else
+		{
+			stream = new byte[ first.length + length ];
+						
+			for( i = 0; i < first.length; i++ )
+				stream[i] = first[i];
+			
+			for( j = 0; j < length; i++, j++ )
+				stream[i] = chunk[j];
+		}
+		
+		return stream;
+	}
+    
+    // return the index of the first occurrence of pattern inside stream
+    private static int streamIndexOf( byte[] stream, byte[] pattern ){
+    	boolean match = false;
+    	int     i, j;
+    	
+    	for( i = 0; i < stream.length; i++ )
+    	{
+    		match = true;
+    		
+    		for( j = 0; j < pattern.length && match && ( i + j ) < stream.length; j++ )
+    		{
+    			if( stream[ i + j ] != pattern[ j ] )
+    				match = false;
+    		}
+    		
+    		if( match ) return i;
+    	}
+    	
+    	return -1;
     }
     
     public void run() {
     	
-    	int    read     = -1;
-    	StringBuilder builder = new StringBuilder();
-    	byte[] buffer   = new byte[ BUFFER_SIZE ];
+    	int    read   = -1;
+    	byte[] stream = null,
+    		   buffer = new byte[ BUFFER_SIZE ];
     	
     	try 
     	{
@@ -79,7 +116,10 @@ public class StreamThread implements Runnable
     			{
     				if( ( read = mReader.read( buffer, 0, BUFFER_SIZE ) ) != -1 )
     				{
-    					builder.append( new String( Arrays.copyOfRange( buffer, 0, read ) ) );
+    					// since we don't know yet if we have a binary or text stream,
+    					// use only a byte array buffer instead of a string builder to
+    					// avoid encoding corruption
+    					stream = streamAppend( stream, buffer, read );
     				}
     				else
     					break;
@@ -89,37 +129,31 @@ public class StreamThread implements Runnable
     				
     			}
     		}
-    		
-			String data 	= builder.toString();
-			byte[] response = data.getBytes();
-						
+    								
 			// do we have html ?
-			if( data.toLowerCase().contains( "content-type: text/html" ) && mFilter != null )
+			if( streamIndexOf( stream, "text/html".getBytes() ) != -1 )
 			{
+				// split headers and body, then apply the filter				
+				String   data    = new String( stream );
 				String[] split   = data.split( "<", 2 );
 				String   headers = split[ 0 ],
-						 body	 = ( split.length > 1 ? split[ 1 ] : "" );
-				int      length  = body.length(),
-						 clength = 0;				
-				Matcher	 match   = LENGTH_PATTERN.matcher( headers );
+						 body	 = ( split.length > 1 ? split[ 1 ] : "" ),
+						 patched = "";
 				
 				body = mFilter.onHtmlReceived( body );
-				
-				if( match != null && match.find() )				
-					clength = Integer.parseInt( match.group( 1 ) );
-				else
-					clength = length;
-				
-				// patch content-length
-				if( body.length() != clength )
-				{					
-					headers = headers.replaceAll( "Content-Length: \\d+", "Content-Length: " + clength );					
+
+				// remove explicit content length, just in case the body changed after filtering				
+				for( String header : headers.split("\n") )
+				{
+					if( header.toLowerCase().contains("content-length") == false )
+						patched += header + "\n";
 				}
 				
-				response = ( headers + "<" + body ).getBytes();
+				headers = patched;				
+				stream  = ( headers + "<" + body ).getBytes();				
 			}
-
-			mWriter.write( response );    			    			
+			
+			mWriter.write( stream );    			    			
 			mWriter.flush();
 		} 
     	catch( IOException e ) 

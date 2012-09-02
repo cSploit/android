@@ -33,9 +33,16 @@ public class InputDialog extends AlertDialog
 	}
 	
 	public InputDialog( String title, String message, Activity activity, InputDialogListener inputDialogListener ){
+		this( title, message, null, activity, inputDialogListener );
+	}
+	
+	public InputDialog( String title, String message, String text, Activity activity, InputDialogListener inputDialogListener ){
 		super( activity );
 		
 		mEditText = new EditText( activity );
+		
+		if( text != null )
+			mEditText.setText(text);
 		
 		this.setTitle( title );
 		this.setMessage( message );
