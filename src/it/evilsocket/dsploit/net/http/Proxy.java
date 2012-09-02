@@ -105,15 +105,6 @@ public class Proxy implements Runnable
 			}
 			
 			Log.d( TAG, "Proxy stopped." );
-			
-			try
-			{
-				mSocket.close();
-			}
-			catch( IOException e )
-			{
-				Log.e( TAG, e.toString() );
-			}
 		}
 		catch( IOException e )
 		{
