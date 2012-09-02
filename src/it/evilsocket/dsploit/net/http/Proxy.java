@@ -64,32 +64,56 @@ public class Proxy implements Runnable
 	}
 		
 	public void stop() {
+		Log.d( TAG, "Stopping proxy ..." );
+		
+		try 
+		{
+			mSocket.close();
+		} 
+		catch( IOException e )
+		{
+
+		}
+		
 		mRunning = false;
+		mSocket  = null;
 	}
 	
 	public void run() {
 		
-		Log.d( TAG, "Proxy started on " + mAddress + ":" + mPort );
-		
-		mRunning = true;
-		
-		while( mRunning )
+		try
 		{
+			if( mSocket == null )
+				mSocket = new ServerSocket( mPort, BACKLOG, mAddress );		
+			
+			Log.d( TAG, "Proxy started on " + mAddress + ":" + mPort );
+			
+			mRunning = true;
+			
+			while( mRunning )
+			{
+				try
+				{
+					Socket client = mSocket.accept();
+					
+					new ProxyThread( client, mFilters ).start();
+				}
+				catch( IOException e )
+				{
+					Log.e( TAG, e.toString() );
+				}
+			}
+			
+			Log.d( TAG, "Proxy stopped." );
+			
 			try
 			{
-				Socket client = mSocket.accept();
-				
-				new ProxyThread( client, mFilters ).start();
+				mSocket.close();
 			}
 			catch( IOException e )
 			{
 				Log.e( TAG, e.toString() );
 			}
-		}
-		
-		try
-		{
-			mSocket.close();
 		}
 		catch( IOException e )
 		{

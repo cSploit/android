@@ -79,7 +79,6 @@ public class ProxyThread extends Thread
 	}
 	
 	public void run() {
-		Log.d( TAG, "New connection from " + mSocket.getLocalAddress() );
 		
 		try 
 		{						
@@ -88,35 +87,27 @@ public class ProxyThread extends Thread
 			
 			for( String line : request.split("\n" ) )
 			{
-				// Just for debugging purpose, when using this class as non trasparent http proxy.
-				if( line.startsWith("GET http://") || line.startsWith("POST http://") )
-				{					
-					line = line.substring( 0, line.indexOf(' ') + 1 ) + 
-						   line.substring( line.indexOf( '/', line.indexOf( "http://") + "http://".length() ) );					    
-				}
-				else if( line.contains("Proxy-Connection") )
-					line = line.replace( "Proxy-Connection", "Connection" );
-				
-				// Set encoding to deflate since we are not handling gziped streams
+				// Set encoding to identity since we are not handling gzipped streams
 				if( line.contains("Accept-Encoding") )
-					line = "Accept-Encoding: deflate";
+					line = "Accept-Encoding: identity";
 				// Can't easily handle keep alive connections with blocking sockets
 				else if( line.contains("keep-alive") )
-					line = "Connection: close";
+				 	line = "Connection: close";
 				// Exctract the real request target and connect to it.
 				else if( line.contains( HOST_TOKEN ) )
 				{					
-					mServerName = line.substring( line.indexOf( HOST_TOKEN ) + HOST_TOKEN.length() ).trim();	
-									
+					mServerName   = line.substring( line.indexOf( HOST_TOKEN ) + HOST_TOKEN.length() ).trim();										
 					mServer 	  = new Socket( mServerName, SERVER_PORT );
 					mServerReader = new BufferedInputStream( mServer.getInputStream() ); 
-					mServerWriter = new BufferedOutputStream( mServer.getOutputStream() );					
+					mServerWriter = new BufferedOutputStream( mServer.getOutputStream() );		
+					
+					Log.d( TAG, mSocket.getLocalAddress() + " > " + mServerName );
 				}
 				
 				// build the patched request
 				builder.append( line + "\n" );
 			}
-				
+							
 			// any real host found ?
 			if( mServer != null )
 			{				
@@ -128,6 +119,7 @@ public class ProxyThread extends Thread
 					@Override
 					public String onHtmlReceived( String html ) 
 					{	
+						// apply each provided filter
 						for( Proxy.ProxyFilter filter : mFilters )
 						{
 							html = filter.onHtmlReceived( html );

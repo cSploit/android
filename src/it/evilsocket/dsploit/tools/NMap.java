@@ -66,7 +66,8 @@ public class NMap extends Tool {
 		}
 		
 		public void onEnd( int exitCode ) {
-			// TODO: check exit code
+			if( exitCode != 0 )
+				Log.e( TAG, "nmap exited with code " + exitCode );
 		}
 
 		public abstract void onEndpointFound( Endpoint endpoint );
@@ -94,8 +95,8 @@ public class NMap extends Tool {
 		}
 		
 		public void onEnd( int exitCode ) {
-			// TODO: check exit code
-			Log.d( TAG, "synScan OnEnd( " + exitCode +" )" );
+			if( exitCode != 0 )
+				Log.e( TAG, "nmap exited with code " + exitCode );
 		}
 		
 		public abstract void onPortFound( String port, String protocol );

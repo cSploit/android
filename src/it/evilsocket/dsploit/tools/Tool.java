@@ -21,6 +21,7 @@ package it.evilsocket.dsploit.tools;
 import it.evilsocket.dsploit.system.Shell;
 import it.evilsocket.dsploit.system.Shell.OutputReceiver;
 
+import java.io.File;
 import java.io.IOException;
 import android.content.Context;
 import android.util.Log;
@@ -29,6 +30,7 @@ public class Tool
 {
 	private static final String TAG = "Tool";
 	
+	private File    mFile		 = null;
 	private String  mName 		 = null;
 	private String  mDirName	 = null;
 	private String  mFileName    = null;
@@ -37,12 +39,12 @@ public class Tool
 	private boolean mCustomLibs  = true;
 
 	public Tool( String name, Context context ) {
-		// TODO: Add better file name & dir name handling with File class
-		mAppContext  = context;
-		mName        = name.substring( name.lastIndexOf('/') + 1 );
-		mFileName    = mAppContext.getFilesDir().getAbsolutePath() + "/tools/" + name;
-		mDirName	 = mFileName.substring( 0, mFileName.lastIndexOf('/') );
-		mLibPath     = mAppContext.getFilesDir().getAbsolutePath() + "/tools/libs";
+		mAppContext = context;
+		mLibPath	= mAppContext.getFilesDir().getAbsolutePath() + "/tools/libs";
+		mFileName   = mAppContext.getFilesDir().getAbsolutePath() + "/tools/" + name;
+		mFile	    = new File( mFileName );
+		mName		= mFile.getName();
+		mDirName	= mFile.getParent();
 	}
 	
 	public Tool( String name ){
@@ -89,6 +91,11 @@ public class Tool
 		try
 		{
 			// TODO: Kill process by pid instead that by name
+			
+			// Some processes like ettercap need a sigint ( ctrl+c ) to restore previous state
+			// such as the arp table.
+			Shell.exec( "killall -SIGINT " + mName );
+			Thread.sleep( 200 );
 			Shell.exec( "killall -9 " + mName );
 			
 			return true;
