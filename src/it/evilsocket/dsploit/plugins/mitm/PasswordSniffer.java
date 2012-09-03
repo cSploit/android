@@ -18,11 +18,17 @@
  */
 package it.evilsocket.dsploit.plugins.mitm;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import it.evilsocket.dsploit.MainActivity;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
 import it.evilsocket.dsploit.net.Stream;
 import it.evilsocket.dsploit.tools.Ettercap;
 import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
@@ -32,6 +38,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -39,12 +47,15 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 public class PasswordSniffer extends Activity 
 {
+	private static final String TAG			= "PASSWORDSNIFFER";
 	private static final String PCAP_FILTER = "not '(src host localhost or dst host localhost or arp)'";
-
+	private static final String FILENAME    = "dsploit-password-sniff.log";
+	
 	private ToggleButton       mSniffToggleButton = null;
 	private ProgressBar	       mSniffProgress     = null;
 	private ExpandableListView mListView		  = null;		
@@ -52,6 +63,10 @@ public class PasswordSniffer extends Activity
 	private boolean	           mRunning			  = false;	
 	private Ettercap           mEttercap		  = null;
 	private TcpDump	           mTcpDump			  = null;
+	private String			   mExternalStorage   = null;
+	private String			   mFileOutput		  = null;
+	private FileWriter		   mFileWriter		  = null;
+	private BufferedWriter	   mBufferedWriter	  = null;
 	
 	public class ListViewAdapter extends BaseExpandableListAdapter
 	{
@@ -170,6 +185,8 @@ public class PasswordSniffer extends Activity
         setTitle( "MITM - Password Sniffer" );
         setContentView( R.layout.plugin_mitm_password_sniffer );
         
+        mExternalStorage   = Environment.getExternalStorageDirectory().toString();
+        mFileOutput		   = ( new File( mExternalStorage, FILENAME ) ).getAbsolutePath();
         mSniffToggleButton = ( ToggleButton )findViewById( R.id.sniffToggleButton );
         mSniffProgress	   = ( ProgressBar )findViewById( R.id.sniffActivity );
         mListView		   = ( ExpandableListView )findViewById( R.id.listView );
@@ -199,6 +216,15 @@ public class PasswordSniffer extends Activity
 		mEttercap.kill();
 		mTcpDump.kill();
 
+		try
+		{
+			mBufferedWriter.close();
+		}
+		catch( IOException e )
+		{
+			Log.e( TAG, e.toString() );
+		}
+
 		System.setForwarding( false );
 		
 		mSniffProgress.setVisibility( View.INVISIBLE );
@@ -211,6 +237,19 @@ public class PasswordSniffer extends Activity
 		// never say never :)
 		mEttercap.kill();
 		mTcpDump.kill();
+		
+		try
+		{
+			// open file in appending mode
+			mFileWriter     = new FileWriter( mFileOutput, true );
+			mBufferedWriter = new BufferedWriter( mFileWriter );
+		}
+		catch( IOException e )
+		{
+			new FatalDialog( "Error", e.toString(), PasswordSniffer.this ).show();
+		}
+		
+		Toast.makeText( PasswordSniffer.this, "Logging to " + mFileOutput, Toast.LENGTH_LONG ).show();
 		
 		final Ettercap spoof = mEttercap;
 		final TcpDump  dump  = mTcpDump;
@@ -227,7 +266,16 @@ public class PasswordSniffer extends Activity
 						PasswordSniffer.this.runOnUiThread( new Runnable() {
 							@Override
 							public void run()
-							{												
+							{						
+								try
+								{
+									mBufferedWriter.write( stream.endpoint.toString() + " :\n" + data + "\n\n" );
+								}
+								catch( IOException e )
+								{
+									Log.e( TAG, e.toString() );
+								}
+								
 								mAdapter.addChild( stream.endpoint.toString(), data );
 							}							
 						});				
