@@ -71,19 +71,7 @@ public class Shell
 			} 
 			catch (IOException e) {
 				// ignore errors
-			} 
-			finally 
-			{
-				try
-				{
-					if( process != null )
-						process.destroy();
-				}
-				catch( Exception e )
-				{
-					
-				}
-			}
+			} 			
 		}
 		
 		return granted;		
