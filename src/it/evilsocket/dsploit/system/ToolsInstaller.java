@@ -32,6 +32,14 @@ public class ToolsInstaller
 	private final static String   TAG			   = "TOOLSINSTALLER";
 	private final static String   TOOLS_FILENAME   = "tools.zip";
 	private final static int      BUFFER_SIZE      = 4096;
+	public  final static String[] TOOLS 		   = {
+		"ettercap",
+		"nmap",
+		"arpspoof",
+		"tcpdump",
+		"driftnet",
+		"hydra"
+	};
 	private final static String[] INSTALL_COMMANDS = {
 		"chmod 777 {PATH}/*/",
 		"chmod 777 {PATH}/ettercap/share",

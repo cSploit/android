@@ -250,6 +250,19 @@ public class Environment
 		
 	public static void clean() {
 		setForwarding( false );
+		
+		for( String tool : ToolsInstaller.TOOLS )
+		{
+			try
+			{
+				Log.d( TAG, "Killing any running instance of " + tool + " ..." );
+				Shell.exec( "killall -9 " + tool );							
+			}
+			catch( Exception e )
+			{ 
+				Log.e( TAG, e.toString() );
+			}
+		}
 	}
 	
 }
