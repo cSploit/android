@@ -30,6 +30,7 @@ import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.plugins.LoginCracker;
 import it.evilsocket.dsploit.plugins.PortScanner;
 import it.evilsocket.dsploit.plugins.mitm.MITM;
+import it.evilsocket.dsploit.system.CrashManager;
 import it.evilsocket.dsploit.system.Environment;
 import it.evilsocket.dsploit.system.Shell;
 import it.evilsocket.dsploit.system.ToolsInstaller;
@@ -165,7 +166,7 @@ public class MainActivity extends Activity
 			{		
 				// select clicked target and go to action list activity
 				final Target target = ( ( TargetHolder )v.getTag() ).target;
-				
+	
 				Environment.setTarget( target );
 					
 				MainActivity.this.runOnUiThread( new Runnable() {
@@ -285,6 +286,9 @@ public class MainActivity extends Activity
         Environment.registerPlugin( new PortScanner( ) );
         Environment.registerPlugin( new MITM( ) );
         Environment.registerPlugin( new LoginCracker( ) );
+        
+        // register the crash manager
+        CrashManager.register( getApplicationContext() );
         
         mNmap	  = new NMap( this );
         mListView = ( ListView )findViewById( R.id.listView );
