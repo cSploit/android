@@ -65,8 +65,8 @@ public class Endpoint
 		}
 	}
 	
-	public boolean equals( Endpoint endpoint ){
-		return mAddress.equals( endpoint.getAddress() ) && ( mHardware == null ? ( mHardware == endpoint.getHardware() ) : mHardware.equals( endpoint.getHardware() ) );
+	public boolean equals( Endpoint endpoint ){		
+		return mAddress.equals( endpoint.getAddress() );
 	}
 	
 	public InetAddress getAddress() {

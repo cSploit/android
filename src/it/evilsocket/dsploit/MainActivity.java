@@ -18,6 +18,7 @@
  */
 package it.evilsocket.dsploit;
 
+import java.net.SocketException;
 import java.util.ArrayList;
 
 import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
@@ -64,9 +65,8 @@ public class MainActivity extends Activity
 	
 	public class TargetAdapter extends ArrayAdapter<Target> 
 	{
-		private int               mLayoutId 	 = 0;
-		private ArrayList<Target> mTargets  	 = null;
-		private boolean			  mSubnetScanned = false;
+		private int               mLayoutId = 0;
+		private ArrayList<Target> mTargets  = null;
 		
 		class TargetHolder
 	    {
@@ -78,7 +78,7 @@ public class MainActivity extends Activity
 		
 		public TargetAdapter( int layoutId, ArrayList<Target> targets ) {		
 	        super( MainActivity.this, layoutId, targets );
-
+	        
 	        mLayoutId = layoutId;
 	        mTargets  = targets;                
 	    }
@@ -122,8 +122,6 @@ public class MainActivity extends Activity
 						@Override
 						public void onEnd( int code ) {
 							dialog.dismiss();
-			            	
-	                    	mSubnetScanned = true;	                    				            	
 						}
 					}).start();
 				}
@@ -220,7 +218,7 @@ public class MainActivity extends Activity
 	        	holder.itemTitle.setTypeface( null, Typeface.NORMAL );
 	        	
 	        	// hide the scan button in the network item if already scanned or in other items
-	        	if( ( mSubnetScanned && target.getType() == Target.Type.NETWORK ) || target.getType() != Target.Type.NETWORK ) 
+	        	if( /* ( mSubnetScanned && target.getType() == Target.Type.NETWORK ) || */ target.getType() != Target.Type.NETWORK ) 
 	        	{
 	        		holder.scanButton.setVisibility( View.GONE );
 	        	}
@@ -248,7 +246,7 @@ public class MainActivity extends Activity
 	        return row;
 	    }
 	}
-	
+
 	@Override
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);        
@@ -293,17 +291,17 @@ public class MainActivity extends Activity
 	    
 	    try
     	{
-    		ArrayList<Target> targets = new ArrayList<Target>();
-    		
-    		targets.add( new Target( Environment.getNetwork() ) );
-    		targets.add( new Target( Environment.getNetwork().getLoacalAddress(), null ) );
-    		targets.add( null );
-    		    		
-    		mTargetAdapter = new TargetAdapter( R.layout.target_list_item, targets );
+	    	ArrayList<Target> targets = new ArrayList<Target>();
+			
+			targets.add( new Target( Environment.getNetwork() ) );
+			targets.add( new Target( Environment.getNetwork().getLoacalAddress(), null ) );
+			targets.add( null );
+
+			mTargetAdapter = new TargetAdapter( R.layout.target_list_item, targets );
 	    	
-    		mListView.setAdapter( mTargetAdapter );
+			mListView.setAdapter( mTargetAdapter );  	
     	}
-    	catch( Exception e )
+    	catch( SocketException e )
     	{
     		new FatalDialog( "Error", e.getMessage(), this ).show();
     	}

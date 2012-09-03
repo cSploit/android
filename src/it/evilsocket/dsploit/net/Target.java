@@ -154,10 +154,10 @@ public class Target {
 				return mNetwork.equals( target.getNetwork() );
 			
 			else if( mType == Type.ENDPOINT )
-				return mEndpoint.equals( target.getEndpoint() ) && mPort == target.getPort(); 
+				return mEndpoint.equals( target.getEndpoint() ); 
 			
 			else if( mType == Type.REMOTE )
-				return mHostname.equals( target.getHostname() ) && mPort == target.getPort(); 
+				return mHostname.equals( target.getHostname() ); 
 		}
 		
 		
