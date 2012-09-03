@@ -88,16 +88,15 @@ public class Tool
 	}
 	
 	public boolean kill(){
+		return kill( "9" );
+	}
+	
+	public boolean kill( String signal ){
 		try
 		{
 			// TODO: Kill process by pid instead that by name
-			
-			// Some processes like ettercap need a sigint ( ctrl+c ) to restore previous state
-			// such as the arp table.
-			Shell.exec( "killall -SIGINT " + mName );
-			Thread.sleep( 200 );
-			Shell.exec( "killall -9 " + mName );
-			
+			Shell.exec( "killall -" + signal + " " + mName );
+						
 			return true;
 		}
 		catch( Exception e )

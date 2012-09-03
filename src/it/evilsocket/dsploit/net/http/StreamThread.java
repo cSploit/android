@@ -114,6 +114,7 @@ public class StreamThread implements Runnable
     		{
     			try
     			{
+    				// TODO: Implement support for chunkend transfer encoding
     				if( ( read = mReader.read( buffer, 0, BUFFER_SIZE ) ) != -1 )
     				{
     					// since we don't know yet if we have a binary or text stream,

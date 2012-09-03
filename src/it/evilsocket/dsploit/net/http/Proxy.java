@@ -68,7 +68,8 @@ public class Proxy implements Runnable
 		
 		try 
 		{
-			mSocket.close();
+			if( mSocket != null )
+				mSocket.close();
 		} 
 		catch( IOException e )
 		{

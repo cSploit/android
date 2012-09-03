@@ -20,6 +20,7 @@ package it.evilsocket.dsploit.plugins.mitm;
 
 import java.util.ArrayList;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -47,6 +48,8 @@ import it.evilsocket.dsploit.tools.IPTables;
 
 public class MITM extends Plugin 
 {
+	private static final String TAG = "MITM";
+	
 	private ListView      	  mActionListView = null;
 	private ActionAdapter 	  mActionAdapter  = null;
 	private ArrayList<Action> mActions  	  = new ArrayList<Action>();	
@@ -73,7 +76,7 @@ public class MITM extends Plugin
 		private int 			  mLayoutId = 0;
 		private ArrayList<Action> mActions;
 		
-		class ActionHolder
+		public class ActionHolder
 		{		
 			TextView    name;
 			TextView    description;
@@ -131,6 +134,48 @@ public class MITM extends Plugin
 		    R.drawable.action_mitm_48 
 	    );		
 	}
+	
+	private void setStoppedState() {
+		int rows = mActionListView.getChildCount(),
+			i;
+		boolean somethingIsRunning = false;
+		ActionAdapter.ActionHolder holder;
+		View row;
+		
+		for( i = 0; i < rows && somethingIsRunning == false; i++ )
+		{
+			if( ( row = mActionListView.getChildAt( i ) ) != null )
+			{
+				holder = ( ActionAdapter.ActionHolder )row.getTag();
+				if( holder.activity.getVisibility() == View.VISIBLE )
+					somethingIsRunning = true;
+			}
+		}
+		
+		if( somethingIsRunning )
+		{
+			Log.d( TAG, "Stopping current jobs ..." );
+			
+			ProgressDialog dialog = ProgressDialog.show( this, "", "Stopping current jobs ...", true, false );
+			
+			Environment.setForwarding( false );
+			
+			mEttercap.kill();
+			mIpTables.undoPortRedirect( 80, 8080 );
+			mProxy.stop();
+			
+			for( i = 0; i < rows; i++ )
+			{
+				if( ( row = mActionListView.getChildAt( i ) ) != null )
+				{
+					holder = ( ActionAdapter.ActionHolder )row.getTag();
+					holder.activity.setVisibility( View.INVISIBLE );
+				}
+			}
+			
+			dialog.dismiss();
+		}
+	}
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -144,13 +189,15 @@ public class MITM extends Plugin
         }
         catch( Exception e )
         {
-        	Log.e( "MITM", e.toString() );
+        	Log.e( TAG, e.toString() );
         }
         
         mActions.add( new Action( "Simple Sniff", "Only redirect target's traffic through this device, useful when using a network sniffer like 'Sharp' for android.", new OnClickListener(){
 			@Override
 			public void onClick( View v ) 
 			{
+				setStoppedState();
+				
 				startActivity
                 ( 
                   new Intent
@@ -170,18 +217,25 @@ public class MITM extends Plugin
 
 				if( activity.getVisibility() == View.INVISIBLE )
 				{
+					setStoppedState();
+					
 					activity.setVisibility( View.VISIBLE );
 					
 					Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
-
-					Environment.setForwarding( false );
-
-					mEttercap.spoof( Environment.getTarget(), null ).start();											
+					
+					mEttercap.spoof( Environment.getTarget(), new OnReadyListener(){
+						@Override
+						public void onReady() 
+						{
+							Environment.setForwarding( false );							
+						}
+						
+					}).start();				
 				}
 				else
 				{
 	
-					Environment.setForwarding( true );
+					Environment.setForwarding( false );
 					mEttercap.kill();
 								
 					activity.setVisibility( View.INVISIBLE );
@@ -193,6 +247,8 @@ public class MITM extends Plugin
         	@Override
 			public void onClick( View v ) 
 			{
+        		setStoppedState();
+        		
 				startActivity
                 ( 
                   new Intent
@@ -212,6 +268,8 @@ public class MITM extends Plugin
 
 				if( activity.getVisibility() == View.INVISIBLE )
 				{
+					setStoppedState();
+					
 					new InputDialog( "Image URL", "Enter the URL of an image, starting with 'http://' :", "http://www.evilsocket.net/trollface.png", MITM.this, new InputDialogListener(){
 						@Override
 						public void onInputEntered( String input ) 
@@ -267,6 +325,8 @@ public class MITM extends Plugin
 
 				if( activity.getVisibility() == View.INVISIBLE )
 				{
+					setStoppedState();
+					
 					new InputDialog
 					( 
 						"Javascript", 
@@ -347,6 +407,12 @@ public class MITM extends Plugin
         mActionListView = ( ListView )findViewById( R.id.actionListView );
         mActionAdapter  = new ActionAdapter( R.layout.plugin_mitm_list_item, mActions );
         
-        mActionListView.setAdapter( mActionAdapter );
+        mActionListView.setAdapter( mActionAdapter );               
+	}
+	
+	@Override
+	public void onBackPressed() {
+	    setStoppedState();	
+	    super.onBackPressed();
 	}
 }

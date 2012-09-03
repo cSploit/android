@@ -42,9 +42,9 @@ public class Ettercap extends Tool
 		}
 
 		@Override
-		public void onNewLine(String line) {
+		public void onNewLine(String line) {			
 			if( line.toLowerCase().contains("for inline help") )
-				onReady();
+				onReady();			
 		}
 
 		@Override
@@ -55,8 +55,7 @@ public class Ettercap extends Tool
 		public abstract void onReady();
 	}
 	
-	public Thread spoof( Target target, OnReadyListener listener )
-	{
+	public Thread spoof( Target target, OnReadyListener listener ) {
 		String commandLine;
 
 		// poison the entire network
@@ -76,5 +75,10 @@ public class Ettercap extends Tool
 		}
 		
 		return super.async( commandLine, listener );
+	}
+	
+	public boolean kill( ) {
+		// Ettercap needs SIGINT ( ctrl+c ) to restore arp table.
+		return super.kill( "SIGINT" );
 	}
 }

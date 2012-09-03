@@ -87,9 +87,12 @@ public class ProxyThread extends Thread
 			
 			for( String line : request.split("\n" ) )
 			{
+				// Set protocol version to 1.0 since we don't support chunked transfer encoding ( yet )
+				if( line.contains("HTTP/1.1") )
+					line = line.replace( "HTTP/1.1", "HTTP/1.0" );
 				// Set encoding to identity since we are not handling gzipped streams
-				if( line.contains("Accept-Encoding") )
-					line = "Accept-Encoding: identity";
+				else if( line.contains("Accept-Encoding") )
+					line = "Accept-Encoding: identity";				
 				// Can't easily handle keep alive connections with blocking sockets
 				else if( line.contains("keep-alive") )
 				 	line = "Connection: close";
