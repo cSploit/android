@@ -74,8 +74,15 @@ public class Shell
 			} 
 			finally 
 			{
-				if( process != null )
-					process.destroy();
+				try
+				{
+					if( process != null )
+						process.destroy();
+				}
+				catch( Exception e )
+				{
+					
+				}
 			}
 		}
 		
