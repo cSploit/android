@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with dSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.evilsocket.dsploit.system;
+package it.evilsocket.dsploit.core;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -39,9 +39,9 @@ import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Network.Protocol;
 import it.evilsocket.dsploit.net.Target.Port;
 
-public class Environment 
+public class System 
 {	
-	private static final String TAG 		  		  = "Environment";
+	private static final String TAG 		  		  = "SYSTEM";
 	public  static final String IPV4_FORWARD_FILEPATH = "/proc/sys/net/ipv4/ip_forward";
 
 	private static Context 			  mContext  	 = null;

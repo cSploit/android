@@ -18,9 +18,9 @@
  */
 package it.evilsocket.dsploit.tools;
 
+import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 import it.evilsocket.dsploit.net.Target;
-import it.evilsocket.dsploit.system.Environment;
-import it.evilsocket.dsploit.system.Shell.OutputReceiver;
 import android.content.Context;
 import android.util.Log;
 
@@ -67,7 +67,7 @@ public class Ettercap extends Tool
 		
 		try
 		{
-			commandLine = "-Tq -M arp:remote -i " + Environment.getNetwork().getInterface().getDisplayName() + " " + commandLine;
+			commandLine = "-Tq -M arp:remote -i " + System.getNetwork().getInterface().getDisplayName() + " " + commandLine;
 		}
 		catch( Exception e )
 		{

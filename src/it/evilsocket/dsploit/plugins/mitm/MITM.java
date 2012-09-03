@@ -35,13 +35,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.http.Proxy;
-import it.evilsocket.dsploit.system.Environment;
-import it.evilsocket.dsploit.system.Plugin;
 import it.evilsocket.dsploit.tools.Ettercap;
 import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
 import it.evilsocket.dsploit.tools.IPTables;
@@ -158,7 +158,7 @@ public class MITM extends Plugin
 			
 			ProgressDialog dialog = ProgressDialog.show( this, "", "Stopping current jobs ...", true, false );
 			
-			Environment.setForwarding( false );
+			System.setForwarding( false );
 			
 			mEttercap.kill();
 			mIpTables.undoPortRedirect( 80, 8080 );
@@ -185,7 +185,7 @@ public class MITM extends Plugin
         {
 	        mEttercap = new Ettercap( this );
 	        mIpTables = new IPTables();
-			mProxy    = new Proxy( Environment.getNetwork().getLoacalAddress(), 8080 );
+			mProxy    = new Proxy( System.getNetwork().getLoacalAddress(), 8080 );
         }
         catch( Exception e )
         {
@@ -223,11 +223,11 @@ public class MITM extends Plugin
 					
 					Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
 					
-					mEttercap.spoof( Environment.getTarget(), new OnReadyListener(){
+					mEttercap.spoof( System.getTarget(), new OnReadyListener(){
 						@Override
 						public void onReady() 
 						{
-							Environment.setForwarding( false );							
+							System.setForwarding( false );							
 						}
 						
 					}).start();				
@@ -235,7 +235,7 @@ public class MITM extends Plugin
 				else
 				{
 	
-					Environment.setForwarding( false );
+					System.setForwarding( false );
 					mEttercap.kill();
 								
 					activity.setVisibility( View.INVISIBLE );
@@ -281,11 +281,11 @@ public class MITM extends Plugin
 								
 								Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
 													
-								mEttercap.spoof( Environment.getTarget(), new OnReadyListener(){
+								mEttercap.spoof( System.getTarget(), new OnReadyListener(){
 									@Override
 									public void onReady() 
 									{
-										Environment.setForwarding( true );
+										System.setForwarding( true );
 										
 										mProxy.setFilter( new Proxy.ProxyFilter() {					
 											@Override
@@ -311,7 +311,7 @@ public class MITM extends Plugin
 					mEttercap.kill();
 					mIpTables.undoPortRedirect( 80, 8080 );
 					mProxy.stop();
-					Environment.setForwarding( false );
+					System.setForwarding( false );
 
 					activity.setVisibility( View.INVISIBLE );
 				}
@@ -346,11 +346,11 @@ public class MITM extends Plugin
 								
 								Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
 													
-								mEttercap.spoof( Environment.getTarget(), new OnReadyListener(){
+								mEttercap.spoof( System.getTarget(), new OnReadyListener(){
 									@Override
 									public void onReady() 
 									{
-										Environment.setForwarding( true );
+										System.setForwarding( true );
 										
 										mProxy.setFilter( new Proxy.ProxyFilter() {					
 											@Override
@@ -381,7 +381,7 @@ public class MITM extends Plugin
 					mEttercap.kill();
 					mIpTables.undoPortRedirect( 80, 8080 );
 					mProxy.stop();
-					Environment.setForwarding( false );
+					System.setForwarding( false );
 
 					activity.setVisibility( View.INVISIBLE );
 				}

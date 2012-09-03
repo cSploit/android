@@ -30,10 +30,10 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 import it.evilsocket.dsploit.MainActivity;
 import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.Target;
-import it.evilsocket.dsploit.system.Environment;
-import it.evilsocket.dsploit.system.Plugin;
 import it.evilsocket.dsploit.tools.NMap;
 import it.evilsocket.dsploit.tools.NMap.SynScanOutputReceiver;
 
@@ -83,7 +83,7 @@ public class PortScanner extends Plugin
 			PortScanner.this.runOnUiThread( new Runnable() {
                 @Override
                 public void run() {
-                	String proto = Environment.getProtocolByPort( openPort ),
+                	String proto = System.getProtocolByPort( openPort ),
                 		   entry = openPort;
                 	
                 	if( proto != null )
@@ -96,7 +96,7 @@ public class PortScanner extends Plugin
                 	mPortList.add( entry );
                 	mScanList.setAdapter( mListAdapter );
                 	
-                	Environment.addOpenPort( Integer.parseInt( openPort ), Network.Protocol.fromString(portProto) );                	
+                	System.addOpenPort( Integer.parseInt( openPort ), Network.Protocol.fromString(portProto) );                	
                 }
             });					
 		}
@@ -113,7 +113,7 @@ public class PortScanner extends Plugin
 		);
 
 		mPortList     = new ArrayList<String>();
-		mNmap 	      = new NMap( Environment.getContext() );
+		mNmap 	      = new NMap( System.getContext() );
 		mScanReceiver = new Receiver();
 	}
 	
@@ -130,7 +130,7 @@ public class PortScanner extends Plugin
 	private void setStartedState( ) {
 		mPortList.clear();
 
-		mNmap.synScan( Environment.getTarget(), mScanReceiver ).start();
+		mNmap.synScan( System.getTarget(), mScanReceiver ).start();
 		
 		mRunning = true;
 	}

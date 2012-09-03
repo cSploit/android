@@ -19,8 +19,8 @@
 package it.evilsocket.dsploit.net;
 
 import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.Network.Protocol;
-import it.evilsocket.dsploit.system.Environment;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -85,13 +85,13 @@ public class Target {
 						port = Integer.parseInt(sport);
 					
 					else if( protocol != null )
-						port = Environment.getPortByProtocol( protocol );
+						port = System.getPortByProtocol( protocol );
 					
 					// determine if the 'address' part is an ip address or a host name
 					if( IP_PATTERN.matcher( address ).find() )
 					{
 						// internal ip address
-						if( Environment.getNetwork().isInternal( address ) )
+						if( System.getNetwork().isInternal( address ) )
 						{
 							target = new Target( new Endpoint( address, null ) );
 							target.setPort( port );							
@@ -201,10 +201,10 @@ public class Target {
 				return R.drawable.target_network_48;
 			
 			else if( mType == Type.ENDPOINT )
-				if( mEndpoint.getAddress().equals(  Environment.getNetwork().getGatewayAddress() ) )
+				if( mEndpoint.getAddress().equals(  System.getNetwork().getGatewayAddress() ) )
 					return R.drawable.target_router_48;
 			
-				else if( mEndpoint.getAddress().equals( Environment.getNetwork().getLoacalAddress() ) )
+				else if( mEndpoint.getAddress().equals( System.getNetwork().getLoacalAddress() ) )
 					return R.drawable.target_self_48;
 			
 				else

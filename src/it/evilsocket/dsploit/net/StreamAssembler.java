@@ -18,8 +18,8 @@
  */
 package it.evilsocket.dsploit.net;
 
+import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.parsers.StreamParser;
-import it.evilsocket.dsploit.system.Environment;
 
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -84,7 +84,7 @@ public class StreamAssembler
 				
 				try
 				{
-					if( Environment.getNetwork().isInternal( source ) )
+					if( System.getNetwork().isInternal( source ) )
 					{
 						endpoint = source;
 						server   = dest;

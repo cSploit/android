@@ -21,6 +21,10 @@ package it.evilsocket.dsploit;
 import java.net.SocketException;
 import java.util.ArrayList;
 
+import it.evilsocket.dsploit.core.CrashManager;
+import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.core.Shell;
+import it.evilsocket.dsploit.core.ToolsInstaller;
 import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
 import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog;
@@ -30,10 +34,6 @@ import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.plugins.LoginCracker;
 import it.evilsocket.dsploit.plugins.PortScanner;
 import it.evilsocket.dsploit.plugins.mitm.MITM;
-import it.evilsocket.dsploit.system.CrashManager;
-import it.evilsocket.dsploit.system.Environment;
-import it.evilsocket.dsploit.system.Shell;
-import it.evilsocket.dsploit.system.ToolsInstaller;
 import it.evilsocket.dsploit.tools.NMap;
 import it.evilsocket.dsploit.tools.NMap.FindAliveEndpointsOutputReceiver;
 
@@ -167,7 +167,7 @@ public class MainActivity extends Activity
 				// select clicked target and go to action list activity
 				final Target target = ( ( TargetHolder )v.getTag() ).target;
 	
-				Environment.setTarget( target );
+				System.setTarget( target );
 					
 				MainActivity.this.runOnUiThread( new Runnable() {
 	                @Override
@@ -280,12 +280,12 @@ public class MainActivity extends Activity
 			}
 		}).start();
         
-        Environment.init( getApplicationContext() );
+        System.init( getApplicationContext() );
         
         // TODO: Implement automatic loading
-        Environment.registerPlugin( new PortScanner( ) );
-        Environment.registerPlugin( new MITM( ) );
-        Environment.registerPlugin( new LoginCracker( ) );
+        System.registerPlugin( new PortScanner( ) );
+        System.registerPlugin( new MITM( ) );
+        System.registerPlugin( new LoginCracker( ) );
         
         // register the crash manager
         CrashManager.register( getApplicationContext() );
@@ -297,8 +297,8 @@ public class MainActivity extends Activity
     	{
 	    	ArrayList<Target> targets = new ArrayList<Target>();
 			
-			targets.add( new Target( Environment.getNetwork() ) );
-			targets.add( new Target( Environment.getNetwork().getLoacalAddress(), null ) );
+			targets.add( new Target( System.getNetwork() ) );
+			targets.add( new Target( System.getNetwork().getLoacalAddress(), null ) );
 			targets.add( null );
 
 			mTargetAdapter = new TargetAdapter( R.layout.target_list_item, targets );
@@ -315,7 +315,7 @@ public class MainActivity extends Activity
 	@Override
 	public void onDestroy() {		
 		// make sure no zombie process is running before destroying the activity
-		Environment.clean();
+		System.clean();
 		
 		super.onDestroy();
 	}

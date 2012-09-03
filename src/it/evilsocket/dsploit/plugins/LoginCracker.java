@@ -27,11 +27,11 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.gui.dialogs.FinishDialog;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Target.Port;
-import it.evilsocket.dsploit.system.Environment;
-import it.evilsocket.dsploit.system.Plugin;
 
 public class LoginCracker extends Plugin
 {
@@ -103,12 +103,12 @@ public class LoginCracker extends Plugin
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);   
         
-        if( Environment.getTarget().hasOpenPorts() == false )
+        if( System.getTarget().hasOpenPorts() == false )
         	new FinishDialog( "Warning", "No open ports detected on current target, run the port scanner first.", this ).show();
         
         ArrayList<String> ports = new ArrayList<String>();
         
-        for( Port port : Environment.getTarget().getOpenPorts() )
+        for( Port port : System.getTarget().getOpenPorts() )
         	ports.add( Integer.toString( port.port ) );
         
         mPortSpinner     = ( Spinner )findViewById( R.id.portSpinner );
@@ -117,7 +117,7 @@ public class LoginCracker extends Plugin
         	public void onItemSelected( AdapterView<?> adapter, View view, int position, long id ) 
         	{
         		String port 	= ( String )adapter.getItemAtPosition( position ),
-        			   protocol = Environment.getProtocolByPort( port );
+        			   protocol = System.getProtocolByPort( port );
         		
         		if( protocol != null )
         		{

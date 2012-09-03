@@ -18,12 +18,12 @@
  */
 package it.evilsocket.dsploit.tools;
 
+import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 import it.evilsocket.dsploit.net.Stream;
 import it.evilsocket.dsploit.net.StreamAssembler;
 import it.evilsocket.dsploit.net.parsers.FTPStreamParser;
 import it.evilsocket.dsploit.net.parsers.HTTPCookieStreamParser;
 import it.evilsocket.dsploit.net.parsers.HTTPFormStreamParser;
-import it.evilsocket.dsploit.system.Shell.OutputReceiver;
 
 import android.content.Context;
 import android.util.Log;

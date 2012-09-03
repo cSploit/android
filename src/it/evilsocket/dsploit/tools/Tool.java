@@ -18,8 +18,8 @@
  */
 package it.evilsocket.dsploit.tools;
 
-import it.evilsocket.dsploit.system.Shell;
-import it.evilsocket.dsploit.system.Shell.OutputReceiver;
+import it.evilsocket.dsploit.core.Shell;
+import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 
 import java.io.File;
 import java.io.IOException;

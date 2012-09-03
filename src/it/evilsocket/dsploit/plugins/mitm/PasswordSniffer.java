@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.Stream;
-import it.evilsocket.dsploit.system.Environment;
 import it.evilsocket.dsploit.tools.Ettercap;
 import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
 import it.evilsocket.dsploit.tools.TcpDump;
@@ -43,7 +43,7 @@ import android.widget.ToggleButton;
 
 public class PasswordSniffer extends Activity 
 {
-	private static final String  PCAP_FILTER = "not '(src host localhost or dst host localhost or arp)'";
+	private static final String PCAP_FILTER = "not '(src host localhost or dst host localhost or arp)'";
 
 	private ToggleButton       mSniffToggleButton = null;
 	private ProgressBar	       mSniffProgress     = null;
@@ -199,7 +199,7 @@ public class PasswordSniffer extends Activity
 		mEttercap.kill();
 		mTcpDump.kill();
 
-		Environment.setForwarding( false );
+		System.setForwarding( false );
 		
 		mSniffProgress.setVisibility( View.INVISIBLE );
 		
@@ -215,10 +215,10 @@ public class PasswordSniffer extends Activity
 		final Ettercap spoof = mEttercap;
 		final TcpDump  dump  = mTcpDump;
 		
-		spoof.spoof( Environment.getTarget(), new OnReadyListener(){
+		spoof.spoof( System.getTarget(), new OnReadyListener(){
 			@Override
 			public void onReady() {
-				Environment.setForwarding( true );
+				System.setForwarding( true );
 
 				dump.sniffPasswords( PCAP_FILTER, new PasswordReceiver(){
 					@Override

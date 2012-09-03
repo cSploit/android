@@ -20,8 +20,8 @@ package it.evilsocket.dsploit;
 
 import java.util.ArrayList;
 
-import it.evilsocket.dsploit.system.Environment;
-import it.evilsocket.dsploit.system.Plugin;
+import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.core.Plugin;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -68,7 +68,7 @@ public class ActionActivity extends Activity
 			{		
 				final Plugin plugin = ( ( ActionHolder )v.getTag() ).action;
 				
-				Environment.setCurrentPlugin( plugin );
+				System.setCurrentPlugin( plugin );
 
 				ActionActivity.this.runOnUiThread(new Runnable() {
 	                @Override
@@ -132,7 +132,7 @@ public class ActionActivity extends Activity
         setContentView( LAYOUT );
         
         mListView       = ( ListView )findViewById( R.id.actionListView );
-        mAvailable      = Environment.getPluginsForTarget();
+        mAvailable      = System.getPluginsForTarget();
         mActionsAdapter = new ActionsAdapter( R.layout.actions_list_item );
         
 	    mListView.setAdapter( mActionsAdapter );    

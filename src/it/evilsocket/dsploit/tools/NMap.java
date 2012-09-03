@@ -21,10 +21,10 @@ package it.evilsocket.dsploit.tools;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 import it.evilsocket.dsploit.net.Endpoint;
 import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.Target;
-import it.evilsocket.dsploit.system.Shell.OutputReceiver;
 import android.content.Context;
 import android.util.Log;
 

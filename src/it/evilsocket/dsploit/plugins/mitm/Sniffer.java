@@ -22,8 +22,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import it.evilsocket.dsploit.R;
-import it.evilsocket.dsploit.system.Environment;
-import it.evilsocket.dsploit.system.Shell.OutputReceiver;
+import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 import it.evilsocket.dsploit.tools.Ettercap;
 import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
 import it.evilsocket.dsploit.tools.TcpDump;
@@ -80,7 +80,7 @@ public class Sniffer extends Activity
 		mEttercap.kill();
 		mTcpDump.kill();
 
-		Environment.setForwarding( false );
+		System.setForwarding( false );
 		
 		mSniffProgress.setVisibility( View.INVISIBLE );
 		
@@ -96,10 +96,10 @@ public class Sniffer extends Activity
 		final Ettercap spoof = mEttercap;
 		final TcpDump  dump  = mTcpDump;
 					
-		spoof.spoof( Environment.getTarget(), new OnReadyListener(){
+		spoof.spoof( System.getTarget(), new OnReadyListener(){
 			@Override
 			public void onReady() { 
-				Environment.setForwarding( true );
+				System.setForwarding( true );
 
 				dump.sniff( PCAP_FILTER, new OutputReceiver(){
 					@Override

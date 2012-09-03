@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with dSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.evilsocket.dsploit.system;
+package it.evilsocket.dsploit.core;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
