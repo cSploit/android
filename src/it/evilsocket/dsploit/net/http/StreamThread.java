@@ -31,6 +31,7 @@ import android.util.Log;
 public class StreamThread implements Runnable
 {
 	private final static String  TAG            = "PROXYSTREAMTHREAD";
+	private final static String  HEAD_SEPARATOR = "\r\n\r\n";
     private final static int     BUFFER_SIZE    = 1024;
     private final static int     TIMEOUT        = 20;
     
@@ -130,32 +131,35 @@ public class StreamThread implements Runnable
     				
     			}
     		}
-    								
-			// do we have html ?
-			if( streamIndexOf( stream, "text/html".getBytes() ) != -1 )
-			{
-				// split headers and body, then apply the filter				
-				String   data    = new String( stream );
-				String[] split   = data.split( "<", 2 );
-				String   headers = split[ 0 ],
-						 body	 = ( split.length > 1 ? split[ 1 ] : "" ),
-						 patched = "";
-				
-				body = mFilter.onHtmlReceived( body );
-
-				// remove explicit content length, just in case the body changed after filtering				
-				for( String header : headers.split("\n") )
+    		
+    		if( stream != null && stream.length > 0 )
+    		{
+				// do we have html ?
+				if( streamIndexOf( stream, "text/html".getBytes() ) != -1 )
 				{
-					if( header.toLowerCase().contains("content-length") == false )
-						patched += header + "\n";
+					// split headers and body, then apply the filter				
+					String   data    = new String( stream );
+					String[] split   = data.split( HEAD_SEPARATOR, 2 );
+					String   headers = split[ 0 ],
+							 body	 = ( split.length > 1 ? split[ 1 ] : "" ),
+							 patched = "";
+					
+					body = mFilter.onHtmlReceived( body );
+	
+					// remove explicit content length, just in case the body changed after filtering				
+					for( String header : headers.split("\n") )
+					{
+						if( header.toLowerCase().contains("content-length") == false )
+							patched += header + "\n";
+					}
+					
+					headers = patched;				
+					stream  = ( headers + HEAD_SEPARATOR + body ).getBytes();				
 				}
 				
-				headers = patched;				
-				stream  = ( headers + "<" + body ).getBytes();				
-			}
-			
-			mWriter.write( stream );    			    			
-			mWriter.flush();
+				mWriter.write( stream );    			    			
+				mWriter.flush();
+    		}
 		} 
     	catch( IOException e ) 
     	{			
