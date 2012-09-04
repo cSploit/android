@@ -43,7 +43,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -252,9 +251,7 @@ public class MainActivity extends Activity
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);        
         setContentView( LAYOUT );
-       
-        Log.d( "MAIN", "onCreate" );
-        
+               
         new Thread( new Runnable(){
 			@Override
 			public void run() 
@@ -294,7 +291,7 @@ public class MainActivity extends Activity
         mListView = ( ListView )findViewById( R.id.listView );
 	    
 	    try
-    	{
+    	{	    	
 	    	ArrayList<Target> targets = new ArrayList<Target>();
 			
 			targets.add( new Target( System.getNetwork() ) );

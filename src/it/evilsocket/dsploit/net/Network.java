@@ -71,7 +71,7 @@ public class Network
 		mWifiManager		 = ( WifiManager )context.getSystemService( Context.WIFI_SERVICE );
 		mConnectivityManager = ( ConnectivityManager )context.getSystemService( Context.CONNECTIVITY_SERVICE );
 		mInfo		 		 = mWifiManager.getDhcpInfo();
-				
+								
 		if( isConnected() == false)
 			throw new NoRouteToHostException("Not connected to any WiFi access point.");
 		
@@ -79,14 +79,10 @@ public class Network
 			mInterface = NetworkInterface.getByInetAddress( getLoacalAddress() );		
 	}
 			
-	private int countBits( int n ){
-    	int bits = 0;
+	private static int countBits( int n ){
+    	int bits, i;
     	
-    	while( n > 0 )
-    	{
-    		bits  += n & 1;
-    		n    >>= 1; 
-    	}
+    	for( i = 0, bits = ( n & 1 ); i < 32; i++, n >>= 1, bits += n & 1 );    		
     	
     	return bits;
     }
