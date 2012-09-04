@@ -18,32 +18,35 @@
  */
 package it.evilsocket.dsploit.core;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.Date;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.StrictMode;
 import android.util.Log;
 
 public class CrashManager implements UncaughtExceptionHandler
 {
-	private static final String   TAG 		  = "CRASHMANAGER";
-	private static final String   EMAIL_TITLE = "dSploit Error Report";
-	private static final String[] EMAIL_RECVR = new String[]{ "evilsocket@gmail.com" };
-	
+	private static final String   TAG 	   = "CRASHMANAGER";
+	private static final String   RECEIVER = "http://dsploit.evilsocket.net/crash_report_receiver.php";
+		
 	private Context 				 mContext 		  = null;
 	private UncaughtExceptionHandler mDefaultHandler  = null;
-	private Intent					 mIntent		  = null;
 	
 	public CrashManager( Context context ) {
 		mContext 		= context;
 		mDefaultHandler = Thread.getDefaultUncaughtExceptionHandler();
-		mIntent			= new Intent( Intent.ACTION_SEND );
 	}
 	
 	public static void register( Context context ) {
@@ -106,14 +109,39 @@ public class CrashManager implements UncaughtExceptionHandler
 	        
 	        Log.w( TAG, report );
 	        	    
-	        mIntent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
-	        mIntent.putExtra( Intent.EXTRA_EMAIL,   EMAIL_RECVR );
-	        mIntent.putExtra( Intent.EXTRA_TEXT,    report );
-	        mIntent.putExtra( Intent.EXTRA_SUBJECT, EMAIL_TITLE );
-	        mIntent.putExtra( Intent.EXTRA_TITLE,   EMAIL_TITLE ); 
-	        mIntent.setType("message/rfc822");
-	        
-	        mContext.startActivity( mIntent );
+	        try 
+	        {
+	        	// This is needed to avoid NetworkOnMainThreadException
+	        	StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+	        	StrictMode.setThreadPolicy(policy);
+	        	
+	        	// TODO: Add a "sending report bla bla bla" activity.	        	
+	            String		       data = URLEncoder.encode( "report", "UTF-8" ) + "=" + URLEncoder.encode( report, "UTF-8");
+	            URL	   		       url  = new URL( RECEIVER );
+	            URLConnection      conn = url.openConnection();
+	            OutputStreamWriter writer;
+	            BufferedReader	   reader;
+	            
+	            conn.setDoOutput(true);
+	            
+	            writer = new OutputStreamWriter( conn.getOutputStream() );
+	            writer.write(data);
+	            writer.flush();
+	            
+	            reader = new BufferedReader( new InputStreamReader( conn.getInputStream() ) );
+	            String line;
+	            while( (line = reader.readLine()) != null ) 
+	            {
+	                Log.d( TAG, line );
+	            }
+	            
+	            reader.close();
+	            writer.close();	            
+	        } 
+	        catch( Exception e ) 
+	        {
+	        	Log.e( TAG, e.toString() );
+	        }
 		}
 		catch( Exception e )
 		{

@@ -168,7 +168,7 @@ public class MainActivity extends Activity
 				final Target target = ( ( TargetHolder )v.getTag() ).target;
 	
 				System.setTarget( target );
-					
+
 				MainActivity.this.runOnUiThread( new Runnable() {
 	                @Override
 	                public void run() {
