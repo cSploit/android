@@ -30,6 +30,8 @@ public class IPTables extends Tool
 	}
 	
 	public void portRedirect( int from, int to ){
+		Log.d( TAG, "Redirecting traffic from port " + from + " to port " + to );
+		
 		try
 		{
 			super.run("-P FORWARD ACCEPT");
@@ -43,6 +45,8 @@ public class IPTables extends Tool
 	}
 	
 	public void undoPortRedirect( int from, int to ){
+		Log.d( TAG, "Undoing port redirection" );
+		
 		try
 		{
 			super.run("-t nat -D PREROUTING -p tcp --dport " + from + " -j REDIRECT --to-port " + to );

@@ -307,8 +307,7 @@ public class MainActivity extends Activity
     		new FatalDialog( "Error", e.getMessage(), this ).show();
     	}
 	}
-	
-	
+
 	@Override
 	public void onDestroy() {		
 		// make sure no zombie process is running before destroying the activity

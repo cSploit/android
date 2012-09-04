@@ -42,8 +42,8 @@ public class Ettercap extends Tool
 		}
 
 		@Override
-		public void onNewLine(String line) {			
-			if( line.toLowerCase().contains("for inline help") )
+		public void onNewLine(String line) {	
+			if( line.toLowerCase().contains("(press 'q' to exit)") )
 				onReady();			
 		}
 
@@ -67,7 +67,7 @@ public class Ettercap extends Tool
 		
 		try
 		{
-			commandLine = "-Tq -M arp:remote -i " + System.getNetwork().getInterface().getDisplayName() + " " + commandLine;
+			commandLine = "-Tqo -M arp:remote -i " + System.getNetwork().getInterface().getDisplayName() + " " + commandLine;
 		}
 		catch( Exception e )
 		{

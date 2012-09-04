@@ -81,8 +81,8 @@ public class NMap extends Tool {
 	{
 		private final Pattern PORT_PATTERN = Pattern.compile( "^discovered open port (\\d+)/([^\\s]+).+", Pattern.CASE_INSENSITIVE );
 		
-		public void onStart( String commandLine) {
-			Log.d( TAG, "synScan OnStart( " + commandLine + " )" );
+		public void onStart( String commandLine ) {
+			
 		}
 		
 		public void onNewLine( String line ) {			
