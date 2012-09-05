@@ -23,11 +23,13 @@ import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.Network.Protocol;
 
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.os.StrictMode;
 import android.util.Log;
 
 public class Target {
@@ -57,7 +59,7 @@ public class Target {
 	private List<Port>  mPorts	  = new ArrayList<Port>();
 	
 	public static Target getFromString( String string ){
-		final Pattern PARSE_PATTERN = Pattern.compile( "^(([a-z]+)://)?([0-9a-z\\-\\.]+)(:([\\d]+))?.*$", Pattern.CASE_INSENSITIVE );
+		final Pattern PARSE_PATTERN = Pattern.compile( "^(([a-z]+)://)?([0-9a-z\\-\\.]+)(:([\\d]+))?[0-9a-z\\-\\./]*$", Pattern.CASE_INSENSITIVE );
 		final Pattern IP_PATTERN    = Pattern.compile( "^[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}$" );
 		
 		Matcher matcher = null;
@@ -110,26 +112,45 @@ public class Target {
 		}
 		catch( Exception e )
 		{
-			Log.e( "Target", e.toString() );
+			Log.e( "Target.getFromString()", e.toString() );
 		}
 		
 		// determine if the target is reachable.
-		/*
 		if( target != null )
 		{
 			try
 			{
+				// This is needed to avoid NetworkOnMainThreadException
+	        	StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+	        	StrictMode.setThreadPolicy(policy);
+	        	
 				InetAddress.getByName( target.getCommandLineRepresentation() );
 			}
 			catch( Exception e )
 			{
+				Log.d( "Target.getFromString()", e.toString() );
 				target = null;
 			}
 		}
-		*/
+
 		return target;
 	}
+
+	public boolean comesAfter( Target target ){
+
+		if( mType == Type.NETWORK )
+			return false;
 		
+		else if( mType == Type.ENDPOINT )
+			if( target.getType() == Type.ENDPOINT )					
+				return mEndpoint.getAddressAsLong() > target.getEndpoint().getAddressAsLong();					
+			else
+				return false;
+		
+		else 
+			return true; 
+	}
+	
 	public Target( Network net ){
 		setNetwork( net );
 	}
@@ -166,10 +187,10 @@ public class Target {
 
 	public String toString( ){
 		if( mType == Type.NETWORK )
-			return mNetwork.getNetworkRepresentation() + " ( Your Network )";
+			return mNetwork.getNetworkRepresentation();
 		
 		else if( mType == Type.ENDPOINT )
-			return mEndpoint.getAddress().toString().split("/")[1] + ( mPort == 0 ? "" : ":" + mPort );
+			return mEndpoint.getAddress().getHostAddress() + ( mPort == 0 ? "" : ":" + mPort );
 		
 		else if( mType == Type.REMOTE )
 			return mHostname + ( mPort == 0 ? "" : ":" + mPort );
@@ -178,13 +199,40 @@ public class Target {
 			return "???";
 	}
 	
+	public String getDescription(){
+		if( mType == Type.NETWORK )
+			return "This is your network subnet mask";
+		
+		else if( mType == Type.ENDPOINT )
+		{
+			String desc = mEndpoint.getHardwareAsString();
+			
+			try
+			{
+				if( mEndpoint.getAddress().equals( System.getNetwork().getGatewayAddress() ) )
+					desc += " ( Your network gateway / router )";
+			
+				else if( mEndpoint.getAddress().equals( System.getNetwork().getLoacalAddress() ) )
+					desc += " ( This device )";
+			}
+			catch( SocketException e )
+			{
+				Log.e( "Target.getDescription()", e.toString() );
+			}
+			
+			return desc.trim();
+		}		
+		else
+			return "";
+	}
+	
 	public String getCommandLineRepresentation()
 	{
 		if( mType == Type.NETWORK )
 			return mNetwork.getNetworkRepresentation();
 		
 		else if( mType == Type.ENDPOINT )
-			return mEndpoint.getAddress().toString().split("/")[1];
+			return mEndpoint.getAddress().getHostAddress();
 		
 		else if( mType == Type.REMOTE )
 			return mHostname;
@@ -201,7 +249,7 @@ public class Target {
 				return R.drawable.target_network_48;
 			
 			else if( mType == Type.ENDPOINT )
-				if( mEndpoint.getAddress().equals(  System.getNetwork().getGatewayAddress() ) )
+				if( mEndpoint.getAddress().equals( System.getNetwork().getGatewayAddress() ) )
 					return R.drawable.target_router_48;
 			
 				else if( mEndpoint.getAddress().equals( System.getNetwork().getLoacalAddress() ) )

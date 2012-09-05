@@ -73,6 +73,7 @@ public class MainActivity extends Activity
 			Target		target;
 	        ImageView   itemImage;
 	        TextView    itemTitle;
+	        TextView	itemDescription;
 	        Button      scanButton;
 	    }
 		
@@ -97,18 +98,31 @@ public class MainActivity extends Activity
 		{					
 			public void onClick( View v ) {
 				Target 				 target = ( Target )v.getTag();
-				final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Scanning alive endpoints ...", true, false );
+				final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Searching alive endpoints ...", true, false );
 				
 				if( target.getType() == Target.Type.NETWORK ) {
 					
 					mNmap.findAliveEndpoints( target.getNetwork(), new FindAliveEndpointsOutputReceiver(){						
 						@Override
 						public void onEndpointFound( Endpoint endpoint ) {
-							Target target = new Target( endpoint );
+							Target  target = new Target( endpoint );
+							int     i;
+							boolean added = false;
 							
 							if( hasTarget( target ) == false )
 							{
-								mTargets.add( 1, target );
+								for( i = 0; i < mTargets.size() && !added; i++ )
+								{
+									if( mTargets.get( i ) != null && mTargets.get( i ).comesAfter( target ) )
+									{
+										mTargets.add( i, target );
+										added = true;
+									}
+								}
+								
+								if( !added )								
+									mTargets.add( mTargets.size() - 1, target );
+																
 								// refresh the target listview
 		                    	MainActivity.this.runOnUiThread(new Runnable() {
 				                    @Override
@@ -116,7 +130,7 @@ public class MainActivity extends Activity
 				                    	notifyDataSetChanged();
 				                    }
 				                });
-							}
+							}														
 						}
 					
 						@Override
@@ -136,15 +150,27 @@ public class MainActivity extends Activity
 					@Override
 					public void onInputEntered( String input ) 
 					{
-						Target target = Target.getFromString(input);
+						Target target = Target.getFromString(input);						
 						if( target != null )
 						{
 							if( hasTarget(target) == false )
-							{
-		            			mTargets.add( 1, target );
-		            			
-		            			// refresh the target listview
-		            			MainActivity.this.runOnUiThread(new Runnable() {
+							{								
+								boolean added = false;
+								
+								for( int i = 0; i < mTargets.size() && !added; i++ )
+								{
+									if( mTargets.get( i ) != null && mTargets.get( i ).comesAfter( target ) )
+									{
+										mTargets.add( i, target );
+										added = true;
+									}
+								}
+								
+								if( !added )								
+									mTargets.add( mTargets.size() - 1, target );
+								
+								// refresh the target listview
+		                    	MainActivity.this.runOnUiThread(new Runnable() {
 				                    @Override
 				                    public void run() {
 				                    	notifyDataSetChanged();
@@ -198,9 +224,10 @@ public class MainActivity extends Activity
 	            
 	            holder = new TargetHolder();
 	            
-	            holder.itemImage  = ( ImageView )row.findViewById( R.id.itemIcon );
-	            holder.itemTitle  = ( TextView )row.findViewById( R.id.itemTitle );
-	            holder.scanButton = ( Button )row.findViewById( R.id.scanButton );
+	            holder.itemImage  	   = ( ImageView )row.findViewById( R.id.itemIcon );
+	            holder.itemTitle  	   = ( TextView )row.findViewById( R.id.itemTitle );
+	            holder.itemDescription = ( TextView )row.findViewById( R.id.itemDescription );
+	            holder.scanButton 	   = ( Button )row.findViewById( R.id.scanButton );
 
 	            row.setTag(holder);
 	        }
@@ -216,9 +243,10 @@ public class MainActivity extends Activity
 	        	holder.itemImage.setImageResource( target.getDrawableResourceId() );
 	        	holder.itemTitle.setText( target.toString() );
 	        	holder.itemTitle.setTypeface( null, Typeface.NORMAL );
+	        	holder.itemDescription.setText( target.getDescription() );
 	        	
 	        	// hide the scan button in the network item if already scanned or in other items
-	        	if( /* ( mSubnetScanned && target.getType() == Target.Type.NETWORK ) || */ target.getType() != Target.Type.NETWORK ) 
+	        	if( target.getType() != Target.Type.NETWORK ) 
 	        	{
 	        		holder.scanButton.setVisibility( View.GONE );
 	        	}
@@ -235,7 +263,7 @@ public class MainActivity extends Activity
 	        {
 	        	holder.itemImage.setImageResource( R.drawable.target_add_48 );
 	        	holder.itemTitle.setText( "Add custom target" );
-	        	holder.itemTitle.setTypeface( null, Typeface.BOLD );
+	        	holder.itemDescription.setText( "Add any hostname or address to the list." );
 	        	holder.scanButton.setVisibility( View.GONE );
 	        	
 	        	row.setOnClickListener( new AddCustomTargetClickListener() );
@@ -251,35 +279,42 @@ public class MainActivity extends Activity
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);        
         setContentView( LAYOUT );
+        
+        final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Initializing ...", true, false );
                
         new Thread( new Runnable(){
 			@Override
 			public void run() 
 			{						
+				dialog.show();
+				
 		        mToolsInstaller = new ToolsInstaller( MainActivity.this.getApplicationContext() );
 		       
 				if( Shell.isRootGranted() == false )  
 				{
+					dialog.dismiss();
 					MainActivity.this.runOnUiThread( new Runnable() {
 				       public void run() {
 				    	   new FatalDialog( "Error", "This application can run only on rooted devices.", MainActivity.this ).show();
 				       }
 				    });
 				}		        							                
-		        else if( mToolsInstaller.needed() && mToolsInstaller.install() == false )
+				else if( mToolsInstaller.needed() && mToolsInstaller.install() == false )
 		        {
+		        	dialog.dismiss();
 					MainActivity.this.runOnUiThread( new Runnable() {
 				       public void run() {
 				    	   new FatalDialog( "Error", "Error during files installation!", MainActivity.this ).show();
 				       }
 				    });
 		        }
+				
+				dialog.dismiss();
 			}
 		}).start();
         
         System.init( getApplicationContext() );
         
-        // TODO: Implement automatic loading
         System.registerPlugin( new PortScanner( ) );
         System.registerPlugin( new MITM( ) );
         System.registerPlugin( new LoginCracker( ) );
@@ -295,7 +330,7 @@ public class MainActivity extends Activity
 	    	ArrayList<Target> targets = new ArrayList<Target>();
 			
 			targets.add( new Target( System.getNetwork() ) );
-			targets.add( new Target( System.getNetwork().getLoacalAddress(), null ) );
+			targets.add( new Target( System.getNetwork().getLoacalAddress(), System.getNetwork().getLocalHardware() ) );
 			targets.add( null );
 
 			mTargetAdapter = new TargetAdapter( R.layout.target_list_item, targets );

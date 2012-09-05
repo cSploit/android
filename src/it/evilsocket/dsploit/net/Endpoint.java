@@ -29,7 +29,7 @@ public class Endpoint
 	private InetAddress mAddress  = null;
 	private byte[]      mHardware = null;
 	
-	private static byte[] parseMacAddress( String macAddress) {
+	private static byte[] parseMacAddress( String macAddress ) {
         String[] bytes = macAddress.split(":");
         byte[] parsed  = new byte[bytes.length];
 
@@ -73,12 +73,34 @@ public class Endpoint
 		return mAddress;
 	}
 	
+	public long getAddressAsLong() {
+		byte[] baddr = mAddress.getAddress();
+		
+		return ( ( baddr[0] & 0xFFl) << 24 ) + ( ( baddr[1] & 0xFFl ) << 16 ) + ( ( baddr[2] & 0xFFl ) << 8 ) + ( baddr[3] &  0xFFl ); 
+	}
+	
 	public void setAddress( InetAddress address ) {
 		this.mAddress = address;
 	}
 	
 	public byte[] getHardware() {
 		return mHardware;
+	}
+	
+	public String getHardwareAsString() {
+		if( mHardware == null )
+			return "";
+		
+		StringBuilder builder = new StringBuilder(18);
+	    for( byte b : mHardware ) 
+	    {
+	        if( builder.length() > 0 )
+	            builder.append(':');
+	        
+	        builder.append( String.format("%02X", b) );
+	    }
+	    
+	    return builder.toString();
 	}
 	
 	public void setHardware( byte[] hardware ) {

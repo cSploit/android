@@ -28,7 +28,8 @@ import it.evilsocket.dsploit.net.Target;
 import android.content.Context;
 import android.util.Log;
 
-public class NMap extends Tool {
+public class NMap extends Tool 
+{
 	private static final String TAG = "NMAP";
 	
 	public NMap( Context context ){

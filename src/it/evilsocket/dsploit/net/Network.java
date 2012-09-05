@@ -153,6 +153,19 @@ public class Network
 		return null;
 	}
 	
+	public byte[] getLocalHardware( ){
+		try 
+		{
+			return mInterface.getHardwareAddress();
+		} 
+		catch( SocketException e ) 
+		{
+			Log.e( "Network", e.toString() );
+		}
+		
+		return null;
+	}
+	
 	public InetAddress getLoacalAddress( ){
 		try
 		{

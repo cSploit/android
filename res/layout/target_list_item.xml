@@ -3,7 +3,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="horizontal"
-    android:padding="10dp">
+    android:padding="10dp" >
 
     <ImageView
         android:id="@+id/itemIcon"
@@ -18,23 +18,32 @@
 
     <TextView
         android:id="@+id/itemTitle"
-        android:layout_width="369dp"
-        android:layout_height="fill_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_alignTop="@+id/scanButton"
-        android:layout_marginBottom="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/scanButton"
         android:layout_toRightOf="@id/itemIcon"
-        android:gravity="center_vertical"
         android:textColor="#FFFFFF"
         android:textSize="15dp" />
 
+    <TextView
+        android:id="@+id/itemDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/scanButton"
+        android:layout_toRightOf="@id/itemIcon"
+        android:paddingTop="20dp"
+        android:textColor="#888888"
+        android:textSize="12dp" />
+    
     <Button
         android:id="@+id/scanButton"
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:layout_alignParentRight="true" 
-        android:padding="10dip"
-        android:text="Scan" />
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/action_scan_48"
+        android:minHeight="1dip"
+        android:minWidth="1dip" />
 
 </RelativeLayout>
