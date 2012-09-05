@@ -18,34 +18,33 @@
  */
 package it.evilsocket.dsploit.net.http;
 
-import it.evilsocket.dsploit.net.ByteBuffer;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import android.util.Log;
 
 public class ProxyThread extends Thread
 {			  
-	private final static String TAG			= "PROXYTHREAD";
-	private final static int    BUFFER_SIZE = 2048;
-	private final static int    TIMEOUT     = 200;
-	private final static String HOST_HEADER = "Host: ";
-	private final static int    SERVER_PORT = 80;
+	private final static String TAG				 = "PROXYTHREAD";
+	private final static int    MAX_REQUEST_SIZE = 8192;
+	private final static String HOST_HEADER 	 = "Host: ";
+	private final static int    SERVER_PORT 	 = 80;
 	
 	private Socket 			 			 mSocket 	   = null;
 	private BufferedOutputStream 		 mWriter 	   = null;
-	private BufferedInputStream   	 	 mReader 	   = null;
+	private InputStream   	 	 		 mReader 	   = null;
 	private String			 			 mServerName   = null;
 	private Socket			 			 mServer 	   = null;
-	private BufferedInputStream	 	 	 mServerReader = null;
-	private BufferedOutputStream 		 mServerWriter = null;
+	private InputStream			 	 	 mServerReader = null;
+	private OutputStream		 		 mServerWriter = null;
 	private ArrayList<Proxy.ProxyFilter> mFilters 	   = null;
 	
 	public ProxyThread( Socket socket, ArrayList<Proxy.ProxyFilter> filters ) throws IOException {
@@ -53,84 +52,79 @@ public class ProxyThread extends Thread
 		
 		mSocket  = socket;
 		mWriter  = new BufferedOutputStream( mSocket.getOutputStream() );
-		mReader  = new BufferedInputStream( mSocket.getInputStream() );
-		mFilters = filters;
-		
-		mSocket.setSoTimeout( TIMEOUT );					
+		mReader  = mSocket.getInputStream();
+		mFilters = filters;		
 	}
 	
 	public void run() {
 		
 		try 
-		{					
-			// read the request headers.
-			ByteBuffer buffer = new ByteBuffer();
-
-			try
-			{
-				int    read  = -1;
-				byte[] chunk = new byte[ BUFFER_SIZE ];
-				
-				while( ( read = mReader.read( chunk, 0, BUFFER_SIZE ) ) != -1 )
-				{
-					buffer.append( chunk, read );
-				}
-			}
-			catch( SocketTimeoutException timeout )
-			{
-				
-			}
-			
-			String 		  request = buffer.toString();
-			StringBuilder builder = new StringBuilder();
-			
-			for( String line : request.split("\n" ) )
-			{
-				// Set protocol version to 1.0 since we don't support chunked transfer encoding ( yet )
-				if( line.contains("HTTP/1.1") )
-					line = line.replace( "HTTP/1.1", "HTTP/1.0" );
-				// Set encoding to identity since we are not handling gzipped streams
-				else if( line.contains("Accept-Encoding") )
-					line = "Accept-Encoding: identity";				
-				// Can't easily handle keep alive connections with blocking sockets
-				else if( line.contains("keep-alive") )
-				 	line = "Connection: close";
-				// Extract the real request target and connect to it.
-				else if( line.contains( HOST_HEADER ) )
-				{					
-					mServerName   = line.substring( line.indexOf( HOST_HEADER ) + HOST_HEADER.length() ).trim();										
-					mServer 	  = new Socket( mServerName, SERVER_PORT );
-					mServerReader = new BufferedInputStream( mServer.getInputStream() ); 
-					mServerWriter = new BufferedOutputStream( mServer.getOutputStream() );		
-					
-					Log.d( TAG, mSocket.getLocalAddress() + " > " + mServerName );
-				}
-				
-				// build the patched request
-				builder.append( line + "\n" );
-			}
-							
-			// any real host found ?
-			if( mServer != null )
-			{				
-				// send the patched request
-				mServerWriter.write( builder.toString().getBytes() );
-				mServerWriter.flush();
-				// start the stream session with specified filters				
-				new StreamThread( mServer, mServerReader, mWriter, new Proxy.ProxyFilter() {									
-					@Override
-					public String onHtmlReceived( String html ) 
-					{	
-						// apply each provided filter
-						for( Proxy.ProxyFilter filter : mFilters )
-						{
-							html = filter.onHtmlReceived( html );
-						}
+		{						
+            // Apache's default header limit is 8KB.
+            byte[] buffer = new byte[ MAX_REQUEST_SIZE ];
+            int	   read   = 0;
+            
+            // Read the header and rebuild it
+            if( ( read = mReader.read( buffer , 0,  MAX_REQUEST_SIZE ) ) > 0 )
+            {            
+	            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream( buffer, 0, read );
+	            BufferedReader 		 bReader 			  = new BufferedReader( new InputStreamReader( byteArrayInputStream ) );	            
+	            StringBuilder 		 builder 			  = new StringBuilder();
+	            String		  		 line    			  = null;
+	            
+	            while( ( line = bReader.readLine() ) != null )
+				{	            	
+					// Set protocol version to 1.0 since we don't support chunked transfer encoding ( yet )
+					if( line.contains("HTTP/1.1") )
+						line = line.replace( "HTTP/1.1", "HTTP/1.0" );
+					// Set encoding to identity since we are not handling gzipped streams
+					else if( line.contains("Accept-Encoding") )
+						line = "Accept-Encoding: identity";				
+					// Can't easily handle keep alive connections with blocking sockets
+					else if( line.contains("keep-alive") )
+					 	line = "Connection: close";
+					// Extract the real request target and connect to it.
+					else if( line.contains( HOST_HEADER ) )
+					{					
+						mServerName   = line.substring( line.indexOf( HOST_HEADER ) + HOST_HEADER.length() ).trim();										
+						mServer 	  = new Socket( mServerName, SERVER_PORT );
+						mServerReader = mServer.getInputStream(); 
+						mServerWriter = mServer.getOutputStream();		
 						
-						return html;
+						Log.d( TAG, mSocket.getLocalAddress() + " > " + mServerName );
 					}
-				});
-			}							
+					
+					// build the patched request
+					builder.append( line + "\n" );
+				}
+	            
+	            // any real host found ?
+	 			if( mServer != null )
+	 			{				
+	 				// send the patched request
+	 				mServerWriter.write( builder.toString().getBytes() );
+	 				mServerWriter.flush();
+	 				// start the stream session with specified filters				
+	 				new StreamThread( mServerReader, mWriter, new Proxy.ProxyFilter() {									
+	 					@Override
+	 					public String onHtmlReceived( String html ) 
+	 					{	
+	 						// apply each provided filter
+	 						for( Proxy.ProxyFilter filter : mFilters )
+	 						{
+	 							html = filter.onHtmlReceived( html );
+	 						}
+	 						
+	 						return html;
+	 					}
+	 				});
+	 			}					
+            }
+            else
+            {
+            	mReader.close();
+            	Log.w( TAG, "Empty HTTP request." );
+            }
 		} 
 		catch( IOException e )
 		{

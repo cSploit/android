@@ -27,6 +27,10 @@ public class ByteBuffer
 	public ByteBuffer(){
 		
 	}
+	
+	public ByteBuffer( byte[] buffer ){
+		setData( buffer );
+	}
 
 	public void append( byte[] buffer, int length ) {
 		byte[] chunk   = Arrays.copyOfRange( buffer, 0, length ),

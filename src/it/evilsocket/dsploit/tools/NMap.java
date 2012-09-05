@@ -44,7 +44,7 @@ public class NMap extends Tool
 		private String		  mLastAddress = null;
 		private String		  mLastMac     = null;
 		
-		public void onStart( String commandLine) {
+		public void onStart( String commandLine ) {
 
 		}
 		

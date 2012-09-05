@@ -23,9 +23,6 @@ import it.evilsocket.dsploit.net.ByteBuffer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
 
 import android.util.Log;
 
@@ -35,29 +32,17 @@ public class StreamThread implements Runnable
 	private final static byte[]  CONTENT_TEXT_HTML = "text/html".getBytes();
 	private final static String  HEAD_SEPARATOR    = "\r\n\r\n";
     private final static int     CHUNK_SIZE        = 1024;
-    private final static int     TIMEOUT           = 20;
     
-    private Socket			  mSocket = null;
     private InputStream       mReader = null;
     private OutputStream      mWriter = null;
     private ByteBuffer		  mBuffer = null;
     private Proxy.ProxyFilter mFilter = null;
     
-    public StreamThread( Socket socket, InputStream reader, OutputStream writer, Proxy.ProxyFilter filter ){
-    	mSocket = socket;
+    public StreamThread( InputStream reader, OutputStream writer, Proxy.ProxyFilter filter ){
     	mReader = reader;
     	mWriter = writer;
     	mBuffer = new ByteBuffer();
     	mFilter = filter;
-    	
-    	try
-    	{
-    		mSocket.setSoTimeout( TIMEOUT );
-    	}
-    	catch( SocketException e )
-    	{
-    		Log.e( TAG, e.toString() );
-    	}
     	
     	new Thread( this ).start();
     }
@@ -69,30 +54,14 @@ public class StreamThread implements Runnable
     	
     	try 
     	{
-    		// just read CHUNK_SIZE bytes at time until there's nothing more to read.
-    		while( true )
+    		// TODO: Implement support for chunkend transfer encoding
+    		while( ( read = mReader.read( chunk, 0, CHUNK_SIZE ) ) > 0 )
     		{
-    			try
-    			{
-    				// TODO: Implement support for chunkend transfer encoding
-    				if( ( read = mReader.read( chunk, 0, CHUNK_SIZE ) ) != -1 )
-    				{
-    					// since we don't know yet if we have a binary or text stream,
-    					// use only a byte array buffer instead of a string builder to
-    					// avoid encoding corruption
-    					mBuffer.append( chunk, read );
-    				}
-    				else
-    					break;
-    			}
-    			catch( SocketTimeoutException timeout )
-    			{
-    				
-    			}
+    			mBuffer.append( chunk, read );
     		}
     		
     		if( mBuffer.isEmpty() == false )
-    		{
+    		{    			
 				// do we have html ?
 				if( mBuffer.indexOf( CONTENT_TEXT_HTML ) != -1 )
 				{
