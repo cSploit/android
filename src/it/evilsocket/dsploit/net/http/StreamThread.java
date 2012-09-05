@@ -18,32 +18,36 @@
  */
 package it.evilsocket.dsploit.net.http;
 
+import it.evilsocket.dsploit.net.ByteBuffer;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.Arrays;
 
 import android.util.Log;
 
 public class StreamThread implements Runnable
 {
-	private final static String  TAG            = "PROXYSTREAMTHREAD";
-	private final static String  HEAD_SEPARATOR = "\r\n\r\n";
-    private final static int     BUFFER_SIZE    = 1024;
-    private final static int     TIMEOUT        = 20;
+	private final static String  TAG               = "PROXYSTREAMTHREAD";
+	private final static byte[]  CONTENT_TEXT_HTML = "text/html".getBytes();
+	private final static String  HEAD_SEPARATOR    = "\r\n\r\n";
+    private final static int     CHUNK_SIZE        = 1024;
+    private final static int     TIMEOUT           = 20;
     
     private Socket			  mSocket = null;
     private InputStream       mReader = null;
     private OutputStream      mWriter = null;
+    private ByteBuffer		  mBuffer = null;
     private Proxy.ProxyFilter mFilter = null;
     
     public StreamThread( Socket socket, InputStream reader, OutputStream writer, Proxy.ProxyFilter filter ){
     	mSocket = socket;
     	mReader = reader;
     	mWriter = writer;
+    	mBuffer = new ByteBuffer();
     	mFilter = filter;
     	
     	try
@@ -58,70 +62,25 @@ public class StreamThread implements Runnable
     	new Thread( this ).start();
     }
     
-    // return first + second[ 0..length ]
-    private static byte[] streamAppend( byte[] first, byte[] second, int length ){
-		byte[] stream = null,
-			   chunk  = Arrays.copyOfRange( second, 0, length );
-		int    i, j;
-		
-		if( first == null )
-			stream = chunk;
-		
-		else
-		{
-			stream = new byte[ first.length + length ];
-						
-			for( i = 0; i < first.length; i++ )
-				stream[i] = first[i];
-			
-			for( j = 0; j < length; i++, j++ )
-				stream[i] = chunk[j];
-		}
-		
-		return stream;
-	}
-    
-    // return the index of the first occurrence of pattern inside stream
-    private static int streamIndexOf( byte[] stream, byte[] pattern ){
-    	boolean match = false;
-    	int     i, j;
-    	
-    	for( i = 0; i < stream.length; i++ )
-    	{
-    		match = true;
-    		
-    		for( j = 0; j < pattern.length && match && ( i + j ) < stream.length; j++ )
-    		{
-    			if( stream[ i + j ] != pattern[ j ] )
-    				match = false;
-    		}
-    		
-    		if( match ) return i;
-    	}
-    	
-    	return -1;
-    }
-    
     public void run() {
     	
-    	int    read   = -1;
-    	byte[] stream = null,
-    		   buffer = new byte[ BUFFER_SIZE ];
+    	int    read  = -1;
+    	byte[] chunk = new byte[ CHUNK_SIZE ];
     	
     	try 
     	{
-    		// just read BUFFER_SIZE bytes at time until there's nothing more to read.
+    		// just read CHUNK_SIZE bytes at time until there's nothing more to read.
     		while( true )
     		{
     			try
     			{
     				// TODO: Implement support for chunkend transfer encoding
-    				if( ( read = mReader.read( buffer, 0, BUFFER_SIZE ) ) != -1 )
+    				if( ( read = mReader.read( chunk, 0, CHUNK_SIZE ) ) != -1 )
     				{
     					// since we don't know yet if we have a binary or text stream,
     					// use only a byte array buffer instead of a string builder to
     					// avoid encoding corruption
-    					stream = streamAppend( stream, buffer, read );
+    					mBuffer.append( chunk, read );
     				}
     				else
     					break;
@@ -132,13 +91,13 @@ public class StreamThread implements Runnable
     			}
     		}
     		
-    		if( stream != null && stream.length > 0 )
+    		if( mBuffer.isEmpty() == false )
     		{
 				// do we have html ?
-				if( streamIndexOf( stream, "text/html".getBytes() ) != -1 )
+				if( mBuffer.indexOf( CONTENT_TEXT_HTML ) != -1 )
 				{
 					// split headers and body, then apply the filter				
-					String   data    = new String( stream );
+					String   data    = mBuffer.toString();
 					String[] split   = data.split( HEAD_SEPARATOR, 2 );
 					String   headers = split[ 0 ],
 							 body	 = ( split.length > 1 ? split[ 1 ] : "" ),
@@ -154,10 +113,10 @@ public class StreamThread implements Runnable
 					}
 					
 					headers = patched;				
-					stream  = ( headers + HEAD_SEPARATOR + body ).getBytes();				
+					mBuffer.setData( ( headers + HEAD_SEPARATOR + body ).getBytes() );				
 				}
 				
-				mWriter.write( stream );    			    			
+				mWriter.write( mBuffer.getData() );    			    			
 				mWriter.flush();
     		}
 		} 

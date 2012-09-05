@@ -18,6 +18,8 @@
  */
 package it.evilsocket.dsploit.net.http;
 
+import it.evilsocket.dsploit.net.ByteBuffer;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -34,7 +36,7 @@ public class ProxyThread extends Thread
 	private final static String TAG			= "PROXYTHREAD";
 	private final static int    BUFFER_SIZE = 2048;
 	private final static int    TIMEOUT     = 200;
-	private final static String HOST_TOKEN  = "Host: ";
+	private final static String HOST_HEADER = "Host: ";
 	private final static int    SERVER_PORT = 80;
 	
 	private Socket 			 			 mSocket 	   = null;
@@ -57,32 +59,29 @@ public class ProxyThread extends Thread
 		mSocket.setSoTimeout( TIMEOUT );					
 	}
 	
-	private String readRequest( InputStream reader ) throws IOException {
-		StringBuilder buffer = new StringBuilder();
-
-		try
-		{
-			int    read = -1;
-			byte[] toread = new byte[ BUFFER_SIZE ];
-			
-			while( ( read = reader.read( toread, 0, BUFFER_SIZE ) ) != -1 )
-			{
-				buffer.append( new String( Arrays.copyOfRange( toread, 0, read ) ) );
-			}
-		}
-		catch( SocketTimeoutException timeout )
-		{
-			
-		}
-		
-		return buffer.toString();
-	}
-	
 	public void run() {
 		
 		try 
-		{						
-			String 		  request = readRequest( mReader );
+		{					
+			// read the request headers.
+			ByteBuffer buffer = new ByteBuffer();
+
+			try
+			{
+				int    read  = -1;
+				byte[] chunk = new byte[ BUFFER_SIZE ];
+				
+				while( ( read = mReader.read( chunk, 0, BUFFER_SIZE ) ) != -1 )
+				{
+					buffer.append( chunk, read );
+				}
+			}
+			catch( SocketTimeoutException timeout )
+			{
+				
+			}
+			
+			String 		  request = buffer.toString();
 			StringBuilder builder = new StringBuilder();
 			
 			for( String line : request.split("\n" ) )
@@ -96,10 +95,10 @@ public class ProxyThread extends Thread
 				// Can't easily handle keep alive connections with blocking sockets
 				else if( line.contains("keep-alive") )
 				 	line = "Connection: close";
-				// Exctract the real request target and connect to it.
-				else if( line.contains( HOST_TOKEN ) )
+				// Extract the real request target and connect to it.
+				else if( line.contains( HOST_HEADER ) )
 				{					
-					mServerName   = line.substring( line.indexOf( HOST_TOKEN ) + HOST_TOKEN.length() ).trim();										
+					mServerName   = line.substring( line.indexOf( HOST_HEADER ) + HOST_HEADER.length() ).trim();										
 					mServer 	  = new Socket( mServerName, SERVER_PORT );
 					mServerReader = new BufferedInputStream( mServer.getInputStream() ); 
 					mServerWriter = new BufferedOutputStream( mServer.getOutputStream() );		
