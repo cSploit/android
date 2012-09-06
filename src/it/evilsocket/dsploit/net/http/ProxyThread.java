@@ -35,9 +35,14 @@ public class ProxyThread extends Thread
 {			  
 	private final static String TAG				 = "PROXYTHREAD";
 	private final static int    MAX_REQUEST_SIZE = 8192;
-	private final static String HOST_HEADER 	 = "Host: ";
 	private final static int    SERVER_PORT 	 = 80;
 	
+	private final static String HOST_HEADER 	 		 = "Host";
+	private final static String ACCEPT_ENCODING_HEADER 	 = "Accept-Encoding";
+	private final static String CONNECTION_HEADER     	 = "Connection";
+	private final static String IF_MODIFIED_SINCE_HEADER = "If-Modified-Since";
+	private final static String CACHE_CONTROL_HEADER	 = "Cache-Control";
+
 	private Socket 			 			 mSocket 	   = null;
 	private BufferedOutputStream 		 mWriter 	   = null;
 	private InputStream   	 	 		 mReader 	   = null;
@@ -71,35 +76,52 @@ public class ProxyThread extends Thread
 	            BufferedReader 		 bReader 			  = new BufferedReader( new InputStreamReader( byteArrayInputStream ) );	            
 	            StringBuilder 		 builder 			  = new StringBuilder();
 	            String		  		 line    			  = null;
-
+	            boolean				 headersProcessed     = false;
+	            
 	            while( ( line = bReader.readLine() ) != null )
-				{	            	
-					// Set protocol version to 1.0 since we don't support chunked transfer encoding ( yet )
-					if( line.contains("HTTP/1.1") )
-						line = line.replace( "HTTP/1.1", "HTTP/1.0" );
-					// Set encoding to identity since we are not handling gzipped streams
-					else if( line.contains("Accept-Encoding") )
-						line = "Accept-Encoding: identity";				
-					// Can't easily handle keep alive connections with blocking sockets
-					else if( line.contains("keep-alive") )
-					 	line = "Connection: close";
-					// Keep requesting fresh files and ignore any cache instance
-					else if( line.contains( "If-Modified-Since") || line.contains( "Cache-Control") )
-						line = null;
-					// Extract the real request target and connect to it.
-					else if( line.contains( HOST_HEADER ) )
-					{					
-						mServerName   = line.substring( line.indexOf( HOST_HEADER ) + HOST_HEADER.length() ).trim();										
-						mServer 	  = new Socket( mServerName, SERVER_PORT );
-						mServerReader = mServer.getInputStream(); 
-						mServerWriter = mServer.getOutputStream();		
-						
-						Log.d( TAG, mSocket.getLocalAddress() + " > " + mServerName );
-					}
-					
+				{	    
+	            	if( headersProcessed == false )
+	            	{
+	            		// \r\n\r\n received ?
+	            		if( line.trim().isEmpty() )
+	            			headersProcessed = true;
+						// Set protocol version to 1.0 since we don't support chunked transfer encoding ( yet )
+	            		else if( line.contains( "HTTP/1.1" ) )
+							line = line.replace( "HTTP/1.1", "HTTP/1.0" );
+		            	// Fix headers
+		            	else if( line.indexOf(':') != -1 )
+		            	{
+		            		String[] split  = line.split( ":", 2 );
+		            		String   header = split[0].trim(),
+		            				 value  = split[1].trim();
+		            		
+							// Set encoding to identity since we are not handling gzipped streams
+		            		if( header.equals( ACCEPT_ENCODING_HEADER ) )
+		            			value = "identity";	            		
+							// Can't easily handle keep alive connections with blocking sockets
+		            		else if( header.equals( CONNECTION_HEADER ) )
+		            			value = "close";
+							// Keep requesting fresh files and ignore any cache instance
+		            		else if( header.equals( IF_MODIFIED_SINCE_HEADER ) || header.equals( CACHE_CONTROL_HEADER ) )
+		            			header = null;
+							// Extract the real request target and connect to it.
+		            		else if( header.equals( HOST_HEADER ) )
+		            		{
+		            			mServerName   = value;										
+								mServer 	  = new Socket( mServerName, SERVER_PORT );
+								mServerReader = mServer.getInputStream(); 
+								mServerWriter = mServer.getOutputStream();		
+								
+								Log.d( TAG, mSocket.getLocalAddress().getHostAddress() + " > " + mServerName );
+		            		}
+		            			
+		            		if( header != null )
+		            			line = header + ": " + value;
+		            	}
+	            	}
+	            	
 					// build the patched request
-					if( line != null )
-						builder.append( line + "\n" );
+					builder.append( line + "\n" );
 				}
 	            
 	            // any real host found ?
