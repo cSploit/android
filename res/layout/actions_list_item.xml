@@ -19,8 +19,8 @@
       android:layout_width="fill_parent"
       android:layout_height="wrap_content"
       android:layout_toRightOf="@id/actionIcon"
-      android:padding="5dip"     
-      android:textAppearance="?android:attr/textAppearanceLarge" />
+      android:paddingLeft="5dip"
+      android:textAppearance="?android:attr/textAppearanceMedium" />
 
    <TextView
        android:id="@+id/actionDescription"
@@ -28,7 +28,8 @@
        android:layout_height="wrap_content"
        android:layout_alignLeft="@+id/actionName"
        android:layout_below="@id/actionName"
-       android:padding="5dip"
+       android:paddingBottom="5dip"
+       android:paddingLeft="5dip"
        android:textAppearance="?android:attr/textAppearanceSmall" />
 
 </RelativeLayout>

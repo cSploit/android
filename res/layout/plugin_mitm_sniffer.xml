@@ -20,6 +20,13 @@
         android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/sniffToggleButton"
         android:visibility="invisible" />
+    
+    <View
+        android:id="@+id/separator"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/sniffToggleButton"
+        android:background="@android:color/darker_gray" />
 
     <EditText
         android:id="@+id/sniffData"
@@ -28,7 +35,7 @@
         android:layout_alignLeft="@+id/sniffToggleButton"
         android:layout_alignParentBottom="true"
         android:layout_alignRight="@+id/sniffActivity"
-        android:layout_below="@+id/sniffActivity"
+        android:layout_below="@+id/separator"
         android:ems="10"
         android:focusable="false"
         android:focusableInTouchMode="false"

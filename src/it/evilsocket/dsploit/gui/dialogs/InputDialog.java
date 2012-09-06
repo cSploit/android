@@ -43,7 +43,7 @@ public class InputDialog extends AlertDialog
 		
 		if( text != null )
 			mEditText.setText(text);
-		
+				
 		this.setTitle( title );
 		this.setMessage( message );
 		this.setView( mEditText );

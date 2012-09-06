@@ -104,6 +104,58 @@ public class NMap extends Tool
 	}
 	
 	public Thread synScan( Target target, SynScanOutputReceiver receiver ) {		
-		return super.async( "-sS -P0 --system-dns -vvv " + target.getCommandLineRepresentation() , receiver );
+		return super.async( "-sS -P0 --system-dns -vvv " + target.getCommandLineRepresentation(), receiver );
+	}
+	
+	public static abstract class InspectionReceiver implements OutputReceiver
+	{
+		private final Pattern OPEN_PORT_PATTERN    = Pattern.compile( "^discovered open port (\\d+)/([^\\s]+).+", Pattern.CASE_INSENSITIVE );
+		private final Pattern SERVICE_PATTERN  	   = Pattern.compile( "^\\d+/[a-z]+\\s+[a-z]+\\s+[a-z]+.*$", Pattern.CASE_INSENSITIVE );
+		private final Pattern OS_PATTERN	   	   = Pattern.compile( "^Running:\\s+(.+)$", Pattern.CASE_INSENSITIVE );
+		private final Pattern OS_GUESS_PATTERN 	   = Pattern.compile( "^Running\\s+\\(JUST\\s+GUESSING\\):\\s+(.+)$", Pattern.CASE_INSENSITIVE );
+		private final Pattern SERVICE_INFO_PATTERN = Pattern.compile( "^Service\\s+Info:\\s+OS:\\s+([^;]+).*$", Pattern.CASE_INSENSITIVE );		
+		private final Pattern DEVICE_PATTERN       = Pattern.compile( "^Device\\s+type:\\s+(.+)$", Pattern.CASE_INSENSITIVE );
+		
+		public void onStart( String commandLine ) {
+			
+		}
+		
+		public void onNewLine( String line ) {			
+			Matcher matcher = null;
+			
+			if( ( matcher = OPEN_PORT_PATTERN.matcher(line) ) != null && matcher.find() )
+				onOpenPortFound( Integer.parseInt( matcher.group(1) ), matcher.group(2) );
+			
+			else if( ( matcher = SERVICE_PATTERN.matcher(line) ) != null && matcher.find() )
+				onServiceFound( line );
+			
+			else if( ( matcher = OS_PATTERN.matcher(line) ) != null && matcher.find() )
+				onOsFound( matcher.group(1) );
+			
+			else if( ( matcher = OS_GUESS_PATTERN.matcher(line) ) != null && matcher.find() )
+				onGuessOsFound( matcher.group(1) );
+			
+			else if( ( matcher = DEVICE_PATTERN.matcher(line) ) != null && matcher.find() )
+				onDeviceFound( matcher.group(1).replace( "|", ",  ") );
+			
+			else if( ( matcher = SERVICE_INFO_PATTERN.matcher(line) ) != null && matcher.find() )
+				onServiceInfoFound( matcher.group(1) );
+		}
+		
+		public abstract void onOpenPortFound( int port, String protocol );
+		public abstract void onServiceFound( String service );
+		public abstract void onOsFound( String os );
+		public abstract void onGuessOsFound( String os );
+		public abstract void onDeviceFound( String device );
+		public abstract void onServiceInfoFound( String info );
+
+		public void onEnd( int exitCode ) {
+			if( exitCode != 0 )
+				Log.e( TAG, "nmap exited with code " + exitCode );
+		}
+	}
+	
+	public Thread inpsect( Target target, InspectionReceiver receiver ) {
+		return super.async( "-T4 -F -O -sV --system-dns -vvv " + target.getCommandLineRepresentation(), receiver );
 	}
 }

@@ -19,25 +19,40 @@
 package it.evilsocket.dsploit.plugins;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
+import it.evilsocket.dsploit.MainActivity;
 import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.MainActivity.TargetAdapter;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.gui.dialogs.FinishDialog;
+import it.evilsocket.dsploit.gui.dialogs.InputDialog;
+import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Target.Port;
+import it.evilsocket.dsploit.plugins.mitm.MITM;
+import it.evilsocket.dsploit.tools.Hydra;
 
 public class LoginCracker extends Plugin
 {
 	private static final String[] PROTOCOLS = new String[]
 	{
 		"ftp",
+		/*
 		"http-head",
 		"http-get",
 		"http-get-form",
@@ -48,6 +63,7 @@ public class LoginCracker extends Plugin
 		"https-get",
 		"http-proxy",
 		"http-proxy-ntlm",
+		*/
 		"icq",
 		"imap",
 		"imap-ntlm",
@@ -86,8 +102,76 @@ public class LoginCracker extends Plugin
 		"vmauthd"
 	};
 	
-	private Spinner mPortSpinner	 = null;
-	private Spinner mProtocolSpinner = null;
+	private static final String[] CHARSETS = new String[]
+	{
+		"a-z",
+		"A-Z",
+		"a-z0-9",
+		"A-Z0-9",
+		"a-zA-Z0-9"
+	};
+	
+	private static final String[] CHARSETS_MAPPING = new String[]
+	{
+		"a",
+		"A",
+		"a1",
+		"A1",
+		"aA1"
+	};
+	
+	private static String[] USERNAMES = new String[]
+	{
+		"saroot",
+		"admin",
+		"root",
+		"administrator",
+		"Administrator",
+		"Admin",
+		"admin",
+		"system",
+		"webadminadministrator",
+		"daemon ",
+		"bin ",
+		"sys ",
+		"adm ",
+		"lp ",
+		"uucp ",
+		"nuucp ",
+		"smmsp ",
+		"listen ",
+		"gdm ",
+		"sshd ",
+		"webservd ",
+		"oracle",
+		"httpd",
+		"nginx",
+		"-- ADD --"
+	};
+	
+	private static final String[] LENGTHS = new String[]
+	{
+		"1",
+		"2",
+		"3",
+		"4",
+		"5",
+		"6"
+	};
+	
+	private Spinner 	 	mPortSpinner	 = null;
+	private Spinner 	 	mProtocolSpinner = null;
+	private Spinner 	 	mCharsetSpinner  = null;
+	private Spinner 	 	mUserSpinner	 = null;
+	private Spinner 	 	mMinSpinner	  	 = null;
+	private Spinner 	 	mMaxSpinner	  	 = null;
+	private ToggleButton 	mStartButton 	 = null;
+	private TextView 	 	mStatusText 	 = null;
+	private ProgressBar	    mActivity		 = null;
+	private ProgressBar  	mProgressBar 	 = null;
+	private Hydra		 	mHydra			 = null;
+	private boolean	     	mRunning		 = false;
+	private AttemptReceiver mReceiver     	 = null;
 	
 	public LoginCracker( ) {
 		super
@@ -100,9 +184,127 @@ public class LoginCracker extends Plugin
 	    );		
 	}
 	
+	private class AttemptReceiver extends Hydra.AttemptReceiver
+	{
+		@Override
+		public void onNewAttempt( String login, String password, int progress, int total ) {
+			final String user = login,
+						 pass = password;
+			
+			final int    step = progress,
+						 tot  = total;
+			
+			LoginCracker.this.runOnUiThread(new Runnable() {
+	            @Override
+	            public void run() {
+	            	mStatusText.setTextColor( Color.DKGRAY );
+	            	mStatusText.setText( "Trying " + user + ":" + pass );
+	            	mProgressBar.setMax( tot );
+	            	mProgressBar.setProgress( step );
+	            }
+	        });
+		}		
+		
+		@Override
+		public void onAccountFound( String login, String password ) {
+			final String user = login,
+						 pass = password;
+			
+			LoginCracker.this.runOnUiThread(new Runnable() {
+	            @Override
+	            public void run() {
+	            	setStoppedState();
+	            	mStatusText.setTextColor( Color.GREEN );
+	            	mStatusText.setText( "USERNAME = " + user + " - PASSWORD = " + pass );
+	            }
+	        });			
+		}
+		
+		@Override
+		public void onError( String message ) {
+			final String error = message;
+			
+			LoginCracker.this.runOnUiThread(new Runnable() {
+	            @Override
+	            public void run() {
+	            	mStatusText.setTextColor( Color.YELLOW );
+	            	mStatusText.setText( error );
+	            }
+	        });
+		}
+
+		@Override
+		public void onFatal( String message ) {			
+			final String error = message;
+			
+			LoginCracker.this.runOnUiThread(new Runnable() {
+	            @Override
+	            public void run() {
+	    			setStoppedState();
+	            	mStatusText.setTextColor( Color.RED );
+	            	mStatusText.setText( error );
+	            }
+	        });
+		}				
+		
+		@Override
+		public void onEnd( int code ) {
+			if( mRunning )
+			{
+				LoginCracker.this.runOnUiThread(new Runnable() {
+		            @Override
+		            public void run() {
+		    			setStoppedState();
+		            }
+		        });
+			}
+		}
+	}
+	
+	private void setStoppedState( ) {
+		mHydra.kill();
+		mRunning = false;
+		
+		LoginCracker.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+            	mActivity.setVisibility( View.INVISIBLE );
+        		mProgressBar.setProgress( 0 );
+        		mStartButton.setChecked( false );
+            	mStatusText.setTextColor( Color.DKGRAY );
+            	mStatusText.setText( "Stopped ..." );
+            }
+        });
+	}
+	
+	private void setStartedState( ) {
+		int min = Integer.parseInt( ( String )mMinSpinner.getSelectedItem() ), 
+			max	= Integer.parseInt( ( String )mMaxSpinner.getSelectedItem() );
+		
+		if( min > max ) max = min + 1;
+		
+		mActivity.setVisibility( View.VISIBLE );
+    	mStatusText.setTextColor( Color.DKGRAY );
+    	mStatusText.setText( "Starting ..." );
+    	
+		mHydra.crack
+		(
+		  System.getTarget(), 
+		  Integer.parseInt( ( String )mPortSpinner.getSelectedItem() ), 
+		  ( String )mProtocolSpinner.getSelectedItem(), 
+		  CHARSETS_MAPPING[ mCharsetSpinner.getSelectedItemPosition() ], 
+		  min,
+		  max,
+		  ( String )mUserSpinner.getSelectedItem(), 
+		  mReceiver
+		).start();
+		
+		mRunning = true;
+	}
+	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);   
-        
+       
         if( System.getTarget().hasOpenPorts() == false )
         	new FinishDialog( "Warning", "No open ports detected on current target, run the port scanner first.", this ).show();
         
@@ -111,7 +313,7 @@ public class LoginCracker extends Plugin
         for( Port port : System.getTarget().getOpenPorts() )
         	ports.add( Integer.toString( port.port ) );
         
-        mPortSpinner     = ( Spinner )findViewById( R.id.portSpinner );
+        mPortSpinner = ( Spinner )findViewById( R.id.portSpinner );
         mPortSpinner.setAdapter( new ArrayAdapter<String>( this, android.R.layout.simple_spinner_item, ports ) );
         mPortSpinner.setOnItemSelectedListener( new OnItemSelectedListener() {
         	public void onItemSelected( AdapterView<?> adapter, View view, int position, long id ) 
@@ -137,5 +339,66 @@ public class LoginCracker extends Plugin
         
         mProtocolSpinner = ( Spinner )findViewById( R.id.protocolSpinner );
         mProtocolSpinner.setAdapter( new ArrayAdapter<String>( this, android.R.layout.simple_spinner_item, PROTOCOLS ) );
+        
+        mCharsetSpinner = ( Spinner )findViewById( R.id.charsetSpinner );
+        mCharsetSpinner.setAdapter( new ArrayAdapter<String>( this, android.R.layout.simple_spinner_item, CHARSETS ) );
+
+        mUserSpinner = ( Spinner )findViewById( R.id.userSpinner );
+        mUserSpinner.setAdapter( new ArrayAdapter<String>( this, android.R.layout.simple_spinner_item, USERNAMES ) );
+        mUserSpinner.setOnItemSelectedListener( new OnItemSelectedListener() {
+        	public void onItemSelected( AdapterView<?> adapter, View view, int position, long id ) 
+        	{
+        		String user = ( String )adapter.getItemAtPosition( position );
+        		if( user.equals("-- ADD --") )
+        		{
+        			new InputDialog( "Add username", "Enter the username you want to use:", LoginCracker.this, new InputDialogListener(){
+						@Override
+						public void onInputEntered( String input ) {
+							USERNAMES = Arrays.copyOf( USERNAMES, USERNAMES.length + 1 );
+							USERNAMES[ USERNAMES.length - 1 ] = "-- ADD --";
+							USERNAMES[ USERNAMES.length - 2 ] = input;
+							
+							mUserSpinner.setAdapter( new ArrayAdapter<String>( LoginCracker.this, android.R.layout.simple_spinner_item, USERNAMES ) );
+							mUserSpinner.setSelection( USERNAMES.length - 2 );
+						}        				
+        			}).show();
+        		}
+        	}
+        	
+        	public void onNothingSelected(AdapterView<?> arg0) {}
+		});
+
+        mMaxSpinner = ( Spinner )findViewById( R.id.maxSpinner );
+        mMaxSpinner.setAdapter( new ArrayAdapter<String>( this, android.R.layout.simple_spinner_item, LENGTHS ) );
+        mMinSpinner = ( Spinner )findViewById( R.id.minSpinner );
+        mMinSpinner.setAdapter( new ArrayAdapter<String>( this, android.R.layout.simple_spinner_item, LENGTHS ) );
+        
+        mStartButton = ( ToggleButton )findViewById( R.id.startButton );
+        mStatusText  = ( TextView )findViewById( R.id.statusText );
+        mProgressBar = ( ProgressBar )findViewById( R.id.progressBar );
+        mActivity	 = ( ProgressBar )findViewById( R.id.activity );
+        
+        mHydra 	  = new Hydra( this );        
+        mReceiver = new AttemptReceiver();
+        
+        mStartButton.setOnClickListener( new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				if( mRunning )
+				{
+					setStoppedState();
+				}
+				else
+				{
+					setStartedState();
+				}
+			}} 
+		);
+	}
+	
+	@Override
+	public void onBackPressed() {
+		setStoppedState();	
+	    super.onBackPressed();
 	}
 }

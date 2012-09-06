@@ -12,6 +12,12 @@
         android:text="ToggleButton"
         android:textOff="Start"
         android:textOn="Stop" />
+    <View
+        android:id="@+id/separator"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/scanToggleButton"
+        android:background="@android:color/darker_gray" />
 
     <ListView
         android:id="@+id/scanListView"
@@ -19,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/scanToggleButton" >
+        android:layout_below="@+id/separator" >
     </ListView>
 
     <ProgressBar

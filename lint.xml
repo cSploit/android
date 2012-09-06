@@ -1,3 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lint>
+    <issue id="HardcodedText">
+        <ignore path="res/layout/plugin_inspector.xml" />
+    </issue>
 </lint>

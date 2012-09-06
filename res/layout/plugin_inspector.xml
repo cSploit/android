@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp" >
+
+    <ToggleButton
+        android:id="@+id/inspectToggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ToggleButton"
+        android:textOff="Start"
+        android:textOn="Stop" />
+
+    <ProgressBar
+        android:id="@+id/inspectActivity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/inspectToggleButton"
+        android:visibility="invisible" />
+
+    <View
+        android:id="@+id/separator"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/inspectToggleButton"
+        android:background="@android:color/darker_gray" />
+
+    <TextView
+        android:id="@+id/deviceTypeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/inspectToggleButton"
+        android:layout_below="@+id/separator"
+        android:layout_marginTop="33dp"
+        android:text="Device Type"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/deviceTypeLabel"
+        android:layout_alignRight="@+id/deviceTypeLabel"
+        android:layout_below="@+id/deviceTypeLabel"
+        android:text="OS"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView2"
+        android:layout_alignRight="@+id/textView2"
+        android:layout_below="@+id/textView2"
+        android:layout_marginTop="25dp"
+        android:text="Services"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/deviceType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/textView2"
+        android:layout_alignRight="@+id/inspectActivity"
+        android:layout_alignTop="@+id/deviceTypeLabel"
+        android:layout_toRightOf="@+id/deviceTypeLabel"
+        android:paddingLeft="5dp"
+        android:text="unknown"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/deviceOS"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/textView2"
+        android:layout_alignLeft="@+id/deviceType"
+        android:layout_alignRight="@+id/deviceType"
+        android:layout_below="@+id/deviceType"
+        android:paddingLeft="5dp"
+        android:text="unknown"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/deviceServices"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView3"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/deviceOS"
+        android:layout_below="@+id/textView3"
+        android:padding="5dp"
+        android:text="unknown"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+    
+</RelativeLayout>

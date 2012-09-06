@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -10,15 +11,15 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Port"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        tools:ignore="HardcodedText" />
 
     <Spinner
         android:id="@+id/portSpinner"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/textView1"
-        android:layout_below="@+id/textView1"
-      />
+        android:layout_below="@+id/textView1" />
 
     <TextView
         android:id="@+id/TextView01"
@@ -27,7 +28,8 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/portSpinner"
         android:text="Service"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        tools:ignore="HardcodedText" />
 
     <Spinner
         android:id="@+id/protocolSpinner"
@@ -35,5 +37,121 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/TextView01"
         android:layout_below="@+id/TextView01" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/protocolSpinner"
+        android:layout_alignRight="@+id/protocolSpinner"
+        android:layout_below="@+id/protocolSpinner"
+        android:text="Charset"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        tools:ignore="HardcodedText" />
+
+    <Spinner
+        android:id="@+id/charsetSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView2"
+        android:layout_alignRight="@+id/textView2"
+        android:layout_below="@+id/textView2" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/charsetSpinner"
+        android:layout_alignRight="@+id/charsetSpinner"
+        android:layout_below="@+id/charsetSpinner"
+        android:text="Username"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        tools:ignore="HardcodedText" />
+
+    <Spinner
+        android:id="@+id/userSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView3"
+        android:layout_alignRight="@+id/textView3"
+        android:layout_below="@+id/textView3" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/maxSpinner"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/minSpinner" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/userSpinner"
+        android:layout_alignRight="@+id/userSpinner"
+        android:layout_below="@+id/userSpinner"
+        android:text="Min Length"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        tools:ignore="HardcodedText" />
+
+    <Spinner
+        android:id="@+id/minSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView5"
+        android:layout_alignRight="@+id/textView5"
+        android:layout_below="@+id/textView5" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/minSpinner"
+        android:layout_below="@+id/minSpinner"
+        android:text="Max Password Length"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        tools:ignore="HardcodedText" />
+
+    <Spinner
+        android:id="@+id/maxSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView4"
+        android:layout_alignRight="@+id/minSpinner"
+        android:layout_below="@+id/textView4" />
+
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/progressBar"
+        android:layout_alignLeft="@+id/progressBar"
+        android:layout_toLeftOf="@+id/activity"
+        android:text="Stopped ..."
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#888888"
+        tools:ignore="HardcodedText" />
+
+    <ProgressBar
+        android:id="@+id/activity"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/progressBar"
+        android:layout_alignRight="@+id/progressBar"
+        android:layout_alignTop="@+id/statusText"
+        android:visibility="invisible" />
+
+    <ToggleButton
+        android:id="@+id/startButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/statusText"
+        android:layout_alignLeft="@+id/statusText"
+        android:layout_alignRight="@+id/activity"
+        android:textOff="START"
+        android:textOn="STOP" />
 
 </RelativeLayout>

@@ -31,6 +31,7 @@ import it.evilsocket.dsploit.gui.dialogs.InputDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
 import it.evilsocket.dsploit.net.Endpoint;
 import it.evilsocket.dsploit.net.Target;
+import it.evilsocket.dsploit.plugins.Inspector;
 import it.evilsocket.dsploit.plugins.LoginCracker;
 import it.evilsocket.dsploit.plugins.PortScanner;
 import it.evilsocket.dsploit.plugins.mitm.MITM;
@@ -127,7 +128,7 @@ public class MainActivity extends Activity
 		                    	MainActivity.this.runOnUiThread(new Runnable() {
 				                    @Override
 				                    public void run() {
-				                    	notifyDataSetChanged();
+				                    	( ( TargetAdapter )mListView.getAdapter() ).notifyDataSetChanged();
 				                    }
 				                });
 							}														
@@ -173,7 +174,7 @@ public class MainActivity extends Activity
 		                    	MainActivity.this.runOnUiThread(new Runnable() {
 				                    @Override
 				                    public void run() {
-				                    	notifyDataSetChanged();
+				                    	( ( TargetAdapter )mListView.getAdapter() ).notifyDataSetChanged();
 				                    }
 				                });
 							}
@@ -316,6 +317,7 @@ public class MainActivity extends Activity
         System.init( getApplicationContext() );
         
         System.registerPlugin( new PortScanner( ) );
+        System.registerPlugin( new Inspector( ) );
         System.registerPlugin( new MITM( ) );
         System.registerPlugin( new LoginCracker( ) );
         

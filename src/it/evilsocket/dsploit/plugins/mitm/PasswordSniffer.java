@@ -218,7 +218,8 @@ public class PasswordSniffer extends Activity
 
 		try
 		{
-			mBufferedWriter.close();
+			if( mBufferedWriter != null )
+				mBufferedWriter.close();
 		}
 		catch( IOException e )
 		{
