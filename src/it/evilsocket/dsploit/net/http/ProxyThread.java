@@ -55,7 +55,7 @@ public class ProxyThread extends Thread
 		mReader  = mSocket.getInputStream();
 		mFilters = filters;		
 	}
-	
+
 	public void run() {
 		
 		try 
@@ -71,7 +71,7 @@ public class ProxyThread extends Thread
 	            BufferedReader 		 bReader 			  = new BufferedReader( new InputStreamReader( byteArrayInputStream ) );	            
 	            StringBuilder 		 builder 			  = new StringBuilder();
 	            String		  		 line    			  = null;
-	            
+
 	            while( ( line = bReader.readLine() ) != null )
 				{	            	
 					// Set protocol version to 1.0 since we don't support chunked transfer encoding ( yet )
@@ -83,6 +83,9 @@ public class ProxyThread extends Thread
 					// Can't easily handle keep alive connections with blocking sockets
 					else if( line.contains("keep-alive") )
 					 	line = "Connection: close";
+					// Keep requesting fresh files and ignore any cache instance
+					else if( line.contains( "If-Modified-Since") || line.contains( "Cache-Control") )
+						line = null;
 					// Extract the real request target and connect to it.
 					else if( line.contains( HOST_HEADER ) )
 					{					
@@ -95,7 +98,8 @@ public class ProxyThread extends Thread
 					}
 					
 					// build the patched request
-					builder.append( line + "\n" );
+					if( line != null )
+						builder.append( line + "\n" );
 				}
 	            
 	            // any real host found ?
