@@ -44,6 +44,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -280,7 +281,7 @@ public class MainActivity extends Activity
 
 	@Override
     public void onCreate( Bundle savedInstanceState ) {
-        super.onCreate(savedInstanceState);        
+        super.onCreate(savedInstanceState);      
         setContentView( LAYOUT );
         
         final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Initializing ...", true, false );
@@ -321,9 +322,9 @@ public class MainActivity extends Activity
         System.registerPlugin( new PortScanner( ) );
         System.registerPlugin( new Inspector( ) );
         System.registerPlugin( new ExploitFinder( ) );
-        System.registerPlugin( new MITM( ) );
         System.registerPlugin( new LoginCracker( ) );
-        
+        System.registerPlugin( new MITM( ) );
+
         // register the crash manager
         CrashManager.register( getApplicationContext() );
         
