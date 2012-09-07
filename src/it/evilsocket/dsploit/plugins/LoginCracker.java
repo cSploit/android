@@ -166,6 +166,7 @@ public class LoginCracker extends Plugin
 	private ProgressBar  	mProgressBar 	 = null;
 	private Hydra		 	mHydra			 = null;
 	private boolean	     	mRunning		 = false;
+	private boolean			mAccountFound	 = false;
 	private AttemptReceiver mReceiver     	 = null;
 	
 	public LoginCracker( ) {
@@ -201,16 +202,14 @@ public class LoginCracker extends Plugin
 		}		
 		
 		@Override
-		public void onAccountFound( String login, String password ) {
+		public void onAccountFound( final String login, final String password ) {
 			final String user = login,
 						 pass = password;
 			
 			LoginCracker.this.runOnUiThread(new Runnable() {
 	            @Override
 	            public void run() {
-	            	setStoppedState();
-	            	mStatusText.setTextColor( Color.GREEN );
-	            	mStatusText.setText( "USERNAME = " + user + " - PASSWORD = " + pass );
+	            	setStoppedState( login, password );
 	            }
 	        });			
 		}
@@ -256,6 +255,23 @@ public class LoginCracker extends Plugin
 		}
 	}
 	
+	private void setStoppedState( final String user, final String pass ) {
+		mHydra.kill();
+		mRunning 	  = false;
+		mAccountFound = true;
+		
+		LoginCracker.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+            	mActivity.setVisibility( View.INVISIBLE );
+        		mProgressBar.setProgress( 0 );
+        		mStartButton.setChecked( false );
+        		mStatusText.setTextColor( Color.GREEN );
+            	mStatusText.setText( "USERNAME = " + user + " - PASSWORD = " + pass );
+            }
+        });
+	}
+	
 	private void setStoppedState( ) {
 		mHydra.kill();
 		mRunning = false;
@@ -266,8 +282,11 @@ public class LoginCracker extends Plugin
             	mActivity.setVisibility( View.INVISIBLE );
         		mProgressBar.setProgress( 0 );
         		mStartButton.setChecked( false );
-            	mStatusText.setTextColor( Color.DKGRAY );
-            	mStatusText.setText( "Stopped ..." );
+        		if( mAccountFound == false )
+        		{
+        			mStatusText.setTextColor( Color.DKGRAY );
+        			mStatusText.setText( "Stopped ..." );
+        		}
             }
         });
 	}
@@ -277,6 +296,8 @@ public class LoginCracker extends Plugin
 			max	= Integer.parseInt( ( String )mMaxSpinner.getSelectedItem() );
 		
 		if( min > max ) max = min + 1;
+		
+		mAccountFound = false;
 		
 		mActivity.setVisibility( View.VISIBLE );
     	mStatusText.setTextColor( Color.DKGRAY );

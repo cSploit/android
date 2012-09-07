@@ -110,7 +110,7 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/minSpinner"
         android:layout_below="@+id/minSpinner"
-        android:text="Max Password Length"
+        android:text="Max Length"
         android:textAppearance="?android:attr/textAppearanceSmall"
         tools:ignore="HardcodedText" />
 
