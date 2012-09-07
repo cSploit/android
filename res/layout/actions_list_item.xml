@@ -18,7 +18,7 @@
       android:id="@+id/actionName"
       android:layout_width="fill_parent"
       android:layout_height="wrap_content"
-      android:layout_toRightOf="@id/actionIcon"
+      android:layout_toRightOf="@+id/actionIcon"
       android:paddingLeft="5dip"
       android:textAppearance="?android:attr/textAppearanceMedium" />
 

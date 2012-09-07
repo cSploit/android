@@ -37,6 +37,7 @@ public class Inspector extends Plugin
 
 	private ToggleButton mStartButton 	 = null;
 	private ProgressBar	 mActivity    	 = null;
+	private TextView     mDeviceName  	 = null;
 	private TextView     mDeviceType  	 = null;
 	private TextView     mDeviceOS  	 = null;
 	private TextView     mDeviceServices = null;
@@ -157,9 +158,12 @@ public class Inspector extends Plugin
         
         mStartButton    = ( ToggleButton )findViewById( R.id.inspectToggleButton );
         mActivity	    = ( ProgressBar )findViewById( R.id.inspectActivity );
+        mDeviceName		= ( TextView)findViewById( R.id.deviceName );
         mDeviceType 	= ( TextView)findViewById( R.id.deviceType ); 
         mDeviceOS   	= ( TextView)findViewById( R.id.deviceOS ); 
         mDeviceServices = ( TextView)findViewById( R.id.deviceServices ); 
+        
+        mDeviceName.setText( System.getTarget().toString() );
         
         mStartButton.setOnClickListener( new OnClickListener(){
 			@Override

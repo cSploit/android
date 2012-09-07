@@ -93,5 +93,27 @@
         android:padding="5dp"
         android:text="unknown"
         android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/deviceType"
+        android:layout_alignLeft="@+id/deviceTypeLabel"
+        android:layout_toLeftOf="@+id/deviceType"
+        android:text="Target"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/deviceName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/deviceType"
+        android:layout_alignLeft="@+id/deviceType"
+        android:layout_alignRight="@+id/deviceType"
+        android:layout_alignTop="@+id/textView1"
+        android:paddingLeft="5dp"
+        android:text="target"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
     
 </RelativeLayout>
