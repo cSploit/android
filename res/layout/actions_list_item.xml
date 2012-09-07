@@ -30,6 +30,8 @@
        android:layout_below="@id/actionName"
        android:paddingBottom="5dip"
        android:paddingLeft="5dip"
-       android:textAppearance="?android:attr/textAppearanceSmall" />
+       android:textAppearance="?android:attr/textAppearanceSmall"
+       android:textColor="#888888"
+       android:textSize="12dp" />
 
 </RelativeLayout>

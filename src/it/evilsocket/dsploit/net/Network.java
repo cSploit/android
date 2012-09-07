@@ -27,6 +27,7 @@ import java.net.UnknownHostException;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
@@ -65,13 +66,15 @@ public class Network
 	private ConnectivityManager mConnectivityManager = null;
 	private WifiManager 		mWifiManager 		 = null;	
 	private DhcpInfo   			mInfo        		 = null;
+	private WifiInfo			mWifiInfo			 = null;
 	private NetworkInterface    mInterface			 = null;
 	
 	public Network( Context context ) throws NoRouteToHostException, SocketException {
 		mWifiManager		 = ( WifiManager )context.getSystemService( Context.WIFI_SERVICE );
 		mConnectivityManager = ( ConnectivityManager )context.getSystemService( Context.CONNECTIVITY_SERVICE );
 		mInfo		 		 = mWifiManager.getDhcpInfo();
-								
+		mWifiInfo			 = mWifiManager.getConnectionInfo();
+		
 		if( isConnected() == false)
 			throw new NoRouteToHostException("Not connected to any WiFi access point.");
 		
@@ -151,6 +154,10 @@ public class Network
 		}
 		
 		return null;
+	}
+	
+	public byte[] getGatewayHardware(){
+		return Endpoint.parseMacAddress( mWifiInfo.getBSSID() );
 	}
 	
 	public byte[] getLocalHardware( ){

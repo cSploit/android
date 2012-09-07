@@ -44,10 +44,16 @@ public class Target {
 	{
 		public Protocol protocol;
 		public int		port;
+		public String   service;
 						
-		public Port( int port, Protocol proto ) {
+		public Port( int port, Protocol proto, String service ) {
 			this.port     = port;
 			this.protocol = proto;
+			this.service  = service;
+		}
+		
+		public Port( int port, Protocol proto ) {
+			this( port, proto, null );
 		}
 	}
 	
@@ -56,6 +62,7 @@ public class Target {
 	private int 		mPort 	  = 0;
 	private String 		mHostname = null;
 	private Type		mType     = null;
+	private InetAddress mAddress  = null;
 	private List<Port>  mPorts	  = new ArrayList<Port>();
 	
 	public static Target getFromString( String string ){
@@ -222,8 +229,10 @@ public class Target {
 			
 			return desc.trim();
 		}		
-		else
-			return "";
+		else if( mType == Type.REMOTE )
+			return mAddress.getHostAddress();
+		
+		return "";
 	}
 	
 	public String getCommandLineRepresentation()
@@ -288,6 +297,19 @@ public class Target {
 		mHostname = hostname;
 		mPort	  = port;
 		mType	  = Type.REMOTE;
+		
+		try
+		{
+			// This is needed to avoid NetworkOnMainThreadException
+        	StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        	StrictMode.setThreadPolicy(policy);
+        	
+			mAddress = InetAddress.getByName( mHostname );
+		}
+		catch( Exception e )
+		{
+			Log.d( "Target.setHostname()", e.toString() );
+		}
 	}
 	
 	public Type getType(){
@@ -315,11 +337,26 @@ public class Target {
 	}
 	
 	public void addOpenPort( Port port ) {
+		for( int i = 0; i < mPorts.size(); i++ )
+		{
+			if( mPorts.get(i).port == port.port )
+			{
+				if( port.service != null )
+					mPorts.get(i).service = port.service;
+				
+				return;
+			}
+		}
+
 		mPorts.add( port );
 	}
 	
 	public void addOpenPort( int port, Protocol protocol ) {
-		mPorts.add( new Port( port, protocol ) );
+		addOpenPort( new Port( port, protocol ) );
+	}
+	
+	public void addOpenPort( int port, Protocol protocol, String service ) {
+		addOpenPort( new Port( port, protocol, service ) );
 	}
 		
 	public List<Port> getOpenPorts() {
@@ -328,6 +365,18 @@ public class Target {
 	
 	public boolean hasOpenPorts() {
 		return !mPorts.isEmpty();
+	}
+	
+	public boolean hasOpenPortsWithService() {
+		if( mPorts.isEmpty() == false )
+		{
+			for( Port p : mPorts ) {
+				if( p.service != null && p.service.isEmpty() == false )
+					return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	public boolean hasOpenPort( int port ) {

@@ -30,7 +30,9 @@ import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
 import it.evilsocket.dsploit.net.Endpoint;
+import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.Target;
+import it.evilsocket.dsploit.plugins.ExploitFinder;
 import it.evilsocket.dsploit.plugins.Inspector;
 import it.evilsocket.dsploit.plugins.LoginCracker;
 import it.evilsocket.dsploit.plugins.PortScanner;
@@ -194,7 +196,7 @@ public class MainActivity extends Activity
 				final Target target = ( ( TargetHolder )v.getTag() ).target;
 	
 				System.setTarget( target );
-
+				
 				MainActivity.this.runOnUiThread( new Runnable() {
 	                @Override
 	                public void run() {
@@ -318,6 +320,7 @@ public class MainActivity extends Activity
         
         System.registerPlugin( new PortScanner( ) );
         System.registerPlugin( new Inspector( ) );
+        System.registerPlugin( new ExploitFinder( ) );
         System.registerPlugin( new MITM( ) );
         System.registerPlugin( new LoginCracker( ) );
         
@@ -332,6 +335,7 @@ public class MainActivity extends Activity
 	    	ArrayList<Target> targets = new ArrayList<Target>();
 			
 			targets.add( new Target( System.getNetwork() ) );
+			targets.add( new Target( System.getNetwork().getGatewayAddress(), System.getNetwork().getGatewayHardware() ) );
 			targets.add( new Target( System.getNetwork().getLoacalAddress(), System.getNetwork().getLocalHardware() ) );
 			targets.add( null );
 

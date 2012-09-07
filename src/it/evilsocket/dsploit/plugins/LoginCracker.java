@@ -23,7 +23,6 @@ import java.util.Arrays;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -32,11 +31,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
-import it.evilsocket.dsploit.MainActivity;
 import it.evilsocket.dsploit.R;
-import it.evilsocket.dsploit.MainActivity.TargetAdapter;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.gui.dialogs.FinishDialog;
@@ -44,7 +40,6 @@ import it.evilsocket.dsploit.gui.dialogs.InputDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Target.Port;
-import it.evilsocket.dsploit.plugins.mitm.MITM;
 import it.evilsocket.dsploit.tools.Hydra;
 
 public class LoginCracker extends Plugin
@@ -307,7 +302,7 @@ public class LoginCracker extends Plugin
        
         if( System.getTarget().hasOpenPorts() == false )
         	new FinishDialog( "Warning", "No open ports detected on current target, run the port scanner first.", this ).show();
-        
+                        
         ArrayList<String> ports = new ArrayList<String>();
         
         for( Port port : System.getTarget().getOpenPorts() )

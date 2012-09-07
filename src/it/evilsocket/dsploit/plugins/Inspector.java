@@ -47,16 +47,31 @@ public class Inspector extends Plugin
 	private class Receiver extends InspectionReceiver
 	{
 		@Override
-		public void onServiceFound( final String service ) {
-			Inspector.this.runOnUiThread(new Runnable() {
+		public void onServiceFound( final int port, final String protocol, final String service ) {
+			final boolean hasServiceDescription = !service.trim().isEmpty();
+					
+			Inspector.this.runOnUiThread( new Runnable() {
                 @Override
                 public void run() {
                 	if( mDeviceServices.getText().equals("unknown") )
                 		mDeviceServices.setText("");
                 	
-                	mDeviceServices.append( service + "\n" );
+                	if( hasServiceDescription )
+                		mDeviceServices.append( port + " ( " + protocol + " ) : " + service + "\n" );
+                	else
+                		mDeviceServices.append( port + " ( " + protocol + " )\n" );
                 }
             });			
+			
+			if( hasServiceDescription )
+				System.addOpenPort( port, Network.Protocol.fromString(protocol), service );
+			else
+				System.addOpenPort( port, Network.Protocol.fromString(protocol) );  
+		}
+		
+		@Override
+		public void onOpenPortFound( int port, String protocol ) {
+			System.addOpenPort( port, Network.Protocol.fromString(protocol) );       				
 		}
 
 		@Override
@@ -108,11 +123,6 @@ public class Inspector extends Plugin
                 		setStoppedState();
                 }
             });	
-		}
-
-		@Override
-		public void onOpenPortFound( int port, String protocol ) {
-			System.addOpenPort( port, Network.Protocol.fromString(protocol) );       				
 		}
 	}
 	

@@ -29,7 +29,7 @@ public class Endpoint
 	private InetAddress mAddress  = null;
 	private byte[]      mHardware = null;
 	
-	private static byte[] parseMacAddress( String macAddress ) {
+	public static byte[] parseMacAddress( String macAddress ) {
         String[] bytes = macAddress.split(":");
         byte[] parsed  = new byte[bytes.length];
 

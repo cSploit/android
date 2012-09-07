@@ -110,7 +110,7 @@ public class NMap extends Tool
 	public static abstract class InspectionReceiver implements OutputReceiver
 	{
 		private final Pattern OPEN_PORT_PATTERN    = Pattern.compile( "^discovered open port (\\d+)/([^\\s]+).+", Pattern.CASE_INSENSITIVE );
-		private final Pattern SERVICE_PATTERN  	   = Pattern.compile( "^\\d+/[a-z]+\\s+[a-z]+\\s+[a-z]+.*$", Pattern.CASE_INSENSITIVE );
+		private final Pattern SERVICE_PATTERN  	   = Pattern.compile( "^(\\d+)/([a-z]+)\\s+[a-z]+\\s+[a-z]+\\s+(.*)$", Pattern.CASE_INSENSITIVE );		
 		private final Pattern OS_PATTERN	   	   = Pattern.compile( "^Running:\\s+(.+)$", Pattern.CASE_INSENSITIVE );
 		private final Pattern OS_GUESS_PATTERN 	   = Pattern.compile( "^Running\\s+\\(JUST\\s+GUESSING\\):\\s+(.+)$", Pattern.CASE_INSENSITIVE );
 		private final Pattern SERVICE_INFO_PATTERN = Pattern.compile( "^Service\\s+Info:\\s+OS:\\s+([^;]+).*$", Pattern.CASE_INSENSITIVE );		
@@ -127,7 +127,7 @@ public class NMap extends Tool
 				onOpenPortFound( Integer.parseInt( matcher.group(1) ), matcher.group(2) );
 			
 			else if( ( matcher = SERVICE_PATTERN.matcher(line) ) != null && matcher.find() )
-				onServiceFound( line );
+				onServiceFound( Integer.parseInt( matcher.group(1) ),  matcher.group(2), matcher.group(3) );
 			
 			else if( ( matcher = OS_PATTERN.matcher(line) ) != null && matcher.find() )
 				onOsFound( matcher.group(1) );
@@ -143,7 +143,7 @@ public class NMap extends Tool
 		}
 		
 		public abstract void onOpenPortFound( int port, String protocol );
-		public abstract void onServiceFound( String service );
+		public abstract void onServiceFound( int port, String protocol, String service );
 		public abstract void onOsFound( String os );
 		public abstract void onGuessOsFound( String os );
 		public abstract void onDeviceFound( String device );

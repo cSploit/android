@@ -194,7 +194,11 @@ public class System
 	}
 	
 	public static void addOpenPort( int port, Protocol protocol ) {
-		Port p = new Port( port, protocol );
+		addOpenPort( port, protocol, null );
+	}
+	
+	public static void addOpenPort( int port, Protocol protocol, String service ) {
+		Port p = new Port( port, protocol, service );
 		
 		if( mTarget != null )
 			mTarget.addOpenPort( p );
