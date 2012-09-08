@@ -269,6 +269,14 @@ public class Target {
 		{
 			mHostname = reader.readLine();
 			mHostname = mHostname.equals("null") ? null : mHostname;
+			if( mHostname != null )		
+			{
+				// This is needed to avoid NetworkOnMainThreadException
+	        	StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+	        	StrictMode.setThreadPolicy(policy);
+	        	
+				mAddress = InetAddress.getByName( mHostname );
+			}
 		}
 		
 		int ports = Integer.parseInt( reader.readLine() );
