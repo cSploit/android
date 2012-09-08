@@ -35,7 +35,6 @@ import it.evilsocket.dsploit.plugins.Inspector;
 import it.evilsocket.dsploit.plugins.LoginCracker;
 import it.evilsocket.dsploit.plugins.PortScanner;
 import it.evilsocket.dsploit.plugins.mitm.MITM;
-import it.evilsocket.dsploit.tools.NMap;
 import it.evilsocket.dsploit.tools.NMap.FindAliveEndpointsOutputReceiver;
 
 import android.app.Activity;
@@ -64,7 +63,6 @@ public class MainActivity extends Activity
 	private ToolsInstaller mToolsInstaller = null;
 	private TargetAdapter  mTargetAdapter  = null;
 	private ListView	   mListView	   = null;
-	private NMap		   mNmap		   = null;
 	
 	public class TargetAdapter extends ArrayAdapter<Target> 
 	{
@@ -211,7 +209,6 @@ public class MainActivity extends Activity
 		        // register the crash manager
 		        CrashManager.register( getApplicationContext() );
 		        
-		        mNmap 		   = new NMap( this );
 		        mListView 	   = ( ListView )findViewById( R.id.listView );
 				mTargetAdapter = new TargetAdapter( R.layout.target_list_item );
 		    	
@@ -267,7 +264,7 @@ public class MainActivity extends Activity
 				{
 					final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Searching alive endpoints ...", true, false );
 									
-					mNmap.findAliveEndpoints( System.getNetwork(), new FindAliveEndpointsOutputReceiver(){						
+					System.getNMap().findAliveEndpoints( System.getNetwork(), new FindAliveEndpointsOutputReceiver(){						
 						@Override
 						public void onEndpointFound( Endpoint endpoint ) {
 							Target target = new Target( endpoint );

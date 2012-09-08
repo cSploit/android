@@ -39,6 +39,11 @@ import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Network.Protocol;
 import it.evilsocket.dsploit.net.Target.Port;
 import it.evilsocket.dsploit.net.Target.Vulnerability;
+import it.evilsocket.dsploit.tools.Ettercap;
+import it.evilsocket.dsploit.tools.Hydra;
+import it.evilsocket.dsploit.tools.IPTables;
+import it.evilsocket.dsploit.tools.NMap;
+import it.evilsocket.dsploit.tools.TcpDump;
 
 public class System 
 {	
@@ -53,9 +58,15 @@ public class System
 	private static Map<String,String>    mServices 	    = null;
 	private static Map<String,String>    mPorts         = null;
 	private static Map< String, String > mVendors       = null;
-
+	// registered plugins
 	private static ArrayList<Plugin>     mPlugins  	    = null;
-	private static Plugin			     mCurrentPlugin = null;
+	private static Plugin			     mCurrentPlugin = null;	
+	// tools singleton
+	private static NMap					 mNmap			= null;
+	private static Ettercap				 mEttercap		= null;
+	private static IPTables				 mIptables		= null;
+	private static Hydra				 mHydra			= null;
+	private static TcpDump				 mTcpdump		= null;
 		
 	public static void init( Context context ) throws NoRouteToHostException, SocketException {
 		mContext = context;		
@@ -69,7 +80,33 @@ public class System
 		// device network address
 		mTargets.add( new Target( System.getNetwork().getLoacalAddress(), System.getNetwork().getLocalHardware() ) );
 		
+		mNmap     = new NMap( mContext );
+		mEttercap = new Ettercap( mContext );
+		mIptables = new IPTables( );
+		mHydra    = new Hydra( mContext );
+		mTcpdump  = new TcpDump( mContext );
+		
 		mInitialized = true;
+	}
+	
+	public static NMap getNMap() {
+		return mNmap;
+	}
+	
+	public static Ettercap getEttercap() {
+		return mEttercap;
+	}
+	
+	public static IPTables getIPTables() {
+		return mIptables;
+	}
+	
+	public static Hydra getHydra() {
+		return mHydra;
+	}
+	
+	public static TcpDump getTcpDump() {
+		return mTcpdump;
 	}
 	
 	public static void reset() throws NoRouteToHostException, SocketException {

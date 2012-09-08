@@ -28,14 +28,12 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-import it.evilsocket.dsploit.MainActivity;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Target.Port;
-import it.evilsocket.dsploit.tools.NMap;
 import it.evilsocket.dsploit.tools.NMap.SynScanOutputReceiver;
 
 public class PortScanner extends Plugin
@@ -46,7 +44,6 @@ public class PortScanner extends Plugin
 	private boolean      		  mRunning		    = false;
 	private ArrayList<String>     mPortList    	    = null;
 	private ArrayAdapter<String>  mListAdapter 	    = null;
-	private NMap           		  mNmap		  	    = null;
 	private Receiver              mScanReceiver     = null;
 	
 	private class Receiver extends SynScanOutputReceiver
@@ -82,7 +79,7 @@ public class PortScanner extends Plugin
 			final String portProto = protocol;
 			
 			PortScanner.this.runOnUiThread( new Runnable() {
-                @Override
+				@Override
                 public void run() {
                 	String proto = System.getProtocolByPort( openPort ),
                 		   entry = openPort;
@@ -114,12 +111,11 @@ public class PortScanner extends Plugin
 		);
 
 		mPortList     = new ArrayList<String>();
-		mNmap 	      = new NMap( System.getContext() );
 		mScanReceiver = new Receiver();
 	}
 	
 	private void setStoppedState( ) {
-		mNmap.kill();
+		System.getNMap().kill();
 		mScanProgress.setVisibility( View.INVISIBLE );
 		mRunning = false;
 		mScanToggleButton.setChecked( false );
@@ -131,7 +127,7 @@ public class PortScanner extends Plugin
 	private void setStartedState( ) {
 		mPortList.clear();
 
-		mNmap.synScan( System.getCurrentTarget(), mScanReceiver ).start();
+		System.getNMap().synScan( System.getCurrentTarget(), mScanReceiver ).start();
 		
 		mRunning = true;
 	}

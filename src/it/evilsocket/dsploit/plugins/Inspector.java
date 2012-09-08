@@ -30,7 +30,6 @@ import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Target.Port;
-import it.evilsocket.dsploit.tools.NMap;
 import it.evilsocket.dsploit.tools.NMap.InspectionReceiver;
 
 public class Inspector extends Plugin
@@ -43,7 +42,6 @@ public class Inspector extends Plugin
 	private TextView     mDeviceOS  	 = null;
 	private TextView     mDeviceServices = null;
 	private boolean      mRunning	  	 = false;
-	private NMap         mNmap		  	 = null;
 	private Receiver	 mReceiver	  	 = null;
 	
 	private class Receiver extends InspectionReceiver
@@ -148,7 +146,7 @@ public class Inspector extends Plugin
 	}
 	
 	private void setStoppedState( ) {
-		mNmap.kill();
+		System.getNMap().kill();
 		mActivity.setVisibility( View.INVISIBLE );
 		mRunning = false;
 		mStartButton.setChecked( false );                	
@@ -158,7 +156,7 @@ public class Inspector extends Plugin
 		mActivity.setVisibility( View.VISIBLE );
 		mRunning = true;
 		
-		mNmap.inpsect( System.getCurrentTarget(), mReceiver ).start();
+		System.getNMap().inpsect( System.getCurrentTarget(), mReceiver ).start();
 	}
 	
 	@Override
@@ -207,7 +205,6 @@ public class Inspector extends Plugin
 			}} 
 		);
         
-        mNmap 	  = new NMap( this );
         mReceiver = new Receiver();
 	}
 	@Override

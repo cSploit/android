@@ -37,14 +37,14 @@ import android.widget.Toast;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Plugin;
+import it.evilsocket.dsploit.gui.dialogs.CustomFilterDialog;
+import it.evilsocket.dsploit.gui.dialogs.CustomFilterDialog.CustomFilterDialogListener;
 import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
+import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.http.Proxy;
-import it.evilsocket.dsploit.tools.Ettercap;
-import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
-import it.evilsocket.dsploit.tools.IPTables;
 
 public class MITM extends Plugin 
 {
@@ -53,8 +53,6 @@ public class MITM extends Plugin
 	private ListView      	  mActionListView = null;
 	private ActionAdapter 	  mActionAdapter  = null;
 	private ArrayList<Action> mActions  	  = new ArrayList<Action>();	
-	private Ettercap		  mEttercap		  = null;
-	private IPTables		  mIpTables		  = null;
 	private Proxy			  mProxy		  = null;
 	
 	class Action
@@ -160,8 +158,8 @@ public class MITM extends Plugin
 			
 			System.setForwarding( false );
 			
-			mEttercap.kill();
-			mIpTables.undoPortRedirect( 80, 8080 );
+			System.getEttercap().kill();
+			System.getIPTables().undoPortRedirect( 80, 8080 );
 			mProxy.stop();
 			
 			for( i = 0; i < rows; i++ )
@@ -183,13 +181,12 @@ public class MITM extends Plugin
         
         try
         {
-	        mEttercap = new Ettercap( this );
-	        mIpTables = new IPTables();
-			mProxy    = new Proxy( System.getNetwork().getLoacalAddress(), 8080 );
+			mProxy = new Proxy( System.getNetwork().getLoacalAddress(), 8080 );
         }
         catch( Exception e )
         {
         	Log.e( TAG, e.toString() );
+        	new FatalDialog( "Error", "Could not create proxy instance.", MITM.this ).show();
         }
         
         mActions.add( new Action( "Simple Sniff", "Only redirect target's traffic through this device, useful when using a network sniffer like 'Sharp' for android.", new OnClickListener(){
@@ -223,20 +220,12 @@ public class MITM extends Plugin
 					
 					Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
 					
-					mEttercap.spoof( System.getCurrentTarget(), new OnReadyListener(){
-						@Override
-						public void onReady() 
-						{
-							System.setForwarding( false );							
-						}
-						
-					}).start();				
+					ConnectionKiller.start();		
 				}
 				else
 				{
 	
-					System.setForwarding( false );
-					mEttercap.kill();
+					ConnectionKiller.stop();
 								
 					activity.setVisibility( View.INVISIBLE );
 				}
@@ -280,26 +269,8 @@ public class MITM extends Plugin
 								activity.setVisibility( View.VISIBLE );
 								
 								Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
-													
-								mEttercap.spoof( System.getCurrentTarget(), new OnReadyListener(){
-									@Override
-									public void onReady() 
-									{
-										System.setForwarding( true );
-										
-										mProxy.setFilter( new Proxy.ProxyFilter() {					
-											@Override
-											public String onHtmlReceived(String html) {
-												return html.replaceAll( "src=['\"][^'\"]+\\.(jpg|jpeg|png|gif)['\"]", "src=\"" + url + "\"" );
-											}
-										});
-										
-										new Thread( mProxy ).start();
-										
-										mIpTables.portRedirect( 80, 8080 );									
-									}
-									
-								}).start();				
+
+								HTTPFilter.start( mProxy, "src=['\"][^'\"]+\\.(jpg|jpeg|png|gif)['\"]", "src=\"" + url + "\"" );
 							}
 							else
 								new ErrorDialog( "Error", "Invalid image url.", MITM.this ).show();
@@ -308,10 +279,7 @@ public class MITM extends Plugin
 				}
 				else
 				{					
-					mEttercap.kill();
-					mIpTables.undoPortRedirect( 80, 8080 );
-					mProxy.stop();
-					System.setForwarding( false );
+					HTTPFilter.stop( mProxy );
 
 					activity.setVisibility( View.INVISIBLE );
 				}
@@ -345,31 +313,8 @@ public class MITM extends Plugin
 								activity.setVisibility( View.VISIBLE );
 								
 								Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
-													
-								mEttercap.spoof( System.getCurrentTarget(), new OnReadyListener(){
-									@Override
-									public void onReady() 
-									{
-										System.setForwarding( true );
-										
-										mProxy.setFilter( new Proxy.ProxyFilter() {					
-											@Override
-											public String onHtmlReceived(String html) {
-												return html.replaceAll
-												( 
-												  "(?i)</head>",
-												  js + "</head>"
-												);
-											}
-										});
-										
-										new Thread( mProxy ).start();
-										
-										mIpTables.portRedirect( 80, 8080 );									
-									}
-									
-								}).start();		
-									
+												
+								HTTPFilter.start( mProxy, "(?i)</head>", js + "</head>" );								
 							}
 							else
 								new ErrorDialog( "Error", "Invalid javascript code, remember to use <script></script> enclosing tags.", MITM.this ).show();
@@ -378,32 +323,51 @@ public class MITM extends Plugin
 				}
 				else
 				{					
-					mEttercap.kill();
-					mIpTables.undoPortRedirect( 80, 8080 );
-					mProxy.stop();
-					System.setForwarding( false );
+					HTTPFilter.stop( mProxy );
 
 					activity.setVisibility( View.INVISIBLE );
 				}
 			}
 		}));
-        
-        /*        
-    	TODO: ?
-        mActions.add( new Action( "Traffic Redirect", "Redirect every http request to a specific website.", new OnClickListener(){
-			@Override
-			public void onClick(View v) {
-								
-			}
-		}));
-        
+    
         mActions.add( new Action( "Custom Filter", "Replace custom text on webpages with the specified one.", new OnClickListener(){
 			@Override
 			public void onClick(View v) {
+				final ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
+
+				if( activity.getVisibility() == View.INVISIBLE )
+				{
+					setStoppedState();
+					
+					new CustomFilterDialog( "Custom Filter", MITM.this, new CustomFilterDialogListener(){
+						@Override
+						public void onInputEntered( String from, String to ) {
+							from = from.trim();
+							to   = to.trim();
+							
+							if( from.isEmpty() == false )
+							{
+								activity.setVisibility( View.VISIBLE );
 								
+								Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
+												
+								HTTPFilter.start( mProxy, from, to );				
+							}
+							else
+								new ErrorDialog( "Error", "Invalid from expression.", MITM.this ).show();
+						}} 
+					).show();
+				}
+				else
+				{
+					HTTPFilter.stop( mProxy );
+
+					activity.setVisibility( View.INVISIBLE );
+
+				}
 			}
 		}));
-*/        
+        
         mActionListView = ( ListView )findViewById( R.id.actionListView );
         mActionAdapter  = new ActionAdapter( R.layout.plugin_mitm_list_item, mActions );
         

@@ -24,9 +24,7 @@ import java.util.regex.Pattern;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
-import it.evilsocket.dsploit.tools.Ettercap;
 import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
-import it.evilsocket.dsploit.tools.TcpDump;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
@@ -44,8 +42,6 @@ public class Sniffer extends Activity
 	private ProgressBar	 mSniffProgress     = null;
 	private TextView	 mSniffText			= null;		
 	private boolean	     mRunning			= false;	
-	private Ettercap     mEttercap			= null;
-	private TcpDump	     mTcpDump			= null;
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        
@@ -57,9 +53,6 @@ public class Sniffer extends Activity
         mSniffText		   = ( TextView )findViewById( R.id.sniffData );
         
         mSniffText.setEnabled(false);
-        
-        mEttercap = new Ettercap( this );
-        mTcpDump  = new TcpDump( this );
                 
         mSniffToggleButton.setOnClickListener( new OnClickListener(){
 			@Override
@@ -77,8 +70,8 @@ public class Sniffer extends Activity
 	}
 
 	private void setStoppedState( ) {		
-		mEttercap.kill();
-		mTcpDump.kill();
+		System.getEttercap().kill();
+		System.getTcpDump().kill();
 
 		System.setForwarding( false );
 		
@@ -90,18 +83,15 @@ public class Sniffer extends Activity
 
 	private void setStartedState( ) {		
 		// never say never :)
-		mEttercap.kill();
-		mTcpDump.kill();
-		
-		final Ettercap spoof = mEttercap;
-		final TcpDump  dump  = mTcpDump;
+		System.getEttercap().kill();
+		System.getTcpDump().kill();
 					
-		spoof.spoof( System.getCurrentTarget(), new OnReadyListener(){
+		System.getEttercap().spoof( System.getCurrentTarget(), new OnReadyListener(){
 			@Override
 			public void onReady() { 
 				System.setForwarding( true );
 
-				dump.sniff( PCAP_FILTER, new OutputReceiver(){
+				System.getTcpDump().sniff( PCAP_FILTER, new OutputReceiver(){
 					@Override
 					public void onStart(String command) { }
 

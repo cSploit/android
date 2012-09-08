@@ -164,7 +164,6 @@ public class LoginCracker extends Plugin
 	private TextView 	 	mStatusText 	 = null;
 	private ProgressBar	    mActivity		 = null;
 	private ProgressBar  	mProgressBar 	 = null;
-	private Hydra		 	mHydra			 = null;
 	private boolean	     	mRunning		 = false;
 	private boolean			mAccountFound	 = false;
 	private AttemptReceiver mReceiver     	 = null;
@@ -256,7 +255,7 @@ public class LoginCracker extends Plugin
 	}
 	
 	private void setStoppedState( final String user, final String pass ) {
-		mHydra.kill();
+		System.getHydra().kill();
 		mRunning 	  = false;
 		mAccountFound = true;
 		
@@ -273,7 +272,7 @@ public class LoginCracker extends Plugin
 	}
 	
 	private void setStoppedState( ) {
-		mHydra.kill();
+		System.getHydra().kill();
 		mRunning = false;
 		
 		LoginCracker.this.runOnUiThread(new Runnable() {
@@ -303,7 +302,7 @@ public class LoginCracker extends Plugin
     	mStatusText.setTextColor( Color.DKGRAY );
     	mStatusText.setText( "Starting ..." );
     	
-		mHydra.crack
+    	System.getHydra().crack
 		(
 		  System.getCurrentTarget(), 
 		  Integer.parseInt( ( String )mPortSpinner.getSelectedItem() ), 
@@ -394,7 +393,6 @@ public class LoginCracker extends Plugin
         mProgressBar = ( ProgressBar )findViewById( R.id.progressBar );
         mActivity	 = ( ProgressBar )findViewById( R.id.activity );
         
-        mHydra 	  = new Hydra( this );        
         mReceiver = new AttemptReceiver();
         
         mStartButton.setOnClickListener( new OnClickListener(){
