@@ -22,6 +22,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.net.Target;
+import it.evilsocket.dsploit.net.Target.Port;
+import it.evilsocket.dsploit.net.Target.Vulnerability;
 
 public abstract class Plugin extends Activity 
 {
@@ -80,7 +82,11 @@ public abstract class Plugin extends Activity
 	    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
 	}
 	
-	public void onTargetNewOpenPort( Target target, Target.Port port ) {
+	public void onTargetNewOpenPort( Target target, Port port ) {
+		
+	}
+	
+	public void onTargetNewVulnerability( Target target, Port port, Vulnerability vulnerability ) {
 		
 	}
 }

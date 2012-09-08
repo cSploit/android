@@ -223,7 +223,7 @@ public class MITM extends Plugin
 					
 					Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
 					
-					mEttercap.spoof( System.getTarget(), new OnReadyListener(){
+					mEttercap.spoof( System.getCurrentTarget(), new OnReadyListener(){
 						@Override
 						public void onReady() 
 						{
@@ -281,7 +281,7 @@ public class MITM extends Plugin
 								
 								Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
 													
-								mEttercap.spoof( System.getTarget(), new OnReadyListener(){
+								mEttercap.spoof( System.getCurrentTarget(), new OnReadyListener(){
 									@Override
 									public void onReady() 
 									{
@@ -346,7 +346,7 @@ public class MITM extends Plugin
 								
 								Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
 													
-								mEttercap.spoof( System.getTarget(), new OnReadyListener(){
+								mEttercap.spoof( System.getCurrentTarget(), new OnReadyListener(){
 									@Override
 									public void onReady() 
 									{

@@ -60,7 +60,7 @@ public class Network
 			}
 				
 			return UNKNOWN;
-		}
+		}			
 	}
 	
 	private ConnectivityManager mConnectivityManager = null;

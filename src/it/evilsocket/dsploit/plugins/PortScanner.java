@@ -34,6 +34,7 @@ import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.Target;
+import it.evilsocket.dsploit.net.Target.Port;
 import it.evilsocket.dsploit.tools.NMap;
 import it.evilsocket.dsploit.tools.NMap.SynScanOutputReceiver;
 
@@ -94,7 +95,7 @@ public class PortScanner extends Plugin
                 	
                 	// add open port to the listview and notify the environment about the event
                 	mPortList.add( entry );
-                	mScanList.setAdapter( mListAdapter );
+                	( ( ArrayAdapter<String> )mScanList.getAdapter() ).notifyDataSetChanged();
                 	
                 	System.addOpenPort( Integer.parseInt( openPort ), Network.Protocol.fromString(portProto) );                	
                 }
@@ -130,7 +131,7 @@ public class PortScanner extends Plugin
 	private void setStartedState( ) {
 		mPortList.clear();
 
-		mNmap.synScan( System.getTarget(), mScanReceiver ).start();
+		mNmap.synScan( System.getCurrentTarget(), mScanReceiver ).start();
 		
 		mRunning = true;
 	}
@@ -156,7 +157,13 @@ public class PortScanner extends Plugin
 			}} 
 		);
 		
-		mScanList	 = ( ListView )findViewById( R.id.scanListView );
+		mScanList = ( ListView )findViewById( R.id.scanListView );
+		
+		for( Port port : System.getCurrentTarget().getOpenPorts() )
+		{
+			mPortList.add( port.number + " ( " + port.protocol.toString().toLowerCase() + " )" );
+		}
+		
 		mListAdapter = new ArrayAdapter<String>( this, android.R.layout.simple_list_item_1, mPortList );
 		mScanList.setAdapter( mListAdapter );
 	}

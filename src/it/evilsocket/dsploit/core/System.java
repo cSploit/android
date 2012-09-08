@@ -38,26 +38,43 @@ import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Network.Protocol;
 import it.evilsocket.dsploit.net.Target.Port;
+import it.evilsocket.dsploit.net.Target.Vulnerability;
 
 public class System 
 {	
 	private static final String TAG 		  		  = "SYSTEM";
 	public  static final String IPV4_FORWARD_FILEPATH = "/proc/sys/net/ipv4/ip_forward";
 
+	private static boolean			  mInitialized   = false;
 	private static Context 			  mContext  	 = null;
 	private static Network 			  mNetwork  	 = null;
-	private static Target  			  mTarget   	 = null;
+	private static ArrayList<Target>  mTargets		 = null;
+	private static int  			  mCurrentTarget = 0;
 	private static Map<String,String> mServices 	 = null;
 	private static Map<String,String> mPorts     	 = null;
 	
 	private static ArrayList<Plugin>  mPlugins  	 = null;
 	private static Plugin			  mCurrentPlugin = null;
 		
-	public static void init( Context context ){
+	public static void init( Context context ) throws NoRouteToHostException, SocketException {
 		mContext = context;		
 		mPlugins = new ArrayList<Plugin>();
+		mTargets = new ArrayList<Target>();
+		
+		// local network
+		mTargets.add( new Target( System.getNetwork() ) );
+		// network gateway
+		mTargets.add( new Target( System.getNetwork().getGatewayAddress(), System.getNetwork().getGatewayHardware() ) );
+		// device network address
+		mTargets.add( new Target( System.getNetwork().getLoacalAddress(), System.getNetwork().getLocalHardware() ) );
+		
+		mInitialized = true;
 	}
-
+	
+	public static boolean isInitialized(){
+		return mInitialized;
+	}
+	
 	public static String getProtocolByPort( String port ){
 		if( mPorts == null )
 		{
@@ -146,17 +163,41 @@ public class System
 		return mNetwork;
 	}
 	
-	public static void setTarget( Target target ){
-		Log.d( TAG, "setTarget( " + target + " )" );
-		mTarget = target;
+	public static ArrayList<Target> getTargets() {
+		return mTargets;
 	}
 	
-	public static Target getTarget(){
-		return mTarget;
+	public static void addTarget( int index, Target target ){
+		mTargets.add( index, target );
+	}
+	
+	public static void addTarget( Target target ){
+		mTargets.add( target );
+	}
+	
+	public static Target getTarget( int index ){
+		return mTargets.get( index );
+	}
+	
+	public static boolean hasTarget( Target target ) {
+		for( Target t : mTargets )
+		{
+			if( t != null && t.equals(target) )
+				return true;
+		}
+		
+		return false;
+	}
+	
+	public static void setCurrentTarget( int index ){
+		mCurrentTarget = index;
+	}
+	
+	public static Target getCurrentTarget(){
+		return getTarget( mCurrentTarget );
 	}
 	
 	public static void registerPlugin( Plugin plugin ){
-		Log.d( TAG, "Registering plugin '" + plugin.getName() + "'" );
 		mPlugins.add(plugin);
 	}
 	
@@ -173,14 +214,12 @@ public class System
 				if( plugin.isAllowedTarget(target) )
 					filtered.add(plugin);
 		}
-		
-		Log.d( TAG, "Returning " + filtered.size() + " plugins for current target ( " + mTarget + " )" );
-		
+				
 		return filtered;
 	}
 	
 	public static ArrayList<Plugin> getPluginsForTarget(){
-		return getPluginsForTarget( mTarget );
+		return getPluginsForTarget( getCurrentTarget() );
 	} 
 	
 	public static void setCurrentPlugin( Plugin plugin ){
@@ -200,16 +239,23 @@ public class System
 	public static void addOpenPort( int port, Protocol protocol, String service ) {
 		Port p = new Port( port, protocol, service );
 		
-		if( mTarget != null )
-			mTarget.addOpenPort( p );
+		getCurrentTarget().addOpenPort( p );
 		
 		for( Plugin plugin : getPluginsForTarget() ) {
-			plugin.onTargetNewOpenPort( mTarget, p );
+			plugin.onTargetNewOpenPort( getCurrentTarget(), p );
+		}
+	}
+	
+	public static void addVulnerability( Port port, Vulnerability v ) {
+		getCurrentTarget().addVulnerability( port, v );
+		
+		for( Plugin plugin : getPluginsForTarget() ) {
+			plugin.onTargetNewVulnerability( getCurrentTarget(), port, v );
 		}
 	}
 
 	public static String getGatewayAddress() {
-		return mNetwork.getGatewayAddress().toString().substring( 1 );
+		return mNetwork.getGatewayAddress().getHostAddress();
 	}
 		
 	public static boolean isForwardingEnabled( ) {

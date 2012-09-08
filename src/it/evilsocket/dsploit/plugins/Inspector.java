@@ -29,6 +29,7 @@ import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.Target;
+import it.evilsocket.dsploit.net.Target.Port;
 import it.evilsocket.dsploit.tools.NMap;
 import it.evilsocket.dsploit.tools.NMap.InspectionReceiver;
 
@@ -77,6 +78,8 @@ public class Inspector extends Plugin
 
 		@Override
 		public void onOsFound( final String os ) {
+			System.getCurrentTarget().setDeviceOS( os );
+			
 			Inspector.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -87,6 +90,8 @@ public class Inspector extends Plugin
 
 		@Override
 		public void onGuessOsFound( final String os ) {
+			System.getCurrentTarget().setDeviceOS( os );
+			
 			Inspector.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -97,6 +102,8 @@ public class Inspector extends Plugin
 
 		@Override
 		public void onDeviceFound( final String device ) {
+			System.getCurrentTarget().setDeviceType( device );
+			
 			Inspector.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -107,6 +114,8 @@ public class Inspector extends Plugin
 
 		@Override
 		public void onServiceInfoFound( final String info ) {
+			System.getCurrentTarget().setDeviceOS( info );
+			
 			Inspector.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -149,7 +158,7 @@ public class Inspector extends Plugin
 		mActivity.setVisibility( View.VISIBLE );
 		mRunning = true;
 		
-		mNmap.inpsect( System.getTarget(), mReceiver ).start();
+		mNmap.inpsect( System.getCurrentTarget(), mReceiver ).start();
 	}
 	
 	@Override
@@ -163,7 +172,26 @@ public class Inspector extends Plugin
         mDeviceOS   	= ( TextView)findViewById( R.id.deviceOS ); 
         mDeviceServices = ( TextView)findViewById( R.id.deviceServices ); 
         
-        mDeviceName.setText( System.getTarget().toString() );
+        mDeviceName.setText( System.getCurrentTarget().toString() );
+        
+        if( System.getCurrentTarget().getDeviceType() != null )
+        	mDeviceType.setText( System.getCurrentTarget().getDeviceType() );
+        
+        if( System.getCurrentTarget().getDeviceOS() != null )
+        	mDeviceOS.setText( System.getCurrentTarget().getDeviceOS() );
+        
+        if( System.getCurrentTarget().hasOpenPortsWithService() )
+        {
+        	mDeviceServices.setText("");
+        	
+	        for( Port port : System.getCurrentTarget().getOpenPorts() )
+	        {
+	        	if( port.service != null && port.service.isEmpty() == false )
+	        	{
+	        		mDeviceServices.append( port.number + " ( " + port.protocol.toString().toLowerCase() + " ) : " + port.service + "\n" );
+	        	}
+	        }
+        }
         
         mStartButton.setOnClickListener( new OnClickListener(){
 			@Override

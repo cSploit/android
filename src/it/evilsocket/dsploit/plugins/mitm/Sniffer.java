@@ -96,7 +96,7 @@ public class Sniffer extends Activity
 		final Ettercap spoof = mEttercap;
 		final TcpDump  dump  = mTcpDump;
 					
-		spoof.spoof( System.getTarget(), new OnReadyListener(){
+		spoof.spoof( System.getCurrentTarget(), new OnReadyListener(){
 			@Override
 			public void onReady() { 
 				System.setForwarding( true );

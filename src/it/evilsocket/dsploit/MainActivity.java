@@ -18,9 +18,6 @@
  */
 package it.evilsocket.dsploit;
 
-import java.net.SocketException;
-import java.util.ArrayList;
-
 import it.evilsocket.dsploit.core.CrashManager;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Shell;
@@ -49,6 +46,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -67,11 +65,11 @@ public class MainActivity extends Activity
 	
 	public class TargetAdapter extends ArrayAdapter<Target> 
 	{
-		private int               mLayoutId = 0;
-		private ArrayList<Target> mTargets  = null;
+		private int mLayoutId = 0;
 		
 		class TargetHolder
 	    {
+			int			position;
 			Target		target;
 	        ImageView   itemImage;
 	        TextView    itemTitle;
@@ -79,23 +77,12 @@ public class MainActivity extends Activity
 	        Button      scanButton;
 	    }
 		
-		public TargetAdapter( int layoutId, ArrayList<Target> targets ) {		
-	        super( MainActivity.this, layoutId, targets );
+		public TargetAdapter( int layoutId ) {		
+	        super( MainActivity.this, layoutId );
 	        
 	        mLayoutId = layoutId;
-	        mTargets  = targets;                
 	    }
-		
-		private boolean hasTarget( Target target ) {
-			for( Target t : mTargets )
-			{
-				if( t != null && t.equals(target) )
-					return true;
-			}
-			
-			return false;
-		}
-		
+									
 		private class TargetScanClickListener implements OnClickListener 
 		{					
 			public void onClick( View v ) {
@@ -111,20 +98,20 @@ public class MainActivity extends Activity
 							int     i;
 							boolean added = false;
 							
-							if( hasTarget( target ) == false )
+							if( System.hasTarget( target ) == false )
 							{
-								for( i = 0; i < mTargets.size() && !added; i++ )
+								for( i = 0; i < System.getTargets().size() && !added; i++ )
 								{
-									if( mTargets.get( i ) != null && mTargets.get( i ).comesAfter( target ) )
+									if( System.getTarget( i ).comesAfter( target ) )
 									{
-										mTargets.add( i, target );
+										System.addTarget( i, target );
 										added = true;
 									}
 								}
 								
-								if( !added )								
-									mTargets.add( mTargets.size() - 1, target );
-																
+								if( !added )	
+									System.addTarget( target );
+																								
 								// refresh the target listview
 		                    	MainActivity.this.runOnUiThread(new Runnable() {
 				                    @Override
@@ -155,21 +142,21 @@ public class MainActivity extends Activity
 						Target target = Target.getFromString(input);						
 						if( target != null )
 						{
-							if( hasTarget(target) == false )
+							if( System.hasTarget(target) == false )
 							{								
 								boolean added = false;
 								
-								for( int i = 0; i < mTargets.size() && !added; i++ )
+								for( int i = 0; i < System.getTargets().size() && !added; i++ )
 								{
-									if( mTargets.get( i ) != null && mTargets.get( i ).comesAfter( target ) )
+									if( System.getTarget( i ).comesAfter( target ) )
 									{
-										mTargets.add( i, target );
+										System.addTarget( i, target );
 										added = true;
 									}
 								}
 								
 								if( !added )								
-									mTargets.add( mTargets.size() - 1, target );
+									System.addTarget( target );
 								
 								// refresh the target listview
 		                    	MainActivity.this.runOnUiThread(new Runnable() {
@@ -192,14 +179,14 @@ public class MainActivity extends Activity
 			public void onClick( View v ) 
 			{		
 				// select clicked target and go to action list activity
-				final Target target = ( ( TargetHolder )v.getTag() ).target;
+				int position = ( ( TargetHolder )v.getTag() ).position;
 	
-				System.setTarget( target );
+				System.setCurrentTarget( position );
 				
 				MainActivity.this.runOnUiThread( new Runnable() {
 	                @Override
 	                public void run() {
-	                	Toast.makeText( MainActivity.this, "Selected " + target, Toast.LENGTH_SHORT ).show();	                	
+	                	Toast.makeText( MainActivity.this, "Selected " + System.getCurrentTarget(), Toast.LENGTH_SHORT ).show();	                	
 	                    startActivity
 	                    ( 
 	                      new Intent
@@ -215,6 +202,12 @@ public class MainActivity extends Activity
 		}
 		
 		@Override
+		public int getCount(){
+			// plus one for the "Add Custom Target" row
+			return System.getTargets().size() + 1;
+		}
+		
+		@Override
 	    public View getView( int position, View convertView, ViewGroup parent ) {		
 	        View 		 row    = convertView;
 	        TargetHolder holder = null;
@@ -226,6 +219,7 @@ public class MainActivity extends Activity
 	            
 	            holder = new TargetHolder();
 	            
+	            holder.position		   = position;
 	            holder.itemImage  	   = ( ImageView )row.findViewById( R.id.itemIcon );
 	            holder.itemTitle  	   = ( TextView )row.findViewById( R.id.itemTitle );
 	            holder.itemDescription = ( TextView )row.findViewById( R.id.itemDescription );
@@ -238,10 +232,22 @@ public class MainActivity extends Activity
 	            holder = ( TargetHolder )row.getTag();
 	        }
 	        
-	        Target target = mTargets.get( position );
+	        Target target = null;
 	        
-	        if( target != null )
+	        // last line to add a custom target
+	        if( position == getCount() - 1 )
 	        {
+	        	holder.itemImage.setImageResource( R.drawable.target_add_48 );
+	        	holder.itemTitle.setText( "Add custom target" );
+	        	holder.itemDescription.setText( "Add any hostname or address to the list." );
+	        	holder.scanButton.setVisibility( View.GONE );
+	        	
+	        	row.setOnClickListener( new AddCustomTargetClickListener() );
+	        }
+	        else
+	        {
+	        	target = System.getTarget( position );
+	        	
 	        	holder.itemImage.setImageResource( target.getDrawableResourceId() );
 	        	holder.itemTitle.setText( target.toString() );
 	        	holder.itemTitle.setTypeface( null, Typeface.NORMAL );
@@ -260,16 +266,6 @@ public class MainActivity extends Activity
 	        	
 	        	row.setOnClickListener( new SelectTargetClickListener() );
 	        }
-	        // last line to add a custom target
-	        else
-	        {
-	        	holder.itemImage.setImageResource( R.drawable.target_add_48 );
-	        	holder.itemTitle.setText( "Add custom target" );
-	        	holder.itemDescription.setText( "Add any hostname or address to the list." );
-	        	holder.scanButton.setVisibility( View.GONE );
-	        	
-	        	row.setOnClickListener( new AddCustomTargetClickListener() );
-	        }
 	        
 	        holder.target = target;
 	        
@@ -279,73 +275,69 @@ public class MainActivity extends Activity
 
 	@Override
     public void onCreate( Bundle savedInstanceState ) {
-        super.onCreate(savedInstanceState);      
+        super.onCreate(savedInstanceState);   
         setContentView( LAYOUT );
         
-        final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Initializing ...", true, false );
-               
-        new Thread( new Runnable(){
-			@Override
-			public void run() 
-			{						
-				dialog.show();
-				
-		        mToolsInstaller = new ToolsInstaller( MainActivity.this.getApplicationContext() );
-		       
-				if( Shell.isRootGranted() == false )  
-				{
+        if( System.isInitialized() == false )
+        {
+	        final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Initializing ...", true, false );
+	               
+	        new Thread( new Runnable(){
+				@Override
+				public void run() 
+				{						
+					dialog.show();
+					
+			        mToolsInstaller = new ToolsInstaller( MainActivity.this.getApplicationContext() );
+			       
+					if( Shell.isRootGranted() == false )  
+					{
+						dialog.dismiss();
+						MainActivity.this.runOnUiThread( new Runnable() {
+					       public void run() {
+					    	   new FatalDialog( "Error", "This application can run only on rooted devices.", MainActivity.this ).show();
+					       }
+					    });
+					}		        							                
+					else if( mToolsInstaller.needed() && mToolsInstaller.install() == false )
+			        {
+			        	dialog.dismiss();
+						MainActivity.this.runOnUiThread( new Runnable() {
+					       public void run() {
+					    	   new FatalDialog( "Error", "Error during files installation!", MainActivity.this ).show();
+					       }
+					    });
+			        }
+					
 					dialog.dismiss();
-					MainActivity.this.runOnUiThread( new Runnable() {
-				       public void run() {
-				    	   new FatalDialog( "Error", "This application can run only on rooted devices.", MainActivity.this ).show();
-				       }
-				    });
-				}		        							                
-				else if( mToolsInstaller.needed() && mToolsInstaller.install() == false )
-		        {
-		        	dialog.dismiss();
-					MainActivity.this.runOnUiThread( new Runnable() {
-				       public void run() {
-				    	   new FatalDialog( "Error", "Error during files installation!", MainActivity.this ).show();
-				       }
-				    });
-		        }
-				
-				dialog.dismiss();
-			}
-		}).start();
-        
-        System.init( getApplicationContext() );
-        
-        System.registerPlugin( new PortScanner( ) );
-        System.registerPlugin( new Inspector( ) );
-        System.registerPlugin( new ExploitFinder( ) );
-        System.registerPlugin( new LoginCracker( ) );
-        System.registerPlugin( new MITM( ) );
-
-        // register the crash manager
-        CrashManager.register( getApplicationContext() );
-        
-        mNmap	  = new NMap( this );
-        mListView = ( ListView )findViewById( R.id.listView );
-	    
-	    try
-    	{	    	
-	    	ArrayList<Target> targets = new ArrayList<Target>();
-			
-			targets.add( new Target( System.getNetwork() ) );
-			targets.add( new Target( System.getNetwork().getGatewayAddress(), System.getNetwork().getGatewayHardware() ) );
-			targets.add( new Target( System.getNetwork().getLoacalAddress(), System.getNetwork().getLocalHardware() ) );
-			targets.add( null );
-
-			mTargetAdapter = new TargetAdapter( R.layout.target_list_item, targets );
-	    	
-			mListView.setAdapter( mTargetAdapter );  	
-    	}
-    	catch( SocketException e )
-    	{
-    		new FatalDialog( "Error", e.getMessage(), this ).show();
-    	}
+				}
+			}).start();
+	               	   
+		    try
+	    	{	    	
+		    	// initialize the system
+		    	System.init( getApplicationContext() );
+		        
+		        System.registerPlugin( new PortScanner( ) );
+		        System.registerPlugin( new Inspector( ) );
+		        System.registerPlugin( new ExploitFinder( ) );
+		        System.registerPlugin( new LoginCracker( ) );
+		        System.registerPlugin( new MITM( ) );
+	
+		        // register the crash manager
+		        CrashManager.register( getApplicationContext() );
+		        
+		        mNmap 		   = new NMap( this );
+		        mListView 	   = ( ListView )findViewById( R.id.listView );
+				mTargetAdapter = new TargetAdapter( R.layout.target_list_item );
+		    	
+				mListView.setAdapter( mTargetAdapter );  	
+	    	}
+	    	catch( Exception e )
+	    	{
+	    		new FatalDialog( "Error", e.getMessage(), this ).show();
+	    	}
+        }
 	}
 
 	@Override

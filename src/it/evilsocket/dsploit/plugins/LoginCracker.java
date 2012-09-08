@@ -305,7 +305,7 @@ public class LoginCracker extends Plugin
     	
 		mHydra.crack
 		(
-		  System.getTarget(), 
+		  System.getCurrentTarget(), 
 		  Integer.parseInt( ( String )mPortSpinner.getSelectedItem() ), 
 		  ( String )mProtocolSpinner.getSelectedItem(), 
 		  CHARSETS_MAPPING[ mCharsetSpinner.getSelectedItemPosition() ], 
@@ -321,13 +321,13 @@ public class LoginCracker extends Plugin
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);   
        
-        if( System.getTarget().hasOpenPorts() == false )
+        if( System.getCurrentTarget().hasOpenPorts() == false )
         	new FinishDialog( "Warning", "No open ports detected on current target, run the port scanner first.", this ).show();
                         
         ArrayList<String> ports = new ArrayList<String>();
         
-        for( Port port : System.getTarget().getOpenPorts() )
-        	ports.add( Integer.toString( port.port ) );
+        for( Port port : System.getCurrentTarget().getOpenPorts() )
+        	ports.add( Integer.toString( port.number ) );
         
         mPortSpinner = ( Spinner )findViewById( R.id.portSpinner );
         mPortSpinner.setAdapter( new ArrayAdapter<String>( this, android.R.layout.simple_spinner_item, ports ) );

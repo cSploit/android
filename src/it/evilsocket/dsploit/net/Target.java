@@ -25,6 +25,7 @@ import it.evilsocket.dsploit.net.Network.Protocol;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,11 +44,11 @@ public class Target {
 	public static class Port 
 	{
 		public Protocol protocol;
-		public int		port;
+		public int		number;
 		public String   service;
 						
 		public Port( int port, Protocol proto, String service ) {
-			this.port     = port;
+			this.number   = port;
 			this.protocol = proto;
 			this.service  = service;
 		}
@@ -55,15 +56,90 @@ public class Target {
 		public Port( int port, Protocol proto ) {
 			this( port, proto, null );
 		}
+		
+		public String getServiceQuery() {
+			String query = "";
+			
+			if( service != null )
+			{
+				query = service;
+				
+				// remove version numbers
+				query = query.replaceAll( "[\\d\\.]+", " " );
+				// remove everything but letters, digits upper and under scores
+				query = query.replaceAll( "[^a-zA-Z0-9\\-_]", " " );
+				// remove multiple spaces
+				query = query.replaceAll( "[\\s]{2,}", " " );
+				// trim
+				query = query.trim();
+			}
+			
+			return query;
+		}
+		
+		// needed for vulnerabilities hashmap
+		public String toString(){
+			return protocol.toString() + "|" + number + "|" + service;
+		}
 	}
 	
-	private Network 	mNetwork  = null;
-	private Endpoint    mEndpoint = null;
-	private int 		mPort 	  = 0;
-	private String 		mHostname = null;
-	private Type		mType     = null;
-	private InetAddress mAddress  = null;
-	private List<Port>  mPorts	  = new ArrayList<Port>();
+	public static class Vulnerability
+	{
+		private String mIdentifier = null;
+		private double mSeverity   = 0;
+		private String mSummary	   = null;
+		
+		public String getIdentifier() {
+			return mIdentifier;
+		}
+		
+		public double getSeverity() {
+			return mSeverity;
+		}
+		
+		public String getSummary() {
+			return mSummary;
+		}
+		
+		public void setIdentifier( String identifier ) {
+			this.mIdentifier = identifier;
+		}
+		
+		public void setSeverity( double severity ) {
+			this.mSeverity = severity;
+		}
+		
+		public void setSummary( String summary ) {
+			this.mSummary = summary;
+		}		
+		
+		public String toString(){
+			return mIdentifier + " ( Sev. " + mSeverity + " ) : " + mSummary;
+		}
+		
+		public String getHtmlColor( )
+		{
+			if( mSeverity < 5.0 )
+				return "#59FF00";
+			
+			else if( mSeverity < 7 )
+				return "#FFD732";
+			
+			else
+				return "#FF0000";
+		}		
+	}
+	
+	private Network 	mNetwork                              			 = null;
+	private Endpoint    mEndpoint                             			 = null;
+	private int 		mPort 	                              			 = 0;
+	private String 		mHostname                             			 = null;
+	private Type		mType                                 			 = null;
+	private InetAddress mAddress                              			 = null;
+	private List<Port>  mPorts	                              			 = new ArrayList<Port>();
+	private String		mDeviceType										 = null;
+	private String		mDeviceOS										 = null;
+	private HashMap< String, ArrayList<Vulnerability> > mVulnerabilities = new HashMap< String, ArrayList<Vulnerability> >();
 	
 	public static Target getFromString( String string ){
 		final Pattern PARSE_PATTERN = Pattern.compile( "^(([a-z]+)://)?([0-9a-z\\-\\.]+)(:([\\d]+))?[0-9a-z\\-\\./]*$", Pattern.CASE_INSENSITIVE );
@@ -339,7 +415,7 @@ public class Target {
 	public void addOpenPort( Port port ) {
 		for( int i = 0; i < mPorts.size(); i++ )
 		{
-			if( mPorts.get(i).port == port.port )
+			if( mPorts.get(i).number == port.number )
 			{
 				if( port.service != null )
 					mPorts.get(i).service = port.service;
@@ -381,10 +457,45 @@ public class Target {
 	
 	public boolean hasOpenPort( int port ) {
 		for( Port p : mPorts ) {
-			if( p.port == port )
+			if( p.number == port )
 				return true;
 		}
 		
 		return false;
+	}
+	
+	public void setDeviceType( String type ) {
+		mDeviceType = type;
+	}
+	
+	public String getDeviceType() {
+		return mDeviceType;
+	}
+	
+	public void setDeviceOS( String os ) {
+		mDeviceOS = os;
+	}
+	
+	public String getDeviceOS() {
+		return mDeviceOS;
+	}
+	
+	public void addVulnerability( Port port, Vulnerability v ) {		
+		if( mVulnerabilities.containsKey( port.toString() ) == false )	
+		{
+			mVulnerabilities.put( port.toString(), new ArrayList< Vulnerability >() );
+		}
+		else
+		{
+			for( Vulnerability vuln : mVulnerabilities.get( port.toString() ) )
+				if( vuln.getIdentifier().equals( v.getIdentifier() ) )
+					return;
+		}
+		
+		mVulnerabilities.get( port.toString() ).add( v );
+	}
+	
+	public HashMap< String, ArrayList< Vulnerability > > getVulnerabilities() {
+		return mVulnerabilities;
 	}
 }
