@@ -22,6 +22,7 @@ import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.Network.Protocol;
 
+import java.io.BufferedReader;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -38,7 +39,24 @@ public class Target {
 	public enum Type {
 		NETWORK,
 		ENDPOINT,
-		REMOTE
+		REMOTE;
+		
+		public static Type fromString( String type ) throws Exception {
+			if( type != null )
+			{
+				type = type.trim().toLowerCase();
+				if( type.equals("network") )
+					return Type.NETWORK;
+				
+				else if( type.equals("endpoint") )
+					return Type.ENDPOINT;
+				
+				else if( type.equals("remote") )
+					return Type.REMOTE;
+			}
+			
+			throw new Exception( "Could not deserialize target type from string." );
+		}
 	}
 	
 	public static class Port 
@@ -50,7 +68,7 @@ public class Target {
 		public Port( int port, Protocol proto, String service ) {
 			this.number   = port;
 			this.protocol = proto;
-			this.service  = service;
+			this.service  = service != null ? ( service.equals("null") ? null : service ) : null;
 		}
 		
 		public Port( int port, Protocol proto ) {
@@ -89,6 +107,19 @@ public class Target {
 		private double mSeverity   = 0;
 		private String mSummary	   = null;
 		
+		public Vulnerability(){
+			
+		}
+		
+		public Vulnerability( BufferedReader reader ) throws Exception {
+			String serialized = reader.readLine();
+			String[] parts	  = serialized.split( "\\|", 3 );
+			
+			mIdentifier = parts[0];
+			mSeverity   = Double.parseDouble( parts[1] );
+			mSummary	= parts[2];
+		}
+		
 		public String getIdentifier() {
 			return mIdentifier;
 		}
@@ -114,9 +145,9 @@ public class Target {
 		}		
 		
 		public String toString(){
-			return mIdentifier + " ( Sev. " + mSeverity + " ) : " + mSummary;
+			return mIdentifier + "|" + mSeverity + "|" + mSummary;
 		}
-		
+						
 		public String getHtmlColor( )
 		{
 			if( mSeverity < 5.0 )
@@ -219,6 +250,89 @@ public class Target {
 		return target;
 	}
 
+	public Target( BufferedReader reader ) throws Exception {
+		mType 		= Type.fromString( reader.readLine() );
+		mDeviceType = reader.readLine();
+		mDeviceType = mDeviceType.equals("null") ? null : mDeviceType;
+		mDeviceOS   = reader.readLine();
+		mDeviceOS   = mDeviceOS.equals("null") ? null : mDeviceOS;
+		
+		if( mType == Type.NETWORK )
+		{
+			return;
+		}
+		else if( mType == Type.ENDPOINT )
+		{
+			mEndpoint = new Endpoint( reader );
+		}
+		else if( mType == Type.REMOTE )
+		{
+			mHostname = reader.readLine();
+			mHostname = mHostname.equals("null") ? null : mHostname;
+		}
+		
+		int ports = Integer.parseInt( reader.readLine() );
+		for( int i = 0; i < ports; i++ )
+		{
+			String   key   = reader.readLine();
+			String[] parts = key.split( "\\|", 3 );			
+			Port	 port  = new Port
+			(
+			  Integer.parseInt( parts[1] ), 
+			  Protocol.fromString( parts[0] ), 
+			  parts[2]
+			);
+			
+			mPorts.add( port );
+			mVulnerabilities.put( key, new ArrayList< Vulnerability >() );
+			
+			int nvulns = Integer.parseInt( reader.readLine() );
+			for( int j = 0; j < nvulns; j++ )
+			{
+				Vulnerability v = new Vulnerability( reader );
+				
+				mVulnerabilities.get(key).add(v);
+			}
+		}
+	}
+	
+	public void serialize( StringBuilder builder ) {
+		builder.append( mType + "\n" );
+		builder.append( mDeviceType + "\n" );
+		builder.append( mDeviceOS + "\n" );
+		
+		// a network can't be saved in a session file
+		if( mType == Type.NETWORK )
+		{
+			return;
+		}
+		else if( mType == Type.ENDPOINT )
+		{
+			mEndpoint.serialize(builder);
+		}
+		else if( mType == Type.REMOTE )
+		{
+			builder.append( mHostname + "\n" );
+		}
+		
+		builder.append( mPorts.size() + "\n" );
+		for( Port port : mPorts )
+		{
+			String key = port.toString();
+			builder.append( key + "\n" );
+			if( mVulnerabilities.containsKey( key ) )
+			{
+				builder.append( mVulnerabilities.get( key ).size() + "\n" );
+				for( Vulnerability v : mVulnerabilities.get( key ) )
+				{
+					builder.append( v.toString() + "\n" );
+				}
+			}
+			else
+				builder.append( "0\n" );
+		}				
+	}
+	
 	public boolean comesAfter( Target target ){
 
 		if( mType == Type.NETWORK )

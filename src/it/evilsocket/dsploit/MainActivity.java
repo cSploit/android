@@ -18,6 +18,9 @@
  */
 package it.evilsocket.dsploit;
 
+import java.io.IOException;
+import java.util.ArrayList;
+
 import it.evilsocket.dsploit.core.CrashManager;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Shell;
@@ -29,6 +32,8 @@ import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
 import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
+import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog;
+import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog.SpinnerDialogListener;
 import it.evilsocket.dsploit.net.Endpoint;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.plugins.ExploitFinder;
@@ -317,9 +322,60 @@ public class MainActivity extends Activity
 				return true;
 				
 			case R.id.save_session :
+				
+				new InputDialog( "Save Session", "Enter the name of the session file :", System.getSessionName(), MainActivity.this, new InputDialogListener(){
+					@Override
+					public void onInputEntered( String input ) 
+					{
+						String name = input.trim().replace( "/", "" ).replace( "..", "" );
+						
+						if( name.isEmpty() == false )
+						{
+							try
+							{
+								String filename = System.saveSession( name );
+						
+								Toast.makeText( MainActivity.this, "Session saved to " + filename + " .", Toast.LENGTH_SHORT ).show();
+							}
+							catch( IOException e )
+							{
+								new ErrorDialog( "Error", e.toString(), MainActivity.this ).show();
+							}
+						}
+						else
+							new ErrorDialog( "Error", "Invalid session name.", MainActivity.this ).show();
+					}} 
+				).show();	
+				
+				return true;
+				
 			case R.id.restore_session :
 				
-				Toast.makeText( this, "TODO :)", Toast.LENGTH_LONG ).show();
+				final ArrayList<String> sessions = System.getAvailableSessionFiles();
+				
+				if( sessions != null && sessions.size() > 0 )
+				{
+					new SpinnerDialog( "Select Session", "Select a session file from the sd card :", sessions.toArray( new String[ sessions.size() ] ), MainActivity.this, new SpinnerDialogListener(){
+						@Override
+						public void onItemSelected(int index) 
+						{						
+							String session = sessions.get( index );
+							
+							try
+							{
+								System.loadSession( session );
+								mTargetAdapter.notifyDataSetChanged();
+							}
+							catch( Exception e )
+							{
+								e.printStackTrace();
+								new ErrorDialog( "Error", e.getMessage(), MainActivity.this ).show();
+							}
+						}
+					}).show();
+				}
+				else
+					new ErrorDialog( "Error", "No session file found on sd card.", MainActivity.this ).show();
 				
 				return true;
 												

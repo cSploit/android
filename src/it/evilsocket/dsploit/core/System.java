@@ -20,7 +20,9 @@ package it.evilsocket.dsploit.core;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -31,8 +33,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.Target;
@@ -46,8 +51,9 @@ import it.evilsocket.dsploit.tools.NMap;
 import it.evilsocket.dsploit.tools.TcpDump;
 
 public class System 
-{	
+{		
 	private static final String TAG 		  		  = "SYSTEM";
+	private static final String SESSION_MAGIC		  = "DSS"; 
 	public  static final String IPV4_FORWARD_FILEPATH = "/proc/sys/net/ipv4/ip_forward";
 
 	private static boolean			     mInitialized   = false;
@@ -67,6 +73,9 @@ public class System
 	private static IPTables				 mIptables		= null;
 	private static Hydra				 mHydra			= null;
 	private static TcpDump				 mTcpdump		= null;
+	
+	private static String				 mStoragePath   = null;
+	private static String				 mSessionName	= null;
 		
 	public static void init( Context context ) throws NoRouteToHostException, SocketException {
 		mContext = context;		
@@ -86,7 +95,124 @@ public class System
 		mHydra    = new Hydra( mContext );
 		mTcpdump  = new TcpDump( mContext );
 		
+		mStoragePath = Environment.getExternalStorageDirectory().toString();
+		mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
+		
 		mInitialized = true;
+	}
+	
+	public static String getSessionName() {
+		return mSessionName;
+	}
+	
+	public static String getStoragePath() {
+		return mStoragePath;
+	}
+	
+	public static ArrayList<String> getAvailableSessionFiles( )
+	{
+		ArrayList<String> files = new ArrayList<String>();		
+		File storage            = new File( mStoragePath );
+
+		String[] children = storage.list();
+		
+		for( String child : children )
+		{
+			if( child.endsWith(".dss") )
+				files.add( child );
+		}
+
+		return files;
+	}
+	
+	public static String saveSession( String sessionName ) throws IOException {
+		StringBuilder builder  = new StringBuilder();
+		String		  filename = mStoragePath + '/' + sessionName + ".dss",
+					  session  = null;
+		
+		builder.append( SESSION_MAGIC + "\n" );
+		
+		// skip the network target
+		builder.append( ( mTargets.size() - 1 ) + "\n" );
+		for( Target target : mTargets )
+		{
+			if( target.getType() != Target.Type.NETWORK )
+				target.serialize(builder);
+		}
+		builder.append( mCurrentTarget + "\n" );
+		
+		session = builder.toString();
+
+		FileOutputStream ostream = new FileOutputStream( filename );
+	    GZIPOutputStream gzip    = new GZIPOutputStream( ostream );
+
+	    gzip.write( session.getBytes() );
+	    
+	    gzip.close();
+	    
+		mSessionName = sessionName;
+		
+		return filename;
+	}
+	
+	public static void loadSession( String filename ) throws Exception
+	{
+		File file = new File( mStoragePath + '/' + filename );
+		
+		if( file.exists() && file.length() > 0 )
+		{
+			BufferedReader reader = new BufferedReader(new InputStreamReader( new GZIPInputStream( new FileInputStream( file ) ) ) );
+			String		   line   = null;
+			
+			
+			// begin decoding procedure
+			try
+			{
+				line = reader.readLine();
+				if( line == null || line.equals( SESSION_MAGIC ) == false )
+					throw new Exception( "Not a dSploit session file." );
+												
+				reset();
+				
+				// read targets 
+				int targets = Integer.parseInt( reader.readLine() );
+				for( int i = 0; i < targets; i++ )
+				{
+					Target target = new Target( reader );
+					
+					if( hasTarget(target) == false )
+					{
+						System.addOrderedTarget(target);
+					}
+					else
+					{
+						for( int j = 0; j < mTargets.size(); j++ )
+						{
+							if( mTargets.get( j ) != null && mTargets.get( j ).equals( target ) )
+							{
+								mTargets.set( j, target );
+								break;
+							}
+						}
+					}
+				}
+				
+				mCurrentTarget = Integer.parseInt( reader.readLine() );
+				
+				reader.close();
+			}
+			catch( Exception e )
+			{
+				reset();
+				
+				if( reader != null )
+					reader.close();
+				
+				throw e;
+			}
+		}
+		else
+			throw new Exception( filename + " does not exists or is empty." );
 	}
 	
 	public static NMap getNMap() {

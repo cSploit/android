@@ -35,7 +35,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -60,7 +59,6 @@ public class PasswordSniffer extends Activity
 	private ExpandableListView mListView		  = null;		
 	private ListViewAdapter	   mAdapter			  = null;
 	private boolean	           mRunning			  = false;	
-	private String			   mExternalStorage   = null;
 	private String			   mFileOutput		  = null;
 	private FileWriter		   mFileWriter		  = null;
 	private BufferedWriter	   mBufferedWriter	  = null;
@@ -182,8 +180,7 @@ public class PasswordSniffer extends Activity
         setTitle( "MITM - Password Sniffer" );
         setContentView( R.layout.plugin_mitm_password_sniffer );
         
-        mExternalStorage   = Environment.getExternalStorageDirectory().toString();
-        mFileOutput		   = ( new File( mExternalStorage, FILENAME ) ).getAbsolutePath();
+        mFileOutput		   = ( new File( System.getStoragePath(), FILENAME ) ).getAbsolutePath();
         mSniffToggleButton = ( ToggleButton )findViewById( R.id.sniffToggleButton );
         mSniffCookies	   = ( CheckBox )findViewById( R.id.cookieCheckBox );
         mSniffProgress	   = ( ProgressBar )findViewById( R.id.sniffActivity );

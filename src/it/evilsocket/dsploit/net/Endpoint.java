@@ -18,6 +18,7 @@
  */
 package it.evilsocket.dsploit.net;
 
+import java.io.BufferedReader;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -30,17 +31,22 @@ public class Endpoint
 	private byte[]      mHardware = null;
 		
 	public static byte[] parseMacAddress( String macAddress ) {
-        String[] bytes = macAddress.split(":");
-        byte[] parsed  = new byte[bytes.length];
-
-        for (int x = 0; x < bytes.length; x++)
-        {
-            BigInteger temp = new BigInteger(bytes[x], 16);
-            byte[] raw 		= temp.toByteArray();
-            parsed[x] 		= raw[raw.length - 1];
-        }
-        
-        return parsed;
+		if( macAddress != null && macAddress.equals("null") == false )
+		{
+	        String[] bytes = macAddress.split(":");
+	        byte[] parsed  = new byte[bytes.length];
+	
+	        for (int x = 0; x < bytes.length; x++)
+	        {
+	            BigInteger temp = new BigInteger(bytes[x], 16);
+	            byte[] raw 		= temp.toByteArray();
+	            parsed[x] 		= raw[raw.length - 1];
+	        }
+	        
+	        return parsed;
+		}
+		return null;
+		
     }
 	
 	public Endpoint( String address ){
@@ -63,6 +69,16 @@ public class Endpoint
 			Log.e( "ENDPOINT", e.toString() );
 			mAddress = null;
 		}
+	}
+	
+	public Endpoint( BufferedReader reader ) throws Exception {
+		mAddress  = InetAddress.getByName( reader.readLine() );
+		mHardware = parseMacAddress( reader.readLine() ); 
+	}
+	
+	public void serialize( StringBuilder builder ) {
+		builder.append( mAddress.getHostAddress() + "\n" );
+		builder.append( getHardwareAsString() + "\n" );
 	}
 	
 	public boolean equals( Endpoint endpoint ){		
