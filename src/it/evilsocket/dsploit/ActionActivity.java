@@ -22,35 +22,32 @@ import java.util.ArrayList;
 
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Plugin;
-import android.app.Activity;
+import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ActionActivity extends Activity 
+public class ActionActivity extends ListActivity 
 {
 	private static final int LAYOUT = R.layout.actions_layout;
 	
 	private ActionsAdapter    mActionsAdapter = null; 
-	private ListView	      mListView	      = null;
 	private ArrayList<Plugin> mAvailable      = null;
 	
 	public class ActionsAdapter extends ArrayAdapter<Plugin> 
 	{
 		private int mLayoutId = 0;
 		
-		class ActionHolder
+		public class ActionHolder
 	    {
-			Plugin    action;
 			ImageView icon;
 			TextView  name;
 			TextView  description;
@@ -61,33 +58,6 @@ public class ActionActivity extends Activity
 	        	       
 	        mLayoutId = layoutId;
 	    }
-		
-		private class SelectActionClickListener implements OnClickListener
-		{
-			public void onClick( View v ) 
-			{		
-				final Plugin plugin = ( ( ActionHolder )v.getTag() ).action;
-				
-				System.setCurrentPlugin( plugin );
-
-				ActionActivity.this.runOnUiThread(new Runnable() {
-	                @Override
-	                public void run() {
-	                	Toast.makeText( ActionActivity.this, "Selected " + plugin.getName(), Toast.LENGTH_SHORT ).show();
-	                	
-	                	startActivity
-	                    ( 
-	                      new Intent
-	                      ( 
-	                        ActionActivity.this, 
-	                        plugin.getClass()
-	                      ) 
-	                    );
-	                    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-	                }
-	            });
-			}
-		}
 		
 		@Override
 	    public View getView( int position, View convertView, ViewGroup parent ) {		
@@ -114,13 +84,10 @@ public class ActionActivity extends Activity
 	        
 	        Plugin action = mAvailable.get( position );
 	                
-	        holder.action = action;
 	        holder.icon.setImageResource( action.getIconResourceId() );
 	        holder.name.setText( action.getName() );
 	        holder.description.setText( action.getDescription() );
-	        
-	        row.setOnClickListener( new SelectActionClickListener() );
-	        
+	        	        
 	        return row;
 	    }
 	}
@@ -131,11 +98,31 @@ public class ActionActivity extends Activity
 
         setContentView( LAYOUT );
         
-        mListView       = ( ListView )findViewById( R.id.actionListView );
         mAvailable      = System.getPluginsForTarget();
         mActionsAdapter = new ActionsAdapter( R.layout.actions_list_item );
         
-	    mListView.setAdapter( mActionsAdapter );    
+	    setListAdapter( mActionsAdapter );    
+	}
+	
+	@Override
+	protected void onListItemClick( ListView l, View v, int position, long id ){
+		super.onListItemClick( l, v, position, id);
+		
+		Plugin plugin = mAvailable.get( position );
+		
+		System.setCurrentPlugin( plugin );
+
+		Toast.makeText( ActionActivity.this, "Selected " + plugin.getName(), Toast.LENGTH_SHORT ).show();
+    	
+    	startActivity
+        ( 
+          new Intent
+          ( 
+            ActionActivity.this, 
+            plugin.getClass()
+          ) 
+        );
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
 	}
 
 	@Override

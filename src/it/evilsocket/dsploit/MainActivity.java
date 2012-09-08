@@ -43,7 +43,7 @@ import it.evilsocket.dsploit.plugins.PortScanner;
 import it.evilsocket.dsploit.plugins.mitm.MITM;
 import it.evilsocket.dsploit.tools.NMap.FindAliveEndpointsOutputReceiver;
 
-import android.app.Activity;
+import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -55,20 +55,18 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity 
+public class MainActivity extends ListActivity 
 {
 	private static final int LAYOUT = R.layout.target_layout;
 	
 	private ToolsInstaller mToolsInstaller = null;
 	private TargetAdapter  mTargetAdapter  = null;
-	private ListView	   mListView	   = null;
 	
 	public class TargetAdapter extends ArrayAdapter<Target> 
 	{
@@ -76,11 +74,10 @@ public class MainActivity extends Activity
 		
 		class TargetHolder
 	    {
-			int			position;
-			Target		target;
-	        ImageView   itemImage;
-	        TextView    itemTitle;
-	        TextView	itemDescription;
+			Target     target;
+	        ImageView  itemImage;
+	        TextView   itemTitle;
+	        TextView   itemDescription;
 	    }
 		
 		public TargetAdapter( int layoutId ) {		
@@ -88,34 +85,7 @@ public class MainActivity extends Activity
 	        
 	        mLayoutId = layoutId;
 	    }
-											
-		private class SelectTargetClickListener implements OnClickListener
-		{
-			public void onClick( View v ) 
-			{		
-				// select clicked target and go to action list activity
-				int position = ( ( TargetHolder )v.getTag() ).position;
-	
-				System.setCurrentTarget( position );
-				
-				MainActivity.this.runOnUiThread( new Runnable() {
-	                @Override
-	                public void run() {
-	                	Toast.makeText( MainActivity.this, "Selected " + System.getCurrentTarget(), Toast.LENGTH_SHORT ).show();	                	
-	                    startActivity
-	                    ( 
-	                      new Intent
-	                      ( 
-	                        MainActivity.this, 
-	                        ActionActivity.class
-	                      ) 
-	                    );
-	                    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-	                }
-	            });
-			}
-		}
-		
+
 		@Override
 		public int getCount(){
 			return System.getTargets().size();
@@ -133,7 +103,6 @@ public class MainActivity extends Activity
 	            
 	            holder = new TargetHolder();
 	            
-	            holder.position		   = position;
 	            holder.itemImage  	   = ( ImageView )row.findViewById( R.id.itemIcon );
 	            holder.itemTitle  	   = ( TextView )row.findViewById( R.id.itemTitle );
 	            holder.itemDescription = ( TextView )row.findViewById( R.id.itemDescription );
@@ -151,10 +120,7 @@ public class MainActivity extends Activity
         	holder.itemTitle.setText( target.toString() );
         	holder.itemTitle.setTypeface( null, Typeface.NORMAL );
         	holder.itemDescription.setText( target.getDescription() );
-        	
-        	row.setOnClickListener( new SelectTargetClickListener() );
-	        
-	        
+        		       	       
 	        holder.target = target;
 	        
 	        return row;
@@ -215,16 +181,15 @@ public class MainActivity extends Activity
 		        // register the crash manager
 		        CrashManager.register( getApplicationContext() );
 		        
-		        mListView 	   = ( ListView )findViewById( R.id.listView );
 				mTargetAdapter = new TargetAdapter( R.layout.target_list_item );
 		    	
-				mListView.setAdapter( mTargetAdapter );						
+				setListAdapter( mTargetAdapter );						
 	    	}
 	    	catch( Exception e )
 	    	{
 	    		new FatalDialog( "Error", e.getMessage(), this ).show();
 	    	}
-        }                        
+        }                       
 	}
 	
 	@Override
@@ -252,7 +217,7 @@ public class MainActivity extends Activity
 		                    	MainActivity.this.runOnUiThread(new Runnable() {
 				                    @Override
 				                    public void run() {
-				                    	( ( TargetAdapter )mListView.getAdapter() ).notifyDataSetChanged();
+				                    	mTargetAdapter.notifyDataSetChanged();
 				                    }
 				                });
 							}
@@ -281,7 +246,7 @@ public class MainActivity extends Activity
 		                    	MainActivity.this.runOnUiThread(new Runnable() {
 				                    @Override
 				                    public void run() {
-				                    	( ( TargetAdapter )mListView.getAdapter() ).notifyDataSetChanged();
+				                    	mTargetAdapter.notifyDataSetChanged();
 				                    }
 				                });
 							}														
@@ -387,6 +352,24 @@ public class MainActivity extends Activity
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+	
+	@Override
+	protected void onListItemClick( ListView l, View v, int position, long id ){
+		super.onListItemClick( l, v, position, id);
+					
+		System.setCurrentTarget( position );
+		
+		Toast.makeText( MainActivity.this, "Selected " + System.getCurrentTarget(), Toast.LENGTH_SHORT ).show();	                	
+        startActivity
+        ( 
+          new Intent
+          ( 
+            MainActivity.this, 
+            ActionActivity.class
+          ) 
+        );
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
 	}
 
 	@Override
