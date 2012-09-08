@@ -22,6 +22,7 @@ import it.evilsocket.dsploit.core.CrashManager;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.ToolsInstaller;
+import it.evilsocket.dsploit.gui.dialogs.AboutDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
 import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
@@ -324,8 +325,7 @@ public class MainActivity extends Activity
 												
 			case R.id.about:
 				
-				// TODO: Make an About dialog
-				Toast.makeText( this, "dSploit - Android Network Penetration Suite\n      by Simone Margaritelli aka evilsocket", Toast.LENGTH_LONG ).show();
+				new AboutDialog( this ).show();
 				
 				return true;
 		}
