@@ -22,6 +22,8 @@ import it.evilsocket.dsploit.core.CrashManager;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.ToolsInstaller;
+import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
+import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
 import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
 import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog;
@@ -295,8 +297,39 @@ public class MainActivity extends Activity
 				
 				return true;
 	
+			case R.id.new_session:
+								
+					new ConfirmDialog( "Warning", "Starting a new session would delete the current one, continue ?", this, new ConfirmDialogListener(){
+						@Override
+						public void onConfirm() {
+							try
+							{
+								System.reset();
+								mTargetAdapter.notifyDataSetChanged();
+								
+								Toast.makeText( MainActivity.this, "New session started", Toast.LENGTH_SHORT ).show();
+							}
+							catch( Exception e )
+							{
+								new FatalDialog( "Error", e.toString(), MainActivity.this ).show();
+							}
+						}}
+					).show();										
+								
+				return true;
+				
+			case R.id.save_session :
+			case R.id.restore_session :
+				
+				Toast.makeText( this, "TODO :)", Toast.LENGTH_LONG ).show();
+				
+				return true;
+												
 			case R.id.about:
+				
+				// TODO: Make an About dialog
 				Toast.makeText( this, "dSploit - Android Network Penetration Suite\n      by Simone Margaritelli aka evilsocket", Toast.LENGTH_LONG ).show();
+				
 				return true;
 		}
 

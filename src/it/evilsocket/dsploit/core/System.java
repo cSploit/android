@@ -72,6 +72,19 @@ public class System
 		mInitialized = true;
 	}
 	
+	public static void reset() throws NoRouteToHostException, SocketException {
+		mTargets.clear();
+		
+		// local network
+		mTargets.add( new Target( System.getNetwork() ) );
+		// network gateway
+		mTargets.add( new Target( System.getNetwork().getGatewayAddress(), System.getNetwork().getGatewayHardware() ) );
+		// device network address
+		mTargets.add( new Target( System.getNetwork().getLoacalAddress(), System.getNetwork().getLocalHardware() ) );
+				
+		mCurrentTarget = 0;
+	}
+	
 	public static boolean isInitialized(){
 		return mInitialized;
 	}

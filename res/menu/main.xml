@@ -4,5 +4,8 @@
   <item android:id="@+id/add"  android:title="Add"  android:icon="@android:drawable/ic_input_add"  android:showAsAction="always"/>
   <item android:id="@+id/scan" android:title="Scan" android:icon="@android:drawable/ic_popup_sync" android:showAsAction="always"/>
   
-  <item android:id="@+id/about" android:title="About" />
+  <item android:id="@+id/new_session"     android:title="New Session"    />
+  <item android:id="@+id/save_session"    android:title="Save Session"   />
+  <item android:id="@+id/restore_session" android:title="Restore Session"/>
+  <item android:id="@+id/about"           android:title="About" />
 </menu>
