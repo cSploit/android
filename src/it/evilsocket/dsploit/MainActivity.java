@@ -43,12 +43,13 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -74,7 +75,6 @@ public class MainActivity extends Activity
 	        ImageView   itemImage;
 	        TextView    itemTitle;
 	        TextView	itemDescription;
-	        Button      scanButton;
 	    }
 		
 		public TargetAdapter( int layoutId ) {		
@@ -82,98 +82,7 @@ public class MainActivity extends Activity
 	        
 	        mLayoutId = layoutId;
 	    }
-									
-		private class TargetScanClickListener implements OnClickListener 
-		{					
-			public void onClick( View v ) {
-				Target 				 target = ( Target )v.getTag();
-				final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Searching alive endpoints ...", true, false );
-				
-				if( target.getType() == Target.Type.NETWORK ) {
-					
-					mNmap.findAliveEndpoints( target.getNetwork(), new FindAliveEndpointsOutputReceiver(){						
-						@Override
-						public void onEndpointFound( Endpoint endpoint ) {
-							Target  target = new Target( endpoint );
-							int     i;
-							boolean added = false;
-							
-							if( System.hasTarget( target ) == false )
-							{
-								for( i = 0; i < System.getTargets().size() && !added; i++ )
-								{
-									if( System.getTarget( i ).comesAfter( target ) )
-									{
-										System.addTarget( i, target );
-										added = true;
-									}
-								}
-								
-								if( !added )	
-									System.addTarget( target );
-																								
-								// refresh the target listview
-		                    	MainActivity.this.runOnUiThread(new Runnable() {
-				                    @Override
-				                    public void run() {
-				                    	( ( TargetAdapter )mListView.getAdapter() ).notifyDataSetChanged();
-				                    }
-				                });
-							}														
-						}
-					
-						@Override
-						public void onEnd( int code ) {
-							dialog.dismiss();
-						}
-					}).start();
-				}
-			}
-		}
-		
-		private class AddCustomTargetClickListener implements OnClickListener 
-		{
-			public void onClick( View v ) 
-			{		
-				new InputDialog( "Add custom target", "Enter an URL, host name or ip address below:", MainActivity.this, new InputDialogListener(){
-					@Override
-					public void onInputEntered( String input ) 
-					{
-						Target target = Target.getFromString(input);						
-						if( target != null )
-						{
-							if( System.hasTarget(target) == false )
-							{								
-								boolean added = false;
-								
-								for( int i = 0; i < System.getTargets().size() && !added; i++ )
-								{
-									if( System.getTarget( i ).comesAfter( target ) )
-									{
-										System.addTarget( i, target );
-										added = true;
-									}
-								}
-								
-								if( !added )								
-									System.addTarget( target );
-								
-								// refresh the target listview
-		                    	MainActivity.this.runOnUiThread(new Runnable() {
-				                    @Override
-				                    public void run() {
-				                    	( ( TargetAdapter )mListView.getAdapter() ).notifyDataSetChanged();
-				                    }
-				                });
-							}
-						}
-						else
-							new ErrorDialog( "Error", "Invalid target.", MainActivity.this ).show();
-					}} 
-				).show();
-			}
-		}
-		
+											
 		private class SelectTargetClickListener implements OnClickListener
 		{
 			public void onClick( View v ) 
@@ -203,8 +112,7 @@ public class MainActivity extends Activity
 		
 		@Override
 		public int getCount(){
-			// plus one for the "Add Custom Target" row
-			return System.getTargets().size() + 1;
+			return System.getTargets().size();
 		}
 		
 		@Override
@@ -223,7 +131,6 @@ public class MainActivity extends Activity
 	            holder.itemImage  	   = ( ImageView )row.findViewById( R.id.itemIcon );
 	            holder.itemTitle  	   = ( TextView )row.findViewById( R.id.itemTitle );
 	            holder.itemDescription = ( TextView )row.findViewById( R.id.itemDescription );
-	            holder.scanButton 	   = ( Button )row.findViewById( R.id.scanButton );
 
 	            row.setTag(holder);
 	        }
@@ -232,40 +139,15 @@ public class MainActivity extends Activity
 	            holder = ( TargetHolder )row.getTag();
 	        }
 	        
-	        Target target = null;
+	        Target target = System.getTarget( position );
+	        	
+        	holder.itemImage.setImageResource( target.getDrawableResourceId() );
+        	holder.itemTitle.setText( target.toString() );
+        	holder.itemTitle.setTypeface( null, Typeface.NORMAL );
+        	holder.itemDescription.setText( target.getDescription() );
+        	
+        	row.setOnClickListener( new SelectTargetClickListener() );
 	        
-	        // last line to add a custom target
-	        if( position == getCount() - 1 )
-	        {
-	        	holder.itemImage.setImageResource( R.drawable.target_add_48 );
-	        	holder.itemTitle.setText( "Add custom target" );
-	        	holder.itemDescription.setText( "Add any hostname or address to the list." );
-	        	holder.scanButton.setVisibility( View.GONE );
-	        	
-	        	row.setOnClickListener( new AddCustomTargetClickListener() );
-	        }
-	        else
-	        {
-	        	target = System.getTarget( position );
-	        	
-	        	holder.itemImage.setImageResource( target.getDrawableResourceId() );
-	        	holder.itemTitle.setText( target.toString() );
-	        	holder.itemTitle.setTypeface( null, Typeface.NORMAL );
-	        	holder.itemDescription.setText( target.getDescription() );
-	        	
-	        	// hide the scan button in the network item if already scanned or in other items
-	        	if( target.getType() != Target.Type.NETWORK ) 
-	        	{
-	        		holder.scanButton.setVisibility( View.GONE );
-	        	}
-	        	else
-	        	{
-	        		holder.scanButton.setTag( target );
-	        		holder.scanButton.setOnClickListener( new TargetScanClickListener() );
-	        	}
-	        	
-	        	row.setOnClickListener( new SelectTargetClickListener() );
-	        }
 	        
 	        holder.target = target;
 	        
@@ -331,13 +213,94 @@ public class MainActivity extends Activity
 		        mListView 	   = ( ListView )findViewById( R.id.listView );
 				mTargetAdapter = new TargetAdapter( R.layout.target_list_item );
 		    	
-				mListView.setAdapter( mTargetAdapter );  	
+				mListView.setAdapter( mTargetAdapter );						
 	    	}
 	    	catch( Exception e )
 	    	{
 	    		new FatalDialog( "Error", e.getMessage(), this ).show();
 	    	}
-        }
+        }                        
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		new MenuInflater(this).inflate( R.menu.main, menu );		
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch( item.getItemId() ) 
+		{
+			case R.id.add:
+				
+				new InputDialog( "Add custom target", "Enter an URL, host name or ip address below:", MainActivity.this, new InputDialogListener(){
+					@Override
+					public void onInputEntered( String input ) 
+					{
+						Target target = Target.getFromString(input);						
+						if( target != null )
+						{
+							if( System.addOrderedTarget( target ) == true )
+							{																								
+								// refresh the target listview
+		                    	MainActivity.this.runOnUiThread(new Runnable() {
+				                    @Override
+				                    public void run() {
+				                    	( ( TargetAdapter )mListView.getAdapter() ).notifyDataSetChanged();
+				                    }
+				                });
+							}
+						}
+						else
+							new ErrorDialog( "Error", "Invalid target.", MainActivity.this ).show();
+					}} 
+				).show();
+				
+				return true;
+	
+			case R.id.scan:
+				
+				try
+				{
+					final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Searching alive endpoints ...", true, false );
+									
+					mNmap.findAliveEndpoints( System.getNetwork(), new FindAliveEndpointsOutputReceiver(){						
+						@Override
+						public void onEndpointFound( Endpoint endpoint ) {
+							Target target = new Target( endpoint );
+
+							if( System.addOrderedTarget( target ) == true )
+							{													
+								// refresh the target listview
+		                    	MainActivity.this.runOnUiThread(new Runnable() {
+				                    @Override
+				                    public void run() {
+				                    	( ( TargetAdapter )mListView.getAdapter() ).notifyDataSetChanged();
+				                    }
+				                });
+							}														
+						}
+					
+						@Override
+						public void onEnd( int code ) {
+							dialog.dismiss();
+						}
+					}).start();		
+				}
+				catch( Exception e )
+				{
+					new FatalDialog( "Error", e.toString(), MainActivity.this ).show();
+				}
+				
+				return true;
+	
+			case R.id.about:
+				Toast.makeText( this, "dSploit - Android Network Penetration Suite\n      by Simone Margaritelli aka evilsocket", Toast.LENGTH_LONG ).show();
+				return true;
+		}
+
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override

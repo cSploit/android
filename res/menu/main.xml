@@ -1,5 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menu_settings"
-        android:title="@string/menu_settings"
-        android:orderInCategory="100" />
+ 
+  <item android:id="@+id/add"  android:title="Add"  android:icon="@android:drawable/ic_input_add"  android:showAsAction="always"/>
+  <item android:id="@+id/scan" android:title="Scan" android:icon="@android:drawable/ic_popup_sync" android:showAsAction="always"/>
+  
+  <item android:id="@+id/about" android:title="About" />
 </menu>

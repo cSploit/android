@@ -11,7 +11,6 @@
         android:layout_height="fill_parent"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignTop="@+id/scanButton"
         android:layout_marginBottom="5dp"
         android:layout_marginRight="15dp"
         android:gravity="center_vertical" />
@@ -21,7 +20,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/scanButton"
         android:layout_toRightOf="@id/itemIcon"
         android:textColor="#FFFFFF"
         android:textSize="15dp" />
@@ -31,19 +29,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/scanButton"
         android:layout_toRightOf="@id/itemIcon"
         android:paddingTop="20dp"
         android:textColor="#888888"
         android:textSize="12dp" />
-    
-    <Button
-        android:id="@+id/scanButton"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
-        android:background="@drawable/action_scan_48"
-        android:minHeight="1dip"
-        android:minWidth="1dip" />
 
 </RelativeLayout>

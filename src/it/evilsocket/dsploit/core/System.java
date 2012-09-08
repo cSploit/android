@@ -45,16 +45,17 @@ public class System
 	private static final String TAG 		  		  = "SYSTEM";
 	public  static final String IPV4_FORWARD_FILEPATH = "/proc/sys/net/ipv4/ip_forward";
 
-	private static boolean			  mInitialized   = false;
-	private static Context 			  mContext  	 = null;
-	private static Network 			  mNetwork  	 = null;
-	private static ArrayList<Target>  mTargets		 = null;
-	private static int  			  mCurrentTarget = 0;
-	private static Map<String,String> mServices 	 = null;
-	private static Map<String,String> mPorts     	 = null;
-	
-	private static ArrayList<Plugin>  mPlugins  	 = null;
-	private static Plugin			  mCurrentPlugin = null;
+	private static boolean			     mInitialized   = false;
+	private static Context 			     mContext  	    = null;
+	private static Network 			     mNetwork  	    = null;
+	private static ArrayList<Target>     mTargets		= null;
+	private static int  			     mCurrentTarget = 0;
+	private static Map<String,String>    mServices 	    = null;
+	private static Map<String,String>    mPorts         = null;
+	private static Map< String, String > mVendors       = null;
+
+	private static ArrayList<Plugin>     mPlugins  	    = null;
+	private static Plugin			     mCurrentPlugin = null;
 		
 	public static void init( Context context ) throws NoRouteToHostException, SocketException {
 		mContext = context;		
@@ -73,6 +74,44 @@ public class System
 	
 	public static boolean isInitialized(){
 		return mInitialized;
+	}
+	
+	public static String getMacVendor( byte[] mac ){
+		if( mVendors == null )
+		{
+			mVendors = new HashMap<String,String>();
+			
+			// preload mac vendors
+			try
+			{
+				FileInputStream fstream = new FileInputStream( mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-mac-prefixes" );
+				DataInputStream in 	    = new DataInputStream(fstream);
+				BufferedReader  reader  = new BufferedReader(new InputStreamReader(in));
+				String 		    line;
+				
+				while( ( line = reader.readLine() ) != null )   
+				{
+					line = line.trim();
+					if( line.startsWith("#") == false && line.isEmpty() == false )  
+					{
+						String[] tokens = line.split( " ", 2 );
+						
+						if( tokens.length == 2 )
+							mVendors.put( tokens[0], tokens[1] );						
+					}
+				}
+				
+				in.close();
+			}
+			catch( Exception e )
+			{
+				Log.e( TAG, e.toString() );
+			}
+		}
+		
+		String signature = String.format( "%02X", mac[0] ) + String.format( "%02X", mac[1] ) + String.format( "%02X", mac[2] );
+		
+		return mVendors.get( signature );
 	}
 	
 	public static String getProtocolByPort( String port ){
@@ -173,6 +212,26 @@ public class System
 	
 	public static void addTarget( Target target ){
 		mTargets.add( target );
+	}
+	
+	public static boolean addOrderedTarget( Target target ){
+		if( target != null && hasTarget( target ) == false )
+		{
+			for( int i = 0; i < getTargets().size(); i++ )
+			{
+				if( getTarget( i ).comesAfter( target ) )
+				{
+					addTarget( i, target );
+					return true;
+				}
+			}
+			
+			addTarget( target );
+			
+			return true;
+		}
+		
+		return false;
 	}
 	
 	public static Target getTarget( int index ){

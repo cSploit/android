@@ -288,7 +288,11 @@ public class Target {
 		
 		else if( mType == Type.ENDPOINT )
 		{
-			String desc = mEndpoint.getHardwareAsString();
+			String vendor = System.getMacVendor( mEndpoint.getHardware() ),
+				   desc   = mEndpoint.getHardwareAsString();
+			
+			if( vendor != null )
+				desc += " - " + vendor;
 			
 			try
 			{

@@ -22,7 +22,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:padding="5dp"
-        android:text="Select a target below by clicking on a row, alternatively you can scan your network to find alive endpoints."
+        android:text="Select a target below by clicking on a row, or use the action bar to scan your network to find alive endpoints."
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#ccc" />
 

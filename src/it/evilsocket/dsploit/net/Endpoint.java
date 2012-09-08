@@ -25,10 +25,10 @@ import java.net.UnknownHostException;
 import android.util.Log;
 
 public class Endpoint 
-{
+{	
 	private InetAddress mAddress  = null;
 	private byte[]      mHardware = null;
-	
+		
 	public static byte[] parseMacAddress( String macAddress ) {
         String[] bytes = macAddress.split(":");
         byte[] parsed  = new byte[bytes.length];
