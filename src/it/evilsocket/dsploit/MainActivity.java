@@ -70,6 +70,7 @@ public class MainActivity extends ListActivity
 	
 	private ToolsInstaller 	  mToolsInstaller  = null;
 	private TargetAdapter  	  mTargetAdapter   = null;
+	private IntentFilter	  mIntentFilter	   = null;
 	private BroadcastReceiver mMessageReceiver = null;
 	
 	public class TargetAdapter extends ArrayAdapter<Target> 
@@ -189,43 +190,43 @@ public class MainActivity extends ListActivity
 		        
 				mTargetAdapter = new TargetAdapter( R.layout.target_list_item );
 		    	
-				setListAdapter( mTargetAdapter );						
+				setListAdapter( mTargetAdapter );	
+				
+				mMessageReceiver = new BroadcastReceiver() {
+					@Override
+					public void onReceive(Context context, Intent intent) {
+						if( intent.getAction().equals( NetworkMonitorService.NEW_ENDPOINT ) )
+						{
+							String address  = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_ADDRESS ),
+								   hardware = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_HARDWARE );	            	
+							Target target	= Target.getFromString( address );
+							
+							target.getEndpoint().setHardware( Endpoint.parseMacAddress(hardware) );
+							
+							if( System.addOrderedTarget( target ) == true )
+							{													
+								// refresh the target listview
+				            	MainActivity.this.runOnUiThread(new Runnable() {
+				                    @Override
+				                    public void run() {
+				                    	mTargetAdapter.notifyDataSetChanged();
+				                    }
+				                });
+							}			
+						}	
+					}
+			    };
+			    
+			    mIntentFilter = new IntentFilter( );
+			    
+			    mIntentFilter.addAction( NetworkMonitorService.NEW_ENDPOINT );
+			    
+		        registerReceiver( mMessageReceiver, mIntentFilter );	        
 	    	}
 	    	catch( Exception e )
 	    	{
 	    		new FatalDialog( "Error", e.getMessage(), this ).show();
-	    	}
-		    
-		    mMessageReceiver = new BroadcastReceiver() {
-				@Override
-				public void onReceive(Context context, Intent intent) {
-					if( intent.getAction().equals( NetworkMonitorService.NEW_ENDPOINT ) )
-					{
-						String address  = ( String )intent.getExtras().get( "ENDPOINT_ADDRESS" ),
-							   hardware = ( String )intent.getExtras().get( "ENDPOINT_HARDWARE" );	            	
-						Target target	= Target.getFromString( address );
-						
-						target.getEndpoint().setHardware( Endpoint.parseMacAddress(hardware) );
-						
-						if( System.addOrderedTarget( target ) == true )
-						{													
-							// refresh the target listview
-			            	MainActivity.this.runOnUiThread(new Runnable() {
-			                    @Override
-			                    public void run() {
-			                    	mTargetAdapter.notifyDataSetChanged();
-			                    }
-			                });
-						}			
-					}	
-				}
-		    };
-		    
-		    IntentFilter filter = new IntentFilter( );
-		    
-		    filter.addAction( NetworkMonitorService.NEW_ENDPOINT );
-		    
-	        registerReceiver( mMessageReceiver, filter );	        
+	    	}		    		    
         }                       
 	}
 	

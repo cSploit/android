@@ -45,7 +45,7 @@ public class Sniffer extends Activity
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        
-        setTitle( "MITM - Sniffer" );
+        setTitle( System.getCurrentTarget() + " > MITM > Sniffer" );
         setContentView( R.layout.plugin_mitm_sniffer );
         
         mSniffToggleButton = ( ToggleButton )findViewById( R.id.sniffToggleButton );

@@ -46,6 +46,7 @@ import it.evilsocket.dsploit.net.Network.Protocol;
 import it.evilsocket.dsploit.net.Target.Port;
 import it.evilsocket.dsploit.net.Target.Type;
 import it.evilsocket.dsploit.net.Target.Vulnerability;
+import it.evilsocket.dsploit.net.http.Proxy;
 import it.evilsocket.dsploit.tools.Ettercap;
 import it.evilsocket.dsploit.tools.Hydra;
 import it.evilsocket.dsploit.tools.IPTables;
@@ -54,9 +55,9 @@ import it.evilsocket.dsploit.tools.TcpDump;
 
 public class System 
 {		
-	private static final String TAG 		  		  = "SYSTEM";
-	private static final String SESSION_MAGIC		  = "DSS"; 
-	public  static final String IPV4_FORWARD_FILEPATH = "/proc/sys/net/ipv4/ip_forward";
+	private static final String TAG 		  		    = "SYSTEM";
+	private static final String SESSION_MAGIC		    = "DSS"; 
+	public  static final String IPV4_FORWARD_FILEPATH   = "/proc/sys/net/ipv4/ip_forward";
 
 	private static boolean			     mInitialized   = false;
 	private static Context 			     mContext  	    = null;
@@ -75,6 +76,8 @@ public class System
 	private static IPTables				 mIptables		= null;
 	private static Hydra				 mHydra			= null;
 	private static TcpDump				 mTcpdump		= null;
+	
+	private static Proxy				 mProxy			= null;
 	
 	private static String				 mStoragePath   = null;
 	private static String				 mSessionName	= null;
@@ -235,6 +238,20 @@ public class System
 	
 	public static TcpDump getTcpDump() {
 		return mTcpdump;
+	}
+	
+	public static Proxy getProxy() {
+		try
+		{
+			if( mProxy == null )
+				mProxy = new Proxy( getNetwork().getLoacalAddress(), 8080 );
+		}
+		catch( Exception e )
+		{
+			Log.e( TAG, e.toString() );
+		}
+		
+		return mProxy;
 	}
 	
 	public static void reset() throws NoRouteToHostException, SocketException {

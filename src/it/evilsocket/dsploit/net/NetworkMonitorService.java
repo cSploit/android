@@ -33,12 +33,14 @@ import android.os.IBinder;
 
 public class NetworkMonitorService extends Service
 {
-	public static final String NEW_ENDPOINT = "NetworkMonitorService.action.NEW_ENDPOINT";
-
+	public static final String NEW_ENDPOINT		 = "NetworkMonitorService.action.NEW_ENDPOINT";
+	public static final String ENDPOINT_ADDRESS  = "NetworkMonitorService.data.ENDPOINT_ADDRESS";
+	public static final String ENDPOINT_HARDWARE = "NetworkMonitorService.data.ENDPOINT_HARDWARE";
 	
-	private Network			  				 mNetwork 	= null;
-	private FindAliveEndpointsOutputReceiver mReceiver  = null;
-	private boolean							 mRunning   = false;
+	private Network			  				 mNetwork 		 = null;
+	private FindAliveEndpointsOutputReceiver mReceiver  	 = null;
+	private boolean							 mRunning  		 = false;
+	private int								 mNotificationId = 1;
 	
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -60,7 +62,7 @@ public class NetworkMonitorService extends Service
 
 		notification.setLatestEventInfo( context, "Network Monitor", message, null );
 		
-		manager.notify( 1, notification );
+		manager.notify( mNotificationId++, notification );
 	}
 	
 	private void sendNewEndpointNotification( Endpoint endpoint ) {
@@ -68,8 +70,8 @@ public class NetworkMonitorService extends Service
 		
 		Intent intent = new Intent( NEW_ENDPOINT );
 		
-		intent.putExtra( "ENDPOINT_ADDRESS",  endpoint.toString() );
-		intent.putExtra( "ENDPOINT_HARDWARE", endpoint.getHardwareAsString() );
+		intent.putExtra( ENDPOINT_ADDRESS,  endpoint.toString() );
+		intent.putExtra( ENDPOINT_HARDWARE, endpoint.getHardwareAsString() );
         sendBroadcast(intent);    	
 	}
 

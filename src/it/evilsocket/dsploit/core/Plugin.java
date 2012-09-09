@@ -72,7 +72,7 @@ public abstract class Plugin extends Activity
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);     
-        setTitle( mName );
+        setTitle( System.getCurrentTarget() + " > " + mName );
         setContentView( mLayoutId );        
 	}
 	

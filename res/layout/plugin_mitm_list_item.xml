@@ -3,11 +3,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
+      <ImageView
+      android:id="@+id/actionIcon"
+      android:layout_width="wrap_content"
+      android:layout_height="fill_parent"
+      android:layout_alignParentBottom="true"
+      android:layout_alignParentLeft="true"
+      android:layout_centerVertical="true"
+      android:layout_marginRight="15dp"
+      android:gravity="center_vertical"
+      android:src="@drawable/action_plugin_48" />
+      
     <TextView
         android:id="@+id/itemName"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="5dip"
+        android:layout_toRightOf="@+id/actionIcon"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
@@ -16,8 +27,10 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/itemName"
         android:layout_below="@id/itemName"
-        android:padding="5dip"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:paddingBottom="5dip"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#888888"
+        android:textSize="12dp" />
 
     <ProgressBar
         android:id="@+id/itemActivity"

@@ -177,7 +177,7 @@ public class PasswordSniffer extends Activity
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        
-        setTitle( "MITM - Password Sniffer" );
+        setTitle( System.getCurrentTarget() + " > MITM > Password Sniffer" );
         setContentView( R.layout.plugin_mitm_password_sniffer );
         
         mFileOutput		   = ( new File( System.getStoragePath(), FILENAME ) ).getAbsolutePath();

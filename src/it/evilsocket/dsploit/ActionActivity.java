@@ -95,7 +95,7 @@ public class ActionActivity extends ListActivity
 	@Override
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);        
-
+        setTitle( "dSploit > " + System.getCurrentTarget() );
         setContentView( LAYOUT );
         
         mAvailable      = System.getPluginsForTarget();
