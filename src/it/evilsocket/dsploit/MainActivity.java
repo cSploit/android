@@ -70,7 +70,6 @@ public class MainActivity extends ListActivity
 {
 	private static final int LAYOUT = R.layout.target_layout;
 	
-	private ToolsInstaller 	  mToolsInstaller  = null;
 	private TargetAdapter  	  mTargetAdapter   = null;
 	private IntentFilter	  mIntentFilter	   = null;
 	private BroadcastReceiver mMessageReceiver = null;
@@ -81,7 +80,6 @@ public class MainActivity extends ListActivity
 		
 		class TargetHolder
 	    {
-			Target     target;
 	        ImageView  itemImage;
 	        TextView   itemTitle;
 	        TextView   itemDescription;
@@ -127,9 +125,7 @@ public class MainActivity extends ListActivity
         	holder.itemTitle.setText( target.toString() );
         	holder.itemTitle.setTypeface( null, Typeface.NORMAL );
         	holder.itemDescription.setText( target.getDescription() );
-        		       	       
-	        holder.target = target;
-	        
+        		       	       	        
 	        return row;
 	    }
 	}
@@ -140,40 +136,39 @@ public class MainActivity extends ListActivity
         setContentView( LAYOUT );
         
         if( System.isInitialized() == false )
-        {
-	        final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Initializing ...", true, false );
-	               
+        {	        	        
+        	final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Initializing ...", true, false );
+
 	        new Thread( new Runnable(){
 				@Override
 				public void run() 
-				{						
+				{				
 					dialog.show();
-					
-			        mToolsInstaller = new ToolsInstaller( MainActivity.this.getApplicationContext() );
+
+					String 		   fatal     = null;										
+					ToolsInstaller installer = new ToolsInstaller( MainActivity.this.getApplicationContext() );
 			       
-					if( Shell.isRootGranted() == false )  
-					{
-						dialog.dismiss();
-						MainActivity.this.runOnUiThread( new Runnable() {
-					       public void run() {
-					    	   new FatalDialog( "Error", "This application can run only on rooted devices.", MainActivity.this ).show();
-					       }
-					    });
-					}		        							                
-					else if( mToolsInstaller.needed() && mToolsInstaller.install() == false )
-			        {
-			        	dialog.dismiss();
-						MainActivity.this.runOnUiThread( new Runnable() {
-					       public void run() {
-					    	   new FatalDialog( "Error", "Error during files installation!", MainActivity.this ).show();
-					       }
-					    });
-			        }
-					
+					if( Shell.isRootGranted() == false )  					
+						fatal =  "This application can run only on rooted devices.";
+							        						                
+					else if( installer.needed() && installer.install() == false )			        
+						fatal = "Error during files installation!";
+			        					
 					dialog.dismiss();
 					
-					if( Network.isWifiConnected( MainActivity.this ) ) 
+					if( fatal != null )
+					{
+						final String fatalMessage = fatal;
+						MainActivity.this.runOnUiThread( new Runnable() {
+					       public void run() {
+					    	   new FatalDialog( "Error", fatalMessage, MainActivity.this ).show();
+					       }
+					    });
+					}
+					else if( Network.isWifiConnected( MainActivity.this ) ) 
+					{
 						startService( new Intent( MainActivity.this, NetworkMonitorService.class ) );
+					}
 				}
 			}).start();
 	               	   
