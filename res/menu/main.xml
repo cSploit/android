@@ -7,5 +7,6 @@
   <item android:id="@+id/new_session"     android:title="New Session"    />
   <item android:id="@+id/save_session"    android:title="Save Session"   />
   <item android:id="@+id/restore_session" android:title="Restore Session"/>
-  <item android:id="@+id/about"           android:title="About" />
+  <item android:id="@+id/submit_issue"    android:title="Submit Issue" />
+  <item android:id="@+id/about"           android:title="About" /> 
 </menu>

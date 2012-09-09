@@ -52,6 +52,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -381,6 +382,15 @@ public class MainActivity extends ListActivity
 				}
 				else
 					new ErrorDialog( "Error", "No session file found on sd card.", MainActivity.this ).show();
+				
+				return true;
+				
+			case R.id.submit_issue :
+				
+				String uri     = "https://github.com/evilsocket/dsploit/issues/new";
+				Intent browser = new Intent( Intent.ACTION_VIEW, Uri.parse( uri ) );
+				
+				startActivity( browser );
 				
 				return true;
 												
