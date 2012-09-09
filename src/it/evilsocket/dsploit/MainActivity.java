@@ -35,6 +35,7 @@ import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
 import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog;
 import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog.SpinnerDialogListener;
 import it.evilsocket.dsploit.net.Endpoint;
+import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.NetworkMonitorService;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.plugins.ExploitFinder;
@@ -170,7 +171,8 @@ public class MainActivity extends ListActivity
 					
 					dialog.dismiss();
 					
-			        startService( new Intent( MainActivity.this, NetworkMonitorService.class ) );
+					if( Network.isWifiConnected( MainActivity.this ) ) 
+						startService( new Intent( MainActivity.this, NetworkMonitorService.class ) );
 				}
 			}).start();
 	               	   
