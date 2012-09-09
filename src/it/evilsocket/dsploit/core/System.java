@@ -39,10 +39,12 @@ import java.util.zip.GZIPOutputStream;
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
+import it.evilsocket.dsploit.net.Endpoint;
 import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Network.Protocol;
 import it.evilsocket.dsploit.net.Target.Port;
+import it.evilsocket.dsploit.net.Target.Type;
 import it.evilsocket.dsploit.net.Target.Vulnerability;
 import it.evilsocket.dsploit.tools.Ettercap;
 import it.evilsocket.dsploit.tools.Hydra;
@@ -382,6 +384,30 @@ public class System
 		return mTargets;
 	}
 	
+	public static ArrayList<Target> getTargetsByType( Target.Type type ) {
+		ArrayList<Target> filtered = new ArrayList<Target>();
+		
+		for( Target target : mTargets )
+		{
+			if( target.getType() == type )
+				filtered.add( target );
+		}
+		
+		return filtered;
+	}
+	
+	public static ArrayList<Endpoint> getNetworkEndpoints() {
+		ArrayList<Endpoint> filtered = new ArrayList<Endpoint>();
+		
+		for( Target target : mTargets )
+		{
+			if( target.getType() == Type.ENDPOINT )
+				filtered.add( target.getEndpoint() );
+		}
+		
+		return filtered;
+	}
+	
 	public static void addTarget( int index, Target target ){
 		mTargets.add( index, target );
 	}
@@ -419,6 +445,19 @@ public class System
 		{
 			if( t != null && t.equals(target) )
 				return true;
+		}
+		
+		return false;
+	}
+	
+	public static boolean removeTarget( Target target ) {
+		for( int i = 0; i < mTargets.size(); i++ )
+		{
+			if( mTargets.get(i) != null && mTargets.get(i).equals(target) )
+			{
+				mTargets.remove(i);
+				return true;
+			}
 		}
 		
 		return false;

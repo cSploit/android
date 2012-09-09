@@ -35,6 +35,7 @@ import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
 import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog;
 import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog.SpinnerDialogListener;
 import it.evilsocket.dsploit.net.Endpoint;
+import it.evilsocket.dsploit.net.NetworkMonitorService;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.plugins.ExploitFinder;
 import it.evilsocket.dsploit.plugins.Inspector;
@@ -45,8 +46,10 @@ import it.evilsocket.dsploit.tools.NMap.FindAliveEndpointsOutputReceiver;
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -61,12 +64,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends ListActivity 
+public class MainActivity extends ListActivity
 {
 	private static final int LAYOUT = R.layout.target_layout;
 	
-	private ToolsInstaller mToolsInstaller = null;
-	private TargetAdapter  mTargetAdapter  = null;
+	private ToolsInstaller 	  mToolsInstaller  = null;
+	private TargetAdapter  	  mTargetAdapter   = null;
+	private BroadcastReceiver mMessageReceiver = null;
 	
 	public class TargetAdapter extends ArrayAdapter<Target> 
 	{
@@ -164,6 +168,8 @@ public class MainActivity extends ListActivity
 			        }
 					
 					dialog.dismiss();
+					
+			        startService( new Intent( MainActivity.this, NetworkMonitorService.class ) );
 				}
 			}).start();
 	               	   
@@ -189,6 +195,37 @@ public class MainActivity extends ListActivity
 	    	{
 	    		new FatalDialog( "Error", e.getMessage(), this ).show();
 	    	}
+		    
+		    mMessageReceiver = new BroadcastReceiver() {
+				@Override
+				public void onReceive(Context context, Intent intent) {
+					if( intent.getAction().equals( NetworkMonitorService.NEW_ENDPOINT ) )
+					{
+						String address  = ( String )intent.getExtras().get( "ENDPOINT_ADDRESS" ),
+							   hardware = ( String )intent.getExtras().get( "ENDPOINT_HARDWARE" );	            	
+						Target target	= Target.getFromString( address );
+						
+						target.getEndpoint().setHardware( Endpoint.parseMacAddress(hardware) );
+						
+						if( System.addOrderedTarget( target ) == true )
+						{													
+							// refresh the target listview
+			            	MainActivity.this.runOnUiThread(new Runnable() {
+			                    @Override
+			                    public void run() {
+			                    	mTargetAdapter.notifyDataSetChanged();
+			                    }
+			                });
+						}			
+					}	
+				}
+		    };
+		    
+		    IntentFilter filter = new IntentFilter( );
+		    
+		    filter.addAction( NetworkMonitorService.NEW_ENDPOINT );
+		    
+	        registerReceiver( mMessageReceiver, filter );	        
         }                       
 	}
 	
@@ -374,6 +411,9 @@ public class MainActivity extends ListActivity
 
 	@Override
 	public void onDestroy() {		
+		stopService( new Intent( this, NetworkMonitorService.class ) );
+		
+		this.unregisterReceiver( mMessageReceiver );
 		// make sure no zombie process is running before destroying the activity
 		System.clean();
 		

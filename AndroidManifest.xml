@@ -17,6 +17,8 @@
             </intent-filter>
         </activity>
         
+        <service android:enabled="true" android:name=".net.NetworkMonitorService" />
+        
         <activity android:configChanges="keyboardHidden|orientation" android:name=".ActionActivity" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>        
         <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.PortScanner" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>        
         <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.Inspector" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>        
@@ -25,6 +27,7 @@
         <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.mitm.Sniffer" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>        
         <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.mitm.PasswordSniffer" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>        
         <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.LoginCracker" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>
+        <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.NetworkMonitor" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>
         
     </application>
 

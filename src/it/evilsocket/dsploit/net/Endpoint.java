@@ -124,6 +124,6 @@ public class Endpoint
 	}
 	
 	public String toString(){
-		return mAddress.toString().substring(1);
+		return mAddress.getHostAddress();
 	}
 }
