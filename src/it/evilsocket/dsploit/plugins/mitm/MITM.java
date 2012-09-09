@@ -279,7 +279,7 @@ public class MITM extends Plugin
 				{
 					setStoppedState();
 					
-					new InputDialog( "Image URL", "Enter the URL of an image, starting with 'http://' :", "http://www.evilsocket.net/trollface.png", MITM.this, new InputDialogListener(){
+					new InputDialog( "Image URL", "Enter the URL of an image, starting with 'http://' :", "http://www.evilsocket.net/trollface.png", true, MITM.this, new InputDialogListener(){
 						@Override
 						public void onInputEntered( String input ) 
 						{
@@ -327,6 +327,7 @@ public class MITM extends Plugin
 						"<script type=\"text/javascript\">\n" +
 						"  alert('This site has been hacked with dSploit!');\n" +
 						"</script>", 
+						true,
 						MITM.this, 
 						new InputDialogListener(){
 						@Override

@@ -33,17 +33,19 @@ public class InputDialog extends AlertDialog
 	}
 	
 	public InputDialog( String title, String message, Activity activity, InputDialogListener inputDialogListener ){
-		this( title, message, null, activity, inputDialogListener );
+		this( title, message, null, true, activity, inputDialogListener );
 	}
 	
-	public InputDialog( String title, String message, String text, Activity activity, InputDialogListener inputDialogListener ){
+	public InputDialog( String title, String message, String text, boolean editable, Activity activity, InputDialogListener inputDialogListener ){
 		super( activity );
 		
 		mEditText = new EditText( activity );
 		
 		if( text != null )
 			mEditText.setText(text);
-				
+		
+		mEditText.setEnabled( editable );
+					
 		this.setTitle( title );
 		this.setMessage( message );
 		this.setView( mEditText );
@@ -52,7 +54,8 @@ public class InputDialog extends AlertDialog
 		
 		this.setButton( "Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-            	listener.onInputEntered( mEditText.getText().toString() );
+            	if( listener != null )
+            		listener.onInputEntered( mEditText.getText().toString() );
             }
         });			
 		

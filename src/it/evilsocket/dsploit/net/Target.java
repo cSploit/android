@@ -372,8 +372,18 @@ public class Target {
 		setHostname( hostname, port );
 	}
 	
-	public boolean equals( Target target ) 
-	{
+	public InetAddress getAddress() {
+		if( mType == Type.ENDPOINT )
+			return mEndpoint.getAddress();
+		
+		else if( mType == Type.REMOTE )
+			return mAddress;
+		
+		else
+			return null;
+	}
+	
+	public boolean equals( Target target ) {
 		if( mType == target.getType() )
 		{
 			if( mType == Type.NETWORK )

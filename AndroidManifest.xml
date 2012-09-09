@@ -27,7 +27,7 @@
         <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.mitm.Sniffer" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>        
         <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.mitm.PasswordSniffer" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>        
         <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.LoginCracker" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>
-        <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.NetworkMonitor" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>
+        <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.PacketForger" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>
         
     </application>
 

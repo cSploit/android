@@ -41,6 +41,7 @@ import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.plugins.ExploitFinder;
 import it.evilsocket.dsploit.plugins.Inspector;
 import it.evilsocket.dsploit.plugins.LoginCracker;
+import it.evilsocket.dsploit.plugins.PacketForger;
 import it.evilsocket.dsploit.plugins.PortScanner;
 import it.evilsocket.dsploit.plugins.mitm.MITM;
 import it.evilsocket.dsploit.tools.NMap.FindAliveEndpointsOutputReceiver;
@@ -149,7 +150,7 @@ public class MainActivity extends ListActivity
 					ToolsInstaller installer = new ToolsInstaller( MainActivity.this.getApplicationContext() );
 			       
 					if( Shell.isRootGranted() == false )  					
-						fatal =  "This application can run only on rooted devices.";
+						fatal = "This application can run only on rooted devices.";
 							        						                
 					else if( installer.needed() && installer.install() == false )			        
 						fatal = "Error during files installation!";
@@ -182,6 +183,7 @@ public class MainActivity extends ListActivity
 		        System.registerPlugin( new ExploitFinder( ) );
 		        System.registerPlugin( new LoginCracker( ) );
 		        System.registerPlugin( new MITM( ) );
+		        System.registerPlugin( new PacketForger( ) );
 	
 		        // register the crash manager
 		        CrashManager.register( getApplicationContext() );
@@ -324,7 +326,7 @@ public class MainActivity extends ListActivity
 				
 			case R.id.save_session :
 				
-				new InputDialog( "Save Session", "Enter the name of the session file :", System.getSessionName(), MainActivity.this, new InputDialogListener(){
+				new InputDialog( "Save Session", "Enter the name of the session file :", System.getSessionName(), true, MainActivity.this, new InputDialogListener(){
 					@Override
 					public void onInputEntered( String input ) 
 					{
