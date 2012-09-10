@@ -40,7 +40,7 @@ public class NetworkMonitorService extends Service
 	private Network			  				 mNetwork 		 = null;
 	private FindAliveEndpointsOutputReceiver mReceiver  	 = null;
 	private boolean							 mRunning  		 = false;
-	private int								 mNotificationId = 1;
+	private int								 mNotificationId = 0;
 	
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -62,7 +62,8 @@ public class NetworkMonitorService extends Service
 
 		notification.setLatestEventInfo( context, "Network Monitor", message, null );
 		
-		manager.notify( mNotificationId++, notification );
+		manager.cancel( mNotificationId );
+		manager.notify( ++mNotificationId, notification );
 	}
 	
 	private void sendNewEndpointNotification( Endpoint endpoint ) {
