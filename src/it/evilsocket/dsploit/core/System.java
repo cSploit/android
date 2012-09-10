@@ -542,18 +542,19 @@ public class System
 		
 	public static void clean() {
 		setForwarding( false );
-		
-		for( String tool : ToolsInstaller.TOOLS )
+
+		try
 		{
-			try
-			{
-				Log.d( TAG, "Killing any running instance of " + tool + " ..." );
-				Shell.exec( "killall -9 " + tool );							
-			}
-			catch( Exception e )
-			{ 
-				Log.e( TAG, e.toString() );
-			}
+			String tools = "";
+			for( String tool : ToolsInstaller.TOOLS )
+				tools += tool + " ";
+			
+			Log.d( TAG, "Killing any running instance of " + tools );
+			Shell.exec( "killall -9 " + tools.trim() );							
+		}
+		catch( Exception e )
+		{ 
+			Log.e( TAG, e.toString() );
 		}
 	}
 	
