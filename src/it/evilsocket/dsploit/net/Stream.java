@@ -28,21 +28,15 @@ public class Stream
 		IMAP,
 		UNKNOWN;
 		
-		public static Type fromString( String port ) {
-			port = port.trim().toLowerCase();
-			
-			if( port.equals("80") )
-				return HTTP;
-			
-			else if( port.equals("21" ) )
-				return FTP;
-
-			else if( port.equals("25") )
-				return SMTP;
-			
-			else if( port.equals("143") )
-				return IMAP;
-			
+		public static Type fromString( String port ) {			
+			switch( Integer.parseInt( port.trim() ) )
+			{
+				case 80  : return HTTP;
+				case 21  : return FTP;
+				case 25  : return SMTP;
+				case 143 : return IMAP;
+			}
+						
 			return UNKNOWN;
 		}
 	}
