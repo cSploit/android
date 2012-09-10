@@ -24,8 +24,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-
 import android.util.Log;
+import it.evilsocket.dsploit.core.System;
 
 public class Proxy implements Runnable
 {
@@ -33,7 +33,7 @@ public class Proxy implements Runnable
 	private static final int    BACKLOG = 10;
 	
 	private InetAddress  		   mAddress = null;
-	private int     	 		   mPort    = 8080;
+	private int     	 		   mPort    = System.HTTP_PROXY_PORT;
 	private boolean 	 		   mRunning = false;
 	private ServerSocket 		   mSocket  = null;
 	private ArrayList<ProxyFilter> mFilters = null;

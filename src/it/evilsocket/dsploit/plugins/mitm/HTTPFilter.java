@@ -41,7 +41,7 @@ public class HTTPFilter
 				
 				new Thread( proxy ).start();
 				
-				System.getIPTables().portRedirect( 80, 8080 );									
+				System.getIPTables().portRedirect( 80, System.HTTP_PROXY_PORT );									
 			}
 			
 		}).start();				
@@ -49,7 +49,7 @@ public class HTTPFilter
 	
 	public static void stop( Proxy proxy ){
 		System.getEttercap().kill();
-		System.getIPTables().undoPortRedirect( 80, 8080 );
+		System.getIPTables().undoPortRedirect( 80, System.HTTP_PROXY_PORT );
 		proxy.stop();
 		System.setForwarding( false );
 	}

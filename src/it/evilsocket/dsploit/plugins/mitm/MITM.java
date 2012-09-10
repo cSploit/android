@@ -166,7 +166,7 @@ public class MITM extends Plugin
 			System.setForwarding( false );
 			
 			System.getEttercap().kill();
-			System.getIPTables().undoPortRedirect( 80, 8080 );
+			System.getIPTables().undoPortRedirect( 80, System.HTTP_PROXY_PORT );
 			System.getProxy().stop();
 			
 			for( i = 0; i < rows; i++ )

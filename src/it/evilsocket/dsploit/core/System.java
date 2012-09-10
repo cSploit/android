@@ -55,10 +55,12 @@ import it.evilsocket.dsploit.tools.TcpDump;
 
 public class System 
 {		
-	private static final String TAG 		  		    = "SYSTEM";
-	private static final String SESSION_MAGIC		    = "DSS"; 
-	public  static final String IPV4_FORWARD_FILEPATH   = "/proc/sys/net/ipv4/ip_forward";
-
+	private static final String  TAG 		  		    = "SYSTEM";
+	private static final String  SESSION_MAGIC		    = "DSS"; 
+	private static final Pattern SERVICE_PARSER		    = Pattern.compile( "^([^\\s]+)\\s+(\\d+).*$", Pattern.CASE_INSENSITIVE );
+	public  static final int	 HTTP_PROXY_PORT		= 8080;
+	public  static final String  IPV4_FORWARD_FILEPATH  = "/proc/sys/net/ipv4/ip_forward";	
+ 
 	private static boolean			     mInitialized   = false;
 	private static Context 			     mContext  	    = null;
 	private static Network 			     mNetwork  	    = null;
@@ -99,6 +101,68 @@ public class System
 		mIptables = new IPTables( );
 		mHydra    = new Hydra( mContext );
 		mTcpdump  = new TcpDump( mContext );
+				
+		// preload network service map
+		try
+		{	
+			mServices = new HashMap<String,String>();
+			mPorts	  = new HashMap<String,String>();
+			
+			FileInputStream fstream = new FileInputStream( mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-services" );
+			DataInputStream in 	    = new DataInputStream(fstream);
+			BufferedReader  reader  = new BufferedReader(new InputStreamReader(in));
+			String 		    line;
+			Matcher			matcher;
+				
+			while( ( line = reader.readLine() ) != null )   
+			{
+				line = line.trim();
+				  
+				if( ( matcher = SERVICE_PARSER.matcher(line) ) != null && matcher.find() )
+				{
+					String proto = matcher.group( 1 ),
+						   port  = matcher.group( 2 );
+					
+					mServices.put( proto, port );
+					mPorts.put( port, proto );
+				}
+			}
+			  
+			in.close();
+		}
+		catch( Exception e )
+		{
+			Log.e( TAG, e.toString() );
+		}
+				
+		// preload mac vendors
+		try
+		{
+			mVendors = new HashMap<String,String>();
+			
+			FileInputStream fstream = new FileInputStream( mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-mac-prefixes" );
+			DataInputStream in 	    = new DataInputStream(fstream);
+			BufferedReader  reader  = new BufferedReader(new InputStreamReader(in));
+			String 		    line;
+			
+			while( ( line = reader.readLine() ) != null )   
+			{
+				line = line.trim();
+				if( line.startsWith("#") == false && line.isEmpty() == false )  
+				{
+					String[] tokens = line.split( " ", 2 );
+					
+					if( tokens.length == 2 )
+						mVendors.put( tokens[0], tokens[1] );						
+				}
+			}
+			
+			in.close();
+		}
+		catch( Exception e )
+		{
+			Log.e( TAG, e.toString() );
+		}
 		
 		mStoragePath = Environment.getExternalStorageDirectory().toString();
 		mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
@@ -244,7 +308,7 @@ public class System
 		try
 		{
 			if( mProxy == null )
-				mProxy = new Proxy( getNetwork().getLoacalAddress(), 8080 );
+				mProxy = new Proxy( getNetwork().getLoacalAddress(), HTTP_PROXY_PORT );
 		}
 		catch( Exception e )
 		{
@@ -271,118 +335,15 @@ public class System
 		return mInitialized;
 	}
 	
-	public static String getMacVendor( byte[] mac ){
-		if( mVendors == null )
-		{
-			mVendors = new HashMap<String,String>();
-			
-			// preload mac vendors
-			try
-			{
-				FileInputStream fstream = new FileInputStream( mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-mac-prefixes" );
-				DataInputStream in 	    = new DataInputStream(fstream);
-				BufferedReader  reader  = new BufferedReader(new InputStreamReader(in));
-				String 		    line;
-				
-				while( ( line = reader.readLine() ) != null )   
-				{
-					line = line.trim();
-					if( line.startsWith("#") == false && line.isEmpty() == false )  
-					{
-						String[] tokens = line.split( " ", 2 );
-						
-						if( tokens.length == 2 )
-							mVendors.put( tokens[0], tokens[1] );						
-					}
-				}
-				
-				in.close();
-			}
-			catch( Exception e )
-			{
-				Log.e( TAG, e.toString() );
-			}
-		}
-		
-		String signature = String.format( "%02X", mac[0] ) + String.format( "%02X", mac[1] ) + String.format( "%02X", mac[2] );
-		
-		return mVendors.get( signature );
+	public static String getMacVendor( byte[] mac ){		
+		return mVendors.get( String.format( "%02X%02X%02X", mac[0], mac[1], mac[2] ) );
 	}
 	
 	public static String getProtocolByPort( String port ){
-		if( mPorts == null )
-		{
-			mPorts = new HashMap<String,String>();
-			
-			// preload network service map
-			try
-			{
-				final Pattern PARSER = Pattern.compile( "^([^\\s]+)\\s+(\\d+).*$", Pattern.CASE_INSENSITIVE );
-						
-				FileInputStream fstream = new FileInputStream( mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-services" );
-				DataInputStream in 	    = new DataInputStream(fstream);
-				BufferedReader  reader  = new BufferedReader(new InputStreamReader(in));
-				String 		    line;
-				Matcher			matcher;
-					
-				while( ( line = reader.readLine() ) != null )   
-				{
-					line = line.trim();
-					  
-					if( ( matcher = PARSER.matcher(line) ) != null && matcher.find() )
-					{
-						mPorts.put( matcher.group( 2 ), matcher.group( 1 ) );
-					}
-				}
-				  
-				in.close();
-			}
-			catch( Exception e )
-			{
-				Log.e( TAG, e.toString() );
-			}
-		}
-		
 		return mPorts.containsKey(port) ? mPorts.get(port) : null;
 	}
 	
 	public static int getPortByProtocol( String protocol ){
-		if( mServices == null )
-		{
-			mServices = new HashMap<String,String>();
-			
-			// preload network service map
-			try
-			{
-				final Pattern PARSER = Pattern.compile( "^([^\\s]+)\\s+(\\d+).*$", Pattern.CASE_INSENSITIVE );
-						
-				FileInputStream fstream = new FileInputStream( mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-services" );
-				DataInputStream in 	    = new DataInputStream(fstream);
-				BufferedReader  reader  = new BufferedReader(new InputStreamReader(in));
-				String 		    line;
-				Matcher			matcher;
-					
-				while( ( line = reader.readLine() ) != null )   
-				{
-					line = line.trim();
-					  
-					if( ( matcher = PARSER.matcher(line) ) != null && matcher.find() )
-					{
-						String proto = matcher.group( 1 ),
-							   port  = matcher.group( 2 );
-						
-						mServices.put( proto, port );
-					}
-				}
-				  
-				in.close();
-			}
-			catch( Exception e )
-			{
-				Log.e( TAG, e.toString() );
-			}
-		}
-		
 		return mServices.containsKey(protocol) ? Integer.parseInt( mServices.get(protocol) ) : 0;
 	}
 		
@@ -469,20 +430,7 @@ public class System
 		
 		return false;
 	}
-	
-	public static boolean removeTarget( Target target ) {
-		for( int i = 0; i < mTargets.size(); i++ )
-		{
-			if( mTargets.get(i) != null && mTargets.get(i).equals(target) )
-			{
-				mTargets.remove(i);
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
+
 	public static void setCurrentTarget( int index ){
 		mCurrentTarget = index;
 	}
