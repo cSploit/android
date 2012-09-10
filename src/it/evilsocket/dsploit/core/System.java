@@ -427,6 +427,9 @@ public class System
 	
 	public static void addTarget( int index, Target target ){
 		mTargets.add( index, target );
+		// update current target index
+		if( mCurrentTarget >= index )
+			mCurrentTarget++;
 	}
 	
 	public static void addTarget( Target target ){
