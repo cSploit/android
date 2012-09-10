@@ -75,6 +75,9 @@ public class ToolsInstaller
 	{
 		Log.d( TAG, "Installing tools ..." );
 		
+		// Avoid some binary file being busy as a running process.
+		System.clean();
+		
 		ZipInputStream   zipInput;
 		ZipEntry 		 zipEntry;
 	    byte[] 		     buffer = new byte[ BUFFER_SIZE ];
