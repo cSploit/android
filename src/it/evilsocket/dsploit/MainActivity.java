@@ -422,8 +422,8 @@ public class MainActivity extends ListActivity
 	@Override
 	public void onDestroy() {		
 		stopService( new Intent( this, NetworkMonitorService.class ) );
+		unregisterReceiver( mMessageReceiver );
 		
-		this.unregisterReceiver( mMessageReceiver );
 		// make sure no zombie process is running before destroying the activity
 		System.clean();
 		

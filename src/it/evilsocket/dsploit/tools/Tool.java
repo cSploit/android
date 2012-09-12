@@ -94,7 +94,6 @@ public class Tool
 	public boolean kill( String signal ){
 		try
 		{
-			// TODO: Kill process by pid instead that by name
 			Shell.exec( "killall -" + signal + " " + mName );
 						
 			return true;

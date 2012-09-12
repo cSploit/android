@@ -7,6 +7,14 @@ Copyleft of Simone Margaritelli aka evilsocket, sponsored by the BackBox Linux P
 - <http://www.evilsocket.net/>
 - <http://www.backbox.org/>
 
+dSploit is an Android network analysis and penetration suite which aims to offer to IT security experts/geeks
+**the most complete and advanced professional toolkit** to perform network security assesments on a mobile device.
+
+Once dSploit is started, you will be able to easily map your network, fingerprint alive hosts operating systems
+and running services, search for **known vulnerabilities**, crack logon procedures of many tcp protocols, perform
+man in the middle attacks such as **password sniffing** ( with common protocols dissection ), real time **traffic
+manipulation**, etc, etc .
+
 Disclaimer
 -------------
 

@@ -526,7 +526,6 @@ public class System
 	{
 		Log.d( TAG, "Setting ipv4 forwarding to " + enabled );
 		
-
 		String status = ( enabled ? "1" : "0" ),
 			   cmd    = "echo " + status + " > " + IPV4_FORWARD_FILEPATH;
 		    	
