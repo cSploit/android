@@ -40,6 +40,7 @@ public class StreamAssembler
 	private static final String  IP			  = "([\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3})\\.([\\d]+)";
 	private static final Pattern TYPE_PATTERN = Pattern.compile( "^.+\\s+" + IP + "\\s+>\\s+" + IP + ":.+$" );
 	
+	private static final int 	 MAX_STREAM_SIZE = 8192;
 	
 	public static abstract class NewCredentialHandler
 	{
@@ -146,6 +147,10 @@ public class StreamAssembler
 		// handled stream data line ?
 		else if( mCurrent != null )
 		{
+			// fixes out of memory exception for long streams
+			if( mCurrent.data.length() > MAX_STREAM_SIZE )
+				mCurrent.data.setLength(0);
+			
 			mCurrent.data.append( line + "\n" );
 			
 			for( StreamParser parser : mParsers.get( mCurrent.toString() ) )
