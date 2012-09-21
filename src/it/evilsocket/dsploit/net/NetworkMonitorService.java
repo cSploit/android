@@ -57,8 +57,7 @@ public class NetworkMonitorService extends Service
 		Notification 		notification = new Notification( R.drawable.dsploit_icon_48 , message, java.lang.System.currentTimeMillis() );
 		Context 			context 	 = getApplicationContext();
 		
-		notification.defaults |= Notification.DEFAULT_SOUND;
-		notification.flags 	  |= Notification.FLAG_AUTO_CANCEL;
+		notification.flags |= Notification.FLAG_AUTO_CANCEL;
 
 		notification.setLatestEventInfo( context, "Network Monitor", message, null );
 		
