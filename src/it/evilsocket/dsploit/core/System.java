@@ -69,6 +69,7 @@ public class System
 	private static Map<String,String>    mServices 	    = null;
 	private static Map<String,String>    mPorts         = null;
 	private static Map< String, String > mVendors       = null;
+	
 	// registered plugins
 	private static ArrayList<Plugin>     mPlugins  	    = null;
 	private static Plugin			     mCurrentPlugin = null;	
@@ -163,13 +164,13 @@ public class System
 		{
 			Log.e( TAG, e.toString() );
 		}
-		
+								
 		mStoragePath = Environment.getExternalStorageDirectory().toString();
 		mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
 		
 		mInitialized = true;
 	}
-	
+
 	public static String getSessionName() {
 		return mSessionName;
 	}

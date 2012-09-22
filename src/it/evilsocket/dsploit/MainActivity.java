@@ -151,7 +151,10 @@ public class MainActivity extends ListActivity
 			       
 					if( Shell.isRootGranted() == false )  					
 						fatal = "This application can run only on rooted devices.";
-							        						                
+					
+					else if( Shell.isBinaryAvailable("killall") == false )
+		    			fatal = "Full BusyBox installation required, killall binary not found.";
+		        							        						               
 					else if( installer.needed() && installer.install() == false )			        
 						fatal = "Error during files installation!";
 			        					
@@ -177,7 +180,7 @@ public class MainActivity extends ListActivity
 	    	{	    	
 		    	// initialize the system
 		    	System.init( getApplicationContext() );
-		        
+
 		        System.registerPlugin( new PortScanner( ) );
 		        System.registerPlugin( new Inspector( ) );
 		        System.registerPlugin( new ExploitFinder( ) );

@@ -20,8 +20,11 @@ package it.evilsocket.dsploit.core;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import android.util.Log;
 
@@ -29,6 +32,8 @@ public class Shell
 {
 	private static final String TAG = "SHELL";
 	
+	private static ArrayList<String> mPath = null;
+
 	public static boolean isRootGranted( ) {
 		Process			 process = null;
 		DataOutputStream writer  = null;
@@ -82,6 +87,48 @@ public class Shell
 		public void onStart( String command );
 		public void onNewLine( String line );
 		public void onEnd( int exitCode );
+	}
+	
+	public static boolean isBinaryAvailable( String binary )
+	{
+		if( mPath == null )
+		{
+			try
+			{
+				Shell.exec( "cat /init.rc", new OutputReceiver(){
+					@Override
+					public void onStart(String command) { }
+		
+					@Override
+					public void onNewLine(String line) {
+						if( line.contains("export PATH") )
+	                    {
+							int tmp = line.indexOf("/");
+	                        mPath = new ArrayList<String>( Arrays.asList( line.substring(tmp).split(":") ) );
+	                    }
+					}
+		
+					@Override
+					public void onEnd(int exitCode) { }
+				});
+			}
+			catch( Exception e )
+			{
+				Log.e( TAG, e.toString() );
+			}
+		}
+		
+		if( mPath != null )
+		{
+			for( String path: mPath )
+			{
+				String fullPath = path + '/' + binary;
+				if( new File( fullPath ).exists() )
+					return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	public static int exec( String command, OutputReceiver receiver ) throws IOException, InterruptedException {
