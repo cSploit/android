@@ -19,6 +19,8 @@
 package it.evilsocket.dsploit.plugins.mitm;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -373,14 +375,23 @@ public class MITM extends Plugin
 							
 							if( from.isEmpty() == false )
 							{
-								activity.setVisibility( View.VISIBLE );
-								
-								Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
-												
-								HTTPFilter.start( System.getProxy(), from, to );				
+								try 
+								{
+						            Pattern.compile( from );
+						            
+						            activity.setVisibility( View.VISIBLE );
+									
+									Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
+													
+									HTTPFilter.start( System.getProxy(), from, to );			
+						        } 
+								catch( PatternSyntaxException e ) 
+								{
+									new ErrorDialog( "Error", "Invalid regular expression: " + e.getDescription() + " .", MITM.this ).show();
+						        }								 									
 							}
 							else
-								new ErrorDialog( "Error", "Invalid from expression.", MITM.this ).show();
+								new ErrorDialog( "Error", "Invalid regular expression.", MITM.this ).show();
 						}} 
 					).show();
 				}

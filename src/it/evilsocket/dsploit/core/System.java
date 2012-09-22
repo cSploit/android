@@ -335,8 +335,11 @@ public class System
 		return mInitialized;
 	}
 	
-	public static String getMacVendor( byte[] mac ){		
-		return mVendors.get( String.format( "%02X%02X%02X", mac[0], mac[1], mac[2] ) );
+	public static String getMacVendor( byte[] mac ){	
+		if( mac != null && mac.length >= 3 )
+			return mVendors.get( String.format( "%02X%02X%02X", mac[0], mac[1], mac[2] ) );
+		else
+			return null;
 	}
 	
 	public static String getProtocolByPort( String port ){
