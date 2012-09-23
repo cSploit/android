@@ -126,7 +126,7 @@ public class LoginCracker extends Plugin
 		"Admin",
 		"admin",
 		"system",
-		"webadminadministrator",
+		"webadmin",
 		"daemon ",
 		"bin ",
 		"sys ",
