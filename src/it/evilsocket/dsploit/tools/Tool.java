@@ -30,13 +30,13 @@ public class Tool
 {
 	private static final String TAG = "Tool";
 	
-	private File    mFile		 = null;
-	private String  mName 		 = null;
-	private String  mDirName	 = null;
-	private String  mFileName    = null;
-	private String  mLibPath     = null;
-	private Context mAppContext  = null;
-	private boolean mCustomLibs  = true;
+	protected File    mFile		   = null;
+	protected String  mName 	   = null;
+	protected String  mDirName	   = null;
+	protected String  mFileName    = null;
+	protected String  mLibPath     = null;
+	protected Context mAppContext  = null;
+	protected boolean mCustomLibs  = true;
 
 	public Tool( String name, Context context ) {
 		mAppContext = context;

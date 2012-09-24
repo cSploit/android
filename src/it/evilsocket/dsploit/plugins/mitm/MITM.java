@@ -275,7 +275,7 @@ public class MITM extends Plugin
         mActions.add( new Action
         ( 
         	"Kill Connections", 
-        	"Kill connections preventing everyone to reach any website or server.",
+        	"Kill connections preventing the target to reach any website or server.",
         	R.drawable.action_kill_48,
         	new OnClickListener(){
 			@Override
@@ -284,13 +284,19 @@ public class MITM extends Plugin
 
 				if( activity.getVisibility() == View.INVISIBLE )
 				{
-					setStoppedState();
+					if( System.getCurrentTarget().getType() != Target.Type.ENDPOINT )
+						new ErrorDialog( "Error", "Connection killer can be used only against single endpoints.", MITM.this ).show();
 					
-					activity.setVisibility( View.VISIBLE );
-					
-					Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
-					
-					ConnectionKiller.start();		
+					else
+					{					
+						setStoppedState();
+						
+						activity.setVisibility( View.VISIBLE );
+						
+						Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
+						
+						ConnectionKiller.start();
+					}
 				}
 				else
 				{

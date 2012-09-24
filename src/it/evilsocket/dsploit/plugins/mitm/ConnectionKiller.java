@@ -24,10 +24,11 @@ import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
 public class ConnectionKiller 
 {
 	public static void start() {
-		System.getEttercap().spoof( System.getCurrentTarget(), new OnReadyListener(){
+		System.getEttercap().drop( System.getCurrentTarget(), new OnReadyListener(){
 			@Override
 			public void onReady() 
 			{
+				// just in case :)
 				System.setForwarding( false );							
 			}
 			

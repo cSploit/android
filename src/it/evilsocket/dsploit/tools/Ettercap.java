@@ -27,7 +27,7 @@ import android.util.Log;
 public class Ettercap extends Tool
 {
 	private static final String TAG = "ETTERCAP";
-
+	
 	public Ettercap( Context context ){
 		super( "ettercap/ettercap", context );		
 	}
@@ -68,6 +68,27 @@ public class Ettercap extends Tool
 		try
 		{
 			commandLine = "-Tq -M arp:remote -i " + System.getNetwork().getInterface().getDisplayName() + " " + commandLine;
+		}
+		catch( Exception e )
+		{
+			Log.e( TAG, e.toString() );
+		}
+		
+		return super.async( commandLine, listener );
+	}
+	
+	public Thread drop( Target target, OnReadyListener listener ) {
+		String commandLine = ""; 
+		
+		try
+		{			
+			EtterFilter filter   = new EtterFilter( mAppContext, "drop" );
+			String		compiled = mDirName + "/drop.ef";
+			
+			filter.setVariable( "$target_ip", "'" + target.getCommandLineRepresentation() + "'" );
+			filter.compile( compiled );
+			
+			commandLine = "-Tq -M arp:remote -F " + compiled + " -i " + System.getNetwork().getInterface().getDisplayName() + " " + "/" + target.getCommandLineRepresentation() + "/ //";
 		}
 		catch( Exception e )
 		{
