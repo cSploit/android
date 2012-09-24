@@ -19,7 +19,7 @@
 package it.evilsocket.dsploit.plugins.mitm;
 
 import it.evilsocket.dsploit.core.System;
-import it.evilsocket.dsploit.net.http.Proxy;
+import it.evilsocket.dsploit.net.http.proxy.Proxy;
 import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
 
 

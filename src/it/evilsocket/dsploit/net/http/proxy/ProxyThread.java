@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with dSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.evilsocket.dsploit.net.http;
+package it.evilsocket.dsploit.net.http.proxy;
 
 
 import java.io.BufferedOutputStream;

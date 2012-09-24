@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with dSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.evilsocket.dsploit.net.http;
+package it.evilsocket.dsploit.net.http.proxy;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -29,7 +29,7 @@ import it.evilsocket.dsploit.core.System;
 
 public class Proxy implements Runnable
 {
-	private static final String TAG     = "PROXY";
+	private static final String TAG     = "HTTP.PROXY";
 	private static final int    BACKLOG = 10;
 	
 	private InetAddress  		   mAddress = null;

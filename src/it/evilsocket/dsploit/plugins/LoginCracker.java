@@ -203,9 +203,6 @@ public class LoginCracker extends Plugin
 		
 		@Override
 		public void onAccountFound( final String login, final String password ) {
-			final String user = login,
-						 pass = password;
-			
 			LoginCracker.this.runOnUiThread(new Runnable() {
 	            @Override
 	            public void run() {

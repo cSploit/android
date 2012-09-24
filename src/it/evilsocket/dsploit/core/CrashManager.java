@@ -99,7 +99,8 @@ public class CrashManager implements UncaughtExceptionHandler
 			
 			// If the exception was thrown in a background thread inside
 	        // AsyncTask, then the actual exception can be found with getCause
-	        while( ( cause = exception.getCause() ) != null ) 
+			int i = 0, max = 500;
+	        while( ( cause = exception.getCause() ) != null && ( ++i <= max )) 
 	        {
 	            cause.printStackTrace( pWriter );	            
 	        	report += sWriter.toString() + "\n";

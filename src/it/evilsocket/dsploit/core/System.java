@@ -46,7 +46,8 @@ import it.evilsocket.dsploit.net.Network.Protocol;
 import it.evilsocket.dsploit.net.Target.Port;
 import it.evilsocket.dsploit.net.Target.Type;
 import it.evilsocket.dsploit.net.Target.Vulnerability;
-import it.evilsocket.dsploit.net.http.Proxy;
+import it.evilsocket.dsploit.net.http.proxy.Proxy;
+import it.evilsocket.dsploit.net.http.server.Server;
 import it.evilsocket.dsploit.tools.Ettercap;
 import it.evilsocket.dsploit.tools.Hydra;
 import it.evilsocket.dsploit.tools.IPTables;
@@ -59,6 +60,7 @@ public class System
 	private static final String  SESSION_MAGIC		    = "DSS"; 
 	private static final Pattern SERVICE_PARSER		    = Pattern.compile( "^([^\\s]+)\\s+(\\d+).*$", Pattern.CASE_INSENSITIVE );
 	public  static final int	 HTTP_PROXY_PORT		= 8080;
+	public  static final int	 HTTP_SERVER_PORT		= 8081;
 	public  static final String  IPV4_FORWARD_FILEPATH  = "/proc/sys/net/ipv4/ip_forward";	
  
 	private static boolean			     mInitialized   = false;
@@ -81,6 +83,7 @@ public class System
 	private static TcpDump				 mTcpdump		= null;
 	
 	private static Proxy				 mProxy			= null;
+	private static Server				 mServer		= null;
 	
 	private static String				 mStoragePath   = null;
 	private static String				 mSessionName	= null;
@@ -319,6 +322,39 @@ public class System
 		return mProxy;
 	}
 	
+	public static Server getServer() {		
+		try
+		{
+			if( mServer == null )			
+				mServer = new Server( getNetwork().getLoacalAddress(), HTTP_SERVER_PORT );					
+		}
+		catch( Exception e )
+		{
+			Log.e( TAG, e.toString() );
+		}
+		
+		return mServer;
+	}
+	
+	public static String getImageMimeType( String fileName ) {
+		String type = "image/jpeg",
+			   name = fileName.toLowerCase();
+		
+		if( name.endsWith( ".jpeg") || name.endsWith( ".jpg" ) )
+			type = "image/jpeg";
+		
+		else if( name.endsWith( ".png" ) )
+			type = "image/png";
+		
+		else if( name.endsWith( ".gif" ) )
+			type = "image/gif";
+		
+		else if( name.endsWith( ".tiff" ) )
+			type = "image/tiff";
+
+		return type;
+	}
+
 	public static void reset() throws NoRouteToHostException, SocketException {
 		mTargets.clear();
 		
