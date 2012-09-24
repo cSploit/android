@@ -342,26 +342,6 @@ public class MITM extends Plugin
 			    	activity.setVisibility( View.VISIBLE );
 
 					startActivityForResult( mImagePicker, SELECT_PICTURE );  
-					
-					/*
-					new InputDialog( "Image URL", "Enter the URL of an image, starting with 'http://' :", "http://www.evilsocket.net/trollface.png", true, MITM.this, new InputDialogListener(){
-						@Override
-						public void onInputEntered( String input ) 
-						{
-							final String url = input.trim();
-							if( url.isEmpty() == false )
-							{
-								activity.setVisibility( View.VISIBLE );
-								
-								Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
-
-								HTTPFilter.start( System.getProxy(), "src=['\"][^'\"]+\\.(jpg|jpeg|png|gif)['\"]", "src=\"" + url + "\"" );
-							}
-							else
-								new ErrorDialog( "Error", "Invalid image url.", MITM.this ).show();
-						}} 
-					).show();	
-					*/
 				}
 				else
 				{					
