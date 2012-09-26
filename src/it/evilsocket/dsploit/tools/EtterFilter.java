@@ -57,8 +57,7 @@ public class EtterFilter extends Tool
 		in.close();
 	}
 	
-	public void setVariable( String name, String value )
-	{
+	public void setVariable( String name, String value ) {
 		mFilterData = mFilterData.replace( name, value );
 	}
 	
@@ -68,9 +67,7 @@ public class EtterFilter extends Tool
 			BufferedWriter writer = new BufferedWriter( new FileWriter( mTmpFile ) );
 			writer.write( mFilterData );
 			writer.close();
-			
-			Log.d( TAG, mTmpFile.getAbsolutePath() + " -o " + output );
-		    
+					    
 			super.run( mTmpFile.getAbsolutePath() + " -o " + output );
 		}
 		catch( Exception e )
