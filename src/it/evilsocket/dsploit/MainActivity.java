@@ -25,6 +25,7 @@ import it.evilsocket.dsploit.core.CrashManager;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.ToolsInstaller;
+import it.evilsocket.dsploit.core.UpdateService;
 import it.evilsocket.dsploit.gui.dialogs.AboutDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
@@ -216,15 +217,58 @@ public class MainActivity extends ListActivity
 				                    }
 				                });
 							}			
-						}	
+						}							
+						else if( intent.getAction().equals( UpdateService.UPDATE_AVAILABLE ) )
+						{
+							final String remoteVersion = ( String )intent.getExtras().get( UpdateService.AVAILABLE_VERSION );
+							
+							MainActivity.this.runOnUiThread(new Runnable() {
+			                    @Override
+			                    public void run() {
+			                    	new ConfirmDialog
+			                    	( 
+			                    	  "Update Available", 
+			                    	  "A new update to version " + remoteVersion + " is available, do you want to download it ?",
+			                    	  MainActivity.this,
+			                    	  new ConfirmDialogListener(){
+										@Override
+										public void onConfirm() 
+										{
+											final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Downloading update ...", true, false );
+											
+											new Thread( new Runnable(){
+												@Override
+												public void run() 
+												{				
+													if( System.getUpdateManager().downloadUpdate() == false )
+													{
+														MainActivity.this.runOnUiThread(new Runnable() {
+										                    @Override
+										                    public void run() {
+										                    	new ErrorDialog( "Error", "An error occurred while downloading the update.", MainActivity.this ).show();
+										                    }
+										                });
+													}
+													
+													dialog.dismiss();
+												}
+											}).start();											
+										}}
+			                    	).show();
+			                    }
+			                });
+						}							
 					}
 			    };
 			    
 			    mIntentFilter = new IntentFilter( );
 			    
 			    mIntentFilter.addAction( NetworkMonitorService.NEW_ENDPOINT );
+			    mIntentFilter.addAction( UpdateService.UPDATE_AVAILABLE );
 			    
-		        registerReceiver( mMessageReceiver, mIntentFilter );	        
+		        registerReceiver( mMessageReceiver, mIntentFilter );		
+		        
+		        startService( new Intent( this, UpdateService.class ) );
 	    	}
 	    	catch( Exception e )
 	    	{

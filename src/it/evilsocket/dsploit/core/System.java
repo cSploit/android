@@ -64,6 +64,7 @@ public class System
 	public  static final String  IPV4_FORWARD_FILEPATH  = "/proc/sys/net/ipv4/ip_forward";	
  
 	private static boolean			     mInitialized   = false;
+	private static UpdateManager		 mUpdateManager = null;
 	private static Context 			     mContext  	    = null;
 	private static Network 			     mNetwork  	    = null;
 	private static ArrayList<Target>     mTargets		= null;
@@ -89,9 +90,10 @@ public class System
 	private static String				 mSessionName	= null;
 		
 	public static void init( Context context ) throws NoRouteToHostException, SocketException {
-		mContext = context;		
-		mPlugins = new ArrayList<Plugin>();
-		mTargets = new ArrayList<Target>();
+		mContext 	   = context;		
+		mUpdateManager = new UpdateManager( mContext );
+		mPlugins 	   = new ArrayList<Plugin>();
+		mTargets 	   = new ArrayList<Target>();
 		
 		// local network
 		mTargets.add( new Target( System.getNetwork() ) );
@@ -172,6 +174,10 @@ public class System
 		mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
 		
 		mInitialized = true;
+	}
+	
+	public static UpdateManager getUpdateManager() {
+		return mUpdateManager;
 	}
 
 	public static String getSessionName() {

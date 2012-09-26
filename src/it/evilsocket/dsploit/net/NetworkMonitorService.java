@@ -76,7 +76,7 @@ public class NetworkMonitorService extends Service
 	}
 
 	@Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand( Intent intent, int flags, int startId ) {
     	super.onStartCommand(intent, flags, startId);
     	if( !mRunning )
     	{    		
@@ -120,6 +120,5 @@ public class NetworkMonitorService extends Service
 	@Override
 	public void onDestroy() {
 		System.getNMap().kill();
-		sendNotification( "Network monitor stopped." );
 	}
 }
