@@ -15,6 +15,13 @@ and running services, search for **known vulnerabilities**, crack logon procedur
 man in the middle attacks such as **password sniffing** ( with common protocols dissection ), real time **traffic
 manipulation**, etc, etc .
 
+Requirements
+-------------
+
+- An Android device with at least the 3.0 version of the OS.
+- The device **must be rooted**.
+- The device must have a BusyBox **full install**, this means with **every** utility installed ( not the partial installation ).
+
 Disclaimer
 -------------
 
