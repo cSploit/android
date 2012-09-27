@@ -13,16 +13,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true" >
-
-        <TextView
-            android:id="@+id/textView1"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.50"
-            android:text="Port"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            tools:ignore="HardcodedText" />
-
+        
         <TextView
             android:id="@+id/TextView01"
             android:layout_width="fill_parent"
@@ -31,6 +22,16 @@
             android:text="Service"
             android:textAppearance="?android:attr/textAppearanceSmall"
             tools:ignore="HardcodedText" />
+        
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.50"
+            android:text="Port"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            tools:ignore="HardcodedText" />
+                
     </LinearLayout>
 
     <LinearLayout
@@ -165,7 +166,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/progressBar"
         android:text="Stopped ..."
-        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#888888"
         tools:ignore="HardcodedText" />
 

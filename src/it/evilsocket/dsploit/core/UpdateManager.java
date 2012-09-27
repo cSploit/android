@@ -64,15 +64,14 @@ public class UpdateManager
 	}
 			
 	private static double getVersionCode( String version )
-	{
-		final 
-		
+	{		
 		String[] padded = new String[ 3 ],
 				 parts  = version.split( "[^0-9a-zA-Z]" );
 		String 	 item   = "",
 				 digit	= "";
-		double   code	= 0;
-		int		 i, j;		
+		double   code	= 0,
+				 coeff	= 0;
+		int		 i, j;
 		
 		Arrays.fill( padded, 0, 3, "0" );
 		
@@ -83,20 +82,21 @@ public class UpdateManager
 		
 		for( i = padded.length - 1; i >= 0; i-- )
 		{
-			item = padded[ i ];
-			
+			item  = padded[ i ];
+			coeff = Math.pow( 10, padded.length - i );
+		
 			for( j = 0; j < item.length(); j++ )
 			{
 				digit = "" + item.charAt( j );
 						
 				if( digit.matches( "\\d" ) )				
-					code += ( Integer.parseInt( digit ) + 1 );
+					code += ( Integer.parseInt( digit ) + 1 ) * coeff;
 				
 				else if( digit.matches( "[a-zA-Z]" ) )				
 					code -= ( ( VERSION_CHAR_MAP.indexOf( digit.toLowerCase() ) + 1 ) / 100.0 );
 				
 				else
-					code += 1;
+					code += coeff;
 			}			
 		}
 		
