@@ -285,6 +285,7 @@ public class MainActivity extends ListActivity
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		
 		switch( item.getItemId() ) 
 		{
 			case R.id.add:
@@ -428,6 +429,23 @@ public class MainActivity extends ListActivity
 				}
 				else
 					new ErrorDialog( "Error", "No session file found on sd card.", MainActivity.this ).show();
+				
+				return true;
+				
+			case R.id.ss_monitor :
+				
+				if( NetworkMonitorService.RUNNING )
+				{
+					stopService( new Intent( this, NetworkMonitorService.class ) );
+					
+					item.setTitle( "Start Network Monitor" );
+				}
+				else
+				{
+					startService( new Intent( this, NetworkMonitorService.class ) );
+					
+					item.setTitle( "Stop Network Monitor" );
+				}
 				
 				return true;
 				

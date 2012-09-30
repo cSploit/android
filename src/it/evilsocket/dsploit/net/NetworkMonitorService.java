@@ -30,12 +30,17 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.util.Log;
 
 public class NetworkMonitorService extends Service
 {
+	public static final String TAG				 = "NETWORKMONITORSERVICE";
+	
 	public static final String NEW_ENDPOINT		 = "NetworkMonitorService.action.NEW_ENDPOINT";
 	public static final String ENDPOINT_ADDRESS  = "NetworkMonitorService.data.ENDPOINT_ADDRESS";
 	public static final String ENDPOINT_HARDWARE = "NetworkMonitorService.data.ENDPOINT_HARDWARE";
+	
+	public static boolean      RUNNING			 = false;
 	
 	private Network			  				 mNetwork 		 = null;
 	private FindAliveEndpointsOutputReceiver mReceiver  	 = null;
@@ -78,9 +83,13 @@ public class NetworkMonitorService extends Service
 	@Override
     public int onStartCommand( Intent intent, int flags, int startId ) {
     	super.onStartCommand(intent, flags, startId);
+    	
+    	Log.d( TAG, "Starting ..." );
+    	
     	if( !mRunning )
     	{    		
     		mRunning = true;
+    		RUNNING  = true;
     		
     		sendNotification( "Network monitor started ..." );
     		
@@ -119,6 +128,10 @@ public class NetworkMonitorService extends Service
 
 	@Override
 	public void onDestroy() {
+		RUNNING = false;
+		
+		Log.d( TAG, "Stopping ..." );
+		
 		NotificationManager manager = ( NotificationManager )getSystemService(Context.NOTIFICATION_SERVICE);
 		
 		for( int i = mNotificationId; i >= 0; i-- )
