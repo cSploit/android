@@ -50,7 +50,7 @@ public class CrashManager implements UncaughtExceptionHandler
 	}
 	
 	public static void register( Context context ) {
-		 Thread.setDefaultUncaughtExceptionHandler( new CrashManager( context) );
+		 Thread.setDefaultUncaughtExceptionHandler( new CrashManager( context ) );
 	}
 	
 	@Override
@@ -142,7 +142,7 @@ public class CrashManager implements UncaughtExceptionHandler
 	        catch( Exception e ) 
 	        {
 	        	Log.e( TAG, e.toString() );
-	        }
+	        }	        
 		}
 		catch( Exception e )
 		{

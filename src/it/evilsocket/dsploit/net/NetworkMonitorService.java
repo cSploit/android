@@ -116,7 +116,8 @@ public class NetworkMonitorService extends Service
     			@Override
     			public void onEnd( int code )
     			{
-    				System.getNMap().findAliveEndpoints( mNetwork, mReceiver ).start();
+    				if( mRunning )
+    					System.getNMap().findAliveEndpoints( mNetwork, mReceiver ).start();
     			}
     		};
     		
@@ -128,7 +129,8 @@ public class NetworkMonitorService extends Service
 
 	@Override
 	public void onDestroy() {
-		RUNNING = false;
+		RUNNING  = false;
+		mRunning = false;
 		
 		Log.d( TAG, "Stopping ..." );
 		

@@ -144,7 +144,7 @@ public class MainActivity extends ListActivity
 	        new Thread( new Runnable(){
 				@Override
 				public void run() 
-				{				
+				{												
 					dialog.show();
 
 					String 		   fatal     = null;										
@@ -176,7 +176,7 @@ public class MainActivity extends ListActivity
 					}
 				}
 			}).start();
-	               	   
+	            					
 		    try
 	    	{	    	
 		    	// initialize the system
@@ -326,7 +326,7 @@ public class MainActivity extends ListActivity
 						@Override
 						public void onEndpointFound( Endpoint endpoint ) {
 							Target target = new Target( endpoint );
-
+							
 							if( System.addOrderedTarget( target ) == true )
 							{													
 								// refresh the target listview
