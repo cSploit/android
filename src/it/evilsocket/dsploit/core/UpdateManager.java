@@ -31,8 +31,6 @@ import javax.net.ssl.HttpsURLConnection;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.StrictMode;
 import android.util.Log;
@@ -48,19 +46,8 @@ public class UpdateManager
 	private String  mRemoteVersion	  = null;
 	
 	public UpdateManager( Context context ) {
-		mContext = context;
-		
-		try
-		{
-			PackageManager manager = mContext.getPackageManager();
-			PackageInfo    info    = manager.getPackageInfo( mContext.getPackageName(), 0 );
-			
-			mInstalledVersion = info.versionName;
-		}
-		catch( Exception e )
-		{
-			Log.e( TAG, e.getMessage() );
-		}
+		mContext 		  = context;
+		mInstalledVersion = System.getAppVersionName();
 	}
 			
 	private static double getVersionCode( String version )

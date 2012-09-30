@@ -37,6 +37,9 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Environment;
 import android.util.Log;
 import it.evilsocket.dsploit.net.Endpoint;
@@ -186,6 +189,22 @@ public class System
 	
 	public static String getStoragePath() {
 		return mStoragePath;
+	}
+	
+	public static String getAppVersionName() {
+		try
+		{
+			PackageManager manager = mContext.getPackageManager();
+			PackageInfo    info    = manager.getPackageInfo( mContext.getPackageName(), 0 );
+		
+			return info.versionName;
+		}
+		catch( NameNotFoundException e )
+		{
+			Log.e( TAG, e.toString() );
+		}
+		
+		return "?";
 	}
 	
 	public static ArrayList<String> getAvailableSessionFiles( )

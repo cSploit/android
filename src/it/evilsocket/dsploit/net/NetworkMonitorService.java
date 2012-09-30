@@ -119,6 +119,11 @@ public class NetworkMonitorService extends Service
 
 	@Override
 	public void onDestroy() {
+		NotificationManager manager = ( NotificationManager )getSystemService(Context.NOTIFICATION_SERVICE);
+		
+		for( int i = mNotificationId; i >= 0; i-- )
+			manager.cancel( i );
+		
 		System.getNMap().kill();
 	}
 }

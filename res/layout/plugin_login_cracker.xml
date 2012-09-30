@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:orientation="vertical"
     android:padding="10dp" >
 
@@ -151,43 +153,58 @@
             android:layout_weight="0.50" />
     </LinearLayout>
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/statusText"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/startButton" />
+   <LinearLayout
+       android:id="@+id/linearLayout7"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignLeft="@+id/linearLayout6"
+       android:layout_alignParentBottom="true"
+       android:layout_alignRight="@+id/linearLayout6" >
 
-    <TextView
-        android:id="@+id/statusText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/progressBar"
-        android:text="Stopped ..."
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="#888888"
-        tools:ignore="HardcodedText" />
+       <ToggleButton
+           android:id="@+id/startButton"
+           android:layout_width="76dp"
+           android:layout_height="wrap_content"
+           android:textOff="START"
+           android:textOn="STOP" />
 
-    <ToggleButton
-        android:id="@+id/startButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/statusText"
-        android:layout_alignLeft="@+id/linearLayout6"
-        android:layout_alignRight="@+id/linearLayout6"
-        android:textOff="START"
-        android:textOn="STOP" />
+       <RelativeLayout
+           xmlns:android="http://schemas.android.com/apk/res/android"
+           xmlns:tools="http://schemas.android.com/tools"
+           android:layout_width="fill_parent"
+           android:layout_height="fill_parent"
+           android:orientation="vertical"
+           android:paddingLeft="10dp" >
+       
+       <TextView
+           android:id="@+id/statusText"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="Stopped ..."
+           android:textAppearance="?android:attr/textAppearanceMedium"
+           android:textColor="#888888"
+           tools:ignore="HardcodedText" />
 
-    <ProgressBar
-        android:id="@+id/activity"
-        style="?android:attr/progressBarStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/statusText"
-        android:layout_alignRight="@+id/progressBar"
-        android:layout_below="@+id/startButton"
-        android:visibility="invisible" />
+       <ProgressBar
+           android:id="@+id/progressBar"
+           style="?android:attr/progressBarStyleHorizontal"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_alignParentLeft="true"
+           android:layout_alignParentRight="true"
+           android:layout_below="@+id/statusText" />
+
+       <ProgressBar
+           android:id="@+id/activity"
+           style="?android:attr/progressBarStyleSmall"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_above="@+id/progressBar"
+           android:layout_alignParentRight="true"
+           android:visibility="invisible" />
+  
+       </RelativeLayout>
+   </LinearLayout>
 
 </RelativeLayout>
+

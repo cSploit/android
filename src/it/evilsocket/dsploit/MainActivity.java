@@ -302,7 +302,8 @@ public class MainActivity extends ListActivity
 		                    	MainActivity.this.runOnUiThread(new Runnable() {
 				                    @Override
 				                    public void run() {
-				                    	mTargetAdapter.notifyDataSetChanged();
+				                    	if( mTargetAdapter != null )
+				                    		mTargetAdapter.notifyDataSetChanged();
 				                    }
 				                });
 							}
@@ -331,7 +332,8 @@ public class MainActivity extends ListActivity
 		                    	MainActivity.this.runOnUiThread(new Runnable() {
 				                    @Override
 				                    public void run() {
-				                    	mTargetAdapter.notifyDataSetChanged();
+				                    	if( mTargetAdapter != null )
+				                    		mTargetAdapter.notifyDataSetChanged();
 				                    }
 				                });
 							}														

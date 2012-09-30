@@ -19,6 +19,7 @@
 package it.evilsocket.dsploit.gui.dialogs;
 
 import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.core.System;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -32,7 +33,7 @@ public class AboutDialog extends AlertDialog
 		
 		final View view = LayoutInflater.from( activity ).inflate( R.layout.about_dialog, null );
 		
-		this.setTitle( "About" );
+		this.setTitle( "About dSploit v" + System.getAppVersionName() );
 		this.setView( view );
 
 		this.setButton( "Ok", new DialogInterface.OnClickListener() {
