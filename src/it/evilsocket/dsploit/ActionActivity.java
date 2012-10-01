@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Plugin;
+import it.evilsocket.dsploit.gui.dialogs.FinishDialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -95,13 +96,19 @@ public class ActionActivity extends ListActivity
 	@Override
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);        
-        setTitle( "dSploit > " + System.getCurrentTarget() );
-        setContentView( LAYOUT );
         
-        mAvailable      = System.getPluginsForTarget();
-        mActionsAdapter = new ActionsAdapter( R.layout.actions_list_item );
-        
-	    setListAdapter( mActionsAdapter );    
+        if( System.getCurrentTarget() != null )
+        {
+	        setTitle( "dSploit > " + System.getCurrentTarget() );
+	        setContentView( LAYOUT );
+	        
+	        mAvailable 		= System.getPluginsForTarget();
+	        mActionsAdapter = new ActionsAdapter( R.layout.actions_list_item );
+	        
+		    setListAdapter( mActionsAdapter );  
+        }
+        else
+        	new FinishDialog( "Warning", "Something went wrong, please select again a valid target.", this ).show();
 	}
 	
 	@Override

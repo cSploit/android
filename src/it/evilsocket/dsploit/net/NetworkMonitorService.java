@@ -26,6 +26,7 @@ import it.evilsocket.dsploit.tools.NMap.FindAliveEndpointsOutputReceiver;
 import it.evilsocket.dsploit.core.System;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -61,9 +62,10 @@ public class NetworkMonitorService extends Service
 		NotificationManager manager 	 = ( NotificationManager )getSystemService(Context.NOTIFICATION_SERVICE);
 		Notification 		notification = new Notification( R.drawable.dsploit_icon_48 , message, java.lang.System.currentTimeMillis() );
 		Context 			context 	 = getApplicationContext();
-		
-		notification.flags |= Notification.FLAG_AUTO_CANCEL;
 
+		notification.flags 		  |= Notification.FLAG_AUTO_CANCEL;
+		notification.contentIntent = PendingIntent.getActivity( context, 0, new Intent(), PendingIntent.FLAG_UPDATE_CURRENT );
+		
 		notification.setLatestEventInfo( context, "Network Monitor", message, null );
 		
 		manager.cancel( mNotificationId );
