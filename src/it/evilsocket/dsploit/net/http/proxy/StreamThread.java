@@ -54,7 +54,6 @@ public class StreamThread implements Runnable
     	
     	try 
     	{
-    		// TODO: Implement support for chunkend transfer encoding
     		while( ( read = mReader.read( chunk, 0, CHUNK_SIZE ) ) > 0 )
     		{
     			mBuffer.append( chunk, read );

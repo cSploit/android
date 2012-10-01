@@ -21,7 +21,8 @@ package it.evilsocket.dsploit;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import it.evilsocket.dsploit.core.CrashManager;
+import com.actionbarsherlock.app.SherlockListActivity;
+
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.ToolsInstaller;
@@ -47,7 +48,6 @@ import it.evilsocket.dsploit.plugins.PortScanner;
 import it.evilsocket.dsploit.plugins.mitm.MITM;
 import it.evilsocket.dsploit.tools.NMap.FindAliveEndpointsOutputReceiver;
 
-import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -57,9 +57,6 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -68,7 +65,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends ListActivity
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+
+public class MainActivity extends SherlockListActivity
 {
 	private static final int LAYOUT = R.layout.target_layout;
 	
@@ -188,10 +189,7 @@ public class MainActivity extends ListActivity
 		        System.registerPlugin( new LoginCracker( ) );
 		        System.registerPlugin( new MITM( ) );
 		        System.registerPlugin( new PacketForger( ) );
-	
-		        // register the crash manager
-		        CrashManager.register( getApplicationContext() );
-		        
+
 				mTargetAdapter = new TargetAdapter( R.layout.target_list_item );
 		    	
 				setListAdapter( mTargetAdapter );	
@@ -278,194 +276,195 @@ public class MainActivity extends ListActivity
 	}
 	
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		new MenuInflater(this).inflate( R.menu.main, menu );		
+	public boolean onCreateOptionsMenu( Menu menu ) {
+		MenuInflater inflater = getSupportMenuInflater();
+		inflater.inflate( R.menu.main, menu );		
 		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected( MenuItem item ) {
+					
+		int itemId = item.getItemId();
 		
-		switch( item.getItemId() ) 
+		if( itemId == R.id.add )
 		{
-			case R.id.add:
-				
-				new InputDialog( "Add custom target", "Enter an URL, host name or ip address below:", MainActivity.this, new InputDialogListener(){
-					@Override
-					public void onInputEntered( String input ) 
+			new InputDialog( "Add custom target", "Enter an URL, host name or ip address below:", MainActivity.this, new InputDialogListener(){
+				@Override
+				public void onInputEntered( String input ) 
+				{
+					Target target = Target.getFromString(input);						
+					if( target != null )
 					{
-						Target target = Target.getFromString(input);						
-						if( target != null )
-						{
-							if( System.addOrderedTarget( target ) == true )
-							{																								
-								// refresh the target listview
-		                    	MainActivity.this.runOnUiThread(new Runnable() {
-				                    @Override
-				                    public void run() {
-				                    	if( mTargetAdapter != null )
-				                    		mTargetAdapter.notifyDataSetChanged();
-				                    }
-				                });
-							}
+						if( System.addOrderedTarget( target ) == true )
+						{																								
+							// refresh the target listview
+	                    	MainActivity.this.runOnUiThread(new Runnable() {
+			                    @Override
+			                    public void run() {
+			                    	if( mTargetAdapter != null )
+			                    		mTargetAdapter.notifyDataSetChanged();
+			                    }
+			                });
 						}
-						else
-							new ErrorDialog( "Error", "Invalid target.", MainActivity.this ).show();
-					}} 
-				).show();
-				
-				return true;
-	
-			case R.id.scan:
-				
-				try
-				{
-					final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Searching alive endpoints ...", true, false );
-									
-					System.getNMap().findAliveEndpoints( System.getNetwork(), new FindAliveEndpointsOutputReceiver(){						
-						@Override
-						public void onEndpointFound( Endpoint endpoint ) {
-							Target target = new Target( endpoint );
-							
-							if( System.addOrderedTarget( target ) == true )
-							{													
-								// refresh the target listview
-		                    	MainActivity.this.runOnUiThread(new Runnable() {
-				                    @Override
-				                    public void run() {
-				                    	if( mTargetAdapter != null )
-				                    		mTargetAdapter.notifyDataSetChanged();
-				                    }
-				                });
-							}														
-						}
-					
-						@Override
-						public void onEnd( int code ) {
-							dialog.dismiss();
-						}
-					}).start();		
-				}
-				catch( Exception e )
-				{
-					new FatalDialog( "Error", e.toString(), MainActivity.this ).show();
-				}
-				
-				return true;
-	
-			case R.id.new_session:
-								
-					new ConfirmDialog( "Warning", "Starting a new session would delete the current one, continue ?", this, new ConfirmDialogListener(){
-						@Override
-						public void onConfirm() {
-							try
-							{
-								System.reset();
-								mTargetAdapter.notifyDataSetChanged();
-								
-								Toast.makeText( MainActivity.this, "New session started", Toast.LENGTH_SHORT ).show();
-							}
-							catch( Exception e )
-							{
-								new FatalDialog( "Error", e.toString(), MainActivity.this ).show();
-							}
-						}}
-					).show();										
-								
-				return true;
-				
-			case R.id.save_session :
-				
-				new InputDialog( "Save Session", "Enter the name of the session file :", System.getSessionName(), true, MainActivity.this, new InputDialogListener(){
-					@Override
-					public void onInputEntered( String input ) 
-					{
-						String name = input.trim().replace( "/", "" ).replace( "..", "" );
-						
-						if( name.isEmpty() == false )
-						{
-							try
-							{
-								String filename = System.saveSession( name );
-						
-								Toast.makeText( MainActivity.this, "Session saved to " + filename + " .", Toast.LENGTH_SHORT ).show();
-							}
-							catch( IOException e )
-							{
-								new ErrorDialog( "Error", e.toString(), MainActivity.this ).show();
-							}
-						}
-						else
-							new ErrorDialog( "Error", "Invalid session name.", MainActivity.this ).show();
-					}} 
-				).show();	
-				
-				return true;
-				
-			case R.id.restore_session :
-				
-				final ArrayList<String> sessions = System.getAvailableSessionFiles();
-				
-				if( sessions != null && sessions.size() > 0 )
-				{
-					new SpinnerDialog( "Select Session", "Select a session file from the sd card :", sessions.toArray( new String[ sessions.size() ] ), MainActivity.this, new SpinnerDialogListener(){
-						@Override
-						public void onItemSelected(int index) 
-						{						
-							String session = sessions.get( index );
-							
-							try
-							{
-								System.loadSession( session );
-								mTargetAdapter.notifyDataSetChanged();
-							}
-							catch( Exception e )
-							{
-								e.printStackTrace();
-								new ErrorDialog( "Error", e.getMessage(), MainActivity.this ).show();
-							}
-						}
-					}).show();
-				}
-				else
-					new ErrorDialog( "Error", "No session file found on sd card.", MainActivity.this ).show();
-				
-				return true;
-				
-			case R.id.ss_monitor :
-				
-				if( NetworkMonitorService.RUNNING )
-				{
-					stopService( new Intent( this, NetworkMonitorService.class ) );
-					
-					item.setTitle( "Start Network Monitor" );
-				}
-				else
-				{
-					startService( new Intent( this, NetworkMonitorService.class ) );
-					
-					item.setTitle( "Stop Network Monitor" );
-				}
-				
-				return true;
-				
-			case R.id.submit_issue :
-				
-				String uri     = "https://github.com/evilsocket/dsploit/issues/new";
-				Intent browser = new Intent( Intent.ACTION_VIEW, Uri.parse( uri ) );
-				
-				startActivity( browser );
-				
-				return true;
-												
-			case R.id.about:
-				
-				new AboutDialog( this ).show();
-				
-				return true;
+					}
+					else
+						new ErrorDialog( "Error", "Invalid target.", MainActivity.this ).show();
+				}} 
+			).show();
+			
+			return true;
 		}
-
-		return super.onOptionsItemSelected(item);
+		else if( itemId == R.id.scan )
+		{
+			try
+			{
+				final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Searching alive endpoints ...", true, false );
+								
+				System.getNMap().findAliveEndpoints( System.getNetwork(), new FindAliveEndpointsOutputReceiver(){						
+					@Override
+					public void onEndpointFound( Endpoint endpoint ) {
+						Target target = new Target( endpoint );
+						
+						if( System.addOrderedTarget( target ) == true )
+						{													
+							// refresh the target listview
+	                    	MainActivity.this.runOnUiThread(new Runnable() {
+			                    @Override
+			                    public void run() {
+			                    	if( mTargetAdapter != null )
+			                    		mTargetAdapter.notifyDataSetChanged();
+			                    }
+			                });
+						}														
+					}
+				
+					@Override
+					public void onEnd( int code ) {
+						dialog.dismiss();
+					}
+				}).start();		
+			}
+			catch( Exception e )
+			{
+				new FatalDialog( "Error", e.toString(), MainActivity.this ).show();
+			}
+			
+			return true;
+		}
+		else if( itemId == R.id.new_session )
+		{
+			new ConfirmDialog( "Warning", "Starting a new session would delete the current one, continue ?", this, new ConfirmDialogListener(){
+				@Override
+				public void onConfirm() {
+					try
+					{
+						System.reset();
+						mTargetAdapter.notifyDataSetChanged();
+						
+						Toast.makeText( MainActivity.this, "New session started", Toast.LENGTH_SHORT ).show();
+					}
+					catch( Exception e )
+					{
+						new FatalDialog( "Error", e.toString(), MainActivity.this ).show();
+					}
+				}}
+			).show();										
+							
+			return true;
+		}
+		else if( itemId == R.id.save_session )
+		{
+			new InputDialog( "Save Session", "Enter the name of the session file :", System.getSessionName(), true, MainActivity.this, new InputDialogListener(){
+				@Override
+				public void onInputEntered( String input ) 
+				{
+					String name = input.trim().replace( "/", "" ).replace( "..", "" );
+					
+					if( name.isEmpty() == false )
+					{
+						try
+						{
+							String filename = System.saveSession( name );
+					
+							Toast.makeText( MainActivity.this, "Session saved to " + filename + " .", Toast.LENGTH_SHORT ).show();
+						}
+						catch( IOException e )
+						{
+							new ErrorDialog( "Error", e.toString(), MainActivity.this ).show();
+						}
+					}
+					else
+						new ErrorDialog( "Error", "Invalid session name.", MainActivity.this ).show();
+				}} 
+			).show();	
+			
+			return true;
+		}
+		else if( itemId == R.id.restore_session )
+		{
+			final ArrayList<String> sessions = System.getAvailableSessionFiles();
+			
+			if( sessions != null && sessions.size() > 0 )
+			{
+				new SpinnerDialog( "Select Session", "Select a session file from the sd card :", sessions.toArray( new String[ sessions.size() ] ), MainActivity.this, new SpinnerDialogListener(){
+					@Override
+					public void onItemSelected(int index) 
+					{						
+						String session = sessions.get( index );
+						
+						try
+						{
+							System.loadSession( session );
+							mTargetAdapter.notifyDataSetChanged();
+						}
+						catch( Exception e )
+						{
+							e.printStackTrace();
+							new ErrorDialog( "Error", e.getMessage(), MainActivity.this ).show();
+						}
+					}
+				}).show();
+			}
+			else
+				new ErrorDialog( "Error", "No session file found on sd card.", MainActivity.this ).show();
+			
+			return true;
+		}
+		else if( itemId == R.id.ss_monitor )
+		{
+			if( NetworkMonitorService.RUNNING )
+			{
+				stopService( new Intent( this, NetworkMonitorService.class ) );
+				
+				item.setTitle( "Start Network Monitor" );
+			}
+			else
+			{
+				startService( new Intent( this, NetworkMonitorService.class ) );
+				
+				item.setTitle( "Stop Network Monitor" );
+			}
+			
+			return true;
+		}
+		else if( itemId == R.id.submit_issue )
+		{
+			String uri     = "https://github.com/evilsocket/dsploit/issues/new";
+			Intent browser = new Intent( Intent.ACTION_VIEW, Uri.parse( uri ) );
+			
+			startActivity( browser );
+			
+			return true;
+		}									
+		else if( itemId == R.id.about )
+		{
+			new AboutDialog( this ).show();
+			
+			return true;
+		}
+		else
+			return super.onOptionsItemSelected(item);
 	}
 	
 	@Override

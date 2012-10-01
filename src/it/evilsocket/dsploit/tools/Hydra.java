@@ -80,6 +80,9 @@ public class Hydra extends Tool
 	public Thread crack( Target target, int port, String service, String charset, int minlength, int maxlength, String username, AttemptReceiver receiver ){
 		String command = "-F -l " + username + " -s " + port + " -x " + minlength + ":" + maxlength + ":" + charset + " -V -t 10 " + target.getCommandLineRepresentation() + " " + service;
 		
+		if( service.equalsIgnoreCase("http-head") )
+			command += " /";
+		
 		return super.async( command, receiver );
 	}
 }

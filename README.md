@@ -1,4 +1,3 @@
-
 dSploit - An Android network penetration suite.
 ==============================
 
@@ -15,10 +14,13 @@ and running services, search for **known vulnerabilities**, crack logon procedur
 man in the middle attacks such as **password sniffing** ( with common protocols dissection ), real time **traffic
 manipulation**, etc, etc .
 
+This application is still in **beta stage**, a stable release will be available as soon as possible, but expect
+some crash or strange behaviour until then, in any case, feel free to submit an issue here on GitHub.
+
 Requirements
 -------------
 
-- An Android device with at least the 3.0 version of the OS.
+- An Android device with at least the 2.3 ( Gingerbread ) version of the OS.
 - The device **must be rooted**.
 - The device must have a BusyBox **full install**, this means with **every** utility installed ( not the partial installation ).
 

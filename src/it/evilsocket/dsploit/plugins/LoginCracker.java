@@ -47,18 +47,7 @@ public class LoginCracker extends Plugin
 	private static final String[] PROTOCOLS = new String[]
 	{
 		"ftp",
-		/* TODO:
 		"http-head",
-		"http-get",
-		"http-get-form",
-		"http-post-form",
-		"https-get-form",
-		"https-post-form",
-		"https-head",
-		"https-get",
-		"http-proxy",
-		"http-proxy-ntlm",
-		*/
 		"icq",
 		"imap",
 		"imap-ntlm",
@@ -97,7 +86,6 @@ public class LoginCracker extends Plugin
 		"vmauthd"
 	};
 	
-	// TODO: Add support for custom charsets
 	private static final String[] CHARSETS = new String[]
 	{
 		"a-z",
@@ -118,8 +106,8 @@ public class LoginCracker extends Plugin
 	
 	private static String[] USERNAMES = new String[]
 	{
-		"saroot",
 		"admin",
+		"saroot",
 		"root",
 		"administrator",
 		"Administrator",
