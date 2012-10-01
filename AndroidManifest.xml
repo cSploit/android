@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="it.evilsocket.dsploit"
     android:versionCode="1"
-    android:versionName="1.0.6b" >
+    android:versionName="1.0.7b" >
 
     <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="15" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
-    <application android:icon="@drawable/ic_launcher" android:label="@string/app_name" android:name="DSploitApplication">
+    <application android:icon="@drawable/ic_launcher" android:label="@string/app_name" android:name="DSploitApplication" android:theme="@style/Theme.Sherlock">
         <activity android:name=".MainActivity" android:label="@string/title_activity_main" android:screenOrientation="landscape" android:configChanges="keyboardHidden|orientation">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
