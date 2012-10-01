@@ -134,7 +134,7 @@ public class MainActivity extends SherlockListActivity
 	}
 
 	@Override
-    public void onCreate( Bundle savedInstanceState ) {
+    public void onCreate( Bundle savedInstanceState ) {		
         super.onCreate(savedInstanceState);   
         setContentView( LAYOUT );
         
@@ -486,13 +486,18 @@ public class MainActivity extends SherlockListActivity
 	}
 
 	@Override
-	public void onDestroy() {		
-		stopService( new Intent( this, NetworkMonitorService.class ) );
-		unregisterReceiver( mMessageReceiver );
+	public void onDestroy() {				
+		stopService( new Intent( MainActivity.this, NetworkMonitorService.class ) );
+		
+		if( mMessageReceiver != null )
+			unregisterReceiver( mMessageReceiver );
 		
 		// make sure no zombie process is running before destroying the activity
-		System.clean();
+		System.clean();			
 		
 		super.onDestroy();
+		
+		// this will remove the application from app cache, forcing it to re-initialize
+		java.lang.System.exit(0);
 	}
 }
