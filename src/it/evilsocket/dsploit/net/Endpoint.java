@@ -31,8 +31,9 @@ public class Endpoint
 	private byte[]      mHardware = null;
 		
 	public static byte[] parseMacAddress( String macAddress ) {
-		if( macAddress != null && macAddress.equals("null") == false )
+		if( macAddress != null && macAddress.equals("null") == false && macAddress.isEmpty() == false )
 		{
+
 	        String[] bytes = macAddress.split(":");
 	        byte[] parsed  = new byte[bytes.length];
 	
@@ -42,9 +43,10 @@ public class Endpoint
 	            byte[] raw 		= temp.toByteArray();
 	            parsed[x] 		= raw[raw.length - 1];
 	        }
-	        
+						        
 	        return parsed;
 		}
+		
 		return null;
 		
     }
