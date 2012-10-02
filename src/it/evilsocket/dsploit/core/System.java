@@ -92,28 +92,28 @@ public class System
 	private static String				 mStoragePath   = null;
 	private static String				 mSessionName	= null;
 		
-	public static void init( Context context ) throws NoRouteToHostException, SocketException {
-		mContext 	   = context;		
-		mUpdateManager = new UpdateManager( mContext );
-		mPlugins 	   = new ArrayList<Plugin>();
-		mTargets 	   = new ArrayList<Target>();
-		
-		// local network
-		mTargets.add( new Target( System.getNetwork() ) );
-		// network gateway
-		mTargets.add( new Target( System.getNetwork().getGatewayAddress(), System.getNetwork().getGatewayHardware() ) );
-		// device network address
-		mTargets.add( new Target( System.getNetwork().getLoacalAddress(), System.getNetwork().getLocalHardware() ) );
-		
-		mNmap     = new NMap( mContext );
-		mEttercap = new Ettercap( mContext );
-		mIptables = new IPTables( );
-		mHydra    = new Hydra( mContext );
-		mTcpdump  = new TcpDump( mContext );
-				
-		// preload network service map
+	public static void init( Context context ) throws Exception {
+		mContext = context;		
 		try
-		{	
+		{				
+			mUpdateManager = new UpdateManager( mContext );
+			mPlugins 	   = new ArrayList<Plugin>();
+			mTargets 	   = new ArrayList<Target>();
+			
+			// local network
+			mTargets.add( new Target( System.getNetwork() ) );
+			// network gateway
+			mTargets.add( new Target( System.getNetwork().getGatewayAddress(), System.getNetwork().getGatewayHardware() ) );
+			// device network address
+			mTargets.add( new Target( System.getNetwork().getLoacalAddress(), System.getNetwork().getLocalHardware() ) );
+			
+			mNmap     = new NMap( mContext );
+			mEttercap = new Ettercap( mContext );
+			mIptables = new IPTables( );
+			mHydra    = new Hydra( mContext );
+			mTcpdump  = new TcpDump( mContext );
+				
+			// preload network service map and mac vendors 
 			mServices = new HashMap<String,String>();
 			mPorts	  = new HashMap<String,String>();
 			
@@ -138,21 +138,11 @@ public class System
 			}
 			  
 			in.close();
-		}
-		catch( Exception e )
-		{
-			Log.e( TAG, e.toString() );
-		}
-				
-		// preload mac vendors
-		try
-		{
-			mVendors = new HashMap<String,String>();
-			
-			FileInputStream fstream = new FileInputStream( mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-mac-prefixes" );
-			DataInputStream in 	    = new DataInputStream(fstream);
-			BufferedReader  reader  = new BufferedReader(new InputStreamReader(in));
-			String 		    line;
+
+			mVendors = new HashMap<String,String>();			
+			fstream  = new FileInputStream( mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-mac-prefixes" );
+			in 	     = new DataInputStream(fstream);
+			reader   = new BufferedReader(new InputStreamReader(in));
 			
 			while( ( line = reader.readLine() ) != null )   
 			{
@@ -167,16 +157,18 @@ public class System
 			}
 			
 			in.close();
+							
+			mStoragePath = Environment.getExternalStorageDirectory().toString();
+			mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
+			
+			mInitialized = true;
 		}
 		catch( Exception e )
 		{
 			Log.e( TAG, e.toString() );
+			
+			throw e;
 		}
-								
-		mStoragePath = Environment.getExternalStorageDirectory().toString();
-		mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
-		
-		mInitialized = true;
 	}
 	
 	public static UpdateManager getUpdateManager() {
