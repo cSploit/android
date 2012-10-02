@@ -112,52 +112,7 @@ public class System
 			mIptables = new IPTables( );
 			mHydra    = new Hydra( mContext );
 			mTcpdump  = new TcpDump( mContext );
-				
-			// preload network service map and mac vendors 
-			mServices = new HashMap<String,String>();
-			mPorts	  = new HashMap<String,String>();
 			
-			FileInputStream fstream = new FileInputStream( mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-services" );
-			DataInputStream in 	    = new DataInputStream(fstream);
-			BufferedReader  reader  = new BufferedReader(new InputStreamReader(in));
-			String 		    line;
-			Matcher			matcher;
-				
-			while( ( line = reader.readLine() ) != null )   
-			{
-				line = line.trim();
-				  
-				if( ( matcher = SERVICE_PARSER.matcher(line) ) != null && matcher.find() )
-				{
-					String proto = matcher.group( 1 ),
-						   port  = matcher.group( 2 );
-					
-					mServices.put( proto, port );
-					mPorts.put( port, proto );
-				}
-			}
-			  
-			in.close();
-
-			mVendors = new HashMap<String,String>();			
-			fstream  = new FileInputStream( mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-mac-prefixes" );
-			in 	     = new DataInputStream(fstream);
-			reader   = new BufferedReader(new InputStreamReader(in));
-			
-			while( ( line = reader.readLine() ) != null )   
-			{
-				line = line.trim();
-				if( line.startsWith("#") == false && line.isEmpty() == false )  
-				{
-					String[] tokens = line.split( " ", 2 );
-					
-					if( tokens.length == 2 )
-						mVendors.put( tokens[0], tokens[1] );						
-				}
-			}
-			
-			in.close();
-							
 			mStoragePath = Environment.getExternalStorageDirectory().toString();
 			mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
 			
@@ -168,6 +123,76 @@ public class System
 			Log.e( TAG, e.toString() );
 			
 			throw e;
+		}
+	}
+	
+	private static void preloadServices( ) {
+		if( mServices == null || mPorts == null )
+		{
+			try
+			{
+				// preload network service map and mac vendors 
+				mServices = new HashMap<String,String>();
+				mPorts	  = new HashMap<String,String>();
+				
+				FileInputStream fstream = new FileInputStream( mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-services" );
+				DataInputStream in 	    = new DataInputStream(fstream);
+				BufferedReader  reader  = new BufferedReader(new InputStreamReader(in));
+				String 		    line;
+				Matcher			matcher;
+					
+				while( ( line = reader.readLine() ) != null )   
+				{
+					line = line.trim();
+					  
+					if( ( matcher = SERVICE_PARSER.matcher(line) ) != null && matcher.find() )
+					{
+						String proto = matcher.group( 1 ),
+							   port  = matcher.group( 2 );
+						
+						mServices.put( proto, port );
+						mPorts.put( port, proto );
+					}
+				}
+				  
+				in.close();
+			}
+			catch( Exception e )
+			{
+				Log.e( TAG, e.toString() );
+			}
+		}
+	}
+	
+	private static void preloadVendors( ) {
+		if( mVendors == null )
+		{
+			try
+			{
+				mVendors				 = new HashMap<String,String>();			
+				FileInputStream fstream  = new FileInputStream( mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-mac-prefixes" );
+				DataInputStream in 	     = new DataInputStream(fstream);
+				BufferedReader  reader   = new BufferedReader(new InputStreamReader(in));
+				String 		    line;
+
+				while( ( line = reader.readLine() ) != null )   
+				{
+					line = line.trim();
+					if( line.startsWith("#") == false && line.isEmpty() == false )  
+					{
+						String[] tokens = line.split( " ", 2 );
+						
+						if( tokens.length == 2 )
+							mVendors.put( tokens[0], tokens[1] );						
+					}
+				}
+				
+				in.close();
+			}
+			catch( Exception e )
+			{
+				Log.e( TAG, e.toString() );
+			}
 		}
 	}
 	
@@ -390,6 +415,8 @@ public class System
 	}
 	
 	public static String getMacVendor( byte[] mac ){	
+		preloadVendors();
+		
 		if( mac != null && mac.length >= 3 )
 			return mVendors.get( String.format( "%02X%02X%02X", mac[0], mac[1], mac[2] ) );
 		else
@@ -397,10 +424,14 @@ public class System
 	}
 	
 	public static String getProtocolByPort( String port ){
+		preloadServices();
+		
 		return mPorts.containsKey(port) ? mPorts.get(port) : null;
 	}
 	
 	public static int getPortByProtocol( String protocol ){
+		preloadServices();
+		
 		return mServices.containsKey(protocol) ? Integer.parseInt( mServices.get(protocol) ) : 0;
 	}
 		
