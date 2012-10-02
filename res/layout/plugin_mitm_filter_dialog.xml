@@ -12,18 +12,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
+        android:layout_marginBottom="5dp"
         android:text="Enter a custom replace filter, including simple string replacement or regular expressions."
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView1"
-        android:layout_alignRight="@+id/textView1"
-        android:layout_below="@+id/textView1"
-        android:layout_marginTop="38dp"
-        android:text="From"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <EditText
@@ -56,5 +46,15 @@
         android:layout_alignRight="@+id/textView3"
         android:layout_below="@+id/textView3"
         android:ems="10" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView1"
+        android:layout_alignRight="@+id/textView1"
+        android:layout_below="@+id/textView1"
+        android:text="From"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
 </RelativeLayout>
