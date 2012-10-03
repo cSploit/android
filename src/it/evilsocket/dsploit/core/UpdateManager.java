@@ -55,10 +55,12 @@ public class UpdateManager
 		String[] padded = new String[ 3 ],
 				 parts  = version.split( "[^0-9a-zA-Z]" );
 		String 	 item   = "",
-				 digit	= "";
+				 digit	= "",
+				 letter = "";
 		double   code	= 0,
 				 coeff	= 0;
 		int		 i, j;
+		char	 c;
 		
 		Arrays.fill( padded, 0, 3, "0" );
 		
@@ -71,20 +73,28 @@ public class UpdateManager
 		{
 			item  = padded[ i ];
 			coeff = Math.pow( 10, padded.length - i );
-		
-			for( j = 0; j < item.length(); j++ )
+			
+			if( item.matches( "\\d+[a-zA-Z]" ) )
 			{
-				digit = "" + item.charAt( j );
-						
-				if( digit.matches( "\\d" ) )				
-					code += ( Integer.parseInt( digit ) + 1 ) * coeff;
+				digit  = "";
+				letter = "";
 				
-				else if( digit.matches( "[a-zA-Z]" ) )				
-					code -= ( ( VERSION_CHAR_MAP.indexOf( digit.toLowerCase() ) + 1 ) / 100.0 );
+				for( j = 0; j < item.length(); j++ )
+				{
+					c = item.charAt( j );
+					if( c >= '0' && c <= '9' )
+						digit += c;
+					else
+						letter += c;
+				}
 				
-				else
-					code += coeff;
-			}			
+				code += ( ( Integer.parseInt( digit ) + 1 ) * coeff ) - ( ( VERSION_CHAR_MAP.indexOf( letter.toLowerCase() ) + 1 ) / 100.0 );
+			}
+			else if(  item.matches( "\\d+" ) )
+				code += ( Integer.parseInt( item ) + 1 ) * coeff;
+			
+			else
+				code += coeff;
 		}
 		
 		return code;
