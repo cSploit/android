@@ -32,6 +32,7 @@ public class StreamThread implements Runnable
 	private final static byte[]  CONTENT_TEXT_HTML = "text/html".getBytes();
 	private final static String  HEAD_SEPARATOR    = "\r\n\r\n";
     private final static int     CHUNK_SIZE        = 1024;
+    private final static int     MAX_BUFFER_SIZE   = 10485760;
     
     private InputStream       mReader = null;
     private OutputStream      mWriter = null;
@@ -49,7 +50,8 @@ public class StreamThread implements Runnable
     
     public void run() {
     	
-    	int    read  = -1;
+    	int    read  = -1,
+    		   size  = 0;
     	byte[] chunk = new byte[ CHUNK_SIZE ];
     	
     	try 
@@ -57,6 +59,11 @@ public class StreamThread implements Runnable
     		while( ( read = mReader.read( chunk, 0, CHUNK_SIZE ) ) > 0 )
     		{
     			mBuffer.append( chunk, read );
+    			
+    			size += read;
+    			
+    			if( size >= MAX_BUFFER_SIZE )
+    				throw new RuntimeException( "Max buffer size reached." );
     		}
     		
     		if( mBuffer.isEmpty() == false )
@@ -88,7 +95,7 @@ public class StreamThread implements Runnable
 				mWriter.flush();
     		}
 		} 
-    	catch( IOException e ) 
+    	catch( Exception e ) 
     	{			
     		Log.e( TAG, e.toString() );
 		}
