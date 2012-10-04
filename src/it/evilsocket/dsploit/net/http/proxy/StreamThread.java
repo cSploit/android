@@ -97,6 +97,10 @@ public class StreamThread implements Runnable
 				mWriter.flush();
     		}
 		} 
+    	catch( OutOfMemoryError ome )
+    	{
+    		Log.e( TAG, ome.toString() );
+    	}
     	catch( Exception e ) 
     	{			
     		Log.e( TAG, e.toString() );
