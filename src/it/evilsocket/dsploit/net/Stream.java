@@ -24,17 +24,25 @@ public class Stream
 	{
 		HTTP,
 		FTP,
+		TELNET,
 		SMTP,
+		POP3,
 		IMAP,
+		IRC,
+		NNTP,
 		UNKNOWN;
 		
 		public static Type fromString( String port ) {			
 			switch( Integer.parseInt( port.trim() ) )
 			{
-				case 80  : return HTTP;
-				case 21  : return FTP;
-				case 25  : return SMTP;
-				case 143 : return IMAP;
+				case 80   : return HTTP;
+				case 21   : return FTP;
+				case 23   : return TELNET;
+				case 25   : return SMTP;
+				case 110  : return POP3;
+				case 143  : return IMAP;
+				case 6667 : return IRC;
+				case 119  : return NNTP;
 			}
 						
 			return UNKNOWN;

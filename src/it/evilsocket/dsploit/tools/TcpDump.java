@@ -24,6 +24,12 @@ import it.evilsocket.dsploit.net.StreamAssembler;
 import it.evilsocket.dsploit.net.parsers.FTPStreamParser;
 import it.evilsocket.dsploit.net.parsers.HTTPCookieStreamParser;
 import it.evilsocket.dsploit.net.parsers.HTTPFormStreamParser;
+import it.evilsocket.dsploit.net.parsers.IMAPStreamParser;
+import it.evilsocket.dsploit.net.parsers.IRCStreamParser;
+import it.evilsocket.dsploit.net.parsers.NNTPStreamParser;
+import it.evilsocket.dsploit.net.parsers.POP3StreamParser;
+import it.evilsocket.dsploit.net.parsers.SMTPStreamParser;
+import it.evilsocket.dsploit.net.parsers.TELNETStreamParser;
 
 import android.content.Context;
 import android.util.Log;
@@ -59,8 +65,14 @@ public class TcpDump extends Tool
 			);
 			
 			mAssembler.addStreamParser( new FTPStreamParser() );
+			mAssembler.addStreamParser( new TELNETStreamParser() );
 			mAssembler.addStreamParser( new HTTPCookieStreamParser() );
 			mAssembler.addStreamParser( new HTTPFormStreamParser() );
+			mAssembler.addStreamParser( new SMTPStreamParser() );
+			mAssembler.addStreamParser( new POP3StreamParser() );
+			mAssembler.addStreamParser( new IMAPStreamParser() );
+			mAssembler.addStreamParser( new IRCStreamParser() );
+			mAssembler.addStreamParser( new NNTPStreamParser() );
 		}
 		
 		public void onNewLine( String line ) {			
