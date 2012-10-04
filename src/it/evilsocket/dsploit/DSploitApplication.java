@@ -18,10 +18,19 @@
  */
 package it.evilsocket.dsploit;
 
+import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.plugins.ExploitFinder;
+import it.evilsocket.dsploit.plugins.Inspector;
+import it.evilsocket.dsploit.plugins.LoginCracker;
+import it.evilsocket.dsploit.plugins.PacketForger;
+import it.evilsocket.dsploit.plugins.PortScanner;
+import it.evilsocket.dsploit.plugins.mitm.MITM;
+
 import org.acra.*;
 import org.acra.annotation.*;
 
 import android.app.Application;
+import android.util.Log;
 
 @ReportsCrashes
 (
@@ -34,7 +43,26 @@ public class DSploitApplication extends Application
 {
 	@Override
 	public void onCreate() {
-		ACRA.init(this);
+		ACRA.init( this );
+
+		// initialize the system
+		try
+		{
+			System.init( this );
+			
+	        System.registerPlugin( new PortScanner( ) );
+	        System.registerPlugin( new Inspector( ) );
+	        System.registerPlugin( new ExploitFinder( ) );
+	        System.registerPlugin( new LoginCracker( ) );
+	        System.registerPlugin( new MITM( ) );
+	        System.registerPlugin( new PacketForger( ) );
+		}
+		catch( Exception e )
+		{
+			System.setLastError( e.toString() );
+			Log.e( "DSPLOIT", e.toString() );
+		}
+		        
 		super.onCreate();
 	}
 }

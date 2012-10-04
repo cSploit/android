@@ -96,7 +96,7 @@ public class ActionActivity extends ListActivity
 	@Override
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);        
-        
+                        
         if( System.getCurrentTarget() != null )
         {
 	        setTitle( "dSploit > " + System.getCurrentTarget() );

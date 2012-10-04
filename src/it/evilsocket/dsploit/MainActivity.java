@@ -40,12 +40,6 @@ import it.evilsocket.dsploit.net.Endpoint;
 import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.NetworkMonitorService;
 import it.evilsocket.dsploit.net.Target;
-import it.evilsocket.dsploit.plugins.ExploitFinder;
-import it.evilsocket.dsploit.plugins.Inspector;
-import it.evilsocket.dsploit.plugins.LoginCracker;
-import it.evilsocket.dsploit.plugins.PacketForger;
-import it.evilsocket.dsploit.plugins.PortScanner;
-import it.evilsocket.dsploit.plugins.mitm.MITM;
 import it.evilsocket.dsploit.tools.NMap.FindAliveEndpointsOutputReceiver;
 
 import android.app.ProgressDialog;
@@ -138,14 +132,23 @@ public class MainActivity extends SherlockListActivity
         super.onCreate(savedInstanceState);   
         setContentView( LAYOUT );
         
-        if( System.isInitialized() == false )
-        {	        	        
-        	final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Initializing ...", true, false );
-
-	        new Thread( new Runnable(){
+        // just initialize the ui the first time
+        if( mTargetAdapter == null )
+        {	        	
+        	// make sure system object was correctly initialized during application startup
+        	if( System.isInitialized() == false )
+        	{
+        		new FatalDialog( "Error", "Error during system initialization: " + System.getLastError(), this ).show();
+        		return;
+        	}
+        	
+        	final ProgressDialog dialog = ProgressDialog.show( this, "", "Initializing ...", true, false );
+						
+        	// this is necessary to not block the user interface while initializing
+        	new Thread( new Runnable(){
 				@Override
 				public void run() 
-				{												
+				{				
 					dialog.show();
 
 					String 		   fatal     = null;										
@@ -164,115 +167,112 @@ public class MainActivity extends SherlockListActivity
 					
 					if( fatal != null )
 					{
-						final String fatalMessage = fatal;
-						MainActivity.this.runOnUiThread( new Runnable() {
-					       public void run() {
-					    	   new FatalDialog( "Error", fatalMessage, MainActivity.this ).show();
-					       }
-					    });
+						final String ffatal = fatal;
+						MainActivity.this.runOnUiThread( new Runnable(){
+							@Override
+							public void run() {
+								new FatalDialog( "Error", ffatal, MainActivity.this ).show();
+							}
+						});													
 					}
 					else if( Network.isWifiConnected( MainActivity.this ) ) 
 					{
 						startService( new Intent( MainActivity.this, NetworkMonitorService.class ) );
-					}
-				}
-			}).start();
-	            					
-		    try
-	    	{	    	
-		    	// initialize the system
-		    	System.init( getApplicationContext() );
+					}	
 
-		        System.registerPlugin( new PortScanner( ) );
-		        System.registerPlugin( new Inspector( ) );
-		        System.registerPlugin( new ExploitFinder( ) );
-		        System.registerPlugin( new LoginCracker( ) );
-		        System.registerPlugin( new MITM( ) );
-		        System.registerPlugin( new PacketForger( ) );
-
-				mTargetAdapter = new TargetAdapter( R.layout.target_list_item );
-		    	
-				setListAdapter( mTargetAdapter );	
-				
-				mMessageReceiver = new BroadcastReceiver() {
-					@Override
-					public void onReceive(Context context, Intent intent) {
-						if( intent.getAction().equals( NetworkMonitorService.NEW_ENDPOINT ) )
+					MainActivity.this.runOnUiThread( new Runnable(){			    			
+						@Override
+						public void run() 
 						{
-							String address  = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_ADDRESS ),
-								   hardware = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_HARDWARE );	            	
-							Target target	= Target.getFromString( address );
-							
-							target.getEndpoint().setHardware( Endpoint.parseMacAddress(hardware) );
-							
-							if( System.addOrderedTarget( target ) == true )
-							{													
-								// refresh the target listview
-				            	MainActivity.this.runOnUiThread(new Runnable() {
-				                    @Override
-				                    public void run() {
-				                    	mTargetAdapter.notifyDataSetChanged();
-				                    }
-				                });
-							}			
-						}							
-						else if( intent.getAction().equals( UpdateService.UPDATE_AVAILABLE ) )
-						{
-							final String remoteVersion = ( String )intent.getExtras().get( UpdateService.AVAILABLE_VERSION );
-							
-							MainActivity.this.runOnUiThread(new Runnable() {
-			                    @Override
-			                    public void run() {
-			                    	new ConfirmDialog
-			                    	( 
-			                    	  "Update Available", 
-			                    	  "A new update to version " + remoteVersion + " is available, do you want to download it ?",
-			                    	  MainActivity.this,
-			                    	  new ConfirmDialogListener(){
-										@Override
-										public void onConfirm() 
+						    try
+					    	{	    			    	
+								mTargetAdapter = new TargetAdapter( R.layout.target_list_item );
+						    	
+								setListAdapter( mTargetAdapter );	
+								
+								mMessageReceiver = new BroadcastReceiver() {
+									@Override
+									public void onReceive(Context context, Intent intent) {
+										if( intent.getAction().equals( NetworkMonitorService.NEW_ENDPOINT ) )
 										{
-											final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Downloading update ...", true, false );
+											String address  = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_ADDRESS ),
+												   hardware = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_HARDWARE );	            	
+											Target target	= Target.getFromString( address );
 											
-											new Thread( new Runnable(){
-												@Override
-												public void run() 
-												{				
-													if( System.getUpdateManager().downloadUpdate() == false )
-													{
-														MainActivity.this.runOnUiThread(new Runnable() {
-										                    @Override
-										                    public void run() {
-										                    	new ErrorDialog( "Error", "An error occurred while downloading the update.", MainActivity.this ).show();
-										                    }
-										                });
-													}
-													
-													dialog.dismiss();
-												}
-											}).start();											
-										}}
-			                    	).show();
-			                    }
-			                });
-						}							
-					}
-			    };
-			    
-			    mIntentFilter = new IntentFilter( );
-			    
-			    mIntentFilter.addAction( NetworkMonitorService.NEW_ENDPOINT );
-			    mIntentFilter.addAction( UpdateService.UPDATE_AVAILABLE );
-			    
-		        registerReceiver( mMessageReceiver, mIntentFilter );		
-		        
-		        if( System.getSettings().getBoolean( "PREF_CHECK_UPDATES", true ) )
-		        	startService( new Intent( this, UpdateService.class ) );
-	    	}
-	    	catch( Exception e )
-	    	{
-	    		new FatalDialog( "Error", e.getMessage(), this ).show();
-	    	}		    		    
+											target.getEndpoint().setHardware( Endpoint.parseMacAddress(hardware) );
+											
+											if( System.addOrderedTarget( target ) == true )
+											{													
+												// refresh the target listview
+								            	MainActivity.this.runOnUiThread(new Runnable() {
+								                    @Override
+								                    public void run() {
+								                    	mTargetAdapter.notifyDataSetChanged();
+								                    }
+								                });
+											}			
+										}							
+										else if( intent.getAction().equals( UpdateService.UPDATE_AVAILABLE ) )
+										{
+											final String remoteVersion = ( String )intent.getExtras().get( UpdateService.AVAILABLE_VERSION );
+											
+											MainActivity.this.runOnUiThread(new Runnable() {
+							                    @Override
+							                    public void run() {
+							                    	new ConfirmDialog
+							                    	( 
+							                    	  "Update Available", 
+							                    	  "A new update to version " + remoteVersion + " is available, do you want to download it ?",
+							                    	  MainActivity.this,
+							                    	  new ConfirmDialogListener(){
+														@Override
+														public void onConfirm() 
+														{
+															final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Downloading update ...", true, false );
+															
+															new Thread( new Runnable(){
+																@Override
+																public void run() 
+																{				
+																	if( System.getUpdateManager().downloadUpdate() == false )
+																	{
+																		MainActivity.this.runOnUiThread(new Runnable() {
+														                    @Override
+														                    public void run() {
+														                    	new ErrorDialog( "Error", "An error occurred while downloading the update.", MainActivity.this ).show();
+														                    }
+														                });
+																	}
+																	
+																	dialog.dismiss();
+																}
+															}).start();											
+														}}
+							                    	).show();
+							                    }
+							                });
+										}							
+									}
+							    };
+							    
+							    mIntentFilter = new IntentFilter( );
+							    
+							    mIntentFilter.addAction( NetworkMonitorService.NEW_ENDPOINT );
+							    mIntentFilter.addAction( UpdateService.UPDATE_AVAILABLE );
+							    
+						        registerReceiver( mMessageReceiver, mIntentFilter );		
+						        
+						        if( System.getSettings().getBoolean( "PREF_CHECK_UPDATES", true ) )
+						        	startService( new Intent( MainActivity.this, UpdateService.class ) );
+					    	}
+					    	catch( Exception e )
+					    	{
+					    		new FatalDialog( "Error", e.getMessage(), MainActivity.this ).show();	    		
+					    	}									
+						}
+					});							
+				}
+			}).start();        		    		    
         }                       
 	}
 	

@@ -69,6 +69,7 @@ public class System
 	public  static final String  IPV4_FORWARD_FILEPATH  = "/proc/sys/net/ipv4/ip_forward";	
  
 	private static boolean			     mInitialized   = false;
+	private static String				 mLastError		= "";
 	private static UpdateManager		 mUpdateManager = null;
 	private static Context 			     mContext  	    = null;
 	private static Network 			     mNetwork  	    = null;
@@ -107,7 +108,7 @@ public class System
 			// network gateway
 			mTargets.add( new Target( System.getNetwork().getGatewayAddress(), System.getNetwork().getGatewayHardware() ) );
 			// device network address
-			mTargets.add( new Target( System.getNetwork().getLoacalAddress(), System.getNetwork().getLocalHardware() ) );
+			mTargets.add( new Target( System.getNetwork().getLocalAddress(), System.getNetwork().getLocalHardware() ) );
 			
 			mNmap     = new NMap( mContext );
 			mEttercap = new Ettercap( mContext );
@@ -126,6 +127,14 @@ public class System
 			
 			throw e;
 		}
+	}
+	
+	public static void setLastError( String error ) {
+		mLastError = error;
+	}
+	
+	public static String getLastError( ) {
+		return mLastError;
 	}
 	
 	private static void preloadServices( ) {
@@ -360,7 +369,7 @@ public class System
 		try
 		{
 			if( mProxy == null )
-				mProxy = new Proxy( getNetwork().getLoacalAddress(), HTTP_PROXY_PORT );
+				mProxy = new Proxy( getNetwork().getLocalAddress(), HTTP_PROXY_PORT );
 		}
 		catch( Exception e )
 		{
@@ -374,7 +383,7 @@ public class System
 		try
 		{
 			if( mServer == null )			
-				mServer = new Server( getNetwork().getLoacalAddress(), HTTP_SERVER_PORT );					
+				mServer = new Server( getNetwork().getLocalAddress(), HTTP_SERVER_PORT );					
 		}
 		catch( Exception e )
 		{
@@ -411,7 +420,7 @@ public class System
 		// network gateway
 		mTargets.add( new Target( System.getNetwork().getGatewayAddress(), System.getNetwork().getGatewayHardware() ) );
 		// device network address
-		mTargets.add( new Target( System.getNetwork().getLoacalAddress(), System.getNetwork().getLocalHardware() ) );
+		mTargets.add( new Target( System.getNetwork().getLocalAddress(), System.getNetwork().getLocalHardware() ) );
 				
 		mCurrentTarget = 0;
 	}

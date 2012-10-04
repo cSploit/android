@@ -79,7 +79,7 @@ public class Network
 			throw new NoRouteToHostException("Not connected to any WiFi access point.");
 		
 		else
-			mInterface = NetworkInterface.getByInetAddress( getLoacalAddress() );		
+			mInterface = NetworkInterface.getByInetAddress( getLocalAddress() );		
 	}
 			
 	private static int countBits( int n ){
@@ -177,7 +177,7 @@ public class Network
 		return null;
 	}
 	
-	public InetAddress getLoacalAddress( ){
+	public InetAddress getLocalAddress( ){
 		try
 		{
 			return InetAddress.getByName( ( mInfo.ipAddress & 0xFF) + "." + (( mInfo.ipAddress >> 8 ) & 0xFF) + "." + (( mInfo.ipAddress >> 16 ) & 0xFF) + "." + (( mInfo.ipAddress >> 24 ) & 0xFF) );

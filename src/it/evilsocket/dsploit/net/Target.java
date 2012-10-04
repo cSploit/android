@@ -431,7 +431,7 @@ public class Target {
 				if( mEndpoint.getAddress().equals( System.getNetwork().getGatewayAddress() ) )
 					desc += " ( Your network gateway / router )";
 			
-				else if( mEndpoint.getAddress().equals( System.getNetwork().getLoacalAddress() ) )
+				else if( mEndpoint.getAddress().equals( System.getNetwork().getLocalAddress() ) )
 					desc += " ( This device )";
 			}
 			catch( SocketException e )
@@ -473,7 +473,7 @@ public class Target {
 				if( mEndpoint.getAddress().equals( System.getNetwork().getGatewayAddress() ) )
 					return R.drawable.target_router_48;
 			
-				else if( mEndpoint.getAddress().equals( System.getNetwork().getLoacalAddress() ) )
+				else if( mEndpoint.getAddress().equals( System.getNetwork().getLocalAddress() ) )
 					return R.drawable.target_self_48;
 			
 				else
