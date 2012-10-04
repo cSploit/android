@@ -20,6 +20,7 @@
         <service android:enabled="true" android:name=".net.NetworkMonitorService" />
         <service android:enabled="true" android:name=".core.UpdateService" />
         
+        <activity android:configChanges="keyboardHidden|orientation" android:name="SettingsActivity" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>                
         <activity android:configChanges="keyboardHidden|orientation" android:name=".ActionActivity" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>        
         <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.PortScanner" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>        
         <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.Inspector" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>        

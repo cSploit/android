@@ -8,6 +8,7 @@
 	  <item android:id="@+id/new_session"     android:title="New Session"    />
 	  <item android:id="@+id/save_session"    android:title="Save Session"   />
 	  <item android:id="@+id/restore_session" android:title="Restore Session"/>
+	  <item android:id="@+id/settings"        android:title="Settings" />
   </group>
   <group android:id="@+id/misc_group">
 	  <item android:id="@+id/ss_monitor"      android:title="Stop Network Monitor"/>

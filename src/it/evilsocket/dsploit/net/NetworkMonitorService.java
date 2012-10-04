@@ -59,17 +59,20 @@ public class NetworkMonitorService extends Service
 	}
 	
 	private void sendNotification( String message ) {
-		NotificationManager manager 	 = ( NotificationManager )getSystemService(Context.NOTIFICATION_SERVICE);
-		Notification 		notification = new Notification( R.drawable.dsploit_icon_48 , message, java.lang.System.currentTimeMillis() );
-		Context 			context 	 = getApplicationContext();
-		PendingIntent	    pending		 = PendingIntent.getActivity( context, 0, new Intent(), PendingIntent.FLAG_UPDATE_CURRENT );
-
-		notification.flags |= Notification.FLAG_AUTO_CANCEL;
-		
-		notification.setLatestEventInfo( context, "Network Monitor", message, pending );
-		
-		manager.cancel( mNotificationId );
-		manager.notify( ++mNotificationId, notification );
+		if( System.getSettings().getBoolean( "PREF_NETWORK_NOTIFICATIONS", true ) )
+		{
+			NotificationManager manager 	 = ( NotificationManager )getSystemService(Context.NOTIFICATION_SERVICE);
+			Notification 		notification = new Notification( R.drawable.dsploit_icon_48 , message, java.lang.System.currentTimeMillis() );
+			Context 			context 	 = getApplicationContext();
+			PendingIntent	    pending		 = PendingIntent.getActivity( context, 0, new Intent(), PendingIntent.FLAG_UPDATE_CURRENT );
+	
+			notification.flags |= Notification.FLAG_AUTO_CANCEL;
+			
+			notification.setLatestEventInfo( context, "Network Monitor", message, pending );
+			
+			manager.cancel( mNotificationId );
+			manager.notify( ++mNotificationId, notification );
+		}
 	}
 	
 	private void sendNewEndpointNotification( Endpoint endpoint ) {

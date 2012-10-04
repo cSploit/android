@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import it.evilsocket.dsploit.core.System;
+
 import android.util.Log;
 
 public class StreamThread implements Runnable
@@ -32,7 +34,6 @@ public class StreamThread implements Runnable
 	private final static byte[]  CONTENT_TEXT_HTML = "text/html".getBytes();
 	private final static String  HEAD_SEPARATOR    = "\r\n\r\n";
     private final static int     CHUNK_SIZE        = 1024;
-    private final static int     MAX_BUFFER_SIZE   = 10485760;
     
     private InputStream       mReader = null;
     private OutputStream      mWriter = null;
@@ -51,7 +52,8 @@ public class StreamThread implements Runnable
     public void run() {
     	
     	int    read  = -1,
-    		   size  = 0;
+    		   size  = 0,
+    		   max   = Integer.parseInt( System.getSettings().getString( "PREF_HTTP_MAX_BUFFER_SIZE", "10485760" ) );
     	byte[] chunk = new byte[ CHUNK_SIZE ];
     	
     	try 
@@ -62,7 +64,7 @@ public class StreamThread implements Runnable
     			
     			size += read;
     			
-    			if( size >= MAX_BUFFER_SIZE )
+    			if( size >= max )
     				throw new RuntimeException( "Max buffer size reached." );
     		}
     		

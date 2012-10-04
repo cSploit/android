@@ -52,6 +52,7 @@ public class Sniffer extends Activity
 	private ListView 		   mListView    	  = null;		
 	private StatListAdapter	   mAdapter			  = null;
 	private boolean	     	   mRunning			  = false;	
+	private double			   mSampleTime		  = 1.0;
 	
 	public static class AddressStats
 	{
@@ -181,6 +182,7 @@ public class Sniffer extends Activity
         mSniffProgress	   = ( ProgressBar )findViewById( R.id.sniffActivity );
         mListView 		   = ( ListView )findViewById( R.id.listView );
         mAdapter		   = new StatListAdapter( R.layout.plugin_mitm_sniffer_list_item );
+        mSampleTime		   = Double.parseDouble( System.getSettings().getString( "PREF_SNIFFER_SAMPLE_TIME", "1.0" ) );
         
         mListView.setAdapter( mAdapter );
                 
@@ -263,7 +265,7 @@ public class Sniffer extends Activity
 									
 									deltat = ( now - stats.mSampledTime ) / 1000.0;
 									
-									if( deltat >= 1 )
+									if( deltat >= mSampleTime )
 									{										
 										stats.mBandwidth   = ( stats.mPackets - stats.mSampledSize ) / deltat;
 										stats.mSampledTime = java.lang.System.currentTimeMillis();

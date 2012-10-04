@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="General" >
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="PREF_CHECK_UPDATES"
+            android:summary="Check for updates everytime the application is started."
+            android:title="Check for Updates" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="PREF_NETWORK_NOTIFICATIONS"
+            android:summary="Enable or disable network service notifications when a new endpoint is found."
+            android:title="Show Network Notifications" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Modules" >
+
+        <EditTextPreference
+            android:defaultValue="1.0"
+            android:inputType="numberDecimal"
+            android:key="PREF_SNIFFER_SAMPLE_TIME"
+            android:summary="Sample time in seconds of the sniffer module network statistics."
+            android:title="Sniffer Sample Time" />
+
+        <EditTextPreference
+            android:defaultValue="10485760"
+            android:inputType="number"
+            android:key="PREF_HTTP_MAX_BUFFER_SIZE"
+            android:summary="Max buffer size of HTTP requests handled by the transparent proxy."
+            android:title="HTTP Max Buffer Size" />
+
+        <EditTextPreference
+            android:defaultValue="dsploit-password-sniff.log"
+            android:key="PREF_PASSWORD_FILENAME"
+            android:summary="Name of the file to use to log passwords and cookies."
+            android:title="Password Sniffer File" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

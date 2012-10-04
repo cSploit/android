@@ -266,7 +266,8 @@ public class MainActivity extends SherlockListActivity
 			    
 		        registerReceiver( mMessageReceiver, mIntentFilter );		
 		        
-		        startService( new Intent( this, UpdateService.class ) );
+		        if( System.getSettings().getBoolean( "PREF_CHECK_UPDATES", true ) )
+		        	startService( new Intent( this, UpdateService.class ) );
 	    	}
 	    	catch( Exception e )
 	    	{
@@ -428,6 +429,12 @@ public class MainActivity extends SherlockListActivity
 			}
 			else
 				new ErrorDialog( "Error", "No session file found on sd card.", MainActivity.this ).show();
+			
+			return true;
+		}
+		else if( itemId == R.id.settings )
+		{
+			startActivity( new Intent( MainActivity.this, SettingsActivity.class ) );
 			
 			return true;
 		}

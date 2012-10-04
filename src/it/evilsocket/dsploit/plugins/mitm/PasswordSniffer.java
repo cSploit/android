@@ -51,7 +51,6 @@ public class PasswordSniffer extends Activity
 {
 	private static final String TAG			= "PASSWORDSNIFFER";
 	private static final String PCAP_FILTER = "not '(src host localhost or dst host localhost or arp)'";
-	private static final String FILENAME    = "dsploit-password-sniff.log";
 	
 	private ToggleButton       mSniffToggleButton = null;
 	private CheckBox		   mSniffCookies	  = null;
@@ -180,7 +179,7 @@ public class PasswordSniffer extends Activity
         setTitle( System.getCurrentTarget() + " > MITM > Password Sniffer" );
         setContentView( R.layout.plugin_mitm_password_sniffer );
         
-        mFileOutput		   = ( new File( System.getStoragePath(), FILENAME ) ).getAbsolutePath();
+        mFileOutput		   = ( new File( System.getStoragePath(), System.getSettings().getString( "PREF_PASSWORD_FILENAME", "dsploit-password-sniff.log" ) ) ).getAbsolutePath();
         mSniffToggleButton = ( ToggleButton )findViewById( R.id.sniffToggleButton );
         mSniffCookies	   = ( CheckBox )findViewById( R.id.cookieCheckBox );
         mSniffProgress	   = ( ProgressBar )findViewById( R.id.sniffActivity );
