@@ -21,8 +21,14 @@ package it.evilsocket.dsploit.plugins;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -35,6 +41,7 @@ import android.widget.ToggleButton;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Plugin;
+import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
 import it.evilsocket.dsploit.gui.dialogs.FinishDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
@@ -44,6 +51,9 @@ import it.evilsocket.dsploit.tools.Hydra;
 
 public class LoginCracker extends Plugin
 {
+	private static final String TAG 		    = "LOGINCRACKER";
+	private static final int 	SELECT_WORDLIST = 1012;
+	
 	private static final String[] PROTOCOLS = new String[]
 	{
 		"ftp",
@@ -153,6 +163,8 @@ public class LoginCracker extends Plugin
 	private TextView 	 	mStatusText 	 = null;
 	private ProgressBar	    mActivity		 = null;
 	private ProgressBar  	mProgressBar 	 = null;
+	private Intent			mWordlistPicker	 = null;
+	private String			mWordlist		 = null;
 	private boolean	     	mRunning		 = false;
 	private boolean			mAccountFound	 = false;
 	private AttemptReceiver mReceiver     	 = null;
@@ -297,6 +309,7 @@ public class LoginCracker extends Plugin
 		  min,
 		  max,
 		  ( String )mUserSpinner.getSelectedItem(), 
+		  mWordlist,
 		  mReceiver
 		).start();
 		
@@ -394,6 +407,64 @@ public class LoginCracker extends Plugin
 				}
 			}} 
 		);       
+        
+        mWordlistPicker = new Intent();
+        mWordlistPicker.addCategory( Intent.CATEGORY_OPENABLE );
+        mWordlistPicker.setType( "text/*" );
+        mWordlistPicker.setAction( Intent.ACTION_GET_CONTENT );
+        mWordlistPicker.putExtra( Intent.EXTRA_LOCAL_ONLY, true );
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu( Menu menu ) {
+		MenuInflater inflater = getSupportMenuInflater();
+		inflater.inflate( R.menu.login_cracker, menu );		
+		return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected( MenuItem item ) {
+					
+		int itemId = item.getItemId();
+		
+		if( itemId == R.id.wordlist )
+		{
+			startActivityForResult( Intent.createChooser( mWordlistPicker, "Select Wordlist" ), SELECT_WORDLIST );
+			
+			return true;
+		}
+		else
+			return super.onOptionsItemSelected(item);
+	}
+	
+	@Override
+	protected void onActivityResult( int request, int result, Intent intent ) { 
+	    super.onActivityResult( request, result, intent  ); 
+	    
+	    if( request == SELECT_WORDLIST && result == RESULT_OK )
+	    {
+	    	try
+	    	{
+	    		String fileName = null;
+	    		
+	    		if( intent != null && intent.getData() != null )
+	    			fileName = intent.getData().getPath();
+
+		    	if( fileName == null )
+		    	{
+		    		new ErrorDialog( "Error", "Could not determine file path, please use a different file manager.", LoginCracker.this ).show();
+		    	}
+		    	else
+		    	{
+		    		mWordlist = fileName;		    		
+		    	}		    	
+	    	}
+	    	catch( Exception e )
+	    	{
+	    		e.printStackTrace();
+	    		Log.e( TAG, e.toString() );
+	    	}
+	    }
 	}
 	
 	@Override

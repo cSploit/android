@@ -77,9 +77,15 @@ public class Hydra extends Tool
 		public abstract void onAccountFound( String login, String password );
 	}
 	
-	public Thread crack( Target target, int port, String service, String charset, int minlength, int maxlength, String username, AttemptReceiver receiver ){
-		String command = "-F -l " + username + " -s " + port + " -x " + minlength + ":" + maxlength + ":" + charset + " -V -t 10 " + target.getCommandLineRepresentation() + " " + service;
+	public Thread crack( Target target, int port, String service, String charset, int minlength, int maxlength, String username, String wordlist, AttemptReceiver receiver ){
+		String command = "";
 		
+		if( wordlist != null )
+			command = "-F -l " + username + " -s " + port + " -P " + wordlist + " -V -t 10 " + target.getCommandLineRepresentation() + " " + service;
+		
+		else
+			command = "-F -l " + username + " -s " + port + " -x " + minlength + ":" + maxlength + ":" + charset + " -V -t 10 " + target.getCommandLineRepresentation() + " " + service;
+				 		
 		if( service.equalsIgnoreCase("http-head") )
 			command += " /";
 		

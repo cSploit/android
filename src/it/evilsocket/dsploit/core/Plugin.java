@@ -18,14 +18,15 @@
  */
 package it.evilsocket.dsploit.core;
 
-import android.app.Activity;
+import com.actionbarsherlock.app.SherlockActivity;
+
 import android.os.Bundle;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Target.Port;
 import it.evilsocket.dsploit.net.Target.Vulnerability;
 
-public abstract class Plugin extends Activity 
+public abstract class Plugin extends SherlockActivity 
 {
 	private String        mName				  = null;
 	private String		  mDescription		  = null;
