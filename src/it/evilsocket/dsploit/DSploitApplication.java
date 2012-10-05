@@ -59,7 +59,7 @@ public class DSploitApplication extends Application
 		}
 		catch( Exception e )
 		{
-			System.setLastError( e.toString() );
+			System.setLastError( e.getMessage() );
 			Log.e( "DSPLOIT", e.toString() );
 		}
 		        

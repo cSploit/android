@@ -138,7 +138,7 @@ public class MainActivity extends SherlockListActivity
         	// make sure system object was correctly initialized during application startup
         	if( System.isInitialized() == false )
         	{
-        		new FatalDialog( "Error", "Error during system initialization: " + System.getLastError(), this ).show();
+        		new FatalDialog( "Initialization Error", System.getLastError(), this ).show();
         		return;
         	}
         	
