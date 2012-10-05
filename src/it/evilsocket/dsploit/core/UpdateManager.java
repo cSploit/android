@@ -33,7 +33,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.StrictMode;
-import android.util.Log;
 
 public class UpdateManager 
 {
@@ -139,7 +138,7 @@ public class UpdateManager
 		}
 		catch( Exception e )
 		{
-			Log.e( TAG, e.getMessage() );
+			System.errorLogging( TAG, e );
 		}
 		
 		return false;
@@ -196,8 +195,7 @@ public class UpdateManager
 		} 
 		catch( Exception e ) 
 		{
-			e.printStackTrace();
-	    	Log.e( TAG, e.getMessage() );
+			System.errorLogging( TAG, e );
 	    }
 	    
 	    return false;

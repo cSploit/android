@@ -18,6 +18,7 @@
  */
 package it.evilsocket.dsploit.tools;
 
+import it.evilsocket.dsploit.core.System;
 import android.util.Log;
 
 public class IPTables extends Tool
@@ -40,7 +41,7 @@ public class IPTables extends Tool
 		}
 		catch( Exception e )
 		{
-			Log.e( TAG, e.toString() );
+			System.errorLogging( TAG, e );
 		}
 	}
 	
@@ -54,7 +55,7 @@ public class IPTables extends Tool
 		}
 		catch( Exception e )
 		{
-			Log.e( TAG, e.toString() );
+			System.errorLogging( TAG, e );
 		}
 	}
 	

@@ -34,7 +34,9 @@ import java.util.regex.Pattern;
 import android.os.StrictMode;
 import android.util.Log;
 
-public class Target {
+public class Target 
+{
+	private static final String TAG = "TARGET";
 	
 	public enum Type {
 		NETWORK,
@@ -226,7 +228,7 @@ public class Target {
 		}
 		catch( Exception e )
 		{
-			Log.e( "Target.getFromString()", e.toString() );
+			System.errorLogging( TAG, e );
 		}
 		
 		// determine if the target is reachable.
@@ -242,7 +244,6 @@ public class Target {
 			}
 			catch( Exception e )
 			{
-				Log.d( "Target.getFromString()", e.toString() );
 				target = null;
 			}
 		}
@@ -436,7 +437,7 @@ public class Target {
 			}
 			catch( SocketException e )
 			{
-				Log.e( "Target.getDescription()", e.toString() );
+				System.errorLogging( TAG, e );
 			}
 			
 			return desc.trim();
@@ -484,7 +485,7 @@ public class Target {
 		}
 		catch( Exception e )
 		{
-			Log.e( "Target", e.toString() );
+			System.errorLogging( TAG, e );
 		}
 		
 		return R.drawable.target_network_48;

@@ -26,8 +26,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import android.util.Log;
-
 public class Shell 
 {
 	private static final String TAG = "SHELL";
@@ -62,7 +60,7 @@ public class Shell
 		} 
 		catch ( Exception e ) 
 		{
-			Log.e( TAG, e.toString() );
+			System.errorLogging( TAG, e );
 		} 
 		finally 
 		{
@@ -114,7 +112,7 @@ public class Shell
 			}
 			catch( Exception e )
 			{
-				Log.e( TAG, e.toString() );
+				System.errorLogging( TAG, e );
 			}
 		}
 		
@@ -182,8 +180,7 @@ public class Shell
 				}
 				catch( Exception e )
 				{
-					e.printStackTrace();
-					Log.e( TAG, e.toString() );
+					System.errorLogging( TAG, e );
 				}
 			}} 
 		);

@@ -134,7 +134,7 @@ public class Server implements Runnable
 				}
 				catch( IOException e )
 				{
-					Log.e( TAG, e.toString() );
+					System.errorLogging( TAG, e );
 				}
 			}
 			
@@ -142,7 +142,7 @@ public class Server implements Runnable
 		}
 		catch( IOException e )
 		{
-			Log.e( TAG, e.toString() );
+			System.errorLogging( TAG, e );
 		}
 	}
 }

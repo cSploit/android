@@ -18,6 +18,8 @@
  */
 package it.evilsocket.dsploit.tools;
 
+import it.evilsocket.dsploit.core.System;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -28,7 +30,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import android.content.Context;
-import android.util.Log;
 
 public class EtterFilter extends Tool
 {
@@ -72,7 +73,7 @@ public class EtterFilter extends Tool
 		}
 		catch( Exception e )
 		{
-			Log.e( TAG, e.toString() );
+			System.errorLogging( TAG, e );
 		}
 	}
 	

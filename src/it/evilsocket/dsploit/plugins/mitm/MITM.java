@@ -193,8 +193,7 @@ public class MITM extends Plugin
 	    	}
 	    	catch( Exception e )
 	    	{
-	    		e.printStackTrace();
-	    		Log.e( TAG, e.toString() );
+	    		System.errorLogging( TAG, e );
 	    	}
 	    }	    
 	}

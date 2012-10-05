@@ -30,8 +30,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.util.Log;
-
 public class StreamAssembler 
 {
 	private static final String  TAG = "StreamAssembler";
@@ -100,7 +98,7 @@ public class StreamAssembler
 				}
 				catch( SocketException e )
 				{
-					Log.e( TAG, e.toString() );
+					System.errorLogging( TAG, e );
 					
 					server = source;
 					type   = Stream.Type.fromString( sport );		

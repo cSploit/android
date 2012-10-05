@@ -30,7 +30,6 @@ import org.acra.*;
 import org.acra.annotation.*;
 
 import android.app.Application;
-import android.util.Log;
 
 @ReportsCrashes
 (
@@ -59,8 +58,7 @@ public class DSploitApplication extends Application
 		}
 		catch( Exception e )
 		{
-			System.setLastError( e.getMessage() );
-			Log.e( "DSPLOIT", e.toString() );
+			System.errorLogging( "DSPLOIT", e );
 		}
 		        
 		super.onCreate();

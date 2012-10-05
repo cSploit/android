@@ -19,6 +19,8 @@
 package it.evilsocket.dsploit.net.http.proxy;
 
 
+import it.evilsocket.dsploit.core.System;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -154,7 +156,7 @@ public class ProxyThread extends Thread
 		} 
 		catch( IOException e )
 		{
-			Log.e( TAG, e.toString() );
+			System.errorLogging( TAG, e );
 		}			
 	}
 }

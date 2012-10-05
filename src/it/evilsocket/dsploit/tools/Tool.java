@@ -19,12 +19,12 @@
 package it.evilsocket.dsploit.tools;
 
 import it.evilsocket.dsploit.core.Shell;
+import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 
 import java.io.File;
 import java.io.IOException;
 import android.content.Context;
-import android.util.Log;
 
 public class Tool 
 {
@@ -100,7 +100,7 @@ public class Tool
 		}
 		catch( Exception e )
 		{ 
-			Log.e( TAG, e.toString() );
+			System.errorLogging( TAG, e );
 		}
 		
 		return false;

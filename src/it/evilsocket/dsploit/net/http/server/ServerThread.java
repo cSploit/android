@@ -18,6 +18,8 @@
  */
 package it.evilsocket.dsploit.net.http.server;
 
+import it.evilsocket.dsploit.core.System;
+
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,7 +70,7 @@ public class ServerThread extends Thread
 		} 
 		catch( IOException e )
 		{
-			Log.e( TAG, e.toString() );
+			System.errorLogging( TAG, e );
 		}	
 		finally
     	{
@@ -80,7 +82,7 @@ public class ServerThread extends Thread
 			} 
     		catch( IOException e ) 
     		{			
-    			Log.e( TAG, e.toString() );
+    			System.errorLogging( TAG, e );
 			}
     	}
 	}

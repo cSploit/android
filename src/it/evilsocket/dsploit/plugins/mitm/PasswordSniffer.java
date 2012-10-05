@@ -35,7 +35,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -214,7 +213,7 @@ public class PasswordSniffer extends Activity
 		}
 		catch( IOException e )
 		{
-			Log.e( TAG, e.toString() );
+			System.errorLogging( TAG, e );
 		}
 
 		System.setForwarding( false );
@@ -267,7 +266,7 @@ public class PasswordSniffer extends Activity
 								}
 								catch( IOException e )
 								{
-									Log.e( TAG, e.toString() );
+									System.errorLogging( TAG, e );
 								}
 								
 								mAdapter.addChild( stream.endpoint.toString(), data );

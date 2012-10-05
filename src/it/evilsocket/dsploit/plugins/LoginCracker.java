@@ -28,7 +28,6 @@ import com.actionbarsherlock.view.MenuItem;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -461,8 +460,7 @@ public class LoginCracker extends Plugin
 	    	}
 	    	catch( Exception e )
 	    	{
-	    		e.printStackTrace();
-	    		Log.e( TAG, e.toString() );
+	    		System.errorLogging( TAG, e );
 	    	}
 	    }
 	}

@@ -127,7 +127,7 @@ public class ToolsInstaller
 	    }
 	    catch( Exception e )
 	    {
-	    	Log.e( "ToolsInstaller", e.getMessage() );
+	    	System.errorLogging( TAG, e );
 	    	
 	    	return false;
 	    }

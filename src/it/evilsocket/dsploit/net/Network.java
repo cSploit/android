@@ -18,6 +18,8 @@
  */
 package it.evilsocket.dsploit.net;
 
+import it.evilsocket.dsploit.core.System;
+
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.NoRouteToHostException;
@@ -29,10 +31,11 @@ import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.util.Log;
 
 public class Network 
 {
+	private static final String TAG = "NETWORK";
+	
 	public enum Protocol {
 		TCP,
 		UDP,
@@ -109,7 +112,7 @@ public class Network
 		}
 		catch( UnknownHostException e )
 		{
-			Log.e( "Network", e.toString() );
+			System.errorLogging( TAG, e );
 		}
 		
 		return false;
@@ -141,7 +144,7 @@ public class Network
 		}
 		catch( UnknownHostException e )
 		{
-			Log.e( "Network", e.toString() );
+			System.errorLogging( TAG, e );
 		}
 		
 		return null;
@@ -154,7 +157,7 @@ public class Network
 		}
 		catch( UnknownHostException e )
 		{
-			Log.e( "Network", e.toString() );
+			System.errorLogging( TAG, e );
 		}
 		
 		return null;
@@ -171,7 +174,7 @@ public class Network
 		} 
 		catch( SocketException e ) 
 		{
-			Log.e( "Network", e.toString() );
+			System.errorLogging( TAG, e );
 		}
 		
 		return null;
@@ -184,7 +187,7 @@ public class Network
 		}
 		catch( UnknownHostException e )
 		{
-			Log.e( "Network", e.toString() );
+			System.errorLogging( TAG, e );
 		}
 		
 		return null;

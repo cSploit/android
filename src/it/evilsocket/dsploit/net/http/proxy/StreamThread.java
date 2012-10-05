@@ -103,7 +103,7 @@ public class StreamThread implements Runnable
     	}
     	catch( Exception e ) 
     	{			
-    		Log.e( TAG, e.toString() );
+    		System.errorLogging( TAG, e );
 		}
     	finally
     	{
@@ -115,7 +115,7 @@ public class StreamThread implements Runnable
 			} 
     		catch( IOException e ) 
     		{			
-    			Log.e( TAG, e.toString() );
+    			System.errorLogging( TAG, e );
 			}
     	}
     }

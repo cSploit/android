@@ -22,7 +22,6 @@ import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 import it.evilsocket.dsploit.net.Target;
 import android.content.Context;
-import android.util.Log;
 
 public class Ettercap extends Tool
 {
@@ -71,7 +70,7 @@ public class Ettercap extends Tool
 		}
 		catch( Exception e )
 		{
-			Log.e( TAG, e.toString() );
+			System.errorLogging( TAG, e );
 		}
 		
 		return super.async( commandLine, listener );
@@ -92,7 +91,7 @@ public class Ettercap extends Tool
 		}
 		catch( Exception e )
 		{
-			Log.e( TAG, e.toString() );
+			System.errorLogging( TAG, e );
 		}
 		
 		return super.async( commandLine, listener );

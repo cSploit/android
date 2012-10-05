@@ -19,13 +19,18 @@
 package it.evilsocket.dsploit.core;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.NoRouteToHostException;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -62,6 +67,7 @@ import it.evilsocket.dsploit.tools.TcpDump;
 public class System 
 {		
 	private static final String  TAG 		  		    = "SYSTEM";
+	private static final String  ERROR_LOG_FILENAME     = "dsploit-debug-error.log";
 	private static final String  SESSION_MAGIC		    = "DSS"; 
 	private static final Pattern SERVICE_PARSER		    = Pattern.compile( "^([^\\s]+)\\s+(\\d+).*$", Pattern.CASE_INSENSITIVE );
 	public  static final int	 HTTP_PROXY_PORT		= 8080;
@@ -123,7 +129,7 @@ public class System
 		}
 		catch( Exception e )
 		{
-			Log.e( TAG, e.toString() );
+			errorLogging( TAG, e );
 			
 			throw e;
 		}
@@ -135,6 +141,40 @@ public class System
 	
 	public static String getLastError( ) {
 		return mLastError;
+	}
+	
+	public static synchronized void errorLogging( String tag, Exception e ) {
+		setLastError( e.getMessage() );
+		
+		Log.e( tag, e.toString() );
+		
+		Writer		sWriter = new StringWriter();
+        PrintWriter pWriter = new PrintWriter( sWriter );
+        String      sTrace  = "",
+        		    sOutput = ( new File( Environment.getExternalStorageDirectory().toString(), ERROR_LOG_FILENAME ) ).getAbsolutePath();
+        
+        e.printStackTrace( pWriter );
+        
+        sTrace = sWriter.toString();
+        
+        Log.e( tag, sTrace );
+        
+		if( mContext != null && getSettings().getBoolean( "PREF_DEBUG_ERROR_LOGGING", false ) == true )
+		{				        
+	        try
+			{
+	        	FileWriter 	   fWriter = new FileWriter( sOutput );
+	        	BufferedWriter bWriter = new BufferedWriter( fWriter );
+	        	
+	        	bWriter.write( sTrace );
+	        	
+	        	bWriter.close();
+			}
+			catch( IOException ioe )
+			{
+				Log.e( TAG, ioe.toString() );
+			}
+		}
 	}
 	
 	private static void preloadServices( ) {
@@ -170,7 +210,7 @@ public class System
 			}
 			catch( Exception e )
 			{
-				Log.e( TAG, e.toString() );
+				errorLogging( TAG, e );
 			}
 		}
 	}
@@ -202,7 +242,7 @@ public class System
 			}
 			catch( Exception e )
 			{
-				Log.e( TAG, e.toString() );
+				errorLogging( TAG, e );
 			}
 		}
 	}
@@ -233,7 +273,7 @@ public class System
 		}
 		catch( NameNotFoundException e )
 		{
-			Log.e( TAG, e.toString() );
+			errorLogging( TAG, e );
 		}
 		
 		return "?";
@@ -373,7 +413,7 @@ public class System
 		}
 		catch( Exception e )
 		{
-			Log.e( TAG, e.toString() );
+			errorLogging( TAG, e );
 		}
 		
 		return mProxy;
@@ -387,7 +427,7 @@ public class System
 		}
 		catch( Exception e )
 		{
-			Log.e( TAG, e.toString() );
+			errorLogging( TAG, e );
 		}
 		
 		return mServer;
@@ -638,7 +678,7 @@ public class System
 		}
 		catch( Exception e )
 		{
-			Log.e( TAG, e.toString() );
+			errorLogging( TAG, e );
 		}
 	}
 		
@@ -656,7 +696,7 @@ public class System
 		}
 		catch( Exception e )
 		{ 
-			Log.e( TAG, e.toString() );
+			errorLogging( TAG, e );
 		}
 	}
 	

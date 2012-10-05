@@ -14,6 +14,13 @@
             android:key="PREF_NETWORK_NOTIFICATIONS"
             android:summary="Enable or disable network service notifications when a new endpoint is found."
             android:title="Show Network Notifications" />
+        
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="PREF_DEBUG_ERROR_LOGGING"
+            android:summary="Enable or disable error logging on a debug file."
+            android:title="Debug Error Logging" />
+        
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Modules" >

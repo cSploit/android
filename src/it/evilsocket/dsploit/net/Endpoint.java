@@ -18,15 +18,17 @@
  */
 package it.evilsocket.dsploit.net;
 
+import it.evilsocket.dsploit.core.System;
+
 import java.io.BufferedReader;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import android.util.Log;
-
 public class Endpoint 
 {	
+	private static final String TAG = "ENDPOINT";
+	
 	private InetAddress mAddress  = null;
 	private byte[]      mHardware = null;
 		
@@ -68,7 +70,7 @@ public class Endpoint
 		}
 		catch( UnknownHostException e )
 		{
-			Log.e( "ENDPOINT", e.toString() );
+			System.errorLogging( TAG, e );
 			mAddress = null;
 		}
 	}
