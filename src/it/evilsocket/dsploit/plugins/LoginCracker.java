@@ -393,7 +393,7 @@ public class LoginCracker extends Plugin
 					setStartedState();
 				}
 			}} 
-		);
+		);       
 	}
 	
 	@Override

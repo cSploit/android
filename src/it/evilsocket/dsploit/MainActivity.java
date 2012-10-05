@@ -263,7 +263,7 @@ public class MainActivity extends SherlockListActivity
 						        registerReceiver( mMessageReceiver, mIntentFilter );		
 						        
 						        if( System.getSettings().getBoolean( "PREF_CHECK_UPDATES", true ) )
-						        	startService( new Intent( MainActivity.this, UpdateService.class ) );
+						        	startService( new Intent( MainActivity.this, UpdateService.class ) );						        						        
 					    	}
 					    	catch( Exception e )
 					    	{
