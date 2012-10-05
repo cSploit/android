@@ -92,7 +92,7 @@ public class PortScanner extends Plugin
                 	
                 	// add open port to the listview and notify the environment about the event
                 	mPortList.add( entry );
-                	( ( ArrayAdapter<String> )mScanList.getAdapter() ).notifyDataSetChanged();
+                	mListAdapter.notifyDataSetChanged();
                 	
                 	System.addOpenPort( Integer.parseInt( openPort ), Network.Protocol.fromString(portProto) );                	
                 }
