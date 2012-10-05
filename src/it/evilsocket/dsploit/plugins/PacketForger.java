@@ -25,23 +25,18 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Socket;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.ToggleButton;
-import it.evilsocket.dsploit.MainActivity;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
-import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
-import it.evilsocket.dsploit.gui.dialogs.InputDialog;
 import it.evilsocket.dsploit.net.Target;
 
 public class PacketForger extends Plugin implements OnClickListener
@@ -158,7 +153,7 @@ public class PacketForger extends Plugin implements OnClickListener
 								writer.close();
 								mSocket.close();
 							}
-							else
+							else if( protocol == UDP_PROTOCOL )
 							{
 								mUdpSocket 			  = new DatagramSocket();
 							    DatagramPacket packet = new DatagramPacket( data.getBytes(), data.length(), System.getCurrentTarget().getAddress(), port );
