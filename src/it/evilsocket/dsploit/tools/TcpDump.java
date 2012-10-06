@@ -19,20 +19,8 @@
 package it.evilsocket.dsploit.tools;
 
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
-import it.evilsocket.dsploit.net.Stream;
-import it.evilsocket.dsploit.net.StreamAssembler;
-import it.evilsocket.dsploit.net.parsers.FTPStreamParser;
-import it.evilsocket.dsploit.net.parsers.HTTPCookieStreamParser;
-import it.evilsocket.dsploit.net.parsers.HTTPFormStreamParser;
-import it.evilsocket.dsploit.net.parsers.IMAPStreamParser;
-import it.evilsocket.dsploit.net.parsers.IRCStreamParser;
-import it.evilsocket.dsploit.net.parsers.NNTPStreamParser;
-import it.evilsocket.dsploit.net.parsers.POP3StreamParser;
-import it.evilsocket.dsploit.net.parsers.SMTPStreamParser;
-import it.evilsocket.dsploit.net.parsers.TELNETStreamParser;
 
 import android.content.Context;
-import android.util.Log;
 
 public class TcpDump extends Tool
 {	
@@ -48,45 +36,5 @@ public class TcpDump extends Tool
 	
 	public void sniff( OutputReceiver receiver ) {
 		sniff( null, receiver );
-	}
-
-	public static abstract class PasswordReceiver implements OutputReceiver
-	{		
-		private StreamAssembler mAssembler = null;
-		
-		public void onStart( String commandLine ) { 
-			Log.d( "PasswordReceiver", "Started '" + commandLine +"'" );
-			
-			mAssembler = new StreamAssembler( new StreamAssembler.NewCredentialHandler(){
-				@Override
-				public void onNewCredentials( Stream stream, String data ) {
-					onAccountFound( stream, data );
-				}} 
-			);
-			
-			mAssembler.addStreamParser( new FTPStreamParser() );
-			mAssembler.addStreamParser( new TELNETStreamParser() );
-			mAssembler.addStreamParser( new HTTPCookieStreamParser() );
-			mAssembler.addStreamParser( new HTTPFormStreamParser() );
-			mAssembler.addStreamParser( new SMTPStreamParser() );
-			mAssembler.addStreamParser( new POP3StreamParser() );
-			mAssembler.addStreamParser( new IMAPStreamParser() );
-			mAssembler.addStreamParser( new IRCStreamParser() );
-			mAssembler.addStreamParser( new NNTPStreamParser() );
-		}
-		
-		public void onNewLine( String line ) {			
-			mAssembler.assemble(line);
-		}
-		
-		public void onEnd( int exitCode ) { 
-			Log.d( "PasswordReceiver", "Ended with exit code '" + exitCode +"'" );
-		}
-		
-		public abstract void onAccountFound( Stream stream, String data );
-	}
-	
-	public Thread sniffPasswords( String filter, PasswordReceiver receiver ) {
-		return super.async( "-n -l -vv -s 0 -A " + ( filter == null ? "" : filter ), receiver );
 	}
 }

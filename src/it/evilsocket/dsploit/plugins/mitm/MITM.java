@@ -273,6 +273,29 @@ public class MITM extends Plugin
         
         mActions.add( new Action
         ( 
+        	"Password Sniffer", 
+        	"Sniff passwords of many protocols such as http, ftp, imap, imaps, irc, msn, etc from the target.",
+        	R.drawable.action_passwords_48,
+        	new OnClickListener(){
+        	@Override
+			public void onClick( View v ) 
+			{
+        		setStoppedState();
+        		
+				startActivity
+                ( 
+                  new Intent
+                  ( 
+                	MITM.this, 
+                	PasswordSniffer.class
+                  ) 
+                );
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+			}
+		}));
+        
+        mActions.add( new Action
+        ( 
         	"Kill Connections", 
         	"Kill connections preventing the target to reach any website or server.",
         	R.drawable.action_kill_48,
@@ -307,29 +330,6 @@ public class MITM extends Plugin
 			}
 		}));
         
-        mActions.add( new Action
-        ( 
-        	"Password & Cookies", 
-        	"Sniff cookies, http, ftp and web passwords from the target.",
-        	R.drawable.action_passwords_48,
-        	new OnClickListener(){
-        	@Override
-			public void onClick( View v ) 
-			{
-        		setStoppedState();
-        		
-				startActivity
-                ( 
-                  new Intent
-                  ( 
-                	MITM.this, 
-                	PasswordSniffer.class
-                  ) 
-                );
-                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-			}
-		}));
-
         mActions.add( new Action
         (
         	"Replace Images", 

@@ -28,9 +28,7 @@ import java.util.HashMap;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
-import it.evilsocket.dsploit.net.Stream;
-import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
-import it.evilsocket.dsploit.tools.TcpDump.PasswordReceiver;
+import it.evilsocket.dsploit.tools.Ettercap.OnAccountListener;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
@@ -39,7 +37,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.CheckBox;
 import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -48,11 +45,9 @@ import android.widget.ToggleButton;
 
 public class PasswordSniffer extends Activity 
 {
-	private static final String TAG			= "PASSWORDSNIFFER";
-	private static final String PCAP_FILTER = "not '(src host localhost or dst host localhost or arp)'";
+	private static final String TAG = "PASSWORDSNIFFER";
 	
 	private ToggleButton       mSniffToggleButton = null;
-	private CheckBox		   mSniffCookies	  = null;
 	private ProgressBar	       mSniffProgress     = null;
 	private ExpandableListView mListView		  = null;		
 	private ListViewAdapter	   mAdapter			  = null;
@@ -180,7 +175,6 @@ public class PasswordSniffer extends Activity
         
         mFileOutput		   = ( new File( System.getStoragePath(), System.getSettings().getString( "PREF_PASSWORD_FILENAME", "dsploit-password-sniff.log" ) ) ).getAbsolutePath();
         mSniffToggleButton = ( ToggleButton )findViewById( R.id.sniffToggleButton );
-        mSniffCookies	   = ( CheckBox )findViewById( R.id.cookieCheckBox );
         mSniffProgress	   = ( ProgressBar )findViewById( R.id.sniffActivity );
         mListView		   = ( ExpandableListView )findViewById( R.id.listView );
         mAdapter		   = new ListViewAdapter( this );
@@ -204,7 +198,6 @@ public class PasswordSniffer extends Activity
 
 	private void setStoppedState( ) {		
 		System.getEttercap().kill();
-		System.getTcpDump().kill();
 
 		try
 		{
@@ -227,7 +220,6 @@ public class PasswordSniffer extends Activity
 	private void setStartedState( ) {		
 		// never say never :)
 		System.getEttercap().kill();
-		System.getTcpDump().kill();
 		
 		try
 		{
@@ -241,43 +233,29 @@ public class PasswordSniffer extends Activity
 		}
 		
 		Toast.makeText( PasswordSniffer.this, "Logging to " + mFileOutput, Toast.LENGTH_LONG ).show();
-				
-		System.getEttercap().spoof( System.getCurrentTarget(), new OnReadyListener(){
-			@Override
-			public void onReady() {
-				System.setForwarding( true );
 
-				System.getTcpDump().sniffPasswords( PCAP_FILTER, new PasswordReceiver(){
+		System.getEttercap().spoofPasswords( System.getCurrentTarget(), new OnAccountListener() {			
+			@Override
+			public void onAccount( final String protocol, final String address, final String port, final String line ) {
+				PasswordSniffer.this.runOnUiThread( new Runnable() {
 					@Override
-					public void onAccountFound( final Stream stream, final String data ) {
+					public void run()
+					{							
+						try
+						{
+							mBufferedWriter.write( line + "\n" );
+						}
+						catch( IOException e )
+						{
+							System.errorLogging( TAG, e );
+						}
 						
-						PasswordSniffer.this.runOnUiThread( new Runnable() {
-							@Override
-							public void run()
-							{	
-								boolean bSniffCookies = mSniffCookies.isChecked();
-								
-								if( bSniffCookies == false && data.startsWith("COOKIES") )
-									return;
-								
-								try
-								{
-									mBufferedWriter.write( stream.endpoint.toString() + " :\n" + data + "\n\n" );
-								}
-								catch( IOException e )
-								{
-									System.errorLogging( TAG, e );
-								}
-								
-								mAdapter.addChild( stream.endpoint.toString(), data );
-							}							
-						});				
-					}
-					
-				}).start();
+						mAdapter.addChild( protocol, line );						
+					}							
+				});				
 			}
 		}).start();
-					
+		
 		mSniffProgress.setVisibility( View.VISIBLE );
 		mRunning = true;
 	}
