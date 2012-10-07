@@ -108,13 +108,14 @@ public class System
 			mUpdateManager = new UpdateManager( mContext );
 			mPlugins 	   = new ArrayList<Plugin>();
 			mTargets 	   = new ArrayList<Target>();
+			mNetwork 	   = new Network( mContext );
 			
 			// local network
-			mTargets.add( new Target( System.getNetwork() ) );
+			mTargets.add( new Target( mNetwork ) );
 			// network gateway
-			mTargets.add( new Target( System.getNetwork().getGatewayAddress(), System.getNetwork().getGatewayHardware() ) );
+			mTargets.add( new Target( mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware() ) );
 			// device network address
-			mTargets.add( new Target( System.getNetwork().getLocalAddress(), System.getNetwork().getLocalHardware() ) );
+			mTargets.add( new Target( mNetwork.getLocalAddress(), mNetwork.getLocalHardware() ) );
 			
 			mNmap     = new NMap( mContext );
 			mEttercap = new Ettercap( mContext );
@@ -144,7 +145,7 @@ public class System
 	}
 	
 	public static synchronized void errorLogging( String tag, Exception e ) {
-		setLastError( e.getMessage() );
+		setLastError( e.getMessage().isEmpty() ? e.toString() : e.getMessage() );
 		
 		Log.e( tag, e.toString() );
 		
@@ -495,9 +496,6 @@ public class System
 	}
 	
 	public static Network getNetwork() throws NoRouteToHostException, SocketException {
-		if( mNetwork == null )
-			mNetwork = new Network( mContext );
-		
 		return mNetwork;
 	}
 	

@@ -25,6 +25,7 @@ import java.net.NetworkInterface;
 import java.net.NoRouteToHostException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Enumeration;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -82,7 +83,45 @@ public class Network
 			throw new NoRouteToHostException("Not connected to any WiFi access point.");
 		
 		else
-			mInterface = NetworkInterface.getByInetAddress( getLocalAddress() );		
+		{
+			try
+			{
+				mInterface = NetworkInterface.getByInetAddress( getLocalAddress() );
+			}
+			catch( SocketException e )
+			{
+				System.errorLogging( TAG, e );
+				
+				/*
+				 * Issue #26: Initialization error in ColdFusionX ROM
+				 * 
+				 * It seems it's a ROM issue which doesn't correctly populate device descriptors.
+				 * This rom maps the default wifi interface to a generic usb device 
+				 * ( maybe it's missing the specific interface driver ), which is obviously not, and
+				 * it all goes shit, use an alternative method to obtain the interface object.
+				 */
+				Enumeration<NetworkInterface> interfaces   = NetworkInterface.getNetworkInterfaces();
+				InetAddress					  ifaceAddress = getLocalAddress();
+				
+				while( interfaces != null && mInterface == null && interfaces.hasMoreElements() ) 
+				{
+					NetworkInterface iface = interfaces.nextElement();
+					//since each interface could have many InetAddresses…
+					Enumeration<InetAddress> inetAddresses = iface.getInetAddresses();
+					
+					while( inetAddresses.hasMoreElements() ) 
+					{
+						InetAddress address = inetAddresses.nextElement();
+
+						if( address.equals(ifaceAddress) )
+						{
+							mInterface = iface;
+							break;
+						}
+					}
+				}
+			}
+		}
 	}
 			
 	private static int countBits( int n ){

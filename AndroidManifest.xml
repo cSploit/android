@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="it.evilsocket.dsploit"
     android:versionCode="1"
-    android:versionName="1.0.13b" >
+    android:versionName="1.0.14b" >
 
     <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="15" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
