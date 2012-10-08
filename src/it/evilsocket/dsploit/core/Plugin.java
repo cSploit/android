@@ -20,6 +20,7 @@ package it.evilsocket.dsploit.core;
 
 import com.actionbarsherlock.app.SherlockActivity;
 
+import android.content.Context;
 import android.os.Bundle;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.net.Target;
@@ -28,6 +29,8 @@ import it.evilsocket.dsploit.net.Target.Vulnerability;
 
 public abstract class Plugin extends SherlockActivity 
 {
+	public static final int NO_LAYOUT = -1;
+	
 	private String        mName				  = null;
 	private String		  mDescription		  = null;
 	private Target.Type[] mAllowedTargetTypes = null;
@@ -69,6 +72,14 @@ public abstract class Plugin extends SherlockActivity
 		
 		return false;
 	}	
+	
+	public boolean hasLayoutToShow() {
+		return mLayoutId != -1;
+	}
+	
+	public void onActionClick( Context context ){
+		
+	}
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {

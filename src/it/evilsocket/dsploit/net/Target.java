@@ -463,6 +463,19 @@ public class Target
 			return "???";
 	}
 	
+	public boolean isRouter() {
+		try
+		{
+			return ( mType == Type.ENDPOINT && mEndpoint.getAddress().equals( System.getNetwork().getGatewayAddress() ) );
+		}
+		catch( Exception e )
+		{
+			System.errorLogging( TAG, e );
+		}
+		
+		return false;
+	}
+	
 	public int getDrawableResourceId( )
 	{
 		try
@@ -471,7 +484,7 @@ public class Target
 				return R.drawable.target_network_48;
 			
 			else if( mType == Type.ENDPOINT )
-				if( mEndpoint.getAddress().equals( System.getNetwork().getGatewayAddress() ) )
+				if( isRouter() )
 					return R.drawable.target_router_48;
 			
 				else if( mEndpoint.getAddress().equals( System.getNetwork().getLocalAddress() ) )

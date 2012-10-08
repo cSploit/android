@@ -119,17 +119,22 @@ public class ActionActivity extends ListActivity
 		
 		System.setCurrentPlugin( plugin );
 
-		Toast.makeText( ActionActivity.this, "Selected " + plugin.getName(), Toast.LENGTH_SHORT ).show();
-    	
-    	startActivity
-        ( 
-          new Intent
-          ( 
-            ActionActivity.this, 
-            plugin.getClass()
-          ) 
-        );
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+		if( plugin.hasLayoutToShow() )
+		{
+			Toast.makeText( ActionActivity.this, "Selected " + plugin.getName(), Toast.LENGTH_SHORT ).show();
+	    	
+	    	startActivity
+	        ( 
+	          new Intent
+	          ( 
+	            ActionActivity.this, 
+	            plugin.getClass()
+	          ) 
+	        );
+	        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+		}
+		else
+			plugin.onActionClick( this );
 	}
 
 	@Override
