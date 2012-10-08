@@ -145,37 +145,46 @@ public class System
 	}
 	
 	public static synchronized void errorLogging( String tag, Exception e ) {
-		setLastError( e.getMessage().isEmpty() ? e.toString() : e.getMessage() );
+		String message  = "Unknown error.",
+			   trace    = "Unknown trace.",
+    		   filename = ( new File( Environment.getExternalStorageDirectory().toString(), ERROR_LOG_FILENAME ) ).getAbsolutePath();
 		
-		Log.e( tag, e.toString() );
-		
-		Writer		sWriter = new StringWriter();
-        PrintWriter pWriter = new PrintWriter( sWriter );
-        String      sTrace  = "",
-        		    sOutput = ( new File( Environment.getExternalStorageDirectory().toString(), ERROR_LOG_FILENAME ) ).getAbsolutePath();
-        
-        e.printStackTrace( pWriter );
-        
-        sTrace = sWriter.toString();
-        
-        Log.e( tag, sTrace );
-        
-		if( mContext != null && getSettings().getBoolean( "PREF_DEBUG_ERROR_LOGGING", false ) == true )
-		{				        
-	        try
-			{
-	        	FileWriter 	   fWriter = new FileWriter( sOutput );
-	        	BufferedWriter bWriter = new BufferedWriter( fWriter );
-	        	
-	        	bWriter.write( sTrace );
-	        	
-	        	bWriter.close();
-			}
-			catch( IOException ioe )
-			{
-				Log.e( TAG, ioe.toString() );
+		if( e != null )
+		{
+			if( e.getMessage() != null && e.getMessage().isEmpty() == false )
+				message = e.getMessage();
+			
+			else if( e.toString() != null )
+				message = e.toString();
+			
+			Writer		sWriter = new StringWriter();
+	        PrintWriter pWriter = new PrintWriter( sWriter );
+	        	        
+	        e.printStackTrace( pWriter );
+	        
+	        trace  = sWriter.toString();
+	        
+	        if( mContext != null && getSettings().getBoolean( "PREF_DEBUG_ERROR_LOGGING", false ) == true )
+			{				        
+		        try
+				{
+		        	FileWriter 	   fWriter = new FileWriter( filename );
+		        	BufferedWriter bWriter = new BufferedWriter( fWriter );
+		        	
+		        	bWriter.write( trace  );
+		        	
+		        	bWriter.close();
+				}
+				catch( IOException ioe )
+				{
+					Log.e( TAG, ioe.toString() );
+				}
 			}
 		}
+
+		setLastError( message );		
+		Log.e( tag, message);
+		Log.e( tag, trace  );        
 	}
 	
 	private static void preloadServices( ) {

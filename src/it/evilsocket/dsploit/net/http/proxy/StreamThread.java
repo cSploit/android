@@ -58,14 +58,11 @@ public class StreamThread implements Runnable
     	
     	try 
     	{
-    		while( ( read = mReader.read( chunk, 0, CHUNK_SIZE ) ) > 0 )
+    		while( ( read = mReader.read( chunk, 0, CHUNK_SIZE ) ) > 0 && size < max )
     		{
     			mBuffer.append( chunk, read );
     			
     			size += read;
-    			
-    			if( size >= max )
-    				throw new RuntimeException( "Max buffer size reached." );
     		}
     		
     		if( mBuffer.isEmpty() == false )
