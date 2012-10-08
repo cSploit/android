@@ -75,7 +75,7 @@ public class NMap extends Tool
 	}
 	
 	public Thread findAliveEndpoints( Network network, FindAliveEndpointsOutputReceiver receiver ) {	
-		return super.async( "-n -sP --system-dns " + network.getNetworkRepresentation() , receiver );
+		return super.async( "--max-retries 1 --max-rtt-timeout 250ms -sn -n -T4 --system-dns " + network.getNetworkRepresentation() , receiver );
 	}
 	
 	public static abstract class SynScanOutputReceiver implements OutputReceiver
@@ -110,9 +110,9 @@ public class NMap extends Tool
 	public static abstract class InspectionReceiver implements OutputReceiver
 	{
 		private static final Pattern OPEN_PORT_PATTERN    = Pattern.compile( "^discovered open port (\\d+)/([^\\s]+).+", Pattern.CASE_INSENSITIVE );
-		private static final Pattern SERVICE_PATTERN  	   = Pattern.compile( "^(\\d+)/([a-z]+)\\s+[a-z]+\\s+[a-z]+\\s+(.*)$", Pattern.CASE_INSENSITIVE );		
-		private static final Pattern OS_PATTERN	   	   = Pattern.compile( "^Running:\\s+(.+)$", Pattern.CASE_INSENSITIVE );
-		private static final Pattern OS_GUESS_PATTERN 	   = Pattern.compile( "^Running\\s+\\(JUST\\s+GUESSING\\):\\s+(.+)$", Pattern.CASE_INSENSITIVE );
+		private static final Pattern SERVICE_PATTERN  	  = Pattern.compile( "^(\\d+)/([a-z]+)\\s+[a-z]+\\s+[a-z]+\\s+(.*)$", Pattern.CASE_INSENSITIVE );		
+		private static final Pattern OS_PATTERN	   	      = Pattern.compile( "^Running:\\s+(.+)$", Pattern.CASE_INSENSITIVE );
+		private static final Pattern OS_GUESS_PATTERN 	  = Pattern.compile( "^Running\\s+\\(JUST\\s+GUESSING\\):\\s+(.+)$", Pattern.CASE_INSENSITIVE );
 		private static final Pattern SERVICE_INFO_PATTERN = Pattern.compile( "^Service\\s+Info:\\s+OS:\\s+([^;]+).*$", Pattern.CASE_INSENSITIVE );		
 		private static final Pattern DEVICE_PATTERN       = Pattern.compile( "^Device\\s+type:\\s+(.+)$", Pattern.CASE_INSENSITIVE );
 		
