@@ -18,6 +18,8 @@
  */
 package it.evilsocket.dsploit.gui.dialogs;
 
+import java.util.ArrayList;
+
 import it.evilsocket.dsploit.R;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -30,7 +32,7 @@ public class CustomFilterDialog extends AlertDialog
 {
 	public interface CustomFilterDialogListener
 	{
-		public void onInputEntered( String from, String to );
+		public void onInputEntered( ArrayList<String> from, ArrayList<String> to );
 	}
 	
 	public CustomFilterDialog( String title, Activity activity, final CustomFilterDialogListener listener ){
@@ -43,8 +45,49 @@ public class CustomFilterDialog extends AlertDialog
 
 		this.setButton( "Ok", new DialogInterface.OnClickListener() {
             public void onClick( DialogInterface dialog, int id ) {
-            	String from = ( ( EditText )view.findViewById( R.id.fromText ) ).getText().toString();
-				String to   = ( ( EditText )view.findViewById( R.id.toText ) ).getText().toString();
+				String f0 = ( ( EditText )view.findViewById( R.id.fromText0 ) ).getText().toString().trim(),
+					   f1 = ( ( EditText )view.findViewById( R.id.fromText1 ) ).getText().toString().trim(),
+					   f2 = ( ( EditText )view.findViewById( R.id.fromText2 ) ).getText().toString().trim(),
+					   f3 = ( ( EditText )view.findViewById( R.id.fromText3 ) ).getText().toString().trim(),
+					   f4 = ( ( EditText )view.findViewById( R.id.fromText4 ) ).getText().toString().trim(),
+					   t0 = ( ( EditText )view.findViewById( R.id.toText0 ) ).getText().toString().trim(),
+					   t1 = ( ( EditText )view.findViewById( R.id.toText1 ) ).getText().toString().trim(),
+					   t2 = ( ( EditText )view.findViewById( R.id.toText2 ) ).getText().toString().trim(),
+					   t3 = ( ( EditText )view.findViewById( R.id.toText3 ) ).getText().toString().trim(),
+					   t4 = ( ( EditText )view.findViewById( R.id.toText4 ) ).getText().toString().trim();
+				
+				ArrayList<String> from = new ArrayList<String>(),
+								  to   = new ArrayList<String>();
+				
+				if( f0.isEmpty() == false && t0.isEmpty() == false )
+				{
+					from.add( f0 );
+					to.add( t0 );
+				}
+				
+				if( f1.isEmpty() == false && t1.isEmpty() == false )
+				{
+					from.add( f1 );
+					to.add( t1 );
+				}
+
+				if( f2.isEmpty() == false && t2.isEmpty() == false )
+				{
+					from.add( f2 );
+					to.add( t2 );
+				}
+				
+				if( f3.isEmpty() == false && t3.isEmpty() == false )
+				{
+					from.add( f3 );
+					to.add( t3 );
+				}
+				
+				if( f4.isEmpty() == false && t4.isEmpty() == false )
+				{
+					from.add( f4 );
+					to.add( t4 );
+				}
 				
 				listener.onInputEntered( from, to );
             }

@@ -502,26 +502,29 @@ public class MITM extends Plugin
 					
 					new CustomFilterDialog( "Custom Filter", MITM.this, new CustomFilterDialogListener(){
 						@Override
-						public void onInputEntered( String from, String to ) {
-							from = from.trim();
-							to   = to.trim();
+						public void onInputEntered( ArrayList<String> from, ArrayList<String> to ) {
 							
-							if( from.isEmpty() == false )
+							if( from.isEmpty() == false && to.isEmpty() == false )
 							{
 								try 
 								{
-						            Pattern.compile( from );
-						            
-						            activity.setVisibility( View.VISIBLE );
+									for( String exp : from )
+									{
+										Pattern.compile( exp );
+									}
+									
+									activity.setVisibility( View.VISIBLE );
 									
 									Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
 													
-									HTTPFilter.start( System.getProxy(), from, to );			
-						        } 
+									HTTPFilter.start( System.getProxy(), from, to );	
+								} 
 								catch( PatternSyntaxException e ) 
 								{
 									new ErrorDialog( "Error", "Invalid regular expression: " + e.getDescription() + " .", MITM.this ).show();
-						        }								 									
+						        }	
+								
+								
 							}
 							else
 								new ErrorDialog( "Error", "Invalid regular expression.", MITM.this ).show();

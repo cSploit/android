@@ -18,26 +18,24 @@
  */
 package it.evilsocket.dsploit.plugins.mitm;
 
+import java.util.ArrayList;
+
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.http.proxy.Proxy;
+import it.evilsocket.dsploit.net.http.proxy.Proxy.ProxyFilter;
 import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
 
 
 public class HTTPFilter 
 {
-	public static void start( final Proxy proxy, final String from, final String to ) {
+	public static void start( final Proxy proxy, final ProxyFilter filter ) {
 		System.getEttercap().spoof( System.getCurrentTarget(), new OnReadyListener(){
 			@Override
 			public void onReady() 
 			{
 				System.setForwarding( true );
 				
-				proxy.setFilter( new Proxy.ProxyFilter() {					
-					@Override
-					public String onHtmlReceived(String html) {
-						return html.replaceAll( from, to );
-					}
-				});
+				proxy.setFilter( filter );
 				
 				new Thread( proxy ).start();
 				
@@ -45,6 +43,31 @@ public class HTTPFilter
 			}
 			
 		}).start();				
+	}
+	
+	public static void start( final Proxy proxy, final String from, final String to ) {
+		start( proxy, new ProxyFilter() 
+		{					
+			@Override
+			public String onHtmlReceived( String html ) {
+				return html.replaceAll( from, to );
+			}
+		});			
+	}
+	
+	public static void start( final Proxy proxy, final ArrayList<String> from, final ArrayList<String> to ) {
+		start( proxy, new ProxyFilter() 
+		{					
+			@Override
+			public String onHtmlReceived( String html ) {
+				for( int i = 0; i < from.size(); i++ )
+				{
+					html = html.replaceAll( from.get( i ), to.get( i ) );
+				}
+				
+				return html;
+			}
+		});		
 	}
 	
 	public static void stop( Proxy proxy ){
