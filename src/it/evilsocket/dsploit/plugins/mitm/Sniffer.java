@@ -22,11 +22,13 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
+
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.Html;
@@ -40,7 +42,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-public class Sniffer extends Activity 
+public class Sniffer extends SherlockActivity
 {
 	private static final String  TAG		 = "SNIFFER";
 	private static final String  PCAP_FILTER = "not '(src host localhost or dst host localhost or arp)'";
@@ -93,11 +95,11 @@ public class Sniffer extends Activity
 			return mStats.get( address );
 		}
 		
-		public void addStats( AddressStats stats ) {
+		public synchronized void addStats( AddressStats stats ) {
 			mStats.put( stats.mAddress, stats );
 		}
 						
-		private AddressStats getByPosition( int position ) {
+		private synchronized AddressStats getByPosition( int position ) {
 			return mStats.get( mStats.keySet().toArray()[ position ] );
 		}
 				
@@ -176,6 +178,7 @@ public class Sniffer extends Activity
         super.onCreate(savedInstanceState);        
         setTitle( System.getCurrentTarget() + " > MITM > Sniffer" );
         setContentView( R.layout.plugin_mitm_sniffer );
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         
         mSniffToggleButton = ( ToggleButton )findViewById( R.id.sniffToggleButton );
         mSniffProgress	   = ( ProgressBar )findViewById( R.id.sniffActivity );
@@ -198,6 +201,22 @@ public class Sniffer extends Activity
 				}
 			}} 
 		);        
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected( MenuItem item ) 
+	{    
+		switch( item.getItemId() ) 
+		{        
+			case android.R.id.home:            
+	         
+				onBackPressed();
+				
+				return true;
+	    	  
+			default:            
+				return super.onOptionsItemSelected(item);    
+	   }
 	}
 
 	private void setStoppedState( ) {		

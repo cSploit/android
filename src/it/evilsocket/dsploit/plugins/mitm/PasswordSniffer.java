@@ -25,11 +25,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
+
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
 import it.evilsocket.dsploit.tools.Ettercap.OnAccountListener;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -43,7 +45,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-public class PasswordSniffer extends Activity 
+public class PasswordSniffer extends SherlockActivity 
 {
 	private static final String TAG = "PASSWORDSNIFFER";
 	
@@ -172,6 +174,7 @@ public class PasswordSniffer extends Activity
         super.onCreate(savedInstanceState);        
         setTitle( System.getCurrentTarget() + " > MITM > Password Sniffer" );
         setContentView( R.layout.plugin_mitm_password_sniffer );
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         
         mFileOutput		   = ( new File( System.getStoragePath(), System.getSettings().getString( "PREF_PASSWORD_FILENAME", "dsploit-password-sniff.log" ) ) ).getAbsolutePath();
         mSniffToggleButton = ( ToggleButton )findViewById( R.id.sniffToggleButton );
@@ -194,6 +197,22 @@ public class PasswordSniffer extends Activity
 				}
 			}} 
 		);        
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected( MenuItem item ) 
+	{    
+		switch( item.getItemId() ) 
+		{        
+			case android.R.id.home:            
+	         
+				onBackPressed();
+				
+				return true;
+	    	  
+			default:            
+				return super.onOptionsItemSelected(item);    
+	   }
 	}
 
 	private void setStoppedState( ) {		

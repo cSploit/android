@@ -50,9 +50,13 @@ import android.content.IntentFilter;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -117,10 +121,22 @@ public class MainActivity extends SherlockListActivity
 	        }
 	        
 	        Target target = System.getTarget( position );
-	        	
-        	holder.itemImage.setImageResource( target.getDrawableResourceId() );
-        	holder.itemTitle.setText( target.toString() );
+	        
+	        if( target.hasAlias() == true )
+	        {
+	        	holder.itemTitle.setText
+	        	(
+	    			Html.fromHtml
+		        	(
+		        	  "<b>" + target.getAlias() + "</b> <small>( " + target.getDisplayAddress() +" )</small>"
+		  			)	
+	        	);
+	        }
+	        else
+	        	holder.itemTitle.setText( target.toString() );
+	        
         	holder.itemTitle.setTypeface( null, Typeface.NORMAL );
+        	holder.itemImage.setImageResource( target.getDrawableResourceId() );
         	holder.itemDescription.setText( target.getDescription() );
         		       	       	        
 	        return row;
@@ -189,6 +205,34 @@ public class MainActivity extends SherlockListActivity
 								mTargetAdapter = new TargetAdapter( R.layout.target_list_item );
 						    	
 								setListAdapter( mTargetAdapter );	
+								
+								getListView().setOnItemLongClickListener( new OnItemLongClickListener() 
+								{
+									@Override
+									public boolean onItemLongClick( AdapterView<?> parent, View view, int position, long id ) {
+										Log.d( "MAIN", "long click" );
+									
+										final Target target = System.getTarget( position );
+										
+										new InputDialog
+										( 
+										  "Target Alias", 
+										  "Set an alias for this target:", 
+										  target.hasAlias() ? target.getAlias() : "",
+										  true,
+										  MainActivity.this, 
+										  new InputDialogListener(){
+											@Override
+											public void onInputEntered( String input ) {
+												target.setAlias(input);			
+												mTargetAdapter.notifyDataSetChanged();
+											}
+										  }
+										).show();
+																				
+										return false;
+									}
+								});
 								
 								mMessageReceiver = new BroadcastReceiver() {
 									@Override
@@ -489,9 +533,9 @@ public class MainActivity extends SherlockListActivity
             ActionActivity.class
           ) 
         );
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);                
 	}
-
+	
 	@Override
 	public void onDestroy() {				
 		stopService( new Intent( MainActivity.this, NetworkMonitorService.class ) );
@@ -500,7 +544,7 @@ public class MainActivity extends SherlockListActivity
 			unregisterReceiver( mMessageReceiver );
 		
 		// make sure no zombie process is running before destroying the activity
-		System.clean();			
+		System.clean( true );			
 		
 		super.onDestroy();
 		

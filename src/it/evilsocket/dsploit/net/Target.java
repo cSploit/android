@@ -172,6 +172,7 @@ public class Target
 	private List<Port>  mPorts	                              			 = new ArrayList<Port>();
 	private String		mDeviceType										 = null;
 	private String		mDeviceOS										 = null;
+	private String		mAlias											 = null;
 	private HashMap< String, ArrayList<Vulnerability> > mVulnerabilities = new HashMap< String, ArrayList<Vulnerability> >();
 	
 	public static Target getFromString( String string ){
@@ -257,6 +258,8 @@ public class Target
 		mDeviceType = mDeviceType.equals("null") ? null : mDeviceType;
 		mDeviceOS   = reader.readLine();
 		mDeviceOS   = mDeviceOS.equals("null") ? null : mDeviceOS;
+		mAlias      = reader.readLine();
+		mAlias      = mAlias.equals("null") ? null : mAlias;
 		
 		if( mType == Type.NETWORK )
 		{
@@ -309,6 +312,7 @@ public class Target
 		builder.append( mType + "\n" );
 		builder.append( mDeviceType + "\n" );
 		builder.append( mDeviceOS + "\n" );
+		builder.append( mAlias + "\n" );
 		
 		// a network can't be saved in a session file
 		if( mType == Type.NETWORK )
@@ -340,6 +344,18 @@ public class Target
 			else
 				builder.append( "0\n" );
 		}				
+	}
+	
+	public void setAlias( String alias ) {
+		mAlias = alias.trim();
+	}
+	
+	public String getAlias( ) {
+		return mAlias;
+	}
+	
+	public boolean hasAlias( ) {
+		return mAlias != null && mAlias.isEmpty() == false;
 	}
 	
 	public boolean comesAfter( Target target ){
@@ -400,8 +416,8 @@ public class Target
 		
 		return false;
 	}
-
-	public String toString( ){
+	
+	public String getDisplayAddress() {
 		if( mType == Type.NETWORK )
 			return mNetwork.getNetworkRepresentation();
 		
@@ -413,6 +429,14 @@ public class Target
 		
 		else
 			return "???";
+	}
+
+	public String toString( ){
+		if( hasAlias() == true )
+			return mAlias;
+		
+		else 
+			return getDisplayAddress();
 	}
 	
 	public String getDescription(){

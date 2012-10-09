@@ -19,6 +19,7 @@
 package it.evilsocket.dsploit.core;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -85,7 +86,24 @@ public abstract class Plugin extends SherlockActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);     
         setTitle( System.getCurrentTarget() + " > " + mName );
-        setContentView( mLayoutId );        
+        setContentView( mLayoutId );     
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected( MenuItem item ) 
+	{    
+		switch( item.getItemId() ) 
+		{        
+			case android.R.id.home:            
+	         
+				onBackPressed();
+				
+				return true;
+	    	  
+			default:            
+				return super.onOptionsItemSelected(item);    
+	   }
 	}
 	
 	@Override

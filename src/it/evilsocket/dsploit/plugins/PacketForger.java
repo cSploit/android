@@ -226,7 +226,7 @@ public class PacketForger extends Plugin implements OnClickListener
 			
 		}
 		
-		if( errorMessage != null )
+		if( errorMessage != null && !isFinishing() )
 			new ErrorDialog( "Error", errorMessage, this ).show();
 	}
 	

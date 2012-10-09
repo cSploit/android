@@ -46,7 +46,11 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiManager.WifiLock;
 import android.os.Environment;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import it.evilsocket.dsploit.net.Endpoint;
@@ -78,6 +82,8 @@ public class System
 	private static String				 mLastError		= "";
 	private static UpdateManager		 mUpdateManager = null;
 	private static Context 			     mContext  	    = null;
+	private static WifiLock				 mWifiLock		= null;
+	private static WakeLock				 mWakeLock		= null;
 	private static Network 			     mNetwork  	    = null;
 	private static ArrayList<Target>     mTargets		= null;
 	private static int  			     mCurrentTarget = 0;
@@ -109,6 +115,21 @@ public class System
 			mPlugins 	   = new ArrayList<Plugin>();
 			mTargets 	   = new ArrayList<Target>();
 			mNetwork 	   = new Network( mContext );
+			
+			// if we are here, network initialization didn't throw any error, lock wifi
+			WifiManager wifiManager = ( WifiManager )mContext.getSystemService( Context.WIFI_SERVICE );
+			
+			mWifiLock = wifiManager.createWifiLock( WifiManager.WIFI_MODE_FULL, "wifiLock" );
+			mWifiLock.acquire();
+			
+			// wake lock if enabled
+			if( getSettings().getBoolean( "PREF_WAKE_LOCK", true ) == true )
+			{
+				PowerManager powerManager = ( PowerManager )mContext.getSystemService( Context.POWER_SERVICE );
+				
+				mWakeLock = powerManager.newWakeLock( PowerManager.PARTIAL_WAKE_LOCK, "wakeLock" );
+				mWakeLock.acquire();
+			}
 			
 			// local network
 			mTargets.add( new Target( mNetwork ) );
@@ -689,17 +710,28 @@ public class System
 		}
 	}
 		
-	public static void clean() {
+	public static void clean( boolean releaseLocks ) {
 		setForwarding( false );
 
 		try
-		{
+		{						
 			String tools = "";
 			for( String tool : ToolsInstaller.TOOLS )
 				tools += tool + " ";
 			
 			Log.d( TAG, "Killing any running instance of " + tools );
-			Shell.exec( "killall -9 " + tools.trim() );							
+			Shell.exec( "killall -9 " + tools.trim() );			
+			
+			if( releaseLocks == true )
+			{
+				Log.d( TAG, "Releasing locks." );
+				
+				if( mWifiLock != null && mWifiLock.isHeld() )
+					mWifiLock.release();
+				
+				if( mWakeLock != null && mWakeLock.isHeld() )
+					mWakeLock.release();
+			}
 		}
 		catch( Exception e )
 		{ 

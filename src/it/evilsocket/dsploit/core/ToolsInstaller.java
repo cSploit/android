@@ -76,7 +76,7 @@ public class ToolsInstaller
 		Log.d( TAG, "Installing tools ..." );
 		
 		// Avoid some binary file being busy as a running process.
-		System.clean();
+		System.clean( false );
 		
 		ZipInputStream   zipInput;
 		ZipEntry 		 zipEntry;

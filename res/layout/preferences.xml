@@ -16,6 +16,12 @@
             android:title="Show Network Notifications" />
         
         <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="PREF_WAKE_LOCK"
+            android:summary="Prevents the device going in sleep mode while the application is running."
+            android:title="Wake Lock" />
+        
+        <CheckBoxPreference
             android:defaultValue="false"
             android:key="PREF_DEBUG_ERROR_LOGGING"
             android:summary="Enable or disable error logging on a debug file."

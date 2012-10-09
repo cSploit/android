@@ -20,10 +20,12 @@ package it.evilsocket.dsploit;
 
 import java.util.ArrayList;
 
+import com.actionbarsherlock.app.SherlockListActivity;
+import com.actionbarsherlock.view.MenuItem;
+
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.gui.dialogs.FinishDialog;
-import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -36,7 +38,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ActionActivity extends ListActivity 
+public class ActionActivity extends SherlockListActivity 
 {
 	private static final int LAYOUT = R.layout.actions_layout;
 	
@@ -100,8 +102,9 @@ public class ActionActivity extends ListActivity
         if( System.getCurrentTarget() != null )
         {
 	        setTitle( "dSploit > " + System.getCurrentTarget() );
-	        setContentView( LAYOUT );
-	        
+	        setContentView( LAYOUT );	        
+	        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+	        	        	        
 	        mAvailable 		= System.getPluginsForTarget();
 	        mActionsAdapter = new ActionsAdapter( R.layout.actions_list_item );
 	        
@@ -112,17 +115,33 @@ public class ActionActivity extends ListActivity
 	}
 	
 	@Override
+	public boolean onOptionsItemSelected( MenuItem item ) 
+	{    
+		switch( item.getItemId() ) 
+		{        
+			case android.R.id.home:            
+	         
+				onBackPressed();
+				
+				return true;
+	    	  
+			default:            
+				return super.onOptionsItemSelected(item);    
+	   }
+	}
+	
+	@Override
 	protected void onListItemClick( ListView l, View v, int position, long id ){
 		super.onListItemClick( l, v, position, id);
-		
+				
 		Plugin plugin = mAvailable.get( position );
-		
+				
 		System.setCurrentPlugin( plugin );
-
+		
 		if( plugin.hasLayoutToShow() )
 		{
 			Toast.makeText( ActionActivity.this, "Selected " + plugin.getName(), Toast.LENGTH_SHORT ).show();
-	    	
+	    				
 	    	startActivity
 	        ( 
 	          new Intent
@@ -133,7 +152,7 @@ public class ActionActivity extends ListActivity
 	        );
 	        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
 		}
-		else
+		else			
 			plugin.onActionClick( this );
 	}
 
