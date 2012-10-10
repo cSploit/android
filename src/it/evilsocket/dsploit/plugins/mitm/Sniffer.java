@@ -291,11 +291,11 @@ public class Sniffer extends SherlockActivity
 									}									
 								}
 								
-								mAdapter.addStats( stats );
-								
+								final AddressStats fstats = stats;
 								Sniffer.this.runOnUiThread( new Runnable() {
 									@Override
 									public void run(){
+										mAdapter.addStats( fstats );
 										mAdapter.notifyDataSetChanged();
 									}							
 								});			

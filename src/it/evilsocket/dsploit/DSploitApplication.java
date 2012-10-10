@@ -42,7 +42,9 @@ import android.app.Application;
 public class DSploitApplication extends Application 
 {
 	@Override
-	public void onCreate() {
+	public void onCreate() {		
+		super.onCreate();
+		
 		ACRA.init( this );
 
 		// initialize the system
@@ -61,8 +63,6 @@ public class DSploitApplication extends Application
 		catch( Exception e )
 		{
 			System.errorLogging( "DSPLOIT", e );
-		}
-		        
-		super.onCreate();
+		}		        		
 	}
 }
