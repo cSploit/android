@@ -167,9 +167,10 @@ public class Network
 	
 	public String getNetworkRepresentation( )
 	{				
-		int bits = countBits( mInfo.netmask );
+        int bits 	= countBits( mInfo.netmask );
+        int network = mInfo.gateway & mInfo.netmask;
     	
-    	return ( mInfo.gateway & 0xFF) + "." + (( mInfo.gateway >> 8 ) & 0xFF) + "." + (( mInfo.gateway >> 16 ) & 0xFF) + ".0/" + bits;
+    	return ( network & 0xFF) + "." + (( network >> 8 ) & 0xFF) + "." + (( network >> 16 ) & 0xFF) + "." + (( network >> 24 ) & 0xFF) + "/" + bits;
 	}
 	
 	public DhcpInfo getInfo(){
