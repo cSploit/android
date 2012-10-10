@@ -32,11 +32,13 @@ public class Proxy implements Runnable
 	private static final String TAG     = "HTTP.PROXY";
 	private static final int    BACKLOG = 10;
 	
-	private InetAddress  		   mAddress = null;
-	private int     	 		   mPort    = System.HTTP_PROXY_PORT;
-	private boolean 	 		   mRunning = false;
-	private ServerSocket 		   mSocket  = null;
-	private ArrayList<ProxyFilter> mFilters = null;
+	private InetAddress  		   mAddress 	 = null;
+	private int     	 		   mPort    	 = System.HTTP_PROXY_PORT;
+	private boolean 	 		   mRunning 	 = false;
+	private ServerSocket 		   mSocket  	 = null;
+	private ArrayList<ProxyFilter> mFilters 	 = null;
+	private String				   mHostRedirect = null;
+	private int					   mPortRedirect = 80;
 	
 	public static interface ProxyFilter
 	{
@@ -54,9 +56,16 @@ public class Proxy implements Runnable
 		this( InetAddress.getByName( address ), port );
 	}
 	
+	public void setRedirection( String host, int port ){
+		mHostRedirect = host;
+		mPortRedirect = port;
+	}
+	
 	public void setFilter( ProxyFilter filter ){
 		mFilters.clear();
-		mFilters.add( filter );
+		
+		if( filter != null )
+			mFilters.add( filter );
 	}
 	
 	public void addFilter( ProxyFilter filter ){
@@ -97,7 +106,7 @@ public class Proxy implements Runnable
 				{
 					Socket client = mSocket.accept();
 					
-					new ProxyThread( client, mFilters ).start();
+					new ProxyThread( client, mFilters, mHostRedirect, mPortRedirect ).start();
 				}
 				catch( IOException e )
 				{

@@ -106,7 +106,7 @@ public class System
 	
 	private static String				 mStoragePath   = null;
 	private static String				 mSessionName	= null;
-		
+
 	public static void init( Context context ) throws Exception {
 		mContext = context;		
 		try
@@ -115,7 +115,7 @@ public class System
 			mPlugins 	   = new ArrayList<Plugin>();
 			mTargets 	   = new ArrayList<Target>();
 			mNetwork 	   = new Network( mContext );
-			
+								
 			// if we are here, network initialization didn't throw any error, lock wifi
 			WifiManager wifiManager = ( WifiManager )mContext.getSystemService( Context.WIFI_SERVICE );
 			
@@ -136,8 +136,9 @@ public class System
 			// network gateway
 			mTargets.add( new Target( mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware() ) );
 			// device network address
-			mTargets.add( new Target( mNetwork.getLocalAddress(), mNetwork.getLocalHardware() ) );
-			
+			Target device = new Target( mNetwork.getLocalAddress(), mNetwork.getLocalHardware() );			
+			mTargets.add( device );
+						
 			mNmap     = new NMap( mContext );
 			mEttercap = new Ettercap( mContext );
 			mIptables = new IPTables( );
@@ -207,7 +208,7 @@ public class System
 		Log.e( tag, message);
 		Log.e( tag, trace  );        
 	}
-	
+		
 	private static void preloadServices( ) {
 		if( mServices == null || mPorts == null )
 		{
@@ -721,7 +722,7 @@ public class System
 			
 			Log.d( TAG, "Killing any running instance of " + tools );
 			Shell.exec( "killall -9 " + tools.trim() );			
-			
+
 			if( releaseLocks == true )
 			{
 				Log.d( TAG, "Releasing locks." );

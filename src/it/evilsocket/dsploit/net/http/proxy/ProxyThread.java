@@ -53,14 +53,18 @@ public class ProxyThread extends Thread
 	private InputStream			 	 	 mServerReader = null;
 	private OutputStream		 		 mServerWriter = null;
 	private ArrayList<Proxy.ProxyFilter> mFilters 	   = null;
+	private String				  		 mHostRedirect = null;
+	private int					   		 mPortRedirect = 80;
 	
-	public ProxyThread( Socket socket, ArrayList<Proxy.ProxyFilter> filters ) throws IOException {
+	public ProxyThread( Socket socket, ArrayList<Proxy.ProxyFilter> filters, String hostRedirection, int portRedirection ) throws IOException {
 		super( "ProxyThread" );
 		
-		mSocket  = socket;
-		mWriter  = new BufferedOutputStream( mSocket.getOutputStream() );
-		mReader  = mSocket.getInputStream();
-		mFilters = filters;		
+		mSocket  	  = socket;
+		mWriter  	  = new BufferedOutputStream( mSocket.getOutputStream() );
+		mReader  	  = mSocket.getInputStream();
+		mFilters 	  = filters;		
+		mHostRedirect = hostRedirection;
+		mPortRedirect = portRedirection;
 	}
 
 	public void run() {
@@ -109,8 +113,17 @@ public class ProxyThread extends Thread
 							// Extract the real request target and connect to it.
 		            		else if( header.equals( HOST_HEADER ) )
 		            		{
-		            			mServerName   = value;										
-								mServer 	  = new Socket( mServerName, SERVER_PORT );
+		            			if( mHostRedirect == null )
+		            			{
+		            				mServerName = value;										
+		            				mServer     = new Socket( mServerName, SERVER_PORT );
+		            			}
+		            			else
+		            			{
+		            				mServerName = mHostRedirect;
+		            				mServer     = new Socket( mServerName, mPortRedirect );
+		            			}
+		            			
 								mServerReader = mServer.getInputStream(); 
 								mServerWriter = mServer.getOutputStream();		
 								
