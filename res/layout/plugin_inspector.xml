@@ -94,7 +94,7 @@
     <TextView
         android:id="@+id/deviceServices"
         android:layout_width="fill_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:padding="5dp"
         android:text="unknown"
         android:textAppearance="?android:attr/textAppearanceSmall" />

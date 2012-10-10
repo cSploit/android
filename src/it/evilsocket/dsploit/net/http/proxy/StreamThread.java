@@ -30,8 +30,13 @@ import android.util.Log;
 
 public class StreamThread implements Runnable
 {
-	private final static String  TAG               = "PROXYSTREAMTHREAD";
-	private final static byte[]  CONTENT_TEXT_HTML = "text/html".getBytes();
+	private final static String   TAG              		 = "PROXYSTREAMTHREAD";
+	private final static byte[][] FILTERED_CONTENT_TYPES = new byte[][]
+    {
+		"text/html".getBytes(),
+		"text/css".getBytes()
+    };
+	
 	private final static String  HEAD_SEPARATOR    = "\r\n\r\n";
     private final static int     CHUNK_SIZE        = 1024;
     
@@ -67,8 +72,18 @@ public class StreamThread implements Runnable
     		
     		if( mBuffer.isEmpty() == false )
     		{    			
-				// do we have html ?
-				if( mBuffer.indexOf( CONTENT_TEXT_HTML ) != -1 )
+				// do we have an handled content type ?
+    			boolean isHandledContentType = false;
+    			for( byte[] handled : FILTERED_CONTENT_TYPES )
+    			{
+    				if( mBuffer.indexOf( handled ) != -1 )
+    				{
+    					isHandledContentType = true;
+    					break;
+    				}
+    			}
+    			
+				if( isHandledContentType )
 				{
 					// split headers and body, then apply the filter				
 					String   data    = mBuffer.toString();
@@ -77,7 +92,7 @@ public class StreamThread implements Runnable
 							 body	 = ( split.length > 1 ? split[ 1 ] : "" ),
 							 patched = "";
 					
-					body = mFilter.onHtmlReceived( body );
+					body = mFilter.onDataReceived( headers, body );
 	
 					// remove explicit content length, just in case the body changed after filtering				
 					for( String header : headers.split("\n") )

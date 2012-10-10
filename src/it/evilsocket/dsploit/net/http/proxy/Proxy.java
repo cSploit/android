@@ -40,7 +40,7 @@ public class Proxy implements Runnable
 	
 	public static interface ProxyFilter
 	{
-		public String onHtmlReceived( String html );
+		public String onDataReceived( String headers, String data );
 	}
 	
 	public Proxy( InetAddress address, int port ) throws UnknownHostException, IOException {

@@ -49,8 +49,8 @@ public class HTTPFilter
 		start( proxy, new ProxyFilter() 
 		{					
 			@Override
-			public String onHtmlReceived( String html ) {
-				return html.replaceAll( from, to );
+			public String onDataReceived( String headers, String data ) {
+				return data.replaceAll( from, to );
 			}
 		});			
 	}
@@ -59,13 +59,13 @@ public class HTTPFilter
 		start( proxy, new ProxyFilter() 
 		{					
 			@Override
-			public String onHtmlReceived( String html ) {
+			public String onDataReceived( String headers, String data ) {
 				for( int i = 0; i < from.size(); i++ )
 				{
-					html = html.replaceAll( from.get( i ), to.get( i ) );
+					data = data.replaceAll( from.get( i ), to.get( i ) );
 				}
 				
-				return html;
+				return data;
 			}
 		});		
 	}

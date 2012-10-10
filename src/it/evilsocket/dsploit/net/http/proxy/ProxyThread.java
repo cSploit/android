@@ -135,15 +135,15 @@ public class ProxyThread extends Thread
 	 				// start the stream session with specified filters				
 	 				new StreamThread( mServerReader, mWriter, new Proxy.ProxyFilter() {									
 	 					@Override
-	 					public String onHtmlReceived( String html ) 
+	 					public String onDataReceived( String headers, String data ) 
 	 					{	
 	 						// apply each provided filter
 	 						for( Proxy.ProxyFilter filter : mFilters )
 	 						{
-	 							html = filter.onHtmlReceived( html );
+	 							data = filter.onDataReceived( headers, data );
 	 						}
 	 						
-	 						return html;
+	 						return data;
 	 					}
 	 				});
 	 			}					
