@@ -82,17 +82,24 @@
         android:text="unknown"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
-    <TextView
-        android:id="@+id/deviceServices"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+      <ScrollView   
+        android:id="@+id/ScrollView01"  
         android:layout_alignLeft="@+id/textView3"
         android:layout_alignParentBottom="true"
         android:layout_alignRight="@+id/deviceOS"
         android:layout_below="@+id/textView3"
+      android:layout_height="fill_parent"   
+      android:layout_width="fill_parent">  
+    
+    <TextView
+        android:id="@+id/deviceServices"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
         android:padding="5dp"
         android:text="unknown"
         android:textAppearance="?android:attr/textAppearanceSmall" />
+    
+    </ScrollView>
 
     <TextView
         android:id="@+id/textView1"
