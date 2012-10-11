@@ -40,7 +40,7 @@ public class Shell
 		boolean 		 granted = false;
 
 		try {
-			process = Runtime.getRuntime().exec("su");
+			process = Runtime.getRuntime().exec( System.getSuPath() );
 			writer  = new DataOutputStream(process.getOutputStream());
 			reader  = new BufferedReader( new InputStreamReader(process.getInputStream()) );
 
@@ -137,8 +137,8 @@ public class Shell
 						 libPath = System.getLibraryPath();
 		String[] 		 envp    = { "LD_LIBRARY_PATH=" + libPath + ":$LD_LIBRARY_PATH" };
 				
-		process = Runtime.getRuntime().exec( "su", envp );
-		
+		process = Runtime.getRuntime().exec( System.getSuPath(), envp );
+				
 		if( receiver != null ) receiver.onStart( command );
 		
 		writer = new DataOutputStream( process.getOutputStream() );

@@ -80,6 +80,7 @@ public class System
  
 	private static boolean			     mInitialized   = false;
 	private static String				 mLastError		= "";
+	private static String				 mSuPath		= null;
 	private static UpdateManager		 mUpdateManager = null;
 	private static Context 			     mContext  	    = null;
 	private static WifiLock				 mWifiLock		= null;
@@ -211,6 +212,36 @@ public class System
 		
 	public static String getLibraryPath( ) {
 		return mContext.getFilesDir().getAbsolutePath() + "/tools/libs";
+	}
+	
+	public static String getSuPath( ) {
+		
+		if( mSuPath != null )
+			return mSuPath;
+		
+		try
+		{
+			Process 	   process = Runtime.getRuntime().exec( "which su" );
+			BufferedReader reader  = new BufferedReader( new InputStreamReader( process.getInputStream() ) );  
+			String		   line	   = null;
+			
+			while( ( line = reader.readLine() ) != null ) 
+			{  
+				if( line.isEmpty() == false && line.startsWith("/") )
+				{
+					mSuPath = line;
+					break;
+				}
+			}  
+
+			return mSuPath;
+		}
+		catch( Exception e )
+		{
+			errorLogging( TAG, e );
+		}
+		
+		return "su";
 	}
 	
 	private static void preloadServices( ) {
