@@ -23,7 +23,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -54,6 +53,7 @@ import it.evilsocket.dsploit.gui.dialogs.InputDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.http.proxy.Proxy;
+import it.evilsocket.dsploit.net.http.server.Server;
 import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
 
 public class MITM extends Plugin 
@@ -260,17 +260,24 @@ public class MITM extends Plugin
 		if( somethingIsRunning )
 		{
 			Log.d( TAG, "Stopping current jobs ..." );
-			
-			ProgressDialog dialog = ProgressDialog.show( this, "", "Stopping current jobs ...", true, false );
-			
+						
 			System.setForwarding( false );
 			
 			System.getEttercap().kill();
 			System.getIPTables().undoPortRedirect( 80, System.HTTP_PROXY_PORT );
-			System.getProxy().stop();
-			System.getProxy().setRedirection( null, 0 );
-			System.getProxy().setFilter( null );
-			System.getServer().stop();
+			
+			Proxy  proxy  = System.getProxy();
+			Server server = System.getServer();
+			
+			if( proxy != null )
+			{
+				proxy.stop();
+				proxy.setRedirection( null, 0 );
+				proxy.setFilter( null );
+			}
+			
+			if( server != null )			
+				server.stop();
 			
 			for( i = 0; i < rows; i++ )
 			{
@@ -279,9 +286,7 @@ public class MITM extends Plugin
 					holder = ( ActionAdapter.ActionHolder )row.getTag();
 					holder.activity.setVisibility( View.INVISIBLE );
 				}
-			}
-			
-			dialog.dismiss();
+			}			
 		}
 	}
 
