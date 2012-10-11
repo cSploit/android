@@ -27,8 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
-import android.util.Log;
-
 public class Shell 
 {
 	private static final String TAG = "SHELL";
@@ -138,16 +136,15 @@ public class Shell
 		ProcessBuilder   builder = null;
 		DataOutputStream writer  = null;
 		BufferedReader   reader  = null;
-		String			 line    = null;
+		String			 line    = null,
+						 libPath = System.getLibraryPath();
 		
 		builder = new ProcessBuilder().command("su");
 		env		= builder.environment();
 		
 		builder.redirectErrorStream(true);
-		env.put( "LD_LIBRARY_PATH", env.get("LD_LIBRARY_PATH") + ":" + System.getLibraryPath() );
-		
-		Log.d( "LD_LIBRARY_PATH", "LD_LIBRARY_PATH = " + env.get("LD_LIBRARY_PATH") );
-		
+		env.put( "LD_LIBRARY_PATH", env.get("LD_LIBRARY_PATH") + ":" + libPath );
+				
 		process = builder.start();
 		
 		if( receiver != null ) receiver.onStart( command );
@@ -155,6 +152,7 @@ public class Shell
 		writer = new DataOutputStream(process.getOutputStream());
 		reader = new BufferedReader( new InputStreamReader( process.getInputStream() ) );
 		
+		writer.writeBytes( "export LD_LIBRARY_PATH=" + libPath + ":$LD_LIBRARY_PATH\n" );
 		writer.writeBytes( command + "\n" );
 		writer.flush();
 		writer.writeBytes( "exit\n" );
