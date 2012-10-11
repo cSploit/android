@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 
 public class Shell 
 {
@@ -132,27 +131,21 @@ public class Shell
 	
 	public static int exec( String command, OutputReceiver receiver ) throws IOException, InterruptedException {
 		Process			 process = null;
-		Map<String, String> env  = null;
-		ProcessBuilder   builder = null;
 		DataOutputStream writer  = null;
 		BufferedReader   reader  = null;
 		String			 line    = null,
 						 libPath = System.getLibraryPath();
-		
-		builder = new ProcessBuilder().command("su");
-		env		= builder.environment();
-		
-		builder.redirectErrorStream(true);
-		env.put( "LD_LIBRARY_PATH", env.get("LD_LIBRARY_PATH") + ":" + libPath );
+		String[] 		 envp    = { "LD_LIBRARY_PATH=" + libPath + ":$LD_LIBRARY_PATH" };
 				
-		process = builder.start();
+		process = Runtime.getRuntime().exec( "su", envp );
 		
 		if( receiver != null ) receiver.onStart( command );
 		
-		writer = new DataOutputStream(process.getOutputStream());
+		writer = new DataOutputStream( process.getOutputStream() );
 		reader = new BufferedReader( new InputStreamReader( process.getInputStream() ) );
 		
 		writer.writeBytes( "export LD_LIBRARY_PATH=" + libPath + ":$LD_LIBRARY_PATH\n" );
+		writer.flush();
 		writer.writeBytes( command + "\n" );
 		writer.flush();
 		writer.writeBytes( "exit\n" );
