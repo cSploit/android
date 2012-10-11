@@ -209,6 +209,10 @@ public class System
 		Log.e( tag, trace  );        
 	}
 		
+	public static String getLibraryPath( ) {
+		return mContext.getFilesDir().getAbsolutePath() + "/tools/libs";
+	}
+	
 	private static void preloadServices( ) {
 		if( mServices == null || mPorts == null )
 		{

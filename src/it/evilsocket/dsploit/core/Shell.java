@@ -25,6 +25,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
+
+import android.util.Log;
 
 public class Shell 
 {
@@ -131,13 +134,19 @@ public class Shell
 	
 	public static int exec( String command, OutputReceiver receiver ) throws IOException, InterruptedException {
 		Process			 process = null;
+		Map<String, String> env  = null;
 		ProcessBuilder   builder = null;
 		DataOutputStream writer  = null;
 		BufferedReader   reader  = null;
 		String			 line    = null;
 		
 		builder = new ProcessBuilder().command("su");
+		env		= builder.environment();
+		
 		builder.redirectErrorStream(true);
+		env.put( "LD_LIBRARY_PATH", env.get("LD_LIBRARY_PATH") + ":" + System.getLibraryPath() );
+		
+		Log.d( "LD_LIBRARY_PATH", "LD_LIBRARY_PATH = " + env.get("LD_LIBRARY_PATH") );
 		
 		process = builder.start();
 		
