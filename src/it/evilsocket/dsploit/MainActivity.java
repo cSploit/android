@@ -241,20 +241,20 @@ public class MainActivity extends SherlockListActivity
 										{
 											String address  = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_ADDRESS ),
 												   hardware = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_HARDWARE );	            	
-											Target target	= Target.getFromString( address );
+											final  Target target = Target.getFromString( address );
 											
 											target.getEndpoint().setHardware( Endpoint.parseMacAddress(hardware) );
-											
-											if( System.addOrderedTarget( target ) == true )
-											{													
-												// refresh the target listview
-								            	MainActivity.this.runOnUiThread(new Runnable() {
-								                    @Override
-								                    public void run() {
-								                    	mTargetAdapter.notifyDataSetChanged();
-								                    }
-								                });
-											}			
+																																		
+											// refresh the target listview
+							            	MainActivity.this.runOnUiThread(new Runnable() {
+							                    @Override
+							                    public void run() {
+							                    	if( System.addOrderedTarget( target ) == true )
+													{
+							                    		mTargetAdapter.notifyDataSetChanged();
+													}
+							                    }
+							                });											
 										}							
 										else if( intent.getAction().equals( UpdateService.UPDATE_AVAILABLE ) )
 										{
@@ -338,20 +338,19 @@ public class MainActivity extends SherlockListActivity
 				@Override
 				public void onInputEntered( String input ) 
 				{
-					Target target = Target.getFromString(input);						
+					final Target target = Target.getFromString(input);						
 					if( target != null )
-					{
-						if( System.addOrderedTarget( target ) == true )
-						{																								
-							// refresh the target listview
-	                    	MainActivity.this.runOnUiThread(new Runnable() {
-			                    @Override
-			                    public void run() {
-			                    	if( mTargetAdapter != null )
-			                    		mTargetAdapter.notifyDataSetChanged();
-			                    }
-			                });
-						}
+					{																							
+						// refresh the target listview
+                    	MainActivity.this.runOnUiThread( new Runnable() {	                    		
+		                    @Override
+		                    public void run() {
+		        				if( System.addOrderedTarget( target ) == true && mTargetAdapter != null )
+								{		
+		        					mTargetAdapter.notifyDataSetChanged();
+								}
+		                    }
+		                });
 					}
 					else
 						new ErrorDialog( "Error", "Invalid target.", MainActivity.this ).show();
@@ -369,19 +368,19 @@ public class MainActivity extends SherlockListActivity
 				System.getNMap().findAliveEndpoints( System.getNetwork(), new FindAliveEndpointsOutputReceiver(){						
 					@Override
 					public void onEndpointFound( Endpoint endpoint ) {
-						Target target = new Target( endpoint );
-						
-						if( System.addOrderedTarget( target ) == true )
-						{													
-							// refresh the target listview
-	                    	MainActivity.this.runOnUiThread(new Runnable() {
-			                    @Override
-			                    public void run() {
-			                    	if( mTargetAdapter != null )
-			                    		mTargetAdapter.notifyDataSetChanged();
-			                    }
-			                });
-						}														
+						final Target target = new Target( endpoint );
+						// refresh the target listview
+                    	MainActivity.this.runOnUiThread(new Runnable() {
+		                    @Override
+		                    public void run() {
+		                    	if( System.addOrderedTarget( target ) == true && mTargetAdapter != null )
+								{																						
+		                    		mTargetAdapter.notifyDataSetChanged();     	
+								}			                    		                    	
+		                    }
+		                });
+                    	
+																			
 					}
 				
 					@Override

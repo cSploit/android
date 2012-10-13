@@ -23,8 +23,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import android.util.Log;
-
 public class Shell 
 {
 	private static final String TAG = "SHELL";
