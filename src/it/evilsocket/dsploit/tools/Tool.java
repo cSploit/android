@@ -36,7 +36,6 @@ public class Tool
 	protected String  mFileName    = null;
 	protected String  mLibPath     = null;
 	protected Context mAppContext  = null;
-	protected boolean mCustomLibs  = true;
 
 	public Tool( String name, Context context ) {
 		mAppContext = context;
@@ -50,22 +49,15 @@ public class Tool
 	public Tool( String name ){
 		mName = name;
 	}
-	
-	public void setCustomLibsUse( boolean use ){
-		mCustomLibs = use;
-	}
-	
+
 	public void run( String args, OutputReceiver receiver ) throws IOException, InterruptedException {		
 		String cmd = null;
 		
 		if( mAppContext != null )
-			if( mCustomLibs )
-				cmd = "LD_LIBRARY_PATH=" + mLibPath + ":$LD_LIBRARY_PATH && cd " + mDirName + " && ./" + mName + " " + args;		
-			else
-				cmd = "cd " + mDirName + " && ./" + mName + " " + args;
+			cmd = "cd " + mDirName + " && ./" + mName + " " + args;
 		else
 			cmd = mName + " " + args;
-
+		
 		Shell.exec( cmd, receiver );
 	}
 	
@@ -77,13 +69,10 @@ public class Tool
 		String cmd = null;
 		
 		if( mAppContext != null )
-			if( mCustomLibs )
-				cmd = "LD_LIBRARY_PATH=" + mLibPath + ":$LD_LIBRARY_PATH && cd " + mDirName + " && ./" + mName + " " + args;		
-			else
-				cmd = "cd " + mDirName + " && ./" + mName + " " + args;
+			cmd = "cd " + mDirName + " && ./" + mName + " " + args;
 		else
 			cmd = mName + " " + args;
-
+		
 		return Shell.async( cmd, receiver );
 	}
 	

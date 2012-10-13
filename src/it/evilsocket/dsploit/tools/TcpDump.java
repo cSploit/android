@@ -26,8 +26,6 @@ public class TcpDump extends Tool
 {	
 	public TcpDump( Context context ){
 		super( "tcpdump/tcpdump", context );		
-		// tcpdump is statically linked
-		setCustomLibsUse(false);
 	}
 	
 	public Thread sniff( String filter, OutputReceiver receiver ) {

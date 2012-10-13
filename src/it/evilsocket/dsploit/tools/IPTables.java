@@ -27,7 +27,6 @@ public class IPTables extends Tool
 	
 	public IPTables( ){
 		super( "iptables" );		
-		setCustomLibsUse(false);		
 	}
 	
 	public void portRedirect( int from, int to ){

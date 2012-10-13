@@ -158,7 +158,7 @@ public class System
 			throw e;
 		}
 	}
-	
+
 	public static void setLastError( String error ) {
 		mLastError = error;
 	}

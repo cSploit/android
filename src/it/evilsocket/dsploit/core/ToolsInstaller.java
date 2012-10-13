@@ -32,14 +32,15 @@ public class ToolsInstaller
 	private final static String   TAG			   = "TOOLSINSTALLER";
 	private final static String   TOOLS_FILENAME   = "tools.zip";
 	private final static int      BUFFER_SIZE      = 4096;
+	
 	public  final static String[] TOOLS 		   = {
 		"ettercap",
 		"nmap",
 		"arpspoof",
 		"tcpdump",
-		"driftnet",
 		"hydra"
 	};
+
 	private final static String[] INSTALL_COMMANDS = {
 		"chmod 777 {PATH}/*/",
 		"chmod 777 {PATH}/ettercap/share",
@@ -52,10 +53,9 @@ public class ToolsInstaller
 		"chmod 755 {PATH}/nmap/nmap",
 		"chmod 755 {PATH}/arpspoof/arpspoof",
 		"chmod 755 {PATH}/tcpdump/tcpdump",
-		"chmod 755 {PATH}/driftnet/*",
 		"chmod 666 {PATH}/hydra/*",
 		"chmod 755 {PATH}/hydra/hydra",
-		"mount -o remount,rw /system /system && (chmod 6755 /system/*/su; mount -o remount,ro /system /system)"
+		"mount -o remount,rw /system /system && ( chmod 6755 /system/*/su; mount -o remount,ro /system /system )"
 	};
 	
 	private Context mAppContext = null;

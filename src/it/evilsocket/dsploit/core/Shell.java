@@ -20,18 +20,15 @@ package it.evilsocket.dsploit.core;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
+
+import android.util.Log;
 
 public class Shell 
 {
 	private static final String TAG = "SHELL";
 	
-	private static ArrayList<String> mPath = null;
-
 	public static boolean isRootGranted( ) {
 		Process			 process = null;
 		DataOutputStream writer  = null;
@@ -89,57 +86,40 @@ public class Shell
 	
 	public static boolean isBinaryAvailable( String binary )
 	{
-		if( mPath == null )
+		try
 		{
-			try
-			{
-				Shell.exec( "cat /init.rc", new OutputReceiver(){
-					@Override
-					public void onStart(String command) { }
-		
-					@Override
-					public void onNewLine(String line) {
-						if( line.contains("export PATH") )
-	                    {
-							int tmp = line.indexOf("/");
-	                        mPath = new ArrayList<String>( Arrays.asList( line.substring(tmp).split(":") ) );
-	                    }
-					}
-		
-					@Override
-					public void onEnd(int exitCode) { }
-				});
-			}
-			catch( Exception e )
-			{
-				System.errorLogging( TAG, e );
-			}
-		}
-		
-		if( mPath != null )
-		{
-			for( String path: mPath )
-			{
-				String fullPath = path + '/' + binary;
-				if( new File( fullPath ).exists() )
+			Process 	   process  = Runtime.getRuntime().exec( "which " + binary );
+			BufferedReader reader   = new BufferedReader( new InputStreamReader( process.getInputStream() ) );  
+			String		   line	    = null;
+			
+			while( ( line = reader.readLine() ) != null ) 
+			{  
+				if( line.isEmpty() == false && line.startsWith("/") )					
 					return true;
-			}
+			}  				
 		}
-		
+		catch( Exception e )
+		{
+			System.errorLogging( TAG, e );
+		}
+				
 		return false;
 	}
 	
 	public static int exec( String command, OutputReceiver receiver ) throws IOException, InterruptedException {
 		Process			 process = null;
+		ProcessBuilder   builder = null;
 		DataOutputStream writer  = null;
 		BufferedReader   reader  = null;
 		String			 line    = null,
 						 libPath = System.getLibraryPath();
-		String[] 		 envp    = { "LD_LIBRARY_PATH=" + libPath + ":$LD_LIBRARY_PATH" };
 				
-		process = Runtime.getRuntime().exec( System.getSuPath(), envp );
+		builder = new ProcessBuilder().command("su");
+		builder.redirectErrorStream(true);
 				
 		if( receiver != null ) receiver.onStart( command );
+		
+		process = builder.start();
 		
 		writer = new DataOutputStream( process.getOutputStream() );
 		reader = new BufferedReader( new InputStreamReader( process.getInputStream() ) );
@@ -150,12 +130,12 @@ public class Shell
 		writer.flush();
 		writer.writeBytes( "exit\n" );
 		writer.flush();
-		
+
 		while( ( line = reader.readLine() ) != null )
 		{
 			if( receiver != null ) receiver.onNewLine( line );
 		}
-		
+
 		int exit = process.waitFor();
 		
 		if( receiver != null ) receiver.onEnd( exit );
