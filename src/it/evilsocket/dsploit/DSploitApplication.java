@@ -25,6 +25,7 @@ import it.evilsocket.dsploit.plugins.LoginCracker;
 import it.evilsocket.dsploit.plugins.PacketForger;
 import it.evilsocket.dsploit.plugins.PortScanner;
 import it.evilsocket.dsploit.plugins.RouterPwn;
+import it.evilsocket.dsploit.plugins.Traceroute;
 import it.evilsocket.dsploit.plugins.mitm.MITM;
 
 import org.acra.*;
@@ -53,6 +54,7 @@ public class DSploitApplication extends Application
 			System.init( this );
 			
 			System.registerPlugin( new RouterPwn( ) );
+			System.registerPlugin( new Traceroute( ) );
 	        System.registerPlugin( new PortScanner( ) );
 	        System.registerPlugin( new Inspector( ) );
 	        System.registerPlugin( new ExploitFinder( ) );

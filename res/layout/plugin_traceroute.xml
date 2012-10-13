@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:padding="10dp" >
+
+    <ToggleButton
+        android:id="@+id/traceToggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ToggleButton"
+        android:textOff="Start"
+        android:textOn="Stop" />
+    <View
+        android:id="@+id/separator"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/traceToggleButton"
+        android:background="@android:color/darker_gray" />
+
+    <ListView
+        android:id="@+id/traceListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/separator" >
+    </ListView>
+
+    <ProgressBar
+        android:id="@+id/traceActivity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/traceListView"
+        android:layout_alignRight="@+id/traceListView"
+        android:visibility="invisible" />
+
+</RelativeLayout>

@@ -78,6 +78,33 @@ public class NMap extends Tool
 		return super.async( "--max-retries 1 --max-rtt-timeout 250ms -sn -n -T4 --system-dns " + network.getNetworkRepresentation() , receiver );
 	}
 	
+	public static abstract class TraceOutputReceiver implements OutputReceiver
+	{
+		private static final Pattern HOP_PATTERN = Pattern.compile( "^(\\d+)\\s+(\\.\\.\\.|[0-9\\.]+\\s[ms]+)\\s+([\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}|[\\d]+).*", Pattern.CASE_INSENSITIVE );
+		
+		public void onStart( String commandLine ) { }
+		
+		public void onNewLine( String line ) {			
+			Matcher matcher;
+			
+			if( ( matcher = HOP_PATTERN.matcher( line ) ) != null && matcher.find() )
+			{
+				onHop( matcher.group( 1 ), matcher.group( 2 ), matcher.group( 3 ) );
+			}				
+		}
+		
+		public void onEnd( int exitCode ) {
+			if( exitCode != 0 )
+				Log.e( TAG, "nmap exited with code " + exitCode );
+		}
+		
+		public abstract void onHop( String hop, String time, String address );
+	}
+	
+	public Thread trace( Target target, TraceOutputReceiver receiver ) {		
+		return super.async( "-sn --traceroute --system-dns " + target.getCommandLineRepresentation(), receiver );
+	}
+	
 	public static abstract class SynScanOutputReceiver implements OutputReceiver
 	{
 		private static final Pattern PORT_PATTERN = Pattern.compile( "^discovered open port (\\d+)/([^\\s]+).+", Pattern.CASE_INSENSITIVE );
