@@ -62,10 +62,11 @@ public class MITM extends Plugin
 	private static final int     SELECT_PICTURE  = 1010;
 	private static final Pattern YOUTUBE_PATTERN = Pattern.compile( "youtube\\.com/.*\\?v=([a-z0-9_-]+)", Pattern.CASE_INSENSITIVE );
 	
-	private ListView      	  mActionListView = null;
-	private ActionAdapter 	  mActionAdapter  = null;
-	private ArrayList<Action> mActions  	  = new ArrayList<Action>();	
-	private Intent			  mImagePicker	  = null;
+	private ListView      	  mActionListView  = null;
+	private ActionAdapter 	  mActionAdapter   = null;
+	private ArrayList<Action> mActions  	   = new ArrayList<Action>();	
+	private Intent			  mImagePicker	   = null;
+	private ProgressBar       mCurrentActivity = null;
 	
 	static class Action
 	{
@@ -187,6 +188,9 @@ public class MITM extends Plugin
 		    	}
 		    	else
 		    	{
+		    		if( mCurrentActivity != null )
+		    			mCurrentActivity.setVisibility( View.VISIBLE );
+
 		    		mimeType = System.getImageMimeType( fileName );
 		    				
 		    		Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
@@ -455,18 +459,20 @@ public class MITM extends Plugin
         	new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				final ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
+				ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
 
 				if( activity.getVisibility() == View.INVISIBLE )
 				{
 					setStoppedState();
 
-			    	activity.setVisibility( View.VISIBLE );
+					mCurrentActivity = activity;
 
 					startActivityForResult( mImagePicker, SELECT_PICTURE );  
 				}
 				else
-				{					
+				{			
+					mCurrentActivity = null;
+					
 					HTTPFilter.stop( System.getProxy() );
 
 					activity.setVisibility( View.INVISIBLE );

@@ -220,10 +220,14 @@ public class Network
 		return null;
 	}
 	
+	public String getLocalAddressAsString( ){
+		return ( mInfo.ipAddress & 0xFF) + "." + (( mInfo.ipAddress >> 8 ) & 0xFF) + "." + (( mInfo.ipAddress >> 16 ) & 0xFF) + "." + (( mInfo.ipAddress >> 24 ) & 0xFF);
+	}
+	
 	public InetAddress getLocalAddress( ){
 		try
 		{
-			return InetAddress.getByName( ( mInfo.ipAddress & 0xFF) + "." + (( mInfo.ipAddress >> 8 ) & 0xFF) + "." + (( mInfo.ipAddress >> 16 ) & 0xFF) + "." + (( mInfo.ipAddress >> 24 ) & 0xFF) );
+			return InetAddress.getByName( getLocalAddressAsString() );
 		}
 		catch( UnknownHostException e )
 		{

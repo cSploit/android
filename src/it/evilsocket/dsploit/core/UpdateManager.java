@@ -32,7 +32,6 @@ import javax.net.ssl.HttpsURLConnection;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.StrictMode;
 
 public class UpdateManager 
 {
@@ -107,11 +106,7 @@ public class UpdateManager
 			{
 				// Read remote version
 				if( mRemoteVersion == null )
-				{
-					// This is needed to avoid NetworkOnMainThreadException
-		        	StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-		        	StrictMode.setThreadPolicy(policy);
-		        						
+				{				
 					URL 			   url 		  = new URL( REMOTE_VERSION_FILE );
 				    HttpsURLConnection connection = (HttpsURLConnection)url.openConnection();
 				    BufferedReader	   reader	  = new BufferedReader( new InputStreamReader( connection.getInputStream() ) );

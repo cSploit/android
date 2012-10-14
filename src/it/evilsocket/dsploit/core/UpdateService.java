@@ -37,24 +37,33 @@ public class UpdateService extends Service
 	
 	@Override
 	public void onCreate() { }
-	
+
 	@Override
     public int onStartCommand( Intent intent, int flags, int startId ) {
     	super.onStartCommand(intent, flags, startId);
     	
-    	Log.d( TAG, "Service started." );
-    	
-    	if( System.getUpdateManager().isUpdateAvailable() )
-    	{
-    		Intent update = new Intent( UPDATE_AVAILABLE );
-    		
-    		update.putExtra( AVAILABLE_VERSION, System.getUpdateManager().getRemoteVersion() );
+    	/* 
+    	 * Since this is a Service and not an IntentService, avoid blocking the main 
+    	 * task while checking for updates.
+    	 */
+    	new Thread( new Runnable(){
+			@Override
+			public void run() {
+				Log.d( TAG, "Service started." );
+		    	
+		    	if( System.getUpdateManager().isUpdateAvailable() )
+		    	{
+		    		Intent update = new Intent( UPDATE_AVAILABLE );
+		    		
+		    		update.putExtra( AVAILABLE_VERSION, System.getUpdateManager().getRemoteVersion() );
 
-    		sendBroadcast( update );    
-    	}
-    	
-    	Log.d( TAG, "Service stopped." );
-    	
+		    		sendBroadcast( update );    
+		    	}
+		    	
+		    	Log.d( TAG, "Service stopped." );			
+			} 
+		}).start();
+    	    	    	
     	return START_NOT_STICKY;
 	}
 }
