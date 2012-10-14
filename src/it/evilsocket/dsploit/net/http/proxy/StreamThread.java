@@ -58,8 +58,17 @@ public class StreamThread implements Runnable
     	
     	int    read  = -1,
     		   size  = 0,
-    		   max   = Integer.parseInt( System.getSettings().getString( "PREF_HTTP_MAX_BUFFER_SIZE", "10485760" ) );
+    		   max   = 0;
     	byte[] chunk = new byte[ CHUNK_SIZE ];
+    	
+    	try
+    	{
+    		max = Integer.parseInt( System.getSettings().getString( "PREF_HTTP_MAX_BUFFER_SIZE", "10485760" ) );
+    	}
+    	catch( NumberFormatException e )
+    	{
+    		max = 10485760;
+    	}
     	
     	try 
     	{
