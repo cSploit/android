@@ -18,11 +18,15 @@
  */
 package it.evilsocket.dsploit.plugins;
 
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.Plugin;
+import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
 import it.evilsocket.dsploit.net.Target;
 
 public class RouterPwn extends Plugin
@@ -45,9 +49,18 @@ public class RouterPwn extends Plugin
 	
 	@Override
 	public void onActionClick( Context context ){
-		String uri     = "http://routerpwn.com/";
-		Intent browser = new Intent( Intent.ACTION_VIEW, Uri.parse( uri ) );
+		try
+		{
+			String uri     = "http://routerpwn.com/";
+			Intent browser = new Intent( Intent.ACTION_VIEW, Uri.parse( uri ) );
 		
-		context.startActivity( browser );
+			context.startActivity( browser );
+		}
+		catch( ActivityNotFoundException e )
+		{
+			System.errorLogging( "ROUTERPWN", e );
+			
+			new ErrorDialog( "Error", "No activities to handle url opening!", ( Activity )context ).show();
+		}
 	}
 }

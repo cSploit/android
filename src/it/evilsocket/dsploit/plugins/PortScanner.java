@@ -20,17 +20,25 @@ package it.evilsocket.dsploit.plugins;
 
 import java.util.ArrayList;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+import android.widget.AdapterView.OnItemLongClickListener;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Plugin;
+import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
+import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
+import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
 import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Target.Port;
@@ -162,6 +170,44 @@ public class PortScanner extends Plugin
 		
 		mListAdapter = new ArrayAdapter<String>( this, android.R.layout.simple_list_item_1, mPortList );
 		mScanList.setAdapter( mListAdapter );
+		mScanList.setOnItemLongClickListener( new OnItemLongClickListener(){
+			@Override
+			public boolean onItemLongClick( AdapterView<?> parent, View view, int position, long id ) {
+				int portNumber = System.getCurrentTarget().getOpenPorts().get( position ).number;
+				
+				if( portNumber == 80 || portNumber == 21 || portNumber == 443 )
+				{
+					final String url = ( portNumber == 80 ? "http" : ( portNumber == 443 ? "https" : "ftp" ) ) + "://" + System.getCurrentTarget().getCommandLineRepresentation() + ":" + portNumber + "/";
+							
+					new ConfirmDialog
+                	( 
+                	  "Open", 
+                	  "Open " + url + " in web browser ?",
+                	  PortScanner.this,
+                	  new ConfirmDialogListener(){
+						@Override
+						public void onConfirm() {
+							try
+							{
+								Intent browser = new Intent( Intent.ACTION_VIEW, Uri.parse( url ) );
+							
+								PortScanner.this.startActivity( browser );
+							}
+							catch( ActivityNotFoundException e )
+							{
+								System.errorLogging( "PORTSCANNER", e );
+								
+								new ErrorDialog( "Error", "No activities to handle this type of url.", PortScanner.this ).show();
+							}
+							
+						}
+                	  }
+                	).show();
+				}
+				
+				return false;
+			}
+		});
 	}
 	
 	@Override

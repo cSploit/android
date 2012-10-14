@@ -100,7 +100,7 @@ public class Proxy implements Runnable
 			
 			mRunning = true;
 			
-			while( mRunning )
+			while( mRunning && mSocket != null )
 			{
 				try
 				{

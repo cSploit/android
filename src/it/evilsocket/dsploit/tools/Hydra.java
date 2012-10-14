@@ -84,7 +84,7 @@ public class Hydra extends Tool
 			command = "-F -l " + username + " -s " + port + " -P " + wordlist + " -V -t 10 " + target.getCommandLineRepresentation() + " " + service;
 		
 		else
-			command = "-F -l " + username + " -s " + port + " -x " + minlength + ":" + maxlength + ":" + charset + " -V -t 10 " + target.getCommandLineRepresentation() + " " + service;
+			command = "-F -l " + username + " -s " + port + " -x \"" + minlength + ":" + maxlength + ":" + charset + "\" -V -t 10 " + target.getCommandLineRepresentation() + " " + service;
 				 		
 		if( service.equalsIgnoreCase("http-head") )
 			command += " /";

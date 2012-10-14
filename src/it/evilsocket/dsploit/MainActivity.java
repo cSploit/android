@@ -51,7 +51,6 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -209,9 +208,7 @@ public class MainActivity extends SherlockListActivity
 								getListView().setOnItemLongClickListener( new OnItemLongClickListener() 
 								{
 									@Override
-									public boolean onItemLongClick( AdapterView<?> parent, View view, int position, long id ) {
-										Log.d( "MAIN", "long click" );
-									
+									public boolean onItemLongClick( AdapterView<?> parent, View view, int position, long id ) {									
 										final Target target = System.getTarget( position );
 										
 										new InputDialog

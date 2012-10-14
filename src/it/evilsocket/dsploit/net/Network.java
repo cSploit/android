@@ -165,6 +165,10 @@ public class Network
 		return mConnectivityManager.getNetworkInfo( ConnectivityManager.TYPE_WIFI ).isConnected();
 	}
 	
+	public String getSSID( ) {
+		return mWifiInfo.getSSID();
+	}
+	
 	public String getNetworkRepresentation( )
 	{				
         int bits 	= countBits( mInfo.netmask );

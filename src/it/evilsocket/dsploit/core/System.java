@@ -132,12 +132,15 @@ public class System
 				mWakeLock.acquire();
 			}
 			
-			// local network
-			mTargets.add( new Target( mNetwork ) );
-			// network gateway
-			mTargets.add( new Target( mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware() ) );
-			// device network address
-			Target device = new Target( mNetwork.getLocalAddress(), mNetwork.getLocalHardware() );			
+			Target network = new Target( mNetwork ),
+				   gateway = new Target( mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware() ),
+				   device  = new Target( mNetwork.getLocalAddress(), mNetwork.getLocalHardware() );
+			
+			gateway.setAlias( mNetwork.getSSID() );
+			device.setAlias( android.os.Build.MODEL );
+			
+			mTargets.add( network );
+			mTargets.add( gateway );
 			mTargets.add( device );
 						
 			mNmap     = new NMap( mContext );

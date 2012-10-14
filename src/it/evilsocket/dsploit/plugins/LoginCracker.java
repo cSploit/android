@@ -101,7 +101,8 @@ public class LoginCracker extends Plugin
 		"A-Z",
 		"a-z0-9",
 		"A-Z0-9",
-		"a-zA-Z0-9"
+		"a-zA-Z0-9",
+		"a-zA-Z0-9 + custom"
 	};
 	
 	private static final String[] CHARSETS_MAPPING = new String[]
@@ -110,7 +111,8 @@ public class LoginCracker extends Plugin
 		"A",
 		"a1",
 		"A1",
-		"aA1"
+		"aA1",
+		null
 	};
 	
 	private static String[] USERNAMES = new String[]
@@ -167,6 +169,7 @@ public class LoginCracker extends Plugin
 	private boolean	     	mRunning		 = false;
 	private boolean			mAccountFound	 = false;
 	private AttemptReceiver mReceiver     	 = null;
+	private String			mCustomCharset	 = null;
 	
 	public LoginCracker( ) {
 		super
@@ -304,7 +307,7 @@ public class LoginCracker extends Plugin
 		  System.getCurrentTarget(), 
 		  Integer.parseInt( ( String )mPortSpinner.getSelectedItem() ), 
 		  ( String )mProtocolSpinner.getSelectedItem(), 
-		  CHARSETS_MAPPING[ mCharsetSpinner.getSelectedItemPosition() ], 
+		  mCustomCharset == null ? CHARSETS_MAPPING[ mCharsetSpinner.getSelectedItemPosition() ] : mCustomCharset, 
 		  min,
 		  max,
 		  ( String )mUserSpinner.getSelectedItem(), 
@@ -355,6 +358,32 @@ public class LoginCracker extends Plugin
         
         mCharsetSpinner = ( Spinner )findViewById( R.id.charsetSpinner );
         mCharsetSpinner.setAdapter( new ArrayAdapter<String>( this, android.R.layout.simple_spinner_item, CHARSETS ) );
+        mCharsetSpinner.setOnItemSelectedListener( new OnItemSelectedListener() {
+        	public void onItemSelected( AdapterView<?> adapter, View view, int position, long id ) 
+        	{
+        		if( CHARSETS_MAPPING[ position ] == null )
+        		{
+        			new InputDialog( "Custom Charset", "Enter the chars you want to use in the custom charset:", LoginCracker.this, new InputDialogListener(){
+						@Override
+						public void onInputEntered( String input ) {
+							input = input.trim();
+							if( input.isEmpty() == false )
+								mCustomCharset = "aA1" + input;
+							
+							else
+							{
+								mCustomCharset = null;
+								mCharsetSpinner.setSelection(0);
+							}
+						}        				
+        			}).show();
+        		}
+        		else
+        			mCustomCharset = null;
+        	}
+        	
+        	public void onNothingSelected(AdapterView<?> arg0) {}
+		});
 
         mUserSpinner = ( Spinner )findViewById( R.id.userSpinner );
         mUserSpinner.setAdapter( new ArrayAdapter<String>( this, android.R.layout.simple_spinner_item, USERNAMES ) );
@@ -380,7 +409,7 @@ public class LoginCracker extends Plugin
         	
         	public void onNothingSelected(AdapterView<?> arg0) {}
 		});
-
+        
         mMaxSpinner = ( Spinner )findViewById( R.id.maxSpinner );
         mMaxSpinner.setAdapter( new ArrayAdapter<String>( this, android.R.layout.simple_spinner_item, LENGTHS ) );
         mMinSpinner = ( Spinner )findViewById( R.id.minSpinner );
