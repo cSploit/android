@@ -351,12 +351,18 @@ public class System
 		ArrayList<String> files = new ArrayList<String>();		
 		File storage            = new File( mStoragePath );
 
-		String[] children = storage.list();
-		
-		for( String child : children )
+		if( storage != null && storage.exists() )
 		{
-			if( child.endsWith(".dss") )
-				files.add( child );
+			String[] children = storage.list();
+			
+			if( children != null && children.length > 0 )
+			{
+				for( String child : children )
+				{
+					if( child.endsWith(".dss") )
+						files.add( child );
+				}
+			}
 		}
 
 		return files;
