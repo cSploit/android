@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.DSploitActionBarStyle" parent="Theme.Sherlock.ForceOverflow">
+        <item name="actionBarStyle">@style/Widget.DSploitActionBarStyle.ActionBar</item>
+        <item name="android:actionBarStyle">@style/Widget.DSploitActionBarStyle.ActionBar</item>
+    </style>
+
+    <style name="Widget.DSploitActionBarStyle.ActionBar" parent="Widget.Sherlock.ActionBar">
+        <item name="android:background">@drawable/actionbar_gradient</item>
+        <item name="background">@drawable/actionbar_gradient</item>
+    </style>
+
+</resources>
