@@ -161,6 +161,10 @@ public class Network
 		return ( ( ConnectivityManager )context.getSystemService( Context.CONNECTIVITY_SERVICE ) ).getNetworkInfo( ConnectivityManager.TYPE_WIFI ).isConnected();
 	}
 	
+	public static boolean isConnectivityAvailable( Context context ) {
+	    return ( ( ConnectivityManager )context.getSystemService( Context.CONNECTIVITY_SERVICE ) ).getActiveNetworkInfo() != null;
+	}
+	
 	public boolean isConnected(){
 		return mConnectivityManager.getNetworkInfo( ConnectivityManager.TYPE_WIFI ).isConnected();
 	}

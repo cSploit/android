@@ -18,6 +18,8 @@
  */
 package it.evilsocket.dsploit.core;
 
+import it.evilsocket.dsploit.MainActivity;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,6 +31,7 @@ import java.util.Arrays;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -151,7 +154,7 @@ public class UpdateManager
 		return "http://cloud.github.com/downloads/evilsocket/dsploit/" + getRemoteVersionFileName();
 	}
 	
-	public boolean downloadUpdate(  )
+	public boolean downloadUpdate( MainActivity activity, final ProgressDialog progress )
 	{
 		try 
 		{
@@ -172,9 +175,24 @@ public class UpdateManager
             FileOutputStream writer = new FileOutputStream( file );
             InputStream 	 reader = connection.getInputStream();
             
+            int total 	   = connection.getContentLength(),
+            	downloaded = 0;
+            
             while( ( read = reader.read(buffer) ) != -1 ) 
             {
                 writer.write( buffer, 0, read );
+                
+                downloaded += read;
+                
+                // update the progress ui
+                final int fdown = downloaded,
+                		  ftot  = total;
+                activity.runOnUiThread( new Runnable() {
+					@Override
+					public void run() {
+						progress.setProgress( ( 100 * fdown ) / ftot );
+					}                	
+                });
             }
             
             writer.close();

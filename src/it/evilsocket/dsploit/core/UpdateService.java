@@ -27,8 +27,10 @@ public class UpdateService extends Service
 {
 	private static final String TAG = "UPDATESERVICE";
 	
-	public static final String UPDATE_AVAILABLE  = "UpdateService.action.UPDATE_AVAILABLE";
-	public static final String AVAILABLE_VERSION = "UpdateService.data.AVAILABLE_VERSION";
+	public static final String UPDATE_CHECKING      = "UpdateService.action.CHECKING";
+	public static final String UPDATE_AVAILABLE     = "UpdateService.action.UPDATE_AVAILABLE";
+	public static final String UPDATE_NOT_AVAILABLE = "UpdateService.action.UPDATE_NOT_AVAILABLE";
+	public static final String AVAILABLE_VERSION 	= "UpdateService.data.AVAILABLE_VERSION";
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -38,6 +40,16 @@ public class UpdateService extends Service
 	@Override
 	public void onCreate() { }
 
+	private void send( String msg, String extra, String value )
+	{
+		Intent intent = new Intent( msg );
+		
+		if( extra != null && value != null )
+			intent.putExtra( extra, value );
+		
+		sendBroadcast( intent );    
+	}
+	
 	@Override
     public int onStartCommand( Intent intent, int flags, int startId ) {
     	super.onStartCommand(intent, flags, startId);
@@ -49,16 +61,16 @@ public class UpdateService extends Service
     	new Thread( new Runnable(){
 			@Override
 			public void run() {
+				send( UPDATE_CHECKING, null, null );
+				
 				Log.d( TAG, "Service started." );
-		    	
+						    	
 		    	if( System.getUpdateManager().isUpdateAvailable() )
 		    	{
-		    		Intent update = new Intent( UPDATE_AVAILABLE );
-		    		
-		    		update.putExtra( AVAILABLE_VERSION, System.getUpdateManager().getRemoteVersion() );
-
-		    		sendBroadcast( update );    
+		    		send( UPDATE_AVAILABLE, AVAILABLE_VERSION, System.getUpdateManager().getRemoteVersion() );
 		    	}
+		    	else
+		    		send( UPDATE_NOT_AVAILABLE, null, null );
 		    	
 		    	Log.d( TAG, "Service stopped." );			
 			} 

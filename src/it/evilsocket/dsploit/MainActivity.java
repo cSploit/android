@@ -51,14 +51,17 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,12 +70,15 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 public class MainActivity extends SherlockListActivity
-{
-	private static final int LAYOUT = R.layout.target_layout;
+{	
+	private static final String NO_WIFI_UPDATE_MESSAGE = "No WiFi connection available, the application will just check for updates.\n#STATUS#";
 	
-	private TargetAdapter  	  mTargetAdapter   = null;
-	private IntentFilter	  mIntentFilter	   = null;
-	private BroadcastReceiver mMessageReceiver = null;
+	private boolean			  isWifiAvailable  		   = false;
+	private boolean			  isConnectivityAvailable  = false;
+	private TargetAdapter  	  mTargetAdapter   		   = null;
+	private IntentFilter	  mIntentFilter	   		   = null;
+	private BroadcastReceiver mMessageReceiver 		   = null;
+	private TextView		  mUpdateStatus			   = null;
 	
 	public class TargetAdapter extends ArrayAdapter<Target> 
 	{
@@ -142,21 +148,55 @@ public class MainActivity extends SherlockListActivity
 	    }
 	}
 
+	private void createUpdateLayout( ) {
+		getListView().setVisibility( View.GONE );
+		findViewById( R.id.textView ).setVisibility( View.GONE );
+		
+		RelativeLayout layout = ( RelativeLayout )findViewById( R.id.layout );
+		LayoutParams   params = new LayoutParams( LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT );		
+		
+		mUpdateStatus = new TextView( this );
+		
+		mUpdateStatus.setGravity( Gravity.CENTER );
+		mUpdateStatus.setLayoutParams( params );
+		mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "..." ) );
+		
+		layout.addView( mUpdateStatus );
+	}
+	
 	@Override
     public void onCreate( Bundle savedInstanceState ) {		
         super.onCreate(savedInstanceState);   
-        setContentView( LAYOUT );
         
+        setContentView( R.layout.target_layout );
+    	
         // just initialize the ui the first time
         if( mTargetAdapter == null )
         {	        	
-        	// make sure system object was correctly initialized during application startup
-        	if( System.isInitialized() == false )
+            isWifiAvailable 		= Network.isWifiConnected( this );
+        	isConnectivityAvailable = isWifiAvailable || Network.isConnectivityAvailable( this );
+        	
+        	// without any kind of connectivity, it's just useless for this app to run
+        	if( isConnectivityAvailable == false )
         	{
-        		new FatalDialog( "Initialization Error", System.getLastError(), this ).show();
+        		new FatalDialog( "Error", "No connectivity available.", this ).show();
         		return;
         	}
         	
+        	// make sure system object was correctly initialized during application startup
+        	if( System.isInitialized() == false )
+        	{
+        		// wifi available but system failed to initialize, this is a fatal :(
+        		if( isWifiAvailable == true )
+        		{
+        			new FatalDialog( "Initialization Error", System.getLastError(), this ).show();        		
+        			return;
+        		}
+        		// just inform the user his wifi is down
+        		else        		
+        			createUpdateLayout( );
+        	}
+        	        	        	
         	final ProgressDialog dialog = ProgressDialog.show( this, "", "Initializing ...", true, false );
 						
         	// this is necessary to not block the user interface while initializing
@@ -190,7 +230,7 @@ public class MainActivity extends SherlockListActivity
 							}
 						});													
 					}
-					else if( Network.isWifiConnected( MainActivity.this ) ) 
+					else if( isWifiAvailable ) 
 					{
 						startService( new Intent( MainActivity.this, NetworkMonitorService.class ) );
 					}	
@@ -200,41 +240,48 @@ public class MainActivity extends SherlockListActivity
 						public void run() 
 						{
 						    try
-					    	{	    			    	
+					    	{	    			  						    	
 								mTargetAdapter = new TargetAdapter( R.layout.target_list_item );
 						    	
-								setListAdapter( mTargetAdapter );	
-								
-								getListView().setOnItemLongClickListener( new OnItemLongClickListener() 
+								if( isWifiAvailable )
 								{
-									@Override
-									public boolean onItemLongClick( AdapterView<?> parent, View view, int position, long id ) {									
-										final Target target = System.getTarget( position );
-										
-										new InputDialog
-										( 
-										  "Target Alias", 
-										  "Set an alias for this target:", 
-										  target.hasAlias() ? target.getAlias() : "",
-										  true,
-										  MainActivity.this, 
-										  new InputDialogListener(){
-											@Override
-											public void onInputEntered( String input ) {
-												target.setAlias(input);			
-												mTargetAdapter.notifyDataSetChanged();
-											}
-										  }
-										).show();
-																				
-										return false;
-									}
-								});
+									setListAdapter( mTargetAdapter );	
 								
+									getListView().setOnItemLongClickListener( new OnItemLongClickListener() 
+									{
+										@Override
+										public boolean onItemLongClick( AdapterView<?> parent, View view, int position, long id ) {									
+											final Target target = System.getTarget( position );
+											
+											new InputDialog
+											( 
+											  "Target Alias", 
+											  "Set an alias for this target:", 
+											  target.hasAlias() ? target.getAlias() : "",
+											  true,
+											  MainActivity.this, 
+											  new InputDialogListener(){
+												@Override
+												public void onInputEntered( String input ) {
+													target.setAlias(input);			
+													mTargetAdapter.notifyDataSetChanged();
+												}
+											  }
+											).show();
+																					
+											return false;
+										}
+									});
+								}
+								else
+								{
+									
+								}
+									
 								mMessageReceiver = new BroadcastReceiver() {
 									@Override
 									public void onReceive(Context context, Intent intent) {
-										if( intent.getAction().equals( NetworkMonitorService.NEW_ENDPOINT ) )
+										if( isWifiAvailable && intent.getAction().equals( NetworkMonitorService.NEW_ENDPOINT ) )
 										{
 											String address  = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_ADDRESS ),
 												   hardware = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_HARDWARE );	            	
@@ -252,10 +299,21 @@ public class MainActivity extends SherlockListActivity
 													}
 							                    }
 							                });											
-										}							
-										else if( intent.getAction().equals( UpdateService.UPDATE_AVAILABLE ) )
+										}		
+										else if( intent.getAction().equals( UpdateService.UPDATE_CHECKING ) && mUpdateStatus != null )
 										{
+											mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "Checking ..." ) );
+										}
+										else if( intent.getAction().equals( UpdateService.UPDATE_NOT_AVAILABLE ) && mUpdateStatus != null )
+										{
+											mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "No updates available." ) );
+										}
+										else if( intent.getAction().equals( UpdateService.UPDATE_AVAILABLE ) )
+										{																						
 											final String remoteVersion = ( String )intent.getExtras().get( UpdateService.AVAILABLE_VERSION );
+											
+											if( mUpdateStatus != null )
+												mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "New version " + remoteVersion + " found!" ) );
 											
 											MainActivity.this.runOnUiThread(new Runnable() {
 							                    @Override
@@ -269,13 +327,18 @@ public class MainActivity extends SherlockListActivity
 														@Override
 														public void onConfirm() 
 														{
-															final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Downloading update ...", true, false );
+															final ProgressDialog dialog = new ProgressDialog( MainActivity.this );
+														    dialog.setMessage( "Downloading update ..." );
+														    dialog.setProgressStyle( ProgressDialog.STYLE_HORIZONTAL );
+														    dialog.setMax(100);
+														    dialog.setCancelable(false);
+														    dialog.show();// ProgressDialog.show( MainActivity.this, "", "Downloading update ...", true, false );
 															
 															new Thread( new Runnable(){
 																@Override
 																public void run() 
 																{				
-																	if( System.getUpdateManager().downloadUpdate() == false )
+																	if( System.getUpdateManager().downloadUpdate( MainActivity.this, dialog ) == false )
 																	{
 																		MainActivity.this.runOnUiThread(new Runnable() {
 														                    @Override
@@ -299,7 +362,9 @@ public class MainActivity extends SherlockListActivity
 							    mIntentFilter = new IntentFilter( );
 							    
 							    mIntentFilter.addAction( NetworkMonitorService.NEW_ENDPOINT );
+							    mIntentFilter.addAction( UpdateService.UPDATE_CHECKING );
 							    mIntentFilter.addAction( UpdateService.UPDATE_AVAILABLE );
+							    mIntentFilter.addAction( UpdateService.UPDATE_NOT_AVAILABLE );
 							    
 						        registerReceiver( mMessageReceiver, mIntentFilter );		
 						        
@@ -321,6 +386,18 @@ public class MainActivity extends SherlockListActivity
 	public boolean onCreateOptionsMenu( Menu menu ) {
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate( R.menu.main, menu );		
+		
+		if( isWifiAvailable == false )
+		{			
+			menu.getItem( 0 ).setVisible( false );
+			menu.getItem( 1 ).setVisible( false );
+			
+			menu.getItem( 2 ).setEnabled( false );
+			menu.getItem( 3 ).setEnabled( false );
+			menu.getItem( 4 ).setEnabled( false );
+			menu.getItem( 6 ).setEnabled( false );
+		}
+		
 		return super.onCreateOptionsMenu(menu);
 	}
 

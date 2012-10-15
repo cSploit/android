@@ -112,6 +112,8 @@ public class System
 		mContext = context;		
 		try
 		{				
+			mStoragePath   = Environment.getExternalStorageDirectory().toString();
+			mSessionName   = "dsploit-session-" + java.lang.System.currentTimeMillis();
 			mUpdateManager = new UpdateManager( mContext );
 			mPlugins 	   = new ArrayList<Plugin>();
 			mTargets 	   = new ArrayList<Target>();
@@ -148,10 +150,7 @@ public class System
 			mIptables = new IPTables( );
 			mHydra    = new Hydra( mContext );
 			mTcpdump  = new TcpDump( mContext );
-			
-			mStoragePath = Environment.getExternalStorageDirectory().toString();
-			mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
-			
+									
 			mInitialized = true;
 		}
 		catch( Exception e )
