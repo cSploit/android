@@ -273,10 +273,6 @@ public class MainActivity extends SherlockListActivity
 										}
 									});
 								}
-								else
-								{
-									
-								}
 									
 								mMessageReceiver = new BroadcastReceiver() {
 									@Override
@@ -332,7 +328,7 @@ public class MainActivity extends SherlockListActivity
 														    dialog.setProgressStyle( ProgressDialog.STYLE_HORIZONTAL );
 														    dialog.setMax(100);
 														    dialog.setCancelable(false);
-														    dialog.show();// ProgressDialog.show( MainActivity.this, "", "Downloading update ...", true, false );
+														    dialog.show();
 															
 															new Thread( new Runnable(){
 																@Override
