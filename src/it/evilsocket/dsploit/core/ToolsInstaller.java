@@ -68,7 +68,7 @@ public class ToolsInstaller
 	
 	public boolean needed( )
 	{
-		return !( new File( mDestPath + "/libs" ) ).exists();
+		return !( new File( mDestPath + "/tools/libs" ) ).exists();
 	}
 	
 	public boolean install( )
