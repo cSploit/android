@@ -68,7 +68,7 @@ public class ToolsInstaller
 	
 	public boolean needed( )
 	{
-		return !( new File( mDestPath + "/tools/libs" ) ).exists();
+		return !( new File( System.getLibraryPath() ) ).exists();
 	}
 	
 	public boolean install( )
@@ -82,7 +82,7 @@ public class ToolsInstaller
 		ZipEntry 		 zipEntry;
 	    byte[] 		     buffer = new byte[ BUFFER_SIZE ];
 	    int				 read;
-	    FileOutputStream fileOutput;
+	    FileOutputStream fileOutput;																																																																																																																																																																																													
 	    File			 file;
 	    String			 fileName;
 	    
