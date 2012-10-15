@@ -99,7 +99,7 @@ public class ActionActivity extends SherlockListActivity
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);        
                         
-        if( System.getCurrentTarget() != null )
+        if( System.getTargets() != null && System.getTargets().size() > 0 && System.getCurrentTarget() != null )
         {
 	        setTitle( "dSploit > " + System.getCurrentTarget() );
 	        setContentView( LAYOUT );	        
