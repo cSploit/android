@@ -3,38 +3,125 @@
     android:versionCode="1"
     android:versionName="1.0.21b" >
 
-    <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="15" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-sdk
+        android:minSdkVersion="9"
+        android:targetSdkVersion="15" />
 
-    <application android:icon="@drawable/ic_launcher" android:label="@string/app_name" android:name="DSploitApplication" android:theme="@style/Theme.DSploitActionBarStyle">
-        <activity android:name=".MainActivity" android:label="@string/title_activity_main" android:screenOrientation="landscape" android:configChanges="keyboardHidden|orientation">
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <application
+        android:name="DSploitApplication"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.DSploitActionBarStyle" >
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="landscape" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
-        <service android:enabled="true" android:name=".net.NetworkMonitorService" />
-        <service android:enabled="true" android:name=".core.UpdateService" />
-        
-        <activity android:configChanges="keyboardHidden|orientation" android:name=".SettingsActivity" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>                
-        <activity android:configChanges="keyboardHidden|orientation" android:name=".ActionActivity" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>      
-        <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.RouterPwn" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity> 
-        <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.Traceroute" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>             
-        <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.PortScanner" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>        
-        <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.Inspector" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>               
-        <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.ExploitFinder" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>        
-        <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.mitm.MITM" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>        
-        <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.mitm.Sniffer" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>        
-        <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.mitm.PasswordSniffer" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>        
-        <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.LoginCracker" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>
-        <activity android:configChanges="keyboardHidden|orientation" android:name=".plugins.PacketForger" android:label="@string/title_activity_main" android:screenOrientation="landscape"></activity>
-        
+
+        <service
+            android:name=".net.NetworkMonitorService"
+            android:enabled="true" />
+        <service
+            android:name=".core.UpdateService"
+            android:enabled="true" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
+            android:name=".ActionActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
+            android:name=".plugins.RouterPwn"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
+            android:name=".plugins.Traceroute"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
+            android:name=".plugins.PortScanner"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
+            android:name=".plugins.Inspector"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
+            android:name=".plugins.ExploitFinder"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
+            android:name=".plugins.mitm.MITM"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
+            android:name=".plugins.mitm.Sniffer"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
+            android:name=".plugins.mitm.PasswordSniffer"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
+            android:name=".plugins.mitm.Hijacker"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
+            android:name=".plugins.mitm.HijackerWebView"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
+            android:name=".plugins.LoginCracker"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
+            android:name=".plugins.PacketForger"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="landscape" >
+        </activity>
     </application>
 
 </manifest>

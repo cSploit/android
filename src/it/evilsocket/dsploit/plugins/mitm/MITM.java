@@ -349,6 +349,29 @@ public class MITM extends Plugin
         
         mActions.add( new Action
         ( 
+        	"Session Hijacker", 
+        	"Listen for cookies on the network and hijack sessions.", 
+        	R.drawable.action_hijack_48,
+        	new OnClickListener(){
+			@Override
+			public void onClick( View v ) 
+			{				
+				setStoppedState();
+				
+				startActivity
+                ( 
+                  new Intent
+                  ( 
+                	MITM.this, 
+                	Hijacker.class
+                  ) 
+                );
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+			}
+		}));
+        
+        mActions.add( new Action
+        ( 
         	"Kill Connections", 
         	"Kill connections preventing the target to reach any website or server.",
         	R.drawable.action_kill_48,

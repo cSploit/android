@@ -32,17 +32,23 @@ public class Proxy implements Runnable
 	private static final String TAG     = "HTTP.PROXY";
 	private static final int    BACKLOG = 10;
 	
-	private InetAddress  		   mAddress 	 = null;
-	private int     	 		   mPort    	 = System.HTTP_PROXY_PORT;
-	private boolean 	 		   mRunning 	 = false;
-	private ServerSocket 		   mSocket  	 = null;
-	private ArrayList<ProxyFilter> mFilters 	 = null;
-	private String				   mHostRedirect = null;
-	private int					   mPortRedirect = 80;
+	private InetAddress  		   mAddress 	 	= null;
+	private int     	 		   mPort    	 	= System.HTTP_PROXY_PORT;
+	private boolean 	 		   mRunning 	 	= false;
+	private ServerSocket 		   mSocket  	 	= null;
+	private OnRequestListener	   mRequestListener = null;
+	private ArrayList<ProxyFilter> mFilters 	 	= null;
+	private String				   mHostRedirect 	= null;
+	private int					   mPortRedirect 	= 80;
 	
 	public static interface ProxyFilter
 	{
 		public String onDataReceived( String headers, String data );
+	}
+	
+	public static interface OnRequestListener
+	{
+		public void onRequest( String address, String hostname, ArrayList<String> headers );
 	}
 	
 	public Proxy( InetAddress address, int port ) throws UnknownHostException, IOException {
@@ -54,6 +60,10 @@ public class Proxy implements Runnable
 	
 	public Proxy( String address, int port ) throws UnknownHostException, IOException {
 		this( InetAddress.getByName( address ), port );
+	}
+	
+	public void setOnRequestListener( OnRequestListener listener ) {
+		mRequestListener = listener;
 	}
 	
 	public void setRedirection( String host, int port ){
@@ -106,7 +116,7 @@ public class Proxy implements Runnable
 				{
 					Socket client = mSocket.accept();
 					
-					new ProxyThread( client, mFilters, mHostRedirect, mPortRedirect ).start();
+					new ProxyThread( client, mRequestListener, mFilters, mHostRedirect, mPortRedirect ).start();
 				}
 				catch( IOException e )
 				{

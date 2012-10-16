@@ -20,6 +20,7 @@ package it.evilsocket.dsploit.net.http.proxy;
 
 
 import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.net.http.proxy.Proxy.OnRequestListener;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -45,26 +46,28 @@ public class ProxyThread extends Thread
 	private final static String IF_MODIFIED_SINCE_HEADER = "If-Modified-Since";
 	private final static String CACHE_CONTROL_HEADER	 = "Cache-Control";
 
-	private Socket 			 			 mSocket 	   = null;
-	private BufferedOutputStream 		 mWriter 	   = null;
-	private InputStream   	 	 		 mReader 	   = null;
-	private String			 			 mServerName   = null;
-	private Socket			 			 mServer 	   = null;
-	private InputStream			 	 	 mServerReader = null;
-	private OutputStream		 		 mServerWriter = null;
-	private ArrayList<Proxy.ProxyFilter> mFilters 	   = null;
-	private String				  		 mHostRedirect = null;
-	private int					   		 mPortRedirect = 80;
+	private Socket 			 			 mSocket 	   	  = null;
+	private BufferedOutputStream 		 mWriter 	   	  = null;
+	private InputStream   	 	 		 mReader 	   	  = null;
+	private String			 			 mServerName  	  = null;
+	private Socket			 			 mServer 	   	  = null;
+	private InputStream			 	 	 mServerReader	  = null;
+	private OutputStream		 		 mServerWriter 	  = null;
+	private OnRequestListener			 mRequestListener = null;
+	private ArrayList<Proxy.ProxyFilter> mFilters 	   	  = null;
+	private String				  		 mHostRedirect 	  = null;
+	private int					   		 mPortRedirect 	  = 80;
 	
-	public ProxyThread( Socket socket, ArrayList<Proxy.ProxyFilter> filters, String hostRedirection, int portRedirection ) throws IOException {
+	public ProxyThread( Socket socket, OnRequestListener listener, ArrayList<Proxy.ProxyFilter> filters, String hostRedirection, int portRedirection ) throws IOException {
 		super( "ProxyThread" );
 		
-		mSocket  	  = socket;
-		mWriter  	  = new BufferedOutputStream( mSocket.getOutputStream() );
-		mReader  	  = mSocket.getInputStream();
-		mFilters 	  = filters;		
-		mHostRedirect = hostRedirection;
-		mPortRedirect = portRedirection;
+		mSocket  	  	 = socket;
+		mWriter  	  	 = new BufferedOutputStream( mSocket.getOutputStream() );
+		mReader  	 	 = mSocket.getInputStream();
+		mRequestListener = listener;
+		mFilters 	  	 = filters;		
+		mHostRedirect 	 = hostRedirection;
+		mPortRedirect 	 = portRedirection;
 	}
 
 	public void run() {
@@ -82,12 +85,15 @@ public class ProxyThread extends Thread
 	            BufferedReader 		 bReader 			  = new BufferedReader( new InputStreamReader( byteArrayInputStream ) );	            
 	            StringBuilder 		 builder 			  = new StringBuilder();
 	            String		  		 line    			  = null;
+	            ArrayList<String>	 headers			  = new ArrayList<String>();
 	            boolean				 headersProcessed     = false;
 	            
 	            while( ( line = bReader.readLine() ) != null )
 				{	    
 	            	if( headersProcessed == false )
 	            	{
+	            		headers.add( line );
+	            		
 	            		// \r\n\r\n received ?
 	            		if( line.trim().isEmpty() )
 	            			headersProcessed = true;
@@ -134,7 +140,7 @@ public class ProxyThread extends Thread
 		            			line = header + ": " + value;
 		            	}
 	            	}
-	            	
+	            		            	
 					// build the patched request
 					builder.append( line + "\n" );
 				}
@@ -142,6 +148,9 @@ public class ProxyThread extends Thread
 	            // any real host found ?
 	 			if( mServer != null )
 	 			{				
+	 				if( mRequestListener != null )
+	            		mRequestListener.onRequest( mSocket.getLocalAddress().getHostAddress(), mServerName, headers );
+	 				
 	 				// send the patched request
 	 				mServerWriter.write( builder.toString().getBytes() );
 	 				mServerWriter.flush();

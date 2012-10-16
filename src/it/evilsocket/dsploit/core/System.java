@@ -107,6 +107,8 @@ public class System
 	
 	private static String				 mStoragePath   = null;
 	private static String				 mSessionName	= null;
+	
+	private static Object				 mCustomData	= null;
 
 	public static void init( Context context ) throws Exception {
 		mContext = context;		
@@ -212,6 +214,14 @@ public class System
 		Log.e( tag, trace  );        
 	}
 		
+	public static synchronized void setCustomData( Object data ) {
+		mCustomData = data;
+	}
+	
+	public static Object getCustomData( ) {
+		return mCustomData;
+	}
+	
 	public static String getLibraryPath( ) {
 		return mContext.getFilesDir().getAbsolutePath() + "/tools/libs";
 	}
