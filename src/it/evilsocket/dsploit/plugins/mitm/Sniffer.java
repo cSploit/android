@@ -95,7 +95,7 @@ public class Sniffer extends SherlockActivity
 			return mStats.get( address );
 		}
 		
-		public synchronized void addStats( AddressStats stats ) {
+		public synchronized void addStats( AddressStats stats ) {			
 			mStats.put( stats.mAddress, stats );
 		}
 						

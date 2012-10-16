@@ -69,9 +69,7 @@ public class RequestParser
 		            if( rawCookieParamNameAndValue.length == 2 )		           
 		            {
 			            String paramValue = rawCookieParamNameAndValue[1].trim();
-		
-			            // TODO: if( paramName.equalsIgnoreCase("expires") ) 
-			            	               	             
+					            	               	             
 			            if( paramName.equalsIgnoreCase("max-age") ) 
 			            {
 			                long maxAge = Long.parseLong(paramValue);
