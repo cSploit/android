@@ -245,7 +245,13 @@ public class Hijacker extends SherlockActivity
 	            holder.address  = ( TextView )row.findViewById( R.id.sessionTitle );
 	            holder.domain   = ( TextView )row.findViewById( R.id.sessionDescription );
 	            
-	            row.setTag( holder );	            	           	           
+	            row.setTag( holder );	     
+	            
+	            if( session.mInited == false && session.mDomain.contains("facebook.") )
+	        	{
+	        		session.mInited = true;
+	        		new FacebookUserTask().execute( session );
+	        	}	 
 	        }
 	        else	        
 	            holder = ( SessionHolder )row.getTag();
@@ -261,13 +267,7 @@ public class Hijacker extends SherlockActivity
 	        	holder.address.setText( session.mAddress );
 	        
         	holder.domain.setText( session.mDomain );
-        	
-        	if( session.mInited == false && session.mDomain.contains("facebook.") )
-        	{
-        		session.mInited = true;
-        		new FacebookUserTask().execute( session );
-        	}	       
-        	
+        	        	              	
 	        return row;
 	    }
 	}
