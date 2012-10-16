@@ -18,10 +18,18 @@
  */
 package it.evilsocket.dsploit.plugins.mitm;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.http.impl.cookie.BasicClientCookie;
+import org.json.JSONObject;
 
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
@@ -33,6 +41,9 @@ import it.evilsocket.dsploit.net.http.proxy.Proxy.OnRequestListener;
 import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,6 +73,9 @@ public class Hijacker extends SherlockActivity
 	
 	public static class Session
 	{
+		public Bitmap								mPicture   = null;
+		public String								mUserName  = null;
+		public boolean								mInited	   = false;
 		public String 			 					mAddress   = "";
 		public String 			 					mDomain    = "";
 		public String								mUserAgent = "";
@@ -104,7 +118,86 @@ public class Hijacker extends SherlockActivity
 		private int 					   mLayoutId = 0;
 		private HashMap< String, Session > mSessions = null;
 		
-		public class StatsHolder
+		private class FacebookUserTask extends AsyncTask<Session, Void, Boolean> 
+		{
+			private Bitmap getUserImage( String uri ) {
+			    Bitmap image = null;
+			    try 
+			    {
+			        URL 		  url  = new URL( uri );
+			        URLConnection conn = url.openConnection();
+			        conn.connect();
+			        
+			        InputStream 		input  = conn.getInputStream();
+			        BufferedInputStream reader = new BufferedInputStream( input );
+			        
+			        image = BitmapFactory.decodeStream( reader );
+			        
+			        reader.close();
+			        input.close();
+			    } 
+			    catch( IOException e ) 
+			    {
+			        System.errorLogging( "HIJACKER", e );
+			    } 
+			    
+			    return image;
+			}
+			
+			private String getUserName( String uri ) {
+				String username = null;
+				
+				try 
+			    {
+			        URL 		  url  = new URL( uri );
+			        URLConnection conn = url.openConnection();
+			        conn.connect();
+			        
+			        InputStream    input  = conn.getInputStream();
+			        BufferedReader reader = new BufferedReader( new InputStreamReader( input ) );
+			        String		   line   = null, 
+			        			   data   = "";
+			        
+			        while( ( line = reader.readLine() ) != null )
+			        	data += line;
+			        			        
+			        reader.close();
+			        input.close();
+			        
+			        JSONObject response = new JSONObject( data );
+			        
+			        username = response.getString("name");
+			    } 
+			    catch( Exception e ) 
+			    {
+			        System.errorLogging( "HIJACKER", e );
+			    } 
+				
+				return username;
+			}
+			
+			
+			@Override
+			protected Boolean doInBackground(Session... sessions) {
+				Session 			session = sessions[0];
+				BasicClientCookie   user    = session.mCookies.get("c_user");
+				
+				if( user != null )
+				{
+					String fbUserId     = user.getValue(),
+						   fbGraphUrl   = "https://graph.facebook.com/" + fbUserId + "/",
+						   fbPictureUrl = fbGraphUrl + "picture";
+					
+					session.mUserName = getUserName( fbGraphUrl );
+					session.mPicture  = getUserImage( fbPictureUrl );
+				}
+				
+				return true;
+			}
+			
+		}
+		
+		public class SessionHolder
 	    {
 			ImageView favicon;
 			TextView  address;
@@ -138,32 +231,43 @@ public class Hijacker extends SherlockActivity
 		@Override
 	    public View getView( int position, View convertView, ViewGroup parent ) {				
 	        View 		row    = convertView;
-	        StatsHolder holder = null;
+	        SessionHolder holder = null;
+	        Session session    = getByPosition( position );
 	        
 	        if( row == null )
 	        {
 	            LayoutInflater inflater = ( LayoutInflater )Hijacker.this.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
 	            row = inflater.inflate( mLayoutId, parent, false );
 	            
-	            holder = new StatsHolder();
+	            holder = new SessionHolder();
 	            
 	            holder.favicon  = ( ImageView )row.findViewById( R.id.sessionIcon );
 	            holder.address  = ( TextView )row.findViewById( R.id.sessionTitle );
-	            holder.domain = ( TextView )row.findViewById( R.id.sessionDescription );
-
-	            row.setTag( holder );
+	            holder.domain   = ( TextView )row.findViewById( R.id.sessionDescription );
+	            
+	            row.setTag( holder );	            	           	           
 	        }
+	        else	        
+	            holder = ( SessionHolder )row.getTag();
+
+	        if( session.mPicture != null )
+	        	holder.favicon.setImageBitmap( session.mPicture );
 	        else
-	        {
-	            holder = ( StatsHolder )row.getTag();
-	        }
+	        	holder.favicon.setImageResource( getFaviconFromDomain( session.mDomain ) );
 	        
-	        Session session = getByPosition( position );
-
-	        holder.favicon.setImageResource( getFaviconFromDomain( session.mDomain ) );	        
-	        holder.address.setText( session.mAddress );
-	        holder.domain.setText( session.mDomain );
-
+	        if( session.mUserName != null )
+	        	holder.address.setText( session.mUserName );
+	        else
+	        	holder.address.setText( session.mAddress );
+	        
+        	holder.domain.setText( session.mDomain );
+        	
+        	if( session.mInited == false && session.mDomain.contains("facebook.") )
+        	{
+        		session.mInited = true;
+        		new FacebookUserTask().execute( session );
+        	}	       
+        	
 	        return row;
 	    }
 	}

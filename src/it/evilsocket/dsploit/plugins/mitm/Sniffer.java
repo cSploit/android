@@ -18,6 +18,7 @@
  */
 package it.evilsocket.dsploit.plugins.mitm;
 
+
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -98,7 +99,7 @@ public class Sniffer extends SherlockActivity
 		public synchronized void addStats( AddressStats stats ) {			
 			mStats.put( stats.mAddress, stats );
 		}
-						
+	
 		private synchronized AddressStats getByPosition( int position ) {
 			return mStats.get( mStats.keySet().toArray()[ position ] );
 		}

@@ -213,7 +213,7 @@ public class MainActivity extends SherlockListActivity
 						fatal = "This application can run only on rooted devices.";
 					
 					else if( Shell.isBinaryAvailable("killall") == false )
-		    			fatal = "Full BusyBox installation required, killall binary not found.";
+		    			fatal = "Full BusyBox installation required, killall binary not found ( maybe you have an old busybox version ).";
 		        							        						               
 					else if( installer.needed() && installer.install() == false )			        
 						fatal = "Error during files installation!";
