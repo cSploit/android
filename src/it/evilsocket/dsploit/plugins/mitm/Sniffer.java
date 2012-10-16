@@ -77,7 +77,7 @@ public class Sniffer extends SherlockActivity
 	{
 		private int 							mLayoutId = 0;
 		private HashMap< String, AddressStats > mStats 	  = null;
-		
+
 		public class StatsHolder
 	    {
 			TextView  address;

@@ -22,17 +22,42 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Map;
 
 public class Shell 
 {
 	private static final String TAG = "SHELL";
 	
-	private static Process spawnShell( String command ) throws IOException {
-		ProcessBuilder builder = new ProcessBuilder().command( command );
+	private static Process spawnShell( String command, boolean bUpdateLibraryPath ) throws IOException {
+		ProcessBuilder 		builder 	= new ProcessBuilder().command( command );
+		Map<String, String> environment = builder.environment();
 		
 		builder.redirectErrorStream(true);
 		
+		if( bUpdateLibraryPath )
+		{
+			boolean found  = false;
+			String libPath = System.getLibraryPath();
+
+			for( Map.Entry<String, String> entry : environment.entrySet() )
+			{
+				if( entry.getKey().equals("LD_LIBRARY_PATH") )
+				{
+					environment.put( "LD_LIBRARY_PATH", entry.getValue() + ":" + libPath );
+					found = true;
+					break;
+				}								
+			}
+			
+			if( found == false )			
+				environment.put( "LD_LIBRARY_PATH", libPath );			
+		}
+		
 		return builder.start();
+	}
+	
+	private static Process spawnShell( String command ) throws IOException {
+		return spawnShell( command, false ); 
 	}
 	
 	public static boolean isRootGranted( ) {
@@ -120,7 +145,7 @@ public class Shell
 	}
 	
 	public static int exec( String command, OutputReceiver receiver ) throws IOException, InterruptedException {
-		Process			 process = spawnShell( "su" );
+		Process			 process = spawnShell( "su", true );
 		DataOutputStream writer  = null;
 		BufferedReader   reader  = null;
 		String			 line    = null,
@@ -131,8 +156,10 @@ public class Shell
 		writer = new DataOutputStream( process.getOutputStream() );
 		reader = new BufferedReader( new InputStreamReader( process.getInputStream() ) );
 		
+		// is this really needed ?
 		writer.writeBytes( "export LD_LIBRARY_PATH=" + libPath + ":$LD_LIBRARY_PATH\n" );
 		writer.flush();
+		
 		writer.writeBytes( command + "\n" );
 		writer.flush();
 		writer.writeBytes( "exit\n" );
