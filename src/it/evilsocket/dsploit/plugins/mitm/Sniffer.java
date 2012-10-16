@@ -90,7 +90,7 @@ public class Sniffer extends SherlockActivity
 	        mLayoutId = layoutId;
 	        mStats    = new HashMap< String, AddressStats >();
 	    }
-		
+
 		public AddressStats getStats( String address ) {
 			return mStats.get( address );
 		}

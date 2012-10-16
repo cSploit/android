@@ -27,6 +27,14 @@ public class Shell
 {
 	private static final String TAG = "SHELL";
 	
+	private static Process spawnShell( String command ) throws IOException {
+		ProcessBuilder builder = new ProcessBuilder().command( command );
+		
+		builder.redirectErrorStream(true);
+		
+		return builder.start();
+	}
+	
 	public static boolean isRootGranted( ) {
 		Process			 process = null;
 		DataOutputStream writer  = null;
@@ -34,9 +42,10 @@ public class Shell
 		String			 line    = null;
 		boolean 		 granted = false;
 
-		try {
-			process = Runtime.getRuntime().exec( System.getSuPath() );
-			writer  = new DataOutputStream(process.getOutputStream());
+		try 
+		{
+			process = spawnShell( "su" );
+			writer  = new DataOutputStream( process.getOutputStream() );
 			reader  = new BufferedReader( new InputStreamReader(process.getInputStream()) );
 
 			writer.writeBytes( "id\n" );
@@ -86,9 +95,15 @@ public class Shell
 	{
 		try
 		{
-			Process 	   process  = Runtime.getRuntime().exec( "which " + binary );
-			BufferedReader reader   = new BufferedReader( new InputStreamReader( process.getInputStream() ) );  
-			String		   line	    = null;
+			Process 	     process  = spawnShell( "sh" );
+			DataOutputStream writer   = new DataOutputStream( process.getOutputStream() );;
+			BufferedReader   reader   = new BufferedReader( new InputStreamReader( process.getInputStream() ) );  
+			String		     line	  = null;
+			
+			writer.writeBytes( "which " + binary + "\n" );
+			writer.flush();
+			writer.writeBytes( "exit\n" );
+			writer.flush();
 			
 			while( ( line = reader.readLine() ) != null ) 
 			{  
@@ -105,20 +120,14 @@ public class Shell
 	}
 	
 	public static int exec( String command, OutputReceiver receiver ) throws IOException, InterruptedException {
-		Process			 process = null;
-		ProcessBuilder   builder = null;
+		Process			 process = spawnShell( "su" );
 		DataOutputStream writer  = null;
 		BufferedReader   reader  = null;
 		String			 line    = null,
 						 libPath = System.getLibraryPath();
-				
-		builder = new ProcessBuilder().command("su");
-		builder.redirectErrorStream(true);
-				
+						
 		if( receiver != null ) receiver.onStart( command );
-		
-		process = builder.start();
-		
+				
 		writer = new DataOutputStream( process.getOutputStream() );
 		reader = new BufferedReader( new InputStreamReader( process.getInputStream() ) );
 		
