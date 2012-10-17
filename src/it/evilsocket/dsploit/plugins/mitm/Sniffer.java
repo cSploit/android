@@ -18,7 +18,6 @@
  */
 package it.evilsocket.dsploit.plugins.mitm;
 
-
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,7 +28,7 @@ import com.actionbarsherlock.view.MenuItem;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
-import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
+import it.evilsocket.dsploit.plugins.mitm.SpoofSession.OnSessionReadyListener;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.Html;
@@ -55,6 +54,7 @@ public class Sniffer extends SherlockActivity
 	private StatListAdapter	   mAdapter			  = null;
 	private boolean	     	   mRunning			  = false;	
 	private double			   mSampleTime		  = 1.0;
+	private SpoofSession	   mSpoofSession	  = null;
 	
 	public static class AddressStats
 	{
@@ -186,6 +186,7 @@ public class Sniffer extends SherlockActivity
         mListView 		   = ( ListView )findViewById( R.id.listView );
         mAdapter		   = new StatListAdapter( R.layout.plugin_mitm_sniffer_list_item );
         mSampleTime		   = Double.parseDouble( System.getSettings().getString( "PREF_SNIFFER_SAMPLE_TIME", "1.0" ) );
+        mSpoofSession	   = new SpoofSession( false, false, null, null );
         
         mListView.setAdapter( mAdapter );
                 
@@ -221,10 +222,9 @@ public class Sniffer extends SherlockActivity
 	}
 
 	private void setStoppedState( ) {		
-		System.getEttercap().kill();
-		System.getTcpDump().kill();
+		mSpoofSession.stop();
 
-		System.setForwarding( false );
+		System.getTcpDump().kill();
 		
 		mSniffProgress.setVisibility( View.INVISIBLE );
 		
@@ -234,14 +234,11 @@ public class Sniffer extends SherlockActivity
 
 	private void setStartedState( ) {		
 		// never say never :)
-		System.getEttercap().kill();
 		System.getTcpDump().kill();
-					
-		System.getEttercap().spoof( System.getCurrentTarget(), new OnReadyListener(){
+		
+		mSpoofSession.start( new OnSessionReadyListener() {			
 			@Override
-			public void onReady() { 
-				System.setForwarding( true );
-
+			public void onSessionReady() {
 				System.getTcpDump().sniff( PCAP_FILTER, new OutputReceiver(){
 					@Override
 					public void onStart(String command) { }
@@ -310,10 +307,10 @@ public class Sniffer extends SherlockActivity
 
 					@Override
 					public void onEnd(int exitCode) { }
-				}).start();
+				}).start();				
 			}
-		}).start();
-						
+		});
+	
 		mSniffProgress.setVisibility( View.VISIBLE );
 		mRunning = true;
 	}

@@ -57,6 +57,7 @@ public class PasswordSniffer extends SherlockActivity
 	private String			   mFileOutput		  = null;
 	private FileWriter		   mFileWriter		  = null;
 	private BufferedWriter	   mBufferedWriter	  = null;
+	private SpoofSession	   mSpoofSession	  = null;
 	
 	public class ListViewAdapter extends BaseExpandableListAdapter
 	{
@@ -68,7 +69,7 @@ public class PasswordSniffer extends SherlockActivity
 			mContext = context; 
 		}
 		
-		public boolean hasGroup( String name ) {
+		public boolean children( String name ) {
 			return mGroups.containsKey(name);
 		}
 		
@@ -77,8 +78,23 @@ public class PasswordSniffer extends SherlockActivity
 			notifyDataSetChanged();
 		}
 		
-		public void addChild( String group, String child ) {
-			if( !hasGroup( group ) )
+		public boolean hasChild( String group, String line ) {
+			ArrayList<String> children =  mGroups.get(group);
+			
+			if( children != null )
+			{
+				for( String child : children )
+				{
+					if( child.equals( line ) )
+						return true;
+				}
+			} 
+			
+			return false;
+		}
+		
+		public synchronized void addChild( String group, String child ) {
+			if( mGroups.get(group) == null )
 				addGroup( group );
 			
 			mGroups.get( group ).add( child );
@@ -181,6 +197,7 @@ public class PasswordSniffer extends SherlockActivity
         mSniffProgress	   = ( ProgressBar )findViewById( R.id.sniffActivity );
         mListView		   = ( ExpandableListView )findViewById( R.id.listView );
         mAdapter		   = new ListViewAdapter( this );
+        mSpoofSession	   = new SpoofSession( false, false, null, null );
         
         mListView.setAdapter( mAdapter );
                 
@@ -216,7 +233,7 @@ public class PasswordSniffer extends SherlockActivity
 	}
 
 	private void setStoppedState( ) {		
-		System.getEttercap().kill();
+		mSpoofSession.stop();
 
 		try
 		{
@@ -227,19 +244,13 @@ public class PasswordSniffer extends SherlockActivity
 		{
 			System.errorLogging( TAG, e );
 		}
-
-		System.setForwarding( false );
 		
-		mSniffProgress.setVisibility( View.INVISIBLE );
-		
+		mSniffProgress.setVisibility( View.INVISIBLE );		
 		mRunning = false;
 		mSniffToggleButton.setChecked( false );                			
 	}
 
-	private void setStartedState( ) {		
-		// never say never :)
-		System.getEttercap().kill();
-		
+	private void setStartedState( ) {				
 		try
 		{
 			// open file in appending mode
@@ -252,28 +263,31 @@ public class PasswordSniffer extends SherlockActivity
 		}
 		
 		Toast.makeText( PasswordSniffer.this, "Logging to " + mFileOutput, Toast.LENGTH_LONG ).show();
-
-		System.getEttercap().spoofPasswords( System.getCurrentTarget(), new OnAccountListener() {			
+			
+		mSpoofSession.startWithPasswords( new OnAccountListener() {			
 			@Override
 			public void onAccount( final String protocol, final String address, final String port, final String line ) {
 				PasswordSniffer.this.runOnUiThread( new Runnable() {
 					@Override
 					public void run()
-					{							
-						try
+					{				
+						if( mAdapter.hasChild( protocol, line ) == false )
 						{
-							mBufferedWriter.write( line + "\n" );
+							try
+							{
+								mBufferedWriter.write( line + "\n" );
+							}
+							catch( IOException e )
+							{
+								System.errorLogging( TAG, e );
+							}
+							
+							mAdapter.addChild( protocol, line );	
 						}
-						catch( IOException e )
-						{
-							System.errorLogging( TAG, e );
-						}
-						
-						mAdapter.addChild( protocol, line );						
 					}							
 				});				
 			}
-		}).start();
+		});
 		
 		mSniffProgress.setVisibility( View.VISIBLE );
 		mRunning = true;

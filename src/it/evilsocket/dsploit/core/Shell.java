@@ -167,7 +167,8 @@ public class Shell
 
 		while( ( line = reader.readLine() ) != null )
 		{
-			if( receiver != null ) receiver.onNewLine( line );
+			if( receiver != null ) 
+				receiver.onNewLine( line );
 		}
 
 		int exit = process.waitFor();

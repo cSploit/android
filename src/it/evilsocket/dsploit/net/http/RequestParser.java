@@ -20,6 +20,7 @@ package it.evilsocket.dsploit.net.http;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.apache.http.impl.cookie.BasicClientCookie;
 
@@ -112,11 +113,26 @@ public class RequestParser
 	}
 	
 	public static ArrayList<BasicClientCookie> getCookiesFromHeaders( ArrayList<String> headers ){
-		String cookie = getHeaderValue( "Cookie", headers );
+		String headerValue = getHeaderValue( "Cookie", headers );
 		
-		if( cookie != null )
-			return parseRawCookie( cookie );
-		else
-			return null;
+		if( headerValue != null )
+		{
+			ArrayList<BasicClientCookie> cookies = parseRawCookie( headerValue );
+			if( cookies != null && cookies.size() > 0 )
+			{
+				// remove google and cloudflare cookies
+				Iterator<BasicClientCookie> it = cookies.iterator();
+				while( it.hasNext() )
+				{
+					BasicClientCookie cookie = ( BasicClientCookie )it.next();
+					if( cookie.getName().startsWith("__utm" ) || cookie.getName().equals("__cfduid") )					
+						it.remove();					
+				}
+
+				return cookies.size() > 0 ? cookies : null;
+			}
+		}
+		
+		return null;
 	}
 }

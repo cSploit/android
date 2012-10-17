@@ -396,7 +396,20 @@ public class MainActivity extends SherlockListActivity
 		
 		return super.onCreateOptionsMenu(menu);
 	}
-
+	
+	@Override
+	public boolean onPrepareOptionsMenu( Menu menu ) {		
+		MenuItem item = menu.findItem( R.id.ss_monitor );
+		
+		if( NetworkMonitorService.RUNNING )				
+			item.setTitle( "Stop Network Monitor" );
+		
+		else				
+			item.setTitle( "Start Network Monitor" );
+				
+		return super.onPrepareOptionsMenu(menu);
+	}
+	
 	@Override
 	public boolean onOptionsItemSelected( MenuItem item ) {
 					
@@ -590,7 +603,9 @@ public class MainActivity extends SherlockListActivity
 	@Override
 	protected void onListItemClick( ListView l, View v, int position, long id ){
 		super.onListItemClick( l, v, position, id);
-					
+		
+		stopService( new Intent( this, NetworkMonitorService.class ) );
+		
 		System.setCurrentTarget( position );
 		
 		Toast.makeText( MainActivity.this, "Selected " + System.getCurrentTarget(), Toast.LENGTH_SHORT ).show();	                	

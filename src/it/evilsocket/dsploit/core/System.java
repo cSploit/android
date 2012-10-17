@@ -646,7 +646,7 @@ public class System
 		return mTargets.get( index );
 	}
 	
-	public static boolean hasTarget( Target target ) {
+	public synchronized static boolean hasTarget( Target target ) {
 		for( Target t : mTargets )
 		{
 			if( t != null && t.equals(target) )

