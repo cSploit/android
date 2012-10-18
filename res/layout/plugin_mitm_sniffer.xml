@@ -40,5 +40,27 @@
         android:paddingRight="5dp" >
 
     </ListView>
+
+    <Spinner
+        android:id="@+id/sortSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/sniffToggleButton"
+        android:layout_alignTop="@+id/sniffActivity"
+        android:layout_toLeftOf="@+id/sniffActivity"
+        android:layout_toRightOf="@+id/textView1" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/sniffToggleButton"
+        android:layout_alignTop="@+id/sortSpinner"
+        android:layout_toRightOf="@+id/sniffToggleButton"
+        android:gravity="center_vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="10dp"
+        android:text="Sort:"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
     
 </RelativeLayout>

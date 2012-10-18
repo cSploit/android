@@ -86,7 +86,7 @@ public class SpoofSession
 		}).start();		
 	}
 	
-	public void startWithPasswords( Target target, OnAccountListener listener ) {
+	public void start( Target target, OnAccountListener listener ) {
 		this.stop();						
 		System.getEttercap().spoofPasswords( target, listener ).start();		
 	}
@@ -95,8 +95,8 @@ public class SpoofSession
 		this.start( System.getCurrentTarget(), listener );
 	}
 	
-	public void startWithPasswords( OnAccountListener listener ) {
-		this.startWithPasswords( System.getCurrentTarget(), listener );
+	public void start( OnAccountListener listener ) {
+		this.start( System.getCurrentTarget(), listener );
 	}
 	
 	public void stop() {

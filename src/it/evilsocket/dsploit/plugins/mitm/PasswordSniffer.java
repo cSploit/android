@@ -264,7 +264,7 @@ public class PasswordSniffer extends SherlockActivity
 		
 		Toast.makeText( PasswordSniffer.this, "Logging to " + mFileOutput, Toast.LENGTH_LONG ).show();
 			
-		mSpoofSession.startWithPasswords( new OnAccountListener() {			
+		mSpoofSession.start( new OnAccountListener() {			
 			@Override
 			public void onAccount( final String protocol, final String address, final String port, final String line ) {
 				PasswordSniffer.this.runOnUiThread( new Runnable() {

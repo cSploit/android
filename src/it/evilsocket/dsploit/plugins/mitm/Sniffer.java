@@ -18,7 +18,8 @@
  */
 package it.evilsocket.dsploit.plugins.mitm;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,19 +37,33 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
+import android.widget.AdapterView.OnItemSelectedListener;
 
 public class Sniffer extends SherlockActivity
 {
-	private static final String  TAG		 = "SNIFFER";
+	private static final String   TAG  = "SNIFFER";
+	private static final String[] SORT = {
+		"Bandwidth ↓",
+		"Bandwidth ↑",
+		"Total ↓",
+		"Total ↑",
+		"Activity ↓",
+		"Activity ↑",
+	};
+	
 	private static final String  PCAP_FILTER = "not '(src host localhost or dst host localhost or arp)'";
 	private static final Pattern PARSER 	 = Pattern.compile( "^.+length\\s+(\\d+)\\)\\s+([\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3})\\.[^\\s]+\\s+>\\s+([\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3})\\.[^\\:]+:.+", Pattern.CASE_INSENSITIVE );
 
 	private ToggleButton 	   mSniffToggleButton = null;
+	private Spinner			   mSortSpinner		  = null;
+	private int				   mSortType		  = 0;
 	private ProgressBar	 	   mSniffProgress     = null;
 	private ListView 		   mListView    	  = null;		
 	private StatListAdapter	   mAdapter			  = null;
@@ -56,7 +71,7 @@ public class Sniffer extends SherlockActivity
 	private double			   mSampleTime		  = 1.0;
 	private SpoofSession	   mSpoofSession	  = null;
 	
-	public static class AddressStats
+	public class AddressStats implements Comparable<AddressStats>
 	{
 		public String mAddress     = "";
 		public int 	  mPackets	   = 0;
@@ -72,12 +87,41 @@ public class Sniffer extends SherlockActivity
 			mSampledTime = 0;
 			mSampledSize = 0;
 		}
+
+		@Override
+		public int compareTo( AddressStats stats ) {
+			int[]  cmp = null;
+			double va  = 0,
+				   vb  = 0;
+			
+			switch( getSortType() )
+			{
+				case 0 : cmp = new int[]{ -1, 1, 0 }; va = mBandwidth; 	 vb = stats.mBandwidth; break;
+				case 1 : cmp = new int[]{ 1, -1, 0 }; va = mBandwidth; 	 vb = stats.mBandwidth; break;
+				case 2 : cmp = new int[]{ -1, 1, 0 }; va = mPackets; 	 vb = stats.mPackets; break;
+				case 3 : cmp = new int[]{ 1, -1, 0 }; va = mPackets; 	 vb = stats.mPackets; break;
+				case 4 : cmp = new int[]{ -1, 1, 0 }; va = mSampledTime; vb = stats.mSampledTime; break;
+				case 5 : cmp = new int[]{ 1, -1, 0 }; va = mSampledTime; vb = stats.mSampledTime; break;
+				
+				default :
+					cmp = new int[]{ -1, 1, 0 }; va = mBandwidth; 	 vb = stats.mBandwidth; break;
+			}
+			
+			if( va > vb )
+				return cmp[0];
+			
+			else if( va < vb )
+				return cmp[1];
+			
+			else
+				return cmp[2];
+		}
 	}
 
 	public class StatListAdapter extends ArrayAdapter<AddressStats> 
 	{
-		private int 							mLayoutId = 0;
-		private HashMap< String, AddressStats > mStats 	  = null;
+		private int 					  mLayoutId = 0;
+		private ArrayList< AddressStats > mStats 	= null;
 
 		public class StatsHolder
 	    {
@@ -89,19 +133,44 @@ public class Sniffer extends SherlockActivity
 	        super( Sniffer.this, layoutId );
 	        	       
 	        mLayoutId = layoutId;
-	        mStats    = new HashMap< String, AddressStats >();
+	        mStats    = new ArrayList< AddressStats >();
 	    }
 
 		public AddressStats getStats( String address ) {
-			return mStats.get( address );
+			for( AddressStats stats : mStats )
+			{
+				if( stats.mAddress.equals(address) )
+					return stats;
+			}
+			
+			return null;
 		}
 		
-		public synchronized void addStats( AddressStats stats ) {			
-			mStats.put( stats.mAddress, stats );
+		public synchronized void addStats( AddressStats stats ) {	
+			boolean found = false;
+			
+			for( AddressStats sstats : mStats )
+			{
+				if( sstats.mAddress.equals( stats.mAddress ) )
+				{
+					sstats.mPackets     = stats.mPackets;
+					sstats.mBandwidth   = stats.mBandwidth;
+					sstats.mSampledTime = stats.mSampledTime;
+					sstats.mSampledSize = stats.mSampledSize;
+					
+					found = true;
+					break;
+				}
+			}
+			
+			if( found == false )
+				mStats.add( stats );
+			
+			Collections.sort( mStats );
 		}
 	
 		private synchronized AddressStats getByPosition( int position ) {
-			return mStats.get( mStats.keySet().toArray()[ position ] );
+			return mStats.get( position );
 		}
 				
 		@Override
@@ -183,10 +252,21 @@ public class Sniffer extends SherlockActivity
         
         mSniffToggleButton = ( ToggleButton )findViewById( R.id.sniffToggleButton );
         mSniffProgress	   = ( ProgressBar )findViewById( R.id.sniffActivity );
+        mSortSpinner	   = ( Spinner )findViewById( R.id.sortSpinner );
         mListView 		   = ( ListView )findViewById( R.id.listView );
         mAdapter		   = new StatListAdapter( R.layout.plugin_mitm_sniffer_list_item );
         mSampleTime		   = Double.parseDouble( System.getSettings().getString( "PREF_SNIFFER_SAMPLE_TIME", "1.0" ) );
         mSpoofSession	   = new SpoofSession( false, false, null, null );
+        
+        mSortSpinner.setAdapter( new ArrayAdapter<String>( this, android.R.layout.simple_spinner_item, SORT ) );
+        mSortSpinner.setOnItemSelectedListener( new OnItemSelectedListener() {
+        	public void onItemSelected( AdapterView<?> adapter, View view, int position, long id ) 
+        	{
+        		mSortType = position;
+        	}
+        	
+        	public void onNothingSelected(AdapterView<?> arg0) {}
+		});
         
         mListView.setAdapter( mAdapter );
                 
@@ -203,6 +283,10 @@ public class Sniffer extends SherlockActivity
 				}
 			}} 
 		);        
+	}
+	
+	public synchronized int getSortType() {
+		return mSortType;
 	}
 	
 	@Override
@@ -271,8 +355,8 @@ public class Sniffer extends SherlockActivity
 								
 								if( stats == null )
 								{
-									stats 		   = new AddressStats( source );
-									stats.mPackets = ilength;
+									stats 		   	   = new AddressStats( source );
+									stats.mPackets 	   = ilength;
 									stats.mSampledTime = now;							
 								}
 								else
