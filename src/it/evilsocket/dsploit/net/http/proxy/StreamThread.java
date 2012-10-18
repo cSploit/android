@@ -34,18 +34,21 @@ public class StreamThread implements Runnable
 	private final static byte[][] FILTERED_CONTENT_TYPES = new byte[][]
     {
 		"text/html".getBytes(),
-		"text/css".getBytes()
+		"text/css".getBytes(),
+		"text/javascript".getBytes()
     };
 	
 	private final static String  HEAD_SEPARATOR    = "\r\n\r\n";
     private final static int     CHUNK_SIZE        = 1024;
     
+    private String			  mClient = null;
     private InputStream       mReader = null;
     private OutputStream      mWriter = null;
     private ByteBuffer		  mBuffer = null;
     private Proxy.ProxyFilter mFilter = null;
     
-    public StreamThread( InputStream reader, OutputStream writer, Proxy.ProxyFilter filter ){
+    public StreamThread( String client, InputStream reader, OutputStream writer, Proxy.ProxyFilter filter ) {
+    	mClient = client;
     	mReader = reader;
     	mWriter = writer;
     	mBuffer = new ByteBuffer();
@@ -80,7 +83,35 @@ public class StreamThread implements Runnable
     		}
     		
     		if( mBuffer.isEmpty() == false )
-    		{    			
+    		{    	
+    			// handle relocations for https support
+				String   data    = mBuffer.toString();
+				String[] split   = data.split( HEAD_SEPARATOR, 2 );
+				String   headers = split[ 0 ];
+				
+				for( String header : headers.split("\n") )
+				{
+					if( header.indexOf(':') != -1 )
+					{
+						String[] hsplit = header.split( ":", 2 );
+		        		String   hname  = hsplit[0].trim(),
+		        				 hvalue = hsplit[1].trim();
+		        		
+		        		if( hname.equals( "Location" ) && hvalue.startsWith("https://") )
+		        		{
+		        			Log.w( TAG, "Patching 302 HTTPS redirect : " + hvalue );
+							
+		        			// update variables for further filtering
+		        			mBuffer.replace( "Location: https://".getBytes(), "Location: http://".getBytes() );
+		    				data    = mBuffer.toString();
+		    				split   = data.split( HEAD_SEPARATOR, 2 );
+		    				headers = split[ 0 ];
+		    				
+		        			HTTPSMonitor.getInstance().addURL( mClient, hvalue.replace( "https://", "http://" ).replace( "&amp;", "&" ) );
+		        		}
+					}
+				}
+				
 				// do we have an handled content type ?
     			boolean isHandledContentType = false;
     			for( byte[] handled : FILTERED_CONTENT_TYPES )
@@ -94,12 +125,8 @@ public class StreamThread implements Runnable
     			
 				if( isHandledContentType )
 				{
-					// split headers and body, then apply the filter				
-					String   data    = mBuffer.toString();
-					String[] split   = data.split( HEAD_SEPARATOR, 2 );
-					String   headers = split[ 0 ],
-							 body	 = ( split.length > 1 ? split[ 1 ] : "" ),
-							 patched = "";
+					String body	   = ( split.length > 1 ? split[ 1 ] : "" ),
+						   patched = "";
 					
 					body = mFilter.onDataReceived( headers, body );
 	
@@ -110,10 +137,11 @@ public class StreamThread implements Runnable
 							patched += header + "\n";
 					}
 					
-					headers = patched;				
-					mBuffer.setData( ( headers + HEAD_SEPARATOR + body ).getBytes() );				
+					headers = patched;	
+					
+					mBuffer.setData( ( headers + HEAD_SEPARATOR + body ).getBytes() );
 				}
-				
+																		
 				mWriter.write( mBuffer.getData() );    			    			
 				mWriter.flush();
     		}

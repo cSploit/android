@@ -42,6 +42,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -71,10 +72,11 @@ public class Hijacker extends SherlockActivity
 	private SpoofSession	   mSpoof			   = null;
 	
 	public static class Session
-	{
+	{		
 		public Bitmap								mPicture   = null;
 		public String								mUserName  = null;
 		public boolean								mInited	   = false;
+		public boolean								mHTTPS	   = false;
 		public String 			 					mAddress   = "";
 		public String 			 					mDomain    = "";
 		public String								mUserAgent = "";
@@ -117,8 +119,8 @@ public class Hijacker extends SherlockActivity
 
 	public class SessionListAdapter extends ArrayAdapter<Session> 
 	{
-		private int 					   mLayoutId = 0;
-		private HashMap< String, Session > mSessions = null;
+		private int 					   mLayoutId  = 0;
+		private HashMap< String, Session > mSessions  = null;
 		
 		private class FacebookUserTask extends AsyncTask<Session, Void, Boolean> 
 		{
@@ -253,12 +255,12 @@ public class Hijacker extends SherlockActivity
 	        mSessions = new HashMap< String, Session >();
 	    }
 		
-		public Session getSession( String address, String domain ) {
-			return mSessions.get( address + ":" + domain );
+		public Session getSession( String address, String domain, boolean https ) {
+			return mSessions.get( address + ":" + domain + ":" + https );
 		}
 		
 		public synchronized void addSession( Session session ) {
-			mSessions.put( session.mAddress + ":" + session.mDomain, session );
+			mSessions.put( session.mAddress + ":" + session.mDomain + ":" + session.mHTTPS, session );
 		}
 		
 		public synchronized Session getByPosition( int position ) {
@@ -268,6 +270,23 @@ public class Hijacker extends SherlockActivity
 		@Override
 		public int getCount(){
 			return mSessions.size();
+		}
+		
+		public Bitmap addLogo( Bitmap mainImage, Bitmap logoImage ) { 
+		    Bitmap finalImage = null; 
+		    int width, height = 0; 
+		        
+		    width = mainImage.getWidth(); 
+		    height = mainImage.getHeight(); 
+		    
+		    finalImage = Bitmap.createBitmap(width, height, mainImage.getConfig()); 
+		    
+		    Canvas canvas = new Canvas(finalImage); 
+		    
+		    canvas.drawBitmap(mainImage, 0,0,null);
+		    canvas.drawBitmap(logoImage, canvas.getWidth()-logoImage.getWidth() ,canvas.getHeight()-logoImage.getHeight() ,null);
+
+		    return finalImage; 
 		}
 		
 		@Override
@@ -303,12 +322,18 @@ public class Hijacker extends SherlockActivity
         			new XdaUserTask().execute( session );
         	}
            
-
+            Bitmap picture = null;
+            
 	        if( session.mPicture != null )
-	        	holder.favicon.setImageBitmap( session.mPicture );
+	        	picture = session.mPicture;
 	        else
-	        	holder.favicon.setImageResource( getFaviconFromDomain( session.mDomain ) );
+	        	picture = BitmapFactory.decodeResource( getResources(), getFaviconFromDomain( session.mDomain ) );
 	        
+	        if( session.mHTTPS )	        	        
+	        	picture = addLogo( picture, BitmapFactory.decodeResource( getResources(), R.drawable.https_session ) );
+	        	        
+	        holder.favicon.setImageBitmap( picture );
+	        	        	        	        
 	        if( session.mUserName != null )
 	        	holder.address.setText( session.mUserName );
 	        else
@@ -376,7 +401,7 @@ public class Hijacker extends SherlockActivity
         
         System.getProxy().setOnRequestListener( new OnRequestListener() {			
 			@Override
-			public void onRequest( String address, String hostname, ArrayList<String> headers ) {
+			public void onRequest( boolean https, String address, String hostname, ArrayList<String> headers ) {
 				ArrayList<BasicClientCookie> cookies = RequestParser.getCookiesFromHeaders( headers );
 				
 				// got any cookie ?
@@ -392,12 +417,13 @@ public class Hijacker extends SherlockActivity
 							cookies.get(i).setDomain( domain );
 					}
 					
-					Session session = mAdapter.getSession( address, domain );
+					Session session = mAdapter.getSession( address, domain, https );
 					
 					// new session ^^
 					if( session == null )
 					{
 						session = new Session();
+						session.mHTTPS     = https;
 						session.mAddress   = address;
 						session.mDomain    = domain;		
 						session.mUserAgent = RequestParser.getHeaderValue( "User-Agent", headers );

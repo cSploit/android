@@ -106,7 +106,7 @@ public class HijackerWebView extends SherlockActivity
         		if( session.mUserAgent != null && session.mUserAgent.isEmpty() == false )
         			mSettings.setUserAgentString( session.mUserAgent );
         		
-        		mWebView.loadUrl( "http://www." + domain );
+        		mWebView.loadUrl( ( session.mHTTPS ? "https" : "http" ) + "://www." + domain );
         	}        	
         }  
     }  

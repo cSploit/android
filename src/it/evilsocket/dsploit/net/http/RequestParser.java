@@ -26,6 +26,25 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 
 public class RequestParser 
 {
+	public static String getUrlFromRequest( String hostname, String request )
+	{
+		String[] headers = request.split("\n");
+		
+		if( headers != null && headers.length > 0 )
+		{
+			// assuming the GET|POST|WHATEVER /url ... is on the first line
+			String req   = headers[0];		
+			// regexp would be nicer, but this way is faster
+			int    slash = req.indexOf('/'),
+				   space = req.lastIndexOf(' ');
+			
+			if( slash != -1 && space != -1 && space > slash )
+				return "http://" + hostname + req.substring( slash, space );
+		}
+		
+		return null;
+	}
+	
 	public static String getBaseDomain( String host ) {
 	    int startIndex = 0;
 	    int nextIndex = host.indexOf('.');

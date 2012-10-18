@@ -40,7 +40,7 @@ public class Proxy implements Runnable
 	private ArrayList<ProxyFilter> mFilters 	 	= null;
 	private String				   mHostRedirect 	= null;
 	private int					   mPortRedirect 	= 80;
-	
+
 	public static interface ProxyFilter
 	{
 		public String onDataReceived( String headers, String data );
@@ -48,20 +48,20 @@ public class Proxy implements Runnable
 	
 	public static interface OnRequestListener
 	{
-		public void onRequest( String address, String hostname, ArrayList<String> headers );
+		public void onRequest( boolean https, String address, String hostname, ArrayList<String> headers );
 	}
 	
 	public Proxy( InetAddress address, int port ) throws UnknownHostException, IOException {
-		mAddress = address;
-		mPort	 = port;
-		mSocket  = new ServerSocket( mPort, BACKLOG, mAddress );		
-		mFilters = new ArrayList<ProxyFilter>();
+		mAddress     = address;
+		mPort	     = port;
+		mSocket      = new ServerSocket( mPort, BACKLOG, mAddress );		
+		mFilters     = new ArrayList<ProxyFilter>();
 	}
 	
 	public Proxy( String address, int port ) throws UnknownHostException, IOException {
 		this( InetAddress.getByName( address ), port );
 	}
-	
+
 	public void setOnRequestListener( OnRequestListener listener ) {
 		mRequestListener = listener;
 	}

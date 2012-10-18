@@ -31,6 +31,29 @@ public class ByteBuffer
 	public ByteBuffer( byte[] buffer ){
 		setData( buffer );
 	}
+	
+    public void replace( byte[] search, byte[] replace ) {
+    	int idx  = indexOf( search ),
+    		slen = search.length,
+    		rlen = replace.length;
+    	byte[] left, right;
+    	
+    	ByteBuffer buffer = null;
+    	
+    	while( idx != -1 )
+    	{
+	    	left   = Arrays.copyOfRange( mBuffer, 0, idx );
+	    	right  = Arrays.copyOfRange( mBuffer, idx + slen, mBuffer.length );	    		  				
+	    	buffer = new ByteBuffer( left );
+	    	
+	    	buffer.append( replace, rlen );
+	    	buffer.append( right, right.length );
+	    	
+	    	mBuffer = buffer.mBuffer;
+	    	
+	    	idx = indexOf( search );
+    	}
+    }
 
 	public void append( byte[] buffer, int length ) {
 		byte[] chunk   = Arrays.copyOfRange( buffer, 0, length ),
