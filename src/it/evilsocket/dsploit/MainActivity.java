@@ -30,6 +30,7 @@ import it.evilsocket.dsploit.core.UpdateService;
 import it.evilsocket.dsploit.gui.dialogs.AboutDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
+import it.evilsocket.dsploit.gui.dialogs.ChangelogDialog;
 import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
 import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog;
@@ -47,6 +48,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences.Editor;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -244,6 +246,16 @@ public class MainActivity extends SherlockListActivity
 						@Override
 						public void run() 
 						{
+							if( System.getAppVersionName().equals( System.getSettings().getString( "DSPLOIT_INSTALLED_VERSION", "0" ) ) == false )
+							{
+								new ChangelogDialog( MainActivity.this ).show();
+								
+								Editor editor = System.getSettings().edit();
+								
+								editor.putString( "DSPLOIT_INSTALLED_VERSION", System.getAppVersionName() );
+								editor.commit();
+							}
+							
 						    try
 					    	{	    			  						    	
 								mTargetAdapter = new TargetAdapter( R.layout.target_list_item );
