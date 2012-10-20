@@ -30,6 +30,8 @@ import android.widget.Toast;
 public class SettingsActivity extends SherlockPreferenceActivity implements OnSharedPreferenceChangeListener
 {
 	private EditTextPreference mSnifferSampleTime	 = null;
+	private EditTextPreference mProxyPort			 = null;
+	private EditTextPreference mServerPort			 = null;
 	private EditTextPreference mHttpBufferSize		 = null;
 	private EditTextPreference mPasswordFilename	 = null;
 	
@@ -40,6 +42,8 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 		addPreferencesFromResource( R.layout.preferences );		
 				
 		mSnifferSampleTime	  = ( EditTextPreference )getPreferenceScreen().findPreference( "PREF_SNIFFER_SAMPLE_TIME" );
+		mProxyPort			  = ( EditTextPreference )getPreferenceScreen().findPreference( "PREF_HTTP_PROXY_PORT" );
+		mServerPort			  = ( EditTextPreference )getPreferenceScreen().findPreference( "PREF_HTTP_SERVER_PORT" );
 		mHttpBufferSize		  = ( EditTextPreference )getPreferenceScreen().findPreference( "PREF_HTTP_MAX_BUFFER_SIZE" );
 		mPasswordFilename	  = ( EditTextPreference )getPreferenceScreen().findPreference( "PREF_PASSWORD_FILENAME" );
 	}
@@ -87,6 +91,64 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 				Toast.makeText( SettingsActivity.this, message, Toast.LENGTH_SHORT ).show();
 				
 			mSnifferSampleTime.setText( Double.toString( sampleTime ) );
+		}
+		else if( key.equals("PREF_HTTP_PROXY_PORT") )
+		{
+			int proxyPort = 8080;
+			
+			try
+			{				
+				proxyPort = Integer.parseInt( mProxyPort.getText() );
+				if( proxyPort < 1024 )
+				{
+					message   = "Proxy port can't be less than 1024.";
+					proxyPort = 8080;
+				}
+				else if( proxyPort > 65535 )
+				{
+					message   = "Proxy port can't be greater than 65535.";
+					proxyPort = 8080;
+				}
+			}
+			catch( Throwable t )
+			{
+				message   = "Invalid number.";
+				proxyPort = 8080;
+			}
+			
+			if( message != null )
+				Toast.makeText( SettingsActivity.this, message, Toast.LENGTH_SHORT ).show();
+				
+			mProxyPort.setText( Integer.toString( proxyPort ) );
+		}
+		else if( key.equals("PREF_HTTP_SERVER_PORT") )
+		{
+			int serverPort = 8081;
+			
+			try
+			{				
+				serverPort = Integer.parseInt( mServerPort.getText() );
+				if( serverPort < 1024 )
+				{
+					message    = "Server port can't be less than 1024.";
+					serverPort = 8081;
+				}
+				else if( serverPort > 65535 )
+				{
+					message    = "Server port can't be greater than 65535.";
+					serverPort = 8081;
+				}
+			}
+			catch( Throwable t )
+			{
+				message    = "Invalid number.";
+				serverPort = 8081;
+			}
+			
+			if( message != null )
+				Toast.makeText( SettingsActivity.this, message, Toast.LENGTH_SHORT ).show();
+				
+			mServerPort.setText( Integer.toString( serverPort ) );
 		}
 		else if( key.equals("PREF_HTTP_MAX_BUFFER_SIZE") )
 		{

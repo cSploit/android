@@ -39,6 +39,20 @@
             android:title="Sniffer Sample Time" />
 
         <EditTextPreference
+            android:defaultValue="8080"
+            android:inputType="number"
+            android:key="PREF_HTTP_PROXY_PORT"
+            android:summary="MITM transparent proxy port to listen on, change this if you have problems starting the proxy."
+            android:title="HTTP Proxy Port" />
+        
+        <EditTextPreference
+            android:defaultValue="8081"
+            android:inputType="number"
+            android:key="PREF_HTTP_SERVER_PORT"
+            android:summary="MITM http server port to listen on, change this if you have problems starting the server."
+            android:title="HTTP Server Port" />
+        
+        <EditTextPreference
             android:defaultValue="10485760"
             android:inputType="number"
             android:key="PREF_HTTP_MAX_BUFFER_SIZE"

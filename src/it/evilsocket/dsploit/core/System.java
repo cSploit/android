@@ -74,8 +74,8 @@ public class System
 	private static final String  ERROR_LOG_FILENAME     = "dsploit-debug-error.log";
 	private static final String  SESSION_MAGIC		    = "DSS"; 
 	private static final Pattern SERVICE_PARSER		    = Pattern.compile( "^([^\\s]+)\\s+(\\d+).*$", Pattern.CASE_INSENSITIVE );
-	public  static final int	 HTTP_PROXY_PORT		= 8080;
-	public  static final int	 HTTP_SERVER_PORT		= 8081;
+	public  static int	 		 HTTP_PROXY_PORT		= 8080;
+	public  static int	 		 HTTP_SERVER_PORT		= 8081;
 	public  static final String  IPV4_FORWARD_FILEPATH  = "/proc/sys/net/ipv4/ip_forward";	
  
 	private static boolean			     mInitialized   = false;
@@ -132,9 +132,13 @@ public class System
 			{
 				PowerManager powerManager = ( PowerManager )mContext.getSystemService( Context.POWER_SERVICE );
 				
-				mWakeLock = powerManager.newWakeLock( PowerManager.PARTIAL_WAKE_LOCK, "wakeLock" );
+				mWakeLock = powerManager.newWakeLock( PowerManager.FULL_WAKE_LOCK, "wakeLock" );
 				mWakeLock.acquire();
 			}
+			
+			// set ports
+			HTTP_PROXY_PORT  = getSettings().getInt( "PREF_HTTP_PROXY_PORT", HTTP_PROXY_PORT );
+			HTTP_SERVER_PORT = getSettings().getInt( "PREF_HTTP_SERVER_PORT", HTTP_SERVER_PORT );
 			
 			Target network = new Target( mNetwork ),
 				   gateway = new Target( mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware() ),
