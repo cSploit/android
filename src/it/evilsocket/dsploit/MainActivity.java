@@ -206,8 +206,9 @@ public class MainActivity extends SherlockListActivity
 				{				
 					dialog.show();
 
-					String 		   fatal     = null;										
-					ToolsInstaller installer = new ToolsInstaller( MainActivity.this.getApplicationContext() );
+					Context		   appContext = MainActivity.this.getApplicationContext(); 
+					String 		   fatal      = null;										
+					ToolsInstaller installer  = new ToolsInstaller( appContext );
 			       
 					if( Shell.isRootGranted() == false )  					
 						fatal = "This application can run only on rooted devices.";
@@ -217,7 +218,11 @@ public class MainActivity extends SherlockListActivity
 		        							        						               
 					else if( installer.needed() && installer.install() == false )			        
 						fatal = "Error during files installation!";
-			        					
+					// check for LD_LIBRARY_PATH issue ( https://github.com/evilsocket/dsploit/issues/35 )
+					else if( Shell.isLibraryPathOverridable( appContext ) == false )
+			        	fatal = "<p>It seems like your ROM has the <b>LD_LIBRARY_PATH bug</b>, i'm sorry but it's not compatible with dSploit.</p>" +
+			        			"<p>For more info read the <a href=\"http://dsploit.net/#faq\">FAQ</a>.</p>";
+			        	
 					dialog.dismiss();
 					
 					if( fatal != null )
@@ -226,7 +231,7 @@ public class MainActivity extends SherlockListActivity
 						MainActivity.this.runOnUiThread( new Runnable(){
 							@Override
 							public void run() {
-								new FatalDialog( "Error", ffatal, MainActivity.this ).show();
+								new FatalDialog( "Error", ffatal, ffatal.contains(">"), MainActivity.this ).show();
 							}
 						});													
 					}

@@ -35,7 +35,7 @@ public class NMap extends Tool
 	public NMap( Context context ){
 		super( "nmap/nmap", context );		
 	}
-	
+
 	public static abstract class FindAliveEndpointsOutputReceiver implements OutputReceiver
 	{		
 		private static final Pattern IP_PATTERN  = Pattern.compile( "^nmap scan report for ([\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}).*", 			  Pattern.CASE_INSENSITIVE );

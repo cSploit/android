@@ -20,9 +20,12 @@ package it.evilsocket.dsploit.core;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map;
+
+import android.content.Context;
 
 public class Shell 
 {
@@ -142,6 +145,61 @@ public class Shell
 		}
 				
 		return false;
+	}
+	
+	public static boolean isLibraryPathOverridable( Context context ) {
+		boolean linkerError = false;
+		
+		try
+		{
+			String libPath  = System.getLibraryPath(),
+				   fileName = context.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap";
+			File   file	    = new File( fileName );
+			String dirName  = file.getParent(),
+				   command  = "cd " + dirName + " && ./nmap --version";
+			Process			 process = spawnShell( "su", true, false );
+			DataOutputStream writer  = null;
+			BufferedReader   reader  = null,
+							 stderr  = null;
+			String			 line    = null,
+							 error   = null;
+			
+			writer = new DataOutputStream( process.getOutputStream() );
+			reader = new BufferedReader( new InputStreamReader( process.getInputStream() ) );
+			stderr = new BufferedReader( new InputStreamReader( process.getErrorStream() ) );
+			
+			writer.writeBytes( "export LD_LIBRARY_PATH=" + libPath + ":$LD_LIBRARY_PATH\n" );
+			writer.flush();
+			
+			writer.writeBytes( command + "\n" );
+			writer.flush();
+			writer.writeBytes( "exit\n" );
+			writer.flush();
+
+			while( ( ( line = reader.readLine() ) != null || ( error = stderr.readLine() ) != null ) && !linkerError )
+			{
+				line = line == null ? error : line;
+				
+				if( line.contains("CANNOT LINK EXECUTABLE") )
+					linkerError = true;
+			}
+			// flush stderr		
+			while( ( error = stderr.readLine() ) != null && !linkerError )
+			{
+				if( line.contains("CANNOT LINK EXECUTABLE") )
+					linkerError = true;
+			}
+
+			process.waitFor();			
+		}
+		catch( Exception e )
+		{
+			System.errorLogging( TAG, e );
+			
+			return !linkerError;
+		}
+		
+		return !linkerError;
 	}
 	
 	public static int exec( String command, OutputReceiver receiver ) throws IOException, InterruptedException {

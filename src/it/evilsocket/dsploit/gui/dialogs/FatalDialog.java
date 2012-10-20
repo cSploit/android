@@ -21,14 +21,31 @@ package it.evilsocket.dsploit.gui.dialogs;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.widget.TextView;
 
 public class FatalDialog extends AlertDialog 
 {
-	public FatalDialog( String title, String message, final Activity activity ){
+	public FatalDialog( String title, String message, boolean html, final Activity activity ){
 		super( activity );
 		
 		this.setTitle( title );
-		this.setMessage( message );
+		
+		if( html == false )
+			this.setMessage( message );
+		
+		else
+		{
+			TextView text = new TextView( activity );
+			
+			text.setMovementMethod( LinkMovementMethod.getInstance() );
+			text.setText( Html.fromHtml(message) );
+			text.setPadding( 10, 10, 10, 10 );
+			
+			this.setView( text );
+		}
+			
 		this.setCancelable( false );
 		this.setButton( "Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
@@ -36,5 +53,9 @@ public class FatalDialog extends AlertDialog
             	System.exit( 0xFF );
             }
         });			
+	}
+	
+	public FatalDialog( String title, String message,final Activity activity ){
+		this( title, message, false, activity );
 	}
 }
