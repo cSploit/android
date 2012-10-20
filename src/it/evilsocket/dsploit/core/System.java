@@ -137,9 +137,17 @@ public class System
 			}
 			
 			// set ports
-			HTTP_PROXY_PORT  = getSettings().getInt( "PREF_HTTP_PROXY_PORT", HTTP_PROXY_PORT );
-			HTTP_SERVER_PORT = getSettings().getInt( "PREF_HTTP_SERVER_PORT", HTTP_SERVER_PORT );
-			
+			try
+	    	{
+				HTTP_PROXY_PORT  = Integer.parseInt( getSettings().getString( "PREF_HTTP_PROXY_PORT", "8080" ) );
+				HTTP_SERVER_PORT = Integer.parseInt( getSettings().getString( "PREF_HTTP_SERVER_PORT", "8081" ) );				
+	    	}
+	    	catch( NumberFormatException e )
+	    	{
+	    		HTTP_PROXY_PORT  = 8080;
+	    		HTTP_SERVER_PORT = 8081; 
+	    	}
+
 			Target network = new Target( mNetwork ),
 				   gateway = new Target( mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware() ),
 				   device  = new Target( mNetwork.getLocalAddress(), mNetwork.getLocalHardware() );
@@ -199,7 +207,7 @@ public class System
 			{				        
 		        try
 				{
-		        	FileWriter 	   fWriter = new FileWriter( filename );
+		        	FileWriter 	   fWriter = new FileWriter( filename, true );
 		        	BufferedWriter bWriter = new BufferedWriter( fWriter );
 		        	
 		        	bWriter.write( trace  );
@@ -216,6 +224,31 @@ public class System
 		setLastError( message );		
 		Log.e( tag, message);
 		Log.e( tag, trace  );        
+	}
+	
+	public static synchronized void errorLog( String tag, String data ) {
+		String filename = ( new File( Environment.getExternalStorageDirectory().toString(), ERROR_LOG_FILENAME ) ).getAbsolutePath();
+				
+		data = data.trim();
+		
+		if( mContext != null && getSettings().getBoolean( "PREF_DEBUG_ERROR_LOGGING", false ) == true )
+		{				        
+	        try
+			{
+	        	FileWriter 	   fWriter = new FileWriter( filename, true );
+	        	BufferedWriter bWriter = new BufferedWriter( fWriter );
+	        	
+	        	bWriter.write( data  );
+	        	
+	        	bWriter.close();
+			}
+			catch( IOException ioe )
+			{
+				Log.e( TAG, ioe.toString() );
+			}
+		}
+		
+		Log.e( tag, data );
 	}
 		
 	public static synchronized void setCustomData( Object data ) {

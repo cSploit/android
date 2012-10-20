@@ -28,11 +28,11 @@ public class Shell
 {
 	private static final String TAG = "SHELL";
 	
-	private static Process spawnShell( String command, boolean bUpdateLibraryPath ) throws IOException {
+	private static Process spawnShell( String command, boolean bUpdateLibraryPath, boolean bRedirectErrorStream ) throws IOException {
 		ProcessBuilder 		builder 	= new ProcessBuilder().command( command );
 		Map<String, String> environment = builder.environment();
 		
-		builder.redirectErrorStream(true);
+		builder.redirectErrorStream( bRedirectErrorStream );
 		
 		if( bUpdateLibraryPath )
 		{
@@ -57,7 +57,7 @@ public class Shell
 	}
 	
 	private static Process spawnShell( String command ) throws IOException {
-		return spawnShell( command, false ); 
+		return spawnShell( command, false, true ); 
 	}
 	
 	public static boolean isRootGranted( ) {
@@ -145,16 +145,19 @@ public class Shell
 	}
 	
 	public static int exec( String command, OutputReceiver receiver ) throws IOException, InterruptedException {
-		Process			 process = spawnShell( "su", true );
+		Process			 process = spawnShell( "su", true, false );
 		DataOutputStream writer  = null;
-		BufferedReader   reader  = null;
+		BufferedReader   reader  = null,
+						 stderr  = null;
 		String			 line    = null,
+						 error   = null,
 						 libPath = System.getLibraryPath();
 						
 		if( receiver != null ) receiver.onStart( command );
 				
 		writer = new DataOutputStream( process.getOutputStream() );
 		reader = new BufferedReader( new InputStreamReader( process.getInputStream() ) );
+		stderr = new BufferedReader( new InputStreamReader( process.getErrorStream() ) );
 		
 		// is this really needed ?
 		writer.writeBytes( "export LD_LIBRARY_PATH=" + libPath + ":$LD_LIBRARY_PATH\n" );
@@ -165,10 +168,22 @@ public class Shell
 		writer.writeBytes( "exit\n" );
 		writer.flush();
 
-		while( ( line = reader.readLine() ) != null )
+		while( ( line = reader.readLine() ) != null || ( error = stderr.readLine() ) != null )
 		{
+			line = line == null ? error : line;
+			
 			if( receiver != null ) 
-				receiver.onNewLine( line );
+				receiver.onNewLine( line );			
+			
+			if( error != null && error.toLowerCase().contains("killed") == false )
+				System.errorLog( TAG, command + "\n" + error );
+				
+		}
+		// flush stderr		
+		while( ( error = stderr.readLine() ) != null )
+		{
+			if( error.toLowerCase().contains("killed") == false )
+				System.errorLog( TAG, command + "\n" + error );
 		}
 
 		int exit = process.waitFor();
