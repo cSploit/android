@@ -131,25 +131,50 @@ public class RequestParser
 		return null;
 	}
 	
-	public static ArrayList<BasicClientCookie> getCookiesFromHeaders( ArrayList<String> headers ){
-		String headerValue = getHeaderValue( "Cookie", headers );
+	public static ArrayList<String> getHeaderValues( String name, ArrayList<String> headers ) {
+		ArrayList<String> values = new ArrayList<String>();
 		
-		if( headerValue != null )
+		for( String header : headers )
 		{
-			ArrayList<BasicClientCookie> cookies = parseRawCookie( headerValue );
-			if( cookies != null && cookies.size() > 0 )
+			if( header.indexOf(':') != -1 )
 			{
-				// remove google and cloudflare cookies
-				Iterator<BasicClientCookie> it = cookies.iterator();
-				while( it.hasNext() )
-				{
-					BasicClientCookie cookie = ( BasicClientCookie )it.next();
-					if( cookie.getName().startsWith("__utm" ) || cookie.getName().equals("__cfduid") )					
-						it.remove();					
-				}
-
-				return cookies.size() > 0 ? cookies : null;
+				String[] split  = header.split( ":", 2 );
+        		String   hname  = split[0].trim(),
+        				 hvalue = split[1].trim();
+        		
+        		if( hname.equals( name ) )
+        			values.add( hvalue );
 			}
+		}
+				
+		return values;
+	}
+	
+	public static ArrayList<BasicClientCookie> getCookiesFromHeaders( ArrayList<String> headers ){
+		ArrayList<String> values = getHeaderValues( "Cookie", headers );
+		
+		if( values != null && values.size() > 0 )
+		{
+			ArrayList<BasicClientCookie> cookies = new ArrayList<BasicClientCookie>();
+			for( String value : values )
+			{
+				ArrayList<BasicClientCookie> lineCookies = parseRawCookie( value );
+				if( lineCookies != null && lineCookies.size() > 0 )
+				{
+					cookies.addAll( lineCookies );
+				}
+			}
+			
+			// remove google and cloudflare cookies
+			Iterator<BasicClientCookie> it = cookies.iterator();
+			while( it.hasNext() )
+			{
+				BasicClientCookie cookie = ( BasicClientCookie )it.next();
+				if( cookie.getName().startsWith("__utm" ) || cookie.getName().equals("__cfduid") )					
+					it.remove();					
+			}
+
+			return cookies.size() > 0 ? cookies : null;
 		}
 		
 		return null;

