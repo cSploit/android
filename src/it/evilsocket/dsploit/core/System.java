@@ -62,6 +62,7 @@ import it.evilsocket.dsploit.net.Target.Type;
 import it.evilsocket.dsploit.net.Target.Vulnerability;
 import it.evilsocket.dsploit.net.http.proxy.Proxy;
 import it.evilsocket.dsploit.net.http.server.Server;
+import it.evilsocket.dsploit.tools.ArpSpoof;
 import it.evilsocket.dsploit.tools.Ettercap;
 import it.evilsocket.dsploit.tools.Hydra;
 import it.evilsocket.dsploit.tools.IPTables;
@@ -97,6 +98,7 @@ public class System
 	private static Plugin			     mCurrentPlugin = null;	
 	// tools singleton
 	private static NMap					 mNmap			= null;
+	private static ArpSpoof				 mArpSpoof		= null;
 	private static Ettercap				 mEttercap		= null;
 	private static IPTables				 mIptables		= null;
 	private static Hydra				 mHydra			= null;
@@ -160,6 +162,7 @@ public class System
 			mTargets.add( device );
 						
 			mNmap     = new NMap( mContext );
+			mArpSpoof = new ArpSpoof( mContext );
 			mEttercap = new Ettercap( mContext );
 			mIptables = new IPTables( );
 			mHydra    = new Hydra( mContext );
@@ -509,6 +512,10 @@ public class System
 	
 	public static NMap getNMap() {
 		return mNmap;
+	}
+	
+	public static ArpSpoof getArpSpoof() {
+		return mArpSpoof;
 	}
 	
 	public static Ettercap getEttercap() {

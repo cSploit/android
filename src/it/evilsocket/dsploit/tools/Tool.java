@@ -49,7 +49,7 @@ public class Tool
 	public Tool( String name ){
 		mName = name;
 	}
-
+	
 	public void run( String args, OutputReceiver receiver ) throws IOException, InterruptedException {		
 		String cmd = null;
 		
@@ -74,6 +74,17 @@ public class Tool
 			cmd = mName + " " + args;
 		
 		return Shell.async( cmd, receiver );
+	}
+	
+	public Thread asyncStatic( String args, OutputReceiver receiver ) {
+		String cmd = null;
+		
+		if( mAppContext != null )
+			cmd = "cd " + mDirName + " && ./" + mName + " " + args;
+		else
+			cmd = mName + " " + args;
+		
+		return Shell.async( cmd, receiver, false );
 	}
 	
 	public boolean kill(){

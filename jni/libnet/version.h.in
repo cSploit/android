@@ -1,0 +1,7 @@
+/*
+ *  $Id: version.h.in,v 1.1.1.1 2003/06/26 21:55:10 route Exp $
+ *  @configure_input@
+ */
+
+#define VERSION "@PACKAGE_VERSION@"
+

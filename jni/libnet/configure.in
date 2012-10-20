@@ -1,0 +1,299 @@
+dnl $Id: configure.in,v 1.10 2004/11/09 07:02:52 mike Exp $
+dnl
+dnl Libnet autoconfiguration information file
+dnl Copyright (c) 1998 - 2002 Mike D. Schiffman <mike@infonexus.com>
+dnl All rights reserved.
+dnl
+dnl Process this file with autoconf to produce a configure script.
+
+AC_INIT(libnet, 1.1.5)
+AC_MSG_RESULT(beginning autoconfiguration process for libnet-${PACKAGE_VERSION} ...)
+AC_CANONICAL_SYSTEM
+AC_CONFIG_SRCDIR([src/libnet_build_ip.c])
+AC_CONFIG_MACRO_DIR([m4])
+AM_INIT_AUTOMAKE
+AM_CONFIG_HEADER([include/config.h])
+AM_MAINTAINER_MODE
+
+dnl
+dnl Check for the usual programs
+dnl
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_USE_SYSTEM_EXTENSIONS
+dnl disable shared libraries (for now)
+dnl AC_DISABLE_SHARED
+ifdef(
+      [LT_INIT],
+      [LT_INIT],
+      [AC_PROG_LIBTOOL]
+)
+
+AC_CHECK_HEADERS(sys/sockio.h)
+AC_CHECK_FUNCS([gethostbyname2])
+AC_TYPE_UINT16_T
+AC_TYPE_UINT32_T
+AC_TYPE_UINT64_T
+
+dnl
+dnl And some custom things
+dnl
+
+AC_LIBNET_ENDIAN_CHECK
+dnl AC_LBL_LIBRARY_NET
+
+AC_SUBST(ENDIANESS)
+AC_SUBST(HAVE_PACKET_SOCKET)
+AC_SUBST(ADDITIONAL_LIBS)
+AC_SUBST(LIBNET_CONFIG_DEFINES)
+AC_SUBST(LIBNET_CONFIG_LIBS)
+AC_SUBST(LIBNET_CONFIG_CFLAGS)
+AC_SUBST(LTLIBOBJS)
+
+dnl
+dnl Set the root install directory
+dnl
+AC_PREFIX_DEFAULT(/usr/local)
+dnl if test "$prefix" = "NONE"; then
+dnl     prefix="/usr"
+dnl fi
+
+dnl
+dnl Get link-layer interface type
+dnl
+AC_ARG_WITH(
+	[link-layer],
+	[AS_HELP_STRING([--with-link-layer],[when cross-compiling, one of * from libnet_link_*.c @<:@autodetect@:>@])]
+)
+
+AC_CHECK_HEADERS([net/pfilt.h sys/net/nit.h net/raw.h sys/dlpi.h linux/socket.h])
+
+AC_MSG_CHECKING(link-layer packet interface type)
+
+if test -n "${with_link_layer}"; then
+    case "${with_link_layer}" in
+        bpf)   AC_LIBOBJ([libnet_link_bpf]) ;;
+        pf)    AC_LIBOBJ([libnet_link_pf]) ;;
+        snit)  AC_LIBOBJ([libnet_link_snit]) ;;
+        nit)   AC_LIBOBJ([libnet_link_nit]) ;;
+        snoop) AC_LIBOBJ([libnet_link_snoop]) ;;
+        dlpi)  AC_LIBOBJ([libnet_link_dlpi]) ;;
+        linux) AC_LIBOBJ([libnet_link_linux])
+	       AC_LIBNET_CHECK_PF_PACKET
+	       AC_LIBNET_LINUX_PROCFS ;;
+        none) AC_LIBOBJ([libnet_link_none]) ;;
+        *) AC_MSG_ERROR([Invalid link type "${with_link_layer}"]) ;;
+    esac
+    AC_MSG_RESULT(forced link layer to ${with_link_layer})
+elif test "${cross_compiling}" != "yes" -a -r /dev/bpf0 ; then
+    AC_LIBOBJ([libnet_link_bpf])
+    AC_MSG_RESULT(found link layer bpf)
+elif test "${ac_cv_header_net_pfilt_h}" = "yes" ; then
+    AC_LIBOBJ([libnet_link_pf])
+    AC_MSG_RESULT(found link layer pf)
+elif test "${cross_compiling}" != "yes" -a -r /dev/nit ; then
+    AC_LIBOBJ([libnet_link_snit])
+    AC_MSG_RESULT(found link layer snit)
+elif test "${ac_cv_header_sys_net_nit_h}" = "yes" ; then
+    AC_LIBOBJ([libnet_link_nit])
+    AC_MSG_RESULT(found link layer nit)
+elif test "${ac_cv_header_net_raw_h}" = "yes" ; then
+    AC_LIBOBJ([libnet_link_snoop])
+    AC_MSG_RESULT(found link layer snoop)
+elif test "${ac_cv_header_sys_dlpi_h}" = "yes" ; then
+    AC_LIBOBJ([libnet_link_dlpi])
+    AC_MSG_RESULT(found link layer dlpi)
+    AC_DEFINE(HAVE_DLPI, 1, [Define if the <sys/dlpi.h> header exists.])
+elif test "${ac_cv_header_linux_socket_h}" = "yes" ; then
+    AC_LIBOBJ([libnet_link_linux])
+    AC_MSG_RESULT(found link layer linux)
+    AC_LIBNET_CHECK_PF_PACKET
+    AC_LIBNET_LINUX_PROCFS
+elif test "${cross_compiling}" != "yes" -a -c /dev/bpf0 ; then           # check again in case not readable
+    AC_LIBOBJ([libnet_link_bpf])
+    AC_MSG_RESULT(found link layer bpf)
+elif test "${cross_compiling}" != "yes" -a -c /dev/nit ; then            # check again in case not readable
+    AC_LIBOBJ([libnet_link_snit])
+    AC_MSG_RESULT(found link layer snit)
+elif test "$target_os" = "cygwin" ; then
+    AC_LIBOBJ([libnet_link_win32])
+    AC_MSG_RESULT(found link layer win32 wpcap)
+else
+    AC_LIBOBJ([libnet_link_none])
+    AC_MSG_WARN(could not find a link-layer packet interface)
+    AC_MSG_WARN(link-layer packet injection will not be available)
+fi
+
+dnl This is necessary so that .o files in LIBOBJS are also built via
+dnl the ANSI2KNR-filtering rules.
+LIB@&t@OBJS=`echo "$LIB@&t@OBJS" |
+       sed 's,\.[[^.]]* ,$U&,g;s,\.[[^.]]*$,$U&,'`
+LTLIBOBJS=`echo "$LIB@&t@OBJS" |
+       sed 's,\.[[^.]]* ,.lo ,g;s,\.[[^.]]*$,.lo,'`
+
+
+
+dnl
+dnl Inform user about the packet builders we've got
+dnl
+echo -n "scanning available packet construction modules: "
+for dir in src/*build*c ; do
+    echo $dir | sed -e /src\\/libnet_build_/s/// | sed -e /\\.c/s/// | tr \\n \\040
+done
+echo ""
+
+dnl
+dnl Check and set OS specific parameters
+dnl
+
+case "$target_os" in
+
+*linux*)
+    AC_DEFINE(_BSD_SOURCE, 1,
+        [Define as necessary to "unhide" header symbols.])
+    AC_DEFINE(__BSD_SOURCE, 1,
+        [Define as necessary to "unhide" header symbols.])
+    AC_DEFINE(__FAVOR_BSD, 1,
+        [Define if we should favor the BSD APIs when possible in Linux.])
+
+    LIBNET_CONFIG_DEFINES="-D_BSD_SOURCE -D__BSD_SOURCE -D__FAVOR_BSD"
+    AC_CHECK_HEADERS(net/ethernet.h, \
+        LIBNET_CONFIG_DEFINES="$LIBNET_CONFIG_DEFINES -DHAVE_NET_ETHERNET_H")
+    ;;
+
+*freebsd*)
+    AC_DEFINE(LIBNET_BSDISH_OS, 1,
+        [Define if our build OS supports the BSD APIs])
+    AC_DEFINE(LIBNET_BSD_BYTE_SWAP, 1,
+        [Define if libnet should byteswap data.])
+    AC_DEFINE(HAVE_SOCKADDR_SA_LEN, 1,
+        [Define if the sockaddr structure includes a sa_len member.])
+
+    LIBNET_CONFIG_DEFINES="-DLIBNET_BSDISH_OS -DLIBNET_BSD_BYTE_SWAP -DHAVE_SOCKADDR_SA_LEN"
+    ;;
+
+*netbsd*)
+    AC_DEFINE(LIBNET_BSDISH_OS, 1,
+        [Define if our build OS supports the BSD APIs])
+    AC_DEFINE(LIBNET_BSD_BYTE_SWAP, 1,
+        [Define if libnet should byteswap data.])
+
+    LIBNET_CONFIG_DEFINES="-DLIBNET_BSDISH_OS -DLIBNET_BSD_BYTE_SWAP"
+    ;;
+
+*openbsd*)
+    AC_DEFINE(LIBNET_BSDISH_OS, 1,
+        [Define if our build OS supports the BSD APIs])
+    AC_DEFINE(HAVE_SOCKADDR_SA_LEN, 1,
+        [Define if the sockaddr structure includes a sa_len member.])
+    LIBNET_CONFIG_DEFINES="-DLIBNET_BSDISH_OS"
+    ;;
+
+*bsdi*)
+    AC_DEFINE(LIBNET_BSDISH_OS, 1,
+        [Define if our build OS supports the BSD APIs])
+    AC_DEFINE(LIBNET_BSD_BYTE_SWAP, 1,
+        [Define if libnet should byteswap data.])
+    LIBNET_CONFIG_DEFINES="-DLIBNET_BSDISH_OS -DLIBNET_BSD_BYTE_SWAP"
+    ;;
+
+*darwin*)
+    AC_DEFINE(HAVE_SOCKADDR_SA_LEN, 1,
+        [Define if the sockaddr structure includes a sa_len member.])
+    LIBNET_CONFIG_DEFINES="-DHAVE_SOCKADDR_SA_LEN"
+    ;;
+
+*solaris*)
+    AC_DEFINE(HAVE_SOLARIS, 1, [Define if we are running on Solaris.])
+    AC_CHECK_HEADERS(sys/bufmod.h sys/dlpi_ext.h)
+    AC_MSG_CHECKING(for /dev/dlpi device)
+    if test -c /dev/dlpi; then
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_DEV_DLPI, 1, [Define if /dev/dlpi is available.])
+    else
+        AC_MSG_RESULT(no)
+        dir="/dev/dlpi"
+        AC_MSG_CHECKING(for $dir directory)
+        if test -d $dir ; then
+            AC_MSG_RESULT(yes)
+            AC_DEFINE_UNQUOTED(DLPI_DEV_PREFIX, "$dir",
+                [Define if /dev/dlpi is a directory.])
+        else
+            AC_MSG_RESULT(no)
+        fi
+    fi
+    AC_CHECK_LIB(socket, socket, ,AC_MSG_ERROR(libsocket not found.))
+    AC_CHECK_LIB(nsl, gethostbyname, ,AC_MSG_ERROR(libnsl not found.))
+    AC_CHECK_LIB(resolv, hstrerror, ,AC_MSG_ERROR(libresolv not found.))
+
+dnl 
+dnl Broken checksums?
+dnl
+    case "`uname -r`" in
+    5.4)
+        AC_DEFINE(STUPID_SOLARIS_CHECKSUM_BUG, 1,
+            [Define if our version of Solaris has broken checksums.])
+        ;;
+    5.5*)
+        AC_DEFINE(STUPID_SOLARIS_CHECKSUM_BUG, 1,
+            [Define if our version of Solaris has broken checksums.])
+        ;;
+    5.8)
+        AC_DEFINE(STUPID_SOLARIS_CHECKSUM_BUG, 1,
+            [Define if our version of Solaris has broken checksums.])
+        AC_DEFINE(HAVE_SOLARIS_IPV6, 1,
+            [Define if our version of Solaris supports IPv6.])
+
+        ;;
+    5.9)
+        AC_DEFINE(STUPID_SOLARIS_CHECKSUM_BUG, 1,
+            [Define if our version of Solaris has broken checksums.])
+        AC_DEFINE(HAVE_SOLARIS_IPV6, 1,
+            [Define if our version of Solaris supports IPv6.])
+        ;;
+
+    esac
+
+    ADDITIONAL_LIBS='-lresolv -lsocket -lnsl'
+    LIBNET_CONFIG_LIBS="$LIBNET_CONFIG_LIBS -lresolv -lsocket -lnsl"
+
+    ;;
+
+*hpux11*)
+    AC_DEFINE(HAVE_HPUX11, 1, [Define if we're building on HP/UX.])
+    AC_CHECK_HEADERS(sys/dlpi_ext.h)
+    ;;
+
+*cygwin*)
+     AC_DEFINE(LIBNET_BSDISH_OS, 1,
+         [Define if our build OS supports the BSD APIs])
+     AC_DEFINE(NO_SNPRINTF, 1,
+         [Define if snprintf() is unavailable on our system.])
+     LIBNET_CONFIG_DEFINES="-DLIBNET_BSDISH_OS -DNO_SNPRINTF"
+     CFLAGS="$CFLAGS -mno-cygwin -O0 -fnative-struct -DNO_SNPRINTF -I/usr/include/pcap"
+     AC_CHECK_LIB(packet, PacketSetMode, ,AC_MSG_ERROR(packet lib not found.))
+     AC_CHECK_LIB(wpcap, pcap_setmode, ,AC_MSG_ERROR(pcap lib not found.))
+     LIBS="$LIBS -lws2_32"
+     ;;
+
+*)
+    AC_MSG_WARN(apparently your OS is not officially supported yet)
+    AC_MSG_WARN(this may not work)
+    AC_MSG_RESULT(please send diffs to vieuxtech@gmail.com)
+    ;;
+
+esac
+
+
+AC_ARG_ENABLE([samples],
+    [AS_HELP_STRING([--enable-samples],[install the sample programs @<:@default=no@:>@])])
+
+AM_CONDITIONAL([INSTALL_SAMPLES], [test x"$enable_samples" = xyes])
+
+AC_OUTPUT(Makefile src/Makefile win32/Makefile \
+	include/Makefile \
+	include/libnet/Makefile include/win32/Makefile \
+	sample/Makefile doc/Makefile \
+	doc/man/Makefile doc/man/man3/Makefile doc/html/Makefile \
+	version.h include/libnet.h libnet-config)
+dnl EOF

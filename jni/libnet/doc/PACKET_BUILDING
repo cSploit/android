@@ -1,0 +1,207 @@
+===============================================================================
+    $Id: PACKET_BUILDING,v 1.3 2004/04/13 17:32:28 mike Exp $
+    LIBNET 1.1 (c) 1998 - 2004 Mike D. Schiffman <mike@infonexus.com>
+                               http://www.packetfactory.net/libnet
+===============================================================================
+
+
+    ADDING A NEW PACKET BUILDER, STATIC HEADER SIZE
+
+Adding a new packet building module to libnet is usually pretty simple. The
+following short document details how to add a packet builder to libnet for a
+protocol that has a static header size. We'll use the Sebek protocol as an
+example to walk through the process.
+
+1) Make sure you have a good reference for the protocol in question. Be it an
+   RFC or an official release doc from the author or vendor, you'll need
+   something comprehensive. For Sebek, the comprehensive reference is here:
+   http://project.honeynet.org.
+
+2) Figure out how big the header is and add it to the top of libnet-headers.h:
+
+#define LIBNET_SEBEK_H          0x30    /* sebek header:          48 bytes */   
+
+3) Create the protocol header structure and add it to the end of
+   libnet-headers.h. Take care to use POSIX datatypes to define all of your
+   values. Structure naming conventions are more or less up to you. Since
+   they're never exported to the user, it's not a big deal, but try to keep
+   them short and descriptive. Convention is to add the symbolic constant 
+   #defines above the structure members they apply to.
+
+/*
+ *  Sebek header
+ *  Static header size: 48 bytes
+ */
+struct libnet_sebek_hdr
+{
+    u_int32_t magic;                /* identify packets that should be hidden */
+    u_int16_t version;              /* protocol version, currently 1 */
+#define SEBEK_PROTO_VERSION 1
+    u_int16_t type;                 /* type of record */
+#define SEBEK_TYPE_READ     0       /* currently, only read is supported */
+#define SEBEK_TYPE_WRITE    1
+    u_int32_t counter;              /* PDU counter */
+    u_int32_t time_sec;             /* EPOCH timer */
+    u_int32_t time_usec;            /* residual microseconds */
+    u_int32_t pid;                  /* PID */
+    u_int32_t uid;                  /* UID */
+    u_int32_t fd;                   /* FD */
+#define SEBEK_CMD_LENGTH   12
+    u_int8_t cmd[SEBEK_CMD_LENGTH]; /* 12 first characters of the command */
+    u_int32_t length;               /* PDU length */
+};
+
+3) Append a pblock identifier to the end of the list in libnet-structures.h.
+   The ID number is not imporant as long as it is UNIQUE. As such, just find
+   the last entry, append the new entry after it, and increase the pblock ID
+   by one:
+
+#define LIBNET_PBLOCK_SEBEK_H           0x3f    /* Sebek header */
+
+4) Create your new builder file in src/. Adhere to the "libnet_build_PROTOCOL.c"
+   convention. I recommend copying one of the existing builder modules and
+   modifying it as you go.
+
+
+4a) 
+
+#if (HAVE_CONFIG_H)
+#include "../include/config.h"
+#endif
+#if (!(_WIN32) || (__CYGWIN__)) 
+#include "../include/libnet.h"
+#else
+#include "../include/win32/libnet.h"
+#endif
+
+libnet_ptag_t
+libnet_build_sebek(u_int32_t magic, u_int16_t version, u_int16_t type,
+u_int32_t counter, u_int32_t time_sec, u_int32_t time_usec, u_int32_t pid,
+u_int32_t uid, u_int32_t fd, u_int8_t cmd[SEBEK_CMD_LENGTH], u_int32_t length,
+u_int8_t *payload, u_int32_t payload_s, libnet_t *l, libnet_ptag_t ptag)
+{
+
+
+libnet_ptag_t
+libnet_build_XXX(u_char arg1, u_short arg2, u_long arg3, u_char *payload,
+            u_long payload_s, libnet_t *l, libnet_ptag_t ptag)
+{
+    /*
+     *  n is the size of the protocol unit.  This is usually the header size
+     *  plus the payload size.  This is also how many bytes are allocated on
+     *  the heap to hold this protocol unit.
+     */
+    u_long n;
+
+    /*
+     *  h is used inside the pblock structure to let libnet know how big
+     *  much data to checksum.  This is different for different protocols.
+     *  The IPv4 checksum covers the IP header only, while TCP and UDP
+     *  checksums cover header and data.
+     */
+    u_short h;
+
+    /*
+     *  p will be used to refer to the protocol block that will either be
+     *  allocated if the function's pt argument is 0, or located if ptag refers
+     *  to a previously created protocol unit.
+     */
+    libnet_pblock_t *p;
+
+    /*
+     *  XXX_hdr is the header structure that will be overlaid onto the
+     *  allocated memory by way of a memcpy.
+     */
+    struct libnet_XXX_hdr XXX_hdr;
+
+    /*
+     *  Here we sanity check to make sure we have a live l.
+     */
+    if (l == NULL)
+    { 
+        return (-1);
+    }
+
+    n = LIBNET_XXX_H + payload_s;
+    h = 0;          /* no checksum by default */
+
+    /*
+     *  Find the existing protocol block if a ptag is specified, or create
+     *  a new one.
+     */
+    p = libnet_pblock_probe(l, pt, n, LIBNET_PBLOCK_XXX_H);
+    if (p == NULL)
+    {
+        return (-1);
+    }
+
+    /*
+     *  Build your packet here.  Be sure to call appropriate endian conversion
+     *  routines.
+     */
+    XXX_hdr.field1 = arg1;
+    XXX_hdr.field2 = htons(arg2);
+    XXX_hdr.field3 = htonl(arg3);
+
+    /*
+     *  Appened the protocol unit to the list.
+     */
+    n = libnet_pblock_append(l, p, (u_char *)&XXX_hdr, LIBNET_XXX_H);
+    if (n == -1)
+    {
+        goto bad;
+    }
+
+    /*
+     *  Sanity check the payload arguments.
+     */
+    if ((payload && !payload_s) || (!payload && payload_s))
+    {
+        sprintf(l->err_buf, "%s(): payload inconsistency\n", __FUNCTION__);
+        goto bad;
+    }
+
+    /*
+     *  Append the payload to the list if it exists.
+     */
+    if (payload && payload_s)
+    {
+        n = libnet_pblock_append(l, p, payload, payload_s);
+        if (n == -1)
+        {
+            goto bad;
+        }
+    }
+
+    /*
+     *  If this packet header has a checksum field, you'll add this
+     *  and you'll have to edit libnet_checksum.c to add it to the switch
+     *  table.  You might have to define the protocol number too.
+     */
+    if (sum == 0 && l->injection_type != LIBNET_RAW4)
+    {
+        /*
+         *  If checksum is zero, by default libnet will compute a checksum
+         *  for the user.  The programmer can override this by calling
+         *  libnet_toggle_checksum(l, ptag, 1);
+         */
+        libnet_pblock_setflags(p, LIBNET_PBLOCK_DO_CHECKSUM);
+    }
+
+    /*
+     *  Update the protocol block's meta information and return the protocol
+     *  tag id of this pblock.  This tag will be used to locate the pblock
+     *  in order to modify the protocol header in subsequent calls.
+     */
+    return (pt ? pt : libnet_pblock_update(l, p, h, LIBNET_PBLOCK_XXX_H));
+bad:
+    libnet_pblock_delete(l, p);
+    return (-1);
+
+}
+    4) Add it to src/Makefile.am and then automake from the TLD.
+    5) Test the shit out of it.
+    6) Send it over to mike@infonexus.com.
+
+
+EOF

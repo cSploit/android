@@ -18,10 +18,11 @@
  */
 package it.evilsocket.dsploit.plugins.mitm;
 
+import android.util.Log;
+import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.tools.Ettercap.OnAccountListener;
-import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
 
 public class SpoofSession 
 {
@@ -68,13 +69,12 @@ public class SpoofSession
 				mWithServer = false;
 			}
 		}
-						
-		System.getEttercap().spoof( target, new OnReadyListener(){
+					
+		System.getArpSpoof().spoof( target, new OutputReceiver() {			
 			@Override
-			public void onReady() 
-			{				
-				// ip forwarding has to be enabled here, cause ettercap seems
-				// to disable it on startup
+			public void onStart(String command) { 
+				// Log.d( "ARPSPOOF", command );
+				
 				System.setForwarding( true );
 				
 				if( mWithProxy )
@@ -83,7 +83,16 @@ public class SpoofSession
 				listener.onSessionReady();
 			}
 			
-		}).start();		
+			@Override
+			public void onNewLine(String line) {
+				// Log.d( "ARPSPOOF", line );
+			}
+			
+			@Override
+			public void onEnd(int exitCode) { 
+				Log.d( "ARPSPOOF", "onEnd( " + exitCode + " )" );
+			}
+		}).start();
 	}
 	
 	public void start( Target target, OnAccountListener listener ) {
@@ -100,6 +109,7 @@ public class SpoofSession
 	}
 	
 	public void stop() {
+		System.getArpSpoof().kill();
 		System.getEttercap().kill();
 		System.setForwarding( false );
 				

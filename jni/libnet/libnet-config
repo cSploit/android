@@ -1,0 +1,62 @@
+#!/bin/sh
+#
+#   $Id: libnet-config.in,v 1.3 2004/01/03 20:31:00 mike Exp $
+#
+#   Libnet 1.1 libnet-config compilation script
+#   (c) 1998 - 2004  Mike D. Schiffman <mike@infonexus.com>
+#
+#   libnet-config.  Generated from libnet-config.in by configure.
+
+libnet_defines="-D_BSD_SOURCE -D__BSD_SOURCE -D__FAVOR_BSD"
+libnet_cflags=""
+libnet_libs=" -lnet"
+
+usage()
+{
+        cat <<EOF
+Usage: libnet-config [OPTIONS]
+Options:
+        [--libs]
+        [--cflags]
+        [--defines]
+EOF
+        exit
+}
+
+while test $# -gt 0; do
+    case "$1" in
+    -*=*) optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
+    *) optarg= ;;
+    esac 
+
+    case $1 in
+        --libs)
+            echo_libs=yes
+            ;;
+
+        --cflags)
+            echo_cflags=yes
+            ;;
+
+        --defines)
+            echo_defines=yes
+            ;;
+        *)
+            usage 1
+        esac
+    shift
+done
+
+if test "$echo_libs" = "yes"; then
+    echo $libnet_libs
+fi
+
+if test "$echo_cflags" = "yes"; then
+    echo $libnet_cflags
+fi
+
+if test "$echo_defines" = "yes"; then
+    echo $libnet_defines
+fi
+
+# EOF

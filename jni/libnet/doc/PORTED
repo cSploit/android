@@ -1,0 +1,45 @@
+===============================================================================
+    $Id: PORTED,v 1.2 2004/01/03 20:31:00 mike Exp $
+    LIBNET 1.1 (c) 1998 - 2004 Mike D. Schiffman <mike@infonexus.com>
+                               http://www.packetfactory.net/libnet
+===============================================================================
+
+
+    1.1.0 PORTED OPERATING SYSTEMS
+ 
+    If you verify libnet building and running successfully (sample code works)
+    on a platform not listed here please send email to mike@infonexus.com.
+
+    - BSD/OS
+      4.x
+
+    - Cygwin
+      - requires winpcap (http://netgroup-serv.polito.it/winpcap) and pcap
+        header files copied to /usr/include/pcap/ and the library files to 
+        be copied to /usr/lib/
+
+    - FreeBSD
+      version?
+
+    - HPUX
+      11.0
+
+    - Linux
+      2.0.x
+      2.2.x
+      2.4.x
+
+    - OpenBSD
+      2.x
+      3.x
+
+    - OS/X
+      version?
+
+    - Solaris
+      2.x
+      7
+      8
+      9
+
+EOF

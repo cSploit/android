@@ -1,0 +1,134 @@
+===============================================================================
+    $Id: DESIGN_NOTES,v 1.3 2004/01/17 07:51:19 mike Exp $
+    LIBNET 1.1 (c) 1998 - 2004 Mike D. Schiffman <mike@infonexus.com>
+                               http://www.packetfactory.net/libnet
+===============================================================================
+
+
+    DESIGN NOTES
+
+    In order to remove most of the decisions a user had to make (how much
+    memory to allocate for a packet, where to build the packet headers, where
+    to do the checksums, how to inject the packet, etc) I decided to move ALL
+    of that logic into the library, behind the scenes.  To initialize 
+    things and get an initial libnet context, the applications programmer
+    calls:
+ 
+        libnet_t *l;
+        l = libnet_init(INJECTION_TYPE, PROTOCOL, DEVICE, ERRBUFFER);
+ 
+    where:
+
+    INJECTION_TYPE = LIBNET_RAW4 (ipv4 raw socket)
+                     LIBNET_RAW6 (ipv6 raw socket)
+                     LIBNET_LINK (link-layer socket)
+                     LIBNET_RAW4_ADV (advanced mode)
+                     LIBNET_RAW6_ADV (advanced mode)
+                     LIBNET_LINK_ADV (advanced mode)
+ 
+    PROTOCOL =       IP protocol to be used for the raw socket.  This is
+                     ignored for the link-layer, and almost always 
+                     IPPROTO_RAW for ipv4.
+ 
+    DEVICE =         The canoical name of the device, used only with the link
+                     layer stuff.  For ipv4 raw socket, you can leave this
+                     NULL.  If it's NULL with the link-layer, libnet will try
+                     to find a suitable device.
+ 
+    ERRBUFFER =      Until we have our libnet context l, this is where
+                     errors will be.
+ 
+    Inside of this newly created context we have a ton of stuff including a
+    file descriptor for the packet device the injection type, the device name
+    (if applicable) a pointer to the libnet protocol block structure and some
+    other ancillary data.
+ 
+    Additionally, we will soon be supporting context manipulation functions
+    that will allow the user to set certain flags inside the context.  This
+    interface will be akin to libnet_toggle_checksum() for those of you who
+    care.
+
+    When a packet is first constructed, the protocol block (pblock) stuff comes
+    into play.  On the outside, to an applications programmer, a packet is
+    constructed more or less like normal (with a few notable exceptions):
+ 
+        libnet_ptag_t ip_tag;
+        ip_tag = libnet_build_ipv4(
+                        LIBNET_UDP_H,
+                        0,
+                        242,
+                        0,
+                        64,
+                        IPPROTO_UDP,
+                        0,              /* NEW: checksum */
+                        src_ip,
+                        dst_ip,
+                        NULL,
+                        0,
+                        l,              /* NEW: libnet context */
+                        0               /* NEW: libnet ptag */
+                        );
+ 
+    The checksum allows an applications programmer to decide if he wants to
+    specify his own random value (useful in NIDS fooling) or precompute the
+    sum elsewhere, or leave it zero and by default libnet will take care of it
+    (although this is over-ridable).  The libnet context is the opague
+    pointer we allocated earlier and will show up in just about every libnet
+    function call from here on out.  The libnet ptag is a way to reference an
+    ALREADY BUILT protocol block.  This is necessary if you want to change 
+    some values of a header inside of a packet injection loop.
+ 
+    So, when you call a build function, internally, it's a completely new
+    system.  If the item you're constructing is NEW, a new pblock will be
+    allocated and linked onto the end of the list.  It may be helpful to think
+    of this as a "protocol stack" because you MUST build your packets IN 
+    ORDER, from the top of the protocol stack on down (i.e.: tcp -> ip ->
+    ethernet).  Once you build a new protocol block, it's "pushed down on the
+    stack" and you move on to the next.  However, this analogy breaks down 
+    because you can modify any one of these items and when they're assembled
+    for the final packet, libnet starts at the head of the list.  It may be
+    MORE helpful to think of the pblock chain as a doubly linked FIFO 
+    queue, because that's what it is. :)
+ 
+    For example:
+ 
+        libnet_ptag_t 1;
+        libnet_ptag_t 2;
+        libnet_ptag_t 3;
+ 
+        1 = libnet_build_data(blah, l, 0);
+        2 = libnet_build_tcp(blah, l, 0);
+        3 = libnet_build_ipv4(blah, l, 0);
+ 
+    Will result in:
+                          ----------      ----------      ----------
+    l->protocol_blocks--->|  data  |----->|  tcp   |----->|   ip   |
+                          | pblock |<-----| pblock |<-----| pblock |----|
+                        --| ptag: 1|      | ptag: 2|      | ptag: 3|    |
+                        | ----------      ----------      ----------    v
+                        |                                             -----
+                        |------------------------------------------->  ---
+                                                                        -
+ 
+    To access and change the ip header, an additional call to libnet_build_ipv4
+    with the ptag argument would be made:
+ 
+        libnet_build_ipv4(blah..., l, 3);
+ 
+    Note that the ptag DOES NOT CHANGE.  Once a pblock is built, its tag is
+    set in stone.
+ 
+    When it comes time to write the packet to the wire,
+    libnet_pblock_coalesce() is called to assemble the packet fragments.
+ 
+        1) Gather up all of the pblock sizes in order to allocate one
+           contiguous block of memory.
+        2) Copy over the packet fragments.
+        3) Check each pblock to see which items need checksums, then perform
+           that checksum over each portion (the entire packet is needed for
+           some checksums).
+ 
+    So that's a quick description of what's going on under the hood.  There's
+    more, but this should be enough to get you started.
+
+EOF

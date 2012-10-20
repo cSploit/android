@@ -1,0 +1,196 @@
+.TH "libnet-macros.h" 3 "8 Nov 2010" "Version 1.1" "libnet" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+libnet-macros.h \- libnet macros and symbolic constants 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBLIBNET_DONT_RESOLVE\fP   0"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_RESOLVE\fP   1"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_ON\fP   0"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_OFF\fP   1"
+.br
+.ti -1c
+.RI "#define \fBIN6ADDR_ERROR_INIT\fP"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_PR2\fP   0"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_PR8\fP   1"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_PR16\fP   2"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_PRu16\fP   3"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_PR32\fP   4"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_PRu32\fP   5"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_PRAND_MAX\fP   0xffffffff"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_MAX_PACKET\fP   0xffff"
+.br
+.ti -1c
+.RI "#define \fBIP_MAXPACKET\fP   0xffff"
+.br
+.ti -1c
+.RI "#define \fBETHER_ADDR_LEN\fP   0x6"
+.br
+.ti -1c
+.RI "#define \fBFDDI_ADDR_LEN\fP   0x6"
+.br
+.ti -1c
+.RI "#define \fBTOKEN_RING_ADDR_LEN\fP   0x6"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_ORG_CODE_SIZE\fP   0x3"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_ERRBUF_SIZE\fP   0x100"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_MAXOPTION_SIZE\fP   0x28"
+.br
+.ti -1c
+.RI "#define \fBFIX\fP(n)   (n)"
+.br
+.ti -1c
+.RI "#define \fBUNFIX\fP(n)   (n)"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_DO_PAYLOAD\fP(l, p)"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_CKSUM_CARRY\fP(x)   (x = (x >> 16) + (x & 0xffff), (~(x + (x >> 16)) & 0xffff))"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_OSPF_AUTHCPY\fP(x, y)   memcpy((uint8_t *)x, (uint8_t *)y, sizeof(y))"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_OSPF_CKSUMBUF\fP(x, y)   memcpy((uint8_t *)x, (uint8_t *)y, sizeof(y))"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_NTP_DO_LI_VN_MODE\fP(li, vn, md)   ((uint8_t)((((li) << 6) & 0xc0) | (((vn) << 3) & 0x38) | ((md) & 0x7)))"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_ISLOOPBACK\fP(p)   (strcmp((p)->ifr_name, 'lo0') == 0)"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_ISADVMODE\fP(x)   (x & 0x08)"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_LABEL_SIZE\fP   64"
+.br
+.ti -1c
+.RI "#define \fBLIBNET_LABEL_DEFAULT\fP   'cardshark'"
+.br
+.ti -1c
+.RI "#define \fBCQ_LOCK_UNLOCKED\fP   (u_int)0x00000000"
+.br
+.ti -1c
+.RI "#define \fBCQ_LOCK_READ\fP   (u_int)0x00000001"
+.br
+.ti -1c
+.RI "#define \fBCQ_LOCK_WRITE\fP   (u_int)0x00000002"
+.br
+.ti -1c
+.RI "#define \fBfor_each_context_in_cq\fP(l)   for (l = libnet_cq_head(); libnet_cq_last(); l = libnet_cq_next())"
+.br
+.ti -1c
+.RI "#define \fBcq_is_wlocked\fP()   (l_cqd.cq_lock & CQ_LOCK_WRITE)"
+.br
+.ti -1c
+.RI "#define \fBcq_is_rlocked\fP()   (l_cqd.cq_lock & CQ_LOCK_READ)"
+.br
+.ti -1c
+.RI "#define \fBcq_is_locked\fP()   (l_cqd.cq_lock & (CQ_LOCK_READ | CQ_LOCK_WRITE))"
+.br
+.ti -1c
+.RI "#define \fBcheck_cq_lock\fP(x)   (l_cqd.cq_lock & x)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+libnet macros and symbolic constants 
+
+
+.SH "Define Documentation"
+.PP 
+.SS "#define for_each_context_in_cq(l)   for (l = libnet_cq_head(); libnet_cq_last(); l = libnet_cq_next())"
+.PP
+Provides an interface to iterate through the context queue of libnet contexts. Before calling this macro, be sure to set the queue using \fBlibnet_cq_head()\fP. 
+.SS "#define IN6ADDR_ERROR_INIT"
+.PP
+\fBValue:\fP
+.PP
+.nf
+{ { { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, \
+                                 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, \
+                                 0xff, 0xff } } }
+.fi
+IPv6 error code 
+.SS "#define LIBNET_DO_PAYLOAD(l, p)"
+.PP
+\fBValue:\fP
+.PP
+.nf
+if (payload_s && !payload)                                                   \
+{                                                                            \
+    snprintf(l->err_buf, LIBNET_ERRBUF_SIZE,                                 \
+            '%s(): payload inconsistency\n', __func__);                      \
+    goto bad;                                                                \
+}                                                                            \
+if (payload_s)                                                               \
+{                                                                            \
+    n = libnet_pblock_append(l, p, payload, payload_s);                      \
+    if (n == (uint32_t) - 1)                                                 \
+    {                                                                        \
+        goto bad;                                                            \
+    }                                                                        \
+}                                                                            \
+.fi
+.SS "#define LIBNET_DONT_RESOLVE   0"
+.PP
+Used for libnet's name resolution functions, specifies that no DNS lookups should be performed and the IP address should be kept in numeric form. 
+.SS "#define LIBNET_ERRBUF_SIZE   0x100"
+.PP
+The libnet error buffer is 256 bytes long. 
+.SS "#define LIBNET_MAX_PACKET   0xffff"
+.PP
+The biggest an IP packet can be -- 65,535 bytes. 
+.SS "#define LIBNET_MAXOPTION_SIZE   0x28"
+.PP
+IP and TCP options can be up to 40 bytes long. 
+.SS "#define LIBNET_OFF   1"
+.PP
+Used several places, to specify 'on' or 'one' 
+.SS "#define LIBNET_ON   0"
+.PP
+Used several places, to specify 'on' or 'one' 
+.SS "#define LIBNET_PR2   0"
+.PP
+Used for \fBlibnet_get_prand()\fP to specify function disposition 
+.SS "#define LIBNET_RESOLVE   1"
+.PP
+Used for libnet's name resolution functions, specifies that a DNS lookup can be performed if needed to resolve the IP address to a canonical form. 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libnet from the source code.

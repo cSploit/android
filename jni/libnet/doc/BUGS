@@ -1,0 +1,19 @@
+===============================================================================
+    $Id: BUGS,v 1.2 2004/01/03 20:31:00 mike Exp $
+    LIBNET 1.1 (c) 1998 - 2004 Mike D. Schiffman <mike@infonexus.com>
+                               http://www.packetfactory.net/libnet
+===============================================================================
+
+
+    1.1.0 KNOWN BUG LIST
+ 
+    - It appears as though getprotobynumber() is broken in some linux
+      distributions.  The /etc/protocols file should be of the format:
+      protocol name protocol number proctocol symbolic constant comment
+      Most of the file (in my redhat 7.1) distro complies with this format
+      until you get to the end of the file:
+      #       134-254                 # Unassigned  
+      #       255                     # Reserved
+      This will cause getprotobynumber() and presumably getprotobyname() to
+      segfault.  If you get this behavior in your program and you're calling
+      __libnet_file_dump(), this could be the reason.  Caveat Emptor.

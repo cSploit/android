@@ -202,46 +202,36 @@ public class Shell
 		return !linkerError;
 	}
 	
-	public static int exec( String command, OutputReceiver receiver ) throws IOException, InterruptedException {
-		Process			 process = spawnShell( "su", true, false );
+	public static int exec( String command, OutputReceiver receiver, boolean overrideLibraryPath ) throws IOException, InterruptedException {
+		Process			 process = spawnShell( "su", overrideLibraryPath, true );
 		DataOutputStream writer  = null;
-		BufferedReader   reader  = null,
-						 stderr  = null;
+		BufferedReader   reader  = null;
 		String			 line    = null,
-						 error   = null,
 						 libPath = System.getLibraryPath();
 						
 		if( receiver != null ) receiver.onStart( command );
 				
 		writer = new DataOutputStream( process.getOutputStream() );
 		reader = new BufferedReader( new InputStreamReader( process.getInputStream() ) );
-		stderr = new BufferedReader( new InputStreamReader( process.getErrorStream() ) );
 		
 		// is this really needed ?
-		writer.writeBytes( "export LD_LIBRARY_PATH=" + libPath + ":$LD_LIBRARY_PATH\n" );
-		writer.flush();
+		if( overrideLibraryPath )
+		{
+			writer.writeBytes( "export LD_LIBRARY_PATH=" + libPath + ":$LD_LIBRARY_PATH\n" );
+			writer.flush();
+		}
 		
+		writer.writeBytes( "\n" );
+		writer.flush();
 		writer.writeBytes( command + "\n" );
 		writer.flush();
 		writer.writeBytes( "exit\n" );
 		writer.flush();
 
-		while( ( line = reader.readLine() ) != null || ( error = stderr.readLine() ) != null )
-		{
-			line = line == null ? error : line;
-			
+		while( ( line = reader.readLine() ) != null )
+		{			
 			if( receiver != null ) 
-				receiver.onNewLine( line );			
-			
-			if( error != null && error.toLowerCase().contains("killed") == false )
-				System.errorLog( TAG, command + "\n" + error );
-				
-		}
-		// flush stderr		
-		while( ( error = stderr.readLine() ) != null )
-		{
-			if( error.toLowerCase().contains("killed") == false )
-				System.errorLog( TAG, command + "\n" + error );
+				receiver.onNewLine( line );				
 		}
 
 		int exit = process.waitFor();
@@ -251,20 +241,22 @@ public class Shell
 		return exit;
 	}
 	
-	public static int exec( String command ) throws IOException, InterruptedException {
-		return exec( command, null );
+	public static int exec( String command, OutputReceiver reciever ) throws IOException, InterruptedException {
+		return exec( command, reciever, true );
 	}
 	
-	public static Thread async( String command, OutputReceiver receiver ) {
-		final String 		 fCommand  = command;
-		final OutputReceiver fReceiver = receiver;
+	public static int exec( String command ) throws IOException, InterruptedException {
+		return exec( command, null, true );
+	}
+	
+	public static Thread async( final String command, final OutputReceiver receiver, final boolean overrideLibraryPath ) {
 		
 		return new Thread( new Runnable(){
 			@Override
 			public void run() {
 				try
 				{
-					exec( fCommand, fReceiver );
+					exec( command, receiver, overrideLibraryPath );
 				}
 				catch( Exception e )
 				{
@@ -275,6 +267,10 @@ public class Shell
 	}
 	
 	public static Thread async( String command ) {
-		return async( command, null );
+		return async( command, null, true );
+	}
+	
+	public static Thread async( final String command, final OutputReceiver receiver ) {
+		return async( command, receiver, true );
 	}
 }

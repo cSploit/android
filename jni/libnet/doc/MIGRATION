@@ -1,0 +1,172 @@
+===============================================================================
+    $Id: MIGRATION,v 1.2 2004/01/03 20:31:00 mike Exp $
+    LIBNET 1.1 (c) 1998 - 2004 Mike D. Schiffman <mike@infonexus.com>
+                               http://www.packetfactory.net/libnet
+===============================================================================
+
+
+    MIGRATING YOUR CODE AND QUICKSTART
+
+    Using Libnet 1.1 you will find it MUCH simpler to build and write packets
+    than before.  Instead of the previous five steps (initialize memory,
+    initialize network, build packet, do checksums, write packet) there are
+    now only three steps (initialize library, build packet, write packet).  
+    In order to port your existing code, you will mainly be REMOVING 
+    function calls and variables.
+
+    1) Start with code removal:
+
+        - Remove all calls to libnet_init_packet() / packet malloc()ing and
+          all associated variables.
+        - Remove all calls to libnet_open_raw_sock() / libnet_open_link_layer()
+          and all associated variables.
+        - Remove all calls to libnet_do_checksum() and all associated
+          variables.
+
+    2) Continue with code addition and modification:
+
+        - You will need a single "libnet_t *l" which is your libnet file
+          context and an error buffer:
+
+            libnet_t *l
+            char errbuf[LIBNET_ERRBUF_SIZE];
+
+            l = libnet_init(
+                    LIBNET_RAW4,    /* or LIBNET_LINK or LIBNET_RAW6 */
+                    NULL,           /* or device if you using LIBNET_LINK */
+                    errbuf);
+
+        - The libnet_build functions are largely unchanged with a few
+          important differences:
+
+                1) Packets headers MUST be stacked IN ORDER.  This is
+                   intuitive and shouldn't be a problem.  Due to the way
+                   individual packet header memory is allocated and how 
+                   packet pieces are combined to build a packet they HAVE to 
+                   be built IN ORDER, from the high end of the protocol stack 
+                   on down.  ie: using the raw interface to build a NTP
+                   packet, you would:
+                        libnet_build_ntp(...)
+                        libnet_build_udp(...)
+                        libnet_build_ipv4(...)
+                   To build the same packet using the LINK interface on 
+                   top of ethernet you would:
+                        libnet_build_ntp(...)
+                        libnet_build_udp(...)
+                        libnet_build_ipv4(...)
+                        libnet_build_ethernet(...)
+                1a) There is the option now of using libnet_autobuild_ipv4()
+                    and libnet_autobuild_ethernet() which have fewer 
+                    arguments and smaller stack frames and are a bit more
+                    convenient.
+                2) The libnet_build functions return a libnet_ptag_t datatype
+                   on success or -1 on error.  This ptag is your
+                   "protocol/packet tag" so you can find this header again
+                   if you needed to modify it later on.  If you don't need
+                   to modify the packet header you can throw this value
+                   away.  You should definitely check for error now on
+                   your build functions.  Alot's going on down there fellas.
+                2a) NOTE that after packets are built, they may accessed
+                    independently of construction order via the saved ptag.
+                3) They NO LONGER ACCEPT BUFFER ARGUMENTS.  This is ALL
+                   done internally.  The last TWO arguments are the libnet
+                   context you created in your call to libnet_init() and
+                   an OPTIONAL ptag argument.  The ptag argument, if non-zero,
+                   specifes a packet tag to an ALREADY EXISTING packet header
+                   that will be OVERWRITTEN with the values specified in
+                   this libnet_build function call.  This is how you modify
+                   existing packet header pieces.  If this ptag is 0,
+                   a new protocol block is allocated and the packet is
+                   pushed down on the "protocol stack".
+                4) For the functions that build headers that have checksums
+                   these are NOW SPECIFIED AS AN ARGUMENT.  This adds more
+                   flexibility in how checksums are done (you can leave the
+                   field 0, put in a random value, precompute it on your own,
+                   or let the library do it).  By default, when you build
+                   a header, a "DO_CHECKSUM" flag will be set.  This means
+                   the library will compute the checksum for the header
+                   and possibly over the data before the packet is written.
+                   To clear this flag, there is a special macro you
+                   can call on the ptag refering to that header.
+                5) For the functions that have a length, it now specifies
+                   the TOTAL packet length from that protocol unit on down.
+                   For IP, that would be the entire packet length.  For
+                   TCP, that would be TCP and any possible data.
+                6) Nomenclature support for the eventual support of ipv6
+                   has been added.
+
+            libnet_ptag_t ip_tag;
+            libnet_ptag_t tcp_tag;
+
+            tcp_tag = libnet_build_tcp(
+                src_prt,            /* source TCP port */
+                dst_prt,            /* destination TCP port */
+                0xffff,             /* sequence number */
+                0x53,               /* acknowledgement number */
+                TH_SYN,             /* control flags */
+                1024,               /* window size */
+                0xd00d,             /* checksum */
+                0,                  /* urgent pointer */
+                LIBNET_TCP_H        /* TCP packet size */
+                NULL,               /* payload (none) */
+                0,                  /* payload length */
+                l,                  /* libnet context */
+                0);                 /* ptag */
+
+            ip_tag = libnet_build_ipv4(
+                LIBNET_TCP_H + LIBNET_IPV4_H,/* total packet len */
+                IPTOS_LOWDELAY,     /* tos */
+                ip_id,              /* IP ID */
+                0,                  /* IP Frag */
+                64,                 /* TTL */
+                IPPROTO_TCP,        /* protocol */
+                0,                  /* checksum */
+                src_ip,             /* source ip */
+                dst_ip,             /* dest ip */
+                NULL,               /* payload (none) */
+                0,                  /* payload size */
+                l,                  /* libnet context */
+                0);                 /* ptag */
+
+            Now, if you wanted to modify one of these headers in a loop
+            somewhere you would:
+
+            int i;
+            for (ip_tag, tcp_tag = LIBNET_PTAG_INITIALIZER, i = 0; i < 10; i++)
+            {
+                tcp_tag = libnet_build_tcp(++src_prt, ..., l, tcp_tag);
+                ip_tag = libnet_build_ipv4(..., ++ip_id, ..., l, ip_tag);
+                /* do something */
+            }
+            Since we are specifying a ptag for an existing header, the
+            build function will NOT create a new header and append it to
+            the list, it will FIND the one referenced by the ptag and UPDATE
+            it.  Since there is nothing new being created, order is NOT
+            important here.
+
+            Also note that it's perfectly fine to wrap the loop around the
+            initial building of the packets.  Since we're initializing the
+            ptags (to be zero), the first call into the builder functions
+            will allocate the memory and create the packet blocks.  These
+            calls will return ptag values.  The next calls will modify
+            these headers since the ptags will not be NULL.
+
+    - Finally, we write the packet.  Checksums are computed, by default
+      for each protocol header that requires one.  If the user specifies
+      a non-zero value, by default, this will be used INSTEAD of a
+      libnet computed checksum.  This behavior is overridable with:
+      
+    Turn ON checksums for header referenced by ptag:
+        libnet_toggle_checksum(l, ptag, 1)
+
+    Turn OFF checksums for header referenced by ptag:
+        libnet_toggle_checksum(l, ptag, 0)
+
+    Note, the packet header MUST exist before you can toggle this setting.
+
+        int c;
+        c = libnet_write(l);
+
+    Boom.  You're done.  Now go read the sample code.
+
+EOF
