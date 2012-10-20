@@ -39,20 +39,9 @@
             android:layout_alignLeft="@+id/textView2"
             android:layout_alignRight="@+id/textView2"
             android:layout_below="@+id/textView2"
+            android:autoLink="web"
             android:linksClickable="true"
-            android:text="http://www.evilsocket.net/"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/textView3"
-            android:layout_alignRight="@+id/textView3"
-            android:layout_below="@+id/textView3"
-            android:linksClickable="true"
-            android:text="http://www.backbox.org/"
+            android:text="http://www.dsploit.net/"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
 
@@ -60,8 +49,8 @@
             android:id="@+id/textView5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/textView4"
-            android:layout_below="@+id/textView4"
+            android:layout_alignLeft="@+id/textView3"
+            android:layout_below="@+id/textView3"
             android:text="Disclaimer"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
