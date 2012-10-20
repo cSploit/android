@@ -90,7 +90,7 @@ public class SpoofSession
 			
 			@Override
 			public void onEnd(int exitCode) { 
-				Log.d( "ARPSPOOF", "onEnd( " + exitCode + " )" );
+				// Log.d( "ARPSPOOF", "onEnd( " + exitCode + " )" );
 			}
 		}).start();
 	}

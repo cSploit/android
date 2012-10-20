@@ -19,6 +19,7 @@
 package it.evilsocket.dsploit.core;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
@@ -68,7 +69,7 @@ public class ToolsInstaller
 	
 	public boolean needed( )
 	{
-		return !( new File( System.getLibraryPath() ) ).exists();
+		return !System.getSettings().getBoolean( "DSPLOIT_INSTALLED", false );
 	}
 	
 	public boolean install( )
@@ -122,7 +123,12 @@ public class ToolsInstaller
 	    	}
 	    	        	
         	Shell.exec( cmd );
-	    	
+        	
+        	SharedPreferences.Editor editor = System.getSettings().edit();
+        	
+        	editor.putBoolean( "DSPLOIT_INSTALLED", true );
+        	editor.commit();
+        	
 	    	return true;
 	    }
 	    catch( Exception e )
