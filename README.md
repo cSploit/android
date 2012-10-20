@@ -3,8 +3,7 @@ dSploit - An Android network penetration suite.
 
 Copyleft of Simone Margaritelli aka evilsocket, sponsored by the BackBox Linux Project.
 
-- <http://www.evilsocket.net/>
-- <http://www.backbox.org/>
+- <http://www.dsploit.net/>
 
 dSploit is an Android network analysis and penetration suite which aims to offer to IT security experts/geeks
 **the most complete and advanced professional toolkit** to perform network security assesments on a mobile device.
