@@ -18,7 +18,6 @@
  */
 package it.evilsocket.dsploit.plugins.mitm;
 
-import android.util.Log;
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.Target;

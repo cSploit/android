@@ -19,12 +19,14 @@
 package it.evilsocket.dsploit.core;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -59,17 +61,44 @@ public class ToolsInstaller
 		"mount -o remount,rw /system /system && ( chmod 6755 /system/*/su; mount -o remount,ro /system /system )"
 	};
 	
-	private Context mAppContext = null;
-	private String  mDestPath   = null;
+	private Context mAppContext  = null;
+	private String  mDestPath    = null;
+	private String	mVersionFile = null;
+	private String  mAppVersion  = null;
 	
 	public ToolsInstaller( Context c ){
-		mAppContext = c;
-		mDestPath   = mAppContext.getFilesDir().getAbsolutePath();
+		mAppContext  = c;
+		mDestPath    = mAppContext.getFilesDir().getAbsolutePath();
+		mAppVersion  = System.getAppVersionName();
+		mVersionFile = mDestPath + "/tools/VERSION";		
 	}
 	
 	public boolean needed( )
 	{
-		return !System.getSettings().getBoolean( "DSPLOIT_INSTALLED", false );
+		Log.d( TAG, "Checking version file " + mVersionFile );
+
+		File		   file = new File( mVersionFile );
+		BufferedReader reader;
+		String		   line;
+		boolean        needed = true;
+		
+		try 
+		{
+			if( file.exists() )
+			{
+				reader = new BufferedReader( new FileReader( file ) );
+				line   = reader.readLine().trim();							
+				needed = !line.equals( mAppVersion );
+	
+				reader.close();
+			}
+		} 
+		catch( IOException e ) 
+		{
+			Log.w( TAG, e.toString() );
+		}
+		
+		return needed;
 	}
 	
 	public boolean install( )
@@ -124,10 +153,7 @@ public class ToolsInstaller
 	    	        	
         	Shell.exec( cmd );
         	
-        	SharedPreferences.Editor editor = System.getSettings().edit();
-        	
-        	editor.putBoolean( "DSPLOIT_INSTALLED", true );
-        	editor.commit();
+        	Shell.exec( "echo '" + mAppVersion + "' > '" + mVersionFile + "' && chmod 777 '" + mVersionFile + "'" );
         	
 	    	return true;
 	    }
