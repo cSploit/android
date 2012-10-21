@@ -145,13 +145,15 @@ public class System
 			// set ports
 			try
 	    	{
-				HTTP_PROXY_PORT  = Integer.parseInt( getSettings().getString( "PREF_HTTP_PROXY_PORT", "8080" ) );
-				HTTP_SERVER_PORT = Integer.parseInt( getSettings().getString( "PREF_HTTP_SERVER_PORT", "8081" ) );				
+				HTTP_PROXY_PORT  = Integer.parseInt( getSettings().getString( "PREF_HTTP_PROXY_PORT", 		"8080" ) );
+				HTTP_SERVER_PORT = Integer.parseInt( getSettings().getString( "PREF_HTTP_SERVER_PORT", 		"8081" ) );		
+				HTTPS_REDIR_PORT = Integer.parseInt( getSettings().getString( "PREF_HTTPS_REDIRECTOR_PORT", "8082" ) );
 	    	}
 	    	catch( NumberFormatException e )
 	    	{
 	    		HTTP_PROXY_PORT  = 8080;
 	    		HTTP_SERVER_PORT = 8081; 
+	    		HTTPS_REDIR_PORT = 8082;
 	    	}
 
 			Target network = new Target( mNetwork ),

@@ -53,6 +53,13 @@
             android:title="HTTP Server Port" />
         
         <EditTextPreference
+            android:defaultValue="8082"
+            android:inputType="number"
+            android:key="PREF_HTTPS_REDIRECTOR_PORT"
+            android:summary="MITM https redirection server port to listen on."
+            android:title="HTTPS Redirector Port" />
+        
+        <EditTextPreference
             android:defaultValue="10485760"
             android:inputType="number"
             android:key="PREF_HTTP_MAX_BUFFER_SIZE"

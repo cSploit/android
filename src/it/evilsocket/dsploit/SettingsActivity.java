@@ -32,6 +32,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 	private EditTextPreference mSnifferSampleTime	 = null;
 	private EditTextPreference mProxyPort			 = null;
 	private EditTextPreference mServerPort			 = null;
+	private EditTextPreference mRedirectorPort		 = null;
 	private EditTextPreference mHttpBufferSize		 = null;
 	private EditTextPreference mPasswordFilename	 = null;
 	
@@ -44,6 +45,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 		mSnifferSampleTime	  = ( EditTextPreference )getPreferenceScreen().findPreference( "PREF_SNIFFER_SAMPLE_TIME" );
 		mProxyPort			  = ( EditTextPreference )getPreferenceScreen().findPreference( "PREF_HTTP_PROXY_PORT" );
 		mServerPort			  = ( EditTextPreference )getPreferenceScreen().findPreference( "PREF_HTTP_SERVER_PORT" );
+		mRedirectorPort		  =  ( EditTextPreference )getPreferenceScreen().findPreference( "PREF_HTTPS_REDIRECTOR_PORT" );
 		mHttpBufferSize		  = ( EditTextPreference )getPreferenceScreen().findPreference( "PREF_HTTP_MAX_BUFFER_SIZE" );
 		mPasswordFilename	  = ( EditTextPreference )getPreferenceScreen().findPreference( "PREF_PASSWORD_FILENAME" );
 	}
@@ -149,6 +151,35 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 				Toast.makeText( SettingsActivity.this, message, Toast.LENGTH_SHORT ).show();
 				
 			mServerPort.setText( Integer.toString( serverPort ) );
+		}
+		else if( key.equals("PREF_HTTPS_REDIRECTOR_PORT") )
+		{
+			int redirPort = 8082;
+			
+			try
+			{				
+				redirPort = Integer.parseInt( mRedirectorPort.getText() );
+				if( redirPort < 1024 )
+				{
+					message   = "Redirector port can't be less than 1024.";
+					redirPort = 8082;
+				}
+				else if( redirPort > 65535 )
+				{
+					message   = "Redirector port can't be greater than 65535.";
+					redirPort = 8082;
+				}
+			}
+			catch( Throwable t )
+			{
+				message   = "Invalid number.";
+				redirPort = 8082;
+			}
+			
+			if( message != null )
+				Toast.makeText( SettingsActivity.this, message, Toast.LENGTH_SHORT ).show();
+				
+			mRedirectorPort.setText( Integer.toString( redirPort ) );
 		}
 		else if( key.equals("PREF_HTTP_MAX_BUFFER_SIZE") )
 		{

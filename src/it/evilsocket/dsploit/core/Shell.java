@@ -26,7 +26,6 @@ import java.io.InputStreamReader;
 import java.util.Map;
 
 import android.content.Context;
-import android.util.Log;
 
 public class Shell 
 {
