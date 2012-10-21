@@ -81,6 +81,8 @@ public class MainActivity extends SherlockListActivity
 	private IntentFilter	  mIntentFilter	   		   = null;
 	private BroadcastReceiver mMessageReceiver 		   = null;
 	private TextView		  mUpdateStatus			   = null;
+	private Toast 			  mToast 			 	   = null;
+	private long  			  mLastBackPressTime 	   = 0;
 	
 	public class TargetAdapter extends ArrayAdapter<Target> 
 	{
@@ -636,6 +638,32 @@ public class MainActivity extends SherlockListActivity
         );
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);                
 	}
+	
+	@Override
+	public void onBackPressed() {
+		if( mLastBackPressTime < java.lang.System.currentTimeMillis() - 4000 ) 
+		{
+			mToast = Toast.makeText( this, "Press back again to close this app.", Toast.LENGTH_SHORT );
+			mToast.show();
+			mLastBackPressTime = java.lang.System.currentTimeMillis();
+		} 
+		else
+		{
+			if( mToast != null ) 
+				mToast.cancel();
+			
+			new ConfirmDialog( "Exit", "This will close dSploit, are you sure you want to continue ?", this, new ConfirmDialogListener() {				
+				@Override
+				public void onConfirm() {
+					MainActivity.super.onBackPressed();
+					java.lang.System.exit( 0xFF );
+				}
+			}).show();
+			
+			mLastBackPressTime = 0;
+		}
+	}
+
 	
 	@Override
 	public void onDestroy() {				
