@@ -355,7 +355,7 @@ public class Hijacker extends SherlockActivity
         mHijackProgress	    = ( ProgressBar )findViewById( R.id.hijackActivity );
         mListView 		    = ( ListView )findViewById( R.id.listView );
         mAdapter		    = new SessionListAdapter( R.layout.plugin_mitm_hijacker_list_item );
-        mSpoof				= new SpoofSession();
+        mSpoof				= new SpoofSession( );
         
         mListView.setAdapter( mAdapter );
         mListView.setOnItemClickListener( new OnItemClickListener() {

@@ -60,6 +60,7 @@ import it.evilsocket.dsploit.net.Network.Protocol;
 import it.evilsocket.dsploit.net.Target.Port;
 import it.evilsocket.dsploit.net.Target.Type;
 import it.evilsocket.dsploit.net.Target.Vulnerability;
+import it.evilsocket.dsploit.net.http.proxy.HTTPSRedirector;
 import it.evilsocket.dsploit.net.http.proxy.Proxy;
 import it.evilsocket.dsploit.net.http.server.Server;
 import it.evilsocket.dsploit.tools.ArpSpoof;
@@ -77,6 +78,8 @@ public class System
 	private static final Pattern SERVICE_PARSER		    = Pattern.compile( "^([^\\s]+)\\s+(\\d+).*$", Pattern.CASE_INSENSITIVE );
 	public  static int	 		 HTTP_PROXY_PORT		= 8080;
 	public  static int	 		 HTTP_SERVER_PORT		= 8081;
+	public  static int			 HTTPS_REDIR_PORT		= 8082;
+	
 	public  static final String  IPV4_FORWARD_FILEPATH  = "/proc/sys/net/ipv4/ip_forward";	
  
 	private static boolean			     mInitialized   = false;
@@ -104,6 +107,7 @@ public class System
 	private static Hydra				 mHydra			= null;
 	private static TcpDump				 mTcpdump		= null;
 	
+	private static HTTPSRedirector		 mRedirector	= null;
 	private static Proxy				 mProxy			= null;
 	private static Server				 mServer		= null;
 	
@@ -546,6 +550,20 @@ public class System
 		}
 		
 		return mProxy;
+	}
+	
+	public static HTTPSRedirector getHttpsRedirector() {
+		try
+		{
+			if( mRedirector == null )
+				mRedirector = new HTTPSRedirector( mContext, getNetwork().getLocalAddress(), HTTPS_REDIR_PORT );
+		}
+		catch( Exception e )
+		{
+			errorLogging( TAG, e );
+		}
+		
+		return mRedirector;
 	}
 	
 	public static Server getServer() {		
