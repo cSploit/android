@@ -20,27 +20,57 @@ package it.evilsocket.dsploit.gui.dialogs;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.graphics.Bitmap;
 
-public class ChangelogDialog extends AlertDialog
+public class ChangelogDialog extends AlertDialog 
 {
-	public ChangelogDialog( Activity activity ) {
-		super( activity );
+	private ProgressDialog mLoader = null;
+	
+	public ChangelogDialog( final Activity activity ) {
+		super(activity);
+
+		this.setTitle("Changelog");
+
 		
-		this.setTitle( "Changelog" );
+		WebView view = new WebView(activity);
+
+		view.setWebViewClient( new WebViewClient() {
+			@Override
+			public void onPageStarted( WebView view, String url, Bitmap favicon ) {
+				mLoader = ProgressDialog.show( activity, "", "Loading changelog ..." );
+				super.onPageStarted(view, url, favicon);
+			}
+
+			@Override
+			public void onPageFinished( WebView view, String url ) {
+				super.onPageFinished(view, url);
+				mLoader.dismiss();
+			}
+
+			@Override
+			public void onReceivedError( WebView view, int errorCode, String description, String failingUrl ) {
+				super.onReceivedError(view, errorCode, description, failingUrl);
+				try 
+				{
+					mLoader.dismiss();
+				} 
+				catch( Exception e ) { }
+			}
+		});
 		
-		WebView view = new WebView( activity );
-				
-		view.loadUrl( "http://www.dsploit.net/changelog.php" );
-		
-		this.setView( view );
-				
-		this.setCancelable( false );
-		this.setButton( "Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-            	dialog.dismiss();
-            }
-        });	
+		this.setView(view);
+	
+		view.loadUrl("http://www.dsploit.net/changelog.php");
+
+		this.setCancelable(false);
+		this.setButton("Ok", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialog.dismiss();
+			}
+		});
 	}
 }
