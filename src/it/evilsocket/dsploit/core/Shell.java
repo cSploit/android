@@ -29,7 +29,65 @@ import android.content.Context;
 
 public class Shell 
 {
-	private static final String TAG = "SHELL";
+	private static final String TAG = "SHELL";	
+	/*
+	 * "gobblers" seem to be the recommended way to ensure the streams
+	 * don't cause issues
+	 */
+	private static class StreamGobbler extends Thread 
+	{
+		private BufferedReader mReader   = null;
+		private OutputReceiver mReceiver = null;
+		
+		public StreamGobbler( BufferedReader reader, OutputReceiver receiver ) {
+			mReader   = reader;
+			mReceiver = receiver;
+			
+			setDaemon( true );
+		}
+
+		public void run() {
+			try 
+			{
+				while(true) 
+				{
+					String line = "";
+					if( mReader.ready() ) 
+					{
+						if( ( line = mReader.readLine() ) == null )
+							continue;
+					} 
+					else 
+					{
+						try 
+						{
+							Thread.sleep(200);
+						} 
+						catch( InterruptedException e ){ } 
+						
+						continue;
+					}
+					
+					if( line != null && line.isEmpty() == false && mReceiver != null )
+						mReceiver.onNewLine( line );
+				}
+			} 
+			catch( IOException e ) 
+			{
+				System.errorLogging( TAG, e ); 				
+			} 
+			finally 
+			{
+				try 
+				{
+					mReader.close();
+				} 
+				catch( IOException e ) {
+					//swallow error
+				}
+			}
+		}
+	}
 	
 	private static Process spawnShell( String command, boolean bUpdateLibraryPath, boolean bRedirectErrorStream ) throws IOException {
 		ProcessBuilder 		builder 	= new ProcessBuilder().command( command );
@@ -203,17 +261,19 @@ public class Shell
 	}
 	
 	public static int exec( String command, OutputReceiver receiver, boolean overrideLibraryPath ) throws IOException, InterruptedException {
-		Process			 process = spawnShell( "su", overrideLibraryPath, true );
+		Process			 process = spawnShell( "su", overrideLibraryPath, false );
 		DataOutputStream writer  = null;
-		BufferedReader   reader  = null;
-		String			 line    = null,
-						 libPath = System.getLibraryPath();
-						
+		BufferedReader   reader  = null,
+						 error   = null;
+		String			 libPath = System.getLibraryPath();
+		int 			 exit 	 = -1;
+
 		if( receiver != null ) receiver.onStart( command );
 				
 		writer = new DataOutputStream( process.getOutputStream() );
 		reader = new BufferedReader( new InputStreamReader( process.getInputStream() ) );
-		
+		error  = new BufferedReader( new InputStreamReader( process.getErrorStream() ) );
+
 		// is this really needed ?
 		if( overrideLibraryPath )
 		{
@@ -221,21 +281,62 @@ public class Shell
 			writer.flush();
 		}
 		
-		writer.writeBytes( "\n" );
-		writer.flush();
-		writer.writeBytes( command + "\n" );
-		writer.flush();
-		writer.writeBytes( "exit\n" );
-		writer.flush();
-
-		while( ( line = reader.readLine() ) != null )
-		{			
-			if( receiver != null ) 
-				receiver.onNewLine( line );				
+		try
+		{
+			writer.writeBytes( command + "\n" );
+			writer.flush();
+			
+			StreamGobbler outGobbler = new StreamGobbler( reader, receiver ),
+						  errGobbler = new StreamGobbler( error, receiver );
+			
+			outGobbler.start();
+			errGobbler.start();
+							
+			writer.writeBytes( "exit\n" );
+			writer.flush();
+					
+			/* 
+			 * The following catastrophe of code seems to be the best way to ensure 
+			 * this thread can be interrupted.
+			 */
+			while( !Thread.currentThread().isInterrupted() ) 
+			{
+				try 
+				{
+					exit = process.exitValue();
+					Thread.currentThread().interrupt();
+				} 
+				catch( IllegalThreadStateException e ) 
+				{
+					/*
+					 * Just sleep, the process hasn't terminated yet but sleep should (but doesn't) cause 
+					 * InterruptedException to be thrown if interrupt() has been called.
+					 * 
+					 * .25 seconds seems reasonable
+					 */
+					Thread.sleep(250);
+				}
+			}		
 		}
+		catch( IOException e ) 
+		{
+			System.errorLogging( TAG, e );
+		} 
+		catch( InterruptedException e ) 
+		{
+			try 
+			{
+				// key to killing executable and process
+				writer.close();
+				reader.close();
+				error.close();
+			} 
+			catch( IOException ex ) 
+			{
+				// swallow error
+			} 			
+		} 
 
-		int exit = process.waitFor();
-		
 		if( receiver != null ) receiver.onEnd( exit );
 		
 		return exit;
@@ -250,8 +351,7 @@ public class Shell
 	}
 	
 	public static Thread async( final String command, final OutputReceiver receiver, final boolean overrideLibraryPath ) {
-		
-		return new Thread( new Runnable(){
+		Thread launcher = new Thread( new Runnable(){
 			@Override
 			public void run() {
 				try
@@ -264,6 +364,10 @@ public class Shell
 				}
 			}} 
 		);
+		
+		launcher.setDaemon( true );
+		
+		return launcher;
 	}
 	
 	public static Thread async( String command ) {
