@@ -29,7 +29,33 @@ public class IPTables extends Tool
 		super( "iptables" );		
 	}
 	
-	public void portRedirect( int from, int to ){
+	public void trafficRedirect( String to ) {
+		Log.d( TAG, "Redirecting traffic to " + to );
+		
+		try
+		{							
+			super.run("-t nat -A PREROUTING -j DNAT -p tcp --to " + to );	
+		}
+		catch( Exception e )
+		{
+			System.errorLogging( TAG, e );
+		}
+	}
+	
+	public void undoTrafficRedirect( String to ) {
+		Log.d( TAG, "Undoing traffic redirection" );
+		
+		try
+		{
+			super.run("-t nat -D PREROUTING -j DNAT -p tcp --to " + to );
+		}
+		catch( Exception e )
+		{
+			System.errorLogging( TAG, e );
+		}
+	}
+		
+	public void portRedirect( int from, int to ) {
 		Log.d( TAG, "Redirecting traffic from port " + from + " to port " + to );
 		
 		try

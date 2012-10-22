@@ -331,7 +331,7 @@ public class RequestParser
 		return null;
 	}
 	
-	private static ArrayList<BasicClientCookie> parseRawCookie( String rawCookie ) {
+	public static ArrayList<BasicClientCookie> parseRawCookie( String rawCookie ) {
 	    String[] rawCookieParams 	   		 = rawCookie.split(";");
 	    ArrayList<BasicClientCookie> cookies = new ArrayList<BasicClientCookie>();
 	    

@@ -35,9 +35,14 @@ import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
+import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
+import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog;
 import it.evilsocket.dsploit.net.http.RequestParser;
 import it.evilsocket.dsploit.net.http.proxy.Proxy.OnRequestListener;
 import it.evilsocket.dsploit.plugins.mitm.SpoofSession.OnSessionReadyListener;
+import it.evilsocket.dsploit.gui.dialogs.InputDialog;
+import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
+import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog.SpinnerDialogListener;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -51,6 +56,7 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -60,6 +66,8 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 public class Hijacker extends SherlockActivity
@@ -84,6 +92,11 @@ public class Hijacker extends SherlockActivity
 		
 		public Session() {
 			mCookies = new HashMap< String, BasicClientCookie >();
+		}
+		
+		public String getFileName( ) {
+			String name = mDomain + "-" + ( mUserName != null ? mUserName : mAddress );									
+			return name.replaceAll( "[ .\\\\/:*?\"<>|\\\\/:*?\"<>|]", "-" );
 		}
 	}
 	
@@ -122,7 +135,7 @@ public class Hijacker extends SherlockActivity
 		private int 					   mLayoutId  = 0;
 		private HashMap< String, Session > mSessions  = null;
 		
-		private class FacebookUserTask extends AsyncTask<Session, Void, Boolean> 
+		public class FacebookUserTask extends AsyncTask<Session, Void, Boolean> 
 		{
 			private Bitmap getUserImage( String uri ) {
 			    Bitmap image = null;
@@ -196,10 +209,15 @@ public class Hijacker extends SherlockActivity
 				}
 				
 				return true;
-			}			
+			}
+			
+			@Override
+			protected void onPostExecute( Boolean result ) {
+				mAdapter.notifyDataSetChanged();
+			}
 		}
 		
-		private class XdaUserTask extends AsyncTask<Session, Void, Boolean> 
+		public class XdaUserTask extends AsyncTask<Session, Void, Boolean> 
 		{
 			private Bitmap getUserImage( String uri ) {
 			    Bitmap image = null;
@@ -236,9 +254,14 @@ public class Hijacker extends SherlockActivity
 				
 				if( username != null )
 					session.mUserName = username.getValue().toLowerCase();
-									
+																	
 				return true;
-			}			
+			}	
+			
+			@Override
+			protected void onPostExecute( Boolean result ) {
+				mAdapter.notifyDataSetChanged();
+			}
 		}
 		
 		public class SessionHolder
@@ -290,7 +313,7 @@ public class Hijacker extends SherlockActivity
 		}
 		
 		@Override
-	    public View getView( int position, View convertView, ViewGroup parent ) {				
+	    public View getView( int position, View convertView, ViewGroup parent ) {							
 	        View 		row    = convertView;
 	        SessionHolder holder = null;
 	        Session session    = getByPosition( position );
@@ -312,7 +335,7 @@ public class Hijacker extends SherlockActivity
 	            holder = ( SessionHolder )row.getTag();
 	        
             if( session.mInited == false )
-        	{            	
+        	{            	            	
         		session.mInited = true;
         	
         		if( session.mDomain.contains("facebook.") && session.mCookies.get("c_user") != null )
@@ -385,6 +408,48 @@ public class Hijacker extends SherlockActivity
 			}
 		});
         
+        mListView.setOnItemLongClickListener( new OnItemLongClickListener() 
+        {
+        	@Override
+        	public boolean onItemLongClick( AdapterView<?> parent, View view, int position, long id ) {			
+        		final Session session = mAdapter.getByPosition( position );
+        		if( session != null )
+        		{
+        			new InputDialog
+            		( 
+            		  "Save Session", 
+            		  "Set the session file name:", 
+            		  session.getFileName(),
+            		  true,
+            		  Hijacker.this, 
+            		  new InputDialogListener(){
+            			@Override
+            			public void onInputEntered( String name ) {
+            				if( name.isEmpty() == false )
+        					{
+            					
+        						try
+        						{
+        							String filename = System.saveHijackerSession( name, session );
+        					
+        							Toast.makeText( Hijacker.this, "Session saved to " + filename + " .", Toast.LENGTH_SHORT ).show();
+        						}
+        						catch( IOException e )
+        						{
+        							new ErrorDialog( "Error", e.toString(), Hijacker.this ).show();
+        						}
+        					}
+        					else
+        						new ErrorDialog( "Error", "Invalid session name.", Hijacker.this ).show();
+            			}
+            		  }
+            		).show();
+        		}
+			
+        		return false;
+        	}
+        });
+        
         mHijackToggleButton.setOnClickListener( new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -448,6 +513,13 @@ public class Hijacker extends SherlockActivity
 		});     
 	}
 	
+	@Override
+	public boolean onCreateOptionsMenu( Menu menu ) {
+		MenuInflater inflater = getSupportMenuInflater();
+		inflater.inflate( R.menu.hijacker, menu );		
+		return super.onCreateOptionsMenu(menu);
+	}
+	
 	private void setStartedState( ) {	
 		mSpoof.start( new OnSessionReadyListener() {			
 			@Override
@@ -456,9 +528,7 @@ public class Hijacker extends SherlockActivity
 					@Override
 					public void run() {
 						mHijackProgress.setVisibility( View.VISIBLE );
-						mRunning = true;
-						
-						Toast.makeText( Hijacker.this, "Once you see realtime sessions on the list, click on them to start hijacking.", Toast.LENGTH_LONG ).show();	    
+						mRunning = true;						
 					}
 				});
 			}
@@ -478,11 +548,49 @@ public class Hijacker extends SherlockActivity
 	@Override
 	public boolean onOptionsItemSelected( MenuItem item ) 
 	{    
-		switch( item.getItemId() ) 
+		int itemId = item.getItemId();
+		
+		switch( itemId ) 
 		{        
 			case android.R.id.home:            
 	         
 				onBackPressed();
+				
+				return true;
+				
+			case R.id.load :
+				
+				final ArrayList<String> sessions = System.getAvailableHijackerSessionFiles();
+				
+				if( sessions != null && sessions.size() > 0 )
+				{
+					new SpinnerDialog( "Select Session", "Select a session file from the sd card :", sessions.toArray( new String[ sessions.size() ] ), Hijacker.this, new SpinnerDialogListener(){
+						@Override
+						public void onItemSelected(int index) 
+						{						
+							String filename = sessions.get( index );
+							
+							try
+							{
+								Session session = System.loadHijackerSession( filename );
+								
+								if( session != null )
+								{
+									mAdapter.addSession(session);
+									mAdapter.notifyDataSetChanged();
+								}
+							}
+							catch( Exception e )
+							{
+								e.printStackTrace();
+								new ErrorDialog( "Error", e.getMessage(), Hijacker.this ).show();
+							}
+						}
+					}).show();
+				}
+				else
+					new ErrorDialog( "Error", "No session file found on sd card.", Hijacker.this ).show();
+				
 				
 				return true;
 	    	  

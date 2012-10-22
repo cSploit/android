@@ -418,6 +418,7 @@ public class MITM extends Plugin
 									activity.setVisibility( View.VISIBLE );
 									Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
 									
+									
 									final String faddress = address;
 									final int	 fport	  = iport;
 									
@@ -428,7 +429,8 @@ public class MITM extends Plugin
 										public void onSessionReady() {
 											System.getProxy().setRedirection( faddress, fport );											
 										}
-									});																	
+									});		
+																								
 								}
 								catch( Exception e )
 								{

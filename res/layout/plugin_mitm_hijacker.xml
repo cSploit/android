@@ -27,14 +27,26 @@
         android:layout_height="1dp"
         android:layout_below="@+id/hijackToggleButton"
         android:background="@android:color/darker_gray" />
+        
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/separator"
+        android:layout_alignRight="@+id/separator"
+        android:layout_below="@+id/separator"
+        android:padding="5dp"
+        android:text="Tap on a session to start hijacking, long tap to save it to file."
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#ccc" />
 
     <ListView
         android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/hijackActivity"
-        android:layout_below="@+id/separator"
+        android:layout_alignRight="@+id/textView"
+        android:layout_below="@+id/textView"
         android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
         android:paddingLeft="5dp"
         android:paddingRight="5dp" >

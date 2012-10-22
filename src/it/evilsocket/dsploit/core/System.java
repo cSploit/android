@@ -41,6 +41,8 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import org.apache.http.impl.cookie.BasicClientCookie;
+
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
@@ -62,9 +64,11 @@ import it.evilsocket.dsploit.net.Network.Protocol;
 import it.evilsocket.dsploit.net.Target.Port;
 import it.evilsocket.dsploit.net.Target.Type;
 import it.evilsocket.dsploit.net.Target.Vulnerability;
+import it.evilsocket.dsploit.net.http.RequestParser;
 import it.evilsocket.dsploit.net.http.proxy.HTTPSRedirector;
 import it.evilsocket.dsploit.net.http.proxy.Proxy;
 import it.evilsocket.dsploit.net.http.server.Server;
+import it.evilsocket.dsploit.plugins.mitm.Hijacker.Session;
 import it.evilsocket.dsploit.tools.ArpSpoof;
 import it.evilsocket.dsploit.tools.Ettercap;
 import it.evilsocket.dsploit.tools.Hydra;
@@ -470,6 +474,60 @@ public class System
 		return filename;
 	}
 	
+	public static ArrayList<String> getAvailableHijackerSessionFiles( )
+	{
+		ArrayList<String> files = new ArrayList<String>();		
+		File storage            = new File( mStoragePath );
+
+		if( storage != null && storage.exists() )
+		{
+			String[] children = storage.list();
+			
+			if( children != null && children.length > 0 )
+			{
+				for( String child : children )
+				{
+					if( child.endsWith(".dhs") )
+						files.add( child );
+				}
+			}
+		}
+
+		return files;
+	}
+	
+	public static String saveHijackerSession( String sessionName, Session session ) throws IOException {
+		StringBuilder builder  = new StringBuilder();
+		String		  filename = mStoragePath + '/' + sessionName + ".dhs",
+					  buffer   = null;
+		
+		builder.append( SESSION_MAGIC + "\n" );
+		
+		builder.append( ( session.mUserName == null ? "null" : session.mUserName ) + "\n" );
+		builder.append( session.mHTTPS + "\n" );
+		builder.append( session.mAddress + "\n" );
+		builder.append( session.mDomain + "\n" );
+		builder.append( session.mUserAgent + "\n" );
+		builder.append( session.mCookies.size() + "\n" );
+		for( BasicClientCookie cookie : session.mCookies.values() )
+		{
+			builder.append( cookie.getName() + "=" + cookie.getValue() + "; domain=" + cookie.getDomain() + "; path=/" + ( session.mHTTPS ? ";secure" : "" ) + "\n" );    
+		}
+
+		buffer = builder.toString();
+
+		FileOutputStream ostream = new FileOutputStream( filename );
+	    GZIPOutputStream gzip    = new GZIPOutputStream( ostream );
+
+	    gzip.write( buffer.getBytes() );
+	    
+	    gzip.close();
+	    
+		mSessionName = sessionName;
+		
+		return filename;
+	}
+	
 	public static void loadSession( String filename ) throws Exception
 	{
 		File file = new File( mStoragePath + '/' + filename );
@@ -528,6 +586,58 @@ public class System
 		}
 		else
 			throw new Exception( filename + " does not exists or is empty." );
+	}
+	
+	public static Session loadHijackerSession( String filename ) throws Exception
+	{
+		Session session = null;
+		File 	file 	= new File( mStoragePath + '/' + filename );
+		
+		if( file.exists() && file.length() > 0 )
+		{
+			BufferedReader reader = new BufferedReader(new InputStreamReader( new GZIPInputStream( new FileInputStream( file ) ) ) );
+			String		   line   = null;
+						
+			// begin decoding procedure
+			try
+			{
+				line = reader.readLine();
+				if( line == null || line.equals( SESSION_MAGIC ) == false )
+					throw new Exception( "Not a dSploit hijacker session file." );
+						
+				session = new Session();
+				
+				session.mUserName  = reader.readLine();
+				session.mUserName  = session.mUserName.equals("null") ? null : session.mUserName;
+				session.mHTTPS	   = Boolean.parseBoolean( reader.readLine() );
+				session.mAddress   = reader.readLine();
+				session.mDomain	   = reader.readLine();
+				session.mUserAgent = reader.readLine();
+				
+				int ncookies = Integer.parseInt( reader.readLine() );
+				for( int i = 0; i < ncookies; i++ )
+				{
+					ArrayList<BasicClientCookie> cookies = RequestParser.parseRawCookie( reader.readLine() );
+					for( BasicClientCookie cookie : cookies )
+					{
+						session.mCookies.put( cookie.getName(), cookie );
+					}
+				}
+				
+				reader.close();
+			}
+			catch( Exception e )
+			{				
+				if( reader != null )
+					reader.close();
+				
+				throw e;
+			}
+		}
+		else
+			throw new Exception( filename + " does not exists or is empty." );
+		
+		return session;
 	}
 	
 	public static NMap getNMap() {
