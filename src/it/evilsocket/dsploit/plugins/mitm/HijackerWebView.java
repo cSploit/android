@@ -59,6 +59,7 @@ public class HijackerWebView extends SherlockActivity
         
         mSettings.setJavaScriptEnabled(true);  
         mSettings.setBuiltInZoomControls(true);  
+		mSettings.setAppCacheEnabled(false);
         mSettings.setUserAgentString( DEFAULT_USER_AGENT );
         
         mWebView.setWebViewClient( new WebViewClient() {  
@@ -98,7 +99,7 @@ public class HijackerWebView extends SherlockActivity
         @Override  
         protected void onPreExecute() {  
         	CookieSyncManager.createInstance( HijackerWebView.this );              
-        	CookieManager.getInstance().removeSessionCookie();
+        	CookieManager.getInstance().removeAllCookie();
 
             super.onPreExecute();  
         }  
@@ -120,7 +121,7 @@ public class HijackerWebView extends SherlockActivity
         		for( BasicClientCookie cookie : session.mCookies.values() )
         		{
         			domain 	  = cookie.getDomain();
-        			rawcookie = cookie.getName() + "=" + cookie.getValue() + "; domain=" + domain;                        
+        			rawcookie = cookie.getName() + "=" + cookie.getValue() + "; domain=" + domain + "; path=/" + ( session.mHTTPS ? ";secure" : "" );                        
         			        			
         			CookieManager.getInstance().setCookie( domain, rawcookie );
         		}
@@ -142,6 +143,7 @@ public class HijackerWebView extends SherlockActivity
 		{        
 			case android.R.id.home:            
 	         
+				mWebView = null;
 				onBackPressed();
 				
 				return true;
@@ -152,8 +154,15 @@ public class HijackerWebView extends SherlockActivity
 	}
 	
 	@Override
-	public void onBackPressed() {	    
-	    super.onBackPressed();
-	    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);	    	    
+	public void onBackPressed() {
+		
+		if( mWebView != null && mWebView.canGoBack() )
+			mWebView.goBack();
+		
+		else
+		{
+			super.onBackPressed();
+	    	overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+		}
 	}	
 }
