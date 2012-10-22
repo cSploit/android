@@ -40,9 +40,7 @@ public class NetworkMonitorService extends Service
 	public static final String NEW_ENDPOINT		 = "NetworkMonitorService.action.NEW_ENDPOINT";
 	public static final String ENDPOINT_ADDRESS  = "NetworkMonitorService.data.ENDPOINT_ADDRESS";
 	public static final String ENDPOINT_HARDWARE = "NetworkMonitorService.data.ENDPOINT_HARDWARE";
-	
-	public static boolean      RUNNING			 = false;
-	
+		
 	private Network			  				 mNetwork 		 = null;
 	private FindAliveEndpointsOutputReceiver mReceiver  	 = null;
 	private boolean							 mRunning  		 = false;
@@ -94,7 +92,6 @@ public class NetworkMonitorService extends Service
     	if( !mRunning )
     	{    		
     		mRunning = true;
-    		RUNNING  = true;
     		
     		sendNotification( "Network monitor started ..." );
     		
@@ -134,7 +131,6 @@ public class NetworkMonitorService extends Service
 
 	@Override
 	public void onDestroy() {
-		RUNNING  = false;
 		mRunning = false;
 		
 		Log.d( TAG, "Stopping ..." );

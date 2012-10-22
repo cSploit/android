@@ -41,6 +41,8 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -402,6 +404,18 @@ public class System
 		}
 		
 		return "?";
+	}
+	
+	public static boolean isServiceRunning( String name ) {
+		ActivityManager manager = ( ActivityManager )mContext.getSystemService( Context.ACTIVITY_SERVICE );
+		
+		for( RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE) ) 
+		{
+			if( name.equals( service.service.getClassName() ) ) 
+				return true;			
+		}
+		
+		return false;
 	}
 	
 	public static ArrayList<String> getAvailableSessionFiles( )

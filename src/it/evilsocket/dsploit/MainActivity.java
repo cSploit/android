@@ -440,7 +440,7 @@ public class MainActivity extends SherlockListActivity
 	public boolean onPrepareOptionsMenu( Menu menu ) {		
 		MenuItem item = menu.findItem( R.id.ss_monitor );
 		
-		if( NetworkMonitorService.RUNNING )				
+		if( System.isServiceRunning( "it.evilsocket.dsploit.net.NetworkMonitorService" ) )				
 			item.setTitle( "Stop Network Monitor" );
 		
 		else				
@@ -605,7 +605,7 @@ public class MainActivity extends SherlockListActivity
 		}
 		else if( itemId == R.id.ss_monitor )
 		{
-			if( NetworkMonitorService.RUNNING )
+			if( System.isServiceRunning( "it.evilsocket.dsploit.net.NetworkMonitorService" ) )
 			{
 				stopService( new Intent( this, NetworkMonitorService.class ) );
 				
