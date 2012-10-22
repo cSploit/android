@@ -49,7 +49,7 @@ import android.util.Log;
 public class HTTPSRedirector implements Runnable
 {
 	private static final String TAG     = "HTTPS.REDIRECTOR";
-	private static final int    BACKLOG = 10;
+	private static final int    BACKLOG = 255;
 	
 	private static final String KEYSTORE_FILE = "dsploit.keystore";
 	private static final String KEYSTORE_PASS = "dsploit";
@@ -126,8 +126,7 @@ public class HTTPSRedirector implements Runnable
 								
 								Log.d( TAG, "Incoming connection from " + clientAddress );
 								
-								BufferedOutputStream writer = new BufferedOutputStream( client.getOutputStream() );
-								InputStream  	 	 reader = client.getInputStream();
+								InputStream reader = client.getInputStream();
 								
 					            // Apache's default header limit is 8KB.
 					            byte[] buffer     = new byte[ 8192 ];
@@ -175,7 +174,9 @@ public class HTTPSRedirector implements Runnable
 						            
 						            
 						            if( serverName != null )
-						            {			            	
+						            {			        
+										BufferedOutputStream writer = new BufferedOutputStream( client.getOutputStream() );
+
 						 				String request  = builder.toString(),	 							 
 						 					   url      = RequestParser.getUrlFromRequest( serverName, request ),
 							 		  		   response = "HTTP/1.1 302 Found\n" +
@@ -189,11 +190,12 @@ public class HTTPSRedirector implements Runnable
 						 				
 						 				writer.write( response.getBytes() );
 						 				writer.flush();
+						 				
+							            writer.close();		
 						            }
 					            }
 					            
 					            reader.close();
-					            writer.close();		
 							}
 							catch( IOException e )
 							{

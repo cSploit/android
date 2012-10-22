@@ -30,7 +30,7 @@ import it.evilsocket.dsploit.core.System;
 public class Proxy implements Runnable
 {
 	private static final String TAG     = "HTTP.PROXY";
-	private static final int    BACKLOG = 10;
+	private static final int    BACKLOG = 255;
 	
 	private InetAddress  		   mAddress 	 	= null;
 	private int     	 		   mPort    	 	= System.HTTP_PROXY_PORT;

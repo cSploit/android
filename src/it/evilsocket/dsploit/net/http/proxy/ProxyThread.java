@@ -69,7 +69,7 @@ public class ProxyThread extends Thread
 		super( "ProxyThread" );
 		
 		mSocket  	  	 = socket;
-		mWriter  	  	 = new BufferedOutputStream( mSocket.getOutputStream() );
+		mWriter  	  	 = null;
 		mReader  	 	 = mSocket.getInputStream();
 		mRequestListener = listener;
 		mFilters 	  	 = filters;		
@@ -87,6 +87,8 @@ public class ProxyThread extends Thread
             int	   read   = 0;
             
             final String client = mSocket.getInetAddress().getHostAddress();
+            
+            Log.d( TAG, "Connection from " + client );
             		
             // Read the header and rebuild it
             if( ( read = mReader.read( buffer , 0,  MAX_REQUEST_SIZE ) ) > 0 )
@@ -142,6 +144,9 @@ public class ProxyThread extends Thread
 	            // any real host found ?
 	 			if( mServerName != null )
 	 			{			
+	 				long millis = java.lang.System.currentTimeMillis();
+	 				Log.d( TAG, "Connection to " + mServerName );
+	 				 
 	 				String request  = builder.toString(),	 							 
 	 		  			   url      = RequestParser.getUrlFromRequest( mServerName, request ),
 	 		  			   response = null;
@@ -164,17 +169,25 @@ public class ProxyThread extends Thread
         					}
         					
         					https   = true;
-        					mServer = mSocketFactory.createSocket( mServerName, HTTPS_SERVER_PORT );
+        					mServer = DNSCache.getInstance().connect( mSocketFactory, mServerName, HTTPS_SERVER_PORT );
         				}
         				else
-        					mServer = new Socket( mServerName, HTTP_SERVER_PORT );  
+        				{
+        					mServer = DNSCache.getInstance().connect( mServerName, HTTP_SERVER_PORT );
+        					            				
+            				Log.d( TAG, client + " > " + mServerName + " [Ê" + ( java.lang.System.currentTimeMillis() - millis ) + " ms ]" );
+    						
+    						millis = java.lang.System.currentTimeMillis(); 
+        				}
         			}
         			// just redirect requests
-        			else
-        				mServer = new Socket( mServerName, mPortRedirect );
-        											
+        			else        			        		
+        				mServer = DNSCache.getInstance().connect( mServerName, mPortRedirect );
+        			        											
 	 				if( mRequestListener != null )
 	            		mRequestListener.onRequest( https, client, mServerName, headers );
+	 				
+	 				mWriter = new BufferedOutputStream( mSocket.getOutputStream() );
 	 				
 	 				if( response != null )
 	 				{	 					
@@ -183,15 +196,14 @@ public class ProxyThread extends Thread
 	 					mWriter.close();
 	 				}
 	 				else
-	 				{
+	 				{						
 	 					mServerReader = mServer.getInputStream(); 
 						mServerWriter = mServer.getOutputStream();		
-						
-						Log.d( TAG, client + " > " + mServerName );
-						
+																							
 		 				// send the patched request
 		 				mServerWriter.write( request.getBytes() );
 		 				mServerWriter.flush();
+		 						 						 				
 		 				// start the stream session with specified filters				
 		 				new StreamThread( client, mServerReader, mWriter, new Proxy.ProxyFilter() {									
 		 					@Override

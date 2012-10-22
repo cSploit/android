@@ -33,7 +33,7 @@ import android.util.Log;
 public class Server implements Runnable
 {
 	private static final String TAG     	  = "HTTP.SERVER";
-	private static final int    BACKLOG 	  = 10;
+	private static final int    BACKLOG 	  = 255;
 	private static final int    MAX_FILE_SIZE = 10 * 1024 * 1024;
 	
 	private InetAddress  mAddress 	 		  = null;
