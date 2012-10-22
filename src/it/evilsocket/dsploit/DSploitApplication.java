@@ -46,8 +46,15 @@ public class DSploitApplication extends Application
 	public void onCreate() {		
 		super.onCreate();
 		
-		ACRA.init( this );
-
+		try
+		{
+			ACRA.init( this );
+		}
+		catch( IllegalStateException e )
+		{
+			// ignore errors for ACRA being initialized more than once.
+		}
+		
 		// initialize the system
 		try
 		{

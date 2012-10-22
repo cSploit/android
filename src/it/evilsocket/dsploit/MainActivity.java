@@ -50,9 +50,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Typeface;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -153,6 +156,8 @@ public class MainActivity extends SherlockListActivity
 	}
 
 	private void createUpdateLayout( ) {
+		Log.d( "DSPLOIT", "No WiFi available, creating update layout." );
+		
 		getListView().setVisibility( View.GONE );
 		findViewById( R.id.textView ).setVisibility( View.GONE );
 		
@@ -165,7 +170,7 @@ public class MainActivity extends SherlockListActivity
 		mUpdateStatus.setLayoutParams( params );
 		mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "..." ) );
 		
-		layout.addView( mUpdateStatus );
+		layout.addView( mUpdateStatus );		
 	}
 	
 	@Override
@@ -259,11 +264,11 @@ public class MainActivity extends SherlockListActivity
 							}
 							
 						    try
-					    	{	    			  						    	
-								mTargetAdapter = new TargetAdapter( R.layout.target_list_item );
-						    	
+					    	{	    			  						    															    	
 								if( isWifiAvailable )
 								{
+									mTargetAdapter = new TargetAdapter( R.layout.target_list_item );
+									
 									setListAdapter( mTargetAdapter );	
 								
 									getListView().setOnItemLongClickListener( new OnItemLongClickListener() 
@@ -314,7 +319,21 @@ public class MainActivity extends SherlockListActivity
 													}
 							                    }
 							                });											
-										}		
+										}	
+										else if( isWifiAvailable == false && intent.getAction().equals( WifiManager.NETWORK_STATE_CHANGED_ACTION ) )
+										{
+											NetworkInfo info = intent.getParcelableExtra( WifiManager.EXTRA_NETWORK_INFO );
+											
+											if( NetworkInfo.State.CONNECTING.equals( info.getState() ) )
+												mUpdateStatus.setText( "Connecting to WiFi access point ..." );
+											
+											else if( NetworkInfo.State.CONNECTED.equals( info.getState() ) )
+										    {
+										    	Log.d( "DSPLOIT", "Wifi connected." );
+												( ( DSploitApplication )getApplication() ).onCreate();
+									            onCreate( null );
+										    }
+										}
 										else if( intent.getAction().equals( UpdateService.UPDATE_CHECKING ) && mUpdateStatus != null )
 										{
 											mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "Checking ..." ) );
@@ -380,7 +399,8 @@ public class MainActivity extends SherlockListActivity
 							    mIntentFilter.addAction( UpdateService.UPDATE_CHECKING );
 							    mIntentFilter.addAction( UpdateService.UPDATE_AVAILABLE );
 							    mIntentFilter.addAction( UpdateService.UPDATE_NOT_AVAILABLE );
-							    
+							    mIntentFilter.addAction( WifiManager.NETWORK_STATE_CHANGED_ACTION );
+
 						        registerReceiver( mMessageReceiver, mIntentFilter );		
 						        
 						        if( System.getSettings().getBoolean( "PREF_CHECK_UPDATES", true ) )
