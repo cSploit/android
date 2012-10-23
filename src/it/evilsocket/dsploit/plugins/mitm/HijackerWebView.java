@@ -65,24 +65,26 @@ public class HijackerWebView extends SherlockActivity
         mWebView.setWebViewClient( new WebViewClient() {  
         	@Override
 			public void onPageStarted( WebView view, String url, Bitmap favicon ) {
-				mLoader = ProgressDialog.show( HijackerWebView.this, "", "Loading page ..." );
+        		if( mLoader == null )
+        			mLoader = ProgressDialog.show( HijackerWebView.this, "", "Loading page ..." );
+        		
 				super.onPageStarted(view, url, favicon);
 			}
         	
         	@Override
 			public void onPageFinished( WebView view, String url ) {
+				mLoader.dismiss();				
 				super.onPageFinished(view, url);
-				mLoader.dismiss();
 			}
         	
         	@Override
 			public void onReceivedError( WebView view, int errorCode, String description, String failingUrl ) {
-				super.onReceivedError(view, errorCode, description, failingUrl);
 				try 
 				{
 					mLoader.dismiss();
 				} 
 				catch( Exception e ) { }
+				super.onReceivedError(view, errorCode, description, failingUrl);				
 			}
         	
             @Override  

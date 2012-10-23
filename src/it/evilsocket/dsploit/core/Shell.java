@@ -294,7 +294,7 @@ public class Shell
 							
 			writer.writeBytes( "exit\n" );
 			writer.flush();
-								
+											
 			/* 
 			 * The following catastrophe of code seems to be the best way to ensure 
 			 * this thread can be interrupted.

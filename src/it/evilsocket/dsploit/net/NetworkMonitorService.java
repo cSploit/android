@@ -135,7 +135,7 @@ public class NetworkMonitorService extends Service
 		
 		Log.d( TAG, "Stopping ..." );
 		
-		NotificationManager manager = ( NotificationManager )getSystemService(Context.NOTIFICATION_SERVICE);
+		NotificationManager manager = ( NotificationManager )getSystemService( Context.NOTIFICATION_SERVICE );
 		
 		for( int i = mNotificationId; i >= 0; i-- )
 			manager.cancel( i );

@@ -675,8 +675,7 @@ public class MainActivity extends SherlockListActivity
 			new ConfirmDialog( "Exit", "This will close dSploit, are you sure you want to continue ?", this, new ConfirmDialogListener() {				
 				@Override
 				public void onConfirm() {
-					MainActivity.super.onBackPressed();
-					java.lang.System.exit( 0xFF );
+					MainActivity.this.finish();
 				}
 			}).show();
 			
@@ -686,18 +685,15 @@ public class MainActivity extends SherlockListActivity
 
 	
 	@Override
-	public void onDestroy() {				
+	public void onDestroy() {	
 		stopService( new Intent( MainActivity.this, NetworkMonitorService.class ) );
-		
+					
 		if( mMessageReceiver != null )
 			unregisterReceiver( mMessageReceiver );
-		
+				
 		// make sure no zombie process is running before destroying the activity
 		System.clean( true );			
-		
+				
 		super.onDestroy();
-		
-		// this will remove the application from app cache, forcing it to re-initialize
-		java.lang.System.exit(0);
 	}
 }
