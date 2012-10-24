@@ -35,6 +35,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 public class HijackerWebView extends SherlockActivity
@@ -73,7 +75,12 @@ public class HijackerWebView extends SherlockActivity
         	
         	@Override
 			public void onPageFinished( WebView view, String url ) {
-				mLoader.dismiss();				
+        		if( mLoader != null )
+        		{
+        			mLoader.dismiss();			
+					mLoader = null;
+        		}
+        		
 				super.onPageFinished(view, url);
 			}
         	
@@ -81,7 +88,11 @@ public class HijackerWebView extends SherlockActivity
 			public void onReceivedError( WebView view, int errorCode, String description, String failingUrl ) {
 				try 
 				{
-					mLoader.dismiss();
+					if( mLoader != null )
+	        		{
+	        			mLoader.dismiss();			
+						mLoader = null;
+	        		}
 				} 
 				catch( Exception e ) { }
 				super.onReceivedError(view, errorCode, description, failingUrl);				
@@ -95,6 +106,48 @@ public class HijackerWebView extends SherlockActivity
                
         mTask.execute();
     }  
+	
+	@Override
+	public boolean onCreateOptionsMenu( Menu menu ) {
+		MenuInflater inflater = getSupportMenuInflater();
+		inflater.inflate( R.menu.browser, menu );		
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected( MenuItem item ) 
+	{    
+		switch( item.getItemId() ) 
+		{        
+			case android.R.id.home:            
+	         
+				mWebView = null;
+				onBackPressed();
+				
+				return true;
+	    	  
+			case R.id.back :
+				
+				if( mWebView.canGoBack() )
+					mWebView.goBack();
+				
+				return true;
+				
+			case R.id.forward :
+				
+				if( mWebView.canGoForward() )
+					mWebView.goForward();
+				
+				return true;
+				
+			case R.id.reload :
+				
+				mWebView.reload();
+				
+			default:            
+				return super.onOptionsItemSelected(item);    
+	   }
+	}
 	
 	private class WebViewTask extends AsyncTask<Void, Void, Boolean> 
 	{         		
@@ -137,24 +190,7 @@ public class HijackerWebView extends SherlockActivity
         	}        	
         }  
     }  
-	
-	@Override
-	public boolean onOptionsItemSelected( MenuItem item ) 
-	{    
-		switch( item.getItemId() ) 
-		{        
-			case android.R.id.home:            
-	         
-				mWebView = null;
-				onBackPressed();
-				
-				return true;
-	    	  
-			default:            
-				return super.onOptionsItemSelected(item);    
-	   }
-	}
-	
+		
 	@Override
 	public void onBackPressed() {
 		

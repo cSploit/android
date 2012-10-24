@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+ 
+  <item android:id="@+id/back"     android:title="B" android:showAsAction="always" android:icon="@drawable/action_backward"/>
+  <item android:id="@+id/forward"  android:title="F" android:showAsAction="always" android:icon="@drawable/action_forward"/>
+  <item android:id="@+id/reload"   android:title="R" android:showAsAction="always" android:icon="@drawable/action_refresh"/>
+  
+</menu>

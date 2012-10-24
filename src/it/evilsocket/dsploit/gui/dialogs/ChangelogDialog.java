@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.graphics.Bitmap;
@@ -36,12 +37,18 @@ public class ChangelogDialog extends AlertDialog
 		this.setTitle("Changelog");
 
 		
-		WebView view = new WebView(activity);
-
+		WebView 	view 	 = new WebView(activity);
+		WebSettings settings = view.getSettings();  
+        
+		settings.setJavaScriptEnabled(true);  
+		settings.setAppCacheEnabled(false);
+        
 		view.setWebViewClient( new WebViewClient() {
 			@Override
 			public void onPageStarted( WebView view, String url, Bitmap favicon ) {
-				mLoader = ProgressDialog.show( activity, "", "Loading changelog ..." );
+				if( mLoader == null )
+					mLoader = ProgressDialog.show( activity, "", "Loading changelog ..." );
+				
 				super.onPageStarted(view, url, favicon);
 			}
 
