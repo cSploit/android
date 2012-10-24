@@ -136,7 +136,11 @@ public class Network
 		return mInfo.equals( network.getInfo() );
 	}
 	
-	public boolean isInternal( String ip ){
+	public boolean isInternal( int ip ) {
+		return isInternal( ( ip & 0xFF) + "." + (( ip >> 8 ) & 0xFF) + "." + (( ip >> 16 ) & 0xFF) + "." + (( ip >> 24 ) & 0xFF) );
+	}
+	
+	public boolean isInternal( String ip ) {
 		try
 		{
 			byte[] gateway = getGatewayAddress().getAddress();
@@ -173,12 +177,19 @@ public class Network
 		return mWifiInfo.getSSID();
 	}
 	
+	public String getNetworkMasked( ) {
+		int network = mInfo.gateway & mInfo.netmask;
+
+    	return ( network & 0xFF) + "." + (( network >> 8 ) & 0xFF) + "." + (( network >> 16 ) & 0xFF) + "." + (( network >> 24 ) & 0xFF);
+	}
+	
+	public int getNetworkMaskedAsInt( ) {
+		return mInfo.gateway & mInfo.netmask;
+	}
+	
 	public String getNetworkRepresentation( )
 	{				
-        int bits 	= countBits( mInfo.netmask );
-        int network = mInfo.gateway & mInfo.netmask;
-    	
-    	return ( network & 0xFF) + "." + (( network >> 8 ) & 0xFF) + "." + (( network >> 16 ) & 0xFF) + "." + (( network >> 24 ) & 0xFF) + "/" + bits;
+    	return getNetworkMasked() + "/" + countBits( mInfo.netmask );
 	}
 	
 	public DhcpInfo getInfo(){

@@ -41,7 +41,6 @@ import it.evilsocket.dsploit.net.Endpoint;
 import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.NetworkMonitorService;
 import it.evilsocket.dsploit.net.Target;
-import it.evilsocket.dsploit.tools.NMap.FindAliveEndpointsOutputReceiver;
 
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -244,11 +243,7 @@ public class MainActivity extends SherlockListActivity
 							}
 						});													
 					}
-					else if( isWifiAvailable ) 
-					{
-						startService( new Intent( MainActivity.this, NetworkMonitorService.class ) );
-					}	
-
+	
 					MainActivity.this.runOnUiThread( new Runnable(){			    			
 						@Override
 						public void run() 
@@ -404,7 +399,10 @@ public class MainActivity extends SherlockListActivity
 						        registerReceiver( mMessageReceiver, mIntentFilter );		
 						        
 						        if( System.getSettings().getBoolean( "PREF_CHECK_UPDATES", true ) )
-						        	startService( new Intent( MainActivity.this, UpdateService.class ) );						        						        
+						        	startService( new Intent( MainActivity.this, UpdateService.class ) );
+						        
+						        if( isWifiAvailable )
+						        	startService( new Intent( MainActivity.this, NetworkMonitorService.class ) );
 					    	}
 					    	catch( Exception e )
 					    	{
@@ -432,7 +430,7 @@ public class MainActivity extends SherlockListActivity
 			menu.getItem( 4 ).setEnabled( false );
 			menu.getItem( 6 ).setEnabled( false );
 		}
-		
+				
 		return super.onCreateOptionsMenu(menu);
 	}
 	
@@ -445,7 +443,7 @@ public class MainActivity extends SherlockListActivity
 		
 		else				
 			item.setTitle( "Start Network Monitor" );
-				
+						
 		return super.onPrepareOptionsMenu(menu);
 	}
 	
@@ -483,39 +481,16 @@ public class MainActivity extends SherlockListActivity
 		}
 		else if( itemId == R.id.scan )
 		{
-			try
+			if( System.isServiceRunning( "it.evilsocket.dsploit.net.NetworkMonitorService" ) )
+				new ErrorDialog( "", "Network discovery already running.", this ).show();
+
+			else
 			{
-				final ProgressDialog dialog = ProgressDialog.show( MainActivity.this, "", "Searching alive endpoints ...", true, false );
-								
-				System.getNMap().findAliveEndpoints( System.getNetwork(), new FindAliveEndpointsOutputReceiver(){						
-					@Override
-					public void onEndpointFound( Endpoint endpoint ) {
-						final Target target = new Target( endpoint );
-						// refresh the target listview
-                    	MainActivity.this.runOnUiThread(new Runnable() {
-		                    @Override
-		                    public void run() {
-		                    	if( System.addOrderedTarget( target ) == true && mTargetAdapter != null )
-								{																						
-		                    		mTargetAdapter.notifyDataSetChanged();     	
-								}			                    		                    	
-		                    }
-		                });
-                    	
-																			
-					}
+				startService( new Intent( this, NetworkMonitorService.class ) );
 				
-					@Override
-					public void onEnd( int code ) {
-						dialog.dismiss();
-					}
-				}).start();		
+				item.setTitle( "Stop Network Monitor" );
 			}
-			catch( Exception e )
-			{
-				new FatalDialog( "Error", e.toString(), MainActivity.this ).show();
-			}
-			
+
 			return true;
 		}
 		else if( itemId == R.id.new_session )

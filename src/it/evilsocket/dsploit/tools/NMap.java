@@ -22,8 +22,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
-import it.evilsocket.dsploit.net.Endpoint;
-import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.Target;
 import android.content.Context;
 import android.util.Log;
@@ -34,48 +32,6 @@ public class NMap extends Tool
 	
 	public NMap( Context context ){
 		super( "nmap/nmap", context );		
-	}
-
-	public static abstract class FindAliveEndpointsOutputReceiver implements OutputReceiver
-	{		
-		private static final Pattern IP_PATTERN  = Pattern.compile( "^nmap scan report for ([\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}).*", 			  Pattern.CASE_INSENSITIVE );
-		private static final Pattern MAC_PATTERN = Pattern.compile( "^mac address: ([a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}).*", Pattern.CASE_INSENSITIVE );
-		
-		private String		  mLastAddress = null;
-		private String		  mLastMac     = null;
-		
-		public void onStart( String commandLine ) {
-
-		}
-		
-		public void onNewLine( String line ) {						
-			Matcher matcher;
-			
-			if( ( matcher = IP_PATTERN.matcher( line ) ) != null && matcher.find() )
-			{
-				mLastAddress = matcher.group( 1 );
-			}
-			else if( ( matcher = MAC_PATTERN.matcher( line ) ) != null && matcher.find() && mLastAddress != null )
-			{
-				mLastMac = matcher.group( 1 );
-
-				onEndpointFound( new Endpoint( mLastAddress, mLastMac ) );
-				
-				mLastAddress = null;
-				mLastMac	 = null;
-			}
-		}
-		
-		public void onEnd( int exitCode ) {
-			if( exitCode != 0 )
-				Log.e( TAG, "nmap exited with code " + exitCode );
-		}
-
-		public abstract void onEndpointFound( Endpoint endpoint );
-	}
-	
-	public Thread findAliveEndpoints( Network network, FindAliveEndpointsOutputReceiver receiver ) {	
-		return super.async( "--max-retries 1 --max-rtt-timeout 250ms -sn -n -T4 --system-dns " + network.getNetworkRepresentation() , receiver );
 	}
 	
 	public static abstract class TraceOutputReceiver implements OutputReceiver
