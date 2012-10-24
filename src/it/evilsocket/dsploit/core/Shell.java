@@ -281,6 +281,20 @@ public class Shell
 			writer.flush();
 		}
 		
+		// split cd working-directory && ./command
+		if( command.startsWith( "cd /" ) && command.contains("&&") )
+		{
+			String[] split = command.split( "&&", 2 );
+			
+			if( split != null && split.length == 2 )
+			{
+				writer.writeBytes( split[0] + "\n" );
+				writer.flush();
+			
+				command = split[1].trim();
+			}
+		}
+		
 		try
 		{
 			writer.writeBytes( command + "\n" );
@@ -335,12 +349,10 @@ public class Shell
 			{
 				// swallow error
 			} 			
-		} 
-
+		}
+			
 		if( receiver != null ) receiver.onEnd( exit );
-		
-		// android.util.Log.d( TAG, command + " -> EXITED WITH CODE " + exit );
-		
+				
 		return exit;
 	}
 	

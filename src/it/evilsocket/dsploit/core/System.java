@@ -957,7 +957,14 @@ public class System
 				Shell.exec( "iptables -t nat -I POSTROUTING -s 0/0 -j MASQUERADE" );
 				// accept all
 				Shell.exec( "iptables -P FORWARD ACCEPT" );
-			}			
+			}	
+			else	
+			{
+				// remove post routing
+				Shell.exec( "iptables -t nat -D POSTROUTING -s 0/0 -j MASQUERADE" );
+				// drop all
+				Shell.exec( "iptables -P FORWARD DROP" );
+			}
 		}
 		catch( Exception e )
 		{

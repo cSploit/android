@@ -100,9 +100,27 @@ public class SpoofSession
 		}).start();
 	}
 	
-	public void start( Target target, OnAccountListener listener ) {
-		this.stop();						
-		System.getEttercap().spoofPasswords( target, listener ).start();		
+	public void start( final Target target, final OnAccountListener listener ) {
+		this.stop();		
+		System.getArpSpoof().spoof( target, new OutputReceiver() {			
+			@Override
+			public void onStart(String command) { 
+				// Log.d( "ARPSPOOF", command );
+				
+				System.setForwarding( true );				
+				System.getEttercap().dissect( target, listener ).start();	
+			}
+			
+			@Override
+			public void onNewLine(String line) {
+				// Log.d( "ARPSPOOF", line );
+			}
+			
+			@Override
+			public void onEnd(int exitCode) { 
+				// Log.d( "ARPSPOOF", "onEnd( " + exitCode + " )" );
+			}
+		}).start();					
 	}
 	
 	public void start( final OnSessionReadyListener listener ) {

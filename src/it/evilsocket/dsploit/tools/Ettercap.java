@@ -34,51 +34,6 @@ public class Ettercap extends Tool
 		super( "ettercap/ettercap", context );		
 	}
 
-	// ettercap does not start immediately, so we need a listener to know
-	// when we can re-enable ip forwarding and so on ...
-	public static abstract class OnReadyListener implements OutputReceiver
-	{
-		@Override
-		public void onStart(String command) {
-			
-		}
-
-		@Override
-		public void onNewLine(String line) {	
-			if( line.toLowerCase().contains("for inline help") )
-				onReady();			
-		}
-
-		@Override
-		public void onEnd(int exitCode) {
-			
-		}
-		
-		public abstract void onReady();
-	}
-	
-	public Thread spoof( Target target, OnReadyListener listener ) {
-		String commandLine;
-
-		// poison the entire network
-		if( target.getType() == Target.Type.NETWORK )
-			commandLine = "// //";
-		// router -> target poison
-		else
-			commandLine = "/" + target.getCommandLineRepresentation() + "/ //"; 
-		
-		try
-		{
-			commandLine = "-Tq -M arp:remote -i " + System.getNetwork().getInterface().getDisplayName() + " " + commandLine;
-		}
-		catch( Exception e )
-		{
-			System.errorLogging( TAG, e );
-		}
-		
-		return super.async( commandLine, listener );
-	}
-	
 	public static abstract class OnAccountListener implements OutputReceiver
 	{
 		private static final Pattern ACCOUNT_PATTERN  = Pattern.compile( "^([^\\s]+)\\s+:\\s+([^\\:]+):(\\d+).+", Pattern.CASE_INSENSITIVE );
@@ -89,7 +44,7 @@ public class Ettercap extends Tool
 		}
 
 		@Override
-		public void onNewLine(String line) {	
+		public void onNewLine( String line ) {	
 			// when ettercap is ready, enable ip forwarding
 			if( line.toLowerCase().contains("for inline help") )
 			{
@@ -118,7 +73,7 @@ public class Ettercap extends Tool
 		public abstract void onAccount( String protocol, String address, String port, String line );
 	}
 	
-	public Thread spoofPasswords( Target target, OnAccountListener listener ) {
+	public Thread dissect( Target target, OnAccountListener listener ) {
 		String commandLine;
 
 		// poison the entire network
@@ -130,28 +85,8 @@ public class Ettercap extends Tool
 		
 		try
 		{
-			commandLine = "-Tq -M arp:remote -i " + System.getNetwork().getInterface().getDisplayName() + " " + commandLine;
-		}
-		catch( Exception e )
-		{
-			System.errorLogging( TAG, e );
-		}
-		
-		return super.async( commandLine, listener );
-	}
-	
-	public Thread drop( Target target, OnReadyListener listener ) {
-		String commandLine = ""; 
-		
-		try
-		{			
-			EtterFilter filter   = new EtterFilter( mAppContext, "drop" );
-			String		compiled = mDirName + "/drop.ef";
-			
-			filter.setVariable( "$target_ip", "'" + target.getCommandLineRepresentation() + "'" );
-			filter.compile( compiled );
-			
-			commandLine = "-Tq -M arp:remote -F " + compiled + " -i " + System.getNetwork().getInterface().getDisplayName() + " " + "/" + target.getCommandLineRepresentation() + "/ //";
+			// passive dissection, spoofing is performed by arpspoof which is more reliable
+			commandLine = "-Tq -i " + System.getNetwork().getInterface().getDisplayName() + " " + commandLine;
 		}
 		catch( Exception e )
 		{

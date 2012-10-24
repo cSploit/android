@@ -19,24 +19,30 @@
 package it.evilsocket.dsploit.plugins.mitm;
 
 import it.evilsocket.dsploit.core.System;
-import it.evilsocket.dsploit.tools.Ettercap.OnReadyListener;
+import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 
 public class ConnectionKiller 
 {
 	public static void start() {
-		System.getEttercap().drop( System.getCurrentTarget(), new OnReadyListener(){
-			@Override
-			public void onReady() 
-			{
-				// just in case :)
-				System.setForwarding( false );							
-			}
+		System.getArpSpoof().spoof( System.getCurrentTarget(), new OutputReceiver() {
 			
-		}).start();		
+			@Override
+			public void onStart(String command) {
+				// just in case :)
+				System.setForwarding( false );				
+			}
+
+			@Override
+			public void onNewLine(String line) { }
+
+			@Override
+			public void onEnd(int exitCode) { }			
+		})
+		.start();
 	}
 	
 	public static void stop() {
 		System.setForwarding( false );
-		System.getEttercap().kill();
+		System.getArpSpoof().kill();
 	}
 }
