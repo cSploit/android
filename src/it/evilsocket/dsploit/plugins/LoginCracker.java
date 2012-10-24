@@ -51,7 +51,8 @@ import it.evilsocket.dsploit.tools.Hydra;
 public class LoginCracker extends Plugin
 {
 	private static final String TAG 		    = "LOGINCRACKER";
-	private static final int 	SELECT_WORDLIST = 1012;
+	private static final int 	SELECT_USER_WORDLIST = 1012;
+	private static final int 	SELECT_PASS_WORDLIST = 1013;
 	
 	private static final String[] PROTOCOLS = new String[]
 	{
@@ -165,7 +166,8 @@ public class LoginCracker extends Plugin
 	private ProgressBar	    mActivity		 = null;
 	private ProgressBar  	mProgressBar 	 = null;
 	private Intent			mWordlistPicker	 = null;
-	private String			mWordlist		 = null;
+	private String			mUserWordlist	 = null;
+	private String			mPassWordlist	 = null;
 	private boolean	     	mRunning		 = false;
 	private boolean			mAccountFound	 = false;
 	private AttemptReceiver mReceiver     	 = null;
@@ -311,7 +313,8 @@ public class LoginCracker extends Plugin
 		  min,
 		  max,
 		  ( String )mUserSpinner.getSelectedItem(), 
-		  mWordlist,
+		  mUserWordlist,
+		  mPassWordlist,
 		  mReceiver
 		).start();
 		
@@ -455,21 +458,30 @@ public class LoginCracker extends Plugin
 					
 		int itemId = item.getItemId();
 		
-		if( itemId == R.id.wordlist )
+		switch( itemId )
 		{
-			startActivityForResult( Intent.createChooser( mWordlistPicker, "Select Wordlist" ), SELECT_WORDLIST );
-			
-			return true;
+			case R.id.user_wordlist :
+				
+				startActivityForResult( Intent.createChooser( mWordlistPicker, "Select Wordlist" ), SELECT_USER_WORDLIST );
+				
+				return true;
+				
+			case R.id.pass_wordlist :
+				
+				startActivityForResult( Intent.createChooser( mWordlistPicker, "Select Wordlist" ), SELECT_PASS_WORDLIST );
+				
+				return true;
+				
+			default:
+				return super.onOptionsItemSelected(item);
 		}
-		else
-			return super.onOptionsItemSelected(item);
 	}
 	
 	@Override
 	protected void onActivityResult( int request, int result, Intent intent ) { 
 	    super.onActivityResult( request, result, intent  ); 
 	    
-	    if( request == SELECT_WORDLIST && result == RESULT_OK )
+	    if( request == SELECT_USER_WORDLIST && result == RESULT_OK )
 	    {
 	    	try
 	    	{
@@ -484,7 +496,7 @@ public class LoginCracker extends Plugin
 		    	}
 		    	else
 		    	{
-		    		mWordlist = fileName;		    		
+		    		mUserWordlist = fileName;		    		
 		    	}		    	
 	    	}
 	    	catch( Exception e )
@@ -492,6 +504,29 @@ public class LoginCracker extends Plugin
 	    		System.errorLogging( TAG, e );
 	    	}
 	    }
+	    else if( request == SELECT_PASS_WORDLIST && result == RESULT_OK )
+	    {
+	    	try
+	    	{
+	    		String fileName = null;
+	    		
+	    		if( intent != null && intent.getData() != null )
+	    			fileName = intent.getData().getPath();
+
+		    	if( fileName == null )
+		    	{
+		    		new ErrorDialog( "Error", "Could not determine file path, please use a different file manager.", LoginCracker.this ).show();
+		    	}
+		    	else
+		    	{
+		    		mPassWordlist = fileName;		    		
+		    	}		    	
+	    	}
+	    	catch( Exception e )
+	    	{
+	    		System.errorLogging( TAG, e );
+	    	}
+	    }	    	    
 	}
 	
 	@Override

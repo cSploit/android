@@ -94,13 +94,13 @@
 
         <Spinner
             android:id="@+id/charsetSpinner"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.50" />
 
         <Spinner
             android:id="@+id/userSpinner"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.50" />
     </LinearLayout>
@@ -142,13 +142,13 @@
 
         <Spinner
             android:id="@+id/minSpinner"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.50" />
 
         <Spinner
             android:id="@+id/maxSpinner"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.50" />
     </LinearLayout>
