@@ -23,8 +23,6 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.plugins.mitm.Hijacker.Session;
-import android.app.ProgressDialog;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -32,7 +30,6 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
@@ -43,7 +40,6 @@ public class HijackerWebView extends SherlockActivity
 {
 	private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4";
 
-	private ProgressDialog mLoader   = null;
 	private WebSettings    mSettings = null;
 	private WebView 	   mWebView  = null;
 	private WebViewTask    mTask 	 = null;
@@ -63,46 +59,6 @@ public class HijackerWebView extends SherlockActivity
         mSettings.setBuiltInZoomControls(true);  
 		mSettings.setAppCacheEnabled(false);
         mSettings.setUserAgentString( DEFAULT_USER_AGENT );
-        
-        mWebView.setWebViewClient( new WebViewClient() {  
-        	@Override
-			public void onPageStarted( WebView view, String url, Bitmap favicon ) {
-        		if( mLoader == null )
-        			mLoader = ProgressDialog.show( HijackerWebView.this, "", "Loading page ..." );
-        		
-				super.onPageStarted(view, url, favicon);
-			}
-        	
-        	@Override
-			public void onPageFinished( WebView view, String url ) {
-        		if( mLoader != null )
-        		{
-        			mLoader.dismiss();			
-					mLoader = null;
-        		}
-        		
-				super.onPageFinished(view, url);
-			}
-        	
-        	@Override
-			public void onReceivedError( WebView view, int errorCode, String description, String failingUrl ) {
-				try 
-				{
-					if( mLoader != null )
-	        		{
-	        			mLoader.dismiss();			
-						mLoader = null;
-	        		}
-				} 
-				catch( Exception e ) { }
-				super.onReceivedError(view, errorCode, description, failingUrl);				
-			}
-        	
-            @Override  
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {  
-                return super.shouldOverrideUrlLoading(view, url);  
-            }                
-        });  
                
         mTask.execute();
     }  
