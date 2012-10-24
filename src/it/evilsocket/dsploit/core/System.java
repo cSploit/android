@@ -945,6 +945,19 @@ public class System
 		try
 		{
 			Shell.exec(cmd);
+			
+			// clear nat
+			Shell.exec( "iptables -t nat -F" );
+			// clear
+			Shell.exec( "iptables -F" );
+			
+			if( enabled )
+			{				
+				// post route
+				Shell.exec( "iptables -t nat -I POSTROUTING -s 0/0 -j MASQUERADE" );
+				// accept all
+				Shell.exec( "iptables -P FORWARD ACCEPT" );
+			}			
 		}
 		catch( Exception e )
 		{
