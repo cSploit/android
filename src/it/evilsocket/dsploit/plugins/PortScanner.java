@@ -174,36 +174,49 @@ public class PortScanner extends Plugin
 			@Override
 			public boolean onItemLongClick( AdapterView<?> parent, View view, int position, long id ) {
 				int portNumber = System.getCurrentTarget().getOpenPorts().get( position ).number;
+				String url = "";
 				
-				if( portNumber == 80 || portNumber == 21 || portNumber == 443 )
-				{
-					final String url = ( portNumber == 80 ? "http" : ( portNumber == 443 ? "https" : "ftp" ) ) + "://" + System.getCurrentTarget().getCommandLineRepresentation() + ":" + portNumber + "/";
-							
-					new ConfirmDialog
-                	( 
-                	  "Open", 
-                	  "Open " + url + " in web browser ?",
-                	  PortScanner.this,
-                	  new ConfirmDialogListener(){
-						@Override
-						public void onConfirm() {
-							try
-							{
-								Intent browser = new Intent( Intent.ACTION_VIEW, Uri.parse( url ) );
-							
-								PortScanner.this.startActivity( browser );
-							}
-							catch( ActivityNotFoundException e )
-							{
-								System.errorLogging( "PORTSCANNER", e );
-								
-								new ErrorDialog( "Error", "No activities to handle this type of url.", PortScanner.this ).show();
-							}
-							
+				if( portNumber == 80 )
+					url = "http://" + System.getCurrentTarget().getCommandLineRepresentation() + "/";
+				
+				else if( portNumber == 443 )
+					url = "https://" + System.getCurrentTarget().getCommandLineRepresentation() + "/";
+				
+				else if( portNumber == 21 )
+					url = "ftp://" + System.getCurrentTarget().getCommandLineRepresentation();
+				
+				else if( portNumber == 22 )
+					url = "ssh://" + System.getCurrentTarget().getCommandLineRepresentation();
+				
+				else 
+					url = "telnet://" + System.getCurrentTarget().getCommandLineRepresentation() + ":" + portNumber; 
+
+				final String furl = url;
+						
+				new ConfirmDialog
+            	( 
+            	  "Open", 
+            	  "Open " + url + " ?",
+            	  PortScanner.this,
+            	  new ConfirmDialogListener(){
+					@Override
+					public void onConfirm() {
+						try
+						{
+							Intent browser = new Intent( Intent.ACTION_VIEW, Uri.parse( furl ) );
+						
+							PortScanner.this.startActivity( browser );
 						}
-                	  }
-                	).show();
-				}
+						catch( ActivityNotFoundException e )
+						{
+							System.errorLogging( "PORTSCANNER", e );
+							
+							new ErrorDialog( "Error", "No activities to handle this type of url.", PortScanner.this ).show();
+						}
+						
+					}
+            	  }
+            	).show();
 				
 				return false;
 			}
