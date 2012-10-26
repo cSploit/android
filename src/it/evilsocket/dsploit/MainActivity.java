@@ -403,6 +403,9 @@ public class MainActivity extends SherlockListActivity
 						        
 						        if( isWifiAvailable )
 						        	startService( new Intent( MainActivity.this, NetworkMonitorService.class ) );
+						        
+						        // if called for the second time after wifi connection
+						        invalidateOptionsMenu();
 					    	}
 					    	catch( Exception e )
 					    	{
@@ -417,7 +420,7 @@ public class MainActivity extends SherlockListActivity
 	
 	@Override
 	public boolean onCreateOptionsMenu( Menu menu ) {
-		MenuInflater inflater = getSupportMenuInflater();
+		MenuInflater inflater = getSupportMenuInflater();		
 		inflater.inflate( R.menu.main, menu );		
 		
 		if( isWifiAvailable == false )
