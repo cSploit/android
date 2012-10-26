@@ -60,7 +60,16 @@ public class IPTables extends Tool
 		
 		try
 		{							
-			super.run("-t nat -A PREROUTING -j DNAT -p tcp --dport " + from + " --to " + System.getNetwork().getLocalAddressAsString() + ":" + to );	
+			// clear nat
+			super.run( "-t nat -F" );
+			// clear
+			super.run( "-F" );
+			// post route
+			super.run( "-t nat -I POSTROUTING -s 0/0 -j MASQUERADE" );
+			// accept all
+			super.run( "-P FORWARD ACCEPT" );
+			// add rule
+			super.run( "-t nat -A PREROUTING -j DNAT -p tcp --dport " + from + " --to " + System.getNetwork().getLocalAddressAsString() + ":" + to );	
 		}
 		catch( Exception e )
 		{
@@ -73,7 +82,14 @@ public class IPTables extends Tool
 		
 		try
 		{
-			super.run("-t nat -D PREROUTING -j DNAT -p tcp --dport " + from + " --to " + System.getNetwork().getLocalAddressAsString() + ":" + to );
+			// clear nat
+			super.run( "-t nat -F" );
+			// clear
+			super.run( "-F" );
+			// remove post route
+			super.run( "-t nat -D POSTROUTING -s 0/0 -j MASQUERADE" );
+			// remove rule
+			super.run( "-t nat -D PREROUTING -j DNAT -p tcp --dport " + from + " --to " + System.getNetwork().getLocalAddressAsString() + ":" + to );
 		}
 		catch( Exception e )
 		{

@@ -54,7 +54,9 @@ public class SpoofSession
 		
 		if( mWithProxy )
 		{
-			new Thread( System.getHttpsRedirector() ).start();
+			if( System.getSettings().getBoolean( "PREF_HTTPS_REDIRECT", true ) )
+				new Thread( System.getHttpsRedirector() ).start();
+			
 			new Thread( System.getProxy() ).start();
 		}
 		
@@ -81,7 +83,9 @@ public class SpoofSession
 				
 				if( mWithProxy )
 				{
-					System.getIPTables().portRedirect( 443, System.HTTPS_REDIR_PORT );
+					if( System.getSettings().getBoolean( "PREF_HTTPS_REDIRECT", true ) )
+						System.getIPTables().portRedirect( 443, System.HTTPS_REDIR_PORT );
+					
 					System.getIPTables().portRedirect( 80,  System.HTTP_PROXY_PORT );
 				}
 				
@@ -139,8 +143,11 @@ public class SpoofSession
 		if( mWithProxy )
 		{
 			System.getIPTables().undoPortRedirect( 80,  System.HTTP_PROXY_PORT );
-			System.getIPTables().undoPortRedirect( 443, System.HTTPS_REDIR_PORT );
-			System.getHttpsRedirector().stop();           
+			if( System.getSettings().getBoolean( "PREF_HTTPS_REDIRECT", true ) )
+			{
+				System.getIPTables().undoPortRedirect( 443, System.HTTPS_REDIR_PORT );
+				System.getHttpsRedirector().stop();
+			}
 			System.getProxy().stop();
 			System.getProxy().setRedirection( null, 0 );
 			System.getProxy().setFilter( null );

@@ -18,6 +18,7 @@
  */
 package it.evilsocket.dsploit.net.http.proxy;
 
+import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.http.RequestParser;
 import it.evilsocket.dsploit.net.http.proxy.Proxy.OnRequestListener;
 
@@ -155,7 +156,7 @@ public class ProxyThread extends Thread
 	 				// connect to host
         			if( mHostRedirect == null )			
         			{
-        				if( url != null && HTTPSMonitor.getInstance().hasURL( client, url ) == true )
+        				if( url != null && System.getSettings().getBoolean( "PREF_HTTPS_REDIRECT", true ) == true && HTTPSMonitor.getInstance().hasURL( client, url ) == true )
         				{        					
         					Log.w( TAG, "Found stripped HTTPS url : " + url );
         					
@@ -209,21 +210,24 @@ public class ProxyThread extends Thread
 		 					@Override
 		 					public String onDataReceived( String headers, String data ) 
 		 					{	
-		 						// first of all, get rid of every HTTPS url
-		 						Matcher match = LINK_PATTERN.matcher( data );
-		 						if( match != null )
+		 						if( System.getSettings().getBoolean( "PREF_HTTPS_REDIRECT", true ) == true )
 		 						{
-		 							while( match.find() )
-		 							{
-		 								String url 		= match.group( 1 ),
-		 									   stripped = url.replace( "https://", "http://" ).replace( "&amp;", "&" );
-		 										 								
-		 								data = data.replace( url, stripped );
-		 								
-		 								HTTPSMonitor.getInstance().addURL( client, stripped );
-		 							}
+			 						// first of all, get rid of every HTTPS url
+			 						Matcher match = LINK_PATTERN.matcher( data );
+			 						if( match != null )
+			 						{
+			 							while( match.find() )
+			 							{
+			 								String url 		= match.group( 1 ),
+			 									   stripped = url.replace( "https://", "http://" ).replace( "&amp;", "&" );
+			 										 								
+			 								data = data.replace( url, stripped );
+			 								
+			 								HTTPSMonitor.getInstance().addURL( client, stripped );
+			 							}
+			 						}
 		 						}
-		 						
+		 				
 		 						// apply each provided filter
 		 						for( Proxy.ProxyFilter filter : mFilters )
 		 						{

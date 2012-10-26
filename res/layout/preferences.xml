@@ -52,6 +52,12 @@
             android:summary="MITM http server port to listen on, change this if you have problems starting the server."
             android:title="HTTP Server Port" />
         
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="PREF_HTTPS_REDIRECT"
+            android:summary="Redirect traffic from HTTPS to HTTP."
+            android:title="SSL Stripping" />
+        
         <EditTextPreference
             android:defaultValue="8082"
             android:inputType="number"
