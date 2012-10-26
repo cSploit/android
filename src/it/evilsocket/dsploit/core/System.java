@@ -834,11 +834,14 @@ public class System
 		return mTargets.get( index );
 	}
 	
-	public synchronized static boolean hasTarget( Target target ) {
-		for( Target t : mTargets )
+	public static boolean hasTarget( Target target ) {
+		synchronized( mTargets )
 		{
-			if( t != null && t.equals(target) )
-				return true;
+			for( Target t : mTargets )
+			{
+				if( t != null && t.equals(target) )
+					return true;
+			}
 		}
 		
 		return false;
