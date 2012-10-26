@@ -21,6 +21,7 @@ package it.evilsocket.dsploit;
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
 
+import it.evilsocket.dsploit.core.System;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -111,6 +112,11 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 					message   = "Proxy port can't be greater than 65535.";
 					proxyPort = 8080;
 				}
+				else if( System.isPortAvailable( proxyPort ) == false )
+				{
+					message   = "Another process is listening on this port, please use another one.";
+					proxyPort = 8080;
+				}
 			}
 			catch( Throwable t )
 			{
@@ -140,6 +146,11 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 					message    = "Server port can't be greater than 65535.";
 					serverPort = 8081;
 				}
+				else if( System.isPortAvailable( serverPort ) == false )
+				{
+					message    = "Another process is listening on this port, please use another one.";
+					serverPort = 8081;
+				}
 			}
 			catch( Throwable t )
 			{
@@ -167,6 +178,11 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 				else if( redirPort > 65535 )
 				{
 					message   = "Redirector port can't be greater than 65535.";
+					redirPort = 8082;
+				}
+				else if( System.isPortAvailable( redirPort ) == false )
+				{
+					message   = "Another process is listening on this port, please use another one.";
 					redirPort = 8082;
 				}
 			}

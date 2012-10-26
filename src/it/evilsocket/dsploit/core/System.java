@@ -31,8 +31,11 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.NoRouteToHostException;
 import java.net.SocketException;
+import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -420,6 +423,29 @@ public class System
 		}
 		
 		return false;
+	}
+	
+	public static boolean isPortAvailable( int port ) {
+		boolean available = true;
+		
+		try
+		{
+			SocketChannel 	  channel = SocketChannel.open();
+			InetSocketAddress address = new InetSocketAddress( InetAddress.getByName( mNetwork.getLocalAddressAsString() ), port );
+						
+			if( channel.connect( address ) )
+			{				
+				available = !channel.isConnected();
+				
+				channel.close();
+			}
+		}
+		catch( Exception e )
+		{
+			errorLogging( TAG, e );
+		}
+		
+		return available;
 	}
 	
 	public static ArrayList<String> getAvailableSessionFiles( )
