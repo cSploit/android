@@ -947,27 +947,7 @@ public class System
 		    	
 		try
 		{
-			Shell.exec(cmd);
-			
-			// clear nat
-			Shell.exec( "iptables -t nat -F" );
-			// clear
-			Shell.exec( "iptables -F" );
-			
-			if( enabled )
-			{				
-				// post route
-				Shell.exec( "iptables -t nat -I POSTROUTING -s 0/0 -j MASQUERADE" );
-				// accept all
-				Shell.exec( "iptables -P FORWARD ACCEPT" );
-			}	
-			else	
-			{
-				// remove post routing
-				Shell.exec( "iptables -t nat -D POSTROUTING -s 0/0 -j MASQUERADE" );
-				// drop all
-				Shell.exec( "iptables -P FORWARD DROP" );
-			}
+			Shell.exec( cmd );
 		}
 		catch( Exception e )
 		{
