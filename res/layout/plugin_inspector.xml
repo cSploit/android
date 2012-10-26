@@ -58,56 +58,67 @@
         android:text="Services"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/deviceType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ScrollView
+        android:id="@+id/ScrollView03"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:layout_above="@+id/textView2"
         android:layout_alignRight="@+id/inspectActivity"
         android:layout_alignTop="@+id/deviceTypeLabel"
-        android:layout_toRightOf="@+id/deviceTypeLabel"
-        android:paddingLeft="5dp"
-        android:text="unknown"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:layout_toRightOf="@+id/deviceTypeLabel" >
 
-    <TextView
-        android:id="@+id/deviceOS"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        <TextView
+            android:id="@+id/deviceType"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:text="unknown"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </ScrollView>
+
+    <ScrollView
+        android:id="@+id/ScrollView02"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:layout_alignBottom="@+id/textView2"
-        android:layout_alignLeft="@+id/deviceType"
-        android:layout_alignRight="@+id/deviceType"
-        android:layout_below="@+id/deviceType"
-        android:paddingLeft="5dp"
-        android:text="unknown"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:layout_alignLeft="@+id/ScrollView03"
+        android:layout_alignRight="@+id/ScrollView03"
+        android:layout_below="@+id/ScrollView03" >
 
-      <ScrollView   
-        android:id="@+id/ScrollView01"  
+        <TextView
+            android:id="@+id/deviceOS"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:text="unknown"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </ScrollView>
+
+    <ScrollView
+        android:id="@+id/ScrollView01"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:layout_alignLeft="@+id/textView3"
         android:layout_alignParentBottom="true"
         android:layout_alignRight="@+id/deviceOS"
-        android:layout_below="@+id/textView3"
-      android:layout_height="fill_parent"   
-      android:layout_width="fill_parent">  
-    
-    <TextView
-        android:id="@+id/deviceServices"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:text="unknown"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-    
+        android:layout_below="@+id/textView3" >
+
+        <TextView
+            android:id="@+id/deviceServices"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="unknown"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
     </ScrollView>
 
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/deviceType"
+        android:layout_above="@+id/ScrollView03"
         android:layout_alignLeft="@+id/deviceTypeLabel"
-        android:layout_toLeftOf="@+id/deviceType"
+        android:layout_toLeftOf="@+id/ScrollView03"
         android:text="Target"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -115,12 +126,12 @@
         android:id="@+id/deviceName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/deviceType"
-        android:layout_alignLeft="@+id/deviceType"
-        android:layout_alignRight="@+id/deviceType"
+        android:layout_above="@+id/ScrollView03"
+        android:layout_alignLeft="@+id/ScrollView03"
+        android:layout_alignRight="@+id/ScrollView03"
         android:layout_alignTop="@+id/textView1"
         android:paddingLeft="5dp"
         android:text="target"
         android:textAppearance="?android:attr/textAppearanceSmall" />
-    
+
 </RelativeLayout>
