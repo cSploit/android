@@ -27,6 +27,7 @@ public class ConfirmDialog extends AlertDialog
 	public interface ConfirmDialogListener
 	{
 		public void onConfirm();
+		public void onCancel();
 	}
 	
 	public ConfirmDialog( String title, String message, Activity activity, ConfirmDialogListener confirmDialogListener ){
@@ -46,6 +47,7 @@ public class ConfirmDialog extends AlertDialog
 		this.setButton2( "No", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
             	dialog.dismiss();
+            	listener.onCancel();
             }
         });	
 	}

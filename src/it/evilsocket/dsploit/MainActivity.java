@@ -154,9 +154,7 @@ public class MainActivity extends SherlockListActivity
 	    }
 	}
 
-	private void createUpdateLayout( ) {
-		Log.d( "DSPLOIT", "No WiFi available, creating update layout." );
-		
+	private void createUpdateLayout( ) {		
 		getListView().setVisibility( View.GONE );
 		findViewById( R.id.textView ).setVisibility( View.GONE );
 		
@@ -172,10 +170,27 @@ public class MainActivity extends SherlockListActivity
 		layout.addView( mUpdateStatus );		
 	}
 	
+	private void createOfflineLayout( ) {
+		getListView().setVisibility( View.GONE );
+		findViewById( R.id.textView ).setVisibility( View.GONE );
+		
+		RelativeLayout layout = ( RelativeLayout )findViewById( R.id.layout );
+		LayoutParams   params = new LayoutParams( LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT );		
+		
+		mUpdateStatus = new TextView( this );
+		
+		mUpdateStatus.setGravity( Gravity.CENTER );
+		mUpdateStatus.setLayoutParams( params );
+		mUpdateStatus.setText( "No connectivity available." );
+		
+		layout.addView( mUpdateStatus );		
+		
+		startActivity( new Intent( MainActivity.this, WifiScannerActivity.class ) );
+	}
+	
 	@Override
     public void onCreate( Bundle savedInstanceState ) {		
-        super.onCreate(savedInstanceState);   
-        
+        super.onCreate(savedInstanceState);           
         setContentView( R.layout.target_layout );
     	
         // just initialize the ui the first time
@@ -183,14 +198,7 @@ public class MainActivity extends SherlockListActivity
         {	        	
             isWifiAvailable 		= Network.isWifiConnected( this );
         	isConnectivityAvailable = isWifiAvailable || Network.isConnectivityAvailable( this );
-        	
-        	// without any kind of connectivity, it's just useless for this app to run
-        	if( isConnectivityAvailable == false )
-        	{
-        		new FatalDialog( "Error", "No connectivity available.", this ).show();
-        		return;
-        	}
-        	
+        	        	        	
         	// make sure system object was correctly initialized during application startup
         	if( System.isInitialized() == false )
         	{
@@ -201,8 +209,12 @@ public class MainActivity extends SherlockListActivity
         			return;
         		}
         		// just inform the user his wifi is down
-        		else        		
+        		else if( isConnectivityAvailable )        		
         			createUpdateLayout( );
+        		
+        		// no connectivity at all
+        		else
+        			createOfflineLayout( );
         	}
         	        	        	
         	final ProgressDialog dialog = ProgressDialog.show( this, "", "Initializing ...", true, false );
@@ -259,7 +271,7 @@ public class MainActivity extends SherlockListActivity
 							}
 							
 						    try
-					    	{	    			  						    															    	
+					    	{	    							        	
 								if( isWifiAvailable )
 								{
 									mTargetAdapter = new TargetAdapter( R.layout.target_list_item );
@@ -315,7 +327,7 @@ public class MainActivity extends SherlockListActivity
 							                    }
 							                });											
 										}	
-										else if( isWifiAvailable == false && intent.getAction().equals( WifiManager.NETWORK_STATE_CHANGED_ACTION ) )
+										else if( isWifiAvailable == false && isConnectivityAvailable == true && intent.getAction().equals( WifiManager.NETWORK_STATE_CHANGED_ACTION ) )
 										{
 											NetworkInfo info = intent.getParcelableExtra( WifiManager.EXTRA_NETWORK_INFO );
 											
@@ -380,7 +392,11 @@ public class MainActivity extends SherlockListActivity
 																	dialog.dismiss();
 																}
 															}).start();											
-														}}
+														}
+														
+														@Override
+														public void onCancel() { }
+													}
 							                    	).show();
 							                    }
 							                });
@@ -398,7 +414,7 @@ public class MainActivity extends SherlockListActivity
 
 						        registerReceiver( mMessageReceiver, mIntentFilter );		
 						        
-						        if( System.getSettings().getBoolean( "PREF_CHECK_UPDATES", true ) )
+						        if( System.getSettings().getBoolean( "PREF_CHECK_UPDATES", true ) && isConnectivityAvailable )
 						        	startService( new Intent( MainActivity.this, UpdateService.class ) );
 						        
 						        if( isWifiAvailable )
@@ -512,8 +528,12 @@ public class MainActivity extends SherlockListActivity
 					{
 						new FatalDialog( "Error", e.toString(), MainActivity.this ).show();
 					}
-				}}
-			).show();										
+				}
+				
+				@Override
+				public void onCancel() { }
+				
+			}).show();										
 							
 			return true;
 		}
@@ -655,6 +675,9 @@ public class MainActivity extends SherlockListActivity
 				public void onConfirm() {
 					MainActivity.this.finish();
 				}
+				
+				@Override
+				public void onCancel() { }
 			}).show();
 			
 			mLastBackPressTime = 0;

@@ -215,6 +215,9 @@ public class PortScanner extends Plugin
 						}
 						
 					}
+					
+					@Override
+					public void onCancel() { }
             	  }
             	).show();
 				

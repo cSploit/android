@@ -402,6 +402,9 @@ public class Hijacker extends SherlockActivity
 								
 								startActivity( new Intent( Hijacker.this, HijackerWebView.class ) );
 							}
+							
+							@Override
+							public void onCancel() { }
 						} 
 					).show();
 				}

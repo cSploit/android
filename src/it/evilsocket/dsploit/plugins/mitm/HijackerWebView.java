@@ -28,6 +28,7 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
@@ -55,6 +56,14 @@ public class HijackerWebView extends SherlockActivity
         mSettings.setBuiltInZoomControls(true);  
 		mSettings.setAppCacheEnabled(false);
         mSettings.setUserAgentString( DEFAULT_USER_AGENT );
+        
+        mWebView.setWebViewClient( new WebViewClient(){
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url){
+              view.loadUrl(url);
+              return true;
+            }
+        });
                
         CookieSyncManager.createInstance( this );              
     	CookieManager.getInstance().removeAllCookie();
