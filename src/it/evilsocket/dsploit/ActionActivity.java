@@ -39,9 +39,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class ActionActivity extends SherlockListActivity 
-{
-	private static final int LAYOUT = R.layout.actions_layout;
-	
+{	
 	private ActionsAdapter    mActionsAdapter = null; 
 	private ArrayList<Plugin> mAvailable      = null;
 	
@@ -102,7 +100,7 @@ public class ActionActivity extends SherlockListActivity
         if( System.getTargets() != null && System.getTargets().size() > 0 && System.getCurrentTarget() != null )
         {
 	        setTitle( "dSploit > " + System.getCurrentTarget() );
-	        setContentView( LAYOUT );	        
+	        setContentView( R.layout.actions_layout );	        
 	        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	        	        	        
 	        mAvailable 		= System.getPluginsForTarget();

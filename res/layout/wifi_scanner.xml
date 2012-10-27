@@ -12,19 +12,27 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/statusText" >
-
     </ListView>
 
     <TextView
         android:id="@+id/statusText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignLeft="@+id/android:list"
         android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/status"
         android:padding="5dp"
         android:text="Status"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="#ccc" />
+
+    <ProgressBar
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/android:list"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:visibility="invisible" />
 
 </RelativeLayout>

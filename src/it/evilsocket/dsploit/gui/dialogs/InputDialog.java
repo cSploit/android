@@ -21,6 +21,7 @@ package it.evilsocket.dsploit.gui.dialogs;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.text.InputType;
 import android.widget.EditText;
 
 public class InputDialog extends AlertDialog 
@@ -33,10 +34,10 @@ public class InputDialog extends AlertDialog
 	}
 	
 	public InputDialog( String title, String message, Activity activity, InputDialogListener inputDialogListener ){
-		this( title, message, null, true, activity, inputDialogListener );
+		this( title, message, null, true, false, activity, inputDialogListener );
 	}
 	
-	public InputDialog( String title, String message, String text, boolean editable, Activity activity, InputDialogListener inputDialogListener ){
+	public InputDialog( String title, String message, String text, boolean editable, boolean password, Activity activity, InputDialogListener inputDialogListener ){
 		super( activity );
 		
 		mEditText = new EditText( activity );
@@ -45,7 +46,10 @@ public class InputDialog extends AlertDialog
 			mEditText.setText(text);
 		
 		mEditText.setEnabled( editable );
-					
+		
+		if( password )
+			mEditText.setInputType( InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD );
+				
 		this.setTitle( title );
 		this.setMessage( message );
 		this.setView( mEditText );

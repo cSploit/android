@@ -424,6 +424,7 @@ public class Hijacker extends SherlockActivity
             		  "Set the session file name:", 
             		  session.getFileName(),
             		  true,
+            		  false,
             		  Hijacker.this, 
             		  new InputDialogListener(){
             			@Override

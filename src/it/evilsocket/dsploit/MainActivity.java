@@ -54,7 +54,6 @@ import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -75,7 +74,8 @@ import com.actionbarsherlock.view.MenuItem;
 
 public class MainActivity extends SherlockListActivity
 {	
-	private static final String NO_WIFI_UPDATE_MESSAGE = "No WiFi connection available, the application will just check for updates.\n#STATUS#";
+	private static final int    WIFI_CONNECTION_REQUEST = 1012;
+	private static final String NO_WIFI_UPDATE_MESSAGE  = "No WiFi connection available, the application will just check for updates.\n#STATUS#";
 	
 	private boolean			  isWifiAvailable  		   = false;
 	private boolean			  isConnectivityAvailable  = false;
@@ -185,14 +185,31 @@ public class MainActivity extends SherlockListActivity
 		
 		layout.addView( mUpdateStatus );		
 		
-		startActivity( new Intent( MainActivity.this, WifiScannerActivity.class ) );
+		startActivityForResult( new Intent( MainActivity.this, WifiScannerActivity.class ), WIFI_CONNECTION_REQUEST );
+	}
+	
+	@Override
+	protected void onActivityResult( int requestCode, int resultCode, Intent intent ) {		
+		if( requestCode == WIFI_CONNECTION_REQUEST && resultCode == RESULT_OK && intent.hasExtra( WifiScannerActivity.CONNECTED ) ) 
+		{
+			if( intent.getBooleanExtra( WifiScannerActivity.CONNECTED, false ) == true )
+			{
+				( ( DSploitApplication )getApplication() ).onCreate();
+				
+				// view already initialized, just restart the network discovery service
+				if( mTargetAdapter != null )
+					startService( new Intent( MainActivity.this, NetworkMonitorService.class ) );
+				
+	            onCreate( null );
+			}
+		}
 	}
 	
 	@Override
     public void onCreate( Bundle savedInstanceState ) {		
         super.onCreate(savedInstanceState);           
         setContentView( R.layout.target_layout );
-    	
+            	
         // just initialize the ui the first time
         if( mTargetAdapter == null )
         {	        	
@@ -290,6 +307,7 @@ public class MainActivity extends SherlockListActivity
 											  "Set an alias for this target:", 
 											  target.hasAlias() ? target.getAlias() : "",
 											  true,
+											  false,
 											  MainActivity.this, 
 											  new InputDialogListener(){
 												@Override
@@ -336,7 +354,6 @@ public class MainActivity extends SherlockListActivity
 											
 											else if( NetworkInfo.State.CONNECTED.equals( info.getState() ) )
 										    {
-										    	Log.d( "DSPLOIT", "Wifi connected." );
 												( ( DSploitApplication )getApplication() ).onCreate();
 									            onCreate( null );
 										    }
@@ -444,9 +461,9 @@ public class MainActivity extends SherlockListActivity
 			menu.getItem( 0 ).setVisible( false );
 			menu.getItem( 1 ).setVisible( false );
 			
-			menu.getItem( 2 ).setEnabled( false );
 			menu.getItem( 3 ).setEnabled( false );
 			menu.getItem( 4 ).setEnabled( false );
+			menu.getItem( 5 ).setEnabled( false );
 			menu.getItem( 6 ).setEnabled( false );
 		}
 				
@@ -512,6 +529,15 @@ public class MainActivity extends SherlockListActivity
 
 			return true;
 		}
+		else if( itemId == R.id.wifi_scan )
+		{
+			if( System.isServiceRunning( "it.evilsocket.dsploit.net.NetworkMonitorService" ) )			
+				stopService( new Intent( this, NetworkMonitorService.class ) );				
+						
+			startActivityForResult( new Intent( MainActivity.this, WifiScannerActivity.class ), WIFI_CONNECTION_REQUEST );
+			
+			return true;
+		}
 		else if( itemId == R.id.new_session )
 		{
 			new ConfirmDialog( "Warning", "Starting a new session would delete the current one, continue ?", this, new ConfirmDialogListener(){
@@ -539,7 +565,7 @@ public class MainActivity extends SherlockListActivity
 		}
 		else if( itemId == R.id.save_session )
 		{
-			new InputDialog( "Save Session", "Enter the name of the session file :", System.getSessionName(), true, MainActivity.this, new InputDialogListener(){
+			new InputDialog( "Save Session", "Enter the name of the session file :", System.getSessionName(), true, false, MainActivity.this, new InputDialogListener(){
 				@Override
 				public void onInputEntered( String input ) 
 				{

@@ -166,7 +166,8 @@ public class Network
 	}
 	
 	public static boolean isConnectivityAvailable( Context context ) {
-	    return ( ( ConnectivityManager )context.getSystemService( Context.CONNECTIVITY_SERVICE ) ).getActiveNetworkInfo() != null;
+	    return ( ( ConnectivityManager )context.getSystemService( Context.CONNECTIVITY_SERVICE ) ).getActiveNetworkInfo() != null &&
+	    	   ( ( ConnectivityManager )context.getSystemService( Context.CONNECTIVITY_SERVICE ) ).getActiveNetworkInfo().isConnected();
 	}
 	
 	public boolean isConnected(){

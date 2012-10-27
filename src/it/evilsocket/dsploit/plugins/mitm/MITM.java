@@ -493,6 +493,7 @@ public class MITM extends Plugin
 						"Enter the url of the video :", 
 						"http://www.youtube.com/watch?v=dQw4w9WgXcQ", 
 						true,
+						false,
 						MITM.this, 
 						new InputDialogListener(){
 						@Override
@@ -563,6 +564,7 @@ public class MITM extends Plugin
 						"  alert('This site has been hacked with dSploit!');\n" +
 						"</script>", 
 						true,
+						false,
 						MITM.this, 
 						new InputDialogListener(){
 						@Override

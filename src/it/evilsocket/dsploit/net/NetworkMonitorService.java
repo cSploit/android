@@ -262,14 +262,8 @@ public class NetworkMonitorService extends IntentService
 		try
 		{
 			mProber.exit();
-			mProber.join();
 			mArpReader.exit();
-			mArpReader.join();
 		}
-		catch( InterruptedException ie )
-		{
-			// ignore interrupted exception
-		}	
 		catch( Exception e )
 		{
 			System.errorLogging( TAG, e );
