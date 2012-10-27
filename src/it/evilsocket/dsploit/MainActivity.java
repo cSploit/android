@@ -389,7 +389,7 @@ public class MainActivity extends SherlockListActivity
 														    dialog.setMessage( "Downloading update ..." );
 														    dialog.setProgressStyle( ProgressDialog.STYLE_HORIZONTAL );
 														    dialog.setMax(100);
-														    dialog.setCancelable(false);
+														    dialog.setCancelable( true );
 														    dialog.show();
 															
 															new Thread( new Runnable(){

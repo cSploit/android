@@ -35,6 +35,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 
 public class UpdateManager 
 {
@@ -178,7 +179,7 @@ public class UpdateManager
             int total 	   = connection.getContentLength(),
             	downloaded = 0;
             
-            while( ( read = reader.read(buffer) ) != -1 ) 
+            while( progress.isShowing() && ( read = reader.read(buffer) ) != -1 ) 
             {
                 writer.write( buffer, 0, read );
                 
@@ -198,11 +199,16 @@ public class UpdateManager
             writer.close();
             reader.close();
 
-            Intent intent = new Intent( Intent.ACTION_VIEW );
-            intent.setDataAndType( Uri.fromFile( file ), "application/vnd.android.package-archive" );
-            intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
-            
-            mContext.startActivity(intent);
+            if( progress.isShowing() )
+            {
+	            Intent intent = new Intent( Intent.ACTION_VIEW );
+	            intent.setDataAndType( Uri.fromFile( file ), "application/vnd.android.package-archive" );
+	            intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+	            
+	            mContext.startActivity(intent);
+            }
+            else
+            	Log.d( TAG, "Download cancelled." );
             
             return true;
 		} 
@@ -210,6 +216,9 @@ public class UpdateManager
 		{
 			System.errorLogging( TAG, e );
 	    }
+		
+		if( progress.isShowing() )
+			progress.dismiss();
 	    
 	    return false;
 	}
