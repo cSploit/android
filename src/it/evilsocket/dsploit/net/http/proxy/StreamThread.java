@@ -97,7 +97,7 @@ public class StreamThread implements Runnable
 		        		String   hname  = hsplit[0].trim(),
 		        				 hvalue = hsplit[1].trim();
 		        		
-		        		if( hname.equals( "Location" ) && hvalue.startsWith("https://") )
+		        		if( hname.equals( "Location" ) && hvalue.startsWith("https://") && System.getSettings().getBoolean( "PREF_HTTPS_REDIRECT", true ) == true )
 		        		{
 		        			Log.w( TAG, "Patching 302 HTTPS redirect : " + hvalue );
 							

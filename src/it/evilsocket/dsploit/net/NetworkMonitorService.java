@@ -232,15 +232,15 @@ public class NetworkMonitorService extends IntentService
 	@Override
 	protected void onHandleIntent( Intent intent ) {		
 		sendNotification( "Network monitor started ..." );
-		   
-		if( mProber.isAlive() == false )
-			mProber.start();		
-		
-		if( mArpReader.isAlive() == false )
-			mArpReader.start();
-		
+		   		
 		try
 		{
+			if( mProber.isAlive() == false )
+				mProber.start();		
+			
+			if( mArpReader.isAlive() == false )
+				mArpReader.start();
+						
 			mProber.join();
 			mArpReader.join();
 		}

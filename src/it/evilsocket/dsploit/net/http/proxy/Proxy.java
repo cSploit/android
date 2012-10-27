@@ -120,7 +120,7 @@ public class Proxy implements Runnable
 				}
 				catch( IOException e )
 				{
-					System.errorLogging( TAG, e );
+					
 				}
 			}
 			

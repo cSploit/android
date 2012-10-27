@@ -206,7 +206,7 @@ public class HTTPSRedirector implements Runnable
 				}
 				catch( Exception e )
 				{
-					System.errorLogging( TAG, e );
+					
 				}
 			}
 			

@@ -349,14 +349,18 @@ public class MainActivity extends SherlockListActivity
 										{
 											NetworkInfo info = intent.getParcelableExtra( WifiManager.EXTRA_NETWORK_INFO );
 											
-											if( NetworkInfo.State.CONNECTING.equals( info.getState() ) )
-												mUpdateStatus.setText( "Connecting to WiFi access point ..." );
-											
-											else if( NetworkInfo.State.CONNECTED.equals( info.getState() ) )
-										    {
-												( ( DSploitApplication )getApplication() ).onCreate();
-									            onCreate( null );
-										    }
+											// ignore if not initialized
+											if( mUpdateStatus != null )
+											{
+												if( NetworkInfo.State.CONNECTING.equals( info.getState() ) )
+													mUpdateStatus.setText( "Connecting to WiFi access point ..." );
+												
+												else if( NetworkInfo.State.CONNECTED.equals( info.getState() ) )
+											    {
+													( ( DSploitApplication )getApplication() ).onCreate();
+										            onCreate( null );
+											    }
+											}
 										}
 										else if( intent.getAction().equals( UpdateService.UPDATE_CHECKING ) && mUpdateStatus != null )
 										{
