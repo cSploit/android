@@ -129,7 +129,7 @@ public class System
 		mContext = context;		
 		try
 		{				
-			mStoragePath   = Environment.getExternalStorageDirectory().toString();
+			mStoragePath   = getSettings().getString( "PREF_SAVE_PATH", Environment.getExternalStorageDirectory().toString() );
 			mSessionName   = "dsploit-session-" + java.lang.System.currentTimeMillis();
 			mUpdateManager = new UpdateManager( mContext );
 			mPlugins 	   = new ArrayList<Plugin>();

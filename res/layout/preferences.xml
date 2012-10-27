@@ -21,6 +21,11 @@
             android:summary="Prevents the device going in sleep mode while the application is running."
             android:title="Wake Lock" />
         
+        <Preference
+            android:key="PREF_SAVE_PATH"
+            android:summary="Global save path to put every log file."
+            android:title="Save Path" />
+        
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="PREF_DEBUG_ERROR_LOGGING"

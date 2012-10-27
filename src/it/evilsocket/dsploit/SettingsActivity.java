@@ -18,18 +18,25 @@
  */
 package it.evilsocket.dsploit;
 
+import java.io.File;
+
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
 
 import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.gui.DirectoryPicker;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.widget.Toast;
 
 public class SettingsActivity extends SherlockPreferenceActivity implements OnSharedPreferenceChangeListener
 {
+	private Preference 		   mSavePath			 = null;
 	private EditTextPreference mSnifferSampleTime	 = null;
 	private EditTextPreference mProxyPort			 = null;
 	private EditTextPreference mServerPort			 = null;
@@ -43,12 +50,40 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		addPreferencesFromResource( R.layout.preferences );		
 				
+		mSavePath			  = getPreferenceScreen().findPreference( "PREF_SAVE_PATH" );
 		mSnifferSampleTime	  = ( EditTextPreference )getPreferenceScreen().findPreference( "PREF_SNIFFER_SAMPLE_TIME" );
 		mProxyPort			  = ( EditTextPreference )getPreferenceScreen().findPreference( "PREF_HTTP_PROXY_PORT" );
 		mServerPort			  = ( EditTextPreference )getPreferenceScreen().findPreference( "PREF_HTTP_SERVER_PORT" );
-		mRedirectorPort		  =  ( EditTextPreference )getPreferenceScreen().findPreference( "PREF_HTTPS_REDIRECTOR_PORT" );
+		mRedirectorPort		  = ( EditTextPreference )getPreferenceScreen().findPreference( "PREF_HTTPS_REDIRECTOR_PORT" );
 		mHttpBufferSize		  = ( EditTextPreference )getPreferenceScreen().findPreference( "PREF_HTTP_MAX_BUFFER_SIZE" );
-		mPasswordFilename	  = ( EditTextPreference )getPreferenceScreen().findPreference( "PREF_PASSWORD_FILENAME" );
+		mPasswordFilename	  = ( EditTextPreference )getPreferenceScreen().findPreference( "PREF_PASSWORD_FILENAME" );		
+		
+		mSavePath.setOnPreferenceClickListener( new OnPreferenceClickListener() {			
+			@Override
+			public boolean onPreferenceClick( Preference preference ) {
+				startActivityForResult( new Intent( SettingsActivity.this, DirectoryPicker.class ), DirectoryPicker.PICK_DIRECTORY );
+				return true;
+			}
+		});
+	}
+	
+	@Override
+	protected void onActivityResult( int requestCode, int resultCode, Intent intent ) {
+		if( requestCode == DirectoryPicker.PICK_DIRECTORY && resultCode != RESULT_CANCELED )
+		{
+			Bundle extras = intent.getExtras();
+			String path   = ( String )extras.get( DirectoryPicker.CHOSEN_DIRECTORY );
+			File   folder = new File( path );  
+			
+			if( folder.exists() == false )
+				Toast.makeText( SettingsActivity.this, "Folder " + path + " does not exists.", Toast.LENGTH_SHORT ).show();
+			
+			else if( folder.canWrite() == false )
+				Toast.makeText( SettingsActivity.this, "Folder " + path + " is not writable.", Toast.LENGTH_SHORT ).show();
+			
+			else
+				getPreferenceManager().getSharedPreferences().edit().putString( "PREF_SAVE_PATH", path ).commit();
+		}
 	}
 	
 	@Override

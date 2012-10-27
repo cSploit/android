@@ -52,6 +52,12 @@
             android:screenOrientation="landscape" >
         </activity>
         <activity
+            android:name=".gui.DirectoryPicker"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
             android:name=".ActionActivity"
             android:configChanges="keyboardHidden|orientation"
             android:label="@string/title_activity_main"
