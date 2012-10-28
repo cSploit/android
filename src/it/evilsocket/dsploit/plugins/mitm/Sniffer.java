@@ -29,6 +29,7 @@ import com.actionbarsherlock.view.MenuItem;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
+import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.plugins.mitm.SpoofSession.OnSessionReadyListener;
 import android.content.Context;
 import android.os.Bundle;
@@ -229,9 +230,20 @@ public class Sniffer extends SherlockActivity
 	            holder = ( StatsHolder )row.getTag();
 	        }
 	        
-	        AddressStats stats = getByPosition( position );
+	        AddressStats stats  = getByPosition( position );
+	        Target       target = System.getTargetByAddress( stats.mAddress );
 	        
-	        holder.address.setText( stats.mAddress );
+	        if( target != null && target.hasAlias() )
+	        	holder.address.setText
+	        	(
+	    			Html.fromHtml
+		        	(
+		        	  "<b>" + target.getAlias() + "</b> <small>( " + target.getDisplayAddress() +" )</small>"
+		  			)	
+	        	);
+	        else
+	        	holder.address.setText( stats.mAddress );
+	        
 	        holder.description.setText
 	        ( 
 	          Html.fromHtml

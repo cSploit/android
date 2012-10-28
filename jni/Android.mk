@@ -4,7 +4,7 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := arpspoof
 
-LOCAL_SRC_FILES := arpspoof/arp.c  \
+LOCAL_SRC_FILES := arpspoof/hashmap.c \
                    arpspoof/arpspoof.c
                    
 APP_OPTIM := release

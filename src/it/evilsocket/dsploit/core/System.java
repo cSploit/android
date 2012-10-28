@@ -881,6 +881,19 @@ public class System
 		return getTarget( mCurrentTarget );
 	}
 	
+	public static Target getTargetByAddress( String address ) {
+		synchronized( mTargets )
+		{
+			for( Target t : mTargets )
+			{
+				if( t != null && t.getAddress() != null && t.getAddress().getHostAddress().equals(address) )
+					return t;
+			}
+		}
+		
+		return null;
+	}
+	
 	public static void registerPlugin( Plugin plugin ){
 		mPlugins.add(plugin);
 	}
