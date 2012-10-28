@@ -332,18 +332,21 @@ public class MainActivity extends SherlockListActivity
 												   hardware = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_HARDWARE );	            	
 											final  Target target = Target.getFromString( address );
 											
-											target.getEndpoint().setHardware( Endpoint.parseMacAddress(hardware) );
-																																		
-											// refresh the target listview
-							            	MainActivity.this.runOnUiThread(new Runnable() {
-							                    @Override
-							                    public void run() {
-							                    	if( System.addOrderedTarget( target ) == true )
-													{
-							                    		mTargetAdapter.notifyDataSetChanged();
-													}
-							                    }
-							                });											
+											if( target != null && target.getEndpoint() != null )
+											{
+												target.getEndpoint().setHardware( Endpoint.parseMacAddress(hardware) );
+																																			
+												// refresh the target listview
+								            	MainActivity.this.runOnUiThread(new Runnable() {
+								                    @Override
+								                    public void run() {
+								                    	if( System.addOrderedTarget( target ) == true )
+														{
+								                    		mTargetAdapter.notifyDataSetChanged();
+														}
+								                    }
+								                });		
+											}
 										}	
 										else if( isWifiAvailable == false && isConnectivityAvailable == true && intent.getAction().equals( WifiManager.NETWORK_STATE_CHANGED_ACTION ) )
 										{
@@ -670,7 +673,7 @@ public class MainActivity extends SherlockListActivity
 	@Override
 	protected void onListItemClick( ListView l, View v, int position, long id ){
 		super.onListItemClick( l, v, position, id);
-		
+
 		stopService( new Intent( this, NetworkMonitorService.class ) );
 		
 		System.setCurrentTarget( position );

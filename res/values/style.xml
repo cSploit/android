@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.DSploitActionBarStyle" parent="Theme.Sherlock.ForceOverflow">
+    <style name="Theme.DSploitActionBarStyle" parent="Theme.Sherlock">
         <item name="actionBarStyle">@style/Widget.DSploitActionBarStyle.ActionBar</item>
         <item name="android:actionBarStyle">@style/Widget.DSploitActionBarStyle.ActionBar</item>
     </style>

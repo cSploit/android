@@ -18,6 +18,7 @@
  */
 package it.evilsocket.dsploit.plugins.mitm;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.regex.Matcher;
@@ -29,6 +30,8 @@ import com.actionbarsherlock.view.MenuItem;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
+import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
+import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.plugins.mitm.SpoofSession.OnSessionReadyListener;
 import android.content.Context;
@@ -44,6 +47,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 import android.widget.AdapterView.OnItemSelectedListener;
 
@@ -71,6 +75,8 @@ public class Sniffer extends SherlockActivity
 	private boolean	     	   mRunning			  = false;	
 	private double			   mSampleTime		  = 1.0;
 	private SpoofSession	   mSpoofSession	  = null;
+	private boolean	 		   mDumpToFile		  = false;
+	private String			   mPcapFileName	  = null;
 	
 	public class AddressStats implements Comparable<AddressStats>
 	{
@@ -294,7 +300,21 @@ public class Sniffer extends SherlockActivity
 					setStartedState();
 				}
 			}} 
-		);        
+		);    
+        
+        new ConfirmDialog( "File Output", "Do you want to save sniffed traffic to a pcap file ?", this, new ConfirmDialogListener() {			
+			@Override
+			public void onConfirm() {
+				mDumpToFile   = true;
+				mPcapFileName = ( new File( System.getStoragePath(), "dsploit-sniff-" + java.lang.System.currentTimeMillis() + ".pcap" ) ).getAbsolutePath();				
+			}
+			
+			@Override
+			public void onCancel() {
+				mDumpToFile   = false;
+				mPcapFileName = null;
+			}
+		}).show();
 	}
 	
 	public synchronized int getSortType() {
@@ -332,15 +352,20 @@ public class Sniffer extends SherlockActivity
 		// never say never :)
 		System.getTcpDump().kill();
 		
+		if( mDumpToFile )
+			Toast.makeText( Sniffer.this, "Dumping traffic to " + mPcapFileName, Toast.LENGTH_SHORT ).show();
+		
 		mSpoofSession.start( new OnSessionReadyListener() {			
 			@Override
 			public void onSessionReady() {
-				System.getTcpDump().sniff( PCAP_FILTER, new OutputReceiver(){
+				
+				System.getTcpDump().sniff( PCAP_FILTER, mPcapFileName, new OutputReceiver(){
 					@Override
 					public void onStart(String command) { }
 
 					@Override
 					public void onNewLine( String line ) {
+
 						try
 						{
 							Matcher matcher = PARSER.matcher( line.trim() );

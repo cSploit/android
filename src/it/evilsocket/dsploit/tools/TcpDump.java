@@ -28,11 +28,15 @@ public class TcpDump extends Tool
 		super( "tcpdump/tcpdump", context );		
 	}
 	
-	public Thread sniff( String filter, OutputReceiver receiver ) {
-		return super.async( "-l -vv -s 0 " + ( filter == null ? "" : filter ), receiver );
+	public Thread sniff( String filter, String pcap, OutputReceiver receiver ) {
+		if( pcap == null )
+			return super.async( "-l -vv -s 0 " + ( filter == null ? "" : filter ), receiver );
+		
+		else
+			return super.async( "-l -vv -s 0 -w '" + pcap + "' " + ( filter == null ? "" : filter ), receiver );
 	}	
 	
 	public void sniff( OutputReceiver receiver ) {
-		sniff( null, receiver );
+		sniff( null, null, receiver );
 	}
 }
