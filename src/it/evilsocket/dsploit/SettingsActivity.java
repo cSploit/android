@@ -36,6 +36,8 @@ import android.widget.Toast;
 
 public class SettingsActivity extends SherlockPreferenceActivity implements OnSharedPreferenceChangeListener
 {
+	public static final int SETTINGS_DONE = 101285;
+	
 	private Preference 		   mSavePath			 = null;
 	private EditTextPreference mSnifferSampleTime	 = null;
 	private EditTextPreference mProxyPort			 = null;
@@ -163,6 +165,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 				Toast.makeText( SettingsActivity.this, message, Toast.LENGTH_SHORT ).show();
 				
 			mProxyPort.setText( Integer.toString( proxyPort ) );
+			System.HTTP_PROXY_PORT = proxyPort;
 		}
 		else if( key.equals("PREF_HTTP_SERVER_PORT") )
 		{
@@ -197,6 +200,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 				Toast.makeText( SettingsActivity.this, message, Toast.LENGTH_SHORT ).show();
 				
 			mServerPort.setText( Integer.toString( serverPort ) );
+			System.HTTP_SERVER_PORT = serverPort;
 		}
 		else if( key.equals("PREF_HTTPS_REDIRECTOR_PORT") )
 		{
@@ -231,6 +235,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 				Toast.makeText( SettingsActivity.this, message, Toast.LENGTH_SHORT ).show();
 				
 			mRedirectorPort.setText( Integer.toString( redirPort ) );
+			System.HTTPS_REDIR_PORT = redirPort;
 		}
 		else if( key.equals("PREF_HTTP_MAX_BUFFER_SIZE") )
 		{

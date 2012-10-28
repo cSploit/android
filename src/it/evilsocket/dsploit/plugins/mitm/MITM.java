@@ -41,14 +41,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.SettingsActivity;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Plugin;
+import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
 import it.evilsocket.dsploit.gui.dialogs.RedirectionDialog;
 import it.evilsocket.dsploit.gui.dialogs.RedirectionDialog.RedirectionDialogListener;
 import it.evilsocket.dsploit.gui.dialogs.CustomFilterDialog;
 import it.evilsocket.dsploit.gui.dialogs.CustomFilterDialog.CustomFilterDialogListener;
+import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
 import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
-import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
+import it.evilsocket.dsploit.gui.dialogs.FinishDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
 import it.evilsocket.dsploit.net.Target;
@@ -235,7 +238,42 @@ public class MITM extends Plugin
 	    	{
 	    		System.errorLogging( TAG, e );
 	    	}
-	    }	    
+	    }
+	    else if( request == SettingsActivity.SETTINGS_DONE )
+		{
+	    	checkForOpenPorts();
+		}
+	}
+	
+	private void checkForOpenPorts() {
+		/*
+         * Check if needed ports are available, otherwise inform the user.
+         */
+        String message = null;
+        
+        if( System.isPortAvailable( System.HTTP_PROXY_PORT ) == false )
+        	message = "Port " + System.HTTP_PROXY_PORT + " which is needed by the transparent proxy is taken from another process, open application settings ?";
+        
+        else if( System.isPortAvailable( System.HTTP_SERVER_PORT ) == false )
+        	message = "Port " + System.HTTP_SERVER_PORT + " which is needed by the mitm server is taken from another process, open application settings ?";
+        
+        else if( System.getSettings().getBoolean( "PREF_HTTPS_REDIRECT", true ) && System.isPortAvailable( System.HTTPS_REDIR_PORT ) == false )
+        	message = "Port " + System.HTTPS_REDIR_PORT + " which is needed by the mitm https redirector is taken from another process, open application settings ?";
+        
+        if( message != null )
+        {
+        	new ConfirmDialog( "Warning", message, this, new ConfirmDialogListener(){
+				@Override
+				public void onConfirm() {
+					startActivityForResult( new Intent( MITM.this, SettingsActivity.class ), SettingsActivity.SETTINGS_DONE );
+				}
+
+				@Override
+				public void onCancel() {
+					new FinishDialog( "Error", "MITM modules need all ports available.", MITM.this ).show();
+				}
+			}).show();
+        }
 	}
 	
 	private void setStoppedState() {
@@ -279,10 +317,9 @@ public class MITM extends Plugin
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);   
+                        
+        checkForOpenPorts();
         
-        if( System.getProxy() == null )
-        	new FatalDialog( "Error", "Could not create proxy instance.", MITM.this ).show();
-
         mActions.add( new Action
         ( 
         	"Simple Sniff", 

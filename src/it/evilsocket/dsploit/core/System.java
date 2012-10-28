@@ -442,7 +442,7 @@ public class System
 		}
 		catch( Exception e )
 		{
-			errorLogging( TAG, e );
+			// Swallow exception
 		}
 		
 		return available;
