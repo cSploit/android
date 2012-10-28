@@ -5,8 +5,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := arpspoof
 
 LOCAL_SRC_FILES := arpspoof/arp.c  \
-                   arpspoof/arpspoof.c \
-		   arpspoof/ensure_death.c
+                   arpspoof/arpspoof.c
                    
 APP_OPTIM := release
 LOCAL_C_INCLUDES := libpcap libnet/include include

