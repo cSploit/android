@@ -329,11 +329,15 @@ public class MainActivity extends SherlockListActivity
 										if( isWifiAvailable && intent.getAction().equals( NetworkMonitorService.NEW_ENDPOINT ) )
 										{
 											String address  = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_ADDRESS ),
-												   hardware = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_HARDWARE );	            	
+												   hardware = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_HARDWARE ),
+												   name		= ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_NAME );
 											final  Target target = Target.getFromString( address );
 											
 											if( target != null && target.getEndpoint() != null )
 											{
+												if( name != null && name.isEmpty() == false )
+													target.setAlias( name );
+												
 												target.getEndpoint().setHardware( Endpoint.parseMacAddress(hardware) );
 																																			
 												// refresh the target listview

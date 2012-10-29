@@ -20,9 +20,12 @@ package it.evilsocket.dsploit.net;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,16 +48,63 @@ public class NetworkMonitorService extends IntentService
 	public static final String NEW_ENDPOINT		 = "NetworkMonitorService.action.NEW_ENDPOINT";
 	public static final String ENDPOINT_ADDRESS  = "NetworkMonitorService.data.ENDPOINT_ADDRESS";
 	public static final String ENDPOINT_HARDWARE = "NetworkMonitorService.data.ENDPOINT_HARDWARE";
-	
+	public static final String ENDPOINT_NAME     = "NetworkMonitorService.data.ENDPOINT_NAME";
+
 	private static final String  ARP_TABLE_FILE   = "/proc/net/arp";
 	private static final Pattern ARP_TABLE_PARSER = Pattern.compile( "^([\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3})\\s+([0-9-a-fx]+)\\s+([0-9-a-fx]+)\\s+([a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2})\\s+([^\\s]+)\\s+(.+)$", Pattern.CASE_INSENSITIVE );
 	private static final short   NETBIOS_UDP_PORT = 137;
 	private static final byte[]  NETBIOS_REQUEST  = 
 	{ 
-		-126, 40, 1, 32, 67, 75,
-		65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
-		65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 
-		33, 1 
+		(byte)0x82, 
+		(byte)0x28, 
+		(byte)0x0, 
+		(byte)0x0, 
+		(byte)0x0, 
+		(byte)0x1, 
+		(byte)0x0, 
+		(byte)0x0, 
+		(byte)0x0, 
+		(byte)0x0, 
+		(byte)0x0, 
+		(byte)0x0, 
+		(byte)0x20, 
+		(byte)0x43, 
+		(byte)0x4B, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x41, 
+		(byte)0x0, 
+		(byte)0x0, 
+		(byte)0x21, 
+		(byte)0x0, 
+		(byte)0x1
 	};
 
 	private UdpProber mProber		  = null;
@@ -63,7 +113,21 @@ public class NetworkMonitorService extends IntentService
 	
 	private class ArpReader extends Thread
 	{				
-		private boolean mStopped = true;
+		private boolean 			   mStopped    = true;
+		private HashMap<String,String> mNetBiosMap = null;
+		
+		public ArpReader() {
+			super("ArpReader");
+			
+			mNetBiosMap = new HashMap<String,String>(); 
+		}
+		
+		public synchronized void addNetBiosName( String address, String name ) {
+			synchronized( mNetBiosMap )
+			{
+				mNetBiosMap.put( address, name );
+			}
+		}
 		
 		@Override
 		public void run() {
@@ -103,10 +167,16 @@ public class NetworkMonitorService extends IntentService
 								Endpoint endpoint = new Endpoint( address, hwaddr );
 								Target   target   = new Target( endpoint );
 								
-								if( System.hasTarget( target ) == false )
-			    				{    					
-			    					sendNewEndpointNotification( endpoint );	            
-			    				}
+								synchronized( mNetBiosMap )
+								{
+									String name = mNetBiosMap.get(address);
+									
+									if( System.hasTarget( target ) == false )				    				   
+										sendNewEndpointNotification( endpoint, name );
+				    				
+									else if( name != null )
+										System.getTargetByAddress(address).setAlias( name ); 									
+								}
 							}
 						}
 					}
@@ -124,6 +194,63 @@ public class NetworkMonitorService extends IntentService
 		
 		public synchronized void exit() {
 			mStopped = true;
+		}
+	}
+	
+	private class NBResolver extends Thread
+	{
+		InetAddress    mAddress = null;
+		DatagramSocket mSocket  = null;
+		
+		public NBResolver( InetAddress address, DatagramSocket socket ) {
+			super( "NBResolver" );
+			
+			mAddress = address;
+			mSocket  = socket;
+		}
+		
+		@Override
+		public void run() {
+			byte[] 		   buffer = new byte[128];
+			DatagramPacket packet = new DatagramPacket( buffer, buffer.length, mAddress, NETBIOS_UDP_PORT );
+			
+			for( int i = 0; i < 3; i++ )
+			{
+				try
+				{
+					mSocket.receive( packet );
+					
+					byte[] data = packet.getData();
+					
+					if( data != null && data.length > 0 )
+					{
+						String response = new String( data, "ASCII" ),
+							   address  = mAddress.getHostAddress(),
+							   name     = response.substring( 57, 73 ).trim();		
+						Target target   = null;
+						
+						// existing target
+						target = System.getTargetByAddress( address );
+						if( target != null )						
+							target.setAlias( name );
+						// not yet discovered/enqueued target
+						else						
+							mArpReader.addNetBiosName( address, name );						
+					}
+					
+					break;
+				}
+				catch( SocketTimeoutException ste ) { 
+					
+				}
+				catch( IOException e )
+				{
+					System.errorLogging( "NBResolver", e );
+					break;
+				}
+			}
+			
+			mSocket.close();						 
 		}
 	}
 	
@@ -161,14 +288,15 @@ public class NetworkMonitorService extends IntentService
 					current = base;
 					
 					for( i = 1; i <= nhosts && ( current = IP4Address.next( current ) ) != null; i++ ) 
-					{
+					{						
 						InetAddress    address = current.toInetAddress();
 	    				DatagramSocket socket  = new DatagramSocket();
 	    				DatagramPacket packet  = new DatagramPacket( NETBIOS_REQUEST, NETBIOS_REQUEST.length, address, NETBIOS_UDP_PORT );
 	    				
 	    				socket.setSoTimeout( 200 );
 	    				socket.send( packet );    	  
-	    				socket.close();
+	    				
+	    				new NBResolver( address, socket ).start();
 					}
 
 					Thread.sleep( 1000 );
@@ -219,13 +347,15 @@ public class NetworkMonitorService extends IntentService
 		}
 	}
 	
-	private void sendNewEndpointNotification( Endpoint endpoint ) {
+	private void sendNewEndpointNotification( Endpoint endpoint, String name ) {
 		sendNotification( "New endpoint found on network : " + endpoint.toString() );
 		
 		Intent intent = new Intent( NEW_ENDPOINT );
 		
 		intent.putExtra( ENDPOINT_ADDRESS,  endpoint.toString() );
 		intent.putExtra( ENDPOINT_HARDWARE, endpoint.getHardwareAsString() );
+		intent.putExtra( ENDPOINT_NAME,     name == null ? "" : name );
+		
         sendBroadcast(intent);    	
 	}
 
