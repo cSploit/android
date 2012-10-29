@@ -239,11 +239,11 @@ public class NetworkMonitorService extends IntentService
 					
 					byte[] data = packet.getData();
 					
-					if( data != null && data.length > 0 )
+					if( data != null && data.length >= 74 )
 					{
 						String response = new String( data, "ASCII" );
 
-						// i know this is horrible, but i reallt need only the netbios name
+						// i know this is horrible, but i really need only the netbios name
 						name = response.substring( 57, 73 ).trim();		
 						
 						Log.d( "NETBIOS", address + " was resolved to " + name );
@@ -369,7 +369,10 @@ public class NetworkMonitorService extends IntentService
 	}
 	
 	private void sendNewEndpointNotification( Endpoint endpoint, String name ) {
-		sendNotification( "New endpoint found on network : " + endpoint.toString() );
+		if( name != null )
+			sendNotification( "New endpoint found on network : " + name + " ( " + endpoint.toString() + " )" );
+		else
+			sendNotification( "New endpoint found on network : " + endpoint.toString() );
 		
 		Intent intent = new Intent( NEW_ENDPOINT );
 		

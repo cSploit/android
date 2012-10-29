@@ -18,6 +18,7 @@
  */
 package it.evilsocket.dsploit.plugins.mitm;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -450,8 +451,11 @@ public class MITM extends Plugin
 									int iport = Integer.parseInt( port );
 									
 									if( iport <= 0 || iport > 65535 )
-										throw new Exception();
-									
+										throw new Exception( "Port out of range." );
+
+									URL url = new URL( address );								
+									address = url.getHost();
+	
 									activity.setVisibility( View.VISIBLE );
 									Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
 									
@@ -471,7 +475,7 @@ public class MITM extends Plugin
 								}
 								catch( Exception e )
 								{
-									new ErrorDialog( "Error", "Invalid port specified.", MITM.this ).show();
+									new ErrorDialog( "Error", e.getMessage(), MITM.this ).show();
 								}					
 							}
 							else

@@ -40,7 +40,7 @@ public class RedirectionDialog extends AlertDialog
 		
 		this.setTitle( title );
 		this.setView( view );
-
+			
 		this.setButton( "Ok", new DialogInterface.OnClickListener() {
             public void onClick( DialogInterface dialog, int id ) {
             	String address = ( ( EditText )view.findViewById( R.id.redirAddress ) ).getText().toString().trim(),
