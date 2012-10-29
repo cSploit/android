@@ -26,6 +26,7 @@ import it.evilsocket.dsploit.plugins.mitm.Hijacker.Session;
 import android.os.Bundle;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -34,6 +35,7 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.Window;
 
 public class HijackerWebView extends SherlockActivity
 {
@@ -45,10 +47,13 @@ public class HijackerWebView extends SherlockActivity
 	@Override  
     protected void onCreate( Bundle savedInstanceState ) {            
         super.onCreate(savedInstanceState);  
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		requestWindowFeature(Window.FEATURE_PROGRESS);
         setTitle( System.getCurrentTarget() + " > MITM > Session Hijacker" );
         setContentView( R.layout.plugin_mitm_hijacker_webview );  
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                
+        setSupportProgressBarIndeterminateVisibility(false);
+        
         mWebView  = ( WebView )findViewById( R.id.webView );               
         mSettings = mWebView.getSettings();  
         
@@ -65,6 +70,19 @@ public class HijackerWebView extends SherlockActivity
             }
         });
                
+        mWebView.setWebChromeClient( new WebChromeClient() {
+			public void onProgressChanged( WebView view, int progress ) {
+				getSupportActionBar().setSubtitle( HijackerWebView.this.mWebView.getUrl() );
+				setSupportProgressBarIndeterminateVisibility(true);
+				// Normalize our progress along the progress bar's scale
+				int mmprogress = (Window.PROGRESS_END - Window.PROGRESS_START) / 100 * progress;
+				setSupportProgress(mmprogress);
+				
+				if( progress == 100 ) 
+					setSupportProgressBarIndeterminateVisibility(false);			
+			}
+		});
+        
         CookieSyncManager.createInstance( this );              
     	CookieManager.getInstance().removeAllCookie();
     	
