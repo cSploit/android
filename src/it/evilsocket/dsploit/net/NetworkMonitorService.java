@@ -47,6 +47,7 @@ public class NetworkMonitorService extends IntentService
 	public static final String TAG				 = "NETWORKMONITORSERVICE";
 	
 	public static final String NEW_ENDPOINT		 = "NetworkMonitorService.action.NEW_ENDPOINT";
+	public static final String ENDPOINT_UPDATE	 = "NetworkMonitorService.action.ENDPOINT_UPDATE";
 	public static final String ENDPOINT_ADDRESS  = "NetworkMonitorService.data.ENDPOINT_ADDRESS";
 	public static final String ENDPOINT_HARDWARE = "NetworkMonitorService.data.ENDPOINT_HARDWARE";
 	public static final String ENDPOINT_NAME     = "NetworkMonitorService.data.ENDPOINT_NAME";
@@ -54,58 +55,19 @@ public class NetworkMonitorService extends IntentService
 	private static final String  ARP_TABLE_FILE   = "/proc/net/arp";
 	private static final Pattern ARP_TABLE_PARSER = Pattern.compile( "^([\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3})\\s+([0-9-a-fx]+)\\s+([0-9-a-fx]+)\\s+([a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2})\\s+([^\\s]+)\\s+(.+)$", Pattern.CASE_INSENSITIVE );
 	private static final short   NETBIOS_UDP_PORT = 137;
+	// NBT UDP PACKET: QUERY; REQUEST; UNICAST
 	private static final byte[]  NETBIOS_REQUEST  = 
 	{ 
-		(byte)0x82, 
-		(byte)0x28, 
-		(byte)0x0, 
-		(byte)0x0, 
-		(byte)0x0, 
-		(byte)0x1, 
-		(byte)0x0, 
-		(byte)0x0, 
-		(byte)0x0, 
-		(byte)0x0, 
-		(byte)0x0, 
-		(byte)0x0, 
-		(byte)0x20, 
-		(byte)0x43, 
-		(byte)0x4B, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x41, 
-		(byte)0x0, 
-		(byte)0x0, 
-		(byte)0x21, 
-		(byte)0x0, 
-		(byte)0x1
+		(byte)0x82, (byte)0x28, (byte)0x0,  (byte)0x0,  (byte)0x0, 
+		(byte)0x1,  (byte)0x0,  (byte)0x0,  (byte)0x0,  (byte)0x0, 
+		(byte)0x0,  (byte)0x0,  (byte)0x20, (byte)0x43, (byte)0x4B, 
+		(byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, 
+		(byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, 
+		(byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, 
+		(byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, 
+		(byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, 
+		(byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, (byte)0x41, 
+		(byte)0x0,  (byte)0x0,  (byte)0x21, (byte)0x0,  (byte)0x1
 	};
 
 	private UdpProber mProber		  = null;
@@ -148,9 +110,12 @@ public class NetworkMonitorService extends IntentService
 			{
 				try
 				{
-					BufferedReader reader  = new BufferedReader( new FileReader( ARP_TABLE_FILE ) );
-					String		   line    = null;
-					Matcher		   matcher = null;
+					BufferedReader reader   = new BufferedReader( new FileReader( ARP_TABLE_FILE ) );
+					String		   line     = null,
+								   name		= null;
+					Matcher		   matcher  = null;
+					Endpoint 	   endpoint = null;
+					Target 		   target   = null;
 					
 					while( ( line = reader.readLine() ) != null )
 					{
@@ -165,33 +130,38 @@ public class NetworkMonitorService extends IntentService
 							
 							if( device.equals(iface) && hwaddr.equals("00:00:00:00:00:00") == false )
 							{
-								Endpoint endpoint = new Endpoint( address, hwaddr );
-								Target   target   = new Target( endpoint );
+								endpoint = new Endpoint( address, hwaddr );
+								target   = new Target( endpoint );
 								
-								synchronized( mNetBiosMap )
-								{
-									String name = mNetBiosMap.get(address);
-									if( name == null && target.isRouter() == false )
-									{										
-										// attempt DNS resolution
-										name = endpoint.getAddress().getHostName();
-										
-										if( name.equals(address) == false )
-										{
-											Log.d( "NETBIOS", address + " was DNS resolved to " + name );
-											
-											mNetBiosMap.put( address, name );
-										}
-										else
-											name = null;
-									}
+								synchronized( mNetBiosMap ){ name = mNetBiosMap.get(address); }
+								
+								if( name == null && target.isRouter() == false )
+								{										
+									// attempt DNS resolution
+									name = endpoint.getAddress().getHostName();
 									
-									if( System.hasTarget( target ) == false )				    				   
-										sendNewEndpointNotification( endpoint, name );
-				    				
-									else if( name != null )
-										System.getTargetByAddress(address).setAlias( name ); 									
+									if( name.equals(address) == false )
+									{
+										Log.d( "NETBIOS", address + " was DNS resolved to " + name );
+										
+										synchronized( mNetBiosMap ){ mNetBiosMap.put( address, name ); }
+									}
+									else
+										name = null;
 								}
+								
+								if( System.hasTarget( target ) == false )				    				   
+									sendNewEndpointNotification( endpoint, name );
+			    				
+								else if( name != null )
+								{
+									target = System.getTargetByAddress(address);
+									if( target != null && target.hasAlias() == false )
+									{
+										target.setAlias( name );
+										sendEndpointUpdateNotification( );
+									}
+								}								
 							}
 						}
 					}
@@ -251,8 +221,11 @@ public class NetworkMonitorService extends IntentService
 						
 						// existing target
 						target = System.getTargetByAddress( address );
-						if( target != null )						
+						if( target != null )
+						{
 							target.setAlias( name );
+							sendEndpointUpdateNotification( );
+						}
 						// not yet discovered/enqueued target
 						else						
 							mArpReader.addNetBiosName( address, name );						
@@ -388,6 +361,10 @@ public class NetworkMonitorService extends IntentService
 		intent.putExtra( ENDPOINT_NAME,     name == null ? "" : name );
 		
         sendBroadcast(intent);    	
+	}
+	
+	private void sendEndpointUpdateNotification( ) {
+        sendBroadcast( new Intent( ENDPOINT_UPDATE ) );  
 	}
 
 	@Override

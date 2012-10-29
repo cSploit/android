@@ -363,6 +363,16 @@ public class MainActivity extends SherlockListActivity
 								                });		
 											}
 										}	
+										else if( isWifiAvailable && intent.getAction().equals( NetworkMonitorService.ENDPOINT_UPDATE ) )
+										{
+											// refresh the target listview
+							            	MainActivity.this.runOnUiThread(new Runnable() {
+							                    @Override
+							                    public void run() {
+							                    	mTargetAdapter.notifyDataSetChanged();
+							                    }
+							                });		
+										}
 										else if( isWifiAvailable == false && isConnectivityAvailable == true && intent.getAction().equals( WifiManager.NETWORK_STATE_CHANGED_ACTION ) )
 										{
 											NetworkInfo info = intent.getParcelableExtra( WifiManager.EXTRA_NETWORK_INFO );
@@ -446,6 +456,7 @@ public class MainActivity extends SherlockListActivity
 							    mIntentFilter = new IntentFilter( );
 							    
 							    mIntentFilter.addAction( NetworkMonitorService.NEW_ENDPOINT );
+							    mIntentFilter.addAction( NetworkMonitorService.ENDPOINT_UPDATE );
 							    mIntentFilter.addAction( UpdateService.UPDATE_CHECKING );
 							    mIntentFilter.addAction( UpdateService.UPDATE_AVAILABLE );
 							    mIntentFilter.addAction( UpdateService.UPDATE_NOT_AVAILABLE );
