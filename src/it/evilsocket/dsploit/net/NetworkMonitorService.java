@@ -170,6 +170,20 @@ public class NetworkMonitorService extends IntentService
 								synchronized( mNetBiosMap )
 								{
 									String name = mNetBiosMap.get(address);
+									if( name == null && target.isRouter() == false )
+									{										
+										// attempt DNS resolution
+										name = endpoint.getAddress().getHostName();
+										
+										if( name.equals(address) == false )
+										{
+											Log.d( "NETBIOS", address + " was DNS resolved to " + name );
+											
+											mNetBiosMap.put( address, name );
+										}
+										else
+											name = null;
+									}
 									
 									if( System.hasTarget( target ) == false )				    				   
 										sendNewEndpointNotification( endpoint, name );
@@ -211,11 +225,14 @@ public class NetworkMonitorService extends IntentService
 		
 		@Override
 		public void run() {
-			byte[] 		   buffer = new byte[128];
-			DatagramPacket packet = new DatagramPacket( buffer, buffer.length, mAddress, NETBIOS_UDP_PORT );
-			
+			byte[] 		   buffer  = new byte[128];
+			DatagramPacket packet  = new DatagramPacket( buffer, buffer.length, mAddress, NETBIOS_UDP_PORT );
+			String		   name    = null,
+						   address = mAddress.getHostAddress();
+			Target 		   target  = null;
+
 			for( int i = 0; i < 3; i++ )
-			{
+			{				
 				try
 				{
 					mSocket.receive( packet );
@@ -224,10 +241,12 @@ public class NetworkMonitorService extends IntentService
 					
 					if( data != null && data.length > 0 )
 					{
-						String response = new String( data, "ASCII" ),
-							   address  = mAddress.getHostAddress(),
-							   name     = response.substring( 57, 73 ).trim();		
-						Target target   = null;
+						String response = new String( data, "ASCII" );
+
+						// i know this is horrible, but i reallt need only the netbios name
+						name = response.substring( 57, 73 ).trim();		
+						
+						Log.d( "NETBIOS", address + " was resolved to " + name );
 						
 						// existing target
 						target = System.getTargetByAddress( address );
@@ -237,7 +256,9 @@ public class NetworkMonitorService extends IntentService
 						else						
 							mArpReader.addNetBiosName( address, name );						
 					}
-					
+					else
+						mSocket.setSoTimeout( 500 * ( i + 2 ) );
+
 					break;
 				}
 				catch( SocketTimeoutException ste ) { 
