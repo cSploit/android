@@ -56,6 +56,7 @@ import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
 public class WifiScannerActivity extends SherlockListActivity
 {	
@@ -294,6 +295,8 @@ public class WifiScannerActivity extends SherlockListActivity
         super.onCreate(savedInstanceState);           
         setContentView( R.layout.wifi_scanner ); 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        
+        GoogleAnalyticsTracker.getInstance().trackPageView("/wifi-scanner");
         
         mWifiManager = ( WifiManager )this.getSystemService( Context.WIFI_SERVICE );
         mReceiver	 = new ScanReceiver();

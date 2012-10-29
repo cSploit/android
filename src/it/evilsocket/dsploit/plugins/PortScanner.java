@@ -20,6 +20,8 @@ package it.evilsocket.dsploit.plugins;
 
 import java.util.ArrayList;
 
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
+
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
@@ -143,6 +145,8 @@ public class PortScanner extends Plugin
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);    
+        
+        GoogleAnalyticsTracker.getInstance().trackPageView("/port-scanner");
         
         mScanToggleButton = ( ToggleButton )findViewById( R.id.scanToggleButton );
 		mScanProgress	  = ( ProgressBar )findViewById( R.id.scanActivity );

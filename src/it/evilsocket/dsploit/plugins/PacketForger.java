@@ -25,6 +25,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Socket;
 
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
+
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -70,6 +72,8 @@ public class PacketForger extends Plugin implements OnClickListener
 	@Override
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);   
+        
+        GoogleAnalyticsTracker.getInstance().trackPageView("/packet-forger");
         
         mProtocol     = ( Spinner )findViewById( R.id.protocolSpinner );
         mPort	      = ( EditText )findViewById( R.id.portText );

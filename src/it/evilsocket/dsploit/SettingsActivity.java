@@ -22,6 +22,7 @@ import java.io.File;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.DirectoryPicker;
@@ -51,6 +52,8 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 		super.onCreate(savedInstanceState);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		addPreferencesFromResource( R.layout.preferences );		
+		
+		GoogleAnalyticsTracker.getInstance().trackPageView("/settings");
 				
 		mSavePath			  = getPreferenceScreen().findPreference( "PREF_SAVE_PATH" );
 		mSnifferSampleTime	  = ( EditTextPreference )getPreferenceScreen().findPreference( "PREF_SNIFFER_SAMPLE_TIME" );

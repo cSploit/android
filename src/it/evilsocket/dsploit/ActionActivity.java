@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.MenuItem;
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Plugin;
@@ -96,6 +97,8 @@ public class ActionActivity extends SherlockListActivity
 	@Override
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);        
+        
+        GoogleAnalyticsTracker.getInstance().trackPageView("/modules");
                         
         if( System.getTargets() != null && System.getTargets().size() > 0 && System.getCurrentTarget() != null )
         {

@@ -71,6 +71,7 @@ import android.widget.Toast;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
 public class MainActivity extends SherlockListActivity
 {	
@@ -154,7 +155,9 @@ public class MainActivity extends SherlockListActivity
 	    }
 	}
 
-	private void createUpdateLayout( ) {		
+	private void createUpdateLayout( ) {	
+		GoogleAnalyticsTracker.getInstance().trackPageView("/update-layout");
+		
 		getListView().setVisibility( View.GONE );
 		findViewById( R.id.textView ).setVisibility( View.GONE );
 		
@@ -171,6 +174,8 @@ public class MainActivity extends SherlockListActivity
 	}
 	
 	private void createOfflineLayout( ) {
+		GoogleAnalyticsTracker.getInstance().trackPageView("/offline-layout");
+		
 		getListView().setVisibility( View.GONE );
 		findViewById( R.id.textView ).setVisibility( View.GONE );
 		
@@ -213,6 +218,9 @@ public class MainActivity extends SherlockListActivity
         // just initialize the ui the first time
         if( mTargetAdapter == null )
         {	        	
+        	GoogleAnalyticsTracker.getInstance().startNewSession( "UA-35936964-1", this );
+        	GoogleAnalyticsTracker.getInstance().trackPageView("/");
+        	
             isWifiAvailable 		= Network.isWifiConnected( this );
         	isConnectivityAvailable = isWifiAvailable || Network.isConnectivityAvailable( this );
         	        	        	
@@ -222,6 +230,7 @@ public class MainActivity extends SherlockListActivity
         		// wifi available but system failed to initialize, this is a fatal :(
         		if( isWifiAvailable == true )
         		{
+        			GoogleAnalyticsTracker.getInstance().trackEvent( "ERRORS", "Initialization Error", System.getLastError(), 1 );
         			new FatalDialog( "Initialization Error", System.getLastError(), this ).show();        		
         			return;
         		}
@@ -264,6 +273,8 @@ public class MainActivity extends SherlockListActivity
 					
 					if( fatal != null )
 					{
+						GoogleAnalyticsTracker.getInstance().trackEvent( "ERRORS", "Initialization Error", fatal, 2 );
+						
 						final String ffatal = fatal;
 						MainActivity.this.runOnUiThread( new Runnable(){
 							@Override
@@ -730,7 +741,9 @@ public class MainActivity extends SherlockListActivity
 			unregisterReceiver( mMessageReceiver );
 				
 		// make sure no zombie process is running before destroying the activity
-		System.clean( true );			
+		System.clean( true );		
+		
+		GoogleAnalyticsTracker.getInstance().stopSession();
 				
 		super.onDestroy();
 	}
