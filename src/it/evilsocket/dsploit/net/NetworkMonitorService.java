@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import it.evilsocket.dsploit.MainActivity;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.net.Endpoint;
 import it.evilsocket.dsploit.net.Target;
@@ -357,9 +358,15 @@ public class NetworkMonitorService extends IntentService
 			NotificationManager manager 	 = ( NotificationManager )getSystemService(Context.NOTIFICATION_SERVICE);
 			Notification 		notification = new Notification( R.drawable.dsploit_icon_48 , message, java.lang.System.currentTimeMillis() );
 			Context 			context 	 = getApplicationContext();
-			PendingIntent	    pending		 = PendingIntent.getActivity( context, 0, new Intent(), PendingIntent.FLAG_UPDATE_CURRENT );
-	
-			notification.flags |= Notification.FLAG_AUTO_CANCEL;
+			PendingIntent	    pending		 = PendingIntent.getActivity
+			( 
+				context, 
+				0, 
+				new Intent( this, MainActivity.class ).setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP ), 
+				PendingIntent.FLAG_CANCEL_CURRENT 
+			);
+
+			notification.flags |= Notification.FLAG_ONGOING_EVENT;
 			
 			notification.setLatestEventInfo( context, "Network Monitor", message, pending );
 			
