@@ -27,6 +27,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -275,6 +276,10 @@ public class System
 	
 	public static Object getCustomData( ) {
 		return mCustomData;
+	}
+	
+	public static InputStream getRawResource( int id ) {
+		return mContext.getResources().openRawResource( id );
 	}
 	
 	public static String getLibraryPath( ) {

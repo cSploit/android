@@ -24,46 +24,44 @@ import android.content.DialogInterface;
 import android.text.InputType;
 import android.widget.EditText;
 
-public class InputDialog extends AlertDialog 
+public class WifiCrackDialog extends AlertDialog 
 {
 	private EditText mEditText = null;
 	
-	public interface InputDialogListener
+	public interface WifiCrackDialogListener
 	{
-		public void onInputEntered( String input );
+		public void onManualConnect( String key );
+		public void onCrack( );
 	}
-	
-	public InputDialog( String title, String message, Activity activity, InputDialogListener inputDialogListener ){
-		this( title, message, null, true, false, activity, inputDialogListener );
-	}
-	
-	public InputDialog( String title, String message, String text, boolean editable, boolean password, Activity activity, InputDialogListener inputDialogListener ){
+
+	public WifiCrackDialog( String title, String message, Activity activity, WifiCrackDialogListener wifiCrackDialogListener ){
 		super( activity );
 		
 		mEditText = new EditText( activity );
-		
-		if( text != null )
-			mEditText.setText(text);
-		
-		mEditText.setEnabled( editable );
-		
-		if( password )
-			mEditText.setInputType( InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD );
+		mEditText.setEnabled( true );
+		mEditText.setInputType( InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD );
 				
 		this.setTitle( title );
 		this.setMessage( message );
 		this.setView( mEditText );
 		
-		final InputDialogListener listener = inputDialogListener;
+		final WifiCrackDialogListener listener = wifiCrackDialogListener;
 		
-		this.setButton( "Ok", new DialogInterface.OnClickListener() {
+		this.setButton( "Connect", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
             	if( listener != null )
-            		listener.onInputEntered( mEditText.getText().toString() );
+            		listener.onManualConnect( mEditText.getText().toString() );
             }
         });			
 		
-		this.setButton2( "Cancel", new DialogInterface.OnClickListener() {
+		this.setButton2( "Crack", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            	if( listener != null )
+            		listener.onCrack( );
+            }
+        });	
+				
+		this.setButton3( "Cancel", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
             	dialog.dismiss();
             }
