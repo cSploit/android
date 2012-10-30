@@ -49,9 +49,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Typeface;
-import android.net.NetworkInfo;
 import android.net.Uri;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.Gravity;
@@ -71,7 +69,6 @@ import android.widget.Toast;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
 public class MainActivity extends SherlockListActivity
 {	
@@ -84,6 +81,7 @@ public class MainActivity extends SherlockListActivity
 	private IntentFilter	mIntentFilter	   		 = null;
 	private ManagedReceiver mMessageReceiver 		 = null;
 	private TextView		mUpdateStatus			 = null;
+	private Intent			mNetworkMonitorIntent	 = null;
 	private Toast 			mToast 			 	     = null;
 	private long  			mLastBackPressTime 	     = 0;
 	
@@ -156,7 +154,6 @@ public class MainActivity extends SherlockListActivity
 	}
 
 	private void createUpdateLayout( ) {	
-		GoogleAnalyticsTracker.getInstance().trackPageView("/update-layout");
 		
 		getListView().setVisibility( View.GONE );
 		findViewById( R.id.textView ).setVisibility( View.GONE );
@@ -174,7 +171,6 @@ public class MainActivity extends SherlockListActivity
 	}
 	
 	private void createOfflineLayout( ) {
-		GoogleAnalyticsTracker.getInstance().trackPageView("/offline-layout");
 		
 		getListView().setVisibility( View.GONE );
 		findViewById( R.id.textView ).setVisibility( View.GONE );
@@ -188,25 +184,179 @@ public class MainActivity extends SherlockListActivity
 		mUpdateStatus.setLayoutParams( params );
 		mUpdateStatus.setText( "No connectivity available." );
 		
-		layout.addView( mUpdateStatus );		
+		layout.addView( mUpdateStatus );				
+	}
+	
+	public void createOnlineLayout( ) {
+		mTargetAdapter = new TargetAdapter( R.layout.target_list_item );
 		
-		startActivityForResult( new Intent( MainActivity.this, WifiScannerActivity.class ), WIFI_CONNECTION_REQUEST );
+		setListAdapter( mTargetAdapter );	
+	
+		getListView().setOnItemLongClickListener( new OnItemLongClickListener() 
+		{
+			@Override
+			public boolean onItemLongClick( AdapterView<?> parent, View view, int position, long id ) {									
+				final Target target = System.getTarget( position );
+				
+				new InputDialog
+				( 
+				  "Target Alias", 
+				  "Set an alias for this target:", 
+				  target.hasAlias() ? target.getAlias() : "",
+				  true,
+				  false,
+				  MainActivity.this, 
+				  new InputDialogListener(){
+					@Override
+					public void onInputEntered( String input ) {
+						target.setAlias(input);			
+						mTargetAdapter.notifyDataSetChanged();
+					}
+				  }
+				).show();
+														
+				return false;
+			}
+		});
+
+		if( mMessageReceiver == null )
+		{
+			mMessageReceiver = new ManagedReceiver() 
+			{
+				@Override
+				public void onReceive(Context context, Intent intent) 
+				{
+					if( intent.getAction().equals( NetworkMonitorService.NEW_ENDPOINT ) )
+					{
+						String address  = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_ADDRESS ),
+							   hardware = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_HARDWARE ),
+							   name		= ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_NAME );
+						final  Target target = Target.getFromString( address );
+						
+						if( target != null && target.getEndpoint() != null )
+						{
+							if( name != null && name.isEmpty() == false )
+								target.setAlias( name );
+							
+							target.getEndpoint().setHardware( Endpoint.parseMacAddress(hardware) );
+																														
+							// refresh the target listview
+			            	MainActivity.this.runOnUiThread(new Runnable() {
+			                    @Override
+			                    public void run() {
+			                    	if( System.addOrderedTarget( target ) == true )
+									{
+			                    		mTargetAdapter.notifyDataSetChanged();
+									}
+			                    }
+			                });		
+						}
+					}	
+					else if( intent.getAction().equals( NetworkMonitorService.ENDPOINT_UPDATE ) )
+					{
+						// refresh the target listview
+		            	MainActivity.this.runOnUiThread(new Runnable() {
+		                    @Override
+		                    public void run() {
+		                    	mTargetAdapter.notifyDataSetChanged();
+		                    }
+		                });		
+					}					
+					else if( intent.getAction().equals( UpdateService.UPDATE_CHECKING ) && mUpdateStatus != null )
+					{
+						mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "Checking ..." ) );
+					}
+					else if( intent.getAction().equals( UpdateService.UPDATE_NOT_AVAILABLE ) && mUpdateStatus != null )
+					{
+						mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "No updates available." ) );
+					}
+					else if( intent.getAction().equals( UpdateService.UPDATE_AVAILABLE ) )
+					{																						
+						final String remoteVersion = ( String )intent.getExtras().get( UpdateService.AVAILABLE_VERSION );
+						
+						mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "New version " + remoteVersion + " found!" ) );
+						
+						MainActivity.this.runOnUiThread(new Runnable() {
+		                    @Override
+		                    public void run() {
+		                    	new ConfirmDialog
+		                    	( 
+		                    	  "Update Available", 
+		                    	  "A new update to version " + remoteVersion + " is available, do you want to download it ?",
+		                    	  MainActivity.this,
+		                    	  new ConfirmDialogListener(){
+									@Override
+									public void onConfirm() 
+									{
+										final ProgressDialog dialog = new ProgressDialog( MainActivity.this );
+									    dialog.setMessage( "Downloading update ..." );
+									    dialog.setProgressStyle( ProgressDialog.STYLE_HORIZONTAL );
+									    dialog.setMax(100);
+									    dialog.setCancelable( true );
+									    dialog.show();
+										
+										new Thread( new Runnable(){
+											@Override
+											public void run() 
+											{				
+												if( System.getUpdateManager().downloadUpdate( MainActivity.this, dialog ) == false )
+												{
+													MainActivity.this.runOnUiThread(new Runnable() {
+									                    @Override
+									                    public void run() {
+									                    	new ErrorDialog( "Error", "An error occurred while downloading the update.", MainActivity.this ).show();
+									                    }
+									                });
+												}
+												
+												dialog.dismiss();
+											}
+										}).start();											
+									}
+									
+									@Override
+									public void onCancel() { }
+								}
+		                    	).show();
+		                    }
+		                });
+					}							
+				}
+		    };
+		}
+		
+		if( mIntentFilter == null )
+		{
+		    mIntentFilter = new IntentFilter( );
+		    
+		    mIntentFilter.addAction( NetworkMonitorService.NEW_ENDPOINT );
+		    mIntentFilter.addAction( NetworkMonitorService.ENDPOINT_UPDATE );
+		    mIntentFilter.addAction( UpdateService.UPDATE_CHECKING );
+		    mIntentFilter.addAction( UpdateService.UPDATE_AVAILABLE );
+		    mIntentFilter.addAction( UpdateService.UPDATE_NOT_AVAILABLE );
+		}
+		
+	    mMessageReceiver.unregister();
+	    mMessageReceiver.register( MainActivity.this, mIntentFilter );		
+        
+        if( System.getSettings().getBoolean( "PREF_CHECK_UPDATES", true ) )
+        	startService( new Intent( MainActivity.this, UpdateService.class ) );
+        
+        if( mNetworkMonitorIntent == null )
+        	mNetworkMonitorIntent = new Intent( this, NetworkMonitorService.class );
+    
+        startService( mNetworkMonitorIntent );
+        
+        // if called for the second time after wifi connection
+        invalidateOptionsMenu();
 	}
 	
 	@Override
 	protected void onActivityResult( int requestCode, int resultCode, Intent intent ) {		
 		if( requestCode == WIFI_CONNECTION_REQUEST && resultCode == RESULT_OK && intent.hasExtra( WifiScannerActivity.CONNECTED ) ) 
 		{
-			if( intent.getBooleanExtra( WifiScannerActivity.CONNECTED, false ) == true )
-			{
-				( ( DSploitApplication )getApplication() ).onCreate();
-				
-				// view already initialized, just restart the network discovery service
-				if( mTargetAdapter != null )
-					startService( new Intent( MainActivity.this, NetworkMonitorService.class ) );
-				
-	            onCreate( null );
-			}
+			System.reloadNetworkMapping();						
+            onCreate( null );
 		}
 	}
 	
@@ -214,35 +364,38 @@ public class MainActivity extends SherlockListActivity
     public void onCreate( Bundle savedInstanceState ) {		
         super.onCreate(savedInstanceState);           
         setContentView( R.layout.target_layout );
-            	
-        // just initialize the ui the first time
-        if( mTargetAdapter == null )
-        {	        	
-        	GoogleAnalyticsTracker.getInstance().startNewSession( "UA-35936964-1", this );
-        	GoogleAnalyticsTracker.getInstance().trackPageView("/");
-        	
-            isWifiAvailable 		= Network.isWifiConnected( this );
-        	isConnectivityAvailable = isWifiAvailable || Network.isConnectivityAvailable( this );
-        	        	        	
-        	// make sure system object was correctly initialized during application startup
-        	if( System.isInitialized() == false )
-        	{
-        		// wifi available but system failed to initialize, this is a fatal :(
-        		if( isWifiAvailable == true )
-        		{
-        			GoogleAnalyticsTracker.getInstance().trackEvent( "ERRORS", "Initialization Error", System.getLastError(), 1 );
-        			new FatalDialog( "Initialization Error", System.getLastError(), this ).show();        		
-        			return;
-        		}
-        		// just inform the user his wifi is down
-        		else if( isConnectivityAvailable )        		
-        			createUpdateLayout( );
-        		
-        		// no connectivity at all
-        		else
-        			createOfflineLayout( );
-        	}
-        	        	        	
+            	        	    	
+        isWifiAvailable 		= Network.isWifiConnected( this );
+    	isConnectivityAvailable = isWifiAvailable || Network.isConnectivityAvailable( this );
+    	
+    	// make sure system object was correctly initialized during application startup
+    	if( System.isInitialized() == false )
+    	{
+    		// wifi available but system failed to initialize, this is a fatal :(
+    		if( isWifiAvailable == true )
+    		{
+    			new FatalDialog( "Initialization Error", System.getLastError(), this ).show();        		
+    			return;
+    		}    		
+    	}
+    	// initialization ok, but wifi is down
+    	else if( isWifiAvailable == false )
+    	{
+    		// just inform the user his wifi is down
+    		if( isConnectivityAvailable )
+    			createUpdateLayout( );
+    		
+    		// no connectivity at all
+    		else
+    			createOfflineLayout( ); 
+    	}
+    	// we are online, and the system was already initialized
+    	else if( mTargetAdapter != null )
+    		createOnlineLayout( );
+    	
+    	// initialize the ui for the first time
+    	else if( mTargetAdapter == null )
+        {	
         	final ProgressDialog dialog = ProgressDialog.show( this, "", "Initializing ...", true, false );
 						
         	// this is necessary to not block the user interface while initializing
@@ -272,9 +425,7 @@ public class MainActivity extends SherlockListActivity
 					dialog.dismiss();
 					
 					if( fatal != null )
-					{
-						GoogleAnalyticsTracker.getInstance().trackEvent( "ERRORS", "Initialization Error", fatal, 2 );
-						
+					{						
 						final String ffatal = fatal;
 						MainActivity.this.runOnUiThread( new Runnable(){
 							@Override
@@ -300,178 +451,7 @@ public class MainActivity extends SherlockListActivity
 							
 						    try
 					    	{	    							        	
-								if( isWifiAvailable )
-								{
-									mTargetAdapter = new TargetAdapter( R.layout.target_list_item );
-									
-									setListAdapter( mTargetAdapter );	
-								
-									getListView().setOnItemLongClickListener( new OnItemLongClickListener() 
-									{
-										@Override
-										public boolean onItemLongClick( AdapterView<?> parent, View view, int position, long id ) {									
-											final Target target = System.getTarget( position );
-											
-											new InputDialog
-											( 
-											  "Target Alias", 
-											  "Set an alias for this target:", 
-											  target.hasAlias() ? target.getAlias() : "",
-											  true,
-											  false,
-											  MainActivity.this, 
-											  new InputDialogListener(){
-												@Override
-												public void onInputEntered( String input ) {
-													target.setAlias(input);			
-													mTargetAdapter.notifyDataSetChanged();
-												}
-											  }
-											).show();
-																					
-											return false;
-										}
-									});
-								}
-									
-								mMessageReceiver = new ManagedReceiver() {
-									@Override
-									public void onReceive(Context context, Intent intent) {
-										if( isWifiAvailable && intent.getAction().equals( NetworkMonitorService.NEW_ENDPOINT ) )
-										{
-											String address  = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_ADDRESS ),
-												   hardware = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_HARDWARE ),
-												   name		= ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_NAME );
-											final  Target target = Target.getFromString( address );
-											
-											if( target != null && target.getEndpoint() != null )
-											{
-												if( name != null && name.isEmpty() == false )
-													target.setAlias( name );
-												
-												target.getEndpoint().setHardware( Endpoint.parseMacAddress(hardware) );
-																																			
-												// refresh the target listview
-								            	MainActivity.this.runOnUiThread(new Runnable() {
-								                    @Override
-								                    public void run() {
-								                    	if( System.addOrderedTarget( target ) == true )
-														{
-								                    		mTargetAdapter.notifyDataSetChanged();
-														}
-								                    }
-								                });		
-											}
-										}	
-										else if( isWifiAvailable && intent.getAction().equals( NetworkMonitorService.ENDPOINT_UPDATE ) )
-										{
-											// refresh the target listview
-							            	MainActivity.this.runOnUiThread(new Runnable() {
-							                    @Override
-							                    public void run() {
-							                    	mTargetAdapter.notifyDataSetChanged();
-							                    }
-							                });		
-										}
-										else if( isWifiAvailable == false && isConnectivityAvailable == true && intent.getAction().equals( WifiManager.NETWORK_STATE_CHANGED_ACTION ) )
-										{
-											NetworkInfo info = intent.getParcelableExtra( WifiManager.EXTRA_NETWORK_INFO );
-											
-											// ignore if not initialized
-											if( mUpdateStatus != null )
-											{
-												if( NetworkInfo.State.CONNECTING.equals( info.getState() ) )
-													mUpdateStatus.setText( "Connecting to WiFi access point ..." );
-												
-												else if( NetworkInfo.State.CONNECTED.equals( info.getState() ) )
-											    {
-													( ( DSploitApplication )getApplication() ).onCreate();
-										            onCreate( null );
-											    }
-											}
-										}
-										else if( intent.getAction().equals( UpdateService.UPDATE_CHECKING ) && mUpdateStatus != null )
-										{
-											mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "Checking ..." ) );
-										}
-										else if( intent.getAction().equals( UpdateService.UPDATE_NOT_AVAILABLE ) && mUpdateStatus != null )
-										{
-											mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "No updates available." ) );
-										}
-										else if( intent.getAction().equals( UpdateService.UPDATE_AVAILABLE ) )
-										{																						
-											final String remoteVersion = ( String )intent.getExtras().get( UpdateService.AVAILABLE_VERSION );
-											
-											if( mUpdateStatus != null )
-												mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "New version " + remoteVersion + " found!" ) );
-											
-											MainActivity.this.runOnUiThread(new Runnable() {
-							                    @Override
-							                    public void run() {
-							                    	new ConfirmDialog
-							                    	( 
-							                    	  "Update Available", 
-							                    	  "A new update to version " + remoteVersion + " is available, do you want to download it ?",
-							                    	  MainActivity.this,
-							                    	  new ConfirmDialogListener(){
-														@Override
-														public void onConfirm() 
-														{
-															final ProgressDialog dialog = new ProgressDialog( MainActivity.this );
-														    dialog.setMessage( "Downloading update ..." );
-														    dialog.setProgressStyle( ProgressDialog.STYLE_HORIZONTAL );
-														    dialog.setMax(100);
-														    dialog.setCancelable( true );
-														    dialog.show();
-															
-															new Thread( new Runnable(){
-																@Override
-																public void run() 
-																{				
-																	if( System.getUpdateManager().downloadUpdate( MainActivity.this, dialog ) == false )
-																	{
-																		MainActivity.this.runOnUiThread(new Runnable() {
-														                    @Override
-														                    public void run() {
-														                    	new ErrorDialog( "Error", "An error occurred while downloading the update.", MainActivity.this ).show();
-														                    }
-														                });
-																	}
-																	
-																	dialog.dismiss();
-																}
-															}).start();											
-														}
-														
-														@Override
-														public void onCancel() { }
-													}
-							                    	).show();
-							                    }
-							                });
-										}							
-									}
-							    };
-							    
-							    mIntentFilter = new IntentFilter( );
-							    
-							    mIntentFilter.addAction( NetworkMonitorService.NEW_ENDPOINT );
-							    mIntentFilter.addAction( NetworkMonitorService.ENDPOINT_UPDATE );
-							    mIntentFilter.addAction( UpdateService.UPDATE_CHECKING );
-							    mIntentFilter.addAction( UpdateService.UPDATE_AVAILABLE );
-							    mIntentFilter.addAction( UpdateService.UPDATE_NOT_AVAILABLE );
-							    mIntentFilter.addAction( WifiManager.NETWORK_STATE_CHANGED_ACTION );
-
-							    mMessageReceiver.register( MainActivity.this, mIntentFilter );		
-						        
-						        if( System.getSettings().getBoolean( "PREF_CHECK_UPDATES", true ) && isConnectivityAvailable )
-						        	startService( new Intent( MainActivity.this, UpdateService.class ) );
-						        
-						        if( isWifiAvailable )
-						        	startService( new Intent( MainActivity.this, NetworkMonitorService.class ) );
-						        
-						        // if called for the second time after wifi connection
-						        invalidateOptionsMenu();
+						    	createOnlineLayout( );
 					    	}
 					    	catch( Exception e )
 					    	{
@@ -555,7 +535,7 @@ public class MainActivity extends SherlockListActivity
 
 			else
 			{
-				startService( new Intent( this, NetworkMonitorService.class ) );
+				startService( mNetworkMonitorIntent );
 				
 				item.setTitle( "Stop Network Monitor" );
 			}
@@ -565,7 +545,10 @@ public class MainActivity extends SherlockListActivity
 		else if( itemId == R.id.wifi_scan )
 		{
 			if( System.isServiceRunning( "it.evilsocket.dsploit.net.NetworkMonitorService" ) )			
-				stopService( new Intent( this, NetworkMonitorService.class ) );				
+				stopService( mNetworkMonitorIntent );	
+			
+			if( mMessageReceiver != null )
+				mMessageReceiver.unregister();
 						
 			startActivityForResult( new Intent( MainActivity.this, WifiScannerActivity.class ), WIFI_CONNECTION_REQUEST );
 			
@@ -664,13 +647,13 @@ public class MainActivity extends SherlockListActivity
 		{
 			if( System.isServiceRunning( "it.evilsocket.dsploit.net.NetworkMonitorService" ) )
 			{
-				stopService( new Intent( this, NetworkMonitorService.class ) );
+				stopService( mNetworkMonitorIntent );
 				
 				item.setTitle( "Start Network Monitor" );
 			}
 			else
 			{
-				startService( new Intent( this, NetworkMonitorService.class ) );
+				startService( mNetworkMonitorIntent );
 				
 				item.setTitle( "Stop Network Monitor" );
 			}
@@ -700,7 +683,7 @@ public class MainActivity extends SherlockListActivity
 	protected void onListItemClick( ListView l, View v, int position, long id ){
 		super.onListItemClick( l, v, position, id);
 
-		stopService( new Intent( this, NetworkMonitorService.class ) );
+		stopService( mNetworkMonitorIntent );
 		
 		System.setCurrentTarget( position );
 		
@@ -745,17 +728,15 @@ public class MainActivity extends SherlockListActivity
 
 	
 	@Override
-	public void onDestroy() {	
-		stopService( new Intent( MainActivity.this, NetworkMonitorService.class ) );
+	public void onDestroy() {			
+		stopService( mNetworkMonitorIntent );
 					
 		if( mMessageReceiver != null )
 			mMessageReceiver.unregister();
 				
 		// make sure no zombie process is running before destroying the activity
 		System.clean( true );		
-		
-		GoogleAnalyticsTracker.getInstance().stopSession();
-				
+						
 		super.onDestroy();		
 	}
 }

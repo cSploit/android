@@ -18,8 +18,6 @@
  */
 package it.evilsocket.dsploit.plugins;
 
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
-
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -118,9 +116,7 @@ public class Traceroute extends Plugin
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);    
-        
-        GoogleAnalyticsTracker.getInstance().trackPageView("/traceroute");
-        
+                
         mTraceToggleButton = ( ToggleButton )findViewById( R.id.traceToggleButton );
 		mTraceProgress	  = ( ProgressBar )findViewById( R.id.traceActivity );
 		    	

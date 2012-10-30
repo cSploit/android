@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -94,6 +95,9 @@ public class NetworkMonitorService extends IntentService
 		
 		@Override
 		public void run() {
+			Log.d( TAG, "ArpReader started ..." );
+			
+			mNetBiosMap.clear();
 			mStopped = false;
 			String iface = "";
 			
@@ -195,7 +199,7 @@ public class NetworkMonitorService extends IntentService
 		}
 		
 		@Override
-		public void run() {
+		public void run() {			
 			byte[] 		   buffer  = new byte[128];
 			DatagramPacket packet  = new DatagramPacket( buffer, buffer.length, mAddress, NETBIOS_UDP_PORT );
 			String		   name    = null,
@@ -228,15 +232,22 @@ public class NetworkMonitorService extends IntentService
 						}
 						// not yet discovered/enqueued target
 						else						
-							mArpReader.addNetBiosName( address, name );						
+							mArpReader.addNetBiosName( address, name );
+												
+						break;
+					}											
+				}				
+				catch( SocketTimeoutException ste ) 
+				{ 					
+					try
+					{
+						// increase the socket timeout
+						mSocket.setSoTimeout( 200 * ( i + 2 ) );
 					}
-					else
-						mSocket.setSoTimeout( 500 * ( i + 2 ) );
-
-					break;
-				}
-				catch( SocketTimeoutException ste ) { 
-					
+					catch( SocketException se )
+					{
+						Log.d( TAG, se.toString() );
+					}
 				}
 				catch( IOException e )
 				{
@@ -245,7 +256,7 @@ public class NetworkMonitorService extends IntentService
 				}
 			}
 			
-			mSocket.close();						 
+			mSocket.close();	
 		}
 	}
 	
@@ -256,6 +267,8 @@ public class NetworkMonitorService extends IntentService
 
 		@Override
 		public void run() {
+			Log.d( TAG, "UdpProber started ..." );
+			
 			mStopped = false;
 			
 			IP4Address mask	   = null,
@@ -290,7 +303,7 @@ public class NetworkMonitorService extends IntentService
 	    				
 	    				socket.setSoTimeout( 200 );
 	    				socket.send( packet );    	  
-	    				
+
 	    				new NBResolver( address, socket ).start();
 					}
 
@@ -319,8 +332,8 @@ public class NetworkMonitorService extends IntentService
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Log.d( TAG, "Starting ..." );
-				
+		Log.d( TAG, "Starting ..." );	
+		
 		mArpReader = new ArpReader();
 		mProber	   = new UdpProber();
 	}
@@ -368,16 +381,13 @@ public class NetworkMonitorService extends IntentService
 	}
 
 	@Override
-	protected void onHandleIntent( Intent intent ) {		
+	protected void onHandleIntent( Intent intent ) {			
 		sendNotification( "Network monitor started ..." );
 		   		
 		try
-		{
-			if( mProber.isAlive() == false )
-				mProber.start();		
-			
-			if( mArpReader.isAlive() == false )
-				mArpReader.start();
+		{			
+			mProber.start();					
+			mArpReader.start();
 						
 			mProber.join();
 			mArpReader.join();

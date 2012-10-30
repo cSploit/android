@@ -18,8 +18,6 @@
  */
 package it.evilsocket.dsploit.plugins;
 
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
-
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -164,9 +162,7 @@ public class Inspector extends Plugin
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);    
-        
-        GoogleAnalyticsTracker.getInstance().trackPageView("/inspector");
-        
+                
         mStartButton    = ( ToggleButton )findViewById( R.id.inspectToggleButton );
         mActivity	    = ( ProgressBar )findViewById( R.id.inspectActivity );
         mDeviceName		= ( TextView)findViewById( R.id.deviceName );

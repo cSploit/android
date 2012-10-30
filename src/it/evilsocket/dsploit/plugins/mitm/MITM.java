@@ -24,8 +24,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
-
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -320,9 +318,7 @@ public class MITM extends Plugin
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);   
-        
-        GoogleAnalyticsTracker.getInstance().trackPageView("/mitm");
-                        
+                                
         checkForOpenPorts();
         
         mActions.add( new Action
@@ -333,9 +329,7 @@ public class MITM extends Plugin
         	new OnClickListener(){
 			@Override
 			public void onClick( View v ) 
-			{
-				GoogleAnalyticsTracker.getInstance().trackPageView("/mitm-sniffer");
-				
+			{				
 				setStoppedState();
 				
 				startActivity
@@ -358,9 +352,7 @@ public class MITM extends Plugin
         	new OnClickListener(){
         	@Override
 			public void onClick( View v ) 
-			{
-        		GoogleAnalyticsTracker.getInstance().trackPageView("/mitm-password-sniffer");
-        		
+			{        		
         		setStoppedState();
         		
 				startActivity
@@ -383,9 +375,7 @@ public class MITM extends Plugin
         	new OnClickListener(){
 			@Override
 			public void onClick( View v ) 
-			{				
-				GoogleAnalyticsTracker.getInstance().trackPageView("/mitm-session-hijacker");
-				
+			{								
 				setStoppedState();
 				
 				startActivity
@@ -407,9 +397,7 @@ public class MITM extends Plugin
         	R.drawable.action_kill_48,
         	new OnClickListener(){
 			@Override
-			public void onClick(View v) {
-				GoogleAnalyticsTracker.getInstance().trackPageView("/mitm-connection-killer");
-				
+			public void onClick(View v) {				
 				ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
 
 				if( activity.getVisibility() == View.INVISIBLE )
@@ -446,9 +434,7 @@ public class MITM extends Plugin
         	new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				
-				GoogleAnalyticsTracker.getInstance().trackPageView("/mitm-redirector");
-	
+					
 				final ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
 
 				if( activity.getVisibility() == View.INVISIBLE )
@@ -510,9 +496,7 @@ public class MITM extends Plugin
         	new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				
-				GoogleAnalyticsTracker.getInstance().trackPageView("/mitm-image-replacer");
-				
+								
 				ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
 
 				if( activity.getVisibility() == View.INVISIBLE )
@@ -539,9 +523,7 @@ public class MITM extends Plugin
         	new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				
-				GoogleAnalyticsTracker.getInstance().trackPageView("/mitm-video-replacer");
-				
+								
 				final ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
 
 				if( activity.getVisibility() == View.INVISIBLE )
@@ -611,9 +593,7 @@ public class MITM extends Plugin
         	new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				
-				GoogleAnalyticsTracker.getInstance().trackPageView("/mitm-script-injector");
-				
+								
 				final ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
 
 				if( activity.getVisibility() == View.INVISIBLE )
@@ -667,9 +647,7 @@ public class MITM extends Plugin
         mActions.add( new Action( "Custom Filter", "Replace custom text on webpages with the specified one.", new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				
-				GoogleAnalyticsTracker.getInstance().trackPageView("/mitm-custom-filter");
-				
+								
 				final ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
 
 				if( activity.getVisibility() == View.INVISIBLE )

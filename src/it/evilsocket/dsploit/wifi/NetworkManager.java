@@ -22,10 +22,20 @@ import java.util.Comparator;
 import java.util.List;
 
 import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
 public class NetworkManager 
 {	
+	public static void cleanPreviousConfiguration( WifiManager wifiMgr, WifiInfo info ) {
+		WifiConfiguration config;
+		do{
+			config = getWifiConfiguration( wifiMgr, info );
+			if ( config!= null) 
+				wifiMgr.removeNetwork(config.networkId);
+		} while ( config != null );
+	}
+	
 	public static int getMaxPriority(WifiManager wifiManager) {
 		List<WifiConfiguration> configurations = wifiManager.getConfiguredNetworks();
 		int pri = 0;
@@ -61,16 +71,35 @@ public class NetworkManager
 		return size;
 	}
 
-	public static WifiConfiguration getWifiConfiguration(WifiManager wifiMgr,
-			WifiConfiguration configToFind) {
+	public static WifiConfiguration getWifiConfiguration( WifiManager wifiMgr, WifiInfo info ) {
+		final String ssid = info.getSSID();
+		if (ssid.length() == 0) {
+			return null;
+		}
+
+		String bssid = info.getBSSID();
+		List<WifiConfiguration> configurations = wifiMgr.getConfiguredNetworks();
+
+		for (final WifiConfiguration config : configurations) {
+			if (config.SSID == null || !ssid.equals(config.SSID)) {
+				continue;
+			}
+			if (config.BSSID == null || bssid == null
+					|| bssid.equals(config.BSSID)) {
+				return config;
+			}
+		}
+		return null;
+	}
+	
+	public static WifiConfiguration getWifiConfiguration( WifiManager wifiMgr, WifiConfiguration configToFind ) {
 		final String ssid = configToFind.SSID;
 		if (ssid.length() == 0) {
 			return null;
 		}
 
-		final String bssid = configToFind.BSSID;
-		final List<WifiConfiguration> configurations = wifiMgr
-				.getConfiguredNetworks();
+		String bssid = configToFind.BSSID;
+		List<WifiConfiguration> configurations = wifiMgr.getConfiguredNetworks();
 
 		for (final WifiConfiguration config : configurations) {
 			if (config.SSID == null || !ssid.equals(config.SSID)) {

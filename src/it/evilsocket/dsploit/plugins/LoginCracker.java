@@ -24,7 +24,6 @@ import java.util.Arrays;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -324,9 +323,7 @@ public class LoginCracker extends Plugin
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);   
-       
-        GoogleAnalyticsTracker.getInstance().trackPageView("/login-cracker");
-        
+               
         if( System.getCurrentTarget().hasOpenPorts() == false )
         	new FinishDialog( "Warning", "No open ports detected on current target, run the port scanner first.", this ).show();
                         

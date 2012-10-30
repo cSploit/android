@@ -160,7 +160,8 @@ public class Network
 	}
 	
 	public static boolean isWifiConnected( Context context ){
-		return ( ( ConnectivityManager )context.getSystemService( Context.CONNECTIVITY_SERVICE ) ).getNetworkInfo( ConnectivityManager.TYPE_WIFI ).isConnected();
+		return ( ( ConnectivityManager )context.getSystemService( Context.CONNECTIVITY_SERVICE ) ).getNetworkInfo( ConnectivityManager.TYPE_WIFI ) != null &&
+			   ( ( ConnectivityManager )context.getSystemService( Context.CONNECTIVITY_SERVICE ) ).getNetworkInfo( ConnectivityManager.TYPE_WIFI ).isConnected();
 	}
 	
 	public static boolean isConnectivityAvailable( Context context ) {

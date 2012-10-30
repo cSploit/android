@@ -18,8 +18,6 @@
  */
 package it.evilsocket.dsploit.plugins;
 
-import com.google.android.apps.analytics.GoogleAnalyticsTracker;
-
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -50,9 +48,7 @@ public class RouterPwn extends Plugin
 	}	
 	
 	@Override
-	public void onActionClick( Context context ){
-		GoogleAnalyticsTracker.getInstance().trackPageView("/routepwn");
-		
+	public void onActionClick( Context context ){		
 		try
 		{
 			String uri     = "http://routerpwn.com/";

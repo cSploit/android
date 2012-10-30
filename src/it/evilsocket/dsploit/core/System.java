@@ -140,16 +140,22 @@ public class System
 			// if we are here, network initialization didn't throw any error, lock wifi
 			WifiManager wifiManager = ( WifiManager )mContext.getSystemService( Context.WIFI_SERVICE );
 			
-			mWifiLock = wifiManager.createWifiLock( WifiManager.WIFI_MODE_FULL, "wifiLock" );
-			mWifiLock.acquire();
+			if( mWifiLock == null ) 
+				mWifiLock = wifiManager.createWifiLock( WifiManager.WIFI_MODE_FULL, "wifiLock" );
+			
+			if( mWifiLock.isHeld() == false )
+				mWifiLock.acquire();
 			
 			// wake lock if enabled
 			if( getSettings().getBoolean( "PREF_WAKE_LOCK", true ) == true )
 			{
 				PowerManager powerManager = ( PowerManager )mContext.getSystemService( Context.POWER_SERVICE );
 				
-				mWakeLock = powerManager.newWakeLock( PowerManager.FULL_WAKE_LOCK, "wakeLock" );
-				mWakeLock.acquire();
+				if( mWakeLock == null )
+					mWakeLock = powerManager.newWakeLock( PowerManager.FULL_WAKE_LOCK, "wakeLock" );
+				
+				if( mWakeLock.isHeld() == false )
+					mWakeLock.acquire();
 			}
 			
 			// set ports
@@ -191,6 +197,29 @@ public class System
 			errorLogging( TAG, e );
 			
 			throw e;
+		}
+	}
+	
+	public static void reloadNetworkMapping( ) {
+		try
+		{
+			mNetwork = new Network( mContext );
+			
+			Target network = new Target( mNetwork ),
+				   gateway = new Target( mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware() ),
+				   device  = new Target( mNetwork.getLocalAddress(), mNetwork.getLocalHardware() );
+				
+			gateway.setAlias( mNetwork.getSSID() );
+			device.setAlias( android.os.Build.MODEL );
+			
+			mTargets.clear();
+			mTargets.add( network );
+			mTargets.add( gateway );
+			mTargets.add( device );
+		}
+		catch( Exception e )
+		{
+			errorLogging( TAG, e );			
 		}
 	}
 
