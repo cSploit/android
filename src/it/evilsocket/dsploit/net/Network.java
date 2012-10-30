@@ -72,12 +72,18 @@ public class Network
 	private DhcpInfo   			mInfo        		 = null;
 	private WifiInfo			mWifiInfo			 = null;
 	private NetworkInterface    mInterface			 = null;
+	private IP4Address			mGateway			 = null;
+	private IP4Address			mNetmask			 = null;
+	private IP4Address			mLocal				 = null;
 	
-	public Network( Context context ) throws NoRouteToHostException, SocketException {
+	public Network( Context context ) throws NoRouteToHostException, SocketException, UnknownHostException {
 		mWifiManager		 = ( WifiManager )context.getSystemService( Context.WIFI_SERVICE );
 		mConnectivityManager = ( ConnectivityManager )context.getSystemService( Context.CONNECTIVITY_SERVICE );
 		mInfo		 		 = mWifiManager.getDhcpInfo();
 		mWifiInfo			 = mWifiManager.getConnectionInfo();
+		mGateway 			 = new IP4Address( mInfo.gateway );
+		mNetmask 			 = new IP4Address( mInfo.netmask );
+		mLocal	 			 = new IP4Address( mInfo.ipAddress );
 		
 		if( isConnected() == false)
 			throw new NoRouteToHostException("Not connected to any WiFi access point.");
@@ -123,15 +129,7 @@ public class Network
 			}
 		}
 	}
-			
-	private static int countBits( int n ){
-    	int bits, i;
-    	
-    	for( i = 0, bits = ( n & 1 ); i < 32; i++, n >>= 1, bits += n & 1 );    		
-    	
-    	return bits;
-    }
-	
+
 	public boolean equals( Network network ){
 		return mInfo.equals( network.getInfo() );
 	}
@@ -143,9 +141,9 @@ public class Network
 	public boolean isInternal( String ip ) {
 		try
 		{
-			byte[] gateway = getGatewayAddress().getAddress();
+			byte[] gateway = mGateway.toByteArray();
 			byte[] address = InetAddress.getByName( ip ).getAddress();
-			byte[] mask    = getNetmaskAddress().getAddress();
+			byte[] mask    = mNetmask.toByteArray();
 			
 			for( int i = 0; i < gateway.length; i++ )
 		        if( ( gateway[i] & mask[i] ) != ( address[i] & mask[i] ) )
@@ -190,7 +188,7 @@ public class Network
 	
 	public String getNetworkRepresentation( )
 	{				
-    	return getNetworkMasked() + "/" + countBits( mInfo.netmask );
+    	return getNetworkMasked() + "/" + mNetmask.countBits();
 	}
 	
 	public DhcpInfo getInfo(){
@@ -198,29 +196,11 @@ public class Network
 	}
 	
 	public InetAddress getNetmaskAddress( ){
-		try
-		{
-			return InetAddress.getByName( ( mInfo.netmask & 0xFF) + "." + (( mInfo.netmask >> 8 ) & 0xFF) + "." + (( mInfo.netmask >> 16 ) & 0xFF) + "." + (( mInfo.netmask >> 24 ) & 0xFF) );
-		}
-		catch( UnknownHostException e )
-		{
-			System.errorLogging( TAG, e );
-		}
-		
-		return null;
+		return mNetmask.toInetAddress();
 	}
 	
 	public InetAddress getGatewayAddress( ){
-		try
-		{
-			return InetAddress.getByName( ( mInfo.gateway & 0xFF) + "." + (( mInfo.gateway >> 8 ) & 0xFF) + "." + (( mInfo.gateway >> 16 ) & 0xFF) + "." + (( mInfo.gateway >> 24 ) & 0xFF) );
-		}
-		catch( UnknownHostException e )
-		{
-			System.errorLogging( TAG, e );
-		}
-		
-		return null;
+		return mGateway.toInetAddress();
 	}
 	
 	public byte[] getGatewayHardware(){
@@ -241,20 +221,11 @@ public class Network
 	}
 	
 	public String getLocalAddressAsString( ){
-		return ( mInfo.ipAddress & 0xFF) + "." + (( mInfo.ipAddress >> 8 ) & 0xFF) + "." + (( mInfo.ipAddress >> 16 ) & 0xFF) + "." + (( mInfo.ipAddress >> 24 ) & 0xFF);
+		return mLocal.toString();
 	}
 	
 	public InetAddress getLocalAddress( ){
-		try
-		{
-			return InetAddress.getByName( getLocalAddressAsString() );
-		}
-		catch( UnknownHostException e )
-		{
-			System.errorLogging( TAG, e );
-		}
-		
-		return null;
+		return mLocal.toInetAddress();
 	}
 	
 	public NetworkInterface getInterface(){
