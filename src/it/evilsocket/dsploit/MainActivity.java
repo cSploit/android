@@ -168,6 +168,8 @@ public class MainActivity extends SherlockListActivity
 		mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "..." ) );
 		
 		layout.addView( mUpdateStatus );		
+		
+		invalidateOptionsMenu();
 	}
 	
 	private void createOfflineLayout( ) {
@@ -184,7 +186,9 @@ public class MainActivity extends SherlockListActivity
 		mUpdateStatus.setLayoutParams( params );
 		mUpdateStatus.setText( "No connectivity available." );
 		
-		layout.addView( mUpdateStatus );				
+		layout.addView( mUpdateStatus );
+		
+		invalidateOptionsMenu();
 	}
 	
 	public void createOnlineLayout( ) {
@@ -378,8 +382,9 @@ public class MainActivity extends SherlockListActivity
     			return;
     		}    		
     	}
+    	
     	// initialization ok, but wifi is down
-    	else if( isWifiAvailable == false )
+    	if( isWifiAvailable == false )
     	{
     		// just inform the user his wifi is down
     		if( isConnectivityAvailable )
@@ -468,16 +473,17 @@ public class MainActivity extends SherlockListActivity
 	public boolean onCreateOptionsMenu( Menu menu ) {
 		MenuInflater inflater = getSupportMenuInflater();		
 		inflater.inflate( R.menu.main, menu );		
-		
+						
 		if( isWifiAvailable == false )
 		{			
-			menu.getItem( 0 ).setVisible( false );
-			menu.getItem( 1 ).setVisible( false );
-			
-			menu.getItem( 3 ).setEnabled( false );
-			menu.getItem( 4 ).setEnabled( false );
-			menu.getItem( 5 ).setEnabled( false );
-			menu.getItem( 6 ).setEnabled( false );
+			menu.findItem( R.id.add ).setVisible( false );
+			menu.findItem( R.id.scan ).setVisible( false );			
+			menu.findItem( R.id.new_session ).setEnabled( false );
+			menu.findItem( R.id.save_session ).setEnabled( false );
+			menu.findItem( R.id.restore_session ).setEnabled( false );
+			menu.findItem( R.id.settings ).setEnabled( false );
+			menu.findItem( R.id.ss_monitor ).setEnabled( false );
+			menu.findItem( R.id.ss_monitor ).setEnabled( false );
 		}
 				
 		return super.onCreateOptionsMenu(menu);
@@ -486,7 +492,7 @@ public class MainActivity extends SherlockListActivity
 	@Override
 	public boolean onPrepareOptionsMenu( Menu menu ) {		
 		MenuItem item = menu.findItem( R.id.ss_monitor );
-		
+				
 		if( System.isServiceRunning( "it.evilsocket.dsploit.net.NetworkMonitorService" ) )				
 			item.setTitle( "Stop Network Monitor" );
 		
@@ -728,8 +734,9 @@ public class MainActivity extends SherlockListActivity
 
 	
 	@Override
-	public void onDestroy() {			
-		stopService( mNetworkMonitorIntent );
+	public void onDestroy() {		
+		if( mNetworkMonitorIntent != null )
+			stopService( mNetworkMonitorIntent );
 					
 		if( mMessageReceiver != null )
 			mMessageReceiver.unregister();

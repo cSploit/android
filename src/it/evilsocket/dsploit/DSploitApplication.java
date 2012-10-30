@@ -59,19 +59,21 @@ public class DSploitApplication extends Application
 		try
 		{
 			System.init( this );
-			
-			System.registerPlugin( new RouterPwn( ) );
-			System.registerPlugin( new Traceroute( ) );
-	        System.registerPlugin( new PortScanner( ) );
-	        System.registerPlugin( new Inspector( ) );
-	        System.registerPlugin( new ExploitFinder( ) );
-	        System.registerPlugin( new LoginCracker( ) );
-	        System.registerPlugin( new MITM( ) );
-	        System.registerPlugin( new PacketForger( ) );
 		}
 		catch( Exception e )
 		{
 			System.errorLogging( "DSPLOIT", e );
-		}		        		
+		}		
+		
+		// load system modules even if the initialization failed
+		System.registerPlugin( new RouterPwn( ) );
+		System.registerPlugin( new Traceroute( ) );
+        System.registerPlugin( new PortScanner( ) );
+        System.registerPlugin( new Inspector( ) );
+        System.registerPlugin( new ExploitFinder( ) );
+        System.registerPlugin( new LoginCracker( ) );
+        System.registerPlugin( new MITM( ) );
+        System.registerPlugin( new PacketForger( ) );
+        		
 	}
 }

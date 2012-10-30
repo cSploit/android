@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -127,12 +126,12 @@ public class NetworkMonitorService extends IntentService
 						{
 							String address = matcher.group( 1 ),
 								   // hwtype  = matcher.group( 2 ),
-								   // flags   = matcher.group( 3 ),
+								   flags   = matcher.group( 3 ),
 								   hwaddr  = matcher.group( 4 ),
 								   // mask	   = matcher.group( 5 ),
 								   device  = matcher.group( 6 );
 							
-							if( device.equals(iface) && hwaddr.equals("00:00:00:00:00:00") == false )
+							if( device.equals(iface) && hwaddr.equals("00:00:00:00:00:00") == false && flags.contains("2") )
 							{
 								endpoint = new Endpoint( address, hwaddr );
 								target   = new Target( endpoint );
@@ -201,7 +200,8 @@ public class NetworkMonitorService extends IntentService
 		@Override
 		public void run() {			
 			byte[] 		   buffer  = new byte[128];
-			DatagramPacket packet  = new DatagramPacket( buffer, buffer.length, mAddress, NETBIOS_UDP_PORT );
+			DatagramPacket packet  = new DatagramPacket( buffer, buffer.length, mAddress, NETBIOS_UDP_PORT ),
+						   query   = new DatagramPacket( NETBIOS_REQUEST, NETBIOS_REQUEST.length, mAddress, NETBIOS_UDP_PORT );
 			String		   name    = null,
 						   address = mAddress.getHostAddress();
 			Target 		   target  = null;
@@ -235,24 +235,37 @@ public class NetworkMonitorService extends IntentService
 							mArpReader.addNetBiosName( address, name );
 												
 						break;
-					}											
+					}						
 				}				
 				catch( SocketTimeoutException ste ) 
-				{ 					
+				{ 		
+
 					try
 					{
 						// increase the socket timeout
 						mSocket.setSoTimeout( 200 * ( i + 2 ) );
 					}
-					catch( SocketException se )
+					catch( Exception se )
 					{
 						Log.d( TAG, se.toString() );
 					}
+
 				}
 				catch( IOException e )
 				{
 					System.errorLogging( "NBResolver", e );
-					break;
+				}
+				finally
+				{
+					try
+					{
+						// send again a query
+						mSocket.send( query );
+					}
+					catch( Exception e )
+					{
+						System.errorLogging( "NBResolver", e );
+					}
 				}
 			}
 			

@@ -135,7 +135,6 @@ public class System
 			mUpdateManager = new UpdateManager( mContext );
 			mPlugins 	   = new ArrayList<Plugin>();
 			mTargets 	   = new ArrayList<Target>();
-			mNetwork 	   = new Network( mContext );
 								
 			// if we are here, network initialization didn't throw any error, lock wifi
 			WifiManager wifiManager = ( WifiManager )mContext.getSystemService( Context.WIFI_SERVICE );
@@ -171,6 +170,16 @@ public class System
 	    		HTTP_SERVER_PORT = 8081; 
 	    		HTTPS_REDIR_PORT = 8082;
 	    	}
+											
+			mNmap     = new NMap( mContext );
+			mArpSpoof = new ArpSpoof( mContext );
+			mEttercap = new Ettercap( mContext );
+			mIptables = new IPTables( );
+			mHydra    = new Hydra( mContext );
+			mTcpdump  = new TcpDump( mContext );
+			
+			// initialize network data at the end
+			mNetwork  = new Network( mContext );
 
 			Target network = new Target( mNetwork ),
 				   gateway = new Target( mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware() ),
@@ -182,16 +191,9 @@ public class System
 			mTargets.add( network );
 			mTargets.add( gateway );
 			mTargets.add( device );
-						
-			mNmap     = new NMap( mContext );
-			mArpSpoof = new ArpSpoof( mContext );
-			mEttercap = new Ettercap( mContext );
-			mIptables = new IPTables( );
-			mHydra    = new Hydra( mContext );
-			mTcpdump  = new TcpDump( mContext );
 									
 			mInitialized = true;
-		}
+		}		
 		catch( Exception e )
 		{
 			errorLogging( TAG, e );
@@ -216,6 +218,12 @@ public class System
 			mTargets.add( network );
 			mTargets.add( gateway );
 			mTargets.add( device );
+			
+			mInitialized = true;
+		}
+		catch( NoRouteToHostException nrthe )
+		{
+			// swallow bitch
 		}
 		catch( Exception e )
 		{

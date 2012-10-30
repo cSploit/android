@@ -30,6 +30,7 @@ import java.util.Enumeration;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
@@ -160,13 +161,17 @@ public class Network
 	}
 	
 	public static boolean isWifiConnected( Context context ){
-		return ( ( ConnectivityManager )context.getSystemService( Context.CONNECTIVITY_SERVICE ) ).getNetworkInfo( ConnectivityManager.TYPE_WIFI ) != null &&
-			   ( ( ConnectivityManager )context.getSystemService( Context.CONNECTIVITY_SERVICE ) ).getNetworkInfo( ConnectivityManager.TYPE_WIFI ).isConnected();
+		ConnectivityManager manager = ( ConnectivityManager )context.getSystemService( Context.CONNECTIVITY_SERVICE );
+		NetworkInfo		    info	= manager.getNetworkInfo( ConnectivityManager.TYPE_WIFI );
+		
+		return info != null && info.isConnected() && info.isAvailable();
 	}
 	
 	public static boolean isConnectivityAvailable( Context context ) {
-	    return ( ( ConnectivityManager )context.getSystemService( Context.CONNECTIVITY_SERVICE ) ).getActiveNetworkInfo() != null &&
-	    	   ( ( ConnectivityManager )context.getSystemService( Context.CONNECTIVITY_SERVICE ) ).getActiveNetworkInfo().isConnected();
+		ConnectivityManager manager = ( ConnectivityManager )context.getSystemService( Context.CONNECTIVITY_SERVICE );
+		NetworkInfo		    info	= manager.getActiveNetworkInfo();
+		
+		return info != null && info.isConnected();
 	}
 	
 	public boolean isConnected(){

@@ -532,8 +532,7 @@ public class WifiScannerActivity extends SherlockListActivity
 			}
 		}).start();
 	}
-	
-	
+		
 	@Override
 	protected void onListItemClick( ListView l, View v, int position, long id ){
 		super.onListItemClick( l, v, position, id);
@@ -589,13 +588,16 @@ public class WifiScannerActivity extends SherlockListActivity
 			}
 		}
 	}
-		
-	
+			
 	@Override
 	public boolean onCreateOptionsMenu( Menu menu ) {
 		mMenu = menu;		
 		MenuInflater inflater = getSupportMenuInflater();		
 		inflater.inflate( R.menu.wifi_scanner, menu );		
+		
+		if( mScanning )
+			mMenu.findItem(R.id.scan).setActionView( new ProgressBar(this) );
+		
 		return super.onCreateOptionsMenu(menu);
 	}
 
