@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import com.actionbarsherlock.app.SherlockListActivity;
 
+import it.evilsocket.dsploit.core.ManagedReceiver;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.ToolsInstaller;
@@ -43,7 +44,6 @@ import it.evilsocket.dsploit.net.NetworkMonitorService;
 import it.evilsocket.dsploit.net.Target;
 
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -78,14 +78,14 @@ public class MainActivity extends SherlockListActivity
 	private static final int    WIFI_CONNECTION_REQUEST = 1012;
 	private static final String NO_WIFI_UPDATE_MESSAGE  = "No WiFi connection available, the application will just check for updates.\n#STATUS#";
 	
-	private boolean			  isWifiAvailable  		   = false;
-	private boolean			  isConnectivityAvailable  = false;
-	private TargetAdapter  	  mTargetAdapter   		   = null;
-	private IntentFilter	  mIntentFilter	   		   = null;
-	private BroadcastReceiver mMessageReceiver 		   = null;
-	private TextView		  mUpdateStatus			   = null;
-	private Toast 			  mToast 			 	   = null;
-	private long  			  mLastBackPressTime 	   = 0;
+	private boolean			isWifiAvailable  		 = false;
+	private boolean			isConnectivityAvailable  = false;
+	private TargetAdapter  	mTargetAdapter   	     = null;
+	private IntentFilter	mIntentFilter	   		 = null;
+	private ManagedReceiver mMessageReceiver 		 = null;
+	private TextView		mUpdateStatus			 = null;
+	private Toast 			mToast 			 	     = null;
+	private long  			mLastBackPressTime 	     = 0;
 	
 	public class TargetAdapter extends ArrayAdapter<Target> 
 	{
@@ -334,7 +334,7 @@ public class MainActivity extends SherlockListActivity
 									});
 								}
 									
-								mMessageReceiver = new BroadcastReceiver() {
+								mMessageReceiver = new ManagedReceiver() {
 									@Override
 									public void onReceive(Context context, Intent intent) {
 										if( isWifiAvailable && intent.getAction().equals( NetworkMonitorService.NEW_ENDPOINT ) )
@@ -462,7 +462,7 @@ public class MainActivity extends SherlockListActivity
 							    mIntentFilter.addAction( UpdateService.UPDATE_NOT_AVAILABLE );
 							    mIntentFilter.addAction( WifiManager.NETWORK_STATE_CHANGED_ACTION );
 
-						        registerReceiver( mMessageReceiver, mIntentFilter );		
+							    mMessageReceiver.register( MainActivity.this, mIntentFilter );		
 						        
 						        if( System.getSettings().getBoolean( "PREF_CHECK_UPDATES", true ) && isConnectivityAvailable )
 						        	startService( new Intent( MainActivity.this, UpdateService.class ) );
@@ -749,13 +749,13 @@ public class MainActivity extends SherlockListActivity
 		stopService( new Intent( MainActivity.this, NetworkMonitorService.class ) );
 					
 		if( mMessageReceiver != null )
-			unregisterReceiver( mMessageReceiver );
+			mMessageReceiver.unregister();
 				
 		// make sure no zombie process is running before destroying the activity
 		System.clean( true );		
 		
 		GoogleAnalyticsTracker.getInstance().stopSession();
 				
-		super.onDestroy();
+		super.onDestroy();		
 	}
 }

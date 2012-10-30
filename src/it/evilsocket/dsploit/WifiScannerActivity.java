@@ -18,6 +18,7 @@
  */
 package it.evilsocket.dsploit;
 
+import it.evilsocket.dsploit.core.ManagedReceiver;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog;
@@ -35,7 +36,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -70,25 +70,25 @@ public class WifiScannerActivity extends SherlockListActivity
 	
 	public static final String CONNECTED = "WifiScannerActivity.CONNECTED";
 	
-	private static final int   FAILING_MINIMUM_TIME = 1500;
+	private static final int   FAILING_MINIMUM_TIME = 500;
 	
-	private WifiManager        mWifiManager        = null;
-	private WirelessMatcher    mWifiMatcher        = null;
-	private TextView           mStatusText         = null;
-	private ScanReceiver       mScanReceiver	   = null;     
-	private ConnectionReceiver mConnectionReceiver = null;
-	private ScanAdapter	       mAdapter	           = null;
-	private IntentFilter       mIntentFilter       = null;
-	private boolean            mConnected	       = false;
-	private boolean			   mScanning		   = false;
-	private Menu		       mMenu		       = null;
-	private ScanResult		   mCurrentAp	       = null;
-	private List<String>	   mKeyList	           = null;
-	private String			   mCurrentKey        = null;
-	private long			   mLastDisconnected   = 0;
-	private int				   mCurrentNetworkId   = -1;
-	
-	
+	private WifiManager        mWifiManager            = null;
+	private WirelessMatcher    mWifiMatcher            = null;
+	private TextView           mStatusText             = null;
+	private ScanReceiver       mScanReceiver	       = null;     
+	private ConnectionReceiver mConnectionReceiver     = null;
+	private ScanAdapter	       mAdapter	               = null;
+	private IntentFilter       mScanIntentFilter       = null;
+	private IntentFilter	   mConnectionIntentFilter = null;
+	private boolean            mConnected	           = false;
+	private boolean			   mScanning		       = false;
+	private Menu		       mMenu		           = null;
+	private ScanResult		   mCurrentAp	           = null;
+	private List<String>	   mKeyList	               = null;
+	private String			   mCurrentKey             = null;
+	private long			   mLastDisconnected       = 0;
+	private int				   mCurrentNetworkId       = -1;
+		
 	public class ScanAdapter extends ArrayAdapter<ScanResult> 
 	{						
 		class ResultHolder
@@ -251,7 +251,7 @@ public class WifiScannerActivity extends SherlockListActivity
 	    }
 	}
 
-	private class ScanReceiver extends BroadcastReceiver
+	private class ScanReceiver extends ManagedReceiver
 	{
 		public ScanReceiver() {
 			super();
@@ -272,8 +272,7 @@ public class WifiScannerActivity extends SherlockListActivity
 					{
 						mAdapter.addResult( result );
 					}
-					
-					
+
 					mScanning = false;
 					mStatusText.setText( "Scanning finished." );
 				}
@@ -283,11 +282,11 @@ public class WifiScannerActivity extends SherlockListActivity
 		}		
 	}
 	
-	private class ConnectionReceiver extends BroadcastReceiver
+	private class ConnectionReceiver extends ManagedReceiver
 	{
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			SupplicantState state = intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
+			SupplicantState state = intent.getParcelableExtra( WifiManager.EXTRA_NEW_STATE );
 			
 			if( state != null ) 
 			{
@@ -313,7 +312,8 @@ public class WifiScannerActivity extends SherlockListActivity
 				
 		mStatusText.setText( Html.fromHtml( "Connected to <b>" + mCurrentAp.SSID + "</b> with key <b><font color=\"green\">" + mCurrentKey + "</font></b> !" ) );
 		
-		unregisterReceiver( mConnectionReceiver );
+		mConnectionReceiver.unregister();
+		mConnected = true;
 	}
 	
 	public void onFailedConnection() {
@@ -335,7 +335,7 @@ public class WifiScannerActivity extends SherlockListActivity
 					}
 				}
 				
-				unregisterReceiver( mConnectionReceiver );
+				mConnectionReceiver.unregister();
 			}
 			else
 				nextConnectionAttempt();
@@ -369,11 +369,10 @@ public class WifiScannerActivity extends SherlockListActivity
 			mStatusText.setText( "WiFi activated." );						
         }        
                 
-        mIntentFilter = new IntentFilter();
-        
-	    mIntentFilter.addAction( WifiManager.SCAN_RESULTS_AVAILABLE_ACTION );
+        mScanIntentFilter		= new IntentFilter( WifiManager.SCAN_RESULTS_AVAILABLE_ACTION );        	    
+	    mConnectionIntentFilter = new IntentFilter( WifiManager.SUPPLICANT_STATE_CHANGED_ACTION );
 	    
-	    registerReceiver( mScanReceiver, mIntentFilter );   
+	    mScanReceiver.register( this, mScanIntentFilter );   
 	            
 	    if( mMenu != null )					
 			mMenu.findItem(R.id.scan).setActionView( new ProgressBar(this) );
@@ -485,11 +484,14 @@ public class WifiScannerActivity extends SherlockListActivity
 			if( mCurrentNetworkId != -1 )
 			{
 				mLastDisconnected = java.lang.System.currentTimeMillis();
-				registerReceiver( mConnectionReceiver, new IntentFilter( WifiManager.SUPPLICANT_STATE_CHANGED_ACTION ) );				
+				
+				mConnectionReceiver.register( this, mConnectionIntentFilter );
 			}
 			else
-				unregisterReceiver( mConnectionReceiver );
+				mConnectionReceiver.unregister();
 		}
+		else
+			mConnectionReceiver.unregister();
 	}
 	
 	private void performCracking( final Keygen keygen, final ScanResult ap ) {
@@ -559,10 +561,11 @@ public class WifiScannerActivity extends SherlockListActivity
 							if( mCurrentNetworkId != -1 )
 							{
 								mLastDisconnected = java.lang.System.currentTimeMillis();
-								registerReceiver( mConnectionReceiver, new IntentFilter( WifiManager.SUPPLICANT_STATE_CHANGED_ACTION ) );				
+								
+								mConnectionReceiver.register( WifiScannerActivity.this, mConnectionIntentFilter );
 							}
 							else
-								unregisterReceiver( mConnectionReceiver );							
+								mConnectionReceiver.unregister();							
 						}
 						
 						@Override
@@ -583,7 +586,7 @@ public class WifiScannerActivity extends SherlockListActivity
 							if( mCurrentNetworkId != -1 )
 							{
 								mLastDisconnected = java.lang.System.currentTimeMillis();
-								registerReceiver( mConnectionReceiver, new IntentFilter( WifiManager.SUPPLICANT_STATE_CHANGED_ACTION ) );				
+								mConnectionReceiver.register( WifiScannerActivity.this, mConnectionIntentFilter );				
 							}
 						}
 					}).show();
@@ -631,7 +634,8 @@ public class WifiScannerActivity extends SherlockListActivity
 	
 	@Override
 	public void onBackPressed() {
-		unregisterReceiver( mScanReceiver );	
+		mScanReceiver.unregister();
+		mConnectionReceiver.unregister();
 		
 		Bundle bundle = new Bundle();
 	    bundle.putBoolean( CONNECTED, mConnected );
