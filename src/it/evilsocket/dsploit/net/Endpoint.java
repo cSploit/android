@@ -87,7 +87,7 @@ public class Endpoint
 	
 	public boolean equals( Endpoint endpoint ){		
 		if( mHardware != null && endpoint.mHardware != null && mHardware.length == endpoint.mHardware.length )
-			return mHardware.equals( endpoint.mHardware );
+			return getHardwareAsString().equals( endpoint.getHardwareAsString() );		
 		
 		else
 			return mAddress.equals( endpoint.getAddress() );
