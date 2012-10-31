@@ -76,6 +76,7 @@ public class Network
 	private IP4Address			mGateway			 = null;
 	private IP4Address			mNetmask			 = null;
 	private IP4Address			mLocal				 = null;
+	private IP4Address			mBase				 = null;
 	
 	public Network( Context context ) throws NoRouteToHostException, SocketException, UnknownHostException {
 		mWifiManager		 = ( WifiManager )context.getSystemService( Context.WIFI_SERVICE );
@@ -85,6 +86,7 @@ public class Network
 		mGateway 			 = new IP4Address( mInfo.gateway );
 		mNetmask 			 = new IP4Address( mInfo.netmask );
 		mLocal	 			 = new IP4Address( mInfo.ipAddress );
+		mBase				 = new IP4Address( mInfo.netmask & mInfo.gateway );
 		
 		if( isConnected() == false)
 			throw new NoRouteToHostException("Not connected to any WiFi access point.");
@@ -182,8 +184,16 @@ public class Network
 		return mWifiInfo.getSSID();
 	}
 	
+	public int getNumberOfAddresses( ) {
+		return IP4Address.ntohl( ~mNetmask.toInteger() );
+	}
+	
+	public IP4Address getStartAddress( ) {
+		return mBase;
+	}
+	
 	public String getNetworkMasked( ) {
-		int network = mInfo.gateway & mInfo.netmask;
+		int network = mBase.toInteger();
 
     	return ( network & 0xFF) + "." + (( network >> 8 ) & 0xFF) + "." + (( network >> 16 ) & 0xFF) + "." + (( network >> 24 ) & 0xFF);
 	}

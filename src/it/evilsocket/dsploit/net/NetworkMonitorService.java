@@ -239,17 +239,7 @@ public class NetworkMonitorService extends IntentService
 				}				
 				catch( SocketTimeoutException ste ) 
 				{ 		
-
-					try
-					{
-						// increase the socket timeout
-						mSocket.setSoTimeout( 200 * ( i + 2 ) );
-					}
-					catch( Exception se )
-					{
-						Log.d( TAG, se.toString() );
-					}
-
+					// swallow timeout error
 				}
 				catch( IOException e )
 				{
@@ -283,19 +273,14 @@ public class NetworkMonitorService extends IntentService
 			Log.d( TAG, "UdpProber started ..." );
 			
 			mStopped = false;
-			
-			IP4Address mask	   = null,
-					   base    = null,
-					   current = null;
-			
+									
 			int i, nhosts = 0;
+			IP4Address current = null;
 			
 			try
 			{
-				mNetwork = System.getNetwork();				
-				mask     = new IP4Address( mNetwork.getInfo().netmask );
-				base     = new IP4Address( mNetwork.getInfo().netmask & mNetwork.getInfo().gateway );				
-				nhosts   = IP4Address.ntohl( ~mask.toInteger() );
+				mNetwork = System.getNetwork();	
+				nhosts   = mNetwork.getNumberOfAddresses();
 			}
 			catch( Exception e )
 			{
@@ -305,10 +290,8 @@ public class NetworkMonitorService extends IntentService
 			while( mStopped == false && mNetwork != null && nhosts > 0 )
 			{										    			    			    
 				try
-    			{
-					current = base;
-					
-					for( i = 1; i <= nhosts && ( current = IP4Address.next( current ) ) != null; i++ ) 
+    			{							
+					for( i = 1, current = IP4Address.next( mNetwork.getStartAddress() ); current != null && i <= nhosts; current = IP4Address.next( current ), i++ ) 
 					{						
 						InetAddress    address = current.toInetAddress();
 	    				DatagramSocket socket  = new DatagramSocket();

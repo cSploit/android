@@ -58,7 +58,8 @@ public class ToolsInstaller
 		"chmod 755 {PATH}/tcpdump/tcpdump",
 		"chmod 666 {PATH}/hydra/*",
 		"chmod 755 {PATH}/hydra/hydra",
-		"mount -o remount,rw /system /system && ( chmod 6755 /system/*/su; mount -o remount,ro /system /system )"
+		"mount -o remount,rw /system /system && ( chmod 6755 /system/*/su; mount -o remount,ro /system /system )",
+		"chmod 755 {FILES}"
 	};
 	
 	private Context mAppContext  = null;
@@ -148,7 +149,7 @@ public class ToolsInstaller
 	    	
 	    	for( String install_cmd : INSTALL_COMMANDS )
 	    	{
-	    		cmd += install_cmd.replace( "{PATH}", mDestPath + "/tools" ) + "; ";
+	    		cmd += install_cmd.replace( "{PATH}", mDestPath + "/tools" ).replace( "{FILES}", mDestPath ) + "; ";
 	    	}
 	    	        	
         	Shell.exec( cmd );
