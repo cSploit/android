@@ -86,7 +86,11 @@ public class Endpoint
 	}
 	
 	public boolean equals( Endpoint endpoint ){		
-		return mAddress.equals( endpoint.getAddress() );
+		if( mHardware != null && endpoint.mHardware != null && mHardware.length == endpoint.mHardware.length )
+			return mHardware.equals( endpoint.mHardware );
+		
+		else
+			return mAddress.equals( endpoint.getAddress() );
 	}
 	
 	public InetAddress getAddress() {
