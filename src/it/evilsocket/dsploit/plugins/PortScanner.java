@@ -20,6 +20,10 @@ package it.evilsocket.dsploit.plugins;
 
 import java.util.ArrayList;
 
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
@@ -39,6 +43,8 @@ import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
 import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
+import it.evilsocket.dsploit.gui.dialogs.InputDialog;
+import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
 import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Target.Port;
@@ -53,6 +59,7 @@ public class PortScanner extends Plugin
 	private ArrayList<String>     mPortList    	    = null;
 	private ArrayAdapter<String>  mListAdapter 	    = null;
 	private Receiver              mScanReceiver     = null;
+	private String				  mCustomPorts		= null;
 	
 	private class Receiver extends SynScanOutputReceiver
 	{
@@ -135,7 +142,7 @@ public class PortScanner extends Plugin
 	private void setStartedState( ) {
 		mPortList.clear();
 
-		System.getNMap().synScan( System.getCurrentTarget(), mScanReceiver ).start();
+		System.getNMap().synScan( System.getCurrentTarget(), mScanReceiver, mCustomPorts ).start();
 		
 		mRunning = true;
 	}
@@ -224,6 +231,77 @@ public class PortScanner extends Plugin
 				return false;
 			}
 		});
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu( Menu menu ) {
+		MenuInflater inflater = getSupportMenuInflater();		
+		inflater.inflate( R.menu.port_scanner, menu );		
+		return super.onCreateOptionsMenu(menu);
+	}
+		
+	@Override
+	public boolean onOptionsItemSelected( MenuItem item ) 
+	{    
+		switch( item.getItemId() ) 
+		{        
+			case R.id.select_ports:            
+	         
+				new InputDialog( "Select Ports", "Enter a comma separated list of ports:", this, new InputDialogListener() {					
+					@Override
+					public void onInputEntered( String input ) {
+						input = input.trim();
+						
+						if( input.isEmpty() == false )
+						{
+							String[] ports = input.split("[^\\d]+");
+							for( String port : ports )
+							{
+								try
+								{
+									if( port.isEmpty() )
+										throw new Exception( "Invalid port '" + port + "'." );	
+									
+									else
+									{
+										int iport = Integer.parseInt( port );
+		                                if( iport <= 0 || iport > 65535 )		                                
+		                                	throw new Exception( "Port must be greater than 0 and smaller than 65535." );		                                
+									}
+								}
+								catch( Exception e )
+								{
+									new ErrorDialog( "Error", e.toString(), PortScanner.this ).show();
+									return;
+								}
+							}
+							
+							mCustomPorts = "";
+							for( int i = 0, last = ports.length - 1; i < ports.length; i++ )
+							{
+								mCustomPorts += ports[i];
+								if( i != last )
+									mCustomPorts += ",";
+							}
+							
+							if( mCustomPorts.isEmpty() )
+							{
+								mCustomPorts = null;
+								new ErrorDialog( "Error", "Invalid ports specified.", PortScanner.this ).show();
+							}
+							
+							android.util.Log.d( "PORT", "mCustomPorts = " + mCustomPorts );
+						}
+						else
+							new ErrorDialog( "Error", "Empty port list.", PortScanner.this ).show();
+					}
+				}).show();
+				
+				return true;
+	    	  
+			default:            
+				return super.onOptionsItemSelected(item);    
+	   }
 	}
 	
 	@Override

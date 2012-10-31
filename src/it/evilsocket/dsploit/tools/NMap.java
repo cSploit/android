@@ -86,8 +86,15 @@ public class NMap extends Tool
 		public abstract void onPortFound( String port, String protocol );
 	}
 	
-	public Thread synScan( Target target, SynScanOutputReceiver receiver ) {		
-		return super.async( "-sS -P0 --system-dns -vvv " + target.getCommandLineRepresentation(), receiver );
+	public Thread synScan( Target target, SynScanOutputReceiver receiver, String custom ) {
+		String command = "-sS -P0 --system-dns -vvv ";
+		
+		if( custom != null )
+			command += "-p " + custom + " ";
+		
+		command += target.getCommandLineRepresentation();
+		
+		return super.async( command, receiver );
 	}
 	
 	public static abstract class InspectionReceiver implements OutputReceiver
