@@ -74,16 +74,16 @@ public class MainActivity extends SherlockListActivity
 {	
 	private static final int    WIFI_CONNECTION_REQUEST = 1012;
 	private static final String NO_WIFI_UPDATE_MESSAGE  = "No WiFi connection available, the application will just check for updates.\n#STATUS#";
-	
-	private boolean			isWifiAvailable  		 = false;
-	private boolean			isConnectivityAvailable  = false;
-	private TargetAdapter  	mTargetAdapter   	     = null;
-	private IntentFilter	mIntentFilter	   		 = null;
-	private ManagedReceiver mMessageReceiver 		 = null;
-	private TextView		mUpdateStatus			 = null;
-	private Intent			mNetworkMonitorIntent	 = null;
-	private Toast 			mToast 			 	     = null;
-	private long  			mLastBackPressTime 	     = 0;
+	 
+	private boolean			 isWifiAvailable  		 = false;
+	private boolean			 isConnectivityAvailable = false;
+	private TargetAdapter  	 mTargetAdapter   	     = null;
+	private EndpointReceiver mEndpointReceiver 		 = null;
+	private UpdateReceiver	 mUpdateReceiver		 = null;	
+	private TextView		 mUpdateStatus			 = null;
+	private Intent			 mNetworkMonitorIntent	 = null;
+	private Toast 			 mToast 			 	 = null;
+	private long  			 mLastBackPressTime 	 = 0;
 	
 	public class TargetAdapter extends ArrayAdapter<Target> 
 	{
@@ -153,6 +153,144 @@ public class MainActivity extends SherlockListActivity
 	    }
 	}
 
+	private class EndpointReceiver extends ManagedReceiver
+	{
+		private IntentFilter mFilter = null;
+		
+		public EndpointReceiver() {
+			mFilter = new IntentFilter();
+			
+			mFilter.addAction( NetworkMonitorService.NEW_ENDPOINT );
+			mFilter.addAction( NetworkMonitorService.ENDPOINT_UPDATE );
+		}
+		
+		public IntentFilter getFilter( ) {
+			return mFilter;
+		}
+		
+		@Override
+		public void onReceive( Context context, Intent intent ) 
+		{
+			if( intent.getAction().equals( NetworkMonitorService.NEW_ENDPOINT ) )
+			{
+				String address  = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_ADDRESS ),
+					   hardware = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_HARDWARE ),
+					   name		= ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_NAME );
+				final  Target target = Target.getFromString( address );
+				
+				if( target != null && target.getEndpoint() != null )
+				{
+					if( name != null && name.isEmpty() == false )
+						target.setAlias( name );
+					
+					target.getEndpoint().setHardware( Endpoint.parseMacAddress(hardware) );
+																												
+					// refresh the target listview
+	            	MainActivity.this.runOnUiThread(new Runnable() {
+	                    @Override
+	                    public void run() {
+	                    	if( System.addOrderedTarget( target ) == true )
+							{
+	                    		mTargetAdapter.notifyDataSetChanged();
+							}
+	                    }
+	                });		
+				}
+			}	
+			else if( intent.getAction().equals( NetworkMonitorService.ENDPOINT_UPDATE ) )
+			{
+				// refresh the target listview
+            	MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                    	mTargetAdapter.notifyDataSetChanged();
+                    }
+                });		
+			}					
+		}
+	}
+	
+	private class UpdateReceiver extends ManagedReceiver
+	{
+		private IntentFilter mFilter = null;
+		
+		public UpdateReceiver( ) {
+			mFilter = new IntentFilter();
+			
+			mFilter.addAction( UpdateService.UPDATE_CHECKING );
+			mFilter.addAction( UpdateService.UPDATE_AVAILABLE );
+			mFilter.addAction( UpdateService.UPDATE_NOT_AVAILABLE );
+		}
+		
+		public IntentFilter getFilter( ) {
+			return mFilter;
+		}
+		
+		@Override
+		public void onReceive( Context context, Intent intent ) 
+		{
+			if( intent.getAction().equals( UpdateService.UPDATE_CHECKING ) && mUpdateStatus != null )
+			{
+				mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "Checking ..." ) );
+			}
+			else if( intent.getAction().equals( UpdateService.UPDATE_NOT_AVAILABLE ) && mUpdateStatus != null )
+			{
+				mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "No updates available." ) );
+			}
+			else if( intent.getAction().equals( UpdateService.UPDATE_AVAILABLE ) )
+			{																						
+				final String remoteVersion = ( String )intent.getExtras().get( UpdateService.AVAILABLE_VERSION );
+				
+				mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "New version " + remoteVersion + " found!" ) );
+				
+				MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                    	new ConfirmDialog
+                    	( 
+                    	  "Update Available", 
+                    	  "A new update to version " + remoteVersion + " is available, do you want to download it ?",
+                    	  MainActivity.this,
+                    	  new ConfirmDialogListener(){
+							@Override
+							public void onConfirm() 
+							{
+								final ProgressDialog dialog = new ProgressDialog( MainActivity.this );
+							    dialog.setMessage( "Downloading update ..." );
+							    dialog.setProgressStyle( ProgressDialog.STYLE_HORIZONTAL );
+							    dialog.setMax(100);
+							    dialog.setCancelable( true );
+							    dialog.show();
+								
+								new Thread( new Runnable(){
+									@Override
+									public void run() 
+									{				
+										if( System.getUpdateManager().downloadUpdate( MainActivity.this, dialog ) == false )
+										{
+											MainActivity.this.runOnUiThread(new Runnable() {
+							                    @Override
+							                    public void run() {
+							                    	new ErrorDialog( "Error", "An error occurred while downloading the update.", MainActivity.this ).show();
+							                    }
+							                });
+										}
+										
+										dialog.dismiss();
+									}
+								}).start();											
+							}
+							
+							@Override
+							public void onCancel() { }
+						}
+                    	).show();
+                    }
+                });
+			}	
+		}
+	}
+	
 	private void createUpdateLayout( ) {	
 		
 		getListView().setVisibility( View.GONE );
@@ -168,7 +306,17 @@ public class MainActivity extends SherlockListActivity
 		mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "..." ) );
 		
 		layout.addView( mUpdateStatus );		
+
+		if( mUpdateReceiver == null )
+			mUpdateReceiver = new UpdateReceiver();
 		
+	    mUpdateReceiver.unregister();
+	    
+        mUpdateReceiver.register( MainActivity.this );
+		
+        if( System.getSettings().getBoolean( "PREF_CHECK_UPDATES", true ) )
+        	startService( new Intent( MainActivity.this, UpdateService.class ) );
+        
 		invalidateOptionsMenu();
 	}
 	
@@ -223,125 +371,17 @@ public class MainActivity extends SherlockListActivity
 			}
 		});
 
-		if( mMessageReceiver == null )
-		{
-			mMessageReceiver = new ManagedReceiver() 
-			{
-				@Override
-				public void onReceive(Context context, Intent intent) 
-				{
-					if( intent.getAction().equals( NetworkMonitorService.NEW_ENDPOINT ) )
-					{
-						String address  = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_ADDRESS ),
-							   hardware = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_HARDWARE ),
-							   name		= ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_NAME );
-						final  Target target = Target.getFromString( address );
-						
-						if( target != null && target.getEndpoint() != null )
-						{
-							if( name != null && name.isEmpty() == false )
-								target.setAlias( name );
-							
-							target.getEndpoint().setHardware( Endpoint.parseMacAddress(hardware) );
-																														
-							// refresh the target listview
-			            	MainActivity.this.runOnUiThread(new Runnable() {
-			                    @Override
-			                    public void run() {
-			                    	if( System.addOrderedTarget( target ) == true )
-									{
-			                    		mTargetAdapter.notifyDataSetChanged();
-									}
-			                    }
-			                });		
-						}
-					}	
-					else if( intent.getAction().equals( NetworkMonitorService.ENDPOINT_UPDATE ) )
-					{
-						// refresh the target listview
-		            	MainActivity.this.runOnUiThread(new Runnable() {
-		                    @Override
-		                    public void run() {
-		                    	mTargetAdapter.notifyDataSetChanged();
-		                    }
-		                });		
-					}					
-					else if( intent.getAction().equals( UpdateService.UPDATE_CHECKING ) && mUpdateStatus != null )
-					{
-						mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "Checking ..." ) );
-					}
-					else if( intent.getAction().equals( UpdateService.UPDATE_NOT_AVAILABLE ) && mUpdateStatus != null )
-					{
-						mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "No updates available." ) );
-					}
-					else if( intent.getAction().equals( UpdateService.UPDATE_AVAILABLE ) )
-					{																						
-						final String remoteVersion = ( String )intent.getExtras().get( UpdateService.AVAILABLE_VERSION );
-						
-						mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "New version " + remoteVersion + " found!" ) );
-						
-						MainActivity.this.runOnUiThread(new Runnable() {
-		                    @Override
-		                    public void run() {
-		                    	new ConfirmDialog
-		                    	( 
-		                    	  "Update Available", 
-		                    	  "A new update to version " + remoteVersion + " is available, do you want to download it ?",
-		                    	  MainActivity.this,
-		                    	  new ConfirmDialogListener(){
-									@Override
-									public void onConfirm() 
-									{
-										final ProgressDialog dialog = new ProgressDialog( MainActivity.this );
-									    dialog.setMessage( "Downloading update ..." );
-									    dialog.setProgressStyle( ProgressDialog.STYLE_HORIZONTAL );
-									    dialog.setMax(100);
-									    dialog.setCancelable( true );
-									    dialog.show();
-										
-										new Thread( new Runnable(){
-											@Override
-											public void run() 
-											{				
-												if( System.getUpdateManager().downloadUpdate( MainActivity.this, dialog ) == false )
-												{
-													MainActivity.this.runOnUiThread(new Runnable() {
-									                    @Override
-									                    public void run() {
-									                    	new ErrorDialog( "Error", "An error occurred while downloading the update.", MainActivity.this ).show();
-									                    }
-									                });
-												}
-												
-												dialog.dismiss();
-											}
-										}).start();											
-									}
-									
-									@Override
-									public void onCancel() { }
-								}
-		                    	).show();
-		                    }
-		                });
-					}							
-				}
-		    };
-		}
+		if( mEndpointReceiver == null )		
+			mEndpointReceiver = new EndpointReceiver();
 		
-		if( mIntentFilter == null )
-		{
-		    mIntentFilter = new IntentFilter( );
-		    
-		    mIntentFilter.addAction( NetworkMonitorService.NEW_ENDPOINT );
-		    mIntentFilter.addAction( NetworkMonitorService.ENDPOINT_UPDATE );
-		    mIntentFilter.addAction( UpdateService.UPDATE_CHECKING );
-		    mIntentFilter.addAction( UpdateService.UPDATE_AVAILABLE );
-		    mIntentFilter.addAction( UpdateService.UPDATE_NOT_AVAILABLE );
-		}
+		if( mUpdateReceiver == null )
+			mUpdateReceiver = new UpdateReceiver();
 		
-	    mMessageReceiver.unregister();
-	    mMessageReceiver.register( MainActivity.this, mIntentFilter );		
+	    mEndpointReceiver.unregister();
+	    mUpdateReceiver.unregister();
+	    
+	    mEndpointReceiver.register( MainActivity.this );		
+        mUpdateReceiver.register( MainActivity.this );
         
         if( System.getSettings().getBoolean( "PREF_CHECK_UPDATES", true ) )
         	startService( new Intent( MainActivity.this, UpdateService.class ) );
@@ -456,7 +496,7 @@ public class MainActivity extends SherlockListActivity
 							
 						    try
 					    	{	    							        	
-						    	createOnlineLayout( );
+						    	createOnlineLayout( );						    							    	
 					    	}
 					    	catch( Exception e )
 					    	{
@@ -553,9 +593,12 @@ public class MainActivity extends SherlockListActivity
 			if( System.isServiceRunning( "it.evilsocket.dsploit.net.NetworkMonitorService" ) )			
 				stopService( mNetworkMonitorIntent );	
 			
-			if( mMessageReceiver != null )
-				mMessageReceiver.unregister();
-						
+			if( mEndpointReceiver != null )
+				mEndpointReceiver.unregister();
+			
+			if( mUpdateReceiver != null )
+				mUpdateReceiver.unregister();
+			
 			startActivityForResult( new Intent( MainActivity.this, WifiScannerActivity.class ), WIFI_CONNECTION_REQUEST );
 			
 			return true;
@@ -738,8 +781,11 @@ public class MainActivity extends SherlockListActivity
 		if( mNetworkMonitorIntent != null )
 			stopService( mNetworkMonitorIntent );
 					
-		if( mMessageReceiver != null )
-			mMessageReceiver.unregister();
+		if( mEndpointReceiver != null )
+			mEndpointReceiver.unregister();
+		
+		if( mUpdateReceiver != null )
+			mUpdateReceiver.unregister();
 				
 		// make sure no zombie process is running before destroying the activity
 		System.clean( true );		

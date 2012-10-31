@@ -46,6 +46,7 @@ public class InputDialog extends AlertDialog
 			mEditText.setText(text);
 		
 		mEditText.setEnabled( editable );
+		mEditText.setMaxHeight( 250 );
 		
 		if( password )
 			mEditText.setInputType( InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD );

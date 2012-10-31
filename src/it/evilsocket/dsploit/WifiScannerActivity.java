@@ -77,8 +77,6 @@ public class WifiScannerActivity extends SherlockListActivity
 	private ScanReceiver       mScanReceiver	       = null;     
 	private ConnectionReceiver mConnectionReceiver     = null;
 	private ScanAdapter	       mAdapter	               = null;
-	private IntentFilter       mScanIntentFilter       = null;
-	private IntentFilter	   mConnectionIntentFilter = null;
 	private boolean            mConnected	           = false;
 	private boolean			   mScanning		       = false;
 	private Menu		       mMenu		           = null;
@@ -251,8 +249,14 @@ public class WifiScannerActivity extends SherlockListActivity
 
 	private class ScanReceiver extends ManagedReceiver
 	{
+		private IntentFilter mFilter = null;
+				
 		public ScanReceiver() {
-			super();
+			mFilter = new IntentFilter( WifiManager.SUPPLICANT_STATE_CHANGED_ACTION );
+		}
+		
+		public IntentFilter getFilter( ) {
+			return mFilter;
 		}
 		
 		@Override
@@ -282,6 +286,16 @@ public class WifiScannerActivity extends SherlockListActivity
 	
 	private class ConnectionReceiver extends ManagedReceiver
 	{
+		private IntentFilter mFilter = null;
+		
+		public ConnectionReceiver( ) {
+			mFilter = new IntentFilter( WifiManager.SUPPLICANT_STATE_CHANGED_ACTION );
+		}
+		
+		public IntentFilter getFilter() {
+			return mFilter;
+		}
+		
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			SupplicantState state = intent.getParcelableExtra( WifiManager.EXTRA_NEW_STATE );
@@ -368,11 +382,8 @@ public class WifiScannerActivity extends SherlockListActivity
         		NetworkManager.cleanPreviousConfiguration( mWifiManager, info );
         	}
         }
-                
-        mScanIntentFilter		= new IntentFilter( WifiManager.SCAN_RESULTS_AVAILABLE_ACTION );        	    
-	    mConnectionIntentFilter = new IntentFilter( WifiManager.SUPPLICANT_STATE_CHANGED_ACTION );
 	    
-	    mScanReceiver.register( this, mScanIntentFilter );   
+	    mScanReceiver.register( this );   
 	            
 	    if( mMenu != null )					
 			mMenu.findItem(R.id.scan).setActionView( new ProgressBar(this) );
@@ -482,7 +493,7 @@ public class WifiScannerActivity extends SherlockListActivity
 			
 			mCurrentNetworkId = performConnection( mCurrentAp, mCurrentKey );
 			if( mCurrentNetworkId != -1 )						
-				mConnectionReceiver.register( this, mConnectionIntentFilter );
+				mConnectionReceiver.register( this );
 			
 			else
 				mConnectionReceiver.unregister();
@@ -555,7 +566,7 @@ public class WifiScannerActivity extends SherlockListActivity
 						public void onManualConnect( String key ) {
 							mCurrentNetworkId = performConnection( result, key );
 							if( mCurrentNetworkId != -1 )														
-								mConnectionReceiver.register( WifiScannerActivity.this, mConnectionIntentFilter );
+								mConnectionReceiver.register( WifiScannerActivity.this );
 							
 							else
 								mConnectionReceiver.unregister();							
@@ -577,7 +588,7 @@ public class WifiScannerActivity extends SherlockListActivity
 						public void onInputEntered( String input ) {
 							mCurrentNetworkId = performConnection( result, input );
 							if( mCurrentNetworkId != -1 )							
-								mConnectionReceiver.register( WifiScannerActivity.this, mConnectionIntentFilter );				
+								mConnectionReceiver.register( WifiScannerActivity.this );				
 							else
 								mConnectionReceiver.unregister();
 						}

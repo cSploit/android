@@ -40,14 +40,16 @@ public abstract class ManagedReceiver extends BroadcastReceiver
 		}
 	}
 	
-	public void register( Context context, IntentFilter filter ) {
+	public void register( Context context ) {
 		if( mRegistered )
 			unregister( );
 		
-		context.registerReceiver( this, filter );
+		context.registerReceiver( this, getFilter() );
 		mRegistered = true;
 		mContext    = context;
 	}
+	
+	public abstract IntentFilter getFilter();
 	
 	protected void finalize() {
 		unregister();
