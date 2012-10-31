@@ -252,7 +252,7 @@ public class WifiScannerActivity extends SherlockListActivity
 		private IntentFilter mFilter = null;
 				
 		public ScanReceiver() {
-			mFilter = new IntentFilter( WifiManager.SUPPLICANT_STATE_CHANGED_ACTION );
+			mFilter = new IntentFilter( WifiManager.SCAN_RESULTS_AVAILABLE_ACTION );
 		}
 		
 		public IntentFilter getFilter( ) {
