@@ -558,7 +558,7 @@ public class WifiScannerActivity extends SherlockListActivity
 				mKeyList.clear();
 				new WifiCrackDialog
 				(
-				   "Connect", 
+				   result.SSID, 
 				   "Enter WiFi Key or attempt cracking:", 
 				   this, 
 				   new WifiCrackDialogListener() {					
@@ -583,7 +583,7 @@ public class WifiScannerActivity extends SherlockListActivity
 			{
 				if( result.capabilities.contains("WEP") || result.capabilities.contains("WPA") )
 				{
-					new InputDialog( "Connect", "Enter WiFi Key:", null, true, true, this, new InputDialogListener() {					
+					new InputDialog( result.SSID, "Enter WiFi Key:", null, true, true, this, new InputDialogListener() {					
 						@Override
 						public void onInputEntered( String input ) {
 							mCurrentNetworkId = performConnection( result, input );

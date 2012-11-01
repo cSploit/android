@@ -123,6 +123,14 @@ public class IP4Address
 		return mAddress;
 	}
 	
+	public boolean equals( IP4Address address ) {
+		return mInteger == address.toInteger();
+	}
+	
+	public boolean equals( InetAddress address ) {
+		return mAddress.equals( address );
+	}
+	
 	public int countBits( ) {
     	int bits, i, n = mInteger;
     	

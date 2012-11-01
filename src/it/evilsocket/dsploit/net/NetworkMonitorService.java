@@ -254,7 +254,7 @@ public class NetworkMonitorService extends IntentService
 					}
 					catch( Exception e )
 					{
-						System.errorLogging( "NBResolver", e );
+						// swallow error
 					}
 				}
 			}
@@ -292,15 +292,19 @@ public class NetworkMonitorService extends IntentService
 				try
     			{							
 					for( i = 1, current = IP4Address.next( mNetwork.getStartAddress() ); current != null && i <= nhosts; current = IP4Address.next( current ), i++ ) 
-					{						
-						InetAddress    address = current.toInetAddress();
-	    				DatagramSocket socket  = new DatagramSocket();
-	    				DatagramPacket packet  = new DatagramPacket( NETBIOS_REQUEST, NETBIOS_REQUEST.length, address, NETBIOS_UDP_PORT );
-	    				
-	    				socket.setSoTimeout( 200 );
-	    				socket.send( packet );    	  
-
-	    				new NBResolver( address, socket ).start();
+					{				
+						// rescanning the gateway could cause an issue when the gateway itself has multiple interfaces ( LAN, WAN ... )
+						if( current.equals( mNetwork.getGatewayAddress() ) == false && current.equals( mNetwork.getLocalAddress() ) == false )
+						{
+							InetAddress    address = current.toInetAddress();
+		    				DatagramSocket socket  = new DatagramSocket();
+		    				DatagramPacket packet  = new DatagramPacket( NETBIOS_REQUEST, NETBIOS_REQUEST.length, address, NETBIOS_UDP_PORT );
+		    				
+		    				socket.setSoTimeout( 200 );
+		    				socket.send( packet );    	  
+	
+		    				new NBResolver( address, socket ).start();
+						}
 					}
 
 					Thread.sleep( 1000 );
