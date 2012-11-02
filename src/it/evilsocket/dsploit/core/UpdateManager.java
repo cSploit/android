@@ -155,6 +155,35 @@ public class UpdateManager
 		return "http://cloud.github.com/downloads/evilsocket/dsploit/" + getRemoteVersionFileName();
 	}
 	
+	private String formatSize( int size ) {			
+		if( size < 1024 )
+			return size + " B";
+		
+		else if( size < ( 1024 * 1024 ) )
+			return ( size / 1024 ) + " KB";
+		
+		else if( size < ( 1024 * 1024 * 1024 ) )
+			return ( size / ( 1024 * 1024 ) ) + " MB";
+		
+		else 
+			return ( size / ( 1024 * 1024 * 1024 ) ) + " GB";
+	}
+	
+	private String formatSpeed( int speed )
+	{
+		if( speed < 1024 )
+			return speed + " B/s";
+		
+		else if( speed < ( 1024 * 1024 ) )
+			return ( speed / 1024 ) + " KB/s";
+		
+		else if( speed < ( 1024 * 1024 * 1024 ) )
+			return ( speed / ( 1024 * 1024 ) ) + " MB/s";
+		
+		else 
+			return ( speed / ( 1024 * 1024 * 1024 ) ) + " GB/s";
+	}
+	
 	public boolean downloadUpdate( MainActivity activity, final ProgressDialog progress )
 	{
 		try 
@@ -176,8 +205,12 @@ public class UpdateManager
             FileOutputStream writer = new FileOutputStream( file );
             InputStream 	 reader = connection.getInputStream();
             
-            int total 	   = connection.getContentLength(),
-            	downloaded = 0;
+            int  total 	    = connection.getContentLength(),
+            	 downloaded = 0,
+            	 sampled	= 0;
+            long time       = java.lang.System.currentTimeMillis();
+            double speed    = 0.0,
+            	   deltat	= 0.0;
             
             while( progress.isShowing() && ( read = reader.read(buffer) ) != -1 ) 
             {
@@ -185,15 +218,28 @@ public class UpdateManager
                 
                 downloaded += read;
                 
+                deltat = ( java.lang.System.currentTimeMillis() - time ) / 1000.0;
+                
+                if( deltat > 1.0 )
+                {
+                	speed   = ( downloaded - sampled ) / deltat;
+                	time    = java.lang.System.currentTimeMillis();
+                	sampled = downloaded;
+                }
+                                               
                 // update the progress ui
-                final int fdown = downloaded,
-                		  ftot  = total;
+                final int    fdown  = downloaded,
+                		     ftot   = total;
+                final double fspeed = speed;
+                
                 activity.runOnUiThread( new Runnable() {
 					@Override
 					public void run() {
+						progress.setMessage( "[ " + formatSpeed( (int)fspeed ) + " ] " + formatSize( fdown) + " / " + formatSize( ftot ) + " ..." );
 						progress.setProgress( ( 100 * fdown ) / ftot );
 					}                	
                 });
+                
             }
             
             writer.close();

@@ -45,6 +45,7 @@ import it.evilsocket.dsploit.net.Target;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences.Editor;
@@ -230,11 +231,11 @@ public class MainActivity extends SherlockListActivity
 		@Override
 		public void onReceive( Context context, Intent intent ) 
 		{
-			if( intent.getAction().equals( UpdateChecker.UPDATE_CHECKING ) && mUpdateStatus != null )
+			if( mUpdateStatus != null && intent.getAction().equals( UpdateChecker.UPDATE_CHECKING ) && mUpdateStatus != null )
 			{
 				mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "Checking ..." ) );
 			}
-			else if( intent.getAction().equals( UpdateChecker.UPDATE_NOT_AVAILABLE ) && mUpdateStatus != null )
+			else if( mUpdateStatus != null && intent.getAction().equals( UpdateChecker.UPDATE_NOT_AVAILABLE ) && mUpdateStatus != null )
 			{
 				mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "No updates available." ) );
 			}
@@ -242,7 +243,8 @@ public class MainActivity extends SherlockListActivity
 			{																						
 				final String remoteVersion = ( String )intent.getExtras().get( UpdateChecker.AVAILABLE_VERSION );
 				
-				mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "New version " + remoteVersion + " found!" ) );
+				if( mUpdateStatus != null )
+					mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "New version " + remoteVersion + " found!" ) );
 				
 				MainActivity.this.runOnUiThread(new Runnable() {
                     @Override
@@ -260,7 +262,13 @@ public class MainActivity extends SherlockListActivity
 							    dialog.setMessage( "Downloading update ..." );
 							    dialog.setProgressStyle( ProgressDialog.STYLE_HORIZONTAL );
 							    dialog.setMax(100);
-							    dialog.setCancelable( true );
+							    dialog.setCancelable( false );
+							    dialog.setButton( DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+							        @Override
+							        public void onClick(DialogInterface dialog, int which) {
+							            dialog.dismiss();
+							        }
+							    });
 							    dialog.show();
 								
 								new Thread( new Runnable(){
