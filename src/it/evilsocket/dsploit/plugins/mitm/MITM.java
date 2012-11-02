@@ -403,7 +403,7 @@ public class MITM extends Plugin
         mActions.add( new Action
         ( 
         	"Simple Sniff", 
-        	"Only redirect target's traffic through this device, useful when using a network sniffer like 'Sharp' for android.", 
+        	"Redirect target's traffic through this device and show some stats while dumping it to a pcap file.", 
         	R.drawable.action_sniffer_48,
         	new OnClickListener(){
 			@Override
