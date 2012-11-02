@@ -11,12 +11,6 @@
 
         <CheckBoxPreference
             android:defaultValue="true"
-            android:key="PREF_NETWORK_NOTIFICATIONS"
-            android:summary="Enable or disable network service notifications when a new endpoint is found."
-            android:title="Show Network Notifications" />
-        
-        <CheckBoxPreference
-            android:defaultValue="true"
             android:key="PREF_WAKE_LOCK"
             android:summary="Prevents the device going in sleep mode while the application is running."
             android:title="Wake Lock" />

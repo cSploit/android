@@ -27,7 +27,7 @@ import it.evilsocket.dsploit.core.ManagedReceiver;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.ToolsInstaller;
-import it.evilsocket.dsploit.core.UpdateService;
+import it.evilsocket.dsploit.core.UpdateChecker;
 import it.evilsocket.dsploit.gui.dialogs.AboutDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
@@ -40,7 +40,7 @@ import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog;
 import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog.SpinnerDialogListener;
 import it.evilsocket.dsploit.net.Endpoint;
 import it.evilsocket.dsploit.net.Network;
-import it.evilsocket.dsploit.net.NetworkMonitorService;
+import it.evilsocket.dsploit.net.NetworkDiscovery;
 import it.evilsocket.dsploit.net.Target;
 
 import android.app.ProgressDialog;
@@ -78,10 +78,11 @@ public class MainActivity extends SherlockListActivity
 	private boolean			 isWifiAvailable  		 = false;
 	private boolean			 isConnectivityAvailable = false;
 	private TargetAdapter  	 mTargetAdapter   	     = null;
+	private NetworkDiscovery mNetworkDiscovery		 = null;
+	private UpdateChecker	 mUpdateChecker			 = null;
 	private EndpointReceiver mEndpointReceiver 		 = null;
 	private UpdateReceiver	 mUpdateReceiver		 = null;	
 	private TextView		 mUpdateStatus			 = null;
-	private Intent			 mNetworkMonitorIntent	 = null;
 	private Toast 			 mToast 			 	 = null;
 	private long  			 mLastBackPressTime 	 = 0;
 	
@@ -160,8 +161,8 @@ public class MainActivity extends SherlockListActivity
 		public EndpointReceiver() {
 			mFilter = new IntentFilter();
 			
-			mFilter.addAction( NetworkMonitorService.NEW_ENDPOINT );
-			mFilter.addAction( NetworkMonitorService.ENDPOINT_UPDATE );
+			mFilter.addAction( NetworkDiscovery.NEW_ENDPOINT );
+			mFilter.addAction( NetworkDiscovery.ENDPOINT_UPDATE );
 		}
 		
 		public IntentFilter getFilter( ) {
@@ -171,11 +172,11 @@ public class MainActivity extends SherlockListActivity
 		@Override
 		public void onReceive( Context context, Intent intent ) 
 		{
-			if( intent.getAction().equals( NetworkMonitorService.NEW_ENDPOINT ) )
+			if( intent.getAction().equals( NetworkDiscovery.NEW_ENDPOINT ) )
 			{
-				String address  = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_ADDRESS ),
-					   hardware = ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_HARDWARE ),
-					   name		= ( String )intent.getExtras().get( NetworkMonitorService.ENDPOINT_NAME );
+				String address  = ( String )intent.getExtras().get( NetworkDiscovery.ENDPOINT_ADDRESS ),
+					   hardware = ( String )intent.getExtras().get( NetworkDiscovery.ENDPOINT_HARDWARE ),
+					   name		= ( String )intent.getExtras().get( NetworkDiscovery.ENDPOINT_NAME );
 				final  Target target = Target.getFromString( address );
 				
 				if( target != null && target.getEndpoint() != null )
@@ -197,7 +198,7 @@ public class MainActivity extends SherlockListActivity
 	                });		
 				}
 			}	
-			else if( intent.getAction().equals( NetworkMonitorService.ENDPOINT_UPDATE ) )
+			else if( intent.getAction().equals( NetworkDiscovery.ENDPOINT_UPDATE ) )
 			{
 				// refresh the target listview
             	MainActivity.this.runOnUiThread(new Runnable() {
@@ -217,9 +218,9 @@ public class MainActivity extends SherlockListActivity
 		public UpdateReceiver( ) {
 			mFilter = new IntentFilter();
 			
-			mFilter.addAction( UpdateService.UPDATE_CHECKING );
-			mFilter.addAction( UpdateService.UPDATE_AVAILABLE );
-			mFilter.addAction( UpdateService.UPDATE_NOT_AVAILABLE );
+			mFilter.addAction( UpdateChecker.UPDATE_CHECKING );
+			mFilter.addAction( UpdateChecker.UPDATE_AVAILABLE );
+			mFilter.addAction( UpdateChecker.UPDATE_NOT_AVAILABLE );
 		}
 		
 		public IntentFilter getFilter( ) {
@@ -229,17 +230,17 @@ public class MainActivity extends SherlockListActivity
 		@Override
 		public void onReceive( Context context, Intent intent ) 
 		{
-			if( intent.getAction().equals( UpdateService.UPDATE_CHECKING ) && mUpdateStatus != null )
+			if( intent.getAction().equals( UpdateChecker.UPDATE_CHECKING ) && mUpdateStatus != null )
 			{
 				mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "Checking ..." ) );
 			}
-			else if( intent.getAction().equals( UpdateService.UPDATE_NOT_AVAILABLE ) && mUpdateStatus != null )
+			else if( intent.getAction().equals( UpdateChecker.UPDATE_NOT_AVAILABLE ) && mUpdateStatus != null )
 			{
 				mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "No updates available." ) );
 			}
-			else if( intent.getAction().equals( UpdateService.UPDATE_AVAILABLE ) )
+			else if( intent.getAction().equals( UpdateChecker.UPDATE_AVAILABLE ) )
 			{																						
-				final String remoteVersion = ( String )intent.getExtras().get( UpdateService.AVAILABLE_VERSION );
+				final String remoteVersion = ( String )intent.getExtras().get( UpdateChecker.AVAILABLE_VERSION );
 				
 				mUpdateStatus.setText( NO_WIFI_UPDATE_MESSAGE.replace( "#STATUS#", "New version " + remoteVersion + " found!" ) );
 				
@@ -314,8 +315,8 @@ public class MainActivity extends SherlockListActivity
 	    
         mUpdateReceiver.register( MainActivity.this );
 		
-        if( System.getSettings().getBoolean( "PREF_CHECK_UPDATES", true ) )
-        	startService( new Intent( MainActivity.this, UpdateService.class ) );
+        startUpdateChecker();
+        stopNetworkDiscovery();
         
 		invalidateOptionsMenu();
 	}
@@ -335,6 +336,8 @@ public class MainActivity extends SherlockListActivity
 		mUpdateStatus.setText( "No connectivity available." );
 		
 		layout.addView( mUpdateStatus );
+		
+		stopNetworkDiscovery();
 		
 		invalidateOptionsMenu();
 	}
@@ -383,13 +386,8 @@ public class MainActivity extends SherlockListActivity
 	    mEndpointReceiver.register( MainActivity.this );		
         mUpdateReceiver.register( MainActivity.this );
         
-        if( System.getSettings().getBoolean( "PREF_CHECK_UPDATES", true ) )
-        	startService( new Intent( MainActivity.this, UpdateService.class ) );
-        
-        if( mNetworkMonitorIntent == null )
-        	mNetworkMonitorIntent = new Intent( this, NetworkMonitorService.class );
-    
-        startService( mNetworkMonitorIntent );
+        startUpdateChecker();
+        startNetworkDiscovery();
         
         // if called for the second time after wifi connection
         invalidateOptionsMenu();
@@ -422,7 +420,7 @@ public class MainActivity extends SherlockListActivity
     			return;
     		}    		
     	}
-    	
+    	    	
     	// initialization ok, but wifi is down
     	if( isWifiAvailable == false )
     	{
@@ -533,13 +531,52 @@ public class MainActivity extends SherlockListActivity
 	public boolean onPrepareOptionsMenu( Menu menu ) {		
 		MenuItem item = menu.findItem( R.id.ss_monitor );
 				
-		if( System.isServiceRunning( "it.evilsocket.dsploit.net.NetworkMonitorService" ) )				
+		if( mNetworkDiscovery != null && mNetworkDiscovery.isRunning() )				
 			item.setTitle( "Stop Network Monitor" );
 		
 		else				
 			item.setTitle( "Start Network Monitor" );
 						
 		return super.onPrepareOptionsMenu(menu);
+	}
+	
+	public void startUpdateChecker( ) {
+		if( System.getSettings().getBoolean( "PREF_CHECK_UPDATES", true ) )
+		{
+			mUpdateChecker = new UpdateChecker( this );
+			mUpdateChecker.start();
+		}		
+	}
+	
+	public void startNetworkDiscovery( ) {
+		stopNetworkDiscovery();
+		
+		mNetworkDiscovery = new NetworkDiscovery( this );
+		mNetworkDiscovery.start();
+		
+		Toast.makeText( this, "Network discovery started.", Toast.LENGTH_SHORT ).show();
+	}
+	
+	public void stopNetworkDiscovery( ) {
+		if( mNetworkDiscovery != null )
+		{
+			if( mNetworkDiscovery.isRunning() )
+			{
+				mNetworkDiscovery.exit();
+				try
+				{
+					mNetworkDiscovery.join();
+				}
+				catch( Exception e )
+				{
+					// swallow
+				}
+				
+				Toast.makeText( this, "Network discovery stopped.", Toast.LENGTH_SHORT ).show();
+			}
+			
+			mNetworkDiscovery = null;
+		}
 	}
 	
 	@Override
@@ -575,23 +612,16 @@ public class MainActivity extends SherlockListActivity
 			return true;
 		}
 		else if( itemId == R.id.scan )
-		{
-			if( System.isServiceRunning( "it.evilsocket.dsploit.net.NetworkMonitorService" ) )
-				new ErrorDialog( "", "Network discovery already running.", this ).show();
-
-			else
-			{
-				startService( mNetworkMonitorIntent );
-				
-				item.setTitle( "Stop Network Monitor" );
-			}
+		{			
+			startNetworkDiscovery();
+			
+			item.setTitle( "Stop Network Monitor" );
 
 			return true;
 		}
 		else if( itemId == R.id.wifi_scan )
 		{
-			if( System.isServiceRunning( "it.evilsocket.dsploit.net.NetworkMonitorService" ) )			
-				stopService( mNetworkMonitorIntent );	
+			stopNetworkDiscovery();
 			
 			if( mEndpointReceiver != null )
 				mEndpointReceiver.unregister();
@@ -694,15 +724,15 @@ public class MainActivity extends SherlockListActivity
 		}
 		else if( itemId == R.id.ss_monitor )
 		{
-			if( System.isServiceRunning( "it.evilsocket.dsploit.net.NetworkMonitorService" ) )
+			if( mNetworkDiscovery != null && mNetworkDiscovery.isRunning() )
 			{
-				stopService( mNetworkMonitorIntent );
+				stopNetworkDiscovery();
 				
 				item.setTitle( "Start Network Monitor" );
 			}
 			else
 			{
-				startService( mNetworkMonitorIntent );
+				startNetworkDiscovery();
 				
 				item.setTitle( "Stop Network Monitor" );
 			}
@@ -732,7 +762,7 @@ public class MainActivity extends SherlockListActivity
 	protected void onListItemClick( ListView l, View v, int position, long id ){
 		super.onListItemClick( l, v, position, id);
 
-		stopService( mNetworkMonitorIntent );
+		stopNetworkDiscovery();
 		
 		System.setCurrentTarget( position );
 		
@@ -777,9 +807,8 @@ public class MainActivity extends SherlockListActivity
 
 	
 	@Override
-	public void onDestroy() {		
-		if( mNetworkMonitorIntent != null )
-			stopService( mNetworkMonitorIntent );
+	public void onDestroy() {
+		stopNetworkDiscovery();
 					
 		if( mEndpointReceiver != null )
 			mEndpointReceiver.unregister();
@@ -791,5 +820,8 @@ public class MainActivity extends SherlockListActivity
 		System.clean( true );		
 						
 		super.onDestroy();		
+		
+		// remove the application from the cache
+		java.lang.System.exit( 0 );
 	}
 }

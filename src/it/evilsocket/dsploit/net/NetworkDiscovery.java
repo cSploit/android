@@ -29,28 +29,22 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import it.evilsocket.dsploit.MainActivity;
-import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.net.Endpoint;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.core.System;
-import android.app.IntentService;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-public class NetworkMonitorService extends IntentService
+public class NetworkDiscovery extends Thread
 {
-	public static final String TAG				 = "NETWORKMONITORSERVICE";
+	public static final String TAG				 = "NetworkDiscovery";
 	
-	public static final String NEW_ENDPOINT		 = "NetworkMonitorService.action.NEW_ENDPOINT";
-	public static final String ENDPOINT_UPDATE	 = "NetworkMonitorService.action.ENDPOINT_UPDATE";
-	public static final String ENDPOINT_ADDRESS  = "NetworkMonitorService.data.ENDPOINT_ADDRESS";
-	public static final String ENDPOINT_HARDWARE = "NetworkMonitorService.data.ENDPOINT_HARDWARE";
-	public static final String ENDPOINT_NAME     = "NetworkMonitorService.data.ENDPOINT_NAME";
+	public static final String NEW_ENDPOINT		 = "NetworkDiscovery.action.NEW_ENDPOINT";
+	public static final String ENDPOINT_UPDATE	 = "NetworkDiscovery.action.ENDPOINT_UPDATE";
+	public static final String ENDPOINT_ADDRESS  = "NetworkDiscovery.data.ENDPOINT_ADDRESS";
+	public static final String ENDPOINT_HARDWARE = "NetworkDiscovery.data.ENDPOINT_HARDWARE";
+	public static final String ENDPOINT_NAME     = "NetworkDiscovery.data.ENDPOINT_NAME";
 
 	private static final String  ARP_TABLE_FILE   = "/proc/net/arp";
 	private static final Pattern ARP_TABLE_PARSER = Pattern.compile( "^([\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3})\\s+([0-9-a-fx]+)\\s+([0-9-a-fx]+)\\s+([a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2}:[a-f0-9]{2})\\s+([^\\s]+)\\s+(.+)$", Pattern.CASE_INSENSITIVE );
@@ -70,9 +64,10 @@ public class NetworkMonitorService extends IntentService
 		(byte)0x0,  (byte)0x0,  (byte)0x21, (byte)0x0,  (byte)0x1
 	};
 
-	private UdpProber mProber		  = null;
-	private ArpReader mArpReader 	  = null;
-	private int 	  mNotificationId = 0;
+	private Context   mContext	 = null;
+	private UdpProber mProber	 = null;
+	private ArpReader mArpReader = null;
+	private boolean   mRunning	 = false;
 	
 	private class ArpReader extends Thread
 	{				
@@ -321,92 +316,58 @@ public class NetworkMonitorService extends IntentService
 		}
 	}
 	
-	public NetworkMonitorService() {
-        super("NetworkMonitorService");
-    }
-
-    public NetworkMonitorService( String name ) {
-        super(name);        
-    }
-	
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		Log.d( TAG, "Starting ..." );	
-		
-		mArpReader = new ArpReader();
+	public NetworkDiscovery( Context context ) {
+        super("NetworkDiscovery");
+        
+        mContext   = context;
+        mArpReader = new ArpReader();
 		mProber	   = new UdpProber();
-	}
-	
-	private void sendNotification( String message ) {
-		if( System.getSettings().getBoolean( "PREF_NETWORK_NOTIFICATIONS", true ) )
-		{
-			NotificationManager manager 	 = ( NotificationManager )getSystemService(Context.NOTIFICATION_SERVICE);
-			Notification 		notification = new Notification( R.drawable.dsploit_icon_48 , message, java.lang.System.currentTimeMillis() );
-			Context 			context 	 = getApplicationContext();
-			PendingIntent	    pending		 = PendingIntent.getActivity
-			( 
-				context, 
-				0, 
-				new Intent( this, MainActivity.class ).setFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP ), 
-				PendingIntent.FLAG_CANCEL_CURRENT 
-			);
+		mRunning   = false;
+    }
 
-			notification.flags |= Notification.FLAG_ONGOING_EVENT;
-			
-			notification.setLatestEventInfo( context, "Network Monitor", message, pending );
-			
-			manager.cancel( mNotificationId );
-			manager.notify( ++mNotificationId, notification );
-		}
-	}
-	
 	private void sendNewEndpointNotification( Endpoint endpoint, String name ) {
-		if( name != null )
-			sendNotification( "New endpoint found on network : " + name + " ( " + endpoint.toString() + " )" );
-		else
-			sendNotification( "New endpoint found on network : " + endpoint.toString() );
-		
 		Intent intent = new Intent( NEW_ENDPOINT );
 		
 		intent.putExtra( ENDPOINT_ADDRESS,  endpoint.toString() );
 		intent.putExtra( ENDPOINT_HARDWARE, endpoint.getHardwareAsString() );
 		intent.putExtra( ENDPOINT_NAME,     name == null ? "" : name );
 		
-        sendBroadcast(intent);    	
+        mContext.sendBroadcast(intent);    	
 	}
 	
 	private void sendEndpointUpdateNotification( ) {
-        sendBroadcast( new Intent( ENDPOINT_UPDATE ) );  
+		mContext.sendBroadcast( new Intent( ENDPOINT_UPDATE ) );  
+	}
+	
+	public boolean isRunning() {
+		return mRunning;
 	}
 
 	@Override
-	protected void onHandleIntent( Intent intent ) {			
-		sendNotification( "Network monitor started ..." );
-		   		
+	public void run( ) {			
+		Log.d( TAG, "Network monitor started ..." );
+		
+		mRunning = true;
+		   				
 		try
 		{			
 			mProber.start();					
 			mArpReader.start();
-						
+					
 			mProber.join();
 			mArpReader.join();
+			
+			Log.d( TAG, "Network monitor stopped." );
+			
+			mRunning = false;
 		}
 		catch( Exception e )
 		{
 			System.errorLogging( TAG, e );
 		}		
 	}
-
-	@Override
-	public void onDestroy() {		
-		Log.d( TAG, "Stopping ..." );
-		
-		NotificationManager manager = ( NotificationManager )getSystemService( Context.NOTIFICATION_SERVICE );
-		
-		for( int i = mNotificationId; i >= 0; i-- )
-			manager.cancel( i );
-		
+	
+	public void exit() {
 		try
 		{
 			mProber.exit();
@@ -415,8 +376,7 @@ public class NetworkMonitorService extends IntentService
 		catch( Exception e )
 		{
 			System.errorLogging( TAG, e );
-		}
+		}				
 	}
-
 }
 	

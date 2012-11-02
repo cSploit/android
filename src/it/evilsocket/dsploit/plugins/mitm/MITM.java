@@ -384,6 +384,21 @@ public class MITM extends Plugin
                                 
         checkForOpenPorts();
         
+        mActionListView = ( ListView )findViewById( R.id.actionListView );
+        mActionAdapter  = new ActionAdapter( R.layout.plugin_mitm_list_item, mActions );
+        
+        mActionListView.setAdapter( mActionAdapter );     
+        
+		mImagePicker = new Intent( Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI );		
+		mImagePicker.setType("image/*");
+		mImagePicker.putExtra( Intent.EXTRA_LOCAL_ONLY, true );
+		
+		mScriptPicker = new Intent();
+		mScriptPicker.addCategory( Intent.CATEGORY_OPENABLE );
+        mScriptPicker.setType( "text/*" );
+        mScriptPicker.setAction( Intent.ACTION_GET_CONTENT );
+        mScriptPicker.putExtra( Intent.EXTRA_LOCAL_ONLY, true );
+        
         mActions.add( new Action
         ( 
         	"Simple Sniff", 
@@ -850,22 +865,7 @@ public class MITM extends Plugin
 				else
 					setStoppedState();
 			}
-		}));
-        
-        mActionListView = ( ListView )findViewById( R.id.actionListView );
-        mActionAdapter  = new ActionAdapter( R.layout.plugin_mitm_list_item, mActions );
-        
-        mActionListView.setAdapter( mActionAdapter );     
-        
-		mImagePicker = new Intent( Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI );		
-		mImagePicker.setType("image/*");
-		mImagePicker.putExtra( Intent.EXTRA_LOCAL_ONLY, true );
-		
-		mScriptPicker = new Intent();
-		mScriptPicker.addCategory( Intent.CATEGORY_OPENABLE );
-        mScriptPicker.setType( "text/*" );
-        mScriptPicker.setAction( Intent.ACTION_GET_CONTENT );
-        mScriptPicker.putExtra( Intent.EXTRA_LOCAL_ONLY, true );
+		}));        
 	}
 	
 	@Override

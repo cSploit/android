@@ -33,10 +33,10 @@
         </activity>
 
         <service
-            android:name=".net.NetworkMonitorService"
+            android:name=".net.NetworkDiscovery"
             android:enabled="true" />
         <service
-            android:name=".core.UpdateService"
+            android:name=".core.UpdateChecker"
             android:enabled="true" />
 
         <activity
