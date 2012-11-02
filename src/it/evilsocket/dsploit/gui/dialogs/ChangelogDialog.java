@@ -29,6 +29,8 @@ import android.graphics.Bitmap;
 
 public class ChangelogDialog extends AlertDialog 
 {
+	private final static String ERROR_HTML = "<html><body><p><b>Something went wrong while retrieving the changelog:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>";
+	
 	private ProgressDialog mLoader = null;
 	
 	public ChangelogDialog( final Activity activity ) {
@@ -60,12 +62,27 @@ public class ChangelogDialog extends AlertDialog
 
 			@Override
 			public void onReceivedError( WebView view, int errorCode, String description, String failingUrl ) {
-				super.onReceivedError(view, errorCode, description, failingUrl);
 				try 
 				{
 					mLoader.dismiss();
 				} 
 				catch( Exception e ) { }
+				
+				try 
+				{
+					view.stopLoading();
+			    } 
+				catch( Exception e ) { }
+			    
+				try 
+			    {
+					view.clearView();
+			    } 
+				catch( Exception e ) { }
+
+				view.loadData( ERROR_HTML.replace( "{DESCRIPTION}", description ), "text/html", "UTF-8" );
+				
+				super.onReceivedError(view, errorCode, description, failingUrl);
 			}
 		});
 		
