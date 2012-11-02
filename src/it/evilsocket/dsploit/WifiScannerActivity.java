@@ -377,10 +377,7 @@ public class WifiScannerActivity extends SherlockListActivity
         if( Network.isWifiConnected( this ) )
         {
         	WifiInfo info = mWifiManager.getConnectionInfo();        	
-        	if( mWifiManager.disconnect() )
-        	{
-        		NetworkManager.cleanPreviousConfiguration( mWifiManager, info );
-        	}
+        	NetworkManager.cleanPreviousConfiguration( mWifiManager, info );        	
         }
 	    
 	    mScanReceiver.register( this );   
