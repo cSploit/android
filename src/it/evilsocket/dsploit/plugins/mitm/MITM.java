@@ -516,6 +516,8 @@ public class MITM extends Plugin
 									if( iport <= 0 || iport > 65535 )
 										throw new Exception( "Port out of range." );
 
+									address = address.startsWith("http") ? address : "http://" + address;
+									
 									URL url = new URL( address );								
 									address = url.getHost();
 	
