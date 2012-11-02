@@ -26,6 +26,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -588,8 +589,15 @@ public class MITM extends Plugin
 						public void onChoice( int choice ) {
 							if( choice == 0 )
 							{
-								mCurrentActivity = activity;										
-								startActivityForResult( mImagePicker, SELECT_PICTURE );  
+								try
+								{
+									mCurrentActivity = activity;								
+									startActivityForResult( mImagePicker, SELECT_PICTURE );
+								}
+								catch( ActivityNotFoundException e )
+								{
+									new ErrorDialog( "Error", "This is weird, seems like you have no application to handle image browsing.", MITM.this ).show();
+								}
 							}
 							else
 							{
@@ -751,8 +759,15 @@ public class MITM extends Plugin
 						public void onChoice( int choice ) {
 							if( choice == 0 )
 							{
-								mCurrentActivity = activity;
-								startActivityForResult( mScriptPicker, SELECT_SCRIPT );
+								try
+								{
+									mCurrentActivity = activity;
+									startActivityForResult( mScriptPicker, SELECT_SCRIPT );
+								}
+								catch( ActivityNotFoundException e )
+								{
+									new ErrorDialog( "Error", "Seems like you have no file manager capable of browsing files, please install one.", MITM.this ).show();
+								}
 							}
 							else
 							{
