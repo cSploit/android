@@ -31,6 +31,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
@@ -306,41 +307,53 @@ public class MITM extends Plugin
 	    }
 	    else if( request == SettingsActivity.SETTINGS_DONE )
 		{
-	    	checkForOpenPorts();
+	    	new CheckForOpenPortsTask().execute();
 		}
 	}
 	
-	private void checkForOpenPorts() {
-		/*
-         * Check if needed ports are available, otherwise inform the user.
-         */
-        String message = null;
-        
-        if( System.isPortAvailable( System.HTTP_PROXY_PORT ) == false )
-        	message = "Port " + System.HTTP_PROXY_PORT + " which is needed by the transparent proxy is taken from another process, open application settings ?";
-        
-        else if( System.isPortAvailable( System.HTTP_SERVER_PORT ) == false )
-        	message = "Port " + System.HTTP_SERVER_PORT + " which is needed by the mitm server is taken from another process, open application settings ?";
-        
-        else if( System.getSettings().getBoolean( "PREF_HTTPS_REDIRECT", true ) && System.isPortAvailable( System.HTTPS_REDIR_PORT ) == false )
-        	message = "Port " + System.HTTPS_REDIR_PORT + " which is needed by the mitm https redirector is taken from another process, open application settings ?";
-        
-        if( message != null )
-        {
-        	new ConfirmDialog( "Warning", message, this, new ConfirmDialogListener(){
-				@Override
-				public void onConfirm() {
-					startActivityForResult( new Intent( MITM.this, SettingsActivity.class ), SettingsActivity.SETTINGS_DONE );
-				}
+	public class CheckForOpenPortsTask extends AsyncTask<Void, Void, Boolean> 
+	{
+		private String mMessage = null;
+		
+		@Override
+		protected Boolean doInBackground(Void... dummy) {
+			/*
+	         * Check if needed ports are available, otherwise inform the user.
+	         */
+			if( System.isPortAvailable( System.HTTP_PROXY_PORT ) == false )
+				mMessage = "Port " + System.HTTP_PROXY_PORT + " which is needed by the transparent proxy is taken from another process, open application settings ?";
+	        
+	        else if( System.isPortAvailable( System.HTTP_SERVER_PORT ) == false )
+	        	mMessage = "Port " + System.HTTP_SERVER_PORT + " which is needed by the mitm server is taken from another process, open application settings ?";
+	        
+	        else if( System.getSettings().getBoolean( "PREF_HTTPS_REDIRECT", true ) && System.isPortAvailable( System.HTTPS_REDIR_PORT ) == false )
+	        	mMessage = "Port " + System.HTTPS_REDIR_PORT + " which is needed by the mitm https redirector is taken from another process, open application settings ?";
+						
+	        else
+	        	mMessage = null;
+			
+			return true;
+		}	
+		
+		@Override
+		protected void onPostExecute( Boolean result ) {
+			if( mMessage != null )
+	        {
+	        	new ConfirmDialog( "Warning", mMessage, MITM.this, new ConfirmDialogListener(){
+					@Override
+					public void onConfirm() {
+						startActivityForResult( new Intent( MITM.this, SettingsActivity.class ), SettingsActivity.SETTINGS_DONE );
+					}
 
-				@Override
-				public void onCancel() {
-					new FinishDialog( "Error", "MITM modules need all ports available.", MITM.this ).show();
-				}
-			}).show();
-        }
+					@Override
+					public void onCancel() {
+						new FinishDialog( "Error", "MITM modules need all ports available.", MITM.this ).show();
+					}
+				}).show();
+	        }
+		}
 	}
-	
+
 	private void setStoppedState() {
 		int rows = mActionListView.getChildCount(),
 			i;
@@ -383,7 +396,7 @@ public class MITM extends Plugin
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);   
                                 
-        checkForOpenPorts();
+        new CheckForOpenPortsTask().execute();
         
         mActionListView = ( ListView )findViewById( R.id.actionListView );
         mActionAdapter  = new ActionAdapter( R.layout.plugin_mitm_list_item, mActions );

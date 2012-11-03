@@ -263,7 +263,7 @@ public class Hijacker extends SherlockActivity
 				mAdapter.notifyDataSetChanged();
 			}
 		}
-		
+
 		public class SessionHolder
 	    {
 			ImageView favicon;
