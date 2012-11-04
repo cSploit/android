@@ -63,6 +63,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -83,6 +84,7 @@ public class MainActivity extends SherlockListActivity
 	private UpdateChecker	 mUpdateChecker			 = null;
 	private EndpointReceiver mEndpointReceiver 		 = null;
 	private UpdateReceiver	 mUpdateReceiver		 = null;	
+	private Menu			 mMenu					 = null;
 	private TextView		 mUpdateStatus			 = null;
 	private Toast 			 mToast 			 	 = null;
 	private long  			 mLastBackPressTime 	 = 0;
@@ -324,7 +326,7 @@ public class MainActivity extends SherlockListActivity
         mUpdateReceiver.register( MainActivity.this );
 		
         startUpdateChecker();
-        stopNetworkDiscovery();
+        stopNetworkDiscovery( true );
         
 		invalidateOptionsMenu();
 	}
@@ -345,7 +347,7 @@ public class MainActivity extends SherlockListActivity
 		
 		layout.addView( mUpdateStatus );
 		
-		stopNetworkDiscovery();
+		stopNetworkDiscovery( true );
 		
 		invalidateOptionsMenu();
 	}
@@ -395,7 +397,7 @@ public class MainActivity extends SherlockListActivity
         mUpdateReceiver.register( MainActivity.this );
         
         startUpdateChecker();
-        startNetworkDiscovery();
+        startNetworkDiscovery( false );
         
         // if called for the second time after wifi connection
         invalidateOptionsMenu();
@@ -531,6 +533,8 @@ public class MainActivity extends SherlockListActivity
 			menu.findItem( R.id.ss_monitor ).setEnabled( false );
 			menu.findItem( R.id.ss_monitor ).setEnabled( false );
 		}
+		
+		mMenu = menu;
 				
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -544,6 +548,8 @@ public class MainActivity extends SherlockListActivity
 		
 		else				
 			item.setTitle( "Start Network Monitor" );
+		
+		mMenu = menu;
 						
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -556,16 +562,17 @@ public class MainActivity extends SherlockListActivity
 		}		
 	}
 	
-	public void startNetworkDiscovery( ) {
-		stopNetworkDiscovery();
+	public void startNetworkDiscovery( boolean silent ) {
+		stopNetworkDiscovery( silent );
 		
 		mNetworkDiscovery = new NetworkDiscovery( this );
 		mNetworkDiscovery.start();
 		
-		Toast.makeText( this, "Network discovery started.", Toast.LENGTH_SHORT ).show();
+		if( silent == false )
+			Toast.makeText( this, "Network discovery started.", Toast.LENGTH_SHORT ).show();
 	}
 	
-	public void stopNetworkDiscovery( ) {
+	public void stopNetworkDiscovery( boolean silent ) {
 		if( mNetworkDiscovery != null )
 		{
 			if( mNetworkDiscovery.isRunning() )
@@ -580,7 +587,8 @@ public class MainActivity extends SherlockListActivity
 					// swallow
 				}
 				
-				Toast.makeText( this, "Network discovery stopped.", Toast.LENGTH_SHORT ).show();
+				if( silent == false )
+					Toast.makeText( this, "Network discovery stopped.", Toast.LENGTH_SHORT ).show();
 			}
 			
 			mNetworkDiscovery = null;
@@ -621,15 +629,31 @@ public class MainActivity extends SherlockListActivity
 		}
 		else if( itemId == R.id.scan )
 		{			
-			startNetworkDiscovery();
+			if( mMenu != null )
+				mMenu.findItem( R.id.scan ).setActionView( new ProgressBar(this) );
 			
+			new Thread( new Runnable(){
+				@Override
+				public void run() {
+					startNetworkDiscovery( true );
+					
+					MainActivity.this.runOnUiThread( new Runnable(){
+						@Override
+						public void run() {
+							if( mMenu != null )
+								mMenu.findItem( R.id.scan ).setActionView( null);
+						}
+					});
+				}
+			}).start();
+									
 			item.setTitle( "Stop Network Monitor" );
 
 			return true;
 		}
 		else if( itemId == R.id.wifi_scan )
 		{
-			stopNetworkDiscovery();
+			stopNetworkDiscovery( true );
 			
 			if( mEndpointReceiver != null )
 				mEndpointReceiver.unregister();
@@ -734,13 +758,13 @@ public class MainActivity extends SherlockListActivity
 		{
 			if( mNetworkDiscovery != null && mNetworkDiscovery.isRunning() )
 			{
-				stopNetworkDiscovery();
+				stopNetworkDiscovery( false );
 				
 				item.setTitle( "Start Network Monitor" );
 			}
 			else
 			{
-				startNetworkDiscovery();
+				startNetworkDiscovery( false );
 				
 				item.setTitle( "Stop Network Monitor" );
 			}
@@ -770,7 +794,7 @@ public class MainActivity extends SherlockListActivity
 	protected void onListItemClick( ListView l, View v, int position, long id ){
 		super.onListItemClick( l, v, position, id);
 
-		stopNetworkDiscovery();
+		stopNetworkDiscovery( true );
 		
 		System.setCurrentTarget( position );
 		
@@ -816,7 +840,7 @@ public class MainActivity extends SherlockListActivity
 	
 	@Override
 	public void onDestroy() {
-		stopNetworkDiscovery();
+		stopNetworkDiscovery( true );
 					
 		if( mEndpointReceiver != null )
 			mEndpointReceiver.unregister();

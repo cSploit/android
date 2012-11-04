@@ -37,12 +37,10 @@ import java.util.Comparator;
 import java.util.List;
 
 import android.app.ProgressDialog;
+import android.text.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Typeface;
 import android.net.wifi.ScanResult;
 import android.net.wifi.SupplicantState;
@@ -59,12 +57,14 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
+@SuppressWarnings("deprecation")
 public class WifiScannerActivity extends SherlockListActivity
 {	
 	private static final String TAG = "WIFISCANNER";
@@ -84,7 +84,8 @@ public class WifiScannerActivity extends SherlockListActivity
 	private List<String>	   mKeyList	               = null;
 	private String			   mCurrentKey             = null;
 	private int				   mCurrentNetworkId       = -1;
-		
+	private ClipboardManager   mClipboard			   = null;
+	
 	public class ScanAdapter extends ArrayAdapter<ScanResult> 
 	{						
 		class ResultHolder
@@ -142,39 +143,39 @@ public class WifiScannerActivity extends SherlockListActivity
 			return mResults.get( position );
 		}
 		
-		public int getImageFromSignal( int level ) {
-			level = Math.abs( level );
-			
-			if( level <= 76 )
-				return R.drawable.wifi_high;
-			
-			else if( level <= 87 )
-				return R.drawable.wifi_good;
-			
-			else if( level <= 98 )
-				return R.drawable.wifi_low;
-			
-			else
-				return R.drawable.wifi_bad;
-		}
-		
-		public Bitmap addLogo( Bitmap mainImage, Bitmap logoImage ) { 
-		    Bitmap finalImage = null; 
-		    int width, height = 0; 
-		        
-		    width = mainImage.getWidth(); 
-		    height = mainImage.getHeight(); 
-		    
-		    finalImage = Bitmap.createBitmap(width, height, mainImage.getConfig()); 
-		    
-		    Canvas canvas = new Canvas(finalImage); 
-		    
-		    canvas.drawBitmap(mainImage, 0,0,null);
-		    canvas.drawBitmap(logoImage, canvas.getWidth()-logoImage.getWidth() ,canvas.getHeight()-logoImage.getHeight() ,null);
+		public int getWifiIcon( ScanResult wifi ) {
+			int level = Math.abs( wifi.level );
 
-		    return finalImage; 
+			if( wifi.capabilities.contains("WPA") || wifi.capabilities.contains("WEP") )
+			{
+				if( level <= 76 )
+					return R.drawable.ic_wifi_lock_signal_4;
+				
+				else if( level <= 87 )
+					return R.drawable.ic_wifi_lock_signal_3;
+				
+				else if( level <= 98 )
+					return R.drawable.ic_wifi_lock_signal_2;
+				
+				else
+					return R.drawable.ic_wifi_lock_signal_1;
+			}
+			else
+			{
+				if( level <= 76 )
+					return R.drawable.ic_wifi_signal_4;
+				
+				else if( level <= 87 )
+					return R.drawable.ic_wifi_signal_3;
+				
+				else if( level <= 98 )
+					return R.drawable.ic_wifi_signal_2;
+				
+				else
+					return R.drawable.ic_wifi_signal_1;
+			}
 		}
-		
+
 		@Override
 	    public View getView( int position, View convertView, ViewGroup parent ) {		
 	        View 		 row    = convertView;
@@ -206,13 +207,8 @@ public class WifiScannerActivity extends SherlockListActivity
 	        
 	        else
 	        	holder.supported.setImageResource( R.drawable.ic_impossible );
-	        
-	        Bitmap picture = BitmapFactory.decodeResource( getResources(), getImageFromSignal( result.level ) );
-	        
-	        if( result.capabilities.contains("WEP") || result.capabilities.contains("WPA") )
-	        	picture = addLogo( picture, BitmapFactory.decodeResource( getResources(), R.drawable.wifi_locked ) );
-	        	        	        	      
-	        holder.powerIcon.setImageBitmap( picture );
+
+	        holder.powerIcon.setImageResource( getWifiIcon( result ) );
 	        holder.ssid.setTypeface( null, Typeface.BOLD );
 	        holder.ssid.setText( result.SSID );
 	        
@@ -239,7 +235,7 @@ public class WifiScannerActivity extends SherlockListActivity
 	        ( 
 	          Html.fromHtml
 	          (
-	            result.BSSID + " " + protection + " <small>( " + ( Math.round( ( result.frequency / 1000.0 ) * 10.0 ) / 10.0 ) + " Ghz )</small>"
+	            result.BSSID.toUpperCase() + " " + protection + " <small>( " + ( Math.round( ( result.frequency / 1000.0 ) * 10.0 ) / 10.0 ) + " Ghz )</small>"
 	          ) 
 	        );
 	        
@@ -326,6 +322,10 @@ public class WifiScannerActivity extends SherlockListActivity
 		
 		mConnectionReceiver.unregister();
 		mConnected = true;
+		
+		mClipboard.setText( mCurrentKey );
+		
+		Toast.makeText( this, "WiFi key copied to clipboard.", Toast.LENGTH_SHORT ).show();
 	}
 	
 	public void onFailedConnection() {
@@ -356,6 +356,7 @@ public class WifiScannerActivity extends SherlockListActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 
         mWifiManager        = ( WifiManager )this.getSystemService( Context.WIFI_SERVICE );
+        mClipboard			= ( ClipboardManager )this.getSystemService( Context.CLIPBOARD_SERVICE );
         mWifiMatcher        = new WirelessMatcher( getResources().openRawResource(R.raw.alice) );
         mScanReceiver	    = new ScanReceiver();
         mConnectionReceiver = new ConnectionReceiver();
@@ -383,7 +384,7 @@ public class WifiScannerActivity extends SherlockListActivity
 	    mScanReceiver.register( this );   
 	            
 	    if( mMenu != null )					
-			mMenu.findItem(R.id.scan).setActionView( new ProgressBar(this) );
+			mMenu.findItem( R.id.scan ).setActionView( new ProgressBar(this) );
 	    
 	    mStatusText.setText( "Scanning ..." );
 	    mScanning = true;
