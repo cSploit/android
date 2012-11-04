@@ -61,15 +61,15 @@ public class IP4Address
 		if( ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN )
 		{
 			mByteArray[0] = (byte)( address & 0xFF );
-			mByteArray[2] = (byte)( 0xFF & address >> 16 );
 			mByteArray[1] = (byte)( 0xFF & address >> 8 );
+			mByteArray[2] = (byte)( 0xFF & address >> 16 );
 			mByteArray[3] = (byte)( 0xFF & address >> 24 );
 		}
 		else
 		{
 			mByteArray[0] = (byte)( 0xFF & address >> 24 );
-			mByteArray[2] = (byte)( 0xFF & address >> 16 );
-			mByteArray[1] = (byte)( 0xFF & address >> 8 );
+			mByteArray[1] = (byte)( 0xFF & address >> 16 );
+			mByteArray[2] = (byte)( 0xFF & address >> 8 );
 			mByteArray[3] = (byte)( address & 0xFF );
 		}
 		
@@ -131,7 +131,7 @@ public class IP4Address
 		return mAddress.equals( address );
 	}
 	
-	public int countBits( ) {
+	public int getPrefixLength( ) {
     	int bits, i, n = mInteger;
     	
     	for( i = 0, bits = ( n & 1 ); i < 32; i++, n >>>= 1, bits += n & 1 );    		

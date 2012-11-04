@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -127,14 +129,16 @@ public class NetworkDiscovery extends Thread
 								   device  = matcher.group( 6 );
 							
 							if( device.equals(iface) && hwaddr.equals("00:00:00:00:00:00") == false && flags.contains("2") )
-							{
+							{								
 								endpoint = new Endpoint( address, hwaddr );
 								target   = new Target( endpoint );
 								
 								synchronized( mNetBiosMap ){ name = mNetBiosMap.get(address); }
 								
 								if( name == null && target.isRouter() == false )
-								{										
+								{
+									new NBResolver( address ).start();
+									
 									// attempt DNS resolution
 									name = endpoint.getAddress().getHostName();
 									
@@ -182,14 +186,16 @@ public class NetworkDiscovery extends Thread
 	
 	private class NBResolver extends Thread
 	{
-		InetAddress    mAddress = null;
-		DatagramSocket mSocket  = null;
-		
-		public NBResolver( InetAddress address, DatagramSocket socket ) {
+		private InetAddress    mAddress = null;
+		private DatagramSocket mSocket  = null;
+
+		public NBResolver( String address ) throws SocketException, UnknownHostException {
 			super( "NBResolver" );
 			
-			mAddress = address;
-			mSocket  = socket;
+			mAddress   = InetAddress.getByName( address );
+			mSocket    = new DatagramSocket();
+			
+			mSocket.setSoTimeout( 200 );
 		}
 		
 		@Override
@@ -200,11 +206,12 @@ public class NetworkDiscovery extends Thread
 			String		   name    = null,
 						   address = mAddress.getHostAddress();
 			Target 		   target  = null;
-
+			
 			for( int i = 0; i < 3; i++ )
 			{				
 				try
 				{
+					mSocket.send( query );
 					mSocket.receive( packet );
 					
 					byte[] data = packet.getData();
@@ -298,7 +305,7 @@ public class NetworkDiscovery extends Thread
 		    				socket.setSoTimeout( 200 );
 		    				socket.send( packet );    	  
 	
-		    				new NBResolver( address, socket ).start();
+		    				socket.close();
 						}
 					}
 

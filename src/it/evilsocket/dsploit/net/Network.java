@@ -25,7 +25,6 @@ import java.net.NetworkInterface;
 import java.net.NoRouteToHostException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Enumeration;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -88,19 +87,18 @@ public class Network
 		mLocal	 			 = new IP4Address( mInfo.ipAddress );
 		mBase				 = new IP4Address( mInfo.netmask & mInfo.gateway );
 		
-		if( isConnected() == false)
+		if( isConnected() == false )
 			throw new NoRouteToHostException("Not connected to any WiFi access point.");
 		
 		else
 		{
 			try
 			{
-				mInterface = NetworkInterface.getByInetAddress( getLocalAddress() );
+				mInterface = NetworkInterface.getByInetAddress( getLocalAddress() );			
 			}
 			catch( SocketException e )
 			{
-				System.errorLogging( TAG, e );
-				
+				System.errorLogging( TAG, e );				
 				/*
 				 * Issue #26: Initialization error in ColdFusionX ROM
 				 * 
@@ -108,27 +106,11 @@ public class Network
 				 * This rom maps the default wifi interface to a generic usb device 
 				 * ( maybe it's missing the specific interface driver ), which is obviously not, and
 				 * it all goes shit, use an alternative method to obtain the interface object.
-				 */
-				Enumeration<NetworkInterface> interfaces   = NetworkInterface.getNetworkInterfaces();
-				InetAddress					  ifaceAddress = getLocalAddress();
+				 */				
+				mInterface = NetworkInterface.getByName( java.lang.System.getProperty( "wifi.interface", "wlan0" ) );
 				
-				while( interfaces != null && mInterface == null && interfaces.hasMoreElements() ) 
-				{
-					NetworkInterface iface = interfaces.nextElement();
-					//since each interface could have many InetAddresses…
-					Enumeration<InetAddress> inetAddresses = iface.getInetAddresses();
-					
-					while( inetAddresses.hasMoreElements() ) 
-					{
-						InetAddress address = inetAddresses.nextElement();
-
-						if( address.equals(ifaceAddress) )
-						{
-							mInterface = iface;
-							break;
-						}
-					}
-				}
+				if( mInterface == null )
+					throw e;
 			}
 		}
 	}
@@ -197,14 +179,10 @@ public class Network
 
     	return ( network & 0xFF) + "." + (( network >> 8 ) & 0xFF) + "." + (( network >> 16 ) & 0xFF) + "." + (( network >> 24 ) & 0xFF);
 	}
-	
-	public int getNetworkMaskedAsInt( ) {
-		return mInfo.gateway & mInfo.netmask;
-	}
-	
+
 	public String getNetworkRepresentation( )
 	{				
-    	return getNetworkMasked() + "/" + mNetmask.countBits();
+    	return getNetworkMasked() + "/" + mNetmask.getPrefixLength();
 	}
 	
 	public DhcpInfo getInfo(){
