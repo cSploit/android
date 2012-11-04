@@ -96,7 +96,7 @@ public class MITM extends Plugin
 		}
 		
 		public Action( String name, String description, OnClickListener listener ) {
-			this( name, description, R.drawable.action_plugin_48, listener );
+			this( name, description, R.drawable.action_plugin, listener );
 		}
 	}
 	
@@ -163,7 +163,7 @@ public class MITM extends Plugin
 		    "Perform various man-in-the-middle attacks, such as network sniffing, traffic manipulation, etc.", 
 		    new Target.Type[]{ Target.Type.ENDPOINT, Target.Type.NETWORK }, 
 		    R.layout.plugin_mitm,
-		    R.drawable.action_mitm_48 
+		    R.drawable.action_mitm 
 	    );		
 	}
 	
@@ -417,7 +417,7 @@ public class MITM extends Plugin
         ( 
         	"Simple Sniff", 
         	"Redirect target's traffic through this device and show some stats while dumping it to a pcap file.", 
-        	R.drawable.action_sniffer_48,
+        	R.drawable.action_sniffer,
         	new OnClickListener(){
 			@Override
 			public void onClick( View v ) 
@@ -440,7 +440,7 @@ public class MITM extends Plugin
         ( 
         	"Password Sniffer", 
         	"Sniff passwords of many protocols such as http, ftp, imap, imaps, irc, msn, etc from the target.",
-        	R.drawable.action_passwords_48,
+        	R.drawable.action_passwords,
         	new OnClickListener(){
         	@Override
 			public void onClick( View v ) 
@@ -463,7 +463,7 @@ public class MITM extends Plugin
         ( 
         	"Session Hijacker", 
         	"Listen for cookies on the network and hijack sessions.", 
-        	R.drawable.action_hijack_48,
+        	R.drawable.action_hijack,
         	new OnClickListener(){
 			@Override
 			public void onClick( View v ) 
@@ -486,7 +486,7 @@ public class MITM extends Plugin
         ( 
         	"Kill Connections", 
         	"Kill connections preventing the target to reach any website or server.",
-        	R.drawable.action_kill_48,
+        	R.drawable.action_kill,
         	new OnClickListener(){
 			@Override
 			public void onClick(View v) {				
@@ -522,7 +522,7 @@ public class MITM extends Plugin
         ( 
         	"Redirect", 
         	"Redirect all the http traffic to another address.",
-        	R.drawable.action_redirect_48,
+        	R.drawable.action_redirect,
         	new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -586,7 +586,7 @@ public class MITM extends Plugin
         (
         	"Replace Images", 
         	"Replace all images on webpages with the specified one.", 
-        	R.drawable.action_image_48,
+        	R.drawable.action_image,
         	new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -686,7 +686,7 @@ public class MITM extends Plugin
         (
         	"Replace Videos", 
         	"Replace all youtube videos on webpages with the specified one.", 
-        	R.drawable.action_youtube_48,
+        	R.drawable.action_youtube,
         	new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -756,7 +756,7 @@ public class MITM extends Plugin
         ( 
         	"Script Injection", 
         	"Inject a javascript in every visited webpage.",
-        	R.drawable.action_injection_48,
+        	R.drawable.action_injection,
         	new OnClickListener(){
 			@Override
 			public void onClick(View v) {

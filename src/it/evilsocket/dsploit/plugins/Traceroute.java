@@ -92,7 +92,7 @@ public class Traceroute extends Plugin
 		    "Perform a traceroute on target.", 
 		    new Target.Type[]{ Target.Type.ENDPOINT, Target.Type.REMOTE }, 
 		    R.layout.plugin_traceroute,
-		    R.drawable.action_traceroute_48
+		    R.drawable.action_traceroute
 		);
 		
 		mTraceReceiver = new Receiver();

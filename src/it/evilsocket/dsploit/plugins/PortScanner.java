@@ -122,7 +122,7 @@ public class PortScanner extends Plugin
 		    "Perform a SYN port scanning on target.", 
 		    new Target.Type[]{ Target.Type.ENDPOINT, Target.Type.REMOTE }, 
 		    R.layout.plugin_portscanner,
-		    R.drawable.action_scanner_48 
+		    R.drawable.action_scanner 
 		);
 
 		mPortList     = new ArrayList<String>();

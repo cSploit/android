@@ -47,7 +47,7 @@ public abstract class Plugin extends SherlockActivity
 	}
 	
 	public Plugin( String name, String description, Target.Type[] allowedTargetTypes, int layoutId ){
-		this( name, description, allowedTargetTypes, layoutId, R.drawable.action_plugin_48 );
+		this( name, description, allowedTargetTypes, layoutId, R.drawable.action_plugin );
 	}
 	
 	public String getName(){

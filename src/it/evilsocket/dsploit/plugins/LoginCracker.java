@@ -180,7 +180,7 @@ public class LoginCracker extends Plugin
 		    "A very fast network logon cracker which support many different services.", 
 		    new Target.Type[]{ Target.Type.ENDPOINT, Target.Type.REMOTE }, 
 		    R.layout.plugin_login_cracker,
-		    R.drawable.action_login_48
+		    R.drawable.action_login
 	    );		
 	}
 	

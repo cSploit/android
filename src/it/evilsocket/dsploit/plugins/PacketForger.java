@@ -63,7 +63,7 @@ public class PacketForger extends Plugin implements OnClickListener
 		    "Craft and send a custom TCP or UDP packet to the target.", 
 		    new Target.Type[]{ Target.Type.ENDPOINT, Target.Type.REMOTE }, 
 		    R.layout.plugin_packet_forger,
-		    R.drawable.action_forge_48
+		    R.drawable.action_forge
 	    );		
 	}
 	

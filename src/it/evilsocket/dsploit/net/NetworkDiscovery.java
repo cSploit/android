@@ -186,6 +186,8 @@ public class NetworkDiscovery extends Thread
 	
 	private class NBResolver extends Thread
 	{
+		private static final int MAX_RETRIES = 3;
+		
 		private InetAddress    mAddress = null;
 		private DatagramSocket mSocket  = null;
 
@@ -207,7 +209,7 @@ public class NetworkDiscovery extends Thread
 						   address = mAddress.getHostAddress();
 			Target 		   target  = null;
 			
-			for( int i = 0; i < 3; i++ )
+			for( int i = 0; i < MAX_RETRIES; i++ )
 			{				
 				try
 				{

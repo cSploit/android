@@ -12,7 +12,7 @@
       android:layout_centerVertical="true"
       android:layout_marginRight="15dp"
       android:gravity="center_vertical"
-      android:src="@drawable/action_plugin_48" />
+      android:src="@drawable/action_plugin" />
       
     <TextView
         android:id="@+id/itemName"

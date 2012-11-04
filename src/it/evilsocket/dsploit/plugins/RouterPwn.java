@@ -38,7 +38,7 @@ public class RouterPwn extends Plugin
 		    "Launch the http://routerpwn.com/ service to pwn your router.", 
 		    new Target.Type[]{ Target.Type.ENDPOINT }, 
 		    Plugin.NO_LAYOUT,
-		    R.drawable.action_routerpwn_48 
+		    R.drawable.action_routerpwn 
 		);
 	}
 	

@@ -513,27 +513,27 @@ public class Target
 		try
 		{
 			if( mType == Type.NETWORK )
-				return R.drawable.target_network_48;
+				return R.drawable.target_network;
 			
 			else if( mType == Type.ENDPOINT )
 				if( isRouter() )
-					return R.drawable.target_router_48;
+					return R.drawable.target_router;
 			
 				else if( mEndpoint.getAddress().equals( System.getNetwork().getLocalAddress() ) )
-					return R.drawable.target_self_48;
+					return R.drawable.target_self;
 			
 				else
-					return R.drawable.target_endpoint_48;
+					return R.drawable.target_endpoint;
 			
 			else if( mType == Type.REMOTE )
-				return R.drawable.target_remote_48;
+				return R.drawable.target_remote;
 		}
 		catch( Exception e )
 		{
 			System.errorLogging( TAG, e );
 		}
 		
-		return R.drawable.target_network_48;
+		return R.drawable.target_network;
 	}
 	
 	public void setNetwork( Network net ){
