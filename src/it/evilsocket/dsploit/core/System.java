@@ -40,6 +40,7 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -100,7 +101,7 @@ public class System
 	private static WifiLock				 mWifiLock		= null;
 	private static WakeLock				 mWakeLock		= null;
 	private static Network 			     mNetwork  	    = null;
-	private static ArrayList<Target>     mTargets		= null;
+	private static Vector<Target>     	 mTargets		= null;
 	private static int  			     mCurrentTarget = 0;
 	private static Map<String,String>    mServices 	    = null;
 	private static Map<String,String>    mPorts         = null;
@@ -134,7 +135,7 @@ public class System
 			mSessionName   = "dsploit-session-" + java.lang.System.currentTimeMillis();
 			mUpdateManager = new UpdateManager( mContext );
 			mPlugins 	   = new ArrayList<Plugin>();
-			mTargets 	   = new ArrayList<Target>();
+			mTargets 	   = new Vector<Target>();
 								
 			// if we are here, network initialization didn't throw any error, lock wifi
 			WifiManager wifiManager = ( WifiManager )mContext.getSystemService( Context.WIFI_SERVICE );
@@ -839,7 +840,7 @@ public class System
 		return mNetwork;
 	}
 	
-	public static ArrayList<Target> getTargets() {
+	public static Vector<Target> getTargets() {
 		return mTargets;
 	}
 	
@@ -903,16 +904,7 @@ public class System
 	}
 	
 	public static boolean hasTarget( Target target ) {
-		synchronized( mTargets )
-		{
-			for( Target t : mTargets )
-			{
-				if( t != null && t.equals(target) )
-					return true;
-			}
-		}
-		
-		return false;
+		return mTargets.contains( target );
 	}
 
 	public static void setCurrentTarget( int index ){
@@ -924,13 +916,10 @@ public class System
 	}
 	
 	public static Target getTargetByAddress( String address ) {
-		synchronized( mTargets )
+		for( Target t : mTargets )
 		{
-			for( Target t : mTargets )
-			{
-				if( t != null && t.getAddress() != null && t.getAddress().getHostAddress().equals(address) )
-					return t;
-			}
+			if( t != null && t.getAddress() != null && t.getAddress().getHostAddress().equals(address) )
+				return t;
 		}
 		
 		return null;

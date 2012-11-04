@@ -417,6 +417,14 @@ public class Target
 		return false;
 	}
 	
+	public boolean equals( Object o ) {
+		if( o instanceof Target )
+			return equals( (Target)o );
+		
+		else
+			return false;
+	}
+	
 	public String getDisplayAddress() {
 		if( mType == Type.NETWORK )
 			return mNetwork.getNetworkRepresentation();
