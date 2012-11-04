@@ -72,7 +72,9 @@ public class HijackerWebView extends SherlockActivity
                
         mWebView.setWebChromeClient( new WebChromeClient() {
 			public void onProgressChanged( WebView view, int progress ) {
-				getSupportActionBar().setSubtitle( HijackerWebView.this.mWebView.getUrl() );
+				if( mWebView != null )
+					getSupportActionBar().setSubtitle( mWebView.getUrl() );
+				
 				setSupportProgressBarIndeterminateVisibility(true);
 				// Normalize our progress along the progress bar's scale
 				int mmprogress = (Window.PROGRESS_END - Window.PROGRESS_START) / 100 * progress;
@@ -173,6 +175,9 @@ public class HijackerWebView extends SherlockActivity
 		
 		else
 		{
+			if( mWebView != null )
+				mWebView.stopLoading();
+			
 			super.onBackPressed();
 	    	overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
 		}
