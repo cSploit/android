@@ -135,23 +135,25 @@ public class NetworkDiscovery extends Thread
 								
 								synchronized( mNetBiosMap ){ name = mNetBiosMap.get(address); }
 								
-								if( name == null && target.isRouter() == false )
+								if( name == null )
 								{
 									new NBResolver( address ).start();
-									
-									// attempt DNS resolution
-									name = endpoint.getAddress().getHostName();
-									
-									if( name.equals(address) == false )
+									if( target.isRouter() == false )
 									{
-										Log.d( "NETBIOS", address + " was DNS resolved to " + name );
+										// attempt DNS resolution
+										name = endpoint.getAddress().getHostName();
 										
-										synchronized( mNetBiosMap ){ mNetBiosMap.put( address, name ); }
+										if( name.equals(address) == false )
+										{
+											Log.d( "NETBIOS", address + " was DNS resolved to " + name );
+											
+											synchronized( mNetBiosMap ){ mNetBiosMap.put( address, name ); }
+										}
+										else
+											name = null;
 									}
-									else
-										name = null;
 								}
-								
+
 								if( System.hasTarget( target ) == false )				    				   
 									sendNewEndpointNotification( endpoint, name );
 			    				
@@ -227,6 +229,9 @@ public class NetworkDiscovery extends Thread
 						
 						Log.d( "NETBIOS", address + " was resolved to " + name );
 						
+						// update netbios cache
+						mArpReader.addNetBiosName( address, name );
+						
 						// existing target
 						target = System.getTargetByAddress( address );
 						if( target != null )
@@ -234,10 +239,7 @@ public class NetworkDiscovery extends Thread
 							target.setAlias( name );
 							sendEndpointUpdateNotification( );
 						}
-						// not yet discovered/enqueued target
-						else						
-							mArpReader.addNetBiosName( address, name );
-												
+																								
 						break;
 					}						
 				}				
@@ -315,7 +317,7 @@ public class NetworkDiscovery extends Thread
     			}
     			catch( Exception e )
     			{
-    				System.errorLogging( TAG, e );
+    				// swallow
     			}				
 			}
 		}
