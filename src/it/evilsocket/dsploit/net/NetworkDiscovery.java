@@ -28,6 +28,9 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -73,6 +76,9 @@ public class NetworkDiscovery extends Thread
 	
 	private class ArpReader extends Thread
 	{				
+		private static final int RESOLVER_THREAD_POOL_SIZE = 25;
+		
+		private ThreadPoolExecutor	   mExecutor   = null;
 		private boolean 			   mStopped    = true;
 		private HashMap<String,String> mNetBiosMap = null;
 		
@@ -80,6 +86,7 @@ public class NetworkDiscovery extends Thread
 			super("ArpReader");
 			
 			mNetBiosMap = new HashMap<String,String>(); 
+			mExecutor   = ( ThreadPoolExecutor )Executors.newFixedThreadPool( RESOLVER_THREAD_POOL_SIZE );
 		}
 		
 		public synchronized void addNetBiosName( String address, String name ) {
@@ -140,7 +147,8 @@ public class NetworkDiscovery extends Thread
 									
 									if( name == null )
 									{
-										new NBResolver( address ).start();
+										mExecutor.execute( new NBResolver( address ) );
+										
 										if( target.isRouter() == false )
 										{
 											// attempt DNS resolution
@@ -187,6 +195,16 @@ public class NetworkDiscovery extends Thread
 		
 		public synchronized void exit() {
 			mStopped = true;
+			try
+			{
+				mExecutor.shutdown();
+				mExecutor.awaitTermination( 30, TimeUnit.SECONDS );
+				mExecutor.shutdownNow();
+			}
+			catch( Exception e )
+			{
+				
+			}
 		}
 	}
 	
@@ -275,9 +293,43 @@ public class NetworkDiscovery extends Thread
 	
 	private class UdpProber extends Thread
 	{
-		private boolean mStopped = true;
-		private Network mNetwork = null;
+		private static final int PROBER_THREAD_POOL_SIZE = 25;
+		
+		private class SingleProber extends Thread 
+		{
+			private InetAddress mAddress = null;
+			
+			public SingleProber( InetAddress address ) {
+				mAddress = address;
+			}
+			
+			@Override
+			public void run() {
+				try
+				{
+					DatagramSocket socket  = new DatagramSocket();
+					DatagramPacket packet  = new DatagramPacket( NETBIOS_REQUEST, NETBIOS_REQUEST.length, mAddress, NETBIOS_UDP_PORT );
+					
+					socket.setSoTimeout( 200 );
+					socket.send( packet );    	  
+	
+					socket.close();
+				}
+				catch( Exception e )
+				{
+					
+				}
+			}
+		}
+		
+		private ThreadPoolExecutor mExecutor = null;
+		private boolean 		   mStopped  = true;
+		private Network 		   mNetwork  = null;
 
+		public UdpProber( ){
+			mExecutor = ( ThreadPoolExecutor )Executors.newFixedThreadPool( PROBER_THREAD_POOL_SIZE );
+		}
+		
 		@Override
 		public void run() {
 			Log.d( TAG, "UdpProber started ..." );
@@ -306,14 +358,9 @@ public class NetworkDiscovery extends Thread
 						// rescanning the gateway could cause an issue when the gateway itself has multiple interfaces ( LAN, WAN ... )
 						if( current.equals( mNetwork.getGatewayAddress() ) == false && current.equals( mNetwork.getLocalAddress() ) == false )
 						{
-							InetAddress    address = current.toInetAddress();
-		    				DatagramSocket socket  = new DatagramSocket();
-		    				DatagramPacket packet  = new DatagramPacket( NETBIOS_REQUEST, NETBIOS_REQUEST.length, address, NETBIOS_UDP_PORT );
-		    				
-		    				socket.setSoTimeout( 200 );
-		    				socket.send( packet );    	  
-	
-		    				socket.close();
+							InetAddress address = current.toInetAddress();
+
+							mExecutor.execute( new SingleProber( address ) );
 						}
 					}
 
@@ -328,6 +375,16 @@ public class NetworkDiscovery extends Thread
 		
 		public synchronized void exit() {
 			mStopped = true;
+			try
+			{
+				mExecutor.shutdown();
+				mExecutor.awaitTermination( 30, TimeUnit.SECONDS );
+				mExecutor.shutdownNow();
+			}
+			catch( Exception e )
+			{
+				
+			}
 		}
 	}
 	

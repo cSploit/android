@@ -489,7 +489,7 @@ public class MainActivity extends SherlockListActivity
 							}
 						});													
 					}
-	
+					
 					MainActivity.this.runOnUiThread( new Runnable(){			    			
 						@Override
 						public void run() 
