@@ -118,7 +118,7 @@ public class Proxy implements Runnable
 					
 					new ProxyThread( client, mRequestListener, mFilters, mHostRedirect, mPortRedirect ).start();
 				}
-				catch( IOException e )
+				catch( Exception e )
 				{
 					
 				}

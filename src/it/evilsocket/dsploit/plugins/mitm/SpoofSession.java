@@ -146,7 +146,9 @@ public class SpoofSession
 			if( System.getSettings().getBoolean( "PREF_HTTPS_REDIRECT", true ) )
 			{
 				System.getIPTables().undoPortRedirect( 443, System.HTTPS_REDIR_PORT );
-				System.getHttpsRedirector().stop();
+				
+				if( System.getHttpsRedirector() != null )
+					System.getHttpsRedirector().stop();
 			}
 			System.getProxy().stop();
 			System.getProxy().setRedirection( null, 0 );
