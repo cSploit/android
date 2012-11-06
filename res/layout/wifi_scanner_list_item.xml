@@ -8,8 +8,11 @@
     <ImageView
         android:id="@+id/supported"
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
+        android:layout_height="match_parent"
         android:layout_marginRight="5dp"
+        android:adjustViewBounds="false"
+        android:baselineAlignBottom="false"
+        android:cropToPadding="false"
         android:focusable="false"
         android:scaleType="fitXY"
         android:src="@drawable/ic_impossible" />

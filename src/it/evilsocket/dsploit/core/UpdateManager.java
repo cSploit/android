@@ -29,8 +29,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
 
-import javax.net.ssl.HttpsURLConnection;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -40,7 +38,8 @@ import android.util.Log;
 public class UpdateManager 
 {
 	private static final String TAG					= "UPDATEMANAGER";
-	private static final String REMOTE_VERSION_FILE = "https://raw.github.com/evilsocket/dsploit/master/VERSION";
+	private static final String REMOTE_VERSION_URL  = "http://www.dsploit.net/getlatestversion.php";
+	private static final String REMOTE_DOWNLOAD_URL = "http://www.dsploit.net/getlatest.php";
 	private static final String VERSION_CHAR_MAP 	= "zyxwvutsrqponmlkjihgfedcba";
 	
 	private Context mContext		  = null;
@@ -111,11 +110,11 @@ public class UpdateManager
 				// Read remote version
 				if( mRemoteVersion == null )
 				{				
-					URL 			   url 		  = new URL( REMOTE_VERSION_FILE );
-				    HttpsURLConnection connection = (HttpsURLConnection)url.openConnection();
-				    BufferedReader	   reader	  = new BufferedReader( new InputStreamReader( connection.getInputStream() ) );
-				    String			   line		  = null,
-				    				   buffer	  = "";
+					URL 			   url 		 = new URL( REMOTE_VERSION_URL );
+				    HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+				    BufferedReader	   reader	 = new BufferedReader( new InputStreamReader( connection.getInputStream() ) );
+				    String			   line		 = null,
+				    				   buffer	 = "";
 				     
 				    while( ( line = reader.readLine() ) != null )
 				    {
@@ -152,7 +151,7 @@ public class UpdateManager
 	}
 	
 	public String getRemoteVersionUrl() {
-		return "http://cloud.github.com/downloads/evilsocket/dsploit/" + getRemoteVersionFileName();
+		return REMOTE_DOWNLOAD_URL;
 	}
 	
 	private String formatSize( int size ) {			
@@ -188,6 +187,8 @@ public class UpdateManager
 	{
 		try 
 		{
+            HttpURLConnection.setFollowRedirects( true );
+            
 			URL 			  url 		 = new URL( getRemoteVersionUrl() );
             HttpURLConnection connection = (HttpURLConnection)url.openConnection();
             File 			  file 	     = new File( System.getStoragePath() );

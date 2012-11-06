@@ -90,9 +90,7 @@ public class MainActivity extends SherlockListActivity
 	private long  			 mLastBackPressTime 	 = 0;
 	
 	public class TargetAdapter extends ArrayAdapter<Target> 
-	{
-		private int mLayoutId = 0;
-		
+	{		
 		class TargetHolder
 	    {
 	        ImageView  itemImage;
@@ -100,10 +98,8 @@ public class MainActivity extends SherlockListActivity
 	        TextView   itemDescription;
 	    }
 		
-		public TargetAdapter( int layoutId ) {		
-	        super( MainActivity.this, layoutId );
-	        
-	        mLayoutId = layoutId;
+		public TargetAdapter(  ) {		
+	        super( MainActivity.this, R.layout.target_list_item  );	        
 	    }
 
 		@Override
@@ -119,7 +115,7 @@ public class MainActivity extends SherlockListActivity
 	        if( row == null )
 	        {
 	            LayoutInflater inflater = ( LayoutInflater )MainActivity.this.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
-	            row = inflater.inflate( mLayoutId, parent, false );
+	            row = inflater.inflate( R.layout.target_list_item , parent, false );
 	            
 	            holder = new TargetHolder();
 	            
@@ -354,7 +350,7 @@ public class MainActivity extends SherlockListActivity
 	}
 	
 	public void createOnlineLayout( ) {
-		mTargetAdapter = new TargetAdapter( R.layout.target_list_item );
+		mTargetAdapter = new TargetAdapter( );
 		
 		setListAdapter( mTargetAdapter );	
 	

@@ -44,9 +44,7 @@ public class ActionActivity extends SherlockListActivity
 	private ArrayList<Plugin> mAvailable      = null;
 	
 	public class ActionsAdapter extends ArrayAdapter<Plugin> 
-	{
-		private int mLayoutId = 0;
-		
+	{		
 		public class ActionHolder
 	    {
 			ImageView icon;
@@ -54,10 +52,8 @@ public class ActionActivity extends SherlockListActivity
 			TextView  description;
 	    }
 		
-		public ActionsAdapter( int layoutId ) {
-	        super( ActionActivity.this, layoutId, mAvailable );
-	        	       
-	        mLayoutId = layoutId;
+		public ActionsAdapter( ) {
+	        super( ActionActivity.this, R.layout.actions_list_item , mAvailable );	        	       
 	    }
 		
 		@Override
@@ -68,7 +64,7 @@ public class ActionActivity extends SherlockListActivity
 	        if( row == null )
 	        {
 	            LayoutInflater inflater = ( LayoutInflater )ActionActivity.this.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
-	            row = inflater.inflate( mLayoutId, parent, false );
+	            row = inflater.inflate( R.layout.actions_list_item , parent, false );
 	            
 	            holder = new ActionHolder();
 	            
@@ -104,7 +100,7 @@ public class ActionActivity extends SherlockListActivity
 	        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	        	        	        
 	        mAvailable 		= System.getPluginsForTarget();
-	        mActionsAdapter = new ActionsAdapter( R.layout.actions_list_item );
+	        mActionsAdapter = new ActionsAdapter();
 	        
 		    setListAdapter( mActionsAdapter );  
         }
