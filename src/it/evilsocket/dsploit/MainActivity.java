@@ -261,7 +261,8 @@ public class MainActivity extends SherlockListActivity
 							public void onConfirm() 
 							{
 								final ProgressDialog dialog = new ProgressDialog( MainActivity.this );
-							    dialog.setMessage( "Downloading update ..." );
+								dialog.setTitle( "Downloading update ..." );
+							    dialog.setMessage( "Connecting ..." );
 							    dialog.setProgressStyle( ProgressDialog.STYLE_HORIZONTAL );
 							    dialog.setMax(100);
 							    dialog.setCancelable( false );

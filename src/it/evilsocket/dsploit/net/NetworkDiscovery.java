@@ -116,6 +116,7 @@ public class NetworkDiscovery extends Thread
 					Matcher		   matcher  = null;
 					Endpoint 	   endpoint = null;
 					Target 		   target   = null;
+					Network		   network  = System.getNetwork();
 					
 					while( ( line = reader.readLine() ) != null )
 					{
@@ -127,45 +128,48 @@ public class NetworkDiscovery extends Thread
 								   hwaddr  = matcher.group( 4 ),
 								   // mask	   = matcher.group( 5 ),
 								   device  = matcher.group( 6 );
-							
+																					
 							if( device.equals(iface) && hwaddr.equals("00:00:00:00:00:00") == false && flags.contains("2") )
-							{								
+							{									
 								endpoint = new Endpoint( address, hwaddr );
-								target   = new Target( endpoint );
-								
-								synchronized( mNetBiosMap ){ name = mNetBiosMap.get(address); }
-								
-								if( name == null )
+								target   = new Target( endpoint );							
+								// rescanning the gateway could cause an issue when the gateway itself has multiple interfaces ( LAN, WAN ... )
+								if( endpoint.getAddress().equals( network.getGatewayAddress() ) == false && endpoint.getAddress().equals( network.getLocalAddress() ) == false )
 								{
-									new NBResolver( address ).start();
-									if( target.isRouter() == false )
+									synchronized( mNetBiosMap ){ name = mNetBiosMap.get(address); }
+									
+									if( name == null )
 									{
-										// attempt DNS resolution
-										name = endpoint.getAddress().getHostName();
-										
-										if( name.equals(address) == false )
+										new NBResolver( address ).start();
+										if( target.isRouter() == false )
 										{
-											Log.d( "NETBIOS", address + " was DNS resolved to " + name );
+											// attempt DNS resolution
+											name = endpoint.getAddress().getHostName();
 											
-											synchronized( mNetBiosMap ){ mNetBiosMap.put( address, name ); }
+											if( name.equals(address) == false )
+											{
+												Log.d( "NETBIOS", address + " was DNS resolved to " + name );
+												
+												synchronized( mNetBiosMap ){ mNetBiosMap.put( address, name ); }
+											}
+											else
+												name = null;
 										}
-										else
-											name = null;
 									}
-								}
-
-								if( System.hasTarget( target ) == false )				    				   
-									sendNewEndpointNotification( endpoint, name );
-			    				
-								else if( name != null )
-								{
-									target = System.getTargetByAddress(address);
-									if( target != null && target.hasAlias() == false )
+	
+									if( System.hasTarget( target ) == false )				    				   
+										sendNewEndpointNotification( endpoint, name );
+				    				
+									else if( name != null )
 									{
-										target.setAlias( name );
-										sendEndpointUpdateNotification( );
-									}
-								}								
+										target = System.getTargetByAddress(address);
+										if( target != null && target.hasAlias() == false )
+										{
+											target.setAlias( name );
+											sendEndpointUpdateNotification( );
+										}
+									}	
+								}
 							}
 						}
 					}
