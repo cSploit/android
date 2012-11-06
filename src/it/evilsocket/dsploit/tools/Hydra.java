@@ -55,7 +55,21 @@ public class Hydra extends Tool
 					   progress = matcher.group(3),
 					   total	= matcher.group(4);
 				
-				onNewAttempt( login, password, Integer.parseInt(progress), Integer.parseInt(total) );
+				int    iprogress,
+					   itotal;
+				
+				try
+				{
+					iprogress = Integer.parseInt( progress );
+					itotal	  = Integer.parseInt( total );
+				}
+				catch( Exception e )
+				{
+					iprogress = 0;
+					itotal	  = Integer.MAX_VALUE;
+				}
+				
+				onNewAttempt( login, password, iprogress, itotal );
 			}
 			else if( ( matcher = ERROR_PATTERN.matcher( line ) ) != null && matcher.find() )
 				onError( matcher.group( 1 ) );
