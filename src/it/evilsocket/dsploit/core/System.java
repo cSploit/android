@@ -57,6 +57,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
+import android.os.Build;
 import android.os.Environment;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -306,6 +307,14 @@ public class System
 		}
 		
 		Log.e( tag, data );
+	}
+	
+	public static boolean isARM() {
+		String abi = Build.CPU_ABI;
+		
+		Log.d( TAG, "Build.CPU_ABI = " + abi );
+		
+		return Build.CPU_ABI.toLowerCase().startsWith("armeabi");
 	}
 		
 	public static synchronized void setCustomData( Object data ) {

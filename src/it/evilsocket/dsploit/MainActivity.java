@@ -464,9 +464,14 @@ public class MainActivity extends SherlockListActivity
 					
 					else if( Shell.isBinaryAvailable("killall") == false )
 		    			fatal = "Full BusyBox installation required, killall binary not found ( maybe you have an old busybox version ).";
-		        							        						               
+		        							     
+					else if( System.isARM() == false )
+						fatal = "<p>It seems like your device processor is not an ARM, i'm sorry but it's not compatible with dSploit.</p>" +
+			        			"<p>For more info read the <a href=\"http://dsploit.net/#requirements\">requirements</a> section.</p>";
+					
 					else if( installer.needed() && installer.install() == false )			        
 						fatal = "Error during files installation!";
+					
 					// check for LD_LIBRARY_PATH issue ( https://github.com/evilsocket/dsploit/issues/35 )
 					else if( Shell.isLibraryPathOverridable( appContext ) == false )
 			        	fatal = "<p>It seems like your ROM has the <b>LD_LIBRARY_PATH bug</b>, i'm sorry but it's not compatible with dSploit.</p>" +
