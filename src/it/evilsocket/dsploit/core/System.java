@@ -925,10 +925,17 @@ public class System
 	}
 	
 	public static Target getTargetByAddress( String address ) {
-		for( Target t : mTargets )
+		int i, size = mTargets.size();
+		
+		for( i = 0; i < size; i++ )
 		{
-			if( t != null && t.getAddress() != null && t.getAddress().getHostAddress().equals(address) )
-				return t;
+			synchronized( mTargets )
+			{
+				Target t = mTargets.get( i );
+			
+				if( t != null && t.getAddress() != null && t.getAddress().getHostAddress().equals(address) )
+					return t;
+			}
 		}
 		
 		return null;
