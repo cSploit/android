@@ -201,29 +201,31 @@ public class WifiScannerActivity extends SherlockListActivity
 	        }
 	        
 	        ScanResult result = mResults.get( position );
-	        
-	        if( mWifiMatcher.getKeygen( result ) != null )
-	        	holder.supported.setImageResource( R.drawable.ic_possible );
-	        
-	        else
-	        	holder.supported.setImageResource( R.drawable.ic_impossible );
 
 	        holder.powerIcon.setImageResource( getWifiIcon( result ) );
 	        holder.ssid.setTypeface( null, Typeface.BOLD );
 	        holder.ssid.setText( result.SSID );
 	        
-	        String protection = "<b>Open</b>";
+	        String  protection = "<b>Open</b>";
+	        boolean isOpen	   = true;
 	        
 	        List<String> capabilities = Arrays.asList( result.capabilities.split( "[\\-\\[\\]]" ) );
 
 	        if( capabilities.contains("WEP") )
+	        {
+	        	isOpen	   = false;
 	        	protection = "<b>WEP</b>";
-	        
+	        }
 	        else if( capabilities.contains("WPA2") )
+	        {
+	        	isOpen	   = false;
 	        	protection = "<b>WPA2</b>";
-	        
+	        }
 	        else if( capabilities.contains("WPA") )
+	        {
+	        	isOpen	   = false;
 	        	protection = "<b>WPA</b>";
+	        }
 	        
 	        if( capabilities.contains( "PSK" ) )
 	        	protection += " PSK";
@@ -238,6 +240,13 @@ public class WifiScannerActivity extends SherlockListActivity
 	            result.BSSID.toUpperCase() + " " + protection + " <small>( " + ( Math.round( ( result.frequency / 1000.0 ) * 10.0 ) / 10.0 ) + " Ghz )</small>"
 	          ) 
 	        );
+	        	        
+	        if( mWifiMatcher.getKeygen( result ) != null || isOpen )
+	        	holder.supported.setImageResource( R.drawable.ic_possible );
+	        
+	        else
+	        	holder.supported.setImageResource( R.drawable.ic_impossible );
+
 	        
 	        return row;
 	    }
@@ -261,6 +270,8 @@ public class WifiScannerActivity extends SherlockListActivity
 			{								
 				if( mScanning )
 				{
+					mAdapter.reset();
+
 					if( mMenu != null )					
 						mMenu.findItem(R.id.scan).setActionView( null );
 										
@@ -318,14 +329,17 @@ public class WifiScannerActivity extends SherlockListActivity
 			}
 		}
 				
-		mStatusText.setText( Html.fromHtml( "Connected to <b>" + mCurrentAp.SSID + "</b> with key <b><font color=\"green\">" + mCurrentKey + "</font></b> !" ) );
+		if( mCurrentKey != null )
+		{
+			mStatusText.setText( Html.fromHtml( "Connected to <b>" + mCurrentAp.SSID + "</b> with key <b><font color=\"green\">" + mCurrentKey + "</font></b> !" ) );
+			Toast.makeText( this, "WiFi key copied to clipboard.", Toast.LENGTH_SHORT ).show();
+			mClipboard.setText( mCurrentKey );
+		}
+		else
+			mStatusText.setText( Html.fromHtml( "Connected to <b>" + mCurrentAp.SSID + "</b> !" ) );
 		
 		mConnectionReceiver.unregister();
-		mConnected = true;
-		
-		mClipboard.setText( mCurrentKey );
-		
-		Toast.makeText( this, "WiFi key copied to clipboard.", Toast.LENGTH_SHORT ).show();
+		mConnected = true;				
 	}
 	
 	public void onFailedConnection() {
@@ -401,7 +415,10 @@ public class WifiScannerActivity extends SherlockListActivity
 		WifiScannerActivity.this.runOnUiThread( new Runnable(){
 			@Override
 			public void run() {
-				mStatusText.setText( Html.fromHtml( "Attempting connection to <b>" + ap.SSID + "</b> with key <b>" + key + "</b> ..." ) );
+				if( key != null )
+					mStatusText.setText( Html.fromHtml( "Attempting connection to <b>" + ap.SSID + "</b> with key <b>" + key + "</b> ..." ) );
+				else
+					mStatusText.setText( Html.fromHtml( "Connecting to <b>" + ap.SSID + "</b> ..." ) );
 			}
 		});	
 				
@@ -615,10 +632,8 @@ public class WifiScannerActivity extends SherlockListActivity
 		if( item.getItemId() == R.id.scan )
 		{
 			if( mMenu != null )					
-				mMenu.findItem(R.id.scan).setActionView( new ProgressBar(this) );
-						
-			mAdapter.reset();
-			
+				mMenu.findItem( R.id.scan ).setActionView( new ProgressBar(this) );
+									
 			mWifiManager.startScan();
 	        
 	        mStatusText.setText( "Scanning ..." );
