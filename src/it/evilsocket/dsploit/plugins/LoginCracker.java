@@ -20,21 +20,28 @@ package it.evilsocket.dsploit.plugins;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 import it.evilsocket.dsploit.R;
@@ -172,6 +179,49 @@ public class LoginCracker extends Plugin
 	private boolean			mAccountFound	 = false;
 	private AttemptReceiver mReceiver     	 = null;
 	private String			mCustomCharset	 = null;
+	
+	public class ProtocolSpinnerAdapter extends BaseAdapter implements SpinnerAdapter
+	{
+		private List<Port> mOpenPorts = null;
+		
+		public ProtocolSpinnerAdapter( ) {
+			mOpenPorts = System.getCurrentTarget().getOpenPorts();
+		}
+		
+	    public int getCount() {
+	        return PROTOCOLS.length;
+	    }
+
+	    public Object getItem( int position ) {
+	        return PROTOCOLS[ position ];
+	    }
+
+	    public long getItemId( int position ) {
+	        return position;
+	    }
+
+	    public View getView( int position, View convertView, ViewGroup parent ) 
+	    {
+	        LayoutInflater inflater = ( LayoutInflater )LoginCracker.this.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+	        
+	        View 	 spinView = inflater.inflate( android.R.layout.simple_spinner_item, null );
+	        TextView textView = ( TextView )spinView.findViewById( android.R.id.text1 ); 
+	        
+	        textView.setText( PROTOCOLS[ position ] );
+	        
+	        for( Port port : mOpenPorts )
+	        {
+	        	String protocol = System.getProtocolByPort( "" + port.number );
+	        	if( protocol != null && ( protocol.equals( PROTOCOLS[ position ] ) || PROTOCOLS[ position ].toLowerCase().contains( protocol ) ) )
+	        	{
+	        		textView.setTextColor( Color.GREEN );
+	        		textView.setTypeface( null, Typeface.BOLD );
+	        	}
+	        }
+
+	        return spinView;
+	    }
+	}
 	
 	public LoginCracker( ) {
 		super
@@ -327,7 +377,7 @@ public class LoginCracker extends Plugin
         if( System.getCurrentTarget().hasOpenPorts() == false )
         	new FinishDialog( "Warning", "No open ports detected on current target, run the port scanner first.", this ).show();
                         
-        ArrayList<String> ports = new ArrayList<String>();
+        final ArrayList<String> ports = new ArrayList<String>();
         
         for( Port port : System.getCurrentTarget().getOpenPorts() )
         	ports.add( Integer.toString( port.number ) );
@@ -344,7 +394,7 @@ public class LoginCracker extends Plugin
         		{
         			for( int i = 0; i < PROTOCOLS.length; i++ )
         			{
-        				if( PROTOCOLS[i].equals( protocol ) )
+        				if( PROTOCOLS[i].equals( protocol ) || PROTOCOLS[i].toLowerCase().contains( protocol ) )
         				{
         					mProtocolSpinner.setSelection( i );
         					break;
@@ -357,7 +407,26 @@ public class LoginCracker extends Plugin
 		});
         
         mProtocolSpinner = ( Spinner )findViewById( R.id.protocolSpinner );
-        mProtocolSpinner.setAdapter( new ArrayAdapter<String>( this, android.R.layout.simple_spinner_item, PROTOCOLS ) );
+        mProtocolSpinner.setAdapter( new ProtocolSpinnerAdapter() );
+        mProtocolSpinner.setOnItemSelectedListener( new OnItemSelectedListener() {
+        	public void onItemSelected( AdapterView<?> adapter, View view, int position, long id ) 
+        	{
+        		String protocol = PROTOCOLS[ position ];
+        		
+        		for( int i = 0; i < ports.size(); i++ )
+        		{
+        			String pProto = System.getProtocolByPort( ports.get( i ) );
+        			if( pProto != null && ( pProto.equals( protocol ) || protocol.toLowerCase().contains( pProto ) ) )
+        			{
+        				
+        				mPortSpinner.setSelection( i );
+        				break;
+        			}
+        		}
+        	}
+        	
+        	public void onNothingSelected(AdapterView<?> arg0) {}
+		});
         
         mCharsetSpinner = ( Spinner )findViewById( R.id.charsetSpinner );
         mCharsetSpinner.setAdapter( new ArrayAdapter<String>( this, android.R.layout.simple_spinner_item, CHARSETS ) );
