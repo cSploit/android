@@ -29,15 +29,19 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
+import it.evilsocket.dsploit.net.Endpoint;
 import it.evilsocket.dsploit.net.Target;
+import it.evilsocket.dsploit.net.Target.Type;
 
 public class PacketForger extends Plugin implements OnClickListener
 {
@@ -49,8 +53,10 @@ public class PacketForger extends Plugin implements OnClickListener
 	private EditText       mPort 		 = null;
 	private CheckBox       mWaitResponse = null;
 	private EditText       mData 		 = null;
+	private byte[]		   mBinaryData	 = null;
 	private EditText       mResponse     = null;
 	private ToggleButton   mSendButton   = null;
+	private Button		   mSendWOL		 = null;
 	private boolean        mRunning	     = false;
 	private Thread         mThread	     = null;
 	private Socket  	   mSocket	     = null;
@@ -77,125 +83,172 @@ public class PacketForger extends Plugin implements OnClickListener
         mData	      = ( EditText )findViewById( R.id.dataText );
         mResponse     = ( EditText )findViewById( R.id.responseText );
         mSendButton   = ( ToggleButton )findViewById( R.id.sendButton );
+        mSendWOL	  = ( Button )findViewById( R.id.sendWOL );
+        
+        if( System.getCurrentTarget().getType() != Type.ENDPOINT )
+        	mSendWOL.setVisibility( View.INVISIBLE );
         
         mProtocol.setAdapter( new ArrayAdapter<String>( this, android.R.layout.simple_spinner_item, PROTOCOLS ) );
         
         mSendButton.setOnClickListener( this );
+        mSendWOL.setOnClickListener( this );
 	}
 
 	@Override
 	public void onClick(View v) {
 		if( mRunning == false )
 		{
-			mResponse.setText("");
-			
-			mRunning = true;
-
-			mThread = new Thread( new Runnable(){
-				@Override
-				public void run() {
-					int     protocol     = mProtocol.getSelectedItemPosition(),
-						    port	     = -1;
-					String  data         = mData.getText().toString(),
-							error		 = null;
-					boolean waitResponse = mWaitResponse.isChecked();
-					
-					try
-					{
-						port = Integer.parseInt( mPort.getText().toString().trim() );
-						if( port <= 0 || port > 65535 )
-							port = -1;
-					}
-					catch( Exception e )
-					{
-						port = -1;
-					}
-					
-					if( port == -1 )
-						error = "Invalid port specified.";
-					
-					else if( data.isEmpty() )
-						error = "The request can not be empty.";
-					
-					else
-					{
-						try
-						{								
-							if( protocol == TCP_PROTOCOL )
-							{
-								mSocket			    = new Socket( System.getCurrentTarget().getCommandLineRepresentation(), port );
-								OutputStream writer = mSocket.getOutputStream();
-								
-								writer.write( data.getBytes() );
-								writer.flush();
-								
-								if( waitResponse )
-								{
-									BufferedReader reader   = new BufferedReader( new InputStreamReader( mSocket.getInputStream() ) );
-									String 		   response = "",
-												   line	    = null;
-									
-									while( ( line = reader.readLine() ) != null )
-									{
-										response += line + "\n";
-									}
-									
-									final String text = response;								
-									PacketForger.this.runOnUiThread( new Runnable() {
-								       public void run() {
-								    	   mResponse.setText( text );
-								       }
-								    });
-																														
-									reader.close();
-								}
-								
-								writer.close();
-								mSocket.close();
-							}
-							else if( protocol == UDP_PROTOCOL )
-							{
-								mUdpSocket 			  = new DatagramSocket();
-							    DatagramPacket packet = new DatagramPacket( data.getBytes(), data.length(), System.getCurrentTarget().getAddress(), port );
-							    
-							    mUdpSocket.send( packet );
+			if( v.getId() == R.id.sendButton )
+			{
+				mResponse.setText("");
+				
+				mRunning = true;
 	
-							    if( waitResponse )
-								{
-							    	byte[] buffer = new byte[1024];
-							    	
-							    	DatagramPacket response = new DatagramPacket( buffer, buffer.length );
-							        
-							    	mUdpSocket.receive( response );
-							    	
-							    	final String text = new String( buffer );								
-									PacketForger.this.runOnUiThread( new Runnable() {
-								       public void run() {
-								    	   mResponse.setText( text );
-								       }
-								    });
-								}
-							    
-							    mUdpSocket.close();
-							}
+				mThread = new Thread( new Runnable(){
+					@Override
+					public void run() {
+						int     protocol     = mProtocol.getSelectedItemPosition(),
+							    port	     = -1;
+						String  data         = mData.getText().toString(),
+								error		 = null;
+						boolean waitResponse = mWaitResponse.isChecked();
+						
+						try
+						{
+							port = Integer.parseInt( mPort.getText().toString().trim() );
+							if( port <= 0 || port > 65535 )
+								port = -1;
 						}
 						catch( Exception e )
 						{
-							error = e.getMessage();							
-						}				
+							port = -1;
+						}
+						
+						if( port == -1 )
+							error = "Invalid port specified.";
+						
+						else if( data.isEmpty() )
+							error = "The request can not be empty.";
+						
+						else
+						{
+							try
+							{								
+								if( protocol == TCP_PROTOCOL )
+								{
+									mSocket			    = new Socket( System.getCurrentTarget().getCommandLineRepresentation(), port );
+									OutputStream writer = mSocket.getOutputStream();
+									
+									writer.write( data.getBytes() );
+									writer.flush();
+									
+									if( waitResponse )
+									{
+										BufferedReader reader   = new BufferedReader( new InputStreamReader( mSocket.getInputStream() ) );
+										String 		   response = "",
+													   line	    = null;
+										
+										while( ( line = reader.readLine() ) != null )
+										{
+											response += line + "\n";
+										}
+										
+										final String text = response;								
+										PacketForger.this.runOnUiThread( new Runnable() {
+									       public void run() {
+									    	   mResponse.setText( text );
+									       }
+									    });
+																															
+										reader.close();
+									}
+									
+									writer.close();
+									mSocket.close();
+								}
+								else if( protocol == UDP_PROTOCOL )
+								{
+									mUdpSocket 			  = new DatagramSocket();
+								    DatagramPacket packet = null;
+								    
+								    if( mBinaryData != null )
+								    	packet = new DatagramPacket( mBinaryData, mBinaryData.length, System.getCurrentTarget().getAddress(), port );
+								    else
+								    	packet = new DatagramPacket( data.getBytes(), data.length(), System.getCurrentTarget().getAddress(), port );
+								    
+								    mUdpSocket.send( packet );
+		
+								    if( waitResponse )
+									{
+								    	byte[] buffer = new byte[1024];
+								    	
+								    	DatagramPacket response = new DatagramPacket( buffer, buffer.length );
+								        
+								    	mUdpSocket.receive( response );
+								    	
+								    	final String text = new String( buffer );								
+										PacketForger.this.runOnUiThread( new Runnable() {
+									       public void run() {
+									    	   mResponse.setText( text );
+									       }
+									    });
+									}
+								    
+								    mUdpSocket.close();
+								}
+							}
+							catch( Exception e )
+							{
+								error = e.getMessage();							
+							}				
+						}
+						
+						mBinaryData = null;
+						
+						final String errorMessage = error;
+						PacketForger.this.runOnUiThread( new Runnable() {
+					       public void run() {
+					    	   Toast.makeText( PacketForger.this, "Request sent.", Toast.LENGTH_SHORT ).show();
+					    	   setStoppedState( errorMessage );
+					       }
+					    });
 					}
-					
-					
-					final String errorMessage = error;
-					PacketForger.this.runOnUiThread( new Runnable() {
-				       public void run() {
-				    	   setStoppedState( errorMessage );
-				       }
-				    });
+				});
+				
+				mThread.start();	
+			}
+			else
+			{
+				mResponse.setText("");
+				mProtocol.setSelection( UDP_PROTOCOL );
+				mPort.setText( "9" );			
+				
+				Endpoint endpoint = System.getCurrentTarget().getEndpoint();
+				
+				byte[] mac = endpoint.getHardware();				
+				int    i;
+				
+				mBinaryData = new byte[ 6 + 16 * mac.length ];
+				
+				for( i = 0; i < 6; i++ )
+				{
+					mBinaryData[i] = (byte)0xFF;
 				}
-			});
-			
-			mThread.start();			
+				
+				for( i = 6; i < mBinaryData.length; i += mac.length )
+				{
+					java.lang.System.arraycopy( mac, 0, mBinaryData, i, mac.length );
+				}			
+				
+				String hex = "";
+				
+				for( i = 0; i < mBinaryData.length; i++ )
+					hex += "\\x" + Integer.toHexString( 0xFF & mBinaryData[i] ).toUpperCase();
+				
+				mData.setText( hex );
+				
+				Toast.makeText( this, "Customize WOL port and press Send.", Toast.LENGTH_SHORT ).show();
+			}
 		}
 		else
 		{

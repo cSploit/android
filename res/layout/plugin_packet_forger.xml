@@ -60,18 +60,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/linearLayout2"
-        android:layout_alignRight="@+id/linearLayout2"
         android:layout_below="@+id/linearLayout2"
+        android:layout_toLeftOf="@+id/button1"
         android:text="Wait for a response" />
     
   <LinearLayout
-        android:id="@+id/linearLayout3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" 
-        android:layout_alignLeft="@+id/responseCheckBox"
-        android:layout_alignRight="@+id/responseCheckBox"
-        android:layout_below="@+id/responseCheckBox"
-        >
+      android:id="@+id/linearLayout3"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignLeft="@+id/responseCheckBox"
+      android:layout_alignRight="@+id/sendWOL"
+      android:layout_below="@+id/responseCheckBox" >
         
 			    <TextView
 			        android:id="@+id/textView3"
@@ -97,7 +96,7 @@
       android:layout_height="wrap_content"
       android:layout_above="@+id/sendButton"
       android:layout_alignLeft="@+id/linearLayout3"
-      android:layout_alignRight="@+id/linearLayout3"
+      android:layout_alignRight="@+id/sendWOL"
       android:layout_below="@+id/linearLayout3" >
 
       <EditText
@@ -130,5 +129,15 @@
         android:layout_alignRight="@+id/dataText"
         android:textOff="Send"
         android:textOn="Stop" />
+
+  <Button
+      android:id="@+id/sendWOL"
+      style="?android:attr/buttonStyleSmall"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_above="@+id/linearLayout3"
+      android:layout_alignRight="@+id/linearLayout2"
+      android:layout_alignTop="@+id/responseCheckBox"
+      android:text="Wake On Lan" />
         
 </RelativeLayout>
