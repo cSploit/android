@@ -29,6 +29,7 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -147,7 +148,14 @@ public class NetworkDiscovery extends Thread
 									
 									if( name == null )
 									{
-										mExecutor.execute( new NBResolver( address ) );
+										try
+										{
+											mExecutor.execute( new NBResolver( address ) );
+										}
+										catch( RejectedExecutionException e )
+										{
+											// ignore since this is happening because the executor was shut down.
+										}
 										
 										if( target.isRouter() == false )
 										{
@@ -360,7 +368,15 @@ public class NetworkDiscovery extends Thread
 						{
 							InetAddress address = current.toInetAddress();
 
-							mExecutor.execute( new SingleProber( address ) );
+							try
+							{
+								mExecutor.execute( new SingleProber( address ) );
+							}
+							catch( RejectedExecutionException e )
+							{
+								// ignore since this is happening because the executor was shut down.
+								break;
+							}
 						}
 					}
 
