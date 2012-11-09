@@ -87,13 +87,13 @@ public class ByteBuffer
 		
 	}
 	
-	public int indexOf( byte[] pattern ){
+	public int indexOf( byte[] pattern, int start ){
     	boolean match = false;
     	int     i, j;
     	
     	if( isEmpty() == false )
     	{
-	    	for( i = 0; i < mBuffer.length; i++ )
+	    	for( i = start; i < mBuffer.length; i++ )
 	    	{
 	    		match = true;
 	    		
@@ -109,6 +109,10 @@ public class ByteBuffer
     	
     	return -1;
     }
+	
+	public int indexOf( byte[] pattern ) {
+		return indexOf( pattern, 0 );
+	}
 			
 	public String toString(){
 		mCharsetDetector.dataEnd();

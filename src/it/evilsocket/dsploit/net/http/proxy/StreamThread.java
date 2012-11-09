@@ -19,6 +19,7 @@
 package it.evilsocket.dsploit.net.http.proxy;
 
 import it.evilsocket.dsploit.net.ByteBuffer;
+import it.evilsocket.dsploit.net.http.RequestParser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,15 +32,17 @@ import android.util.Log;
 public class StreamThread implements Runnable
 {
 	private final static String   TAG              		 = "PROXYSTREAMTHREAD";
-	private final static byte[][] FILTERED_CONTENT_TYPES = new byte[][]
+	private final static String[] FILTERED_CONTENT_TYPES = new String[]
     {
-		"text/html".getBytes(),
-		"text/css".getBytes(),
-		"text/javascript".getBytes()
+		"text/html",
+		"text/css",
+		"text/javascript",
+		"application/javascript",
+		"application/x-javascript"		
     };
 	
-	private final static String  HEAD_SEPARATOR    = "\r\n\r\n";
-    private final static int     CHUNK_SIZE        = 1024;
+	private final static String  HEAD_SEPARATOR = "\r\n\r\n";
+    private final static int     CHUNK_SIZE     = 1024;
     
     private String			  mClient = null;
     private InputStream       mReader = null;
@@ -75,72 +78,90 @@ public class StreamThread implements Runnable
     	
     	try 
     	{
+    		String location    = null,
+    			   contentType = null;
+    		
     		while( ( read = mReader.read( chunk, 0, CHUNK_SIZE ) ) > 0 && size < max )
     		{
-    			mBuffer.append( chunk, read );
-    			
+    			mBuffer.append( chunk, read );    			    			    			
     			size += read;
+    			
+    			location    = location == null    ? RequestParser.getHeaderValue( "Location",     mBuffer ) : location;
+    			contentType = contentType == null ? RequestParser.getHeaderValue( "Content-Type", mBuffer ) : contentType;
+    			
+    			if( contentType != null )
+    			{
+    				boolean isHandledContentType = false;
+    				
+    				for( String handled : FILTERED_CONTENT_TYPES )
+        			{
+        				if( contentType.equals( handled ) || contentType.contains( handled ) )
+        				{
+        					isHandledContentType = true;
+        					break;
+        				}
+        			}
+    				
+    				// not handled content type, start fast streaming
+    				if( isHandledContentType == false )
+    				{
+    					Log.d( TAG, "Content type " + contentType + " not handled, start fast streaming ..." );
+    					
+    					mWriter.write( mBuffer.getData() );    			    			
+    					mWriter.flush();
+    					
+    					while( ( read = mReader.read( chunk, 0, 512 ) ) > 0 )
+    					{
+    						mWriter.write( chunk, 0, read );
+    					}
+    					
+    					mWriter.flush();
+    					mWriter.close();
+    					mReader.close();
+    					
+    					return;
+    				}
+    			}
     		}
     		
+    		// if we are here, this means we have a document to be filtered 
+    		// ( handled content type )
     		if( mBuffer.isEmpty() == false )
-    		{    	
-    			// handle relocations for https support
+    		{       			
 				String   data    = mBuffer.toString();
 				String[] split   = data.split( HEAD_SEPARATOR, 2 );
 				String   headers = split[ 0 ];
 				
+    			// handle relocations for https support
+    			if( location != null && location.startsWith("https://") && System.getSettings().getBoolean( "PREF_HTTPS_REDIRECT", true ) == true )
+    			{
+    				Log.w( TAG, "Patching 302 HTTPS redirect : " + location );
+					
+        			// update variables for further filtering
+        			mBuffer.replace( "Location: https://".getBytes(), "Location: http://".getBytes() );
+        			
+    				data    = mBuffer.toString();
+    				split   = data.split( HEAD_SEPARATOR, 2 );
+    				headers = split[ 0 ];
+    				
+        			HTTPSMonitor.getInstance().addURL( mClient, location.replace( "https://", "http://" ).replace( "&amp;", "&" ) );
+    			}
+
+    			String body	   = ( split.length > 1 ? split[ 1 ] : "" ),
+					   patched = "";
+				
+				body = mFilter.onDataReceived( headers, body );
+
+				// remove explicit content length, just in case the body changed after filtering				
 				for( String header : headers.split("\n") )
 				{
-					if( header.indexOf(':') != -1 )
-					{
-						String[] hsplit = header.split( ":", 2 );
-		        		String   hname  = hsplit[0].trim(),
-		        				 hvalue = hsplit[1].trim();
-		        		
-		        		if( hname.equals( "Location" ) && hvalue.startsWith("https://") && System.getSettings().getBoolean( "PREF_HTTPS_REDIRECT", true ) == true )
-		        		{
-		        			Log.w( TAG, "Patching 302 HTTPS redirect : " + hvalue );
-							
-		        			// update variables for further filtering
-		        			mBuffer.replace( "Location: https://".getBytes(), "Location: http://".getBytes() );
-		    				data    = mBuffer.toString();
-		    				split   = data.split( HEAD_SEPARATOR, 2 );
-		    				headers = split[ 0 ];
-		    				
-		        			HTTPSMonitor.getInstance().addURL( mClient, hvalue.replace( "https://", "http://" ).replace( "&amp;", "&" ) );
-		        		}
-					}
+					if( header.toLowerCase().contains("content-length") == false )
+						patched += header + "\n";
 				}
 				
-				// do we have an handled content type ?
-    			boolean isHandledContentType = false;
-    			for( byte[] handled : FILTERED_CONTENT_TYPES )
-    			{
-    				if( mBuffer.indexOf( handled ) != -1 )
-    				{
-    					isHandledContentType = true;
-    					break;
-    				}
-    			}
-    			
-				if( isHandledContentType )
-				{
-					String body	   = ( split.length > 1 ? split[ 1 ] : "" ),
-						   patched = "";
-					
-					body = mFilter.onDataReceived( headers, body );
-	
-					// remove explicit content length, just in case the body changed after filtering				
-					for( String header : headers.split("\n") )
-					{
-						if( header.toLowerCase().contains("content-length") == false )
-							patched += header + "\n";
-					}
-					
-					headers = patched;	
-					
-					mBuffer.setData( ( headers + HEAD_SEPARATOR + body ).getBytes() );
-				}
+				headers = patched;	
+				
+				mBuffer.setData( ( headers + HEAD_SEPARATOR + body ).getBytes() );
 																		
 				mWriter.write( mBuffer.getData() );    			    			
 				mWriter.flush();
@@ -164,7 +185,7 @@ public class StreamThread implements Runnable
 			} 
     		catch( IOException e ) 
     		{			
-    			System.errorLogging( TAG, e );
+    			// swallow
 			}
     	}
     }

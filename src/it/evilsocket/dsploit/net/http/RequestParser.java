@@ -18,8 +18,11 @@
  */
 package it.evilsocket.dsploit.net.http;
 
+import it.evilsocket.dsploit.net.ByteBuffer;
+
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import org.apache.http.impl.cookie.BasicClientCookie;
@@ -383,6 +386,30 @@ public class RequestParser
 	    }
 
 	    return cookies;
+	}
+	
+	public static String getHeaderValue( String name, ByteBuffer buffer ) {
+		String value  = null;
+		int    index  = -1,
+			   end	  = -1;
+		byte[] search = ( name + ':' ).getBytes(); 
+		
+		if( ( index = buffer.indexOf( search ) ) != -1 )
+		{
+			index = buffer.indexOf( " ".getBytes(), index );
+			if( index != -1 )
+			{
+				index++;
+				
+				end = buffer.indexOf( "\r".getBytes(), index );
+				if( end == -1 )
+					end = buffer.indexOf( "\n".getBytes(), index );				
+				if( end != -1 )			
+					value = new String( Arrays.copyOfRange( buffer.getData(), index, end ) );									
+			}						
+		}
+		
+		return value;
 	}
 	
 	public static String getHeaderValue( String name, ArrayList<String> headers ) {
