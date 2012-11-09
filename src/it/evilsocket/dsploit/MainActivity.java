@@ -71,6 +71,7 @@ import android.widget.Toast;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.bugsense.trace.BugSenseHandler;
 
 public class MainActivity extends SherlockListActivity
 {	
@@ -481,11 +482,13 @@ public class MainActivity extends SherlockListActivity
 					
 					if( fatal != null )
 					{						
+						BugSenseHandler.sendException( new Exception( fatal ) );
+						
 						final String ffatal = fatal;
 						MainActivity.this.runOnUiThread( new Runnable(){
 							@Override
 							public void run() {
-								new FatalDialog( "Error", ffatal, ffatal.contains(">"), MainActivity.this ).show();
+								new FatalDialog( "Error", ffatal, ffatal.contains(">"), MainActivity.this ).show();								
 							}
 						});													
 					}
@@ -851,7 +854,9 @@ public class MainActivity extends SherlockListActivity
 			mUpdateReceiver.unregister();
 				
 		// make sure no zombie process is running before destroying the activity
-		System.clean( true );		
+		System.clean( true );	
+		
+		BugSenseHandler.closeSession( getApplicationContext() );
 						
 		super.onDestroy();		
 		

@@ -531,6 +531,7 @@ public class Hijacker extends SherlockActivity
 				Hijacker.this.runOnUiThread( new Runnable() {					
 					@Override
 					public void run() {
+						mHijackToggleButton.setText("Stop");
 						mHijackProgress.setVisibility( View.VISIBLE );
 						mRunning = true;						
 					}

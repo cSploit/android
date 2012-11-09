@@ -18,6 +18,10 @@
  */
 package it.evilsocket.dsploit;
 
+import java.net.NoRouteToHostException;
+
+import com.bugsense.trace.BugSenseHandler;
+
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.plugins.ExploitFinder;
 import it.evilsocket.dsploit.plugins.Inspector;
@@ -28,18 +32,8 @@ import it.evilsocket.dsploit.plugins.RouterPwn;
 import it.evilsocket.dsploit.plugins.Traceroute;
 import it.evilsocket.dsploit.plugins.mitm.MITM;
 
-import org.acra.*;
-import org.acra.annotation.*;
-
 import android.app.Application;
 
-@ReportsCrashes
-(
-	formKey 				   = "dDNSaEdZRzVSV3RHaUpGSzlTdzJiSkE6MQ",
-	mode 					   = ReportingInteractionMode.TOAST,
-	forceCloseDialogAfterToast = false,
-	resToastText 			   = R.string.crash_toast_text
-) 
 public class DSploitApplication extends Application 
 {
 	@Override
@@ -48,11 +42,11 @@ public class DSploitApplication extends Application
 		
 		try
 		{
-			ACRA.init( this );
+			BugSenseHandler.initAndStartSession( this, "d5d1ed80" );
 		}
-		catch( IllegalStateException e )
+		catch( Exception e )
 		{
-			// ignore errors for ACRA being initialized more than once.
+			System.errorLogging( "DSPLOIT", e );
 		}
 		
 		// initialize the system
@@ -63,6 +57,10 @@ public class DSploitApplication extends Application
 		catch( Exception e )
 		{
 			System.errorLogging( "DSPLOIT", e );
+			
+			// ignore exception when the user has wifi off
+			if( !( e instanceof NoRouteToHostException ) )
+				BugSenseHandler.sendException( e );
 		}		
 		
 		// load system modules even if the initialization failed
