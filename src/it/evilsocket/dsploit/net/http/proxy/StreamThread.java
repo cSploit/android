@@ -78,20 +78,23 @@ public class StreamThread implements Runnable
     	
     	try 
     	{
-    		String location      = null,
-    			   contentType   = null;
+    		String  location      = null,
+    			    contentType   = null;    		
+    		boolean wasContentTypeChecked = false,
+    				isHandledContentType  = false;
     		
     		while( ( read = mReader.read( chunk, 0, CHUNK_SIZE ) ) > 0 && size < max )
     		{
     			mBuffer.append( chunk, read );    			    			    			
     			size += read;
     			
-    			location    = location == null    ? RequestParser.getHeaderValue( "Location",     mBuffer ) : location;
-    			contentType = contentType == null ? RequestParser.getHeaderValue( "Content-Type", mBuffer ) : contentType;
+    			location    = location == null    ? RequestParser.getHeaderValue( RequestParser.LOCATION_HEADER,     mBuffer ) : location;
+    			contentType = contentType == null ? RequestParser.getHeaderValue( RequestParser.CONTENT_TYPE_HEADER, mBuffer ) : contentType;
     			
-    			if( contentType != null )
-    			{
-    				boolean isHandledContentType = false;
+    			if( contentType != null && wasContentTypeChecked == false )
+    			{    				
+    				wasContentTypeChecked = true;
+    				isHandledContentType  = false;
     				
     				for( String handled : FILTERED_CONTENT_TYPES )
         			{

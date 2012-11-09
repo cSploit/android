@@ -29,6 +29,18 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 
 public class RequestParser 
 {
+	public final static String HOST_HEADER 	 		    = "Host";
+	public final static String ACCEPT_ENCODING_HEADER 	= "Accept-Encoding";
+	public final static String CONNECTION_HEADER     	= "Connection";
+	public final static String IF_MODIFIED_SINCE_HEADER = "If-Modified-Since";
+	public final static String CACHE_CONTROL_HEADER	    = "Cache-Control";
+	public final static String LOCATION_HEADER			= "Location";
+	public final static String CONTENT_TYPE_HEADER	    = "Content-Type";
+	
+	private final static byte[] CARRIAGE_RETURN = "\r".getBytes();
+	private final static byte[] LINE_FEED		= "\n".getBytes();
+	private final static byte[] SPACE			= " ".getBytes();
+	
 	private static final String[] TLD = 
 	{ 
 		".com.ac", ".edu.ac", ".gov.ac",
@@ -396,14 +408,14 @@ public class RequestParser
 		
 		if( ( index = buffer.indexOf( search ) ) != -1 )
 		{
-			index = buffer.indexOf( " ".getBytes(), index );
+			index = buffer.indexOf( SPACE, index );
 			if( index != -1 )
 			{
 				index++;
 				
-				end = buffer.indexOf( "\r".getBytes(), index );
+				end = buffer.indexOf( CARRIAGE_RETURN, index );
 				if( end == -1 )
-					end = buffer.indexOf( "\n".getBytes(), index );				
+					end = buffer.indexOf( LINE_FEED, index );				
 				if( end != -1 )			
 					value = new String( Arrays.copyOfRange( buffer.getData(), index, end ) );									
 			}						

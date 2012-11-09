@@ -47,12 +47,6 @@ public class ProxyThread extends Thread
 	private final static int     HTTPS_SERVER_PORT = 443;
 	private final static Pattern LINK_PATTERN      = Pattern.compile("(https://[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)", Pattern.CASE_INSENSITIVE );
 	
-	private final static String HOST_HEADER 	 		 = "Host";
-	private final static String ACCEPT_ENCODING_HEADER 	 = "Accept-Encoding";
-	private final static String CONNECTION_HEADER     	 = "Connection";
-	private final static String IF_MODIFIED_SINCE_HEADER = "If-Modified-Since";
-	private final static String CACHE_CONTROL_HEADER	 = "Cache-Control";
-
 	private Socket 			 			 mSocket 	   	  = null;
 	private BufferedOutputStream 		 mWriter 	   	  = null;
 	private InputStream   	 	 		 mReader 	   	  = null;
@@ -121,16 +115,16 @@ public class ProxyThread extends Thread
 		            				 value  = split[1].trim();
 		            		
 							// Set encoding to identity since we are not handling gzipped streams
-		            		if( header.equals( ACCEPT_ENCODING_HEADER ) )
+		            		if( header.equals( RequestParser.ACCEPT_ENCODING_HEADER ) )
 		            			value = "identity";	            		
 							// Can't easily handle keep alive connections with blocking sockets
-		            		else if( header.equals( CONNECTION_HEADER ) )
+		            		else if( header.equals( RequestParser.CONNECTION_HEADER ) )
 		            			value = "close";
 							// Keep requesting fresh files and ignore any cache instance
-		            		else if( header.equals( IF_MODIFIED_SINCE_HEADER ) || header.equals( CACHE_CONTROL_HEADER ) )
+		            		else if( header.equals( RequestParser.IF_MODIFIED_SINCE_HEADER ) || header.equals( RequestParser.CACHE_CONTROL_HEADER ) )
 		            			header = null;		            				            	
 							// Extract the real request target.
-		            		else if( header.equals( HOST_HEADER ) )		            	
+		            		else if( header.equals( RequestParser.HOST_HEADER ) )		            	
 		            			mServerName = mHostRedirect == null ? value : mHostRedirect;		            		
 		            				            		
 		            		if( header != null )
