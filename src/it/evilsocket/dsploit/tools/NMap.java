@@ -58,7 +58,7 @@ public class NMap extends Tool
 	}
 	
 	public Thread trace( Target target, TraceOutputReceiver receiver ) {		
-		return super.async( "-sn --traceroute --system-dns " + target.getCommandLineRepresentation(), receiver );
+		return super.async( "-sn --traceroute --privileged --send-ip --system-dns " + target.getCommandLineRepresentation(), receiver );
 	}
 	
 	public static abstract class SynScanOutputReceiver implements OutputReceiver
@@ -87,7 +87,7 @@ public class NMap extends Tool
 	}
 	
 	public Thread synScan( Target target, SynScanOutputReceiver receiver, String custom ) {
-		String command = "-sS -P0 --system-dns -vvv ";
+		String command = "-sS -P0 --privileged --send-ip --system-dns -vvv ";
 		
 		if( custom != null )
 			command += "-p " + custom + " ";
@@ -146,6 +146,6 @@ public class NMap extends Tool
 	}
 	
 	public Thread inpsect( Target target, InspectionReceiver receiver ) {
-		return super.async( "-T4 -F -O -sV --system-dns -vvv " + target.getCommandLineRepresentation(), receiver );
+		return super.async( "-T4 -F -O -sV --privileged --send-ip --system-dns -vvv " + target.getCommandLineRepresentation(), receiver );
 	}
 }
