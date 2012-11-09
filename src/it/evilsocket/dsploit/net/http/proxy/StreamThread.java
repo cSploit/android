@@ -34,11 +34,11 @@ public class StreamThread implements Runnable
 	private final static String   TAG              		 = "PROXYSTREAMTHREAD";
 	private final static String[] FILTERED_CONTENT_TYPES = new String[]
     {
-		"text/html",
-		"text/css",
-		"text/javascript",
-		"application/javascript",
-		"application/x-javascript"		
+		"/html",
+		"/css",
+		"/javascript",
+		"/javascript",
+		"/x-javascript"		
     };
 	
 	private final static String  HEAD_SEPARATOR = "\r\n\r\n";
@@ -78,8 +78,8 @@ public class StreamThread implements Runnable
     	
     	try 
     	{
-    		String location    = null,
-    			   contentType = null;
+    		String location      = null,
+    			   contentType   = null;
     		
     		while( ( read = mReader.read( chunk, 0, CHUNK_SIZE ) ) > 0 && size < max )
     		{
@@ -95,7 +95,7 @@ public class StreamThread implements Runnable
     				
     				for( String handled : FILTERED_CONTENT_TYPES )
         			{
-        				if( contentType.equals( handled ) || contentType.contains( handled ) )
+        				if( contentType.contains( handled ) )
         				{
         					isHandledContentType = true;
         					break;
@@ -110,12 +110,12 @@ public class StreamThread implements Runnable
     					mWriter.write( mBuffer.getData() );    			    			
     					mWriter.flush();
     					
-    					while( ( read = mReader.read( chunk, 0, 512 ) ) > 0 )
+    					while( ( read = mReader.read( chunk, 0, CHUNK_SIZE ) ) > 0 )
     					{
     						mWriter.write( chunk, 0, read );
+    						mWriter.flush();    						
     					}
     					
-    					mWriter.flush();
     					mWriter.close();
     					mReader.close();
     					

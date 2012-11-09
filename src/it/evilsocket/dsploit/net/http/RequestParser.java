@@ -409,7 +409,7 @@ public class RequestParser
 			}						
 		}
 		
-		return value;
+		return value == null ? value : value.trim();
 	}
 	
 	public static String getHeaderValue( String name, ArrayList<String> headers ) {

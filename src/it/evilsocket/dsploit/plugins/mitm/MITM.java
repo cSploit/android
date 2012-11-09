@@ -221,8 +221,8 @@ public class MITM extends Plugin
 											// handle img tags
 											data = data.replaceAll
 											( 
-											  "(?i)<img([^/]+)src=['\"][^'\"]+['\"]", 
-											  "<img$1src=\"" + resource + "\"" 
+											  "(?i)<img([^/]+)src=(['\"])[^'\"]+(['\"])", 
+											  "<img$1src=$2" + resource + "$3" 
 											);
 																		
 											// handle css background declarations
@@ -645,8 +645,8 @@ public class MITM extends Plugin
 															// handle img tags
 															data = data.replaceAll
 															( 
-															  "(?i)<img([^/]+)src=['\"][^'\"]+['\"]", 
-															  "<img$1src=\"" + resource + "\"" 
+															  "(?i)<img([^/]+)src=(['\"])[^'\"]+(['\"])", 
+															  "<img$1src=$2" + resource + "$3" 
 															);
 																						
 															// handle css background declarations
