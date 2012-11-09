@@ -80,7 +80,7 @@ public class MITM extends Plugin
 	private Intent			  mScriptPicker    = null;
 	private ProgressBar       mCurrentActivity = null;
 	private SpoofSession	  mSpoofSession	   = null;
-	
+		
 	static class Action
 	{
 		public int			   resourceId;
@@ -395,7 +395,7 @@ public class MITM extends Plugin
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);   
-                                
+
         new CheckForOpenPortsTask().execute();
         
         mActionListView = ( ListView )findViewById( R.id.actionListView );

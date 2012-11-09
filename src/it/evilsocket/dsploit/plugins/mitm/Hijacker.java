@@ -77,6 +77,7 @@ public class Hijacker extends SherlockActivity
 	private ListView 		   mListView    	   = null;		
 	private SessionListAdapter mAdapter			   = null;
 	private boolean	     	   mRunning			   = false;	
+	private RequestListener    mRequestListener	   = null;
 	private SpoofSession	   mSpoof			   = null;
 	
 	public static class Session
@@ -367,6 +368,55 @@ public class Hijacker extends SherlockActivity
 	        return row;
 	    }
 	}
+	
+	class RequestListener implements OnRequestListener
+	{
+		@Override
+		public void onRequest( boolean https, String address, String hostname, ArrayList<String> headers ) {
+			ArrayList<BasicClientCookie> cookies = RequestParser.getCookiesFromHeaders( headers );
+			
+			// got any cookie ?
+			if( cookies != null && cookies.size() > 0 )
+			{					
+				String domain = cookies.get(0).getDomain();
+				
+				if( domain == null || domain.isEmpty() )
+				{
+					domain = RequestParser.getBaseDomain( hostname );
+					
+					for( int i = 0; i < cookies.size(); i++ )
+						cookies.get(i).setDomain( domain );
+				}
+				
+				Session session = mAdapter.getSession( address, domain, https );
+				
+				// new session ^^
+				if( session == null )
+				{
+					session = new Session();
+					session.mHTTPS     = https;
+					session.mAddress   = address;
+					session.mDomain    = domain;		
+					session.mUserAgent = RequestParser.getHeaderValue( "User-Agent", headers );
+				}
+
+				// update/initialize session cookies
+				for( BasicClientCookie cookie : cookies )
+				{
+					session.mCookies.put( cookie.getName(), cookie );
+				}
+				
+				final Session fsession = session;
+				Hijacker.this.runOnUiThread( new Runnable() {
+					@Override
+					public void run(){
+						mAdapter.addSession( fsession );
+						mAdapter.notifyDataSetChanged();
+					}							
+				});	
+			}
+		}
+	}
 						
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        
@@ -468,53 +518,7 @@ public class Hijacker extends SherlockActivity
 			}} 
 		);  
         
-        System.getProxy().setOnRequestListener( new OnRequestListener() {			
-			@Override
-			public void onRequest( boolean https, String address, String hostname, ArrayList<String> headers ) {
-				ArrayList<BasicClientCookie> cookies = RequestParser.getCookiesFromHeaders( headers );
-				
-				// got any cookie ?
-				if( cookies != null && cookies.size() > 0 )
-				{					
-					String domain = cookies.get(0).getDomain();
-					
-					if( domain == null || domain.isEmpty() )
-					{
-						domain = RequestParser.getBaseDomain( hostname );
-						
-						for( int i = 0; i < cookies.size(); i++ )
-							cookies.get(i).setDomain( domain );
-					}
-					
-					Session session = mAdapter.getSession( address, domain, https );
-					
-					// new session ^^
-					if( session == null )
-					{
-						session = new Session();
-						session.mHTTPS     = https;
-						session.mAddress   = address;
-						session.mDomain    = domain;		
-						session.mUserAgent = RequestParser.getHeaderValue( "User-Agent", headers );
-					}
-
-					// update/initialize session cookies
-					for( BasicClientCookie cookie : cookies )
-					{
-						session.mCookies.put( cookie.getName(), cookie );
-					}
-					
-					final Session fsession = session;
-					Hijacker.this.runOnUiThread( new Runnable() {
-						@Override
-						public void run(){
-							mAdapter.addSession( fsession );
-							mAdapter.notifyDataSetChanged();
-						}							
-					});	
-				}
-			}
-		});     
+        mRequestListener = new RequestListener();        
 	}
 	
 	@Override
@@ -525,6 +529,8 @@ public class Hijacker extends SherlockActivity
 	}
 	
 	private void setStartedState( ) {	
+		System.getProxy().setOnRequestListener( mRequestListener );
+		
 		mSpoof.start( new OnSessionReadyListener() {			
 			@Override
 			public void onSessionReady() {
@@ -542,7 +548,7 @@ public class Hijacker extends SherlockActivity
 	
 	private void setStoppedState( ) {		
 		mSpoof.stop();
-
+		
 		System.getProxy().setOnRequestListener( null );	    
 		mHijackProgress.setVisibility( View.INVISIBLE );
 		

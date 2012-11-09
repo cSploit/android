@@ -35,8 +35,8 @@ import java.io.Writer;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NoRouteToHostException;
+import java.net.Socket;
 import java.net.SocketException;
-import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,6 +63,7 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.SparseIntArray;
 import it.evilsocket.dsploit.net.Endpoint;
 import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.Target;
@@ -107,6 +108,7 @@ public class System
 	private static Map<String,String>    mServices 	    = null;
 	private static Map<String,String>    mPorts         = null;
 	private static Map< String, String > mVendors       = null;
+	private static SparseIntArray		 mOpenPorts		= null;
 	
 	// registered plugins
 	private static ArrayList<Plugin>     mPlugins  	    = null;
@@ -137,7 +139,8 @@ public class System
 			mUpdateManager = new UpdateManager( mContext );
 			mPlugins 	   = new ArrayList<Plugin>();
 			mTargets 	   = new Vector<Target>();
-								
+			mOpenPorts	   = new SparseIntArray( 3 );
+			
 			// if we are here, network initialization didn't throw any error, lock wifi
 			WifiManager wifiManager = ( WifiManager )mContext.getSystemService( Context.WIFI_SERVICE );
 			
@@ -480,22 +483,38 @@ public class System
 	public static boolean isPortAvailable( int port ) {
 		boolean available = true;
 		
+		int available_code = mOpenPorts.get( port );
+		
+		if( available_code != 0 )
+			return available_code == 1 ? false : true;
+		
 		try
 		{
-			SocketChannel 	  channel = SocketChannel.open();
-			InetSocketAddress address = new InetSocketAddress( InetAddress.getByName( mNetwork.getLocalAddressAsString() ), port );
-						
-			if( channel.connect( address ) )
-			{				
+			// attempt 3 times since proxy and server could be still releasing
+			// their ports
+			for( int i = 0; i < 3; i++ )
+			{
+				Socket		 	  channel = new Socket();
+				InetSocketAddress address = new InetSocketAddress( InetAddress.getByName( mNetwork.getLocalAddressAsString() ), port );
+					
+				channel.connect( address, 200 );
+								
 				available = !channel.isConnected();
-				
+
 				channel.close();
+					
+				if( available )
+					break;
+				
+				Thread.sleep( 200 );				
 			}
 		}
 		catch( Exception e )
 		{
-			// Swallow exception
+			available = true;
 		}
+		
+		mOpenPorts.put( port, available ? 2 : 1 );
 		
 		return available;
 	}
