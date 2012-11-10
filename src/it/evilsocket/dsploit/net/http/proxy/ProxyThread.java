@@ -18,6 +18,7 @@
  */
 package it.evilsocket.dsploit.net.http.proxy;
 
+import it.evilsocket.dsploit.core.Profiler;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.http.RequestParser;
 import it.evilsocket.dsploit.net.http.proxy.Proxy.OnRequestListener;
@@ -85,9 +86,13 @@ public class ProxyThread extends Thread
             
             Log.d( TAG, "Connection from " + client );
             		
+            Profiler.instance().profile("proxy request read");
+            
             // Read the header and rebuild it
             if( ( read = mReader.read( buffer , 0,  MAX_REQUEST_SIZE ) ) > 0 )
             {            
+            	Profiler.instance().profile("proxy request parse");
+            	
 	            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream( buffer, 0, read );
 	            BufferedReader 		 bReader 			  = new BufferedReader( new InputStreamReader( byteArrayInputStream ) );	            
 	            StringBuilder 		 builder 			  = new StringBuilder();
@@ -139,6 +144,8 @@ public class ProxyThread extends Thread
 	            // any real host found ?
 	 			if( mServerName != null )
 	 			{			
+	 				Profiler.instance().profile("getUrlFromRequest");
+	 				
 	 				long millis = java.lang.System.currentTimeMillis();
 	 				Log.d( TAG, "Connection to " + mServerName );
 	 				 
@@ -146,6 +153,8 @@ public class ProxyThread extends Thread
 	 		  			   url      = RequestParser.getUrlFromRequest( mServerName, request ),
 	 		  			   response = null;
 	 				boolean https   = false;
+	 				
+	 				Profiler.instance().profile("DNS Resolution");
 	 				
 	 				// connect to host
         			if( mHostRedirect == null )			
@@ -180,7 +189,11 @@ public class ProxyThread extends Thread
         				mServer = DNSCache.getInstance().connect( mServerName, mPortRedirect );
         			        											
 	 				if( mRequestListener != null )
-	            		mRequestListener.onRequest( https, client, mServerName, headers );
+	 				{
+	 					Profiler.instance().profile("onRequest handler");
+	 					
+	 					mRequestListener.onRequest( https, client, mServerName, headers );
+	 				}
 	 				
 	 				mWriter = new BufferedOutputStream( mSocket.getOutputStream() );
 	 				
@@ -194,11 +207,15 @@ public class ProxyThread extends Thread
 	 				{						
 	 					mServerReader = mServer.getInputStream(); 
 						mServerWriter = mServer.getOutputStream();		
-																							
+																
+						Profiler.instance().profile("request write");
+						
 		 				// send the patched request
 		 				mServerWriter.write( request.getBytes() );
 		 				mServerWriter.flush();
-		 						 						 				
+		 						 							 				
+		 				Profiler.instance().profile("StreamThread");
+		 				
 		 				// start the stream session with specified filters				
 		 				new StreamThread( client, mServerReader, mWriter, new Proxy.ProxyFilter() {									
 		 					@Override
@@ -231,6 +248,8 @@ public class ProxyThread extends Thread
 		 						return data;
 		 					}
 		 				});
+		 				
+		 				Profiler.instance().emit();
 	 				}
 	 			}					
             }

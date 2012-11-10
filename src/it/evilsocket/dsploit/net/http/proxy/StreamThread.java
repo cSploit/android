@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import it.evilsocket.dsploit.core.Profiler;
 import it.evilsocket.dsploit.core.System;
 
 import android.util.Log;
@@ -83,8 +84,12 @@ public class StreamThread implements Runnable
     		boolean wasContentTypeChecked = false,
     				isHandledContentType  = false;
     		
+    		Profiler.instance().profile("chunk read");
+    		
     		while( ( read = mReader.read( chunk, 0, CHUNK_SIZE ) ) > 0 && size < max )
     		{
+    			Profiler.instance().emit();
+    			
     			mBuffer.append( chunk, read );    			    			    			
     			size += read;
     			
@@ -108,6 +113,8 @@ public class StreamThread implements Runnable
     				// not handled content type, start fast streaming
     				if( isHandledContentType == false )
     				{
+    					Profiler.instance().profile("Fast streaming");
+    					
     					Log.d( TAG, "Content type " + contentType + " not handled, start fast streaming ..." );
     					
     					mWriter.write( mBuffer.getData() );    			    			
@@ -122,6 +129,8 @@ public class StreamThread implements Runnable
     					mWriter.close();
     					mReader.close();
     					
+    					Profiler.instance().emit();
+    					
     					return;
     				}
     			}
@@ -131,6 +140,8 @@ public class StreamThread implements Runnable
     		// ( handled content type )
     		if( mBuffer.isEmpty() == false )
     		{       			
+    			Profiler.instance().profile("content filtering");
+    			
 				String   data    = mBuffer.toString();
 				String[] split   = data.split( HEAD_SEPARATOR, 2 );
 				String   headers = split[ 0 ];
@@ -168,6 +179,8 @@ public class StreamThread implements Runnable
 																		
 				mWriter.write( mBuffer.getData() );    			    			
 				mWriter.flush();
+				
+				Profiler.instance().emit();
     		}
 		} 
     	catch( OutOfMemoryError ome )

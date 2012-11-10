@@ -25,6 +25,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import android.util.Log;
+import it.evilsocket.dsploit.core.Profiler;
 import it.evilsocket.dsploit.core.System;
 
 public class Proxy implements Runnable
@@ -114,9 +115,13 @@ public class Proxy implements Runnable
 			{
 				try
 				{
+					Profiler.instance().profile("client spawn");
+					
 					Socket client = mSocket.accept();
 					
 					new ProxyThread( client, mRequestListener, mFilters, mHostRedirect, mPortRedirect ).start();
+					
+					Profiler.instance().profile("client spawn");
 				}
 				catch( Exception e )
 				{

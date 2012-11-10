@@ -26,6 +26,12 @@
             android:summary="Enable or disable error logging on a debug file."
             android:title="Debug Error Logging" />
         
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="PREF_ENABLE_PROFILER"
+            android:summary="Enable or disable network code profiler logging."
+            android:title="Code Profiler" />
+        
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Modules" >
