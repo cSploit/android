@@ -61,7 +61,7 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/linearLayout2"
         android:layout_below="@+id/linearLayout2"
-        android:layout_toLeftOf="@+id/button1"
+        android:layout_toLeftOf="@+id/sendWOL"
         android:text="Wait for a response" />
     
   <LinearLayout
