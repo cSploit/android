@@ -88,23 +88,21 @@ public class ByteBuffer
 	}
 	
 	public int indexOf( byte[] pattern, int start ){
-    	boolean match = false;
-    	int     i, j;
-    	
-    	if( isEmpty() == false )
+    	int i, j, plen = pattern.length, stop = mBuffer.length - plen;
+
+    	loop:
+    	for( i = start; i < stop; i++ )
     	{
-	    	for( i = start; i < mBuffer.length; i++ )
-	    	{
-	    		match = true;
-	    		
-	    		for( j = 0; j < pattern.length && match && ( i + j ) < mBuffer.length; j++ )
-	    		{
-	    			if( mBuffer[ i + j ] != pattern[ j ] )
-	    				match = false;
-	    		}
-	    		
-	    		if( match ) return i;
-	    	}
+    		if( pattern[0] == mBuffer[i] )
+    		{
+    			for( j = 1; j < plen; j++ )
+    			{
+    				if( pattern[j] != mBuffer[ i + j ] )
+    					continue loop;
+    			}
+    			
+    			return i;
+    		}
     	}
     	
     	return -1;
