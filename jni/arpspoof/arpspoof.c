@@ -83,9 +83,14 @@ int main(int argc, char *argv[])
 {
 	extern char *optarg;
 	extern int   optind;
-	char pcap_ebuf[PCAP_ERRBUF_SIZE];
-	char libnet_ebuf[LIBNET_ERRBUF_SIZE];
-	int  c;
+	char			   pcap_ebuf[PCAP_ERRBUF_SIZE];
+	char 				 libnet_ebuf[LIBNET_ERRBUF_SIZE];
+	int 				 c,
+			 	 	 	 	 netmask = 0,
+			 	 	 	 	 ifaddr  = 0,
+			 	 	 	 	 nhosts  = 0,
+			 	 	 	 	 i			 = 0;
+	network_entry_t *entry;
 
 	iface			 = NULL;
 	gateway_ip = target_ip = 0;
@@ -104,31 +109,31 @@ int main(int argc, char *argv[])
 				exit(1);
 			break;
 		default:
-			exit(1);
+			return 1;
 		}
 	}
 	argc -= optind;
 	argv += optind;
 
 	if (argc != 1)
-		exit(1);
+		return 1;
 
-	if ((gateway_ip = libnet_name2addr4(lnet, argv[0], LIBNET_RESOLVE)) == -1)
-		exit(1);
-
-	if (iface == NULL && (iface = pcap_lookupdev(pcap_ebuf)) == NULL) {
-		printf( "%s\n", pcap_ebuf);
-		exit(1);
+	if( ( gateway_ip = libnet_name2addr4( lnet, argv[0], LIBNET_RESOLVE ) ) == -1 )
+	{
+		printf( "[ERROR] Unable to resolve gateway ip.\n" );
+		return 1;
 	}
 
-	if ((lnet = libnet_init(LIBNET_LINK, iface, libnet_ebuf)) == NULL) {
-		printf( "%s\n", libnet_ebuf);
-		exit(1);
+	if( iface == NULL && (iface = pcap_lookupdev(pcap_ebuf)) == NULL )
+	{
+		printf( "[ERROR] Unable to lookup network interface ( %s ).\n", pcap_ebuf );
+		return 1;
 	}
 
-	if (target_ip != 0 && !arp_lookup(target_ip, &target_mac, iface ) == 0 ) {
-		printf( "couldn't arp for host %s\n", libnet_addr2name4(target_ip, LIBNET_DONT_RESOLVE));
-		exit(1);
+	if( ( lnet = libnet_init(LIBNET_LINK, iface, libnet_ebuf) ) == NULL )
+	{
+		printf( "[ERROR] Unable to initialize libnet ( %s ).\n", libnet_ebuf );
+		return 1;
 	}
 
 	signal( SIGHUP, cleanup );
@@ -138,15 +143,32 @@ int main(int argc, char *argv[])
 	our_mac = ( struct ether_addr * )libnet_get_hwaddr( lnet );
 	if( our_mac == NULL )
 	{
-		printf( "libnet_get_hwaddr failed : %s\n", libnet_geterror( lnet ) );
-		exit( 1 );
+		printf( "[ERROR] Unable to retrieve local hardware address libnet ( %s ).\n", libnet_geterror( lnet ) );
+		return 1;
 	}
+
+	if( net_get_details( iface, &netmask, &ifaddr, &nhosts ) != 0 )
+		exit( 1 );
+
+	printf( "netmask = %s\n", inet_ntoa( *( struct in_addr *)&netmask ) );
+	printf( "ifaddr  = %s\n", inet_ntoa( *( struct in_addr *)&ifaddr ) );
+	printf( "gateway = %s\n", inet_ntoa( *( struct in_addr *)&gateway_ip ) );
+	printf( "hosts   = %d\n", nhosts );
+
+	// force the arp cache to be populated
+	net_wake( iface, nhosts, ifaddr, netmask, gateway_ip );
 
 	// if the target is the gateway itself, we switch to subnet mode,
 	// otherwise if the target was set, we are in single ip spoofing mode.
 	if( target_ip != 0 && target_ip != gateway_ip )
 	{
-		printf( "Single target mode.\n" );
+		if( target_ip != 0 && arp_lookup( target_ip, &target_mac, iface ) != 0 )
+		{
+			printf( "[ERROR] Couldn't find a cached MAC address for %s, try to wait a little bit and then try again or restart the network discovery.\n", libnet_addr2name4(target_ip, LIBNET_DONT_RESOLVE) );
+			return 1;
+		}
+
+		printf( "\nSingle target mode.\n" );
 
 		while( killed == 0 )
 		{
@@ -157,24 +179,15 @@ int main(int argc, char *argv[])
 	// whole network spoofing
 	else
 	{
-		printf( "Subnet mode.\n" );
+		printf( "\nSubnet mode.\n" );
 
-		int netmask = 0,
-				ifaddr  = 0,
-				nhosts  = 0,
-				i				= 0;
+		netmap = net_get_mapping( iface, nhosts, ifaddr, netmask, gateway_ip, &i );
 
-		network_entry_t *entry;
-
-		if( net_get_details( iface, &netmask, &ifaddr, &nhosts ) != 0 )
-			exit( 1 );
-
-		printf( "netmask = %s\n", inet_ntoa( *( struct in_addr *)&netmask ) );
-		printf( "ifaddr  = %s\n", inet_ntoa( *( struct in_addr *)&ifaddr ) );
-		printf( "gateway = %s\n", inet_ntoa( *( struct in_addr *)&gateway_ip ) );
-		printf( "hosts   = %d\n", nhosts );
-
-		netmap = net_get_mapping( iface, nhosts, ifaddr, netmask, gateway_ip );
+		if( i == 0 )
+		{
+			printf( "[ERROR] No alive endpoints found.\n" );
+			return 1;
+		}
 
 		while( killed == 0 )
 		{

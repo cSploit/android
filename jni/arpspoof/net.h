@@ -37,6 +37,7 @@ typedef struct
 network_entry_t;
 
 int 		 net_get_details( char *iface, int *netmask, int *ifaddr, int *nhosts );
-Hashmap *net_get_mapping( char *iface, int nhosts, int ifaddr, int netmask, in_addr_t gateway );
+void	   net_wake( char *iface, int nhosts, int ifaddr, int netmask, in_addr_t gateway );
+Hashmap *net_get_mapping( char *iface, int nhosts, int ifaddr, int netmask, in_addr_t gateway, int *count );
 
 #endif

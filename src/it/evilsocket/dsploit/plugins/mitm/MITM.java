@@ -240,6 +240,11 @@ public class MITM extends Plugin
 								}
 							});
 						}
+						
+						@Override
+						public void onError( String error ) {
+							setSpoofErrorState( error );				
+						}
 					});			    		
 		    	}		    	
 	    	}
@@ -296,6 +301,11 @@ public class MITM extends Plugin
 									return data.replaceAll( "(?i)</head>", code + "</head>" );
 								}
 							});												
+						}
+						
+						@Override
+						public void onError( String error ) {
+							setSpoofErrorState( error );				
 						}
 					});
 	    		}
@@ -354,6 +364,18 @@ public class MITM extends Plugin
 		}
 	}
 
+	private void setSpoofErrorState( final String error ) {
+		MITM.this.runOnUiThread( new Runnable(){
+			@Override
+			public void run() {		
+				new ErrorDialog( "Error", error, MITM.this ).show();
+				
+				mCurrentActivity = null;
+				setStoppedState();
+			}
+		});		
+	}
+	
 	private void setStoppedState() {
 		int rows = mActionListView.getChildCount(),
 			i;
@@ -564,6 +586,11 @@ public class MITM extends Plugin
 										public void onSessionReady() {
 											System.getProxy().setRedirection( faddress, fport );											
 										}
+										
+										@Override
+										public void onError( String error ) {
+											setSpoofErrorState( error );				
+										}
 									});		
 																								
 								}
@@ -660,6 +687,11 @@ public class MITM extends Plugin
 														}
 													});								
 												}
+												
+												@Override
+												public void onError( String error ) {
+													setSpoofErrorState( error );				
+												}
 											});		
 											
 											Toast.makeText( MITM.this, "Tap again to stop.", Toast.LENGTH_LONG ).show();
@@ -740,6 +772,11 @@ public class MITM extends Plugin
 											}
 										});								
 									}
+									
+									@Override
+									public void onError( String error ) {
+										setSpoofErrorState( error );				
+									}
 								});											
 							}
 							else
@@ -816,6 +853,11 @@ public class MITM extends Plugin
 														}
 													});												
 												}
+												
+												@Override
+												public void onError( String error ) {
+													setSpoofErrorState( error );				
+												}
 											});
 										}
 										else
@@ -877,6 +919,11 @@ public class MITM extends Plugin
 													return data;
 												}
 											});
+										}
+										
+										@Override
+										public void onError( String error ) {
+											setSpoofErrorState( error );				
 										}
 									});									
 								} 

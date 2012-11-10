@@ -31,6 +31,7 @@ import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
+import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.plugins.mitm.SpoofSession.OnSessionReadyListener;
@@ -347,6 +348,16 @@ public class Sniffer extends SherlockActivity
 		mRunning = false;
 		mSniffToggleButton.setChecked( false );                			
 	}
+	
+	private void setSpoofErrorState( final String error ) {
+		Sniffer.this.runOnUiThread( new Runnable(){
+			@Override
+			public void run() {		
+				new ErrorDialog( "Error", error, Sniffer.this ).show();				
+				setStoppedState();
+			}
+		});		
+	}
 
 	private void setStartedState( ) {		
 		// never say never :)
@@ -356,6 +367,11 @@ public class Sniffer extends SherlockActivity
 			Toast.makeText( Sniffer.this, "Dumping traffic to " + mPcapFileName, Toast.LENGTH_SHORT ).show();
 		
 		mSpoofSession.start( new OnSessionReadyListener() {			
+			@Override
+			public void onError( String error ) {
+				setSpoofErrorState( error );				
+			}
+			
 			@Override
 			public void onSessionReady() {
 				

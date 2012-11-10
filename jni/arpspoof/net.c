@@ -67,20 +67,56 @@ int net_get_details( char *iface, int *netmask, int *ifaddr, int *nhosts )
 	return retval;
 }
 
-Hashmap *net_get_mapping( char *iface, int nhosts, int ifaddr, int netmask, in_addr_t gateway )
+void net_wake( char *iface, int nhosts, int ifaddr, int netmask, in_addr_t gateway )
 {
-	network_entry_t  *entry;
-	Hashmap          *netmap = NULL;
-	int			          i;
-	in_addr_t         address;
-	struct ether_addr hardware;
+	int			           i, sd;
+	in_addr_t          address;
+	struct sockaddr_in sin;
+	unsigned char      dummy[128] = {0};
+
+	// force the arp cache to be populated
+	for( i = 1; i <= nhosts; i++ )
+	{
+		address = ( gateway & netmask ) | htonl( i );
+		// skip local address and gateway address
+		if( address != ifaddr && address != gateway )
+		{
+			// send a dummy udp packet just to wake up the arp cache
+			if( ( sd = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP ) ) > 0 )
+			{
+				memset( &sin, 0, sizeof(sin) );
+
+				sin.sin_family 		  = AF_INET;
+				sin.sin_addr.s_addr = address;
+				sin.sin_port 				= htons(67);
+
+				sendto( sd, dummy, 128, 0, (struct sockaddr *)&sin, sizeof(sin) );
+
+				close( sd );
+			}
+		}
+	}
+
+	// seems a fair amount of time to wait
+	sleep( 1 );
+}
+
+Hashmap *net_get_mapping( char *iface, int nhosts, int ifaddr, int netmask, in_addr_t gateway, int *count )
+{
+	network_entry_t   *entry;
+	Hashmap           *netmap = NULL;
+	int			           i;
+	in_addr_t          address;
+	struct ether_addr  hardware;
 
 	netmap = hashmapCreate( nhosts, address_hash, address_hash_equals );
 
-	// precompute addresses
+	*count = 0;
+
+	// precompute alive addresses
 	for( i = 1; i <= nhosts; i++ )
 	{
-		address = ( ifaddr & netmask ) | htonl( i );
+		address = ( gateway & netmask ) | htonl( i );
 		// skip local address and gateway address
 		if( address != ifaddr && address != gateway )
 		{
@@ -93,6 +129,8 @@ Hashmap *net_get_mapping( char *iface, int nhosts, int ifaddr, int netmask, in_a
 				memcpy( &entry->mac, 		 &hardware, sizeof( hardware ) );
 
 				hashmapPut( netmap, (void *)address, entry );
+
+				++(*count);
 			}
 		}
 	}

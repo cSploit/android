@@ -128,15 +128,6 @@ int arp_lookup( in_addr_t address, struct ether_addr *ether, const char* ifname 
 	return -1;
 }
 
-inline char *hwtoa( unsigned char *hw )
-{
-	char a[128] = {0};
-
-	sprintf( a, "%x:%x:%x:%x:%x:%x", hw[0], hw[1], hw[2], hw[3], hw[4], hw[5] );
-
-	return a;
-}
-
 int arp_send( libnet_t *pnet, int opcode, unsigned char *source_hardware, in_addr_t source_address, unsigned char *target_hardware, in_addr_t target_address )
 {
 	int retval = -1;
@@ -159,11 +150,12 @@ int arp_send( libnet_t *pnet, int opcode, unsigned char *source_hardware, in_add
 					else
 						printf
 						(
-								"sent spoof from %s [ %s ] to %s [ %s ]\n",
+								"sent arp %s from %s [ %x:%x:%x:%x:%x:%x ] to %s [ %x:%x:%x:%x:%x:%x ]\n",
+								opcode == ARPOP_REQUEST ? "request" : "reply",
 								inet_ntoa( *(struct in_addr *)&source_address ),
-								hwtoa( source_hardware ),
+								source_hardware[0], source_hardware[1], source_hardware[2], source_hardware[3], source_hardware[4], source_hardware[5],
 								inet_ntoa( *(struct in_addr *)&target_address ),
-								hwtoa( target_hardware )
+								target_hardware[0], target_hardware[1], target_hardware[2], target_hardware[3], target_hardware[4], target_hardware[5]
 						);
 
 					libnet_clear_packet( pnet );

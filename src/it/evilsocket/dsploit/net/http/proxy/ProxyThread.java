@@ -237,7 +237,7 @@ public class ProxyThread extends Thread
             else
             {
             	mReader.close();            	
-            }
+            }            
 		} 
 		catch( IOException e )
 		{

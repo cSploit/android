@@ -35,6 +35,7 @@ public class SpoofSession
 	public static abstract interface OnSessionReadyListener 
 	{
 		public void onSessionReady();
+		public void onError( String error );
 	}
 	
 	public SpoofSession( boolean withProxy, boolean withServer, String serverFileName, String serverMimeType ) {
@@ -77,8 +78,7 @@ public class SpoofSession
 		System.getArpSpoof().spoof( target, new OutputReceiver() {			
 			@Override
 			public void onStart(String command) { 
-				// Log.d( "ARPSPOOF", command );
-				
+				// android.util.Log.d( "ARPSPOOF", command );				
 				System.setForwarding( true );
 				
 				if( mWithProxy )
@@ -93,13 +93,16 @@ public class SpoofSession
 			}
 			
 			@Override
-			public void onNewLine(String line) {
-				// Log.d( "ARPSPOOF", line );
+			public void onNewLine( String line ) {
+				// android.util.Log.d( "ARPSPOOF", line );
+				
+				if( line.startsWith( "[ERROR]" ) )
+					listener.onError( line.substring( "[ERROR]".length() + 1 ).trim() );
 			}
 			
 			@Override
 			public void onEnd(int exitCode) { 
-				// Log.d( "ARPSPOOF", "onEnd( " + exitCode + " )" );
+				// android.util.Log.d( "ARPSPOOF", "onEnd( " + exitCode + " )" );
 			}
 		}).start();
 	}

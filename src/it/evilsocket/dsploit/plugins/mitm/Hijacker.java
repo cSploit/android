@@ -543,7 +543,22 @@ public class Hijacker extends SherlockActivity
 					}
 				});
 			}
+			
+			@Override
+			public void onError( String error ) {
+				setSpoofErrorState( error );				
+			}
 		});
+	}
+	
+	private void setSpoofErrorState( final String error ) {
+		Hijacker.this.runOnUiThread( new Runnable(){
+			@Override
+			public void run() {		
+				new ErrorDialog( "Error", error, Hijacker.this ).show();				
+				setStoppedState();
+			}
+		});		
 	}
 	
 	private void setStoppedState( ) {		
