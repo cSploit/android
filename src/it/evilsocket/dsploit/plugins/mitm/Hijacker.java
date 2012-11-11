@@ -557,8 +557,11 @@ public class Hijacker extends SherlockActivity
 		Hijacker.this.runOnUiThread( new Runnable(){
 			@Override
 			public void run() {		
-				new ErrorDialog( "Error", error, Hijacker.this ).show();				
-				setStoppedState();
+				if( Hijacker.this.isFinishing() == false )
+				{
+					new ErrorDialog( "Error", error, Hijacker.this ).show();				
+					setStoppedState();
+				}
 			}
 		});		
 	}
