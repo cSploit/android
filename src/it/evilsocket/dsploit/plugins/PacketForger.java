@@ -219,35 +219,40 @@ public class PacketForger extends Plugin implements OnClickListener
 			}
 			else
 			{
-				mResponse.setText("");
-				mProtocol.setSelection( UDP_PROTOCOL );
-				mPort.setText( "9" );			
-				
 				Endpoint endpoint = System.getCurrentTarget().getEndpoint();
 				
 				byte[] mac = endpoint.getHardware();				
 				int    i;
-				
-				mBinaryData = new byte[ 6 + 16 * mac.length ];
-				
-				for( i = 0; i < 6; i++ )
+
+				if( mac != null )
 				{
-					mBinaryData[i] = (byte)0xFF;
+					mResponse.setText("");
+					mProtocol.setSelection( UDP_PROTOCOL );
+					mPort.setText( "9" );			
+									
+					mBinaryData = new byte[ 6 + 16 * mac.length ];
+					
+					for( i = 0; i < 6; i++ )
+					{
+						mBinaryData[i] = (byte)0xFF;
+					}
+					
+					for( i = 6; i < mBinaryData.length; i += mac.length )
+					{
+						java.lang.System.arraycopy( mac, 0, mBinaryData, i, mac.length );
+					}			
+					
+					String hex = "";
+					
+					for( i = 0; i < mBinaryData.length; i++ )
+						hex += "\\x" + Integer.toHexString( 0xFF & mBinaryData[i] ).toUpperCase();
+					
+					mData.setText( hex );
+					
+					Toast.makeText( this, "Customize WOL port and press Send.", Toast.LENGTH_SHORT ).show();
 				}
-				
-				for( i = 6; i < mBinaryData.length; i += mac.length )
-				{
-					java.lang.System.arraycopy( mac, 0, mBinaryData, i, mac.length );
-				}			
-				
-				String hex = "";
-				
-				for( i = 0; i < mBinaryData.length; i++ )
-					hex += "\\x" + Integer.toHexString( 0xFF & mBinaryData[i] ).toUpperCase();
-				
-				mData.setText( hex );
-				
-				Toast.makeText( this, "Customize WOL port and press Send.", Toast.LENGTH_SHORT ).show();
+				else
+					Toast.makeText( this, "Could not send a WOL packet to a target without a known MAC address.", Toast.LENGTH_SHORT ).show();
 			}
 		}
 		else
