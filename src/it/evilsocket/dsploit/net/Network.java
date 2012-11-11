@@ -95,6 +95,8 @@ public class Network
 			try
 			{
 				mInterface = NetworkInterface.getByInetAddress( getLocalAddress() );			
+				if( mInterface == null )
+					throw new IllegalStateException("Error retrieving network interface.");
 			}
 			catch( SocketException e )
 			{
