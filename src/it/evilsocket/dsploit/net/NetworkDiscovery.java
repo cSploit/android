@@ -156,6 +156,11 @@ public class NetworkDiscovery extends Thread
 										{
 											// ignore since this is happening because the executor was shut down.
 										}
+										catch( OutOfMemoryError m )
+										{
+											// wait until the thread queue gets freed
+											break;
+										}
 										
 										if( target.isRouter() == false )
 										{
