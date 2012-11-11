@@ -18,8 +18,11 @@
  */
 package it.evilsocket.dsploit.plugins;
 
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import com.actionbarsherlock.view.Menu;
@@ -164,6 +167,7 @@ public class LoginCracker extends Plugin
 	
 	private Spinner 	 	mPortSpinner	 = null;
 	private Spinner 	 	mProtocolSpinner = null;
+	private ProtocolAdapter mProtocolAdapter = null;
 	private Spinner 	 	mCharsetSpinner  = null;
 	private Spinner 	 	mUserSpinner	 = null;
 	private Spinner 	 	mMinSpinner	  	 = null;
@@ -180,26 +184,100 @@ public class LoginCracker extends Plugin
 	private AttemptReceiver mReceiver     	 = null;
 	private String			mCustomCharset	 = null;
 	
-	public class ProtocolSpinnerAdapter extends BaseAdapter implements SpinnerAdapter
+	public class ProtocolAdapter extends BaseAdapter implements SpinnerAdapter
 	{
-		private List<Port> mOpenPorts = null;
+		private List<Port>   	  mOpenPorts = null;
+		private ArrayList<String> mProtocols = null;
 		
-		public ProtocolSpinnerAdapter( ) {
+		public ProtocolAdapter( ) {
 			mOpenPorts = System.getCurrentTarget().getOpenPorts();
+			mProtocols = new ArrayList<String>( Arrays.asList( PROTOCOLS ) );
+			
+			// first sort alphabetically
+			Collections.sort( mProtocols, Collator.getInstance() );
+			
+			// remove open ports protocols from the list
+			List<String>     openProtocols = new ArrayList<String>();
+			Iterator<String> iterator      = mProtocols.iterator();
+			
+			while( iterator.hasNext() )
+			{
+				String sProtocol = iterator.next();
+				
+				if( hasProtocolOpenPort( sProtocol ) )
+				{
+					iterator.remove();
+					openProtocols.add( sProtocol );
+				}
+			}
+			
+			Collections.sort( openProtocols, Collator.getInstance() );
+			
+			// add open ports protocol on top of the list
+			mProtocols.addAll( 0, openProtocols );
+		}
+		
+		private boolean hasProtocolOpenPort( String sProtocol ) {			
+			for( Port port : mOpenPorts )
+	        {
+	        	String protocol = System.getProtocolByPort( "" + port.number );
+	        	if( protocol != null && ( protocol.equals( sProtocol ) || sProtocol.toLowerCase().contains( protocol ) ) )
+	        	{
+	        		return true;
+	        	}
+	        }
+			
+			return false;
+		}
+		
+		public int getIndexByPort( String port ) {
+			String portProtocol = System.getProtocolByPort( port ),
+				   protocol     = null;
+			
+			if( portProtocol != null )
+			{
+				for( int i = 0; i < mProtocols.size(); i++ )
+				{
+					protocol = mProtocols.get( i );
+					if( protocol.equals( portProtocol ) || protocol.toLowerCase().contains( portProtocol ) )
+					{
+						return i;
+					}
+				}
+			}
+
+			return -1;
+		}
+		
+		public int getPortIndexByProtocol( int position ) {
+			String protocol 	= mProtocols.get( position ),
+				   portProtocol = null;
+			
+			for( int i = 0; i < mOpenPorts.size(); i++ )
+			{
+				portProtocol = System.getProtocolByPort( "" + mOpenPorts.get( i ).number );
+				if( portProtocol != null )
+				{
+					if( portProtocol.equals( protocol ) || protocol.toLowerCase().contains( portProtocol ) ) 
+						return i;
+				}
+			}
+
+			return -1;
 		}
 		
 	    public int getCount() {
-	        return PROTOCOLS.length;
+	        return mProtocols.size();
 	    }
 
 	    public Object getItem( int position ) {
-	        return PROTOCOLS[ position ];
+	        return mProtocols.get( position );
 	    }
 
 	    public long getItemId( int position ) {
 	        return position;
 	    }
-
+	    
 	    public View getView( int position, View convertView, ViewGroup parent ) 
 	    {
 	        LayoutInflater inflater = ( LayoutInflater )LoginCracker.this.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
@@ -207,16 +285,14 @@ public class LoginCracker extends Plugin
 	        View 	 spinView = inflater.inflate( android.R.layout.simple_spinner_item, null );
 	        TextView textView = ( TextView )spinView.findViewById( android.R.id.text1 ); 
 	        
-	        textView.setText( PROTOCOLS[ position ] );
+	        String sProtocol = mProtocols.get( position );
 	        
-	        for( Port port : mOpenPorts )
+	        textView.setText( sProtocol );
+	        
+	        if( hasProtocolOpenPort( sProtocol ) )
 	        {
-	        	String protocol = System.getProtocolByPort( "" + port.number );
-	        	if( protocol != null && ( protocol.equals( PROTOCOLS[ position ] ) || PROTOCOLS[ position ].toLowerCase().contains( protocol ) ) )
-	        	{
-	        		textView.setTextColor( Color.GREEN );
-	        		textView.setTypeface( null, Typeface.BOLD );
-	        	}
+	        	textView.setTextColor( Color.GREEN );
+        		textView.setTypeface( null, Typeface.BOLD );
 	        }
 
 	        return spinView;
@@ -236,27 +312,83 @@ public class LoginCracker extends Plugin
 	
 	private class AttemptReceiver extends Hydra.AttemptReceiver
 	{
+		private long mStarted	   = 0;
+		private long mEndTime	   = 0;
+		private long mLastAttempt  = 0;
+		private long mLastLeft	   = 0;
+		private long mNow		   = 0;
+		
+		private String formatTimeLeft( long millis ) {
+			int	   seconds = (int)( millis / 1000 ) % 60,
+				   minutes = (int)( ( millis / 60000 ) % 60 ),
+			       hours   = (int)( ( millis / 3600000 ) % 24 );
+			String time    = "";			
+
+			if( hours > 0 )
+				time += hours + "h";
+			
+			if( minutes > 0 )
+				time += " " + minutes + "m";
+			
+			if( seconds > 0 )
+				time += " " + seconds + "s";
+			
+			return time.trim();
+		}
+		
+		private void reset() {
+			mLastAttempt  = 0;
+			mStarted	  = 0;
+			mEndTime	  = 0;
+			mLastLeft     = 0;
+			mNow	  	  = 0;
+		}
+		
 		@Override
-		public void onNewAttempt( String login, String password, int progress, int total ) {
-			final String user = login,
-						 pass = password;
+		public void onStart( String command ) {
+			reset();
 			
-			final int    step = progress,
-						 tot  = total;
+			mStarted = java.lang.System.currentTimeMillis();
+		}
+		
+		@Override
+		public void onNewAttempt( String login, String password, final int progress, final int total ) {
+			String status = "Trying " + login + ":" + password;
 			
+			mNow = java.lang.System.currentTimeMillis();
+			
+			if( mLastAttempt == 0 )				
+				mLastAttempt = mNow;
+			
+			else
+			{				
+				long timeElapsed  = ( mNow - mStarted );				
+				double timeNeeded = ( timeElapsed / progress ) * total;
+				
+				mEndTime	 = ( mStarted + ( long )timeNeeded );
+				mLastAttempt = mNow;											
+				mLastLeft 	 = mEndTime - mNow;	
+				
+				status += "\t[ " + formatTimeLeft( mLastLeft ) + " left ]";		
+			}
+			
+			final String text = status;			
+
 			LoginCracker.this.runOnUiThread(new Runnable() {
 	            @Override
 	            public void run() {
 	            	mStatusText.setTextColor( Color.DKGRAY );
-	            	mStatusText.setText( "Trying " + user + ":" + pass );
-	            	mProgressBar.setMax( tot );
-	            	mProgressBar.setProgress( step );
+	            	mStatusText.setText( text );
+	            	mProgressBar.setMax( total );
+	            	mProgressBar.setProgress( progress );
 	            }
 	        });
 		}		
 		
 		@Override
 		public void onAccountFound( final String login, final String password ) {
+			reset();
+			
 			LoginCracker.this.runOnUiThread(new Runnable() {
 	            @Override
 	            public void run() {
@@ -267,6 +399,8 @@ public class LoginCracker extends Plugin
 		
 		@Override
 		public void onError( String message ) {
+			reset();
+			
 			final String error = message;
 			
 			LoginCracker.this.runOnUiThread(new Runnable() {
@@ -280,6 +414,8 @@ public class LoginCracker extends Plugin
 
 		@Override
 		public void onFatal( String message ) {			
+			reset();
+			
 			final String error = message;
 			
 			LoginCracker.this.runOnUiThread(new Runnable() {
@@ -296,6 +432,8 @@ public class LoginCracker extends Plugin
 		public void onEnd( int code ) {
 			if( mRunning )
 			{
+				reset();
+				
 				LoginCracker.this.runOnUiThread(new Runnable() {
 		            @Override
 		            public void run() {
@@ -382,47 +520,31 @@ public class LoginCracker extends Plugin
         for( Port port : System.getCurrentTarget().getOpenPorts() )
         	ports.add( Integer.toString( port.number ) );
         
+        mProtocolAdapter = new ProtocolAdapter();
+        
         mPortSpinner = ( Spinner )findViewById( R.id.portSpinner );
         mPortSpinner.setAdapter( new ArrayAdapter<String>( this, android.R.layout.simple_spinner_item, ports ) );
         mPortSpinner.setOnItemSelectedListener( new OnItemSelectedListener() {
         	public void onItemSelected( AdapterView<?> adapter, View view, int position, long id ) 
         	{
-        		String port 	= ( String )adapter.getItemAtPosition( position ),
-        			   protocol = System.getProtocolByPort( port );
+        		String port 		 = ( String )adapter.getItemAtPosition( position );
+        		int    protocolIndex = mProtocolAdapter.getIndexByPort( port );
         		
-        		if( protocol != null )
-        		{
-        			for( int i = 0; i < PROTOCOLS.length; i++ )
-        			{
-        				if( PROTOCOLS[i].equals( protocol ) || PROTOCOLS[i].toLowerCase().contains( protocol ) )
-        				{
-        					mProtocolSpinner.setSelection( i );
-        					break;
-        				}
-        			}
-        		}
+        		if( protocolIndex != -1 )
+        			mProtocolSpinner.setSelection( protocolIndex ); 
         	}
         	
         	public void onNothingSelected(AdapterView<?> arg0) {}
 		});
         
         mProtocolSpinner = ( Spinner )findViewById( R.id.protocolSpinner );
-        mProtocolSpinner.setAdapter( new ProtocolSpinnerAdapter() );
+        mProtocolSpinner.setAdapter( new ProtocolAdapter() );
         mProtocolSpinner.setOnItemSelectedListener( new OnItemSelectedListener() {
         	public void onItemSelected( AdapterView<?> adapter, View view, int position, long id ) 
         	{
-        		String protocol = PROTOCOLS[ position ];
-        		
-        		for( int i = 0; i < ports.size(); i++ )
-        		{
-        			String pProto = System.getProtocolByPort( ports.get( i ) );
-        			if( pProto != null && ( pProto.equals( protocol ) || protocol.toLowerCase().contains( pProto ) ) )
-        			{
-        				
-        				mPortSpinner.setSelection( i );
-        				break;
-        			}
-        		}
+        		int portIndex = mProtocolAdapter.getPortIndexByProtocol( position );
+        		if( portIndex != -1 )
+        			mPortSpinner.setSelection( portIndex );
         	}
         	
         	public void onNothingSelected(AdapterView<?> arg0) {}
