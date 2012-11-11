@@ -529,7 +529,9 @@ public class Hijacker extends SherlockActivity
 	}
 	
 	private void setStartedState( ) {	
-		System.getProxy().setOnRequestListener( mRequestListener );
+		
+		if( System.getProxy() != null )
+			System.getProxy().setOnRequestListener( mRequestListener );
 		
 		mSpoof.start( new OnSessionReadyListener() {			
 			@Override
@@ -564,7 +566,9 @@ public class Hijacker extends SherlockActivity
 	private void setStoppedState( ) {		
 		mSpoof.stop();
 		
-		System.getProxy().setOnRequestListener( null );	    
+		if( System.getProxy() != null )
+			System.getProxy().setOnRequestListener( null );
+		
 		mHijackProgress.setVisibility( View.INVISIBLE );
 		
 		mRunning = false;

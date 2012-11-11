@@ -55,8 +55,21 @@ public class SpoofSession
 		
 		if( mWithProxy )
 		{
+			if( System.getProxy() == null )
+			{
+				listener.onError( "Unable to create the proxy, please check your connection and port availability." );
+				return;
+			}
+			
 			if( System.getSettings().getBoolean( "PREF_HTTPS_REDIRECT", true ) )
+			{
+				if( System.getHttpsRedirector() == null )
+				{
+					listener.onError( "Unable to create the HTTPS redirector, please check your connection and port availability." );
+					return;
+				}
 				new Thread( System.getHttpsRedirector() ).start();
+			}
 			
 			new Thread( System.getProxy() ).start();
 		}
@@ -65,6 +78,12 @@ public class SpoofSession
 		{
 			try
 			{
+				if( System.getServer() == null )
+				{
+					listener.onError( "Unable to create the resource server, please check your connection and port availability." );
+					return;
+				}
+				
 				System.getServer().setResource( mServerFileName, mServerMimeType );
 				new Thread( System.getServer() ).start();
 			}
@@ -153,12 +172,16 @@ public class SpoofSession
 				if( System.getHttpsRedirector() != null )
 					System.getHttpsRedirector().stop();
 			}
-			System.getProxy().stop();
-			System.getProxy().setRedirection( null, 0 );
-			System.getProxy().setFilter( null );
+			
+			if( System.getProxy() != null )
+			{
+				System.getProxy().stop();
+				System.getProxy().setRedirection( null, 0 );
+				System.getProxy().setFilter( null );
+			}
 		}
 		
-		if( mWithServer )		
+		if( mWithServer && System.getServer() != null )		
 			System.getServer().stop();		
 	}
 }
