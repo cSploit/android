@@ -48,9 +48,13 @@ import java.util.zip.GZIPOutputStream;
 
 import org.apache.http.impl.cookie.BasicClientCookie;
 
+import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -58,12 +62,14 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.SparseIntArray;
+import it.evilsocket.dsploit.WifiScannerActivity;
 import it.evilsocket.dsploit.net.Endpoint;
 import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.Target;
@@ -235,6 +241,40 @@ public class System
 			errorLogging( TAG, e );			
 		}
 	}
+	
+	public static boolean checkNetworking( final Activity current ) {
+		if( Network.isWifiConnected( mContext ) == false )        
+        {
+        	AlertDialog.Builder builder = new AlertDialog.Builder( current );
+        	
+        	builder.setCancelable( false );
+            builder.setTitle( "Error" );
+            builder.setMessage( "WiFi connectivity went down." );
+            builder.setPositiveButton( "Ok",new DialogInterface.OnClickListener() {
+                 @Override
+                 public void onClick( DialogInterface dialog, int which ){
+					dialog.dismiss();
+					     
+					Bundle bundle = new Bundle();
+					bundle.putBoolean( WifiScannerActivity.CONNECTED, false );
+					
+					Intent intent = new Intent();
+					intent.putExtras( bundle );
+					    
+					current.setResult( Activity.RESULT_OK, intent );
+					     
+					current.finish();
+                 }
+             });
+             
+             AlertDialog alert = builder.create();
+             alert.show();
+             
+             return false;
+        }
+		
+		return true;
+	}
 
 	public static void setLastError( String error ) {
 		mLastError = error;
@@ -243,7 +283,7 @@ public class System
 	public static String getLastError( ) {
 		return mLastError;
 	}
-	
+
 	public static synchronized void errorLogging( String tag, Exception e ) {
 		String message  = "Unknown error.",
 			   trace    = "Unknown trace.",

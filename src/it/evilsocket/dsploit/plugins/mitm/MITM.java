@@ -444,6 +444,9 @@ public class MITM extends Plugin
 			@Override
 			public void onClick( View v ) 
 			{				
+				if( System.checkNetworking( MITM.this ) == false )
+					return;
+				
 				setStoppedState();
 				
 				startActivity
@@ -467,6 +470,9 @@ public class MITM extends Plugin
         	@Override
 			public void onClick( View v ) 
 			{        		
+        		if( System.checkNetworking( MITM.this ) == false )
+					return;
+        		
         		setStoppedState();
         		
 				startActivity
@@ -489,7 +495,10 @@ public class MITM extends Plugin
         	new OnClickListener(){
 			@Override
 			public void onClick( View v ) 
-			{								
+			{				
+				if( System.checkNetworking( MITM.this ) == false )
+					return;
+				
 				setStoppedState();
 				
 				startActivity
@@ -511,7 +520,10 @@ public class MITM extends Plugin
         	R.drawable.action_kill,
         	new OnClickListener(){
 			@Override
-			public void onClick(View v) {				
+			public void onClick(View v) {	
+				if( System.checkNetworking( MITM.this ) == false )
+					return;
+				
 				ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
 
 				if( activity.getVisibility() == View.INVISIBLE )
@@ -548,7 +560,9 @@ public class MITM extends Plugin
         	new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-					
+				if( System.checkNetworking( MITM.this ) == false )
+					return;
+				
 				final ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
 
 				if( activity.getVisibility() == View.INVISIBLE )
@@ -617,7 +631,9 @@ public class MITM extends Plugin
         	new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-								
+				if( System.checkNetworking( MITM.this ) == false )
+					return;
+				
 				final ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
 
 				if( activity.getVisibility() == View.INVISIBLE )
@@ -722,7 +738,9 @@ public class MITM extends Plugin
         	new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-								
+				if( System.checkNetworking( MITM.this ) == false )
+					return;
+				
 				final ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
 
 				if( activity.getVisibility() == View.INVISIBLE )
@@ -797,7 +815,9 @@ public class MITM extends Plugin
         	new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-								
+				if( System.checkNetworking( MITM.this ) == false )
+					return;
+				
 				final ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
 
 				if( activity.getVisibility() == View.INVISIBLE )
@@ -880,7 +900,9 @@ public class MITM extends Plugin
         mActions.add( new Action( "Custom Filter", "Replace custom text on webpages with the specified one.", new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-								
+				if( System.checkNetworking( MITM.this ) == false )
+					return;
+				
 				final ProgressBar activity = ( ProgressBar )v.findViewById( R.id.itemActivity );
 
 				if( activity.getVisibility() == View.INVISIBLE )

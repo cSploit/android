@@ -804,13 +804,14 @@ public class MainActivity extends SherlockListActivity
 		System.setCurrentTarget( position );
 		
 		Toast.makeText( MainActivity.this, "Selected " + System.getCurrentTarget(), Toast.LENGTH_SHORT ).show();	                	
-        startActivity
+        startActivityForResult
         ( 
           new Intent
           ( 
             MainActivity.this, 
             ActionActivity.class
-          ) 
+          ),
+          WIFI_CONNECTION_REQUEST
         );
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);                
 	}

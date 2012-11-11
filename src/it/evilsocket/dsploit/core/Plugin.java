@@ -84,7 +84,7 @@ public abstract class Plugin extends SherlockActivity
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);     
+        super.onCreate(savedInstanceState);             
         setTitle( System.getCurrentTarget() + " > " + mName );
         setContentView( mLayoutId );     
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

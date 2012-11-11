@@ -127,27 +127,31 @@ public class ActionActivity extends SherlockListActivity
 	@Override
 	protected void onListItemClick( ListView l, View v, int position, long id ){
 		super.onListItemClick( l, v, position, id);
-				
-		Plugin plugin = mAvailable.get( position );
-				
-		System.setCurrentPlugin( plugin );
 		
-		if( plugin.hasLayoutToShow() )
-		{
-			Toast.makeText( ActionActivity.this, "Selected " + plugin.getName(), Toast.LENGTH_SHORT ).show();
-	    				
-	    	startActivity
-	        ( 
-	          new Intent
-	          ( 
-	            ActionActivity.this, 
-	            plugin.getClass()
-	          ) 
-	        );
-	        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-		}
-		else			
-			plugin.onActionClick( this );
+        
+        if( System.checkNetworking( this ) == true )
+        {        
+			Plugin plugin = mAvailable.get( position );
+					
+			System.setCurrentPlugin( plugin );
+			
+			if( plugin.hasLayoutToShow() )
+			{
+				Toast.makeText( ActionActivity.this, "Selected " + plugin.getName(), Toast.LENGTH_SHORT ).show();
+		    				
+		    	startActivity
+		        ( 
+		          new Intent
+		          ( 
+		            ActionActivity.this, 
+		            plugin.getClass()
+		          ) 
+		        );
+		        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+			}
+			else			
+				plugin.onActionClick( this );
+        }
 	}
 
 	@Override
