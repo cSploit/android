@@ -134,17 +134,21 @@ public class DirectoryPicker extends ListActivity
 		finish();
 	}
 
-	public ArrayList<File> filter(File[] file_list, boolean onlyDirs,
-			boolean showHidden) {
+	public ArrayList<File> filter(File[] file_list, boolean onlyDirs, boolean showHidden ) {
 		ArrayList<File> files = new ArrayList<File>();
-		for (File file : file_list) {
-			if (onlyDirs && !file.isDirectory())
-				continue;
-			if (!showHidden && file.isHidden())
-				continue;
-			files.add(file);
+		
+		if( file_list != null )
+		{
+			for (File file : file_list) {
+				if (onlyDirs && !file.isDirectory())
+					continue;
+				if (!showHidden && file.isHidden())
+					continue;
+				files.add(file);
+			}
+			Collections.sort(files);
 		}
-		Collections.sort(files);
+		
 		return files;
 	}
 
