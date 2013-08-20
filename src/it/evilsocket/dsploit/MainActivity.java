@@ -799,22 +799,18 @@ public class MainActivity extends SherlockListActivity
 	protected void onListItemClick( ListView l, View v, int position, long id ){
 		super.onListItemClick( l, v, position, id);
 
-		stopNetworkDiscovery( true );
-		
-		System.setCurrentTarget( position );
-		
-		Toast.makeText( MainActivity.this, "Selected " + System.getCurrentTarget(), Toast.LENGTH_SHORT ).show();	                	
-        startActivityForResult
-        ( 
-          new Intent
-          ( 
-            MainActivity.this, 
-            ActionActivity.class
-          ),
-          WIFI_CONNECTION_REQUEST
-        );
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);                
-	}
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                stopNetworkDiscovery(true);
+                startActivityForResult(new Intent(MainActivity.this, ActionActivity.class), WIFI_CONNECTION_REQUEST);
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+            }
+        }).start();
+
+        System.setCurrentTarget(position);
+        Toast.makeText(MainActivity.this, "Selected " + System.getCurrentTarget(), Toast.LENGTH_SHORT).show();
+        }
 	
 	@Override
 	public void onBackPressed() {
