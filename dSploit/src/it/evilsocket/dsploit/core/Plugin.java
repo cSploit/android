@@ -18,105 +18,103 @@
  */
 package it.evilsocket.dsploit.core;
 
+import android.content.Context;
+import android.os.Bundle;
+
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 
-import android.content.Context;
-import android.os.Bundle;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Target.Port;
 import it.evilsocket.dsploit.net.Target.Vulnerability;
 
-public abstract class Plugin extends SherlockActivity 
-{
-	public static final int NO_LAYOUT = -1;
-	
-	private String        mName				  = null;
-	private String		  mDescription		  = null;
-	private Target.Type[] mAllowedTargetTypes = null;
-	private int			  mLayoutId			  = 0;
-	private int			  mIconId		      = 0;
-		
-	public Plugin( String name, String description, Target.Type[] allowedTargetTypes, int layoutId, int iconResourceId ){
-		mName 				= name;
-		mDescription	    = description;
-		mAllowedTargetTypes = allowedTargetTypes;
-		mLayoutId			= layoutId;
-		mIconId				= iconResourceId;
-	}
-	
-	public Plugin( String name, String description, Target.Type[] allowedTargetTypes, int layoutId ){
-		this( name, description, allowedTargetTypes, layoutId, R.drawable.action_plugin );
-	}
-	
-	public String getName(){
-		return mName;
-	}
-	
-	public String getDescription(){
-		return mDescription;
-	}
-	
-	public Target.Type[] getAllowedTargetTypes(){
-		return mAllowedTargetTypes;
-	}
-	
-	public int getIconResourceId(){
-		return mIconId;
-	}
-	
-	public boolean isAllowedTarget( Target target ){
-		for( Target.Type type : mAllowedTargetTypes )
-			if( type == target.getType() )
-				return true;
-		
-		return false;
-	}	
-	
-	public boolean hasLayoutToShow() {
-		return mLayoutId != -1;
-	}
-	
-	public void onActionClick( Context context ){
-		
-	}
+public abstract class Plugin extends SherlockActivity {
+    public static final int NO_LAYOUT = -1;
 
-	@Override
+    private String mName = null;
+    private String mDescription = null;
+    private Target.Type[] mAllowedTargetTypes = null;
+    private int mLayoutId = 0;
+    private int mIconId = 0;
+
+    public Plugin(String name, String description, Target.Type[] allowedTargetTypes, int layoutId, int iconResourceId) {
+        mName = name;
+        mDescription = description;
+        mAllowedTargetTypes = allowedTargetTypes;
+        mLayoutId = layoutId;
+        mIconId = iconResourceId;
+    }
+
+    public Plugin(String name, String description, Target.Type[] allowedTargetTypes, int layoutId) {
+        this(name, description, allowedTargetTypes, layoutId, R.drawable.action_plugin);
+    }
+
+    public String getName() {
+        return mName;
+    }
+
+    public String getDescription() {
+        return mDescription;
+    }
+
+    public Target.Type[] getAllowedTargetTypes() {
+        return mAllowedTargetTypes;
+    }
+
+    public int getIconResourceId() {
+        return mIconId;
+    }
+
+    public boolean isAllowedTarget(Target target) {
+        for (Target.Type type : mAllowedTargetTypes)
+            if (type == target.getType())
+                return true;
+
+        return false;
+    }
+
+    public boolean hasLayoutToShow() {
+        return mLayoutId != -1;
+    }
+
+    public void onActionClick(Context context) {
+
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);             
-        setTitle( System.getCurrentTarget() + " > " + mName );
-        setContentView( mLayoutId );     
+        super.onCreate(savedInstanceState);
+        setTitle(System.getCurrentTarget() + " > " + mName);
+        setContentView(mLayoutId);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected( MenuItem item ) 
-	{    
-		switch( item.getItemId() ) 
-		{        
-			case android.R.id.home:            
-	         
-				onBackPressed();
-				
-				return true;
-	    	  
-			default:            
-				return super.onOptionsItemSelected(item);    
-	   }
-	}
-	
-	@Override
-	public void onBackPressed() {
-	    super.onBackPressed();
-	    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-	}
-	
-	public void onTargetNewOpenPort( Target target, Port port ) {
-		
-	}
-	
-	public void onTargetNewVulnerability( Target target, Port port, Vulnerability vulnerability ) {
-		
-	}
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+
+                onBackPressed();
+
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+    }
+
+    public void onTargetNewOpenPort(Target target, Port port) {
+
+    }
+
+    public void onTargetNewVulnerability(Target target, Port port, Vulnerability vulnerability) {
+
+    }
 }

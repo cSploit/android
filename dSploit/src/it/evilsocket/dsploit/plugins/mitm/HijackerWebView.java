@@ -18,11 +18,6 @@
  */
 package it.evilsocket.dsploit.plugins.mitm;
 
-import org.apache.http.impl.cookie.BasicClientCookie;
-
-import it.evilsocket.dsploit.R;
-import it.evilsocket.dsploit.core.System;
-import it.evilsocket.dsploit.plugins.mitm.Hijacker.Session;
 import android.os.Bundle;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
@@ -37,149 +32,149 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 
-public class HijackerWebView extends SherlockActivity
-{
-	private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4";
+import org.apache.http.impl.cookie.BasicClientCookie;
 
-	private WebSettings mSettings = null;
-	private WebView 	mWebView  = null;
-	
-	@Override  
-    protected void onCreate( Bundle savedInstanceState ) {            
-        super.onCreate(savedInstanceState);  
+import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.plugins.mitm.Hijacker.Session;
+
+public class HijackerWebView extends SherlockActivity {
+    private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4";
+
+    private WebSettings mSettings = null;
+    private WebView mWebView = null;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		requestWindowFeature(Window.FEATURE_PROGRESS);
-        setTitle( System.getCurrentTarget() + " > MITM > Session Hijacker" );
-        setContentView( R.layout.plugin_mitm_hijacker_webview );  
+        requestWindowFeature(Window.FEATURE_PROGRESS);
+        setTitle(System.getCurrentTarget() + " > MITM > Session Hijacker");
+        setContentView(R.layout.plugin_mitm_hijacker_webview);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setSupportProgressBarIndeterminateVisibility(false);
-        
-        mWebView  = ( WebView )findViewById( R.id.webView );               
-        mSettings = mWebView.getSettings();  
-        
-        mSettings.setJavaScriptEnabled(true);  
-        mSettings.setBuiltInZoomControls(true);  
-		mSettings.setAppCacheEnabled(false);
-        mSettings.setUserAgentString( DEFAULT_USER_AGENT );
-        
-        mWebView.setWebViewClient( new WebViewClient(){
+
+        mWebView = (WebView) findViewById(R.id.webView);
+        mSettings = mWebView.getSettings();
+
+        mSettings.setJavaScriptEnabled(true);
+        mSettings.setBuiltInZoomControls(true);
+        mSettings.setAppCacheEnabled(false);
+        mSettings.setUserAgentString(DEFAULT_USER_AGENT);
+
+        mWebView.setWebViewClient(new WebViewClient() {
             @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url){
-              view.loadUrl(url);
-              return true;
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                return true;
             }
         });
-               
-        mWebView.setWebChromeClient( new WebChromeClient() {
-			public void onProgressChanged( WebView view, int progress ) {
-				if( mWebView != null )
-					getSupportActionBar().setSubtitle( mWebView.getUrl() );
-				
-				setSupportProgressBarIndeterminateVisibility(true);
-				// Normalize our progress along the progress bar's scale
-				int mmprogress = (Window.PROGRESS_END - Window.PROGRESS_START) / 100 * progress;
-				setSupportProgress(mmprogress);
-				
-				if( progress == 100 ) 
-					setSupportProgressBarIndeterminateVisibility(false);			
-			}
-		});
-        
-        CookieSyncManager.createInstance( this );              
-    	CookieManager.getInstance().removeAllCookie();
-    	
-    	Session session = ( Session )System.getCustomData();
-    	if( session != null )
-    	{
-    		String domain    = null,
-    			   rawcookie = null;
-    		
-    		for( BasicClientCookie cookie : session.mCookies.values() )
-    		{
-    			domain 	  = cookie.getDomain();
-    			rawcookie = cookie.getName() + "=" + cookie.getValue() + "; domain=" + domain + "; path=/" + ( session.mHTTPS ? ";secure" : "" );                        
-    			        			
-    			CookieManager.getInstance().setCookie( domain, rawcookie );
-    		}
-    		        		        		
-    		CookieSyncManager.getInstance().sync();  
-    		
-    		if( session.mUserAgent != null && session.mUserAgent.isEmpty() == false )
-    			mSettings.setUserAgentString( session.mUserAgent );
-    		
-    		mWebView.loadUrl( ( session.mHTTPS ? "https" : "http" ) + "://www." + domain );
-    	}        	
-    }  
-	
-	@Override
-	protected void onResume() {
-	    super.onResume();
-	    
-	    CookieSyncManager.getInstance().startSync();
-	}
-	
-	@Override
-	protected void onPause() {
-		super.onPause();
-		
-		CookieSyncManager.getInstance().stopSync();
-	}
-	
-	@Override
-	public boolean onCreateOptionsMenu( Menu menu ) {
-		MenuInflater inflater = getSupportMenuInflater();
-		inflater.inflate( R.menu.browser, menu );		
-		return super.onCreateOptionsMenu(menu);
-	}
 
-	@Override
-	public boolean onOptionsItemSelected( MenuItem item ) 
-	{    
-		switch( item.getItemId() ) 
-		{        
-			case android.R.id.home:            
-	         
-				mWebView = null;
-				onBackPressed();
-				
-				return true;
-	    	  
-			case R.id.back :
-				
-				if( mWebView.canGoBack() )
-					mWebView.goBack();
-				
-				return true;
-				
-			case R.id.forward :
-				
-				if( mWebView.canGoForward() )
-					mWebView.goForward();
-				
-				return true;
-				
-			case R.id.reload :
-				
-				mWebView.reload();
-				
-			default:            
-				return super.onOptionsItemSelected(item);    
-	   }
-	}
-		
-	@Override
-	public void onBackPressed() {
-		
-		if( mWebView != null && mWebView.canGoBack() )
-			mWebView.goBack();
-		
-		else
-		{
-			if( mWebView != null )
-				mWebView.stopLoading();
-			
-			super.onBackPressed();
-	    	overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-		}
-	}	
+        mWebView.setWebChromeClient(new WebChromeClient() {
+            public void onProgressChanged(WebView view, int progress) {
+                if (mWebView != null)
+                    getSupportActionBar().setSubtitle(mWebView.getUrl());
+
+                setSupportProgressBarIndeterminateVisibility(true);
+                // Normalize our progress along the progress bar's scale
+                int mmprogress = (Window.PROGRESS_END - Window.PROGRESS_START) / 100 * progress;
+                setSupportProgress(mmprogress);
+
+                if (progress == 100)
+                    setSupportProgressBarIndeterminateVisibility(false);
+            }
+        });
+
+        CookieSyncManager.createInstance(this);
+        CookieManager.getInstance().removeAllCookie();
+
+        Session session = (Session) System.getCustomData();
+        if (session != null) {
+            String domain = null,
+                    rawcookie = null;
+
+            for (BasicClientCookie cookie : session.mCookies.values()) {
+                domain = cookie.getDomain();
+                rawcookie = cookie.getName() + "=" + cookie.getValue() + "; domain=" + domain + "; path=/" + (session.mHTTPS ? ";secure" : "");
+
+                CookieManager.getInstance().setCookie(domain, rawcookie);
+            }
+
+            CookieSyncManager.getInstance().sync();
+
+            if (session.mUserAgent != null && session.mUserAgent.isEmpty() == false)
+                mSettings.setUserAgentString(session.mUserAgent);
+
+            mWebView.loadUrl((session.mHTTPS ? "https" : "http") + "://www." + domain);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        CookieSyncManager.getInstance().startSync();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        CookieSyncManager.getInstance().stopSync();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getSupportMenuInflater();
+        inflater.inflate(R.menu.browser, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+
+                mWebView = null;
+                onBackPressed();
+
+                return true;
+
+            case R.id.back:
+
+                if (mWebView.canGoBack())
+                    mWebView.goBack();
+
+                return true;
+
+            case R.id.forward:
+
+                if (mWebView.canGoForward())
+                    mWebView.goForward();
+
+                return true;
+
+            case R.id.reload:
+
+                mWebView.reload();
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if (mWebView != null && mWebView.canGoBack())
+            mWebView.goBack();
+
+        else {
+            if (mWebView != null)
+                mWebView.stopLoading();
+
+            super.onBackPressed();
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+        }
+    }
 }

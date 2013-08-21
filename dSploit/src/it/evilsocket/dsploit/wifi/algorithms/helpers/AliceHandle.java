@@ -18,50 +18,50 @@
  */
 package it.evilsocket.dsploit.wifi.algorithms.helpers;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 public class AliceHandle extends DefaultHandler {
-	private final Map<String, ArrayList<AliceMagicInfo>> supportedAlices;
+    private final Map<String, ArrayList<AliceMagicInfo>> supportedAlices;
 
-	public AliceHandle() {
-		supportedAlices = new HashMap<String, ArrayList<AliceMagicInfo>>();
-	}
+    public AliceHandle() {
+        supportedAlices = new HashMap<String, ArrayList<AliceMagicInfo>>();
+    }
 
-	public void startElement(String uri, String localName, String qName,
-			Attributes attributes) {
-		int[] magic = new int[2];
-		String serial;
-		String mac;
-		if (attributes.getLength() == 0)
-			return;
-		ArrayList<AliceMagicInfo> supported = supportedAlices.get(qName);
-		if (supported == null) {
-			supported = new ArrayList<AliceMagicInfo>(5);
-			supportedAlices.put(qName, supported);
-		}
-		serial = attributes.getValue("sn");
-		mac = attributes.getValue("mac");
-		magic[0] = Integer.parseInt(attributes.getValue("q"));
-		magic[1] = Integer.parseInt(attributes.getValue("k"));
-		supported.add(new AliceMagicInfo(qName, magic, serial, mac));
+    public void startElement(String uri, String localName, String qName,
+                             Attributes attributes) {
+        int[] magic = new int[2];
+        String serial;
+        String mac;
+        if (attributes.getLength() == 0)
+            return;
+        ArrayList<AliceMagicInfo> supported = supportedAlices.get(qName);
+        if (supported == null) {
+            supported = new ArrayList<AliceMagicInfo>(5);
+            supportedAlices.put(qName, supported);
+        }
+        serial = attributes.getValue("sn");
+        mac = attributes.getValue("mac");
+        magic[0] = Integer.parseInt(attributes.getValue("q"));
+        magic[1] = Integer.parseInt(attributes.getValue("k"));
+        supported.add(new AliceMagicInfo(qName, magic, serial, mac));
 
-	}
+    }
 
-	public void endElement(String namespaceURI, String localName, String qName)
-			throws SAXException {
-	}
+    public void endElement(String namespaceURI, String localName, String qName)
+            throws SAXException {
+    }
 
-	public void characters(char[] ch, int start, int length)
-			throws SAXException {
-	}
+    public void characters(char[] ch, int start, int length)
+            throws SAXException {
+    }
 
-	public Map<String, ArrayList<AliceMagicInfo>> getSupportedAlices() {
-		return supportedAlices;
-	}
+    public Map<String, ArrayList<AliceMagicInfo>> getSupportedAlices() {
+        return supportedAlices;
+    }
 }

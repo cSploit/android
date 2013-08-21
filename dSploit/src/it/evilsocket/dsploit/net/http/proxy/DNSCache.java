@@ -18,54 +18,52 @@
  */
 package it.evilsocket.dsploit.net.http.proxy;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.HashMap;
+
 import javax.net.SocketFactory;
 
-import android.util.Log;
+public class DNSCache {
+    private static final String TAG = "PROXY.DNSCACHE";
 
-public class DNSCache 
-{
-	private static final String TAG = "PROXY.DNSCACHE";
-	
-	private static DNSCache mInstance = null;
-	
-	private HashMap< String, InetAddress  > mCache = null;
-	
-	public static DNSCache getInstance() {
-		if( mInstance == null )
-			mInstance = new DNSCache();
-		
-		return mInstance;
-	}
-	
-	public DNSCache() {
-		mCache = new HashMap< String, InetAddress  >();
-	}
-	
-	private InetAddress getAddress( String server ) throws IOException {
-		InetAddress address = mCache.get( server );
-		
-		if( address == null )
-		{
-			address = InetAddress.getByName( server );
-			mCache.put( server, address );
-			
-			Log.d( TAG, server + " resolved to " + address.getHostAddress() );
-		}
-		else
-			Log.d( TAG, "Returning a cached DSN result for " + server + " : " + address.getHostAddress() );
-		
-		return address;
-	}
-	
-	public Socket connect( String server, int port ) throws IOException {
-		return new Socket( getAddress( server ), port );
-	}
-	
-	public Socket connect( SocketFactory factory, String server, int port ) throws IOException {		
-		return factory.createSocket( getAddress( server ), port );
-	}
+    private static DNSCache mInstance = null;
+
+    private HashMap<String, InetAddress> mCache = null;
+
+    public static DNSCache getInstance() {
+        if (mInstance == null)
+            mInstance = new DNSCache();
+
+        return mInstance;
+    }
+
+    public DNSCache() {
+        mCache = new HashMap<String, InetAddress>();
+    }
+
+    private InetAddress getAddress(String server) throws IOException {
+        InetAddress address = mCache.get(server);
+
+        if (address == null) {
+            address = InetAddress.getByName(server);
+            mCache.put(server, address);
+
+            Log.d(TAG, server + " resolved to " + address.getHostAddress());
+        } else
+            Log.d(TAG, "Returning a cached DSN result for " + server + " : " + address.getHostAddress());
+
+        return address;
+    }
+
+    public Socket connect(String server, int port) throws IOException {
+        return new Socket(getAddress(server), port);
+    }
+
+    public Socket connect(SocketFactory factory, String server, int port) throws IOException {
+        return factory.createSocket(getAddress(server), port);
+    }
 }

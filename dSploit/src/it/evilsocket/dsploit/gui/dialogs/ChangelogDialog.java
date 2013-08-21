@@ -18,83 +18,81 @@
  */
 package it.evilsocket.dsploit.gui.dialogs;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.graphics.Bitmap;
 
-public class ChangelogDialog extends AlertDialog 
-{
-	private final static String ERROR_HTML = "<html><body><p><b>Something went wrong while retrieving the changelog:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>";
-	
-	private ProgressDialog mLoader = null;
-	
-	public ChangelogDialog( final Activity activity ) {
-		super(activity);
+public class ChangelogDialog extends AlertDialog {
+    private final static String ERROR_HTML = "<html><body><p><b>Something went wrong while retrieving the changelog:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>";
 
-		this.setTitle("Changelog");
+    private ProgressDialog mLoader = null;
 
-		
-		WebView 	view 	 = new WebView(activity);
-		WebSettings settings = view.getSettings();  
-        
-		settings.setJavaScriptEnabled(true);  
-		settings.setAppCacheEnabled(false);
-        
-		view.setWebViewClient( new WebViewClient() {
-			@Override
-			public void onPageStarted( WebView view, String url, Bitmap favicon ) {
-				if( mLoader == null )
-					mLoader = ProgressDialog.show( activity, "", "Loading changelog ..." );
-				
-				super.onPageStarted(view, url, favicon);
-			}
+    @SuppressLint("SetJavaScriptEnabled")
+    public ChangelogDialog(final Activity activity) {
+        super(activity);
 
-			@Override
-			public void onPageFinished( WebView view, String url ) {
-				super.onPageFinished(view, url);
-				mLoader.dismiss();
-			}
+        this.setTitle("Changelog");
 
-			@Override
-			public void onReceivedError( WebView view, int errorCode, String description, String failingUrl ) {
-				try 
-				{
-					mLoader.dismiss();
-				} 
-				catch( Exception e ) { }
-				
-				try 
-				{
-					view.stopLoading();
-			    } 
-				catch( Exception e ) { }
-			    
-				try 
-			    {
-					view.clearView();
-			    } 
-				catch( Exception e ) { }
 
-				view.loadData( ERROR_HTML.replace( "{DESCRIPTION}", description ), "text/html", "UTF-8" );
-				
-				super.onReceivedError(view, errorCode, description, failingUrl);
-			}
-		});
-		
-		this.setView(view);
-	
-		view.loadUrl("http://www.dsploit.net/changelog.php");
+        WebView view = new WebView(activity);
+        WebSettings settings = view.getSettings();
 
-		this.setCancelable(false);
-		this.setButton("Ok", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				dialog.dismiss();
-			}
-		});
-	}
+        settings.setJavaScriptEnabled(true);
+        settings.setAppCacheEnabled(false);
+
+        view.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                if (mLoader == null)
+                    mLoader = ProgressDialog.show(activity, "", "Loading changelog ...");
+
+                super.onPageStarted(view, url, favicon);
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                mLoader.dismiss();
+            }
+
+            @Override
+            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                try {
+                    mLoader.dismiss();
+                } catch (Exception e) {
+                }
+
+                try {
+                    view.stopLoading();
+                } catch (Exception e) {
+                }
+
+                try {
+                    view.clearView();
+                } catch (Exception e) {
+                }
+
+                view.loadData(ERROR_HTML.replace("{DESCRIPTION}", description), "text/html", "UTF-8");
+
+                super.onReceivedError(view, errorCode, description, failingUrl);
+            }
+        });
+
+        this.setView(view);
+
+        view.loadUrl("http://www.dsploit.net/changelog.php");
+
+        this.setCancelable(false);
+        this.setButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+    }
 }

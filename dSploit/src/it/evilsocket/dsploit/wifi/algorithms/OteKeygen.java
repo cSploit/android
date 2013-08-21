@@ -18,9 +18,9 @@
  */
 package it.evilsocket.dsploit.wifi.algorithms;
 
-import it.evilsocket.dsploit.wifi.Keygen;
-
 import java.util.List;
+
+import it.evilsocket.dsploit.wifi.Keygen;
 
 /*
  * This is not actual an algorithm as
@@ -29,15 +29,16 @@ import java.util.List;
  */
 public class OteKeygen extends Keygen {
 
-	private final String ssidIdentifier;
-	public OteKeygen(String ssid, String mac, int level, String enc ) {
-		super(ssid, mac, level, enc);
-		ssidIdentifier = ssid.substring(ssid.length()-6);
-	}
-	
-	@Override
-	public List<String> getKeys() {
-		addPassword("b075d5"+ssidIdentifier);
-		return getResults();
-	}
+    private final String ssidIdentifier;
+
+    public OteKeygen(String ssid, String mac, int level, String enc) {
+        super(ssid, mac, level, enc);
+        ssidIdentifier = ssid.substring(ssid.length() - 6);
+    }
+
+    @Override
+    public List<String> getKeys() {
+        addPassword("b075d5" + ssidIdentifier);
+        return getResults();
+    }
 }

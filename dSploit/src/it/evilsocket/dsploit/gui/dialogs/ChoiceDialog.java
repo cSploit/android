@@ -26,47 +26,44 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 
-public class ChoiceDialog extends AlertDialog
-{
-	public interface ChoiceDialogListener
-	{
-		public void onChoice( int choice );
-	}
-	
-	public ChoiceDialog( final Activity activity, String title, String[] choices, final ChoiceDialogListener listener ) {
-		super( activity );
-		
-		this.setTitle( title );
-		
-		LinearLayout layout = new LinearLayout( activity );
-		
-		layout.setPadding( 10, 10, 10, 10 );
-		
-		for( int i = 0; i < choices.length; i++ )
-		{
-			Button choice = new Button( activity );
-			
-			choice.setLayoutParams( new LayoutParams( LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, 0.5f ) );
-			choice.setTag( "" + i );
-			choice.setOnClickListener( new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					ChoiceDialog.this.dismiss();
-					listener.onChoice( Integer.parseInt( (String)v.getTag() ) );
-				}
-			});
-			
-			choice.setText( choices[i] );
-			layout.addView( choice );
-		}
-		
-		setView( layout );
-		
-		
-		this.setButton( "Cancel", new DialogInterface.OnClickListener() {
+public class ChoiceDialog extends AlertDialog {
+    public interface ChoiceDialogListener {
+        public void onChoice(int choice);
+    }
+
+    public ChoiceDialog(final Activity activity, String title, String[] choices, final ChoiceDialogListener listener) {
+        super(activity);
+
+        this.setTitle(title);
+
+        LinearLayout layout = new LinearLayout(activity);
+
+        layout.setPadding(10, 10, 10, 10);
+
+        for (int i = 0; i < choices.length; i++) {
+            Button choice = new Button(activity);
+
+            choice.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, 0.5f));
+            choice.setTag("" + i);
+            choice.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ChoiceDialog.this.dismiss();
+                    listener.onChoice(Integer.parseInt((String) v.getTag()));
+                }
+            });
+
+            choice.setText(choices[i]);
+            layout.addView(choice);
+        }
+
+        setView(layout);
+
+
+        this.setButton("Cancel", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-            	dialog.dismiss();
+                dialog.dismiss();
             }
         });
-	}
+    }
 }

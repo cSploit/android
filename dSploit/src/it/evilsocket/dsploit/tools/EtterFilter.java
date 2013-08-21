@@ -18,7 +18,7 @@
  */
 package it.evilsocket.dsploit.tools;
 
-import it.evilsocket.dsploit.core.System;
+import android.content.Context;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -29,52 +29,48 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import android.content.Context;
+import it.evilsocket.dsploit.core.System;
 
-public class EtterFilter extends Tool
-{
-	private static final String TAG = "ETTERFILTER";
-	
-	private String mFileName   = null;
-	private File   mTmpFile    = null;
-	private String mFilterData = "";
+public class EtterFilter extends Tool {
+    private static final String TAG = "ETTERFILTER";
 
-	public EtterFilter( Context context, String scriptName ) throws IOException {
-		super( "ettercap/etterfilter", context );		
-		
-		mFileName = mDirName + "/filters/" + scriptName;
-		mTmpFile  = File.createTempFile( "DSPLOIT", scriptName, context.getCacheDir() );
-		
-		mTmpFile.deleteOnExit();
-		
-		FileInputStream fstream = new FileInputStream( mFileName );
-		DataInputStream in 	 	= new DataInputStream(fstream);
-		BufferedReader  reader	= new BufferedReader(new InputStreamReader(in));
-		String 		 	line    = null;
-		  
-		while( ( line = reader.readLine() ) != null )
-			mFilterData += line + "\n";
-		 
-		in.close();
-	}
-	
-	public void setVariable( String name, String value ) {
-		mFilterData = mFilterData.replace( name, value );
-	}
-	
-	public void compile( String output ) {
-		try
-		{
-			BufferedWriter writer = new BufferedWriter( new FileWriter( mTmpFile ) );
-			writer.write( mFilterData );
-			writer.close();
-					    
-			super.run( mTmpFile.getAbsolutePath() + " -o " + output );
-		}
-		catch( Exception e )
-		{
-			System.errorLogging( TAG, e );
-		}
-	}
-	
+    private String mFileName = null;
+    private File mTmpFile = null;
+    private String mFilterData = "";
+
+    public EtterFilter(Context context, String scriptName) throws IOException {
+        super("ettercap/etterfilter", context);
+
+        mFileName = mDirName + "/filters/" + scriptName;
+        mTmpFile = File.createTempFile("DSPLOIT", scriptName, context.getCacheDir());
+
+        mTmpFile.deleteOnExit();
+
+        FileInputStream fstream = new FileInputStream(mFileName);
+        DataInputStream in = new DataInputStream(fstream);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        String line = null;
+
+        while ((line = reader.readLine()) != null)
+            mFilterData += line + "\n";
+
+        in.close();
+    }
+
+    public void setVariable(String name, String value) {
+        mFilterData = mFilterData.replace(name, value);
+    }
+
+    public void compile(String output) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(mTmpFile));
+            writer.write(mFilterData);
+            writer.close();
+
+            super.run(mTmpFile.getAbsolutePath() + " -o " + output);
+        } catch (Exception e) {
+            System.errorLogging(TAG, e);
+        }
+    }
+
 }

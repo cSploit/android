@@ -24,47 +24,46 @@ import android.content.DialogInterface;
 import android.text.InputType;
 import android.widget.EditText;
 
-public class WifiCrackDialog extends AlertDialog 
-{
-	private EditText mEditText = null;
-	
-	public interface WifiCrackDialogListener
-	{
-		public void onManualConnect( String key );
-		public void onCrack( );
-	}
+public class WifiCrackDialog extends AlertDialog {
+    private EditText mEditText = null;
 
-	public WifiCrackDialog( String title, String message, Activity activity, WifiCrackDialogListener wifiCrackDialogListener ){
-		super( activity );
-		
-		mEditText = new EditText( activity );
-		mEditText.setEnabled( true );
-		mEditText.setInputType( InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD );
-				
-		this.setTitle( title );
-		this.setMessage( message );
-		this.setView( mEditText );
-		
-		final WifiCrackDialogListener listener = wifiCrackDialogListener;
-		
-		this.setButton( "Connect", new DialogInterface.OnClickListener() {
+    public WifiCrackDialog(String title, String message, Activity activity, WifiCrackDialogListener wifiCrackDialogListener) {
+        super(activity);
+
+        mEditText = new EditText(activity);
+        mEditText.setEnabled(true);
+        mEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
+        this.setTitle(title);
+        this.setMessage(message);
+        this.setView(mEditText);
+
+        final WifiCrackDialogListener listener = wifiCrackDialogListener;
+
+        this.setButton("Connect", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-            	if( listener != null )
-            		listener.onManualConnect( mEditText.getText().toString() );
+                if (listener != null)
+                    listener.onManualConnect(mEditText.getText() + "");
             }
-        });			
-		
-		this.setButton2( "Crack", new DialogInterface.OnClickListener() {
+        });
+
+        this.setButton2("Crack", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-            	if( listener != null )
-            		listener.onCrack( );
+                if (listener != null)
+                    listener.onCrack();
             }
-        });	
-				
-		this.setButton3( "Cancel", new DialogInterface.OnClickListener() {
+        });
+
+        this.setButton3("Cancel", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-            	dialog.dismiss();
+                dialog.dismiss();
             }
-        });		
-	}
+        });
+    }
+
+    public interface WifiCrackDialogListener {
+        public void onManualConnect(String key);
+
+        public void onCrack();
+    }
 }

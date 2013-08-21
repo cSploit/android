@@ -18,25 +18,24 @@
  */
 package it.evilsocket.dsploit.tools;
 
-import it.evilsocket.dsploit.core.Shell.OutputReceiver;
-
 import android.content.Context;
 
-public class TcpDump extends Tool
-{	
-	public TcpDump( Context context ){
-		super( "tcpdump/tcpdump", context );		
-	}
-	
-	public Thread sniff( String filter, String pcap, OutputReceiver receiver ) {
-		if( pcap == null )
-			return super.async( "-l -vv -s 0 " + ( filter == null ? "" : filter ), receiver );
-		
-		else
-			return super.async( "-l -vv -s 0 -w '" + pcap + "' " + ( filter == null ? "" : filter ), receiver );
-	}	
-	
-	public void sniff( OutputReceiver receiver ) {
-		sniff( null, null, receiver );
-	}
+import it.evilsocket.dsploit.core.Shell.OutputReceiver;
+
+public class TcpDump extends Tool {
+    public TcpDump(Context context) {
+        super("tcpdump/tcpdump", context);
+    }
+
+    public Thread sniff(String filter, String pcap, OutputReceiver receiver) {
+        if (pcap == null)
+            return super.async("-l -vv -s 0 " + (filter == null ? "" : filter), receiver);
+
+        else
+            return super.async("-l -vv -s 0 -w '" + pcap + "' " + (filter == null ? "" : filter), receiver);
+    }
+
+    public void sniff(OutputReceiver receiver) {
+        sniff(null, null, receiver);
+    }
 }

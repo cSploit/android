@@ -52,5 +52,99 @@
     <string name="to">To</string>
     <string name="wake_on_lan">Wake On Lan</string>
     <string name="send">Send</string>
+    <string name="update_available">Update Available</string>
+    <string name="new_update_desc">A new update to version</string>
+    <string name="new_update_desc2">is available, do you want to download it ?</string>
+    <string name="checking">Checking ...</string>
+    <string name="no_updates_available">No updates available.</string>
+    <string name="new_version">New version</string>
+    <string name="new_version2">found!</string>
+    <string name="downloading_update">Downloading update ...</string>
+    <string name="connecting">Connecting ...</string>
+    <string name="cancel">Cancel</string>
+    <string name="error">Error</string>
+    <string name="error_occured">An error occurred while downloading the update.</string>
+    <string name="invalid_target">Invalid target.</string>
+    <string name="add_custom_target">Add custom target</string>
+    <string name="enter_url">Enter an URL, host name or ip address below:</string>
+    <string name="net_discovery_stopped">Network discovery stopped.</string>
+    <string name="net_discovery_started">Network discovery started.</string>
+    <string name="start_monitor">Start Network Monitor</string>
+    <string name="stop_monitor">Stop Network Monitor</string>
+    <string name="exit">Exit</string>
+    <string name="close_confirm">This will close dSploit, are you sure you want to continue ?
+    </string>
+    <string name="press_back">Press back again to close this app.</string>
+    <string name="selected_">Selected</string>
+    <string name="github_issues">https://github.com/evilsocket/dsploit/issues/new</string>
+    <string name="no_session_found">No session file found on sd card.</string>
+    <string name="select_session_file">Select a session file from the sd card :</string>
+    <string name="select_session">Select Session</string>
+    <string name="invalid_session">Invalid session name.</string>
+    <string name="session_saved_to">Session saved to</string>
+    <string name="save_session">Save Session</string>
+    <string name="enter_session_name">Enter the name of the session file :</string>
+    <string name="new_session_started">New session started</string>
+    <string name="warning">Warning</string>
+    <string name="warning_new_session">Starting a new session would delete the current one, continue
+        ?
+    </string>
+    <string name="fatal_error_html">
+        <![CDATA[<p>It seems like your ROM has the <b>LD_LIBRARY_PATH bug</b>, i\'m sorry but it\'s not compatible with dSploit.</p>]]></string>
+    <string name="fatal_error_html2">
+        <![CDATA[<p>For more info read the <a href=\"http://dsploit.net/#faq\">FAQ</a>.</p>]]></string>
+    <string name="install_error">Error during files installation!</string>
+    <string name="arm_error">
+        <![CDATA[<p>It seems like your device processor is not an ARM, i\'m sorry but it\'s not compatible with dSploit.</p>]]></string>
+    <string name="arm_error2">
+        <![CDATA[<p>For more info read the <a href=\"http://dsploit.net/#requirements\">requirements</a> section.</p>]]></string>
+    <string name="busybox_required">Full BusyBox installation required, killall binary not found (
+        maybe you have an old busybox version ).
+    </string>
+    <string name="only_4_root">This application can run only on rooted devices.</string>
+    <string name="initializing">Initializing ...</string>
+    <string name="initialization_error">Initialization Error</string>
+    <string name="target_alias">Target Alias</string>
+    <string name="set_alias">Set an alias for this target:</string>
+    <string name="no_connectivity">No connectivity available.</string>
+    <string name="wifi_key_copied">WiFi key copied to clipboard.</string>
+    <string name="connected_to"><![CDATA[Connected to <b>]]></string>
+    <string name="connected_to2"><![CDATA[</b> with key <b><font color=\"green\">]]></string>
+    <string name="connected_to3"><![CDATA[</font></b> !]]></string>
+    <string name="connection_to"><![CDATA[Connection to <b>]]></string>
+    <string name="connection_to2">
+        <![CDATA[</b> <b><font color=\"red\">FAILED</font></b>.]]></string>
+    <string name="enter_key_or_crack">Enter WiFi Key or attempt cracking:</string>
+    <string name="enter_wifi_key">Enter WiFi Key:</string>
+    <string name="scanning">Scanning ...</string>
+    <string name="invalid_filename">Invalid file name.</string>
+    <string name="something_went_wrong">Something went wrong, please select again a valid target.
+    </string>
+    <string name="selected">Selected</string>
+    <string name="nothing_found"><![CDATA[<small><i>Nothing Found</i></small>]]></string>
+    <string name="no_open_ports">No open ports detected on current target, run the service inspector
+        first.
+    </string>
+    <string name="no_infos_on_target">No specific informations about services running on target
+        machine, run the service inspector first.
+    </string>
+    <string name="custom_charset">Custom Charset</string>
+    <string name="enter_chars_wanted">Enter the chars you want to use in the custom charset:
+    </string>
+    <string name="invalid_port">Invalid port specified.</string>
+    <string name="request_empty">The request can not be empty.</string>
+    <string name="request_sent">Request sent.</string>
+    <string name="customize_wol_port">Customize WOL port and press Send.</string>
+    <string name="couldnt_send_wol_packet">Could not send a WOL packet to a target without a known
+        MAC address.
+    </string>
+    <string name="no_activities_for_url">No activities to handle this type of url.</string>
+    <string name="select_ports">Select Ports</string>
+    <string name="enter_ports_list">Enter a comma separated list of ports:</string>
+    <string name="invalid_port_">Invalid port \'</string>
+    <string name="port_must_be_greater">Port must be greater than 0 and smaller than 65535.</string>
+    <string name="invalid_ports">Invalid ports specified.</string>
+    <string name="empty_port_list">Empty port list.</string>
+    <string name="about_dsploit_v_">About dSploit v</string>
 
 </resources>

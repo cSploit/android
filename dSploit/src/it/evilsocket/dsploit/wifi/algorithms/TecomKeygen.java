@@ -18,12 +18,12 @@
  */
 package it.evilsocket.dsploit.wifi.algorithms;
 
-import it.evilsocket.dsploit.wifi.Keygen;
-
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+
+import it.evilsocket.dsploit.wifi.Keygen;
 
 /*
  * This is the algorithm to generate the WPA passphrase 
@@ -33,28 +33,28 @@ import java.util.List;
  */
 public class TecomKeygen extends Keygen {
 
-	private MessageDigest md;
-	
-	public TecomKeygen(String ssid, String mac, int level, String enc ) {
-		super(ssid, mac, level, enc);
-	}
+    private MessageDigest md;
 
-	@Override
-	public List<String> getKeys() {
-		try {
-			md = MessageDigest.getInstance("SHA1");
-		} catch (NoSuchAlgorithmException e1) {
-			setErrorMessage("This phone cannot process a SHA1 hash.");
-			return null;
-		}
-		md.reset();
-		md.update(getSsidName().getBytes());
-		byte [] hash = md.digest();
-		try {
-			addPassword( getHexString(hash).substring(0,26) );
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		return getResults();
-	}
+    public TecomKeygen(String ssid, String mac, int level, String enc) {
+        super(ssid, mac, level, enc);
+    }
+
+    @Override
+    public List<String> getKeys() {
+        try {
+            md = MessageDigest.getInstance("SHA1");
+        } catch (NoSuchAlgorithmException e1) {
+            setErrorMessage("This phone cannot process a SHA1 hash.");
+            return null;
+        }
+        md.reset();
+        md.update(getSsidName().getBytes());
+        byte[] hash = md.digest();
+        try {
+            addPassword(getHexString(hash).substring(0, 26));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return getResults();
+    }
 }

@@ -18,20 +18,6 @@
  */
 package it.evilsocket.dsploit.plugins.mitm;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.MenuItem;
-
-import it.evilsocket.dsploit.R;
-import it.evilsocket.dsploit.core.System;
-import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
-import it.evilsocket.dsploit.tools.Ettercap.OnAccountListener;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -45,258 +31,252 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-public class PasswordSniffer extends SherlockActivity 
-{
-	private static final String TAG = "PASSWORDSNIFFER";
-	
-	private ToggleButton       mSniffToggleButton = null;
-	private ProgressBar	       mSniffProgress     = null;
-	private ExpandableListView mListView		  = null;		
-	private ListViewAdapter	   mAdapter			  = null;
-	private boolean	           mRunning			  = false;	
-	private String			   mFileOutput		  = null;
-	private FileWriter		   mFileWriter		  = null;
-	private BufferedWriter	   mBufferedWriter	  = null;
-	private SpoofSession	   mSpoofSession	  = null;
-	
-	public class ListViewAdapter extends BaseExpandableListAdapter
-	{
-		private HashMap< String, ArrayList<String> > mGroups   = null;
-		private Context								 mContext  = null;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
 
-		public ListViewAdapter( Context context ) {
-			mGroups  = new HashMap< String, ArrayList<String> >();
-			mContext = context; 
-		}
-		
-		public boolean children( String name ) {
-			return mGroups.containsKey(name);
-		}
-		
-		public void addGroup( String name ) {
-			mGroups.put( name, new ArrayList<String>() );
-			notifyDataSetChanged();
-		}
-		
-		public boolean hasChild( String group, String line ) {
-			ArrayList<String> children =  mGroups.get(group);
-			
-			if( children != null )
-			{
-				for( String child : children )
-				{
-					if( child.equals( line ) )
-						return true;
-				}
-			} 
-			
-			return false;
-		}
-		
-		public synchronized void addChild( String group, String child ) {
-			if( mGroups.get(group) == null )
-				addGroup( group );
-			
-			mGroups.get( group ).add( child );
-			
-			Object[] keys   = mGroups.keySet().toArray();
-			int 	 groups = keys.length;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
-			for( int i = 0; i < groups; i++ )
-			{
-				if( keys[i].toString().equals(group) )
-				{
-					mListView.expandGroup( i );
-					break;
-				}
-			}
-			
-			notifyDataSetChanged();
-		}
-		
-		private ArrayList<String> getGroupAt( int position ){
-			return mGroups.get( mGroups.keySet().toArray()[ position ] );
-		}
-		
-		@Override
-		public Object getChild( int groupPosition, int childPosition ) {
-			return getGroupAt( groupPosition ).get( childPosition );
-		}
+import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
+import it.evilsocket.dsploit.tools.Ettercap.OnAccountListener;
 
-		@Override
-		public long getChildId( int groupPosition, int childPosition ) {			
-			return ( groupPosition * 10 ) + childPosition;
-		}
+public class PasswordSniffer extends SherlockActivity {
+    private static final String TAG = "PASSWORDSNIFFER";
 
-		@Override
-		public int getChildrenCount( int groupPosition ) {
-			return getGroupAt( groupPosition ).size();
-		}
+    private ToggleButton mSniffToggleButton = null;
+    private ProgressBar mSniffProgress = null;
+    private ExpandableListView mListView = null;
+    private ListViewAdapter mAdapter = null;
+    private boolean mRunning = false;
+    private String mFileOutput = null;
+    private FileWriter mFileWriter = null;
+    private BufferedWriter mBufferedWriter = null;
+    private SpoofSession mSpoofSession = null;
 
-		@Override
-		public Object getGroup( int groupPosition ) {
-			return mGroups.keySet().toArray()[ groupPosition ];
-		}
+    public class ListViewAdapter extends BaseExpandableListAdapter {
+        private HashMap<String, ArrayList<String>> mGroups = null;
+        private Context mContext = null;
 
-		@Override
-		public int getGroupCount() {
-			return mGroups.size();
-		}
+        public ListViewAdapter(Context context) {
+            mGroups = new HashMap<String, ArrayList<String>>();
+            mContext = context;
+        }
 
-		@Override
-		public long getGroupId(int groupPosition) {
-			return groupPosition;
-		}
+        public boolean children(String name) {
+            return mGroups.containsKey(name);
+        }
 
-		@Override
-		public View getGroupView( int groupPosition, boolean isExpanded, View convertView, ViewGroup parent ) {
-			TextView row = (TextView)convertView;
-		    if( row == null ) 		    
-		      row = new TextView( mContext);
-		    
-		    row.setText( getGroup( groupPosition ).toString() );
-		    row.setTextSize( 20 );
-		    row.setTypeface( Typeface.DEFAULT_BOLD );
-		    row.setPadding( 50, 0, 0, 0 );
-		    
-		    return row;
-		}
-		
-		@Override
-		public View getChildView( int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent ) {
-			TextView row = (TextView)convertView;
-		    if( row == null ) 		    
-		      row = new TextView( mContext);
-		    
-		    row.setText( getChild( groupPosition, childPosition ).toString() );
-		    row.setPadding( 30, 0, 0, 0 );
-		    
-		    return row;
-		}
+        public void addGroup(String name) {
+            mGroups.put(name, new ArrayList<String>());
+            notifyDataSetChanged();
+        }
 
-		@Override
-		public boolean hasStableIds() {
-			return true;
-		}
+        public boolean hasChild(String group, String line) {
+            ArrayList<String> children = mGroups.get(group);
 
-		@Override
-		public boolean isChildSelectable(int groupPosition, int childPosition) {
-			return true;
-		}
-		
-	}
-	
-	public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);        
-        setTitle( System.getCurrentTarget() + " > MITM > Password Sniffer" );
-        setContentView( R.layout.plugin_mitm_password_sniffer );
+            if (children != null) {
+                for (String child : children) {
+                    if (child.equals(line))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        public synchronized void addChild(String group, String child) {
+            if (mGroups.get(group) == null)
+                addGroup(group);
+
+            mGroups.get(group).add(child);
+
+            Object[] keys = mGroups.keySet().toArray();
+            int groups = keys.length;
+
+            for (int i = 0; i < groups; i++) {
+                if (keys[i].toString().equals(group)) {
+                    mListView.expandGroup(i);
+                    break;
+                }
+            }
+
+            notifyDataSetChanged();
+        }
+
+        private ArrayList<String> getGroupAt(int position) {
+            return mGroups.get(mGroups.keySet().toArray()[position]);
+        }
+
+        @Override
+        public Object getChild(int groupPosition, int childPosition) {
+            return getGroupAt(groupPosition).get(childPosition);
+        }
+
+        @Override
+        public long getChildId(int groupPosition, int childPosition) {
+            return (groupPosition * 10) + childPosition;
+        }
+
+        @Override
+        public int getChildrenCount(int groupPosition) {
+            return getGroupAt(groupPosition).size();
+        }
+
+        @Override
+        public Object getGroup(int groupPosition) {
+            return mGroups.keySet().toArray()[groupPosition];
+        }
+
+        @Override
+        public int getGroupCount() {
+            return mGroups.size();
+        }
+
+        @Override
+        public long getGroupId(int groupPosition) {
+            return groupPosition;
+        }
+
+        @Override
+        public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+            TextView row = (TextView) convertView;
+            if (row == null)
+                row = new TextView(mContext);
+
+            row.setText(getGroup(groupPosition).toString());
+            row.setTextSize(20);
+            row.setTypeface(Typeface.DEFAULT_BOLD);
+            row.setPadding(50, 0, 0, 0);
+
+            return row;
+        }
+
+        @Override
+        public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+            TextView row = (TextView) convertView;
+            if (row == null)
+                row = new TextView(mContext);
+
+            row.setText(getChild(groupPosition, childPosition).toString());
+            row.setPadding(30, 0, 0, 0);
+
+            return row;
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            return true;
+        }
+
+        @Override
+        public boolean isChildSelectable(int groupPosition, int childPosition) {
+            return true;
+        }
+
+    }
+
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setTitle(System.getCurrentTarget() + " > MITM > Password Sniffer");
+        setContentView(R.layout.plugin_mitm_password_sniffer);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        
-        mFileOutput		   = ( new File( System.getStoragePath(), System.getSettings().getString( "PREF_PASSWORD_FILENAME", "dsploit-password-sniff.log" ) ) ).getAbsolutePath();
-        mSniffToggleButton = ( ToggleButton )findViewById( R.id.sniffToggleButton );
-        mSniffProgress	   = ( ProgressBar )findViewById( R.id.sniffActivity );
-        mListView		   = ( ExpandableListView )findViewById( R.id.listView );
-        mAdapter		   = new ListViewAdapter( this );
-        mSpoofSession	   = new SpoofSession( false, false, null, null );
-        
-        mListView.setAdapter( mAdapter );
-                
-        mSniffToggleButton.setOnClickListener( new OnClickListener(){
-			@Override
-			public void onClick(View v) {
-				if( mRunning )
-				{
-					setStoppedState();
-				}
-				else
-				{
-					setStartedState();
-				}
-			}} 
-		);        
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected( MenuItem item ) 
-	{    
-		switch( item.getItemId() ) 
-		{        
-			case android.R.id.home:            
-	         
-				onBackPressed();
-				
-				return true;
-	    	  
-			default:            
-				return super.onOptionsItemSelected(item);    
-	   }
-	}
 
-	private void setStoppedState( ) {		
-		mSpoofSession.stop();
+        mFileOutput = (new File(System.getStoragePath(), System.getSettings().getString("PREF_PASSWORD_FILENAME", "dsploit-password-sniff.log"))).getAbsolutePath();
+        mSniffToggleButton = (ToggleButton) findViewById(R.id.sniffToggleButton);
+        mSniffProgress = (ProgressBar) findViewById(R.id.sniffActivity);
+        mListView = (ExpandableListView) findViewById(R.id.listView);
+        mAdapter = new ListViewAdapter(this);
+        mSpoofSession = new SpoofSession(false, false, null, null);
 
-		try
-		{
-			if( mBufferedWriter != null )
-				mBufferedWriter.close();
-		}
-		catch( IOException e )
-		{
-			System.errorLogging( TAG, e );
-		}
-		
-		mSniffProgress.setVisibility( View.INVISIBLE );		
-		mRunning = false;
-		mSniffToggleButton.setChecked( false );                			
-	}
+        mListView.setAdapter(mAdapter);
 
-	private void setStartedState( ) {				
-		try
-		{
-			// open file in appending mode
-			mFileWriter     = new FileWriter( mFileOutput, true );
-			mBufferedWriter = new BufferedWriter( mFileWriter );
-		}
-		catch( IOException e )
-		{
-			new FatalDialog( "Error", e.toString(), PasswordSniffer.this ).show();
-		}
-		
-		Toast.makeText( PasswordSniffer.this, "Logging to " + mFileOutput, Toast.LENGTH_LONG ).show();
-			
-		mSpoofSession.start( new OnAccountListener() {			
-			@Override
-			public void onAccount( final String protocol, final String address, final String port, final String line ) {
-				PasswordSniffer.this.runOnUiThread( new Runnable() {
-					@Override
-					public void run()
-					{				
-						if( mAdapter.hasChild( protocol, line ) == false )
-						{
-							try
-							{
-								mBufferedWriter.write( line + "\n" );
-							}
-							catch( IOException e )
-							{
-								System.errorLogging( TAG, e );
-							}
-							
-							mAdapter.addChild( protocol, line );	
-						}
-					}							
-				});				
-			}
-		});
-		
-		mSniffProgress.setVisibility( View.VISIBLE );
-		mRunning = true;
-	}
-	
-	@Override
-	public void onBackPressed() {
-	    setStoppedState();	
-	    super.onBackPressed();
-	    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);	    	    
-	}
+        mSniffToggleButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mRunning) {
+                    setStoppedState();
+                } else {
+                    setStartedState();
+                }
+            }
+        }
+        );
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+
+                onBackPressed();
+
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void setStoppedState() {
+        mSpoofSession.stop();
+
+        try {
+            if (mBufferedWriter != null)
+                mBufferedWriter.close();
+        } catch (IOException e) {
+            System.errorLogging(TAG, e);
+        }
+
+        mSniffProgress.setVisibility(View.INVISIBLE);
+        mRunning = false;
+        mSniffToggleButton.setChecked(false);
+    }
+
+    private void setStartedState() {
+        try {
+            // open file in appending mode
+            mFileWriter = new FileWriter(mFileOutput, true);
+            mBufferedWriter = new BufferedWriter(mFileWriter);
+        } catch (IOException e) {
+            new FatalDialog("Error", e.toString(), PasswordSniffer.this).show();
+        }
+
+        Toast.makeText(PasswordSniffer.this, "Logging to " + mFileOutput, Toast.LENGTH_LONG).show();
+
+        mSpoofSession.start(new OnAccountListener() {
+            @Override
+            public void onAccount(final String protocol, final String address, final String port, final String line) {
+                PasswordSniffer.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mAdapter.hasChild(protocol, line) == false) {
+                            try {
+                                mBufferedWriter.write(line + "\n");
+                            } catch (IOException e) {
+                                System.errorLogging(TAG, e);
+                            }
+
+                            mAdapter.addChild(protocol, line);
+                        }
+                    }
+                });
+            }
+        });
+
+        mSniffProgress.setVisibility(View.VISIBLE);
+        mRunning = true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        setStoppedState();
+        super.onBackPressed();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+    }
 }

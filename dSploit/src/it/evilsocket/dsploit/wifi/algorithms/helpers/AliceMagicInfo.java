@@ -21,45 +21,52 @@ package it.evilsocket.dsploit.wifi.algorithms.helpers;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class AliceMagicInfo implements Parcelable{
-	final private String alice;
-	final private int [] magic;
-	final private String serial;
-	final private String mac;
-	public AliceMagicInfo(String alice, int[] magic, String serial, String mac) {
-		this.alice = alice;
-		this.magic = magic;
-		this.serial = serial;
-		this.mac = mac;
-	}
-	public String getAlice() {
-		return alice;
-	}
-	public int[] getMagic() {
-		return magic;
-	}
-	public String getSerial() {
-		return serial;
-	}
-	public String getMac() {
-		return mac;
-	}
-	public int describeContents() {
-		return 0;
-	}
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(alice);
-		dest.writeString(serial);
-		dest.writeString(mac);
-		dest.writeIntArray(magic);
-	}
-	
-	private AliceMagicInfo(Parcel in){
-		this.alice = in.readString();
-		this.serial = in.readString();
-		this.mac = in.readString();
-		this.magic = in.createIntArray();
-	}
+public class AliceMagicInfo implements Parcelable {
+    final private String alice;
+    final private int[] magic;
+    final private String serial;
+    final private String mac;
+
+    public AliceMagicInfo(String alice, int[] magic, String serial, String mac) {
+        this.alice = alice;
+        this.magic = magic;
+        this.serial = serial;
+        this.mac = mac;
+    }
+
+    public String getAlice() {
+        return alice;
+    }
+
+    public int[] getMagic() {
+        return magic;
+    }
+
+    public String getSerial() {
+        return serial;
+    }
+
+    public String getMac() {
+        return mac;
+    }
+
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(alice);
+        dest.writeString(serial);
+        dest.writeString(mac);
+        dest.writeIntArray(magic);
+    }
+
+    private AliceMagicInfo(Parcel in) {
+        this.alice = in.readString();
+        this.serial = in.readString();
+        this.mac = in.readString();
+        this.magic = in.createIntArray();
+    }
 
     public static final Parcelable.Creator<AliceMagicInfo> CREATOR = new Parcelable.Creator<AliceMagicInfo>() {
         public AliceMagicInfo createFromParcel(Parcel in) {

@@ -21,36 +21,34 @@ package it.evilsocket.dsploit.net.http.proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class HTTPSMonitor 
-{
-	private static HTTPSMonitor mInstance = null;
-	
-	private HashMap< String, ArrayList< String > > mMap = null;
-	
-	public static HTTPSMonitor getInstance() {
-		if( mInstance == null )
-			mInstance = new HTTPSMonitor();
-		
-		return mInstance;
-	}
-			
-	public HTTPSMonitor() {
-		mMap = new HashMap< String, ArrayList< String > >();
-	}
-	
-	public void addURL( String client, String url ) {
-		if( mMap.containsKey(client) == false )
-			mMap.put( client, new ArrayList< String >() );
-		
-		mMap.get( client ).add( url );
-	}
-	
-	public boolean hasURL( String client, String url )
-	{
-		ArrayList<String> urls = mMap.get( client );
-		if( urls != null )		
-			return urls.contains( url );		
-		else
-			return false;
-	}
+public class HTTPSMonitor {
+    private static HTTPSMonitor mInstance = null;
+
+    private HashMap<String, ArrayList<String>> mMap = null;
+
+    public static HTTPSMonitor getInstance() {
+        if (mInstance == null)
+            mInstance = new HTTPSMonitor();
+
+        return mInstance;
+    }
+
+    public HTTPSMonitor() {
+        mMap = new HashMap<String, ArrayList<String>>();
+    }
+
+    public void addURL(String client, String url) {
+        if (mMap.containsKey(client) == false)
+            mMap.put(client, new ArrayList<String>());
+
+        mMap.get(client).add(url);
+    }
+
+    public boolean hasURL(String client, String url) {
+        ArrayList<String> urls = mMap.get(client);
+        if (urls != null)
+            return urls.contains(url);
+        else
+            return false;
+    }
 }

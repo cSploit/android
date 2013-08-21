@@ -18,9 +18,9 @@
  */
 package it.evilsocket.dsploit.wifi.algorithms;
 
-import it.evilsocket.dsploit.wifi.Keygen;
-
 import java.util.List;
+
+import it.evilsocket.dsploit.wifi.Keygen;
 
 /*
  * This is not actual an algorithm
@@ -29,18 +29,17 @@ import java.util.List;
  */
 public class InfostradaKeygen extends Keygen {
 
-	public InfostradaKeygen(String ssid, String mac, int level, String enc ) {
-		super(ssid, mac, level, enc);
-	}
-	
-	@Override
-	public List<String> getKeys() {
-		if ( getMacAddress().length() != 12 ) 
-		{
-			setErrorMessage("The MAC address is invalid.");
-			return null;
-		}
-		addPassword("2"+getMacAddress().toUpperCase());
-		return getResults();
-	}
+    public InfostradaKeygen(String ssid, String mac, int level, String enc) {
+        super(ssid, mac, level, enc);
+    }
+
+    @Override
+    public List<String> getKeys() {
+        if (getMacAddress().length() != 12) {
+            setErrorMessage("The MAC address is invalid.");
+            return null;
+        }
+        addPassword("2" + getMacAddress().toUpperCase());
+        return getResults();
+    }
 }

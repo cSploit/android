@@ -22,33 +22,32 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 
-public class ConfirmDialog extends AlertDialog
-{
-	public interface ConfirmDialogListener
-	{
-		public void onConfirm();
-		public void onCancel();
-	}
-	
-	public ConfirmDialog( String title, String message, Activity activity, ConfirmDialogListener confirmDialogListener ){
-		super( activity );
-		
-		this.setTitle( title );
-		this.setMessage( message );
-		
-		final ConfirmDialogListener listener = confirmDialogListener;
-		
-		this.setButton( "Yes", new DialogInterface.OnClickListener() {
+public class ConfirmDialog extends AlertDialog {
+    public interface ConfirmDialogListener {
+        public void onConfirm();
+
+        public void onCancel();
+    }
+
+    public ConfirmDialog(String title, String message, Activity activity, ConfirmDialogListener confirmDialogListener) {
+        super(activity);
+
+        this.setTitle(title);
+        this.setMessage(message);
+
+        final ConfirmDialogListener listener = confirmDialogListener;
+
+        this.setButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-            	listener.onConfirm();
+                listener.onConfirm();
             }
-        });			
-		
-		this.setButton2( "No", new DialogInterface.OnClickListener() {
+        });
+
+        this.setButton2("No", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-            	dialog.dismiss();
-            	listener.onCancel();
+                dialog.dismiss();
+                listener.onCancel();
             }
-        });	
-	}
+        });
+    }
 }

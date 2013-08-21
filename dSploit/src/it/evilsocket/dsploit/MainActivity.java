@@ -72,14 +72,22 @@ import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.NetworkDiscovery;
 import it.evilsocket.dsploit.net.Target;
 
+import static it.evilsocket.dsploit.core.UpdateChecker.AVAILABLE_VERSION;
+import static it.evilsocket.dsploit.core.UpdateChecker.UPDATE_AVAILABLE;
+import static it.evilsocket.dsploit.core.UpdateChecker.UPDATE_CHECKING;
+import static it.evilsocket.dsploit.core.UpdateChecker.UPDATE_NOT_AVAILABLE;
+import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_ADDRESS;
+import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_HARDWARE;
+import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_NAME;
+import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_UPDATE;
+import static it.evilsocket.dsploit.net.NetworkDiscovery.NEW_ENDPOINT;
+
 public class MainActivity extends SherlockListActivity {
     private static final int WIFI_CONNECTION_REQUEST = 1012;
-    private static final String NO_WIFI_UPDATE_MESSAGE = "No WiFi connection available, the application will just check for updates.\n#STATUS#";
+    private final String NO_WIFI_UPDATE_MESSAGE = "No WiFi connection available, the application will just check for updates. #STATUS#";
     private boolean isWifiAvailable = false;
-    private boolean isConnectivityAvailable = false;
     private TargetAdapter mTargetAdapter = null;
     private NetworkDiscovery mNetworkDiscovery = null;
-    private UpdateChecker mUpdateChecker = null;
     private EndpointReceiver mEndpointReceiver = null;
     private UpdateReceiver mUpdateReceiver = null;
     private Menu mMenu = null;
@@ -128,7 +136,7 @@ public class MainActivity extends SherlockListActivity {
 
         mUpdateStatus.setGravity(Gravity.CENTER);
         mUpdateStatus.setLayoutParams(params);
-        mUpdateStatus.setText("No connectivity available.");
+        mUpdateStatus.setText(getString(R.string.no_connectivity));
 
         layout.addView(mUpdateStatus);
 
@@ -149,8 +157,8 @@ public class MainActivity extends SherlockListActivity {
 
                 new InputDialog
                         (
-                                "Target Alias",
-                                "Set an alias for this target:",
+                                getString(R.string.target_alias),
+                                getString(R.string.set_alias),
                                 target.hasAlias() ? target.getAlias() : "",
                                 true,
                                 false,
@@ -201,21 +209,21 @@ public class MainActivity extends SherlockListActivity {
         setContentView(R.layout.target_layout);
 
         isWifiAvailable = Network.isWifiConnected(this);
-        isConnectivityAvailable = isWifiAvailable || Network.isConnectivityAvailable(this);
+        boolean connectivityAvailable = isWifiAvailable || Network.isConnectivityAvailable(this);
 
         // make sure system object was correctly initialized during application startup
-        if (System.isInitialized() == false) {
+        if (!System.isInitialized()) {
             // wifi available but system failed to initialize, this is a fatal :(
-            if (isWifiAvailable == true) {
-                new FatalDialog("Initialization Error", System.getLastError(), this).show();
+            if (isWifiAvailable) {
+                new FatalDialog(getString(R.string.initialization_error), System.getLastError(), this).show();
                 return;
             }
         }
 
         // initialization ok, but wifi is down
-        if (isWifiAvailable == false) {
+        if (!isWifiAvailable) {
             // just inform the user his wifi is down
-            if (isConnectivityAvailable)
+            if (connectivityAvailable)
                 createUpdateLayout();
 
                 // no connectivity at all
@@ -227,8 +235,8 @@ public class MainActivity extends SherlockListActivity {
             createOnlineLayout();
 
             // initialize the ui for the first time
-        else if (mTargetAdapter == null) {
-            final ProgressDialog dialog = ProgressDialog.show(this, "", "Initializing ...", true, false);
+        else {
+            final ProgressDialog dialog = ProgressDialog.show(this, "", getString(R.string.initializing), true, false);
 
             // this is necessary to not block the user interface while initializing
             new Thread(new Runnable() {
@@ -240,23 +248,23 @@ public class MainActivity extends SherlockListActivity {
                     String fatal = null;
                     ToolsInstaller installer = new ToolsInstaller(appContext);
 
-                    if (Shell.isRootGranted() == false)
-                        fatal = "This application can run only on rooted devices.";
+                    if (!Shell.isRootGranted())
+                        fatal = getString(R.string.only_4_root);
 
-                    else if (Shell.isBinaryAvailable("killall") == false)
-                        fatal = "Full BusyBox installation required, killall binary not found ( maybe you have an old busybox version ).";
+                    else if (!Shell.isBinaryAvailable("killall"))
+                        fatal = getString(R.string.busybox_required);
 
-                    else if (System.isARM() == false)
-                        fatal = "<p>It seems like your device processor is not an ARM, i'm sorry but it's not compatible with dSploit.</p>" +
-                                "<p>For more info read the <a href=\"http://dsploit.net/#requirements\">requirements</a> section.</p>";
+                    else if (!System.isARM())
+                        fatal = getString(R.string.arm_error) +
+                                getString(R.string.arm_error2);
 
-                    else if (installer.needed() && installer.install() == false)
-                        fatal = "Error during files installation!";
+                    else if (installer.needed() && !installer.install())
+                        fatal = getString(R.string.install_error);
 
                         // check for LD_LIBRARY_PATH issue ( https://github.com/evilsocket/dsploit/issues/35 )
-                    else if (Shell.isLibraryPathOverridable(appContext) == false)
-                        fatal = "<p>It seems like your ROM has the <b>LD_LIBRARY_PATH bug</b>, i'm sorry but it's not compatible with dSploit.</p>" +
-                                "<p>For more info read the <a href=\"http://dsploit.net/#faq\">FAQ</a>.</p>";
+                    else if (!Shell.isLibraryPathOverridable(appContext))
+                        fatal = getString(R.string.fatal_error_html) +
+                                getString(R.string.fatal_error_html2);
 
                     dialog.dismiss();
 
@@ -267,7 +275,7 @@ public class MainActivity extends SherlockListActivity {
                         MainActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                new FatalDialog("Error", ffatal, ffatal.contains(">"), MainActivity.this).show();
+                                new FatalDialog(getString(R.string.error), ffatal, ffatal.contains(">"), MainActivity.this).show();
                             }
                         });
                     }
@@ -275,19 +283,16 @@ public class MainActivity extends SherlockListActivity {
                     MainActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (System.getAppVersionName().equals(System.getSettings().getString("DSPLOIT_INSTALLED_VERSION", "0")) == false) {
+                            if (!System.getAppVersionName().equals(System.getSettings().getString("DSPLOIT_INSTALLED_VERSION", "0"))) {
                                 new ChangelogDialog(MainActivity.this).show();
-
                                 Editor editor = System.getSettings().edit();
-
                                 editor.putString("DSPLOIT_INSTALLED_VERSION", System.getAppVersionName());
                                 editor.commit();
                             }
-
                             try {
                                 createOnlineLayout();
                             } catch (Exception e) {
-                                new FatalDialog("Error", e.getMessage(), MainActivity.this).show();
+                                new FatalDialog(getString(R.string.error), e.getMessage(), MainActivity.this).show();
                             }
                         }
                     });
@@ -301,7 +306,7 @@ public class MainActivity extends SherlockListActivity {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.main, menu);
 
-        if (isWifiAvailable == false) {
+        if (!isWifiAvailable) {
             menu.findItem(R.id.add).setVisible(false);
             menu.findItem(R.id.scan).setVisible(false);
             menu.findItem(R.id.new_session).setEnabled(false);
@@ -322,10 +327,10 @@ public class MainActivity extends SherlockListActivity {
         MenuItem item = menu.findItem(R.id.ss_monitor);
 
         if (mNetworkDiscovery != null && mNetworkDiscovery.isRunning())
-            item.setTitle("Stop Network Monitor");
+            item.setTitle(getString(R.string.stop_monitor));
 
         else
-            item.setTitle("Start Network Monitor");
+            item.setTitle(getString(R.string.start_monitor));
 
         mMenu = menu;
 
@@ -334,7 +339,7 @@ public class MainActivity extends SherlockListActivity {
 
     public void startUpdateChecker() {
         if (System.getSettings().getBoolean("PREF_CHECK_UPDATES", true)) {
-            mUpdateChecker = new UpdateChecker(this);
+            UpdateChecker mUpdateChecker = new UpdateChecker(this);
             mUpdateChecker.start();
         }
     }
@@ -345,8 +350,8 @@ public class MainActivity extends SherlockListActivity {
         mNetworkDiscovery = new NetworkDiscovery(this);
         mNetworkDiscovery.start();
 
-        if (silent == false)
-            Toast.makeText(this, "Network discovery started.", Toast.LENGTH_SHORT).show();
+        if (!silent)
+            Toast.makeText(this, getString(R.string.net_discovery_started), Toast.LENGTH_SHORT).show();
     }
 
     public void stopNetworkDiscovery(boolean silent) {
@@ -359,8 +364,8 @@ public class MainActivity extends SherlockListActivity {
                     // swallow
                 }
 
-                if (silent == false)
-                    Toast.makeText(this, "Network discovery stopped.", Toast.LENGTH_SHORT).show();
+                if (!silent)
+                    Toast.makeText(this, getString(R.string.net_discovery_stopped), Toast.LENGTH_SHORT).show();
             }
 
             mNetworkDiscovery = null;
@@ -373,7 +378,7 @@ public class MainActivity extends SherlockListActivity {
         int itemId = item.getItemId();
 
         if (itemId == R.id.add) {
-            new InputDialog("Add custom target", "Enter an URL, host name or ip address below:", MainActivity.this, new InputDialogListener() {
+            new InputDialog(getString(R.string.add_custom_target), getString(R.string.enter_url), MainActivity.this, new InputDialogListener() {
                 @Override
                 public void onInputEntered(String input) {
                     final Target target = Target.getFromString(input);
@@ -382,13 +387,13 @@ public class MainActivity extends SherlockListActivity {
                         MainActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                if (System.addOrderedTarget(target) == true && mTargetAdapter != null) {
+                                if (System.addOrderedTarget(target) && mTargetAdapter != null) {
                                     mTargetAdapter.notifyDataSetChanged();
                                 }
                             }
                         });
                     } else
-                        new ErrorDialog("Error", "Invalid target.", MainActivity.this).show();
+                        new ErrorDialog(getString(R.string.error), getString(R.string.invalid_target), MainActivity.this).show();
                 }
             }
             ).show();
@@ -413,7 +418,7 @@ public class MainActivity extends SherlockListActivity {
                 }
             }).start();
 
-            item.setTitle("Stop Network Monitor");
+            item.setTitle(getString(R.string.stop_monitor));
 
             return true;
         } else if (itemId == R.id.wifi_scan) {
@@ -429,16 +434,16 @@ public class MainActivity extends SherlockListActivity {
 
             return true;
         } else if (itemId == R.id.new_session) {
-            new ConfirmDialog("Warning", "Starting a new session would delete the current one, continue ?", this, new ConfirmDialogListener() {
+            new ConfirmDialog(getString(R.string.warning), getString(R.string.warning_new_session), this, new ConfirmDialogListener() {
                 @Override
                 public void onConfirm() {
                     try {
                         System.reset();
                         mTargetAdapter.notifyDataSetChanged();
 
-                        Toast.makeText(MainActivity.this, "New session started", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, getString(R.string.new_session_started), Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
-                        new FatalDialog("Error", e.toString(), MainActivity.this).show();
+                        new FatalDialog(getString(R.string.error), e.toString(), MainActivity.this).show();
                     }
                 }
 
@@ -450,21 +455,21 @@ public class MainActivity extends SherlockListActivity {
 
             return true;
         } else if (itemId == R.id.save_session) {
-            new InputDialog("Save Session", "Enter the name of the session file :", System.getSessionName(), true, false, MainActivity.this, new InputDialogListener() {
+            new InputDialog(getString(R.string.save_session), getString(R.string.enter_session_name), System.getSessionName(), true, false, MainActivity.this, new InputDialogListener() {
                 @Override
                 public void onInputEntered(String input) {
                     String name = input.trim().replace("/", "").replace("..", "");
 
-                    if (name.isEmpty() == false) {
+                    if (!name.isEmpty()) {
                         try {
                             String filename = System.saveSession(name);
 
-                            Toast.makeText(MainActivity.this, "Session saved to " + filename + " .", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, getString(R.string.session_saved_to) + filename + " .", Toast.LENGTH_SHORT).show();
                         } catch (IOException e) {
-                            new ErrorDialog("Error", e.toString(), MainActivity.this).show();
+                            new ErrorDialog(getString(R.string.error), e.toString(), MainActivity.this).show();
                         }
                     } else
-                        new ErrorDialog("Error", "Invalid session name.", MainActivity.this).show();
+                        new ErrorDialog(getString(R.string.error), getString(R.string.invalid_session), MainActivity.this).show();
                 }
             }
             ).show();
@@ -474,7 +479,7 @@ public class MainActivity extends SherlockListActivity {
             final ArrayList<String> sessions = System.getAvailableSessionFiles();
 
             if (sessions != null && sessions.size() > 0) {
-                new SpinnerDialog("Select Session", "Select a session file from the sd card :", sessions.toArray(new String[sessions.size()]), MainActivity.this, new SpinnerDialogListener() {
+                new SpinnerDialog(getString(R.string.select_session), getString(R.string.select_session_file), sessions.toArray(new String[sessions.size()]), MainActivity.this, new SpinnerDialogListener() {
                     @Override
                     public void onItemSelected(int index) {
                         String session = sessions.get(index);
@@ -484,12 +489,12 @@ public class MainActivity extends SherlockListActivity {
                             mTargetAdapter.notifyDataSetChanged();
                         } catch (Exception e) {
                             e.printStackTrace();
-                            new ErrorDialog("Error", e.getMessage(), MainActivity.this).show();
+                            new ErrorDialog(getString(R.string.error), e.getMessage(), MainActivity.this).show();
                         }
                     }
                 }).show();
             } else
-                new ErrorDialog("Error", "No session file found on sd card.", MainActivity.this).show();
+                new ErrorDialog(getString(R.string.error), getString(R.string.no_session_found), MainActivity.this).show();
 
             return true;
         } else if (itemId == R.id.settings) {
@@ -500,16 +505,16 @@ public class MainActivity extends SherlockListActivity {
             if (mNetworkDiscovery != null && mNetworkDiscovery.isRunning()) {
                 stopNetworkDiscovery(false);
 
-                item.setTitle("Start Network Monitor");
+                item.setTitle(getString(R.string.start_monitor));
             } else {
                 startNetworkDiscovery(false);
 
-                item.setTitle("Stop Network Monitor");
+                item.setTitle(getString(R.string.stop_monitor));
             }
 
             return true;
         } else if (itemId == R.id.submit_issue) {
-            String uri = "https://github.com/evilsocket/dsploit/issues/new";
+            String uri = getString(R.string.github_issues);
             Intent browser = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
 
             startActivity(browser);
@@ -537,20 +542,20 @@ public class MainActivity extends SherlockListActivity {
         }).start();
 
         System.setCurrentTarget(position);
-        Toast.makeText(MainActivity.this, "Selected " + System.getCurrentTarget(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, getString(R.string.selected_) + System.getCurrentTarget(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onBackPressed() {
         if (mLastBackPressTime < java.lang.System.currentTimeMillis() - 4000) {
-            mToast = Toast.makeText(this, "Press back again to close this app.", Toast.LENGTH_SHORT);
+            mToast = Toast.makeText(this, getString(R.string.press_back), Toast.LENGTH_SHORT);
             mToast.show();
             mLastBackPressTime = java.lang.System.currentTimeMillis();
         } else {
             if (mToast != null)
                 mToast.cancel();
 
-            new ConfirmDialog("Exit", "This will close dSploit, are you sure you want to continue ?", this, new ConfirmDialogListener() {
+            new ConfirmDialog(getString(R.string.exit), getString(R.string.close_confirm), this, new ConfirmDialogListener() {
                 @Override
                 public void onConfirm() {
                     MainActivity.this.finish();
@@ -606,27 +611,21 @@ public class MainActivity extends SherlockListActivity {
                 row = inflater.inflate(R.layout.target_list_item, parent, false);
 
                 holder = new TargetHolder();
+                holder.itemImage = (ImageView) (row != null ? row.findViewById(R.id.itemIcon) : null);
+                holder.itemTitle = (TextView) (row != null ? row.findViewById(R.id.itemTitle) : null);
+                holder.itemDescription = (TextView) (row != null ? row.findViewById(R.id.itemDescription) : null);
 
-                holder.itemImage = (ImageView) row.findViewById(R.id.itemIcon);
-                holder.itemTitle = (TextView) row.findViewById(R.id.itemTitle);
-                holder.itemDescription = (TextView) row.findViewById(R.id.itemDescription);
+                if (row != null)
+                    row.setTag(holder);
 
-                row.setTag(holder);
-            } else {
+            } else
                 holder = (TargetHolder) row.getTag();
-            }
 
             Target target = System.getTarget(position);
 
-            if (target.hasAlias() == true) {
-                holder.itemTitle.setText
-                        (
-                                Html.fromHtml
-                                        (
-                                                "<b>" + target.getAlias() + "</b> <small>( " + target.getDisplayAddress() + " )</small>"
-                                        )
-                        );
-            } else
+            if (target.hasAlias())
+                holder.itemTitle.setText(Html.fromHtml("<b>" + target.getAlias() + "</b> <small>( " + target.getDisplayAddress() + " )</small>"));
+            else
                 holder.itemTitle.setText(target.toString());
 
             holder.itemTitle.setTypeface(null, Typeface.NORMAL);
@@ -649,47 +648,49 @@ public class MainActivity extends SherlockListActivity {
         public EndpointReceiver() {
             mFilter = new IntentFilter();
 
-            mFilter.addAction(NetworkDiscovery.NEW_ENDPOINT);
-            mFilter.addAction(NetworkDiscovery.ENDPOINT_UPDATE);
+            mFilter.addAction(NEW_ENDPOINT);
+            mFilter.addAction(ENDPOINT_UPDATE);
         }
 
         public IntentFilter getFilter() {
             return mFilter;
         }
 
+        @SuppressWarnings("ConstantConditions")
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(NetworkDiscovery.NEW_ENDPOINT)) {
-                String address = (String) intent.getExtras().get(NetworkDiscovery.ENDPOINT_ADDRESS),
-                        hardware = (String) intent.getExtras().get(NetworkDiscovery.ENDPOINT_HARDWARE),
-                        name = (String) intent.getExtras().get(NetworkDiscovery.ENDPOINT_NAME);
-                final Target target = Target.getFromString(address);
+            if (intent.getAction() != null)
+                if (intent.getAction().equals(NEW_ENDPOINT)) {
+                    String address = (String) intent.getExtras().get(ENDPOINT_ADDRESS),
+                            hardware = (String) intent.getExtras().get(ENDPOINT_HARDWARE),
+                            name = (String) intent.getExtras().get(ENDPOINT_NAME);
+                    final Target target = Target.getFromString(address);
 
-                if (target != null && target.getEndpoint() != null) {
-                    if (name != null && name.isEmpty() == false)
-                        target.setAlias(name);
+                    if (target != null && target.getEndpoint() != null) {
+                        if (name != null && !name.isEmpty())
+                            target.setAlias(name);
 
-                    target.getEndpoint().setHardware(Endpoint.parseMacAddress(hardware));
+                        target.getEndpoint().setHardware(Endpoint.parseMacAddress(hardware));
 
+                        // refresh the target listview
+                        MainActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (System.addOrderedTarget(target)) {
+                                    mTargetAdapter.notifyDataSetChanged();
+                                }
+                            }
+                        });
+                    }
+                } else if (intent.getAction().equals(ENDPOINT_UPDATE)) {
                     // refresh the target listview
                     MainActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (System.addOrderedTarget(target) == true) {
-                                mTargetAdapter.notifyDataSetChanged();
-                            }
+                            mTargetAdapter.notifyDataSetChanged();
                         }
                     });
                 }
-            } else if (intent.getAction().equals(NetworkDiscovery.ENDPOINT_UPDATE)) {
-                // refresh the target listview
-                MainActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mTargetAdapter.notifyDataSetChanged();
-                    }
-                });
-            }
         }
     }
 
@@ -699,74 +700,74 @@ public class MainActivity extends SherlockListActivity {
         public UpdateReceiver() {
             mFilter = new IntentFilter();
 
-            mFilter.addAction(UpdateChecker.UPDATE_CHECKING);
-            mFilter.addAction(UpdateChecker.UPDATE_AVAILABLE);
-            mFilter.addAction(UpdateChecker.UPDATE_NOT_AVAILABLE);
+            mFilter.addAction(UPDATE_CHECKING);
+            mFilter.addAction(UPDATE_AVAILABLE);
+            mFilter.addAction(UPDATE_NOT_AVAILABLE);
         }
 
         public IntentFilter getFilter() {
             return mFilter;
         }
 
+        @SuppressWarnings("ConstantConditions")
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (mUpdateStatus != null && intent.getAction().equals(UpdateChecker.UPDATE_CHECKING) && mUpdateStatus != null) {
-                mUpdateStatus.setText(NO_WIFI_UPDATE_MESSAGE.replace("#STATUS#", "Checking ..."));
-            } else if (mUpdateStatus != null && intent.getAction().equals(UpdateChecker.UPDATE_NOT_AVAILABLE) && mUpdateStatus != null) {
-                mUpdateStatus.setText(NO_WIFI_UPDATE_MESSAGE.replace("#STATUS#", "No updates available."));
-            } else if (intent.getAction().equals(UpdateChecker.UPDATE_AVAILABLE)) {
-                final String remoteVersion = (String) intent.getExtras().get(UpdateChecker.AVAILABLE_VERSION);
+            if (mUpdateStatus != null && intent.getAction().equals(UPDATE_CHECKING) && mUpdateStatus != null) {
+                mUpdateStatus.setText(NO_WIFI_UPDATE_MESSAGE.replace("#STATUS#", getString(R.string.checking)));
+            } else if (mUpdateStatus != null && intent.getAction().equals(UPDATE_NOT_AVAILABLE) && mUpdateStatus != null) {
+                mUpdateStatus.setText(NO_WIFI_UPDATE_MESSAGE.replace("#STATUS#", getString(R.string.no_updates_available)));
+            } else if (intent.getAction().equals(UPDATE_AVAILABLE)) {
+                final String remoteVersion = (String) intent.getExtras().get(AVAILABLE_VERSION);
 
                 if (mUpdateStatus != null)
-                    mUpdateStatus.setText(NO_WIFI_UPDATE_MESSAGE.replace("#STATUS#", "New version " + remoteVersion + " found!"));
+                    mUpdateStatus.setText(NO_WIFI_UPDATE_MESSAGE.replace("#STATUS#", getString(R.string.new_version) + remoteVersion + getString(R.string.new_version2)));
 
                 MainActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        new ConfirmDialog
-                                (
-                                        "Update Available",
-                                        "A new update to version " + remoteVersion + " is available, do you want to download it ?",
-                                        MainActivity.this,
-                                        new ConfirmDialogListener() {
+                        new ConfirmDialog(
+                                getString(R.string.update_available),
+                                getString(R.string.new_update_desc) + remoteVersion + getString(R.string.new_update_desc2),
+                                MainActivity.this,
+                                new ConfirmDialogListener() {
+                                    @Override
+                                    public void onConfirm() {
+                                        final ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+                                        dialog.setTitle(getString(R.string.downloading_update));
+                                        dialog.setMessage(getString(R.string.connecting));
+                                        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                                        dialog.setMax(100);
+                                        dialog.setCancelable(false);
+                                        dialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel), new DialogInterface.OnClickListener() {
                                             @Override
-                                            public void onConfirm() {
-                                                final ProgressDialog dialog = new ProgressDialog(MainActivity.this);
-                                                dialog.setTitle("Downloading update ...");
-                                                dialog.setMessage("Connecting ...");
-                                                dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                                                dialog.setMax(100);
-                                                dialog.setCancelable(false);
-                                                dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        dialog.dismiss();
-                                                    }
-                                                });
-                                                dialog.show();
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                        });
+                                        dialog.show();
 
-                                                new Thread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        if (System.getUpdateManager().downloadUpdate(MainActivity.this, dialog) == false) {
-                                                            MainActivity.this.runOnUiThread(new Runnable() {
-                                                                @Override
-                                                                public void run() {
-                                                                    new ErrorDialog("Error", "An error occurred while downloading the update.", MainActivity.this).show();
-                                                                }
-                                                            });
+                                        new Thread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if (!System.getUpdateManager().downloadUpdate(MainActivity.this, dialog)) {
+                                                    MainActivity.this.runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            new ErrorDialog(getString(R.string.error), getString(R.string.error_occured), MainActivity.this).show();
                                                         }
+                                                    });
+                                                }
 
-                                                        dialog.dismiss();
-                                                    }
-                                                }).start();
+                                                dialog.dismiss();
                                             }
+                                        }).start();
+                                    }
 
-                                            @Override
-                                            public void onCancel() {
-                                            }
-                                        }
-                                ).show();
+                                    @Override
+                                    public void onCancel() {
+                                    }
+                                }
+                        ).show();
                     }
                 });
             }

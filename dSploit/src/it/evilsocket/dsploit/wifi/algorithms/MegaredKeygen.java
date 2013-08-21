@@ -18,9 +18,9 @@
  */
 package it.evilsocket.dsploit.wifi.algorithms;
 
-import it.evilsocket.dsploit.wifi.Keygen;
-
 import java.util.List;
+
+import it.evilsocket.dsploit.wifi.Keygen;
 
 /*
  * This is not actual an algorithm as
@@ -28,13 +28,13 @@ import java.util.List;
  */
 public class MegaredKeygen extends Keygen {
 
-	public MegaredKeygen(String ssid, String mac, int level, String enc ) {
-		super(ssid, mac, level, enc);
-	}
-	
-	@Override
-	public List<String> getKeys() {
-		addPassword(getMacAddress().substring(2));
-		return getResults();
-	}
+    public MegaredKeygen(String ssid, String mac, int level, String enc) {
+        super(ssid, mac, level, enc);
+    }
+
+    @Override
+    public List<String> getKeys() {
+        addPassword(getMacAddress().substring(2));
+        return getResults();
+    }
 }

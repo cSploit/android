@@ -18,122 +18,111 @@
  */
 package it.evilsocket.dsploit.net.http.proxy;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import android.util.Log;
+
 import it.evilsocket.dsploit.core.Profiler;
 import it.evilsocket.dsploit.core.System;
 
-public class Proxy implements Runnable
-{
-	private static final String TAG     = "HTTP.PROXY";
-	private static final int    BACKLOG = 255;
-	
-	private InetAddress  		   mAddress 	 	= null;
-	private int     	 		   mPort    	 	= System.HTTP_PROXY_PORT;
-	private boolean 	 		   mRunning 	 	= false;
-	private ServerSocket 		   mSocket  	 	= null;
-	private OnRequestListener	   mRequestListener = null;
-	private ArrayList<ProxyFilter> mFilters 	 	= null;
-	private String				   mHostRedirect 	= null;
-	private int					   mPortRedirect 	= 80;
+public class Proxy implements Runnable {
+    private static final String TAG = "HTTP.PROXY";
+    private static final int BACKLOG = 255;
 
-	public static interface ProxyFilter
-	{
-		public String onDataReceived( String headers, String data );
-	}
-	
-	public static interface OnRequestListener
-	{
-		public void onRequest( boolean https, String address, String hostname, ArrayList<String> headers );
-	}
-	
-	public Proxy( InetAddress address, int port ) throws UnknownHostException, IOException {
-		mAddress     = address;
-		mPort	     = port;
-		mSocket      = new ServerSocket( mPort, BACKLOG, mAddress );		
-		mFilters     = new ArrayList<ProxyFilter>();
-	}
-	
-	public Proxy( String address, int port ) throws UnknownHostException, IOException {
-		this( InetAddress.getByName( address ), port );
-	}
+    private InetAddress mAddress = null;
+    private int mPort = System.HTTP_PROXY_PORT;
+    private boolean mRunning = false;
+    private ServerSocket mSocket = null;
+    private OnRequestListener mRequestListener = null;
+    private ArrayList<ProxyFilter> mFilters = null;
+    private String mHostRedirect = null;
+    private int mPortRedirect = 80;
 
-	public void setOnRequestListener( OnRequestListener listener ) {
-		mRequestListener = listener;
-	}
-	
-	public void setRedirection( String host, int port ){
-		mHostRedirect = host;
-		mPortRedirect = port;
-	}
-	
-	public void setFilter( ProxyFilter filter ){
-		mFilters.clear();
-		
-		if( filter != null )
-			mFilters.add( filter );
-	}
-	
-	public void addFilter( ProxyFilter filter ){
-		mFilters.add( filter );
-	}
-		
-	public void stop() {
-		Log.d( TAG, "Stopping proxy ..." );
-		
-		try 
-		{
-			if( mSocket != null )
-				mSocket.close();
-		} 
-		catch( IOException e )
-		{
+    public static interface ProxyFilter {
+        public String onDataReceived(String headers, String data);
+    }
 
-		}
-		
-		mRunning = false;
-		mSocket  = null;
-	}
-	
-	public void run() {
-		
-		try
-		{
-			if( mSocket == null )
-				mSocket = new ServerSocket( mPort, BACKLOG, mAddress );		
-			
-			Log.d( TAG, "Proxy started on " + mAddress + ":" + mPort );
-			
-			mRunning = true;
-			
-			while( mRunning && mSocket != null )
-			{
-				try
-				{
-					Profiler.instance().profile("client spawn");
-					
-					Socket client = mSocket.accept();
-					
-					new ProxyThread( client, mRequestListener, mFilters, mHostRedirect, mPortRedirect ).start();
-					
-					Profiler.instance().profile("client spawn");
-				}
-				catch( Exception e )
-				{
-					
-				}
-			}
-			
-			Log.d( TAG, "Proxy stopped." );
-		}
-		catch( IOException e )
-		{
-			System.errorLogging( TAG, e );
-		}
-	}
+    public static interface OnRequestListener {
+        public void onRequest(boolean https, String address, String hostname, ArrayList<String> headers);
+    }
+
+    public Proxy(InetAddress address, int port) throws UnknownHostException, IOException {
+        mAddress = address;
+        mPort = port;
+        mSocket = new ServerSocket(mPort, BACKLOG, mAddress);
+        mFilters = new ArrayList<ProxyFilter>();
+    }
+
+    public Proxy(String address, int port) throws UnknownHostException, IOException {
+        this(InetAddress.getByName(address), port);
+    }
+
+    public void setOnRequestListener(OnRequestListener listener) {
+        mRequestListener = listener;
+    }
+
+    public void setRedirection(String host, int port) {
+        mHostRedirect = host;
+        mPortRedirect = port;
+    }
+
+    public void setFilter(ProxyFilter filter) {
+        mFilters.clear();
+
+        if (filter != null)
+            mFilters.add(filter);
+    }
+
+    public void addFilter(ProxyFilter filter) {
+        mFilters.add(filter);
+    }
+
+    public void stop() {
+        Log.d(TAG, "Stopping proxy ...");
+
+        try {
+            if (mSocket != null)
+                mSocket.close();
+        } catch (IOException e) {
+
+        }
+
+        mRunning = false;
+        mSocket = null;
+    }
+
+    public void run() {
+
+        try {
+            if (mSocket == null)
+                mSocket = new ServerSocket(mPort, BACKLOG, mAddress);
+
+            Log.d(TAG, "Proxy started on " + mAddress + ":" + mPort);
+
+            mRunning = true;
+
+            while (mRunning && mSocket != null) {
+                try {
+                    Profiler.instance().profile("client spawn");
+
+                    Socket client = mSocket.accept();
+
+                    new ProxyThread(client, mRequestListener, mFilters, mHostRedirect, mPortRedirect).start();
+
+                    Profiler.instance().profile("client spawn");
+                } catch (Exception e) {
+
+                }
+            }
+
+            Log.d(TAG, "Proxy stopped.");
+        } catch (IOException e) {
+            System.errorLogging(TAG, e);
+        }
+    }
 }

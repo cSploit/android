@@ -19,103 +19,88 @@
             android:name="DSploitApplication"
             android:icon="@drawable/ic_launcher"
             android:label="@string/app_name"
-            android:theme="@style/Theme.DSploitActionBarStyle">
+            android:theme="@style/Theme.DSploitActionBarStyle"
+            android:allowBackup="true">
         <activity
                 android:name=".MainActivity"
-                android:configChanges="keyboardHidden|orientation"
                 android:label="@string/title_activity_main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
+        <!--suppress AndroidDomInspection -->
         <service
                 android:name=".net.NetworkDiscovery"
                 android:enabled="true"/>
+        <!--suppress AndroidDomInspection -->
         <service
                 android:name=".core.UpdateChecker"
                 android:enabled="true"/>
 
         <activity
                 android:name=".WifiScannerActivity"
-                android:configChanges="keyboardHidden|orientation"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".SettingsActivity"
-                android:configChanges="keyboardHidden|orientation"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".gui.DirectoryPicker"
-                android:configChanges="keyboardHidden|orientation"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".ActionActivity"
-                android:configChanges="keyboardHidden|orientation"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.RouterPwn"
-                android:configChanges="keyboardHidden|orientation"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.Traceroute"
-                android:configChanges="keyboardHidden|orientation"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.PortScanner"
-                android:configChanges="keyboardHidden|orientation"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.Inspector"
-                android:configChanges="keyboardHidden|orientation"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.ExploitFinder"
-                android:configChanges="keyboardHidden|orientation"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.mitm.MITM"
-                android:configChanges="keyboardHidden|orientation"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.mitm.Sniffer"
-                android:configChanges="keyboardHidden|orientation"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.mitm.PasswordSniffer"
-                android:configChanges="keyboardHidden|orientation"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.mitm.Hijacker"
-                android:configChanges="keyboardHidden|orientation"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.mitm.HijackerWebView"
-                android:configChanges="keyboardHidden|orientation"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.LoginCracker"
-                android:configChanges="keyboardHidden|orientation"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.PacketForger"
-                android:configChanges="keyboardHidden|orientation"
                 android:label="@string/title_activity_main">
         </activity>
     </application>

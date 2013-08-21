@@ -18,49 +18,49 @@
  */
 package it.evilsocket.dsploit.wifi.algorithms;
 
-import it.evilsocket.dsploit.wifi.Keygen;
-
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+import it.evilsocket.dsploit.wifi.Keygen;
+
 public class ComtrendKeygen extends Keygen {
 
-	final private String ssidIdentifier;
-	private MessageDigest md;
+    final private String ssidIdentifier;
+    private MessageDigest md;
 
-	public ComtrendKeygen(String ssid, String mac, int level, String enc) {
-		super(ssid, mac, level, enc);
-		ssidIdentifier = ssid.substring(ssid.length() - 4);
-	}
+    public ComtrendKeygen(String ssid, String mac, int level, String enc) {
+        super(ssid, mac, level, enc);
+        ssidIdentifier = ssid.substring(ssid.length() - 4);
+    }
 
-	static final String magic = "bcgbghgg";
+    static final String magic = "bcgbghgg";
 
-	@Override
-	public List<String> getKeys() {
-		try {
-			md = MessageDigest.getInstance("MD5");
-		} catch (NoSuchAlgorithmException e1) {
-			setErrorMessage("This phone cannot process a MD5 hash.");
-			return null;
-		}
-		final String mac = getMacAddress();
-		if (mac.length() != 12) {
-			setErrorMessage("The MAC address is invalid.");
-			return null;
-		}
-		try {
-			final String macMod = mac.substring(0, 8) + ssidIdentifier;
-			md.reset();
-			md.update(magic.getBytes("ASCII"));
-			md.update(macMod.toUpperCase().getBytes("ASCII"));
-			md.update(mac.toUpperCase().getBytes("ASCII"));
-			byte[] hash = md.digest();
-			addPassword( getHexString(hash).substring(0, 20) );
-			return getResults();
-		} catch (UnsupportedEncodingException e) {
-		}
-		return null;
-	}
+    @Override
+    public List<String> getKeys() {
+        try {
+            md = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e1) {
+            setErrorMessage("This phone cannot process a MD5 hash.");
+            return null;
+        }
+        final String mac = getMacAddress();
+        if (mac.length() != 12) {
+            setErrorMessage("The MAC address is invalid.");
+            return null;
+        }
+        try {
+            final String macMod = mac.substring(0, 8) + ssidIdentifier;
+            md.reset();
+            md.update(magic.getBytes("ASCII"));
+            md.update(macMod.toUpperCase().getBytes("ASCII"));
+            md.update(mac.toUpperCase().getBytes("ASCII"));
+            byte[] hash = md.digest();
+            addPassword(getHexString(hash).substring(0, 20));
+            return getResults();
+        } catch (UnsupportedEncodingException e) {
+        }
+        return null;
+    }
 }

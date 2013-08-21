@@ -18,7 +18,6 @@
  */
 package it.evilsocket.dsploit.gui.dialogs;
 
-import it.evilsocket.dsploit.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -26,34 +25,35 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
-public class RedirectionDialog extends AlertDialog
-{
-	public interface RedirectionDialogListener
-	{
-		public void onInputEntered( String address, String port );
-	}
-	
-	public RedirectionDialog( String title, Activity activity, final RedirectionDialogListener listener ){
-		super( activity );
-		
-		final View view = LayoutInflater.from( activity ).inflate( R.layout.plugin_mitm_redirect_dialog, null );
-		
-		this.setTitle( title );
-		this.setView( view );
-			
-		this.setButton( "Ok", new DialogInterface.OnClickListener() {
-            public void onClick( DialogInterface dialog, int id ) {
-            	String address = ( ( EditText )view.findViewById( R.id.redirAddress ) ).getText().toString().trim(),
-            		   port	   = ( ( EditText )view.findViewById( R.id.redirPort ) ).getText().toString().trim();
-            	
-            	listener.onInputEntered( address, port );
-            }
-		});
-		
-		this.setButton2( "Cancel", new DialogInterface.OnClickListener() {
+import it.evilsocket.dsploit.R;
+
+public class RedirectionDialog extends AlertDialog {
+    public RedirectionDialog(String title, Activity activity, final RedirectionDialogListener listener) {
+        super(activity);
+
+        final View view = LayoutInflater.from(activity).inflate(R.layout.plugin_mitm_redirect_dialog, null);
+
+        this.setTitle(title);
+        this.setView(view);
+
+        this.setButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-            	dialog.dismiss();
+                assert view != null;
+                String address = ((EditText) view.findViewById(R.id.redirAddress)).getText() + "".trim(),
+                        port = ((EditText) view.findViewById(R.id.redirPort)).getText() + "".trim();
+
+                listener.onInputEntered(address, port);
             }
-        });	
-	}
+        });
+
+        this.setButton2("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+    }
+
+    public interface RedirectionDialogListener {
+        public void onInputEntered(String address, String port);
+    }
 }

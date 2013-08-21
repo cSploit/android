@@ -18,9 +18,9 @@
  */
 package it.evilsocket.dsploit.wifi.algorithms;
 
-import it.evilsocket.dsploit.wifi.Keygen;
-
 import java.util.List;
+
+import it.evilsocket.dsploit.wifi.Keygen;
 
 /*
  * This is not actual an algorithm as
@@ -28,13 +28,13 @@ import java.util.List;
  */
 public class AndaredKeygen extends Keygen {
 
-	public AndaredKeygen(String ssid, String mac, int level, String enc ) {
-		super(ssid, mac, level, enc);
-	}
-	
-	@Override
-	public List<String> getKeys() {
-		addPassword("6b629f4c299371737494c61b5a101693a2d4e9e1f3e1320f3ebf9ae379cecf32");
-		return getResults();
-	}
+    public AndaredKeygen(String ssid, String mac, int level, String enc) {
+        super(ssid, mac, level, enc);
+    }
+
+    @Override
+    public List<String> getKeys() {
+        addPassword("6b629f4c299371737494c61b5a101693a2d4e9e1f3e1320f3ebf9ae379cecf32");
+        return getResults();
+    }
 }

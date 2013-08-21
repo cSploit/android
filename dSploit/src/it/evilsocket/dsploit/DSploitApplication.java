@@ -18,9 +18,11 @@
  */
 package it.evilsocket.dsploit;
 
-import java.net.NoRouteToHostException;
+import android.app.Application;
 
 import com.bugsense.trace.BugSenseHandler;
+
+import java.net.NoRouteToHostException;
 
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.plugins.ExploitFinder;
@@ -32,46 +34,37 @@ import it.evilsocket.dsploit.plugins.RouterPwn;
 import it.evilsocket.dsploit.plugins.Traceroute;
 import it.evilsocket.dsploit.plugins.mitm.MITM;
 
-import android.app.Application;
+public class DSploitApplication extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
 
-public class DSploitApplication extends Application 
-{
-	@Override
-	public void onCreate() {		
-		super.onCreate();
-		
-		try
-		{
-			BugSenseHandler.initAndStartSession( this, "d5d1ed80" );
-		}
-		catch( Exception e )
-		{
-			System.errorLogging( "DSPLOIT", e );
-		}
-		
-		// initialize the system
-		try
-		{
-			System.init( this );
-		}
-		catch( Exception e )
-		{
-			System.errorLogging( "DSPLOIT", e );
-			
-			// ignore exception when the user has wifi off
-			if( !( e instanceof NoRouteToHostException ) )
-				BugSenseHandler.sendException( e );
-		}		
-		
-		// load system modules even if the initialization failed
-		System.registerPlugin( new RouterPwn( ) );
-		System.registerPlugin( new Traceroute( ) );
-        System.registerPlugin( new PortScanner( ) );
-        System.registerPlugin( new Inspector( ) );
-        System.registerPlugin( new ExploitFinder( ) );
-        System.registerPlugin( new LoginCracker( ) );
-        System.registerPlugin( new MITM( ) );
-        System.registerPlugin( new PacketForger( ) );
-        		
-	}
+        try {
+            BugSenseHandler.initAndStartSession(this, "d5d1ed80");
+        } catch (Exception e) {
+            System.errorLogging("DSPLOIT", e);
+        }
+
+        // initialize the system
+        try {
+            System.init(this);
+        } catch (Exception e) {
+            System.errorLogging("DSPLOIT", e);
+
+            // ignore exception when the user has wifi off
+            if (!(e instanceof NoRouteToHostException))
+                BugSenseHandler.sendException(e);
+        }
+
+        // load system modules even if the initialization failed
+        System.registerPlugin(new RouterPwn());
+        System.registerPlugin(new Traceroute());
+        System.registerPlugin(new PortScanner());
+        System.registerPlugin(new Inspector());
+        System.registerPlugin(new ExploitFinder());
+        System.registerPlugin(new LoginCracker());
+        System.registerPlugin(new MITM());
+        System.registerPlugin(new PacketForger());
+
+    }
 }
