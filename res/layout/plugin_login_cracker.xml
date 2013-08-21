@@ -1,210 +1,222 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:padding="10dp" >
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:padding="8dp">
 
     <LinearLayout
-        android:id="@+id/linearLayout1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true" >
-        
-        <TextView
-            android:id="@+id/TextView01"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.50"
-            android:text="Service"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            tools:ignore="HardcodedText" />
-        
-        <TextView
-            android:id="@+id/textView1"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.50"
-            android:text="Port"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            tools:ignore="HardcodedText" />
-                
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linearLayout2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/linearLayout1"
-        android:layout_alignRight="@+id/linearLayout1"
-        android:layout_below="@+id/linearLayout1" >
-
-        <Spinner
-            android:id="@+id/protocolSpinner"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.50" />
-
-        <Spinner
-            android:id="@+id/portSpinner"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.50" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linearLayout3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/linearLayout2"
-        android:layout_alignRight="@+id/linearLayout2"
-        android:layout_below="@+id/linearLayout2" >
-
-        <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/linearLayout1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.50"
-            android:text="Charset"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            tools:ignore="HardcodedText" />
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true">
 
         <TextView
-            android:id="@+id/textView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.50"
-            android:text="Username"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            tools:ignore="HardcodedText" />
+                android:id="@+id/TextView01"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.50"
+                android:text="@string/service"
+                android:textAllCaps="true"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:fontFamily="sans-serif-condensed"
+                android:textColor="@color/app_color"/>
+
+        <TextView
+                android:id="@+id/textView1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.50"
+                android:text="@string/port"
+                android:textAllCaps="true"
+                android:fontFamily="sans-serif-condensed"
+                android:textColor="@color/app_color"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
+
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/linearLayout4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/linearLayout3"
-        android:layout_alignRight="@+id/linearLayout3"
-        android:layout_below="@+id/linearLayout3" >
+            android:id="@+id/linearLayout2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/linearLayout1"
+            android:layout_alignRight="@+id/linearLayout1"
+            android:layout_below="@+id/linearLayout1">
 
         <Spinner
-            android:id="@+id/charsetSpinner"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.50" />
+                android:id="@+id/protocolSpinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.50"/>
 
         <Spinner
-            android:id="@+id/userSpinner"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.50" />
+                android:id="@+id/portSpinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.50"/>
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/linearLayout5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/linearLayout4"
-        android:layout_alignRight="@+id/linearLayout4"
-        android:layout_below="@+id/linearLayout4" >
-
-        <TextView
-            android:id="@+id/textView5"
+            android:id="@+id/linearLayout3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.50"
-            android:text="Min Length"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            tools:ignore="HardcodedText" />
+            android:layout_alignLeft="@+id/linearLayout2"
+            android:layout_alignRight="@+id/linearLayout2"
+            android:layout_below="@+id/linearLayout2">
 
         <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.50"
-            android:text="Max Length"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            tools:ignore="HardcodedText" />
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.50"
+                android:text="@string/Charset"
+                android:textAllCaps="true"
+                android:fontFamily="sans-serif-condensed"
+                android:textColor="@color/app_color"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+        <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.50"
+                android:text="@string/username"
+                android:textAllCaps="true"
+                android:fontFamily="sans-serif-condensed"
+                android:textColor="@color/app_color"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/linearLayout6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/linearLayout5"
-        android:layout_alignRight="@+id/linearLayout5"
-        android:layout_below="@+id/linearLayout5" >
+            android:id="@+id/linearLayout4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/linearLayout3"
+            android:layout_alignRight="@+id/linearLayout3"
+            android:layout_below="@+id/linearLayout3">
 
         <Spinner
-            android:id="@+id/minSpinner"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.50" />
+                android:id="@+id/charsetSpinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.50"/>
 
         <Spinner
-            android:id="@+id/maxSpinner"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.50" />
+                android:id="@+id/userSpinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.50"/>
     </LinearLayout>
 
-   <LinearLayout
-       android:id="@+id/linearLayout7"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_alignLeft="@+id/linearLayout6"
-       android:layout_alignParentBottom="true"
-       android:layout_alignRight="@+id/linearLayout6" >
+    <LinearLayout
+            android:id="@+id/linearLayout5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/linearLayout4"
+            android:layout_alignRight="@+id/linearLayout4"
+            android:layout_below="@+id/linearLayout4">
 
-       <ToggleButton
-           android:id="@+id/startButton"
-           android:layout_width="76dp"
-           android:layout_height="wrap_content"
-           android:textOff="START"
-           android:textOn="STOP" />
+        <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.50"
+                android:text="@string/min_length"
+                android:textAllCaps="true"
+                android:fontFamily="sans-serif-condensed"
+                android:textColor="@color/app_color"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
 
-       <RelativeLayout
-           xmlns:android="http://schemas.android.com/apk/res/android"
-           xmlns:tools="http://schemas.android.com/tools"
-           android:layout_width="fill_parent"
-           android:layout_height="fill_parent"
-           android:orientation="vertical"
-           android:paddingLeft="10dp" >
-       
-       <TextView
-           android:id="@+id/statusText"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:text="Stopped ..."
-           android:textAppearance="?android:attr/textAppearanceMedium"
-           android:textColor="#888888"
-           tools:ignore="HardcodedText" />
+        <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.50"
+                android:text="@string/max_length"
+                android:textAllCaps="true"
+                android:fontFamily="sans-serif-condensed"
+                android:textColor="@color/app_color"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
+    </LinearLayout>
 
-       <ProgressBar
-           android:id="@+id/progressBar"
-           style="?android:attr/progressBarStyleHorizontal"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_alignParentLeft="true"
-           android:layout_alignParentRight="true"
-           android:layout_below="@+id/statusText" />
+    <LinearLayout
+            android:id="@+id/linearLayout6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/linearLayout5"
+            android:layout_alignRight="@+id/linearLayout5"
+            android:layout_below="@+id/linearLayout5">
 
-       <ProgressBar
-           android:id="@+id/activity"
-           style="?android:attr/progressBarStyleSmall"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_above="@+id/progressBar"
-           android:layout_alignParentRight="true"
-           android:visibility="invisible" />
-  
-       </RelativeLayout>
-   </LinearLayout>
+        <Spinner
+                android:id="@+id/minSpinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.50"/>
+
+        <Spinner
+                android:id="@+id/maxSpinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.50"/>
+    </LinearLayout>
+
+    <LinearLayout
+            android:id="@+id/linearLayout7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/linearLayout6"
+            android:layout_alignParentBottom="true"
+            android:layout_alignRight="@+id/linearLayout6">
+
+        <ToggleButton
+                android:id="@+id/startButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOff="@string/start"
+                android:textOn="@string/stop"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp"
+                android:textAllCaps="true"
+                android:fontFamily="sans-serif-condensed"/>
+
+        <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical"
+                android:paddingLeft="8dp">
+
+            <TextView
+                    android:id="@+id/statusText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stopped"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/gray_text"/>
+
+            <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/statusText"/>
+
+            <ProgressBar
+                    android:id="@+id/activity"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/progressBar"
+                    android:layout_alignParentRight="true"
+                    android:visibility="invisible"/>
+
+        </RelativeLayout>
+    </LinearLayout>
 
 </RelativeLayout>
 

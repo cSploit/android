@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
  
-  <item android:id="@+id/add"       android:title="Add"       android:icon="@android:drawable/ic_input_add"  android:showAsAction="always"/>
+  <item android:id="@+id/add"       android:title="Add"       android:icon="@drawable/target_add"  android:showAsAction="always"/>
   <item android:id="@+id/scan"      android:title="Scan"      android:icon="@drawable/ic_refresh" android:showAsAction="always"/>
   <item android:id="@+id/wifi_scan" android:title="WiFi Scan" android:icon="@drawable/ic_wifi_signal_4"      android:showAsAction="always"/>
   
