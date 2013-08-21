@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger>
+
+    <dataSet config="DSploitActionbarsherlockUnspecified.aar" >
+        <source path="/home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/assets" />
+    </dataSet>
+    <dataSet config="main" >
+        <source path="/home/androguide/Development/Android/Projects/DSploit/dSploit/assets" >
+            <file
+                name="dsploit.keystore"
+                path="/home/androguide/Development/Android/Projects/DSploit/dSploit/assets/dsploit.keystore" />
+            <file
+                name="tools.zip"
+                path="/home/androguide/Development/Android/Projects/DSploit/dSploit/assets/tools.zip" />
+        </source>
+    </dataSet>
+    <dataSet config="debug" >
+        <source path="/home/androguide/Development/Android/Projects/DSploit/dSploit/src/debug/assets" />
+    </dataSet>
+
+</merger>

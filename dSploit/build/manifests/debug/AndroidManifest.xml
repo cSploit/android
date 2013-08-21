@@ -1,0 +1,59 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0.31b" package="it.evilsocket.dsploit">
+
+    <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="18"/>
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
+    <application android:icon="@drawable/ic_launcher" android:label="@string/app_name" android:name="it.evilsocket.dsploit.DSploitApplication" android:theme="@style/Theme.DSploitActionBarStyle">
+        <activity android:configChanges="keyboardHidden|orientation" android:label="@string/title_activity_main" android:name="it.evilsocket.dsploit.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <service android:enabled="true" android:name="it.evilsocket.dsploit.net.NetworkDiscovery"/>
+        <service android:enabled="true" android:name="it.evilsocket.dsploit.core.UpdateChecker"/>
+
+        <activity android:configChanges="keyboardHidden|orientation" android:label="@string/title_activity_main" android:name="it.evilsocket.dsploit.WifiScannerActivity">
+        </activity>
+        <activity android:configChanges="keyboardHidden|orientation" android:label="@string/title_activity_main" android:name="it.evilsocket.dsploit.SettingsActivity">
+        </activity>
+        <activity android:configChanges="keyboardHidden|orientation" android:label="@string/title_activity_main" android:name="it.evilsocket.dsploit.gui.DirectoryPicker">
+        </activity>
+        <activity android:configChanges="keyboardHidden|orientation" android:label="@string/title_activity_main" android:name="it.evilsocket.dsploit.ActionActivity">
+        </activity>
+        <activity android:configChanges="keyboardHidden|orientation" android:label="@string/title_activity_main" android:name="it.evilsocket.dsploit.plugins.RouterPwn">
+        </activity>
+        <activity android:configChanges="keyboardHidden|orientation" android:label="@string/title_activity_main" android:name="it.evilsocket.dsploit.plugins.Traceroute">
+        </activity>
+        <activity android:configChanges="keyboardHidden|orientation" android:label="@string/title_activity_main" android:name="it.evilsocket.dsploit.plugins.PortScanner">
+        </activity>
+        <activity android:configChanges="keyboardHidden|orientation" android:label="@string/title_activity_main" android:name="it.evilsocket.dsploit.plugins.Inspector">
+        </activity>
+        <activity android:configChanges="keyboardHidden|orientation" android:label="@string/title_activity_main" android:name="it.evilsocket.dsploit.plugins.ExploitFinder">
+        </activity>
+        <activity android:configChanges="keyboardHidden|orientation" android:label="@string/title_activity_main" android:name="it.evilsocket.dsploit.plugins.mitm.MITM">
+        </activity>
+        <activity android:configChanges="keyboardHidden|orientation" android:label="@string/title_activity_main" android:name="it.evilsocket.dsploit.plugins.mitm.Sniffer">
+        </activity>
+        <activity android:configChanges="keyboardHidden|orientation" android:label="@string/title_activity_main" android:name="it.evilsocket.dsploit.plugins.mitm.PasswordSniffer">
+        </activity>
+        <activity android:configChanges="keyboardHidden|orientation" android:label="@string/title_activity_main" android:name="it.evilsocket.dsploit.plugins.mitm.Hijacker">
+        </activity>
+        <activity android:configChanges="keyboardHidden|orientation" android:label="@string/title_activity_main" android:name="it.evilsocket.dsploit.plugins.mitm.HijackerWebView">
+        </activity>
+        <activity android:configChanges="keyboardHidden|orientation" android:label="@string/title_activity_main" android:name="it.evilsocket.dsploit.plugins.LoginCracker">
+        </activity>
+        <activity android:configChanges="keyboardHidden|orientation" android:label="@string/title_activity_main" android:name="it.evilsocket.dsploit.plugins.PacketForger">
+        </activity>
+    </application>
+
+</manifest>

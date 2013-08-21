@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content">
+
+    <PreferenceCategory android:title="General">
+
+        <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="PREF_CHECK_UPDATES"
+                android:summary="Check for updates everytime the application is started."
+                android:title="Check for Updates"/>
+
+        <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="PREF_WAKE_LOCK"
+                android:summary="Prevents the device going in sleep mode while the application is running."
+                android:title="Wake Lock"/>
+
+        <Preference
+                android:key="PREF_SAVE_PATH"
+                android:summary="Global save path to put every log file."
+                android:title="Save Path"/>
+
+        <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="PREF_DEBUG_ERROR_LOGGING"
+                android:summary="Enable or disable error logging on a debug file."
+                android:title="Debug Error Logging"/>
+
+        <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="PREF_ENABLE_PROFILER"
+                android:summary="Enable or disable network code profiler logging."
+                android:title="Code Profiler"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Modules">
+
+        <EditTextPreference
+                android:defaultValue="1.0"
+                android:inputType="numberDecimal"
+                android:key="PREF_SNIFFER_SAMPLE_TIME"
+                android:summary="Sample time in seconds of the sniffer module network statistics."
+                android:title="Sniffer Sample Time"/>
+
+        <EditTextPreference
+                android:defaultValue="8080"
+                android:inputType="number"
+                android:key="PREF_HTTP_PROXY_PORT"
+                android:summary="MITM transparent proxy port to listen on, change this if you have problems starting the proxy."
+                android:title="HTTP Proxy Port"/>
+
+        <EditTextPreference
+                android:defaultValue="8081"
+                android:inputType="number"
+                android:key="PREF_HTTP_SERVER_PORT"
+                android:summary="MITM http server port to listen on, change this if you have problems starting the server."
+                android:title="HTTP Server Port"/>
+
+        <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="PREF_HTTPS_REDIRECT"
+                android:summary="Redirect traffic from HTTPS to HTTP."
+                android:title="SSL Stripping"/>
+
+        <EditTextPreference
+                android:defaultValue="8082"
+                android:inputType="number"
+                android:key="PREF_HTTPS_REDIRECTOR_PORT"
+                android:summary="MITM https redirection server port to listen on."
+                android:title="HTTPS Redirector Port"/>
+
+        <EditTextPreference
+                android:defaultValue="10485760"
+                android:inputType="number"
+                android:key="PREF_HTTP_MAX_BUFFER_SIZE"
+                android:summary="Max buffer size of HTTP requests handled by the transparent proxy."
+                android:title="HTTP Max Buffer Size"/>
+
+        <EditTextPreference
+                android:defaultValue="dsploit-password-sniff.log"
+                android:key="PREF_PASSWORD_FILENAME"
+                android:summary="Name of the file to use to log passwords and cookies."
+                android:title="Password Sniffer File"/>
+    </PreferenceCategory>
+
+</PreferenceScreen><!-- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/res/layout/preferences.xml -->

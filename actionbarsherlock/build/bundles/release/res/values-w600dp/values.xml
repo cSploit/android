@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values-w600dp/abs__dimens.xml -->
+    <integer name="abs__max_action_buttons">5</integer>
+
+</resources>

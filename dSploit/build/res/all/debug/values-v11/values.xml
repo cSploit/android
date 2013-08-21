@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-v11/values.xml -->
+    <style name="Sherlock.__Theme" parent="android:Theme.Holo">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+    </style>
+
+    <style name="Sherlock.__Theme.Light" parent="android:Theme.Holo.Light">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+    </style>
+
+</resources>
