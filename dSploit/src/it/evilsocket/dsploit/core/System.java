@@ -70,6 +70,7 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.WifiScannerActivity;
 import it.evilsocket.dsploit.net.Endpoint;
 import it.evilsocket.dsploit.net.Network;
@@ -109,7 +110,7 @@ public class System {
     private static WifiLock mWifiLock = null;
     private static WakeLock mWakeLock = null;
     private static Network mNetwork = null;
-    private static Vector<Target> mTargets = null;
+    private static final Vector<Target> mTargets = new Vector<Target>();
     private static int mCurrentTarget = 0;
     private static Map<String, String> mServices = null;
     private static Map<String, String> mPorts = null;
@@ -143,7 +144,6 @@ public class System {
             mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
             mUpdateManager = new UpdateManager(mContext);
             mPlugins = new ArrayList<Plugin>();
-            mTargets = new Vector<Target>();
             mOpenPorts = new SparseIntArray(3);
 
             // if we are here, network initialization didn't throw any error, lock wifi
@@ -152,17 +152,17 @@ public class System {
             if (mWifiLock == null)
                 mWifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "wifiLock");
 
-            if (mWifiLock.isHeld() == false)
+            if (!mWifiLock.isHeld())
                 mWifiLock.acquire();
 
             // wake lock if enabled
-            if (getSettings().getBoolean("PREF_WAKE_LOCK", true) == true) {
+            if (getSettings().getBoolean("PREF_WAKE_LOCK", true)) {
                 PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
 
                 if (mWakeLock == null)
                     mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "wakeLock");
 
-                if (mWakeLock.isHeld() == false)
+                if (!mWakeLock.isHeld())
                     mWakeLock.acquire();
             }
 
@@ -231,12 +231,12 @@ public class System {
     }
 
     public static boolean checkNetworking(final Activity current) {
-        if (Network.isWifiConnected(mContext) == false) {
+        if (!Network.isWifiConnected(mContext)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(current);
 
             builder.setCancelable(false);
-            builder.setTitle("Error");
-            builder.setMessage("WiFi connectivity went down.");
+            builder.setTitle(current.getString(R.string.error));
+            builder.setMessage(current.getString(R.string.wifi_went_down));
             builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -249,7 +249,6 @@ public class System {
                     intent.putExtras(bundle);
 
                     current.setResult(Activity.RESULT_OK, intent);
-
                     current.finish();
                 }
             });
@@ -277,7 +276,7 @@ public class System {
                 filename = (new File(Environment.getExternalStorageDirectory().toString(), ERROR_LOG_FILENAME)).getAbsolutePath();
 
         if (e != null) {
-            if (e.getMessage() != null && e.getMessage().isEmpty() == false)
+            if (e.getMessage() != null && !e.getMessage().isEmpty())
                 message = e.getMessage();
 
             else if (e.toString() != null)
@@ -290,7 +289,7 @@ public class System {
 
             trace = sWriter.toString();
 
-            if (mContext != null && getSettings().getBoolean("PREF_DEBUG_ERROR_LOGGING", false) == true) {
+            if (mContext != null && getSettings().getBoolean("PREF_DEBUG_ERROR_LOGGING", false)) {
                 try {
                     FileWriter fWriter = new FileWriter(filename, true);
                     BufferedWriter bWriter = new BufferedWriter(fWriter);
@@ -314,7 +313,7 @@ public class System {
 
         data = data.trim();
 
-        if (mContext != null && getSettings().getBoolean("PREF_DEBUG_ERROR_LOGGING", false) == true) {
+        if (mContext != null && getSettings().getBoolean("PREF_DEBUG_ERROR_LOGGING", false)) {
             try {
                 FileWriter fWriter = new FileWriter(filename, true);
                 BufferedWriter bWriter = new BufferedWriter(fWriter);
@@ -351,6 +350,7 @@ public class System {
     }
 
     public static String getLibraryPath() {
+        //noinspection ConstantConditions
         return mContext.getFilesDir().getAbsolutePath() + "/tools/libs";
     }
 
@@ -365,7 +365,7 @@ public class System {
             String line = null;
 
             while ((line = reader.readLine()) != null) {
-                if (line.isEmpty() == false && line.startsWith("/")) {
+                if (!line.isEmpty() && line.startsWith("/")) {
                     mSuPath = line;
                     break;
                 }
@@ -386,7 +386,9 @@ public class System {
                 mServices = new HashMap<String, String>();
                 mPorts = new HashMap<String, String>();
 
+                @SuppressWarnings("ConstantConditions")
                 FileInputStream fstream = new FileInputStream(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-services");
+
                 DataInputStream in = new DataInputStream(fstream);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                 String line;
@@ -415,14 +417,16 @@ public class System {
         if (mVendors == null) {
             try {
                 mVendors = new HashMap<String, String>();
+                @SuppressWarnings("ConstantConditions")
                 FileInputStream fstream = new FileInputStream(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-mac-prefixes");
+
                 DataInputStream in = new DataInputStream(fstream);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                 String line;
 
                 while ((line = reader.readLine()) != null) {
                     line = line.trim();
-                    if (line.startsWith("#") == false && line.isEmpty() == false) {
+                    if (!line.startsWith("#") && !line.isEmpty()) {
                         String[] tokens = line.split(" ", 2);
 
                         if (tokens.length == 2)
@@ -456,7 +460,7 @@ public class System {
     public static String getAppVersionName() {
         try {
             PackageManager manager = mContext.getPackageManager();
-            PackageInfo info = manager.getPackageInfo(mContext.getPackageName(), 0);
+            PackageInfo info = manager != null ? manager.getPackageInfo(mContext.getPackageName(), 0) : null;
 
             return info.versionName;
         } catch (NameNotFoundException e) {
@@ -469,6 +473,7 @@ public class System {
     public static boolean isServiceRunning(String name) {
         ActivityManager manager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
 
+        //noinspection ConstantConditions
         for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (name.equals(service.service.getClassName()))
                 return true;
@@ -483,7 +488,7 @@ public class System {
         int available_code = mOpenPorts.get(port);
 
         if (available_code != 0)
-            return available_code == 1 ? false : true;
+            return available_code != 1;
 
         try {
             // attempt 3 times since proxy and server could be still releasing
@@ -516,7 +521,7 @@ public class System {
         ArrayList<String> files = new ArrayList<String>();
         File storage = new File(mStoragePath);
 
-        if (storage != null && storage.exists()) {
+        if (storage.exists()) {
             String[] children = storage.list();
 
             if (children != null && children.length > 0) {
@@ -533,17 +538,17 @@ public class System {
     public static String saveSession(String sessionName) throws IOException {
         StringBuilder builder = new StringBuilder();
         String filename = mStoragePath + '/' + sessionName + ".dss",
-                session = null;
+                session;
 
         builder.append(SESSION_MAGIC + "\n");
 
         // skip the network target
-        builder.append((mTargets.size() - 1) + "\n");
+        builder.append(mTargets.size() - 1).append("\n");
         for (Target target : mTargets) {
             if (target.getType() != Target.Type.NETWORK)
                 target.serialize(builder);
         }
-        builder.append(mCurrentTarget + "\n");
+        builder.append(mCurrentTarget).append("\n");
 
         session = builder.toString();
 
@@ -563,7 +568,7 @@ public class System {
         ArrayList<String> files = new ArrayList<String>();
         File storage = new File(mStoragePath);
 
-        if (storage != null && storage.exists()) {
+        if (storage.exists()) {
             String[] children = storage.list();
 
             if (children != null && children.length > 0) {
@@ -584,14 +589,14 @@ public class System {
 
         builder.append(SESSION_MAGIC + "\n");
 
-        builder.append((session.mUserName == null ? "null" : session.mUserName) + "\n");
-        builder.append(session.mHTTPS + "\n");
-        builder.append(session.mAddress + "\n");
-        builder.append(session.mDomain + "\n");
-        builder.append(session.mUserAgent + "\n");
-        builder.append(session.mCookies.size() + "\n");
+        builder.append(session.mUserName == null ? "null" : session.mUserName).append("\n");
+        builder.append(session.mHTTPS).append("\n");
+        builder.append(session.mAddress).append("\n");
+        builder.append(session.mDomain).append("\n");
+        builder.append(session.mUserAgent).append("\n");
+        builder.append(session.mCookies.size()).append("\n");
         for (BasicClientCookie cookie : session.mCookies.values()) {
-            builder.append(cookie.getName() + "=" + cookie.getValue() + "; domain=" + cookie.getDomain() + "; path=/" + (session.mHTTPS ? ";secure" : "") + "\n");
+            builder.append(cookie.getName()).append("=").append(cookie.getValue()).append("; domain=").append(cookie.getDomain()).append("; path=/").append(session.mHTTPS ? ";secure" : "").append("\n");
         }
 
         buffer = builder.toString();
@@ -600,7 +605,6 @@ public class System {
         GZIPOutputStream gzip = new GZIPOutputStream(ostream);
 
         gzip.write(buffer.getBytes());
-
         gzip.close();
 
         mSessionName = sessionName;
@@ -613,13 +617,12 @@ public class System {
 
         if (file.exists() && file.length() > 0) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
-            String line = null;
-
+            String line;
 
             // begin decoding procedure
             try {
                 line = reader.readLine();
-                if (line == null || line.equals(SESSION_MAGIC) == false)
+                if (line == null || !line.equals(SESSION_MAGIC))
                     throw new Exception("Not a dSploit session file.");
 
                 reset();
@@ -629,7 +632,7 @@ public class System {
                 for (int i = 0; i < targets; i++) {
                     Target target = new Target(reader);
 
-                    if (hasTarget(target) == false) {
+                    if (!hasTarget(target)) {
                         System.addOrderedTarget(target);
                     } else {
                         for (int j = 0; j < mTargets.size(); j++) {
@@ -642,14 +645,11 @@ public class System {
                 }
 
                 mCurrentTarget = Integer.parseInt(reader.readLine());
-
                 reader.close();
+
             } catch (Exception e) {
                 reset();
-
-                if (reader != null)
-                    reader.close();
-
+                reader.close();
                 throw e;
             }
         } else
@@ -657,17 +657,17 @@ public class System {
     }
 
     public static Session loadHijackerSession(String filename) throws Exception {
-        Session session = null;
+        Session session;
         File file = new File(mStoragePath + '/' + filename);
 
         if (file.exists() && file.length() > 0) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
-            String line = null;
+            String line;
 
             // begin decoding procedure
             try {
                 line = reader.readLine();
-                if (line == null || line.equals(SESSION_MAGIC) == false)
+                if (line == null || !line.equals(SESSION_MAGIC))
                     throw new Exception("Not a dSploit hijacker session file.");
 
                 session = new Session();
@@ -689,8 +689,7 @@ public class System {
 
                 reader.close();
             } catch (Exception e) {
-                if (reader != null)
-                    reader.close();
+                reader.close();
 
                 throw e;
             }
@@ -860,7 +859,7 @@ public class System {
     }
 
     public static boolean addOrderedTarget(Target target) {
-        if (target != null && hasTarget(target) == false) {
+        if (target != null && !hasTarget(target)) {
             for (int i = 0; i < getTargets().size(); i++) {
                 if (getTarget(i).comesAfter(target)) {
                     addTarget(i, target);
@@ -1010,7 +1009,7 @@ public class System {
             Log.d(TAG, "Killing any running instance of " + tools);
             Shell.exec("killall -9 " + tools.trim());
 
-            if (releaseLocks == true) {
+            if (releaseLocks) {
                 Log.d(TAG, "Releasing locks.");
 
                 if (mWifiLock != null && mWifiLock.isHeld())

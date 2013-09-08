@@ -83,8 +83,8 @@ import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_UPDATE;
 import static it.evilsocket.dsploit.net.NetworkDiscovery.NEW_ENDPOINT;
 
 public class MainActivity extends SherlockListActivity {
+    private String NO_WIFI_UPDATE_MESSAGE;
     private static final int WIFI_CONNECTION_REQUEST = 1012;
-    private final String NO_WIFI_UPDATE_MESSAGE = "No WiFi connection available, the application will just check for updates. #STATUS#";
     private boolean isWifiAvailable = false;
     private TargetAdapter mTargetAdapter = null;
     private NetworkDiscovery mNetworkDiscovery = null;
@@ -207,7 +207,7 @@ public class MainActivity extends SherlockListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.target_layout);
-
+        NO_WIFI_UPDATE_MESSAGE = getString(R.string.no_wifi_available);
         isWifiAvailable = Network.isWifiConnected(this);
         boolean connectivityAvailable = isWifiAvailable || Network.isConnectivityAvailable(this);
 
@@ -604,7 +604,7 @@ public class MainActivity extends SherlockListActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View row = convertView;
-            TargetHolder holder = null;
+            TargetHolder holder;
 
             if (row == null) {
                 LayoutInflater inflater = (LayoutInflater) MainActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

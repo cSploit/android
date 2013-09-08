@@ -77,7 +77,7 @@ public class DirectoryPicker extends ListActivity {
         String name = dir.getName();
         if (name.length() == 0)
             name = "/";
-        btnChoose.setText("Choose " + "'" + name + "'");
+        btnChoose.setText(getString(R.string.choose_dir) + "'" + name + "'");
         btnChoose.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 returnDir(dir.getAbsolutePath());
@@ -89,7 +89,7 @@ public class DirectoryPicker extends ListActivity {
 
         if (!dir.canRead()) {
             Context context = getApplicationContext();
-            String msg = "Could not read folder contents.";
+            String msg = getString(R.string.could_not_read_folder);
             if (context != null) Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
             return;
         }

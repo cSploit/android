@@ -53,11 +53,8 @@ public class UpdateManager {
     private static double getVersionCode(String version) {
         String[] padded = new String[3],
                 parts = version.split("[^0-9a-zA-Z]");
-        String item = "",
-                digit = "",
-                letter = "";
-        double code = 0,
-                coeff = 0;
+        String item, digit, letter;
+        double code = 0, coeff;
         int i, j;
         char c;
 
@@ -103,7 +100,7 @@ public class UpdateManager {
                     URL url = new URL(REMOTE_VERSION_URL);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    String line = null,
+                    String line,
                             buffer = "";
 
                     while ((line = reader.readLine()) != null) {
@@ -182,9 +179,11 @@ public class UpdateManager {
 
             connection.connect();
 
+            //noinspection ResultOfMethodCallIgnored
             file.mkdirs();
             file = new File(file, fileName);
             if (file.exists())
+                //noinspection ResultOfMethodCallIgnored
                 file.delete();
 
             FileOutputStream writer = new FileOutputStream(file);
@@ -195,7 +194,7 @@ public class UpdateManager {
                     sampled = 0;
             long time = java.lang.System.currentTimeMillis();
             double speed = 0.0,
-                    deltat = 0.0;
+                    deltat;
 
             while (progress.isShowing() && (read = reader.read(buffer)) != -1) {
                 writer.write(buffer, 0, read);

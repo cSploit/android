@@ -141,8 +141,8 @@ public class ThomsonKeygen extends Keygen {
             i = (0xFF & routerESSID[1]) * 3;
             offset = ((0xFF & table[i]) << 16) | ((0xFF & table[i + 1]) << 8)
                     | (0xFF & table[i + 2]);
-			/*
-			 * There's no check here because humans are lazy people and because
+            /*
+             * There's no check here because humans are lazy people and because
 			 * it doesn't matter
 			 */
             lenght = ((0xFF & table[i + 3]) << 16)

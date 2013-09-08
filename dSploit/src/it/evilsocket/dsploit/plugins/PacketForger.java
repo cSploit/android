@@ -55,7 +55,6 @@ public class PacketForger extends Plugin implements OnClickListener {
     private byte[] mBinaryData = null;
     private EditText mResponse = null;
     private ToggleButton mSendButton = null;
-    private Button mSendWOL = null;
     private boolean mRunning = false;
     private Thread mThread = null;
     private Socket mSocket = null;
@@ -82,7 +81,7 @@ public class PacketForger extends Plugin implements OnClickListener {
         mData = (EditText) findViewById(R.id.dataText);
         mResponse = (EditText) findViewById(R.id.responseText);
         mSendButton = (ToggleButton) findViewById(R.id.sendButton);
-        mSendWOL = (Button) findViewById(R.id.sendWOL);
+        Button mSendWOL = (Button) findViewById(R.id.sendWOL);
 
         if (System.getCurrentTarget().getType() != Type.ENDPOINT)
             mSendWOL.setVisibility(View.INVISIBLE);

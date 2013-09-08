@@ -32,7 +32,7 @@ public class Endpoint {
     private byte[] mHardware = null;
 
     public static byte[] parseMacAddress(String macAddress) {
-        if (macAddress != null && macAddress.equals("null") == false && macAddress.isEmpty() == false) {
+        if (macAddress != null && !macAddress.equals("null") && !macAddress.isEmpty()) {
 
             String[] bytes = macAddress.split(":");
             byte[] parsed = new byte[bytes.length];
@@ -75,8 +75,8 @@ public class Endpoint {
     }
 
     public void serialize(StringBuilder builder) {
-        builder.append(mAddress.getHostAddress() + "\n");
-        builder.append(getHardwareAsString() + "\n");
+        builder.append(mAddress.getHostAddress()).append("\n");
+        builder.append(getHardwareAsString()).append("\n");
     }
 
     public boolean equals(Endpoint endpoint) {

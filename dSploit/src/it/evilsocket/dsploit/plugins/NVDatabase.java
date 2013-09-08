@@ -41,10 +41,9 @@ public class NVDatabase {
 
     public static ArrayList<Vulnerability> search(String query) {
         ArrayList<Vulnerability> results = new ArrayList<Vulnerability>();
-        URLConnection connection = null;
-        BufferedReader reader = null;
-        String line = null,
-                body = "";
+        URLConnection connection;
+        BufferedReader reader;
+        String line, body = "";
 
         try {
             query = "query=" + URLEncoder.encode(query, "UTF-8") + "&search_type=all&cves=on";
@@ -62,7 +61,7 @@ public class NVDatabase {
 
             reader.close();
 
-            Matcher matcher = null;
+            Matcher matcher;
             ArrayList<String> identifiers = new ArrayList<String>(),
                     summaries = new ArrayList<String>(),
                     severities = new ArrayList<String>();

@@ -46,7 +46,7 @@ public class Inspector extends Plugin {
     public Inspector() {
         super(
                 "Inspector",
-                "Perform target operating system and services deep detection ( slower than port scanner, but more accurate ).",
+                "Perform target operating system and services deep detection (slower than port scanner, but more accurate).",
                 new Target.Type[]{Target.Type.ENDPOINT, Target.Type.REMOTE},
                 R.layout.plugin_inspector,
                 R.drawable.action_inspect

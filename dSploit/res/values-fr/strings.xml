@@ -70,13 +70,13 @@
     <string name="exit">Quitter</string>
     <string name="close_confirm">Ceci arrêtera dSploit, voulez-vous vraiment continuer ?</string>
     <string name="press_back">Appuyez sur retour à nouveau pour quitter l\'application.</string>
-    <string name="selected_">Selectionné </string>
+    <string name="selected_">Selectionné&#160;</string>
     <string name="github_issues">https://github.com/evilsocket/dsploit/issues/new</string>
     <string name="no_session_found">Aucune session trouvée sur la carte SD.</string>
     <string name="select_session_file">Choisir un fichier de session depuis la carte SD:</string>
     <string name="select_session">Choisir Session</string>
     <string name="invalid_session">Nom de session invalide.</string>
-    <string name="session_saved_to">Session sauvegardée vers</string>
+    <string name="session_saved_to">Session sauvegardée vers&#160;</string>
     <string name="save_session">Sauvegarder Session</string>
     <string name="enter_session_name">Insérez le nom du fichier de session :</string>
     <string name="new_session_started">Nouvelle session démarrée</string>
@@ -105,7 +105,7 @@
     <string name="scanning">Scan en cours&#8230;</string>
     <string name="invalid_filename">Nom de fichier invalide.</string>
     <string name="something_went_wrong">Il y a eu un problème, veuillez re-sélectionner une cible valide.</string>
-    <string name="selected">Selectionné</string>
+    <string name="selected">Sélectionné&#160;</string>
     <string name="nothing_found"><![CDATA[<small><i>Rien Trouvé :(</i></small>]]></string>
     <string name="no_open_ports">Aucun port ouvert détécté sur la cible actuelle, veuillez d\'abord lancer l\'inspecteur.</string>
     <string name="no_infos_on_target">Aucune information spécifique à propos des services en cours sur la cible actuelle, veuillez d\'abord lancer l\'inspecteur.</string>
@@ -118,7 +118,7 @@
     <string name="couldnt_send_wol_packet">Impossible d\'envoyer un paquet WOL à une cible sans connaître son adresse MAC à l\'avance.</string>
     <string name="no_activities_for_url">Aucune activité displonible pour ce type d\'URL.</string>
     <string name="select_ports">Choisir Ports</string>
-    <string name="enter_ports_list">Insérez une liste de ports séparés par une virgule : </string>
+    <string name="enter_ports_list">Insérez une liste de ports séparés par une virgule :&#160;</string>
     <string name="invalid_port_">Port non-valide \\\'</string>
     <string name="port_must_be_greater">Le port doit être supérieur à 0 et inférieur à 65535.</string>
     <string name="invalid_ports">Ports non-valide spécifiés.</string>
@@ -139,5 +139,42 @@
     <string name="submit_issue">Soumettre un bug/problème</string>
     <string name="about">À propos</string>
     <string name="select_custom_ports">Choisir Ports Manuellement</string>
-
+    <string name="select_target">Sélectionnez une cible dans la liste ci-dessous, ou restez appuyé pour choisir un alias</string>
+    <string name="generating_keys">Création des clefs en cours&#8230;</string>
+    <string name="no_wifi_available">Aucune connection Wi-Fi n\'est disponible, l\'application ne fera que vérifier si une mise à jour est disponible. #STATUS#</string>
+    <string name="loading_changelog">Chargement du Changelog&#8230;</string>
+    <string name="something_went_wrong_changelog"><![CDATA[<html><body><p><b>Oups! Le changelog n\'a pas pu être récupéré :</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
+    <string name="cancel_dialog">Annuler</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+    <string name="connect">Se Connecter</string>
+    <string name="crack">Cracker</string>
+    <string name="could_not_read_folder">Impossible de lire le contenu du dossier.</string>
+    <string name="choose_dir">Choisir&#160;</string>
+    <string name="vulnerability_finder">Scanner de Vulnérabilités</string>
+    <string name="vulnerability_finder_desc">Cherche des vulnérabilités depuis la National Vulnerability Database en fonction des services en cours d\'exécution sur la machine ciblée.</string>
+    <string name="inspector">Inspecteur</string>
+    <string name="inspector_desc">Effecture une détection profonde des services et du système d\'exploitation de la cible (plus lent que le scanner de ports mais plus précis).</string>
+    <string name="login_cracker">Cracker de Login</string>
+    <string name="login_cracker_desc">Un cracker de login réseau extrêmement rapide et supportant un grand nombre de différents services.</string>
+    <string name="packet_forger">Forgeur de Paquets</string>
+    <string name="packet_forger_desc">Forge et envoie un paquet TCP ou UDP customisé à la cible.</string>
+    <string name="port_scanner">Scanner de Ports</string>
+    <string name="port_scanner_desc">Effectue un scan de port SYN sur la cible.</string>
+    <string name="router_pwn">Routeur PWN</string>
+    <string name="router_pwn_desc">Lance le service de http://routerpwn.com/ afin de pown votre routeur.</string>
+    <string name="trace">Trace</string>
+    <string name="trace_desc">Effectue une traceroute sur la cible.</string>
+    <string name="mitm">MITM</string>
+    <string name="mitm_desc">Effectue différentes attaques de type man-in-the-middle, tels que sniffing de réseau, manipulation de trafic, etc&#8230;
+    </string>
+    <string name="network_subnet_mask">Ceci est votre masque de sous-réseau</string>
+    <string name="gateway_router">(Votre passerelle réseau / routeur)</string>
+    <string name="this_device">&#160;(Cet appareil)</string>
+    <string name="wifi_went_down">La connectivité Wi-Fi s\'est arrêtée.</string>
+    <string name="hijack_session">Hijacking de Session</string>
+    <string name="start_hijacking">Arrêter le sniffing et commencer le hijacking de session ?</string>
+    <string name="start_hijacking2">Commencer le hijacking de session ?</string>
+    <string name="set_session_filename">Entrez le nom du fichier de session :&#160;</string>
+    <string name="session_sniffer">Sniffeur de Session</string>
 </resources>

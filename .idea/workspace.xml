@@ -1,0 +1,1737 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AndroidLayoutPreviewToolWindow">
+    <option name="state">
+      <GlobalState />
+    </option>
+  </component>
+  <component name="AndroidLayouts">
+    <shared>
+      <config />
+    </shared>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="e55937d6-683b-42ee-9226-16c207fff22d" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dictionaries/androguide.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/android_support_v4.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/bugsense3_0_6.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/gradle.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/juniversalchardet_1_0_3.xml" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/DSploit.iml" afterPath="$PROJECT_DIR$/dSploit.iml" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/dSploit/dSploit.iml" afterPath="$PROJECT_DIR$/dSploit/dSploit-dSploit.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/actionbarsherlock/res/drawable-hdpi/abs__ic_menu_moreoverflow_normal_holo_light.png" afterPath="$PROJECT_DIR$/actionbarsherlock/res/drawable-hdpi/abs__ic_menu_moreoverflow_normal_holo_light.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/actionbarsherlock/res/drawable-mdpi/abs__ic_menu_moreoverflow_normal_holo_light.png" afterPath="$PROJECT_DIR$/actionbarsherlock/res/drawable-mdpi/abs__ic_menu_moreoverflow_normal_holo_light.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/actionbarsherlock/res/drawable-xhdpi/abs__ic_menu_moreoverflow_normal_holo_light.png" afterPath="$PROJECT_DIR$/actionbarsherlock/res/drawable-xhdpi/abs__ic_menu_moreoverflow_normal_holo_light.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable-hdpi/abs__ic_menu_moreoverflow_normal_holo_light.png" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable-hdpi/abs__ic_menu_moreoverflow_normal_holo_light.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable-mdpi/abs__ic_menu_moreoverflow_normal_holo_light.png" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable-mdpi/abs__ic_menu_moreoverflow_normal_holo_light.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable-xhdpi/abs__ic_menu_moreoverflow_normal_holo_light.png" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable-xhdpi/abs__ic_menu_moreoverflow_normal_holo_light.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable-hdpi/abs__ic_menu_moreoverflow_normal_holo_light.png" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable-hdpi/abs__ic_menu_moreoverflow_normal_holo_light.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable-mdpi/abs__ic_menu_moreoverflow_normal_holo_light.png" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable-mdpi/abs__ic_menu_moreoverflow_normal_holo_light.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable-xhdpi/abs__ic_menu_moreoverflow_normal_holo_light.png" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable-xhdpi/abs__ic_menu_moreoverflow_normal_holo_light.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/classes.jar" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/classes.jar" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable-hdpi/target_remote.png" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable-hdpi/target_remote.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable-mdpi/target_remote.png" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable-mdpi/target_remote.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable-xhdpi/target_remote.png" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable-xhdpi/target_remote.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable-xxhdpi/target_remote.png" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable-xxhdpi/target_remote.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/net/ByteBuffer.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/net/ByteBuffer.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/gui/dialogs/ChangelogDialog.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/gui/dialogs/ChangelogDialog.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/gui/dialogs/ChoiceDialog.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/gui/dialogs/ChoiceDialog.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/gui/dialogs/ConfirmDialog.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/gui/dialogs/ConfirmDialog.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/gui/dialogs/CustomFilterDialog.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/gui/dialogs/CustomFilterDialog.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/gui/DirectoryPicker.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/gui/DirectoryPicker.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/net/Endpoint.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/net/Endpoint.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/ExploitFinder.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/ExploitFinder.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/mitm/Hijacker.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/mitm/Hijacker.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/net/IP4Address.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/net/IP4Address.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/gui/dialogs/InputDialog.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/gui/dialogs/InputDialog.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/Inspector.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/Inspector.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/wifi/Keygen.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/wifi/Keygen.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/mitm/MITM.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/mitm/MITM.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/MainActivity.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/MainActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/core/ManagedReceiver.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/core/ManagedReceiver.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/NVDatabase.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/NVDatabase.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/net/Network.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/net/Network.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/net/NetworkDiscovery.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/net/NetworkDiscovery.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/PacketForger.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/PacketForger.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/actionbarsherlock/build/source/r/debug/com/actionbarsherlock/R.java" afterPath="$PROJECT_DIR$/actionbarsherlock/build/source/r/debug/com/actionbarsherlock/R.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/actionbarsherlock/build/source/r/release/com/actionbarsherlock/R.java" afterPath="$PROJECT_DIR$/actionbarsherlock/build/source/r/release/com/actionbarsherlock/R.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/source/r/debug/com/actionbarsherlock/R.java" afterPath="$PROJECT_DIR$/dSploit/build/source/r/debug/com/actionbarsherlock/R.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/source/r/debug/it/evilsocket/dsploit/R.java" afterPath="$PROJECT_DIR$/dSploit/build/source/r/debug/it/evilsocket/dsploit/R.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/R.txt" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/R.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/gui/dialogs/RedirectionDialog.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/gui/dialogs/RedirectionDialog.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/RouterPwn.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/RouterPwn.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/SettingsActivity.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/SettingsActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/core/Shell.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/core/Shell.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/gui/dialogs/SpinnerDialog.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/gui/dialogs/SpinnerDialog.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/core/System.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/core/System.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/net/Target.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/net/Target.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/wifi/algorithms/ThomsonKeygen.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/wifi/algorithms/ThomsonKeygen.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/core/ToolsInstaller.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/core/ToolsInstaller.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/Traceroute.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/Traceroute.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/core/UpdateManager.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/core/UpdateManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/gui/dialogs/WifiCrackDialog.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/gui/dialogs/WifiCrackDialog.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/WifiScannerActivity.java" afterPath="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/WifiScannerActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/about_dialog.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/about_dialog.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/about_dialog.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/about_dialog.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__action_bar_home.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__action_bar_home.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__action_bar_home.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__action_bar_home.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__action_bar_tab.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__action_bar_tab.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__action_bar_tab.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__action_bar_tab.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__action_bar_tab_bar_view.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__action_bar_tab_bar_view.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__action_bar_tab_bar_view.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__action_bar_tab_bar_view.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__action_bar_title_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__action_bar_title_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__action_bar_title_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__action_bar_title_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__action_menu_item_layout.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__action_menu_item_layout.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__action_menu_item_layout.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__action_menu_item_layout.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__action_menu_layout.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__action_menu_layout.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__action_menu_layout.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__action_menu_layout.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__action_mode_bar.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__action_mode_bar.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__action_mode_bar.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__action_mode_bar.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__action_mode_close_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__action_mode_close_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout-large/abs__action_mode_close_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout-large/abs__action_mode_close_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__action_mode_close_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__action_mode_close_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout-large/abs__action_mode_close_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout-large/abs__action_mode_close_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__activated_background_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__activated_background_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__activated_background_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__activated_background_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__activated_background_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__activated_background_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__activated_background_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__activated_background_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__activity_chooser_view.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__activity_chooser_view.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__activity_chooser_view.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__activity_chooser_view.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__activity_chooser_view_list_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__activity_chooser_view_list_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__activity_chooser_view_list_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__activity_chooser_view_list_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__btn_cab_done_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__btn_cab_done_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__btn_cab_done_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__btn_cab_done_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__btn_cab_done_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__btn_cab_done_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__btn_cab_done_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__btn_cab_done_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__ic_clear.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__ic_clear.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__ic_clear.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__ic_clear.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__ic_clear_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__ic_clear_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__ic_clear_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__ic_clear_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__ic_menu_moreoverflow_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__ic_menu_moreoverflow_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__ic_menu_moreoverflow_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__ic_menu_moreoverflow_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__ic_menu_moreoverflow_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__ic_menu_moreoverflow_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__ic_menu_moreoverflow_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__ic_menu_moreoverflow_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__item_background_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__item_background_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__item_background_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__item_background_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__item_background_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__item_background_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__item_background_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__item_background_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__list_menu_item_checkbox.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__list_menu_item_checkbox.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__list_menu_item_checkbox.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__list_menu_item_checkbox.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__list_menu_item_icon.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__list_menu_item_icon.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__list_menu_item_icon.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__list_menu_item_icon.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__list_menu_item_radio.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__list_menu_item_radio.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__list_menu_item_radio.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__list_menu_item_radio.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__list_selector_background_transition_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__list_selector_background_transition_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__list_selector_background_transition_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__list_selector_background_transition_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__list_selector_background_transition_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__list_selector_background_transition_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__list_selector_background_transition_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__list_selector_background_transition_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__list_selector_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__list_selector_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__list_selector_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__list_selector_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__list_selector_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__list_selector_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__list_selector_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__list_selector_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__popup_menu_item_layout.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__popup_menu_item_layout.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__popup_menu_item_layout.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__popup_menu_item_layout.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/color/abs__primary_text_disable_only_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/color/abs__primary_text_disable_only_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/color/abs__primary_text_disable_only_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/color/abs__primary_text_disable_only_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/color/abs__primary_text_disable_only_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/color/abs__primary_text_disable_only_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/color/abs__primary_text_disable_only_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/color/abs__primary_text_disable_only_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/color/abs__primary_text_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/color/abs__primary_text_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/color/abs__primary_text_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/color/abs__primary_text_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/color/abs__primary_text_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/color/abs__primary_text_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/color/abs__primary_text_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/color/abs__primary_text_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__progress_horizontal_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__progress_horizontal_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__progress_horizontal_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__progress_horizontal_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__progress_horizontal_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__progress_horizontal_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__progress_horizontal_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__progress_horizontal_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__progress_medium_holo.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__progress_medium_holo.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable-v11/abs__progress_medium_holo.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable-v11/abs__progress_medium_holo.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__progress_medium_holo.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__progress_medium_holo.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable-v11/abs__progress_medium_holo.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable-v11/abs__progress_medium_holo.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__screen_action_bar.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__screen_action_bar.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout-xlarge/abs__screen_action_bar.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout-xlarge/abs__screen_action_bar.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__screen_action_bar.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__screen_action_bar.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout-xlarge/abs__screen_action_bar.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout-xlarge/abs__screen_action_bar.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__screen_action_bar_overlay.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__screen_action_bar_overlay.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout-xlarge/abs__screen_action_bar_overlay.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout-xlarge/abs__screen_action_bar_overlay.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__screen_action_bar_overlay.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__screen_action_bar_overlay.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout-xlarge/abs__screen_action_bar_overlay.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout-xlarge/abs__screen_action_bar_overlay.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__screen_simple.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__screen_simple.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__screen_simple.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__screen_simple.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__screen_simple_overlay_action_mode.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__screen_simple_overlay_action_mode.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__screen_simple_overlay_action_mode.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__screen_simple_overlay_action_mode.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__search_dropdown_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__search_dropdown_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__search_dropdown_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__search_dropdown_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__search_dropdown_item_icons_2line.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__search_dropdown_item_icons_2line.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__search_dropdown_item_icons_2line.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__search_dropdown_item_icons_2line.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__search_dropdown_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__search_dropdown_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__search_dropdown_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__search_dropdown_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__search_view.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__search_view.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__search_view.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__search_view.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__simple_dropdown_hint.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/abs__simple_dropdown_hint.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__simple_dropdown_hint.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/abs__simple_dropdown_hint.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__spinner_ab_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__spinner_ab_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__spinner_ab_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__spinner_ab_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__spinner_ab_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__spinner_ab_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__spinner_ab_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__spinner_ab_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__tab_indicator_ab_holo.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__tab_indicator_ab_holo.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__tab_indicator_ab_holo.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__tab_indicator_ab_holo.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__textfield_searchview_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__textfield_searchview_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__textfield_searchview_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__textfield_searchview_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__textfield_searchview_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__textfield_searchview_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__textfield_searchview_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__textfield_searchview_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__textfield_searchview_right_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__textfield_searchview_right_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__textfield_searchview_right_holo_dark.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__textfield_searchview_right_holo_dark.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__textfield_searchview_right_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__textfield_searchview_right_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__textfield_searchview_right_holo_light.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/abs__textfield_searchview_right_holo_light.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/actionbar_gradient.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable/actionbar_gradient.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable-hdpi/actionbar_gradient.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable-hdpi/actionbar_gradient.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable-mdpi/actionbar_gradient.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/drawable-mdpi/actionbar_gradient.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/actionbarsherlock/actionbarsherlock.iml" afterPath="$PROJECT_DIR$/actionbarsherlock/actionbarsherlock.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/actions_layout.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/actions_layout.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/actions_layout.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/actions_layout.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/actions_list_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/actions_list_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/actions_list_item.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/actions_list_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/raw/alice.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/raw/alice.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/menu/browser.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/menu/browser.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/menu/browser.xml" afterPath="$PROJECT_DIR$/dSploit/res/menu/browser.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/dirpicker_chooser_list.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/dirpicker_chooser_list.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/dirpicker_chooser_list.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/dirpicker_chooser_list.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/dirpicker_list_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/dirpicker_list_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/dirpicker_list_item.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/dirpicker_list_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/menu/hijacker.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/menu/hijacker.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/menu/hijacker.xml" afterPath="$PROJECT_DIR$/dSploit/res/menu/hijacker.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/menu/login_cracker.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/menu/login_cracker.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/menu/login_cracker.xml" afterPath="$PROJECT_DIR$/dSploit/res/menu/login_cracker.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/menu/main.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/menu/main.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/menu/main.xml" afterPath="$PROJECT_DIR$/dSploit/res/menu/main.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_exploit_finder.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_exploit_finder.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/plugin_exploit_finder.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/plugin_exploit_finder.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_inspector.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_inspector.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/plugin_inspector.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/plugin_inspector.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_login_cracker.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_login_cracker.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/plugin_login_cracker.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/plugin_login_cracker.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_mitm.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_mitm.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/plugin_mitm.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/plugin_mitm.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_mitm_filter_dialog.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_mitm_filter_dialog.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/plugin_mitm_filter_dialog.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/plugin_mitm_filter_dialog.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_mitm_hijacker.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_mitm_hijacker.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/plugin_mitm_hijacker.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/plugin_mitm_hijacker.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_mitm_hijacker_list_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_mitm_hijacker_list_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/plugin_mitm_hijacker_list_item.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/plugin_mitm_hijacker_list_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_mitm_hijacker_webview.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_mitm_hijacker_webview.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/plugin_mitm_hijacker_webview.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/plugin_mitm_hijacker_webview.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_mitm_list_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_mitm_list_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/plugin_mitm_list_item.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/plugin_mitm_list_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_mitm_password_sniffer.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_mitm_password_sniffer.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/plugin_mitm_password_sniffer.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/plugin_mitm_password_sniffer.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_mitm_redirect_dialog.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_mitm_redirect_dialog.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/plugin_mitm_redirect_dialog.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/plugin_mitm_redirect_dialog.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_mitm_sniffer.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_mitm_sniffer.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/plugin_mitm_sniffer.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/plugin_mitm_sniffer.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_mitm_sniffer_list_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_mitm_sniffer_list_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/plugin_mitm_sniffer_list_item.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/plugin_mitm_sniffer_list_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_packet_forger.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_packet_forger.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/plugin_packet_forger.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/plugin_packet_forger.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_portscanner.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_portscanner.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/plugin_portscanner.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/plugin_portscanner.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_traceroute.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/plugin_traceroute.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/plugin_traceroute.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/plugin_traceroute.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/menu/port_scanner.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/menu/port_scanner.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/menu/port_scanner.xml" afterPath="$PROJECT_DIR$/dSploit/res/menu/port_scanner.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/preferences.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/preferences.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/preferences.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/preferences.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/sherlock_spinner_dropdown_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/sherlock_spinner_dropdown_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout-v14/sherlock_spinner_dropdown_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout-v14/sherlock_spinner_dropdown_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/sherlock_spinner_dropdown_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/sherlock_spinner_dropdown_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout-v14/sherlock_spinner_dropdown_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout-v14/sherlock_spinner_dropdown_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/sherlock_spinner_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout/sherlock_spinner_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout-v14/sherlock_spinner_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/layout-v14/sherlock_spinner_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/sherlock_spinner_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/sherlock_spinner_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout-v14/sherlock_spinner_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout-v14/sherlock_spinner_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/anim/slide_in_left.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/anim/slide_in_left.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/anim/slide_out_left.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/anim/slide_out_left.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/values/strings.xml" afterPath="$PROJECT_DIR$/dSploit/res/values/strings.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/values-fr/strings.xml" afterPath="$PROJECT_DIR$/dSploit/res/values-fr/strings.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/values/style.xml" afterPath="$PROJECT_DIR$/dSploit/res/values/style.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/target_layout.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/target_layout.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/target_layout.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/target_layout.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/target_list_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/target_list_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/target_list_item.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/target_list_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-land/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-land/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-large-hdpi-1024x600/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-large-hdpi-1024x600/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-large-land-hdpi-1024x600/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-large-land-hdpi-1024x600/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-large-land-mdpi-1024x600/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-large-land-mdpi-1024x600/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-large-mdpi-1024x600/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-large-mdpi-1024x600/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-sw600dp/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-sw600dp/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-v11/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-v11/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-v14/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-v14/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-w360dp/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-w360dp/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-w480dp/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-w480dp/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-w500dp/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-w500dp/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-w600dp/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-w600dp/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-xlarge/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-xlarge/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/values/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/values/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-land/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-land/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-large-hdpi-1024x600/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-large-hdpi-1024x600/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-large-land-hdpi-1024x600/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-large-land-hdpi-1024x600/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-large-land-mdpi-1024x600/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-large-land-mdpi-1024x600/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-large-mdpi-1024x600/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-large-mdpi-1024x600/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-sw600dp/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-sw600dp/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-v11/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-v11/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-v14/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-v14/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-w360dp/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-w360dp/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-w480dp/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-w480dp/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-w500dp/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-w500dp/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-w600dp/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-w600dp/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-xlarge/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/values-xlarge/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/wifi_scanner.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/wifi_scanner.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/menu/wifi_scanner.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/menu/wifi_scanner.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/wifi_scanner.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/wifi_scanner.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/menu/wifi_scanner.xml" afterPath="$PROJECT_DIR$/dSploit/res/menu/wifi_scanner.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/wifi_scanner_list_item.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/layout/wifi_scanner_list_item.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/res/layout/wifi_scanner_list_item.xml" afterPath="$PROJECT_DIR$/dSploit/res/layout/wifi_scanner_list_item.xml" />
+    </list>
+    <ignored path="dSploit.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="DaemonCodeAnalyzer">
+    <disable_hints />
+  </component>
+  <component name="DebuggerManager">
+    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
+    <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
+      <breakpoint>
+        <option name="NOTIFY_CAUGHT" value="true" />
+        <option name="NOTIFY_UNCAUGHT" value="true" />
+        <option name="ENABLED" value="false" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint>
+        <option name="NOTIFY_CAUGHT" value="true" />
+        <option name="NOTIFY_UNCAUGHT" value="true" />
+        <option name="ENABLED" value="false" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+    </breakpoint_any>
+    <breakpoint_rules />
+    <ui_properties />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="dSploit" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="Inspector.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/Inspector.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="48" column="123" selection-start="1822" selection-end="1822" vertical-scroll-proportion="0.0" vertical-offset="144" max-vertical-offset="2826">
+              <folding>
+                <element signature="e#4498#4537#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ConnectionKiller.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/mitm/ConnectionKiller.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="23" column="13" selection-start="911" selection-end="911" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="666">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="strings.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/dSploit/res/values-fr/strings.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="178" column="54" selection-start="14170" selection-end="14170" vertical-scroll-proportion="-17.296297" vertical-offset="2737" max-vertical-offset="3330">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Hijacker.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/mitm/Hijacker.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="75" column="47" selection-start="2944" selection-end="2944" vertical-scroll-proportion="0.20930232" vertical-offset="0" max-vertical-offset="9216">
+              <folding>
+                <element signature="e#14531#14566#0" expanded="true" />
+                <element signature="e#15481#15515#0" expanded="true" />
+                <element signature="e#15564#15599#0" expanded="true" />
+                <element signature="e#15602#15638#0" expanded="true" />
+                <element signature="e#16921#16953#0" expanded="true" />
+                <element signature="e#16991#17031#0" expanded="true" />
+                <element signature="e#17742#17778#0" expanded="true" />
+                <element signature="e#17968#17993#0" expanded="true" />
+                <element signature="e#18197#18222#0" expanded="true" />
+                <element signature="e#18224#18259#0" expanded="true" />
+                <element signature="e#20110#20135#0" expanded="true" />
+                <element signature="e#21052#21091#0" expanded="true" />
+                <element signature="e#21155#21976#0" expanded="true" />
+                <element signature="e#21953#21954#0" expanded="true" />
+                <element signature="e#22045#22070#0" expanded="true" />
+                <element signature="e#22072#22108#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="strings.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/dSploit/res/values/strings.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="87" column="59" selection-start="5317" selection-end="5317" vertical-scroll-proportion="25.185184" vertical-offset="2926" max-vertical-offset="3474">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DSploitApplication.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/DSploitApplication.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="61" column="46" selection-start="2181" selection-end="2181" vertical-scroll-proportion="0.0" vertical-offset="195" max-vertical-offset="810">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Plugin.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/core/Plugin.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="56" column="27" selection-start="1993" selection-end="1993" vertical-scroll-proportion="0.0" vertical-offset="231" max-vertical-offset="1800">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Traceroute.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/Traceroute.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="43" column="48" selection-start="1622" selection-end="1622" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1890">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MITM.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/mitm/MITM.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="153" column="122" selection-start="6010" selection-end="6107" vertical-scroll-proportion="0.0" vertical-offset="1278" max-vertical-offset="13626">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindManager">
+    <FindUsagesManager>
+      <setting name="OPEN_NEW_TAB" value="false" />
+    </FindUsagesManager>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitLogSettings">
+    <option name="myDateState">
+      <MyDateState />
+    </option>
+  </component>
+  <component name="GradleLocalSettings">
+    <option name="tasksExpandState">
+      <map>
+        <entry key="" value="true" />
+      </map>
+    </option>
+    <option name="availableProjects">
+      <map>
+        <entry>
+          <key>
+            <ExternalProjectPojo>
+              <option name="name" value="dSploit" />
+              <option name="path" value="$PROJECT_DIR$" />
+            </ExternalProjectPojo>
+          </key>
+          <value>
+            <list>
+              <ExternalProjectPojo>
+                <option name="name" value="dSploit-dSploit" />
+                <option name="path" value="$PROJECT_DIR$/dSploit" />
+              </ExternalProjectPojo>
+              <ExternalProjectPojo>
+                <option name="name" value="dSploit" />
+                <option name="path" value="$PROJECT_DIR$" />
+              </ExternalProjectPojo>
+              <ExternalProjectPojo>
+                <option name="name" value="actionbarsherlock" />
+                <option name="path" value="$PROJECT_DIR$/actionbarsherlock" />
+              </ExternalProjectPojo>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="availableTasks">
+      <map>
+        <entry key="$PROJECT_DIR$">
+          <value>
+            <list>
+              <ExternalTaskPojo>
+                <option name="description" value="Initializes a new Gradle build. [incubating]" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="setupBuild" />
+              </ExternalTaskPojo>
+            </list>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/actionbarsherlock">
+          <value>
+            <list>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the Android dependencies of the project" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="androidDependencies" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles all variants of all applications and secondary packages." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="assemble" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles all Debug builds" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="assembleDebug" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles all Release builds" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="assembleRelease" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles the Test build for the Debug build" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="assembleTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="build" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project and all projects that depend on it." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="buildDependents" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project and all projects it depends on." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="buildNeeded" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles a bundle containing the library in Debug." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="bundleDebug" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles a bundle containing the library in Release." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="bundleRelease" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Runs all checks." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="check" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Deletes the build directory." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="clean" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="compileDebug" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="compileDebugAidl" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="compileDebugRenderscript" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="compileRelease" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="compileReleaseAidl" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="compileReleaseRenderscript" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="compileTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="compileTestAidl" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="compileTestRenderscript" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Runs all device checks on currently connected devices." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="connectedCheck" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Installs and runs the tests for Build 'Debug' on connected devices." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="connectedInstrumentTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Runs all device checks using Device Providers and Test Servers." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="deviceCheck" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="dexTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="generateDebugBuildConfig" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="generateReleaseBuildConfig" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="generateTestBuildConfig" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Installs the Test build for the Debug build" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="installTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="mergeDebugAssets" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="mergeDebugProguardFiles" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="mergeDebugResources" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="mergeReleaseAssets" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="mergeReleaseProguardFiles" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="mergeReleaseResources" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="mergeTestAssets" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="mergeTestResources" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="packageDebugAidl" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="packageDebugJar" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="packageDebugLocalJar" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="packageDebugRenderscript" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="packageReleaseAidl" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="packageReleaseJar" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="packageReleaseLocalJar" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="packageReleaseRenderscript" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="packageTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="prepareDebugDependencies" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="prepareReleaseDependencies" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="prepareTestDependencies" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="processDebugJavaRes" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="processDebugManifest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="processDebugResources" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="processReleaseJavaRes" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="processReleaseManifest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="processReleaseResources" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="processTestJavaRes" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="processTestResources" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="processTestTestManifest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the signing info for each variant" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="signingReport" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Uninstall all applications." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="uninstallAll" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Uninstalls the Test build for the Debug build" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="uninstallTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/actionbarsherlock" />
+                <option name="name" value="validateDebugSigning" />
+              </ExternalTaskPojo>
+            </list>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/dSploit">
+          <value>
+            <list>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the Android dependencies of the project" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="androidDependencies" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles all variants of all applications and secondary packages." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="assemble" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles all Debug builds" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="assembleDebug" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles all Release builds" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="assembleRelease" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles the Test build for the Debug build" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="assembleTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="build" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project and all projects that depend on it." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="buildDependents" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Assembles and tests this project and all projects it depends on." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="buildNeeded" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Runs all checks." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="check" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Deletes the build directory." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="clean" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="compileDebug" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="compileDebugAidl" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="compileDebugRenderscript" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="compileRelease" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="compileReleaseAidl" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="compileReleaseRenderscript" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="compileTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="compileTestAidl" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="compileTestRenderscript" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Runs all device checks on currently connected devices." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="connectedCheck" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Installs and runs the tests for Build 'Debug' on connected devices." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="connectedInstrumentTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Runs all device checks using Device Providers and Test Servers." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="deviceCheck" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="dexDebug" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="dexRelease" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="dexTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="generateDebugBuildConfig" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="generateReleaseBuildConfig" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="generateTestBuildConfig" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Installs the Debug build" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="installDebug" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Installs the Test build for the Debug build" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="installTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="mergeDebugAssets" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="mergeDebugResources" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="mergeReleaseAssets" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="mergeReleaseResources" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="mergeTestAssets" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="mergeTestResources" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="packageDebug" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="packageRelease" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="packageTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Prepare dSploit:actionbarsherlock:unspecified" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="prepareDSploitActionbarsherlockUnspecifiedLibrary" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="prepareDebugDependencies" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="prepareReleaseDependencies" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="prepareTestDependencies" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="processDebugJavaRes" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="processDebugManifest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="processDebugResources" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="processReleaseJavaRes" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="processReleaseManifest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="processReleaseResources" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="processTestJavaRes" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="processTestResources" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="processTestTestManifest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Displays the signing info for each variant" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="signingReport" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Uninstall all applications." />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="uninstallAll" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Uninstalls the Debug build" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="uninstallDebug" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Uninstalls the Release build" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="uninstallRelease" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="description" value="Uninstalls the Test build for the Debug build" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="uninstallTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="validateDebugSigning" />
+              </ExternalTaskPojo>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="modificationStamps">
+      <map>
+        <entry key="$USER_HOME$/Development/Android/Projects/APKreator" value="1375551620542" />
+        <entry key="$USER_HOME$/Development/Android/Projects/QRCode-Container" value="1378060763229" />
+        <entry key="$USER_HOME$/Development/Android/Projects/QRCodes" value="1378054548398" />
+        <entry key="$USER_HOME$/Development/Android/Projects/YoutubeAppKreator" value="1375551620542" />
+        <entry key="$USER_HOME$/Development/Android/Projects/YoutubeChannels" value="1375551620542" />
+        <entry key="$PROJECT_DIR$/../../APKreator" value="1375551620542" />
+        <entry key="$PROJECT_DIR$" value="1378566211021" />
+      </map>
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="changedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/NVDatabase.java" />
+        <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/core/ManagedReceiver.java" />
+        <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/net/Target.java" />
+        <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/DSploitApplication.java" />
+        <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/core/Plugin.java" />
+        <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/LoginCracker.java" />
+        <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/ExploitFinder.java" />
+        <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/PortScanner.java" />
+        <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/RouterPwn.java" />
+        <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/PacketForger.java" />
+        <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/Traceroute.java" />
+        <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/mitm/MITM.java" />
+        <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/Inspector.java" />
+        <option value="$PROJECT_DIR$/dSploit/res/values/strings.xml" />
+        <option value="$PROJECT_DIR$/dSploit/res/values-fr/strings.xml" />
+        <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/mitm/Hijacker.java" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="64" />
+    <option name="y" value="-4" />
+    <option name="width" value="1857" />
+    <option name="height" value="1085" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectReloadState">
+    <option name="STATE" value="0" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+    </navigator>
+    <panes>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dsploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dsploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="plugins" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dsploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="plugins" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mitm" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dsploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="net" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dsploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="gui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dsploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="res" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="values-fr" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="res" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="values" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="res" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="GoToFile.includeJavaFiles" value="false" />
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="MemberChooser.sorted" value="false" />
+    <property name="options.lastSelected" value="preferences.pathVariables" />
+    <property name="recentsLimit" value="5" />
+    <property name="ANDROID_EXTENDED_DEVICE_CHOOSER_SERIALS" value="4df0f8de468a5fbb" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="MemberChooser.showClasses" value="true" />
+    <property name="FullScreen" value="false" />
+    <property name="GoToClass.includeLibraries" value="false" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.searchVisible" value="true" />
+  </component>
+  <component name="RunManager" selected="Android Application.dSploit-dSploit">
+    <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Tests">
+      <module name="" />
+      <option name="TESTING_TYPE" value="0" />
+      <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="USE_COMMAND_LINE" value="true" />
+      <option name="COMMAND_LINE" value="" />
+      <option name="WIPE_USER_DATA" value="false" />
+      <option name="DISABLE_BOOT_ANIMATION" value="false" />
+      <option name="NETWORK_SPEED" value="full" />
+      <option name="NETWORK_LATENCY" value="none" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <patterns />
+      <method />
+    </configuration>
+    <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
+      <module name="" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="DEPLOY" value="true" />
+      <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="USE_COMMAND_LINE" value="true" />
+      <option name="COMMAND_LINE" value="" />
+      <option name="WIPE_USER_DATA" value="false" />
+      <option name="DISABLE_BOOT_ANIMATION" value="false" />
+      <option name="NETWORK_SPEED" value="full" />
+      <option name="NETWORK_LATENCY" value="none" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="dSploit-dSploit" type="AndroidRunConfigurationType" factoryName="Android Application">
+      <module name="dSploit-dSploit" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="DEPLOY" value="true" />
+      <option name="TARGET_SELECTION_MODE" value="SHOW_DIALOG" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="USE_COMMAND_LINE" value="true" />
+      <option name="COMMAND_LINE" value="" />
+      <option name="WIPE_USER_DATA" value="false" />
+      <option name="DISABLE_BOOT_ANIMATION" value="false" />
+      <option name="NETWORK_SPEED" value="full" />
+      <option name="NETWORK_LATENCY" value="none" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <RunnerSettings RunnerId="AndroidDebugRunner" />
+      <ConfigurationWrapper RunnerId="AndroidDebugRunner" />
+      <method />
+    </configuration>
+    <list size="1">
+      <item index="0" class="java.lang.String" itemvalue="Android Application.dSploit-dSploit" />
+    </list>
+    <configuration name="&lt;template&gt;" type="TestNG" default="true" selected="false">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    </configuration>
+    <configuration name="&lt;template&gt;" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" default="true" selected="false">
+      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
+    </configuration>
+    <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
+      <Host>localhost</Host>
+      <Port>5050</Port>
+    </configuration>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="e55937d6-683b-42ee-9226-16c207fff22d" name="Default" comment="" />
+      <created>1378567735462</created>
+      <updated>1378567735462</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="64" y="-4" width="1857" height="1085" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32916668" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24959569" sideWeight="0.67083335" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32916668" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32991913" sideWeight="0.67083335" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="myTodoPanelSettings">
+      <TodoPanelSettings />
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/core/ManagedReceiver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="1" selection-start="1727" selection-end="1727" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="774">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/net/Target.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="411" column="35" selection-start="13267" selection-end="13267" vertical-scroll-proportion="0.0" vertical-offset="6426" max-vertical-offset="10512">
+          <folding>
+            <element signature="e#13267#13321#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/LoginCracker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="177" column="89" selection-start="5992" selection-end="5992" vertical-scroll-proportion="0.46829268" vertical-offset="1890" max-vertical-offset="10800">
+          <folding>
+            <element signature="e#8603#8630#0" expanded="true" />
+            <element signature="e#8632#8665#0" expanded="true" />
+            <element signature="e#10699#10733#0" expanded="true" />
+            <element signature="e#10735#10773#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/ExploitFinder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="59" column="115" selection-start="2237" selection-end="2237" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4950">
+          <folding>
+            <element signature="e#5183#5210#0" expanded="true" />
+            <element signature="e#5212#5245#0" expanded="true" />
+            <element signature="e#5362#5389#0" expanded="true" />
+            <element signature="e#5391#5429#0" expanded="true" />
+            <element signature="e#7678#7720#0" expanded="true" />
+            <element signature="e#10710#10743#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/PortScanner.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="66" column="55" selection-start="2560" selection-end="2560" vertical-scroll-proportion="0.49756098" vertical-offset="0" max-vertical-offset="4140">
+          <folding>
+            <element signature="e#3094#3127#0" expanded="true" />
+            <element signature="e#6141#6166#0" expanded="true" />
+            <element signature="e#6168#6209#0" expanded="true" />
+            <element signature="e#6949#6981#0" expanded="true" />
+            <element signature="e#6983#7019#0" expanded="true" />
+            <element signature="e#7522#7555#0" expanded="true" />
+            <element signature="e#7829#7869#0" expanded="true" />
+            <element signature="e#8669#8694#0" expanded="true" />
+            <element signature="e#8696#8729#0" expanded="true" />
+            <element signature="e#8940#8965#0" expanded="true" />
+            <element signature="e#8967#9002#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/DSploitApplication.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="61" column="46" selection-start="2181" selection-end="2181" vertical-scroll-proportion="0.0" vertical-offset="141" max-vertical-offset="810">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/RouterPwn.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="36" column="76" selection-start="1359" selection-end="1359" vertical-scroll-proportion="0.26341462" vertical-offset="0" max-vertical-offset="738">
+          <folding>
+            <element signature="e#1997#2022#0" expanded="true" />
+            <element signature="e#2024#2065#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/PacketForger.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="66" column="81" selection-start="2448" selection-end="2448" vertical-scroll-proportion="0.3804878" vertical-offset="216" max-vertical-offset="4032">
+          <folding>
+            <element signature="e#4574#4606#0" expanded="true" />
+            <element signature="e#4694#4727#0" expanded="true" />
+            <element signature="e#8244#8276#0" expanded="true" />
+            <element signature="e#9510#9548#0" expanded="true" />
+            <element signature="e#9642#9685#0" expanded="true" />
+            <element signature="e#10381#10406#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/core/Plugin.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="27" selection-start="1993" selection-end="1993" vertical-scroll-proportion="0.0" vertical-offset="231" max-vertical-offset="1800">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/Traceroute.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="43" column="48" selection-start="1622" selection-end="1622" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1890">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/mitm/MITM.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="153" column="122" selection-start="6010" selection-end="6107" vertical-scroll-proportion="0.0" vertical-offset="1278" max-vertical-offset="13626">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/mitm/ConnectionKiller.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="23" column="13" selection-start="911" selection-end="911" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="666">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/Inspector.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="48" column="123" selection-start="1822" selection-end="1822" vertical-scroll-proportion="0.0" vertical-offset="144" max-vertical-offset="2826">
+          <folding>
+            <element signature="e#4498#4537#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dSploit/res/values-fr/strings.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="178" column="54" selection-start="14170" selection-end="14170" vertical-scroll-proportion="-17.296297" vertical-offset="2737" max-vertical-offset="3330">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dSploit/res/values/strings.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="87" column="59" selection-start="5317" selection-end="5317" vertical-scroll-proportion="25.185184" vertical-offset="2926" max-vertical-offset="3474">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/mitm/Hijacker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="75" column="47" selection-start="2944" selection-end="2944" vertical-scroll-proportion="0.20930232" vertical-offset="0" max-vertical-offset="9216">
+          <folding>
+            <element signature="e#14531#14566#0" expanded="true" />
+            <element signature="e#15481#15515#0" expanded="true" />
+            <element signature="e#15564#15599#0" expanded="true" />
+            <element signature="e#15602#15638#0" expanded="true" />
+            <element signature="e#16921#16953#0" expanded="true" />
+            <element signature="e#16991#17031#0" expanded="true" />
+            <element signature="e#17742#17778#0" expanded="true" />
+            <element signature="e#17968#17993#0" expanded="true" />
+            <element signature="e#18197#18222#0" expanded="true" />
+            <element signature="e#18224#18259#0" expanded="true" />
+            <element signature="e#20110#20135#0" expanded="true" />
+            <element signature="e#21052#21091#0" expanded="true" />
+            <element signature="e#21155#21976#0" expanded="true" />
+            <element signature="e#21953#21954#0" expanded="true" />
+            <element signature="e#22045#22070#0" expanded="true" />
+            <element signature="e#22072#22108#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
+

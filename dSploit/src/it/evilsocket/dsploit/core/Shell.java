@@ -274,7 +274,7 @@ public class Shell {
             writer.flush();
 
 			/* 
-			 * The following catastrophe of code seems to be the best way to ensure 
+             * The following catastrophe of code seems to be the best way to ensure
 			 * this thread can be interrupted.
 			 */
             while (!Thread.currentThread().isInterrupted()) {
@@ -282,7 +282,7 @@ public class Shell {
                     exit = process.exitValue();
                     Thread.currentThread().interrupt();
                 } catch (IllegalThreadStateException e) {
-					/*
+                    /*
 					 * Just sleep, the process hasn't terminated yet but sleep should (but doesn't) cause 
 					 * InterruptedException to be thrown if interrupt() has been called.
 					 * 

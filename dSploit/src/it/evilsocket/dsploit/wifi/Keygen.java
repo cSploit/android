@@ -85,7 +85,6 @@ public abstract class Keygen implements Comparable<Keygen> {
 
     public void setErrorMessage(String error) {
         this.errorMessage = error;
-        ;
     }
 
     public boolean isSupported() {
@@ -221,7 +220,7 @@ public abstract class Keygen implements Comparable<Keygen> {
         hex[1] = HEX_CHAR_TABLE[v & 0xF];
         try {
             return new String(hex, "ASCII");
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException ignored) {
         }
         return "";
     }

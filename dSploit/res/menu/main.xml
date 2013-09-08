@@ -1,20 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
- 
-  <item android:id="@+id/add"       android:title="Add"       android:icon="@drawable/target_add"  android:showAsAction="always"/>
-  <item android:id="@+id/scan"      android:title="Scan"      android:icon="@drawable/ic_refresh" android:showAsAction="always"/>
-  <item android:id="@+id/wifi_scan" android:title="WiFi Scan" android:icon="@drawable/ic_wifi_signal_4"      android:showAsAction="always"/>
-  
-  <group android:id="@+id/session_group">
-	  <item android:id="@+id/new_session"     android:title="New Session"    />
-	  <item android:id="@+id/save_session"    android:title="Save Session"   />
-	  <item android:id="@+id/restore_session" android:title="Restore Session"/>
-	  <item android:id="@+id/settings"        android:title="Settings" />
-  </group>
-  <group android:id="@+id/misc_group">
-	  <item android:id="@+id/ss_monitor"      android:title="Stop Network Monitor"/>
-	  <item android:id="@+id/submit_issue"    android:title="Submit Issue" />  
-	  <item android:id="@+id/about"           android:title="About" />
-  </group>
-   
+
+    <item
+        android:id="@+id/add"
+        android:title="Add"
+        android:icon="@drawable/target_add"
+        android:showAsAction="always" />
+    <item
+        android:id="@+id/scan"
+        android:title="Scan"
+        android:icon="@drawable/ic_refresh"
+        android:showAsAction="always" />
+    <item
+        android:id="@+id/wifi_scan"
+        android:title="WiFi Scan"
+        android:icon="@drawable/ic_wifi_signal_4"
+        android:showAsAction="always" />
+
+    <group android:id="@+id/session_group">
+        <item
+            android:id="@+id/new_session"
+            android:title="New Session" />
+        <item
+            android:id="@+id/save_session"
+            android:title="Save Session" />
+        <item
+            android:id="@+id/restore_session"
+            android:title="Restore Session" />
+        <item
+            android:id="@+id/settings"
+            android:title="Settings" />
+    </group>
+    <group android:id="@+id/misc_group">
+        <item
+            android:id="@+id/ss_monitor"
+            android:title="Stop Network Monitor" />
+        <item
+            android:id="@+id/submit_issue"
+            android:title="Submit Issue" />
+        <item
+            android:id="@+id/about"
+            android:title="About" />
+    </group>
+
 </menu>

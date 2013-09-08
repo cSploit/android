@@ -24,6 +24,8 @@ import android.content.DialogInterface;
 import android.text.InputType;
 import android.widget.EditText;
 
+import it.evilsocket.dsploit.R;
+
 public class WifiCrackDialog extends AlertDialog {
     private EditText mEditText = null;
 
@@ -40,21 +42,21 @@ public class WifiCrackDialog extends AlertDialog {
 
         final WifiCrackDialogListener listener = wifiCrackDialogListener;
 
-        this.setButton("Connect", new DialogInterface.OnClickListener() {
+        this.setButton(activity.getString(R.string.connect), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 if (listener != null)
                     listener.onManualConnect(mEditText.getText() + "");
             }
         });
 
-        this.setButton2("Crack", new DialogInterface.OnClickListener() {
+        this.setButton2(activity.getString(R.string.crack), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 if (listener != null)
                     listener.onCrack();
             }
         });
 
-        this.setButton3("Cancel", new DialogInterface.OnClickListener() {
+        this.setButton3(activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
             }

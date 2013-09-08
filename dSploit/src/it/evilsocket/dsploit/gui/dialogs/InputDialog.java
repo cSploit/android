@@ -24,6 +24,8 @@ import android.content.DialogInterface;
 import android.text.InputType;
 import android.widget.EditText;
 
+import it.evilsocket.dsploit.R;
+
 public class InputDialog extends AlertDialog {
     private EditText mEditText = null;
 
@@ -62,7 +64,7 @@ public class InputDialog extends AlertDialog {
             }
         });
 
-        this.setButton2("Cancel", new DialogInterface.OnClickListener() {
+        this.setButton2(activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
             }

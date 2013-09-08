@@ -107,7 +107,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
         String message = null;
 
         if (key.equals("PREF_SNIFFER_SAMPLE_TIME")) {
-            double sampleTime = 1.0;
+            double sampleTime;
 
             try {
                 sampleTime = Double.parseDouble(mSnifferSampleTime.getText());
@@ -128,7 +128,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 
             mSnifferSampleTime.setText(Double.toString(sampleTime));
         } else if (key.equals("PREF_HTTP_PROXY_PORT")) {
-            int proxyPort = 8080;
+            int proxyPort;
 
             try {
                 proxyPort = Integer.parseInt(mProxyPort.getText());
@@ -153,7 +153,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
             mProxyPort.setText(Integer.toString(proxyPort));
             System.HTTP_PROXY_PORT = proxyPort;
         } else if (key.equals("PREF_HTTP_SERVER_PORT")) {
-            int serverPort = 8081;
+            int serverPort;
 
             try {
                 serverPort = Integer.parseInt(mServerPort.getText());
@@ -178,7 +178,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
             mServerPort.setText(Integer.toString(serverPort));
             System.HTTP_SERVER_PORT = serverPort;
         } else if (key.equals("PREF_HTTPS_REDIRECTOR_PORT")) {
-            int redirPort = 8082;
+            int redirPort;
 
             try {
                 redirPort = Integer.parseInt(mRedirectorPort.getText());
@@ -203,7 +203,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
             mRedirectorPort.setText(Integer.toString(redirPort));
             System.HTTPS_REDIR_PORT = redirPort;
         } else if (key.equals("PREF_HTTP_MAX_BUFFER_SIZE")) {
-            int maxBufferSize = 10485760;
+            int maxBufferSize;
 
             try {
                 maxBufferSize = Integer.parseInt(mHttpBufferSize.getText());
@@ -224,7 +224,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 
             mHttpBufferSize.setText(Integer.toString(maxBufferSize));
         } else if (key.equals("PREF_PASSWORD_FILENAME")) {
-            String passFileName = "dsploit-password-sniff.log";
+            String passFileName;
 
             try {
                 passFileName = mPasswordFilename.getText();

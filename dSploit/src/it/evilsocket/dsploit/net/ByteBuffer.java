@@ -44,7 +44,7 @@ public class ByteBuffer {
                 rlen = replace.length;
         byte[] left, right;
 
-        ByteBuffer buffer = null;
+        ByteBuffer buffer;
 
         while (idx != -1) {
             left = Arrays.copyOfRange(mBuffer, 0, idx);
@@ -62,7 +62,7 @@ public class ByteBuffer {
 
     public void append(byte[] buffer, int length) {
         byte[] chunk = Arrays.copyOfRange(buffer, 0, length),
-                reallcd = null;
+                reallcd;
         int i, j;
 
         mCharsetDetector.handleData(buffer, 0, length);

@@ -27,6 +27,8 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import it.evilsocket.dsploit.R;
+
 public class SpinnerDialog extends AlertDialog {
     private int mSelected = 0;
 
@@ -55,7 +57,7 @@ public class SpinnerDialog extends AlertDialog {
             }
         });
 
-        this.setButton2("Cancel", new DialogInterface.OnClickListener() {
+        this.setButton2(activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
             }

@@ -127,16 +127,13 @@ public class MITM extends Plugin {
                 row = inflater.inflate(mLayoutId, parent, false);
 
                 holder = new ActionHolder();
+                holder.icon = (ImageView) (row != null ? row.findViewById(R.id.actionIcon) : null);
+                holder.name = (TextView) (row != null ? row.findViewById(R.id.itemName) : null);
+                holder.description = (TextView) (row != null ? row.findViewById(R.id.itemDescription) : null);
+                holder.activity = (ProgressBar) (row != null ? row.findViewById(R.id.itemActivity) : null);
+                if (row != null) row.setTag(holder);
 
-                holder.icon = (ImageView) row.findViewById(R.id.actionIcon);
-                holder.name = (TextView) row.findViewById(R.id.itemName);
-                holder.description = (TextView) row.findViewById(R.id.itemDescription);
-                holder.activity = (ProgressBar) row.findViewById(R.id.itemActivity);
-
-                row.setTag(holder);
-            } else {
-                holder = (ActionHolder) row.getTag();
-            }
+            } else holder = (ActionHolder) row.getTag();
 
             Action action = mActions.get(position);
 
@@ -144,7 +141,7 @@ public class MITM extends Plugin {
             holder.name.setText(action.name);
             holder.description.setText(action.description);
 
-            row.setOnClickListener(action.listener);
+            if (row != null) row.setOnClickListener(action.listener);
 
             return row;
         }
@@ -154,7 +151,7 @@ public class MITM extends Plugin {
         super
                 (
                         "MITM",
-                        "Perform various man-in-the-middle attacks, such as network sniffing, traffic manipulation, etc.",
+                        "Perform various man-in-the-middle attacks, such as network sniffing, traffic manipulation, etc...",
                         new Target.Type[]{Target.Type.ENDPOINT, Target.Type.NETWORK},
                         R.layout.plugin_mitm,
                         R.drawable.action_mitm

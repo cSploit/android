@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.DSploitActionBarStyle" parent="Theme.Sherlock.Light">
+    <style name="Theme.DSploitActionBarStyle" parent="Theme.Sherlock.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/ActionBarStyle</item>
         <item name="android:windowBackground">@color/background_window</item>
     </style>

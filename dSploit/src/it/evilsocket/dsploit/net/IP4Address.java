@@ -127,7 +127,8 @@ public class IP4Address {
     public int getPrefixLength() {
         int bits, i, n = mInteger;
 
-        for (i = 0, bits = (n & 1); i < 32; i++, n >>>= 1, bits += n & 1) ;
+        // WTF is this?
+        for (i = 0, bits = (n & 1); i < 32; i++, n >>>= 1, bits += n & 1);
 
         return bits;
     }

@@ -68,6 +68,7 @@ public class ToolsInstaller {
 
     public ToolsInstaller(Context c) {
         mAppContext = c;
+        //noinspection ConstantConditions
         mDestPath = mAppContext.getFilesDir().getAbsolutePath();
         mAppVersion = System.getAppVersionName();
         mVersionFile = mDestPath + "/tools/VERSION";

@@ -96,7 +96,7 @@ public class Network {
             } catch (SocketException e) {
                 System.errorLogging(TAG, e);
                 /*
-				 * Issue #26: Initialization error in ColdFusionX ROM
+                 * Issue #26: Initialization error in ColdFusionX ROM
 				 * 
 				 * It seems it's a ROM issue which doesn't correctly populate device descriptors.
 				 * This rom maps the default wifi interface to a generic usb device 

@@ -64,7 +64,9 @@ import it.evilsocket.dsploit.wifi.Keygen;
 import it.evilsocket.dsploit.wifi.NetworkManager;
 import it.evilsocket.dsploit.wifi.WirelessMatcher;
 
-import static android.net.wifi.WifiManager.*;
+import static android.net.wifi.WifiManager.EXTRA_NEW_STATE;
+import static android.net.wifi.WifiManager.SCAN_RESULTS_AVAILABLE_ACTION;
+import static android.net.wifi.WifiManager.SUPPLICANT_STATE_CHANGED_ACTION;
 
 @SuppressWarnings("deprecation")
 public class WifiScannerActivity extends SherlockListActivity {
@@ -261,7 +263,7 @@ public class WifiScannerActivity extends SherlockListActivity {
 
     private void performCracking(final Keygen keygen, final ScanResult ap) {
 
-        final ProgressDialog dialog = ProgressDialog.show(this, "", "Generating keys ...", true, false);
+        final ProgressDialog dialog = ProgressDialog.show(this, "", getString(R.string.generating_keys), true, false);
 
         new Thread(new Runnable() {
             @Override

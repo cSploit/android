@@ -78,12 +78,10 @@ public class NetworkDiscovery extends Thread {
 
         private ThreadPoolExecutor mExecutor = null;
         private boolean mStopped = true;
-        private HashMap<String, String> mNetBiosMap = null;
+        private final HashMap<String, String> mNetBiosMap = new HashMap<String, String>();
 
         public ArpReader() {
             super("ArpReader");
-
-            mNetBiosMap = new HashMap<String, String>();
             mExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(RESOLVER_THREAD_POOL_SIZE);
         }
 
@@ -107,7 +105,7 @@ public class NetworkDiscovery extends Thread {
                 System.errorLogging(TAG, e);
             }
 
-            while (mStopped == false) {
+            while (!mStopped) {
                 try {
                     BufferedReader reader = new BufferedReader(new FileReader(ARP_TABLE_FILE));
                     String line = null,
@@ -126,11 +124,11 @@ public class NetworkDiscovery extends Thread {
                                     // mask	   = matcher.group( 5 ),
                                     device = matcher.group(6);
 
-                            if (device.equals(iface) && hwaddr.equals("00:00:00:00:00:00") == false && flags.contains("2")) {
+                            if (device.equals(iface) && !hwaddr.equals("00:00:00:00:00:00") && flags.contains("2")) {
                                 endpoint = new Endpoint(address, hwaddr);
                                 target = new Target(endpoint);
                                 // rescanning the gateway could cause an issue when the gateway itself has multiple interfaces ( LAN, WAN ... )
-                                if (endpoint.getAddress().equals(network.getGatewayAddress()) == false && endpoint.getAddress().equals(network.getLocalAddress()) == false) {
+                                if (!endpoint.getAddress().equals(network.getGatewayAddress()) && !endpoint.getAddress().equals(network.getLocalAddress())) {
                                     synchronized (mNetBiosMap) {
                                         name = mNetBiosMap.get(address);
                                     }
@@ -145,11 +143,11 @@ public class NetworkDiscovery extends Thread {
                                             break;
                                         }
 
-                                        if (target.isRouter() == false) {
+                                        if (!target.isRouter()) {
                                             // attempt DNS resolution
                                             name = endpoint.getAddress().getHostName();
 
-                                            if (name.equals(address) == false) {
+                                            if (!name.equals(address)) {
                                                 Log.d("NETBIOS", address + " was DNS resolved to " + name);
 
                                                 synchronized (mNetBiosMap) {
@@ -160,12 +158,12 @@ public class NetworkDiscovery extends Thread {
                                         }
                                     }
 
-                                    if (System.hasTarget(target) == false)
+                                    if (!System.hasTarget(target))
                                         sendNewEndpointNotification(endpoint, name);
 
                                     else if (name != null) {
                                         target = System.getTargetByAddress(address);
-                                        if (target != null && target.hasAlias() == false) {
+                                        if (target != null && !target.hasAlias()) {
                                             target.setAlias(name);
                                             sendEndpointUpdateNotification();
                                         }
@@ -190,8 +188,7 @@ public class NetworkDiscovery extends Thread {
                 mExecutor.shutdown();
                 mExecutor.awaitTermination(30, TimeUnit.SECONDS);
                 mExecutor.shutdownNow();
-            } catch (Exception e) {
-
+            } catch (Exception ignored) {
             }
         }
     }
@@ -216,9 +213,8 @@ public class NetworkDiscovery extends Thread {
             byte[] buffer = new byte[128];
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length, mAddress, NETBIOS_UDP_PORT),
                     query = new DatagramPacket(NETBIOS_REQUEST, NETBIOS_REQUEST.length, mAddress, NETBIOS_UDP_PORT);
-            String name = null,
-                    address = mAddress.getHostAddress();
-            Target target = null;
+            String name, address = mAddress.getHostAddress();
+            Target target;
 
             for (int i = 0; i < MAX_RETRIES; i++) {
                 try {
@@ -285,8 +281,7 @@ public class NetworkDiscovery extends Thread {
                     socket.send(packet);
 
                     socket.close();
-                } catch (Exception e) {
-
+                } catch (Exception ignored) {
                 }
             }
         }
@@ -315,11 +310,11 @@ public class NetworkDiscovery extends Thread {
                 System.errorLogging(TAG, e);
             }
 
-            while (mStopped == false && mNetwork != null && nhosts > 0) {
+            while (!mStopped && mNetwork != null && nhosts > 0) {
                 try {
                     for (i = 1, current = IP4Address.next(mNetwork.getStartAddress()); current != null && i <= nhosts; current = IP4Address.next(current), i++) {
                         // rescanning the gateway could cause an issue when the gateway itself has multiple interfaces ( LAN, WAN ... )
-                        if (current.equals(mNetwork.getGatewayAddress()) == false && current.equals(mNetwork.getLocalAddress()) == false) {
+                        if (!current.equals(mNetwork.getGatewayAddress()) && !current.equals(mNetwork.getLocalAddress())) {
                             InetAddress address = current.toInetAddress();
 
                             try {
@@ -347,8 +342,7 @@ public class NetworkDiscovery extends Thread {
                 mExecutor.shutdown();
                 mExecutor.awaitTermination(30, TimeUnit.SECONDS);
                 mExecutor.shutdownNow();
-            } catch (Exception e) {
-
+            } catch (Exception ignored) {
             }
         }
     }

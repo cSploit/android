@@ -50,7 +50,8 @@ public abstract class ManagedReceiver extends BroadcastReceiver {
 
     public abstract IntentFilter getFilter();
 
-    protected void finalize() {
+    protected void finalize() throws Throwable {
         unregister();
+        super.finalize();
     }
 }

@@ -40,8 +40,7 @@ public class Traceroute extends Plugin {
     private Receiver mTraceReceiver = null;
 
     public Traceroute() {
-        super(
-                "Trace",
+        super( "Trace",
                 "Perform a traceroute on target.",
                 new Target.Type[]{Target.Type.ENDPOINT, Target.Type.REMOTE},
                 R.layout.plugin_traceroute,

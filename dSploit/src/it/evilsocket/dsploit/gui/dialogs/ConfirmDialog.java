@@ -22,6 +22,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 
+import it.evilsocket.dsploit.R;
+
 public class ConfirmDialog extends AlertDialog {
     public interface ConfirmDialogListener {
         public void onConfirm();
@@ -37,13 +39,13 @@ public class ConfirmDialog extends AlertDialog {
 
         final ConfirmDialogListener listener = confirmDialogListener;
 
-        this.setButton("Yes", new DialogInterface.OnClickListener() {
+        this.setButton(activity.getString(R.string.yes), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 listener.onConfirm();
             }
         });
 
-        this.setButton2("No", new DialogInterface.OnClickListener() {
+        this.setButton2(activity.getString(R.string.no), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
                 listener.onCancel();

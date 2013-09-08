@@ -26,6 +26,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 
+import it.evilsocket.dsploit.R;
+
 public class ChoiceDialog extends AlertDialog {
     public interface ChoiceDialogListener {
         public void onChoice(int choice);
@@ -60,7 +62,7 @@ public class ChoiceDialog extends AlertDialog {
         setView(layout);
 
 
-        this.setButton("Cancel", new DialogInterface.OnClickListener() {
+        this.setButton(activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
             }

@@ -28,8 +28,10 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import it.evilsocket.dsploit.R;
+
 public class ChangelogDialog extends AlertDialog {
-    private final static String ERROR_HTML = "<html><body><p><b>Something went wrong while retrieving the changelog:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>";
+    private final String ERROR_HTML = getContext().getString(R.string.something_went_wrong_changelog);
 
     private ProgressDialog mLoader = null;
 
@@ -50,7 +52,7 @@ public class ChangelogDialog extends AlertDialog {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 if (mLoader == null)
-                    mLoader = ProgressDialog.show(activity, "", "Loading changelog ...");
+                    mLoader = ProgressDialog.show(activity, "", getContext().getString(R.string.loading_changelog));
 
                 super.onPageStarted(view, url, favicon);
             }

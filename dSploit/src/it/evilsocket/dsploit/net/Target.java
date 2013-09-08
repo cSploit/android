@@ -18,6 +18,7 @@
  */
 package it.evilsocket.dsploit.net;
 
+import android.content.Context;
 import android.os.StrictMode;
 import android.util.Log;
 
@@ -283,10 +284,10 @@ public class Target {
     }
 
     public void serialize(StringBuilder builder) {
-        builder.append(mType + "\n");
-        builder.append(mDeviceType + "\n");
-        builder.append(mDeviceOS + "\n");
-        builder.append(mAlias + "\n");
+        builder.append(mType).append("\n");
+        builder.append(mDeviceType).append("\n");
+        builder.append(mDeviceOS).append("\n");
+        builder.append(mAlias).append("\n");
 
         // a network can't be saved in a session file
         if (mType == Type.NETWORK) {
@@ -294,17 +295,17 @@ public class Target {
         } else if (mType == Type.ENDPOINT) {
             mEndpoint.serialize(builder);
         } else if (mType == Type.REMOTE) {
-            builder.append(mHostname + "\n");
+            builder.append(mHostname).append("\n");
         }
 
-        builder.append(mPorts.size() + "\n");
+        builder.append(mPorts.size()).append("\n");
         for (Port port : mPorts) {
             String key = port.toString();
-            builder.append(key + "\n");
+            builder.append(key).append("\n");
             if (mVulnerabilities.containsKey(key)) {
-                builder.append(mVulnerabilities.get(key).size() + "\n");
+                builder.append(mVulnerabilities.get(key).size()).append("\n");
                 for (Vulnerability v : mVulnerabilities.get(key)) {
-                    builder.append(v.toString() + "\n");
+                    builder.append(v.toString()).append("\n");
                 }
             } else
                 builder.append("0\n");
@@ -320,22 +321,11 @@ public class Target {
     }
 
     public boolean hasAlias() {
-        return mAlias != null && mAlias.isEmpty() == false;
+        return mAlias != null && !mAlias.isEmpty();
     }
 
     public boolean comesAfter(Target target) {
-
-        if (mType == Type.NETWORK)
-            return false;
-
-        else if (mType == Type.ENDPOINT)
-            if (target.getType() == Type.ENDPOINT)
-                return mEndpoint.getAddressAsLong() > target.getEndpoint().getAddressAsLong();
-            else
-                return false;
-
-        else
-            return true;
+        return mType != Type.NETWORK && (mType != Type.ENDPOINT || target.getType() == Type.ENDPOINT && mEndpoint.getAddressAsLong() > target.getEndpoint().getAddressAsLong());
     }
 
     public Target(Network net) {
@@ -382,11 +372,7 @@ public class Target {
     }
 
     public boolean equals(Object o) {
-        if (o instanceof Target)
-            return equals((Target) o);
-
-        else
-            return false;
+        return o instanceof Target && equals((Target) o);
     }
 
     public String getDisplayAddress() {
@@ -404,7 +390,7 @@ public class Target {
     }
 
     public String toString() {
-        if (hasAlias() == true)
+        if (hasAlias())
             return mAlias;
 
         else
@@ -413,21 +399,20 @@ public class Target {
 
     public String getDescription() {
         if (mType == Type.NETWORK)
-            return "This is your network subnet mask";
+            return System.getContext().getString(R.string.network_subnet_mask);
 
         else if (mType == Type.ENDPOINT) {
             String vendor = System.getMacVendor(mEndpoint.getHardware()),
                     desc = mEndpoint.getHardwareAsString();
 
-            if (vendor != null)
-                desc += " - " + vendor;
+            if (vendor != null) desc += " - " + vendor;
 
             try {
                 if (mEndpoint.getAddress().equals(System.getNetwork().getGatewayAddress()))
-                    desc += " ( Your network gateway / router )";
+                    desc += "\n" + System.getContext().getString(R.string.gateway_router);
 
                 else if (mEndpoint.getAddress().equals(System.getNetwork().getLocalAddress()))
-                    desc += " ( This device )";
+                    desc += System.getContext().getString(R.string.this_device);
             } catch (SocketException e) {
                 System.errorLogging(TAG, e);
             }
@@ -543,10 +528,10 @@ public class Target {
     }
 
     public void addOpenPort(Port port) {
-        for (int i = 0; i < mPorts.size(); i++) {
-            if (mPorts.get(i).number == port.number) {
+        for (Port mPort1 : mPorts) {
+            if (mPort1.number == port.number) {
                 if (port.service != null)
-                    mPorts.get(i).service = port.service;
+                    mPort1.service = port.service;
 
                 return;
             }
@@ -572,9 +557,9 @@ public class Target {
     }
 
     public boolean hasOpenPortsWithService() {
-        if (mPorts.isEmpty() == false) {
+        if (!mPorts.isEmpty()) {
             for (Port p : mPorts) {
-                if (p.service != null && p.service.isEmpty() == false)
+                if (p.service != null && !p.service.isEmpty())
                     return true;
             }
         }
@@ -608,7 +593,7 @@ public class Target {
     }
 
     public void addVulnerability(Port port, Vulnerability v) {
-        if (mVulnerabilities.containsKey(port.toString()) == false) {
+        if (!mVulnerabilities.containsKey(port.toString())) {
             mVulnerabilities.put(port.toString(), new ArrayList<Vulnerability>());
         } else {
             for (Vulnerability vuln : mVulnerabilities.get(port.toString()))

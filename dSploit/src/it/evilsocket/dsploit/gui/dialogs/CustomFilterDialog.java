@@ -88,7 +88,7 @@ public class CustomFilterDialog extends AlertDialog {
             }
         });
 
-        this.setButton2("Cancel", new DialogInterface.OnClickListener() {
+        this.setButton2(activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
             }
