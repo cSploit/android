@@ -5,11 +5,6 @@ Copyleft of Simone Margaritelli aka evilsocket, sponsored by the BackBox Linux P
 
 - <http://www.dsploit.net/>
 
-!!! Important !!!
----
-
-**Before opening new issues please read this <http://www.dsploit.net/2013/09/24/the-past-the-present-and-the-future-of-dsploit/>**  
-
 -------------
 
 dSploit is an Android network analysis and penetration suite which aims to offer to IT security experts/geeks
