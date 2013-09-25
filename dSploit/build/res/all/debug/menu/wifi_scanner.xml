@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/scan"
+        android:title="Scan"
+        android:icon="@drawable/ic_refresh"
+        android:showAsAction="always" />
+
+</menu><!-- From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/res/menu/wifi_scanner.xml -->

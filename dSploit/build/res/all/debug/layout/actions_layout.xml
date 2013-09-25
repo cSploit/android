@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    android:paddingTop="8dp">
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:fontFamily="sans-serif-condensed"
+        android:textAllCaps="true"
+        android:text="@string/select_module"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/gray_text" />
+
+    <!--suppress AndroidDomInspection -->
+    <ListView
+        android:id="@+id/android:list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/textView1"/>
+
+</RelativeLayout><!-- From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/res/layout/actions_layout.xml -->

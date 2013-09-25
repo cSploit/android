@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
- 
-  <item android:id="@+id/user_wordlist"  android:title="User Wordlist" android:showAsAction="always"/>
-  <item android:id="@+id/pass_wordlist"  android:title="Password Wordlist" android:showAsAction="always"/>
-
-</menu>

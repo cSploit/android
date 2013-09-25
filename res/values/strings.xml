@@ -1,8 +1,0 @@
-<resources>
-
-    <string name="app_name">DSploit</string>
-    <string name="menu_settings">Settings</string>
-    <string name="title_activity_main">dSploit</string>
-    <string name="crash_toast_text">Ooooops ! I crashed, but a report is going to be sent to my developer to help fix the issue :)</string>
-    
-</resources>

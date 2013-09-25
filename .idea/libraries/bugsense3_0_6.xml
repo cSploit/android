@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="bugsense3.0.6">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dSploit/libs/bugsense3.0.6.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

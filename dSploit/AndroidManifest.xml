@@ -1,0 +1,108 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="it.evilsocket.dsploit"
+          android:versionCode="1"
+          android:versionName="1.0.31b">
+
+    <uses-sdk
+            android:minSdkVersion="9"
+            android:targetSdkVersion="18"/>
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
+    <application
+            android:name="DSploitApplication"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.DSploitActionBarStyle"
+            android:allowBackup="true">
+        <activity
+                android:name=".MainActivity"
+                android:label="@string/title_activity_main">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <!--suppress AndroidDomInspection -->
+        <service
+                android:name=".net.NetworkDiscovery"
+                android:enabled="true"/>
+        <!--suppress AndroidDomInspection -->
+        <service
+                android:name=".core.UpdateChecker"
+                android:enabled="true"/>
+
+        <activity
+                android:name=".WifiScannerActivity"
+                android:label="@string/title_activity_main">
+        </activity>
+        <activity
+                android:name=".SettingsActivity"
+                android:label="@string/title_activity_main">
+        </activity>
+        <activity
+                android:name=".gui.DirectoryPicker"
+                android:label="@string/title_activity_main">
+        </activity>
+        <activity
+                android:name=".ActionActivity"
+                android:label="@string/title_activity_main">
+        </activity>
+        <activity
+                android:name=".plugins.RouterPwn"
+                android:label="@string/title_activity_main">
+        </activity>
+        <activity
+                android:name=".plugins.Traceroute"
+                android:label="@string/title_activity_main">
+        </activity>
+        <activity
+                android:name=".plugins.PortScanner"
+                android:label="@string/title_activity_main">
+        </activity>
+        <activity
+                android:name=".plugins.Inspector"
+                android:label="@string/title_activity_main">
+        </activity>
+        <activity
+                android:name=".plugins.ExploitFinder"
+                android:label="@string/title_activity_main">
+        </activity>
+        <activity
+                android:name=".plugins.mitm.MITM"
+                android:label="@string/title_activity_main">
+        </activity>
+        <activity
+                android:name=".plugins.mitm.Sniffer"
+                android:label="@string/title_activity_main">
+        </activity>
+        <activity
+                android:name=".plugins.mitm.PasswordSniffer"
+                android:label="@string/title_activity_main">
+        </activity>
+        <activity
+                android:name=".plugins.mitm.Hijacker"
+                android:label="@string/title_activity_main">
+        </activity>
+        <activity
+                android:name=".plugins.mitm.HijackerWebView"
+                android:label="@string/title_activity_main">
+        </activity>
+        <activity
+                android:name=".plugins.LoginCracker"
+                android:label="@string/title_activity_main">
+        </activity>
+        <activity
+                android:name=".plugins.PacketForger"
+                android:label="@string/title_activity_main">
+        </activity>
+    </application>
+
+</manifest>

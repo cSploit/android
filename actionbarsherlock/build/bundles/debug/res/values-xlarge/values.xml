@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values-xlarge/abs__dimens.xml -->
+    <dimen name="abs__action_bar_default_height">56dip</dimen>
+    <dimen name="abs__action_bar_icon_vertical_padding">4dip</dimen>
+    <dimen name="abs__action_bar_subtitle_bottom_margin">9dip</dimen>
+    <dimen name="abs__action_bar_subtitle_text_size">14dp</dimen>
+    <dimen name="abs__action_bar_subtitle_top_margin">-3dp</dimen>
+    <dimen name="abs__action_bar_title_text_size">18dp</dimen>
+    <dimen name="abs__action_button_min_width">64dip</dimen>
+
+    <item name="abs__dialog_min_width_major" type="dimen">45%</item>
+    <item name="abs__dialog_min_width_minor" type="dimen">72%</item>
+
+</resources>
