@@ -18,4 +18,4 @@
     <item android:drawable="@drawable/abs__list_pressed_holo_dark"  />
     <item android:drawable="@drawable/abs__list_longpressed_holo"  />
 </transition>
-<!-- From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/drawable/abs__list_selector_background_transition_holo_dark.xml --><!-- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__list_selector_background_transition_holo_dark.xml -->
+<!-- From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/drawable/abs__list_selector_background_transition_holo_dark.xml --><!-- From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/drawable/abs__list_selector_background_transition_holo_dark.xml -->

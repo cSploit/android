@@ -2,4 +2,4 @@
 <set xmlns:android="http://schemas.android.com/apk/res/android">
     <translate android:fromXDelta="-100%p" android:toXDelta="0" android:duration="400" />
     <alpha android:fromAlpha="0.0" android:toAlpha="1.0" android:duration="100" android:startOffset="200" />
-</set><!-- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/res/anim/slide_in_left.xml -->
+</set><!-- From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/res/anim/slide_in_left.xml -->

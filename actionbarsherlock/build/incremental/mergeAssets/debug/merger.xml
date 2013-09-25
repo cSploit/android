@@ -2,10 +2,10 @@
 <merger>
 
     <dataSet config="main" >
-        <source path="/home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/assets" />
+        <source path="/home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/assets" />
     </dataSet>
     <dataSet config="debug" >
-        <source path="/home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/src/debug/assets" />
+        <source path="/home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/src/debug/assets" />
     </dataSet>
 
 </merger>

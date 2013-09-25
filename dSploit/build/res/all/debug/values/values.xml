@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
 
-    <!-- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml -->
+    <!-- From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml -->
     <attr name="actionBarDivider" format="reference" />
     <attr name="actionBarItemBackground" format="reference" />
     <attr name="actionBarSize" format="dimension">
@@ -114,11 +114,11 @@
     <color name="abs__bright_foreground_disabled_holo_light">#ffb2b2b2</color>
     <color name="abs__bright_foreground_holo_dark">@color/abs__background_holo_light</color>
     <color name="abs__bright_foreground_holo_light">@color/abs__background_holo_dark</color>
-    <!-- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/res/values/colors.xml -->
+    <!-- From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/res/values/colors.xml -->
     <color name="app_color">#FF3F9FE0</color>
     <color name="background_window">#FFE5E5E5</color>
     <color name="gray_text">#FF888888</color>
-    <!-- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml -->
+    <!-- From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml -->
     <declare-styleable name="SherlockActionBar">
 
         <!-- The type of navigation to use. -->
@@ -506,9 +506,10 @@
     <item name="abs__up" type="id"/>
 
     <integer name="abs__max_action_buttons">2</integer>
-    <!-- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/res/values/strings.xml -->
+    <!-- From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/res/values/strings.xml -->
     <string name="Charset">Charset</string>
-    <!-- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml -->
+    <string name="about_dsploit_v_">About dSploit v</string>
+    <!-- From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml -->
     <string name="abs__action_bar_home_description">Navigate home</string>
     <string name="abs__action_bar_up_description">Navigate up</string>
     <string name="abs__action_menu_overflow_description">More options</string>
@@ -522,21 +523,60 @@
     <string name="abs__searchview_description_voice">Voice search</string>
     <string name="abs__shareactionprovider_share_with">Share with</string>
     <string name="abs__shareactionprovider_share_with_application">Share with <ns1:g id="application_name" example="Bluetooth">%s</ns1:g></string>
-    <!-- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/res/values/strings.xml -->
+    <!-- From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/res/values/strings.xml -->
+    <string name="add_custom_target">Add custom target</string>
     <string name="address">Address</string>
     <string name="app_name">dSploit</string>
+    <string name="arm_error"><![CDATA[<p>It seems like your device processor is not an ARM, i\'m sorry but it\'s not compatible with dSploit.</p>]]></string>
+    <string name="arm_error2"><![CDATA[<p>For more info read the <a href=\"http://dsploit.net/#requirements\">requirements</a> section.</p>]]></string>
+    <string name="busybox_required">Full BusyBox installation required, killall binary not found(maybe you have an old busybox version).</string>
+    <string name="cancel">Cancel</string>
+    <string name="cancel_dialog">Cancel</string>
+    <string name="checking">Checking…</string>
     <string name="choose">Choose</string>
-    <string name="crash_toast_text">Ooooops ! I crashed, but a report is going to be sent to my developer to help fix the issue :)</string>
+    <string name="choose_dir">Choose </string>
+    <string name="close_confirm">This will close dSploit, are you sure you want to continue ?</string>
+    <string name="connect">Connect</string>
+    <string name="connected_to"><![CDATA[Connected to <b>]]></string>
+    <string name="connected_to2"><![CDATA[</b> with key <b><font color=\"green\">]]></string>
+    <string name="connected_to3"><![CDATA[</font></b> !]]></string>
+    <string name="connecting">Connecting…</string>
+    <string name="connection_to"><![CDATA[Connection to <b>]]></string>
+    <string name="connection_to2"><![CDATA[</b> <b><font color=\"red\">FAILED</font></b>.]]></string>
+    <string name="could_not_read_folder">Could not read folder contents.</string>
+    <string name="couldnt_send_wol_packet">Could not send a WOL packet to a target without a known MAC address.</string>
+    <string name="crack">Crack</string>
+    <string name="crash_toast_text">Ooooops ! I crashed, but a report is going to be sent to my
+        developer to help fix the issue :)</string>
+    <string name="custom_charset">Custom Charset</string>
+    <string name="customize_wol_port">Customize WOL port and press Send.</string>
     <string name="device_type">Device Type</string>
     <string name="disclaimer">Disclaimer</string>
+    <string name="downloading_update">Downloading update…</string>
     <string name="dsploit_catchphrase">dSploit - An Android network penetration suite.</string>
-    <string name="dsploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket, sponsored by the
-        BackBox Linux Project.</string>
+    <string name="dsploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket, sponsored by
+        theBackBox Linux Project.</string>
     <string name="dsploit_disclaimer"><![CDATA[This application is not to be used for any purposes other than to demonstrate its functions, and must only be used on networks for which you have permission to do so. Any other use is not the responsibility of the developer.In other words, don&apos;t be stupid, and don&apos;t direct angry people towards me.]]></string>
     <string name="dsploit_url">http://www.dsploit.net/</string>
+    <string name="empty_port_list">Empty port list.</string>
+    <string name="enter_chars_wanted">Enter the chars you want to use in the custom charset:</string>
+    <string name="enter_key_or_crack">Enter WiFi Key or attempt cracking:</string>
+    <string name="enter_ports_list">Enter a comma separated list of ports:</string>
     <string name="enter_redirection_details">Enter redirection details below:</string>
-    <string name="filter_desc">Enter a custom replace filter, including simple string replacement or regular expressions.</string>
+    <string name="enter_session_name">Enter the name of the session file :</string>
+    <string name="enter_url">Enter an URL, host name or ip address below:</string>
+    <string name="enter_wifi_key">Enter WiFi Key:</string>
+    <string name="error">Error</string>
+    <string name="error_occured">An error occurred while downloading the update.</string>
+    <string name="exit">Exit</string>
+    <string name="fatal_error_html"><![CDATA[<p>It seems like your ROM has the <b>LD_LIBRARY_PATH bug</b>, i\'m sorry but it\'s not compatible with dSploit.</p>]]></string>
+    <string name="fatal_error_html2"><![CDATA[<p>For more info read the <a href=\"http://dsploit.net/#faq\">FAQ</a>.</p>]]></string>
+    <string name="filter_desc">Enter a custom replace filter, including simple string replacement or
+        regular expressions.</string>
     <string name="from">From</string>
+    <string name="gateway_router">(Your network gateway / router)</string>
+    <string name="generating_keys">Generating keys…</string>
+    <string name="github_issues">https://github.com/evilsocket/dsploit/issues/new</string>
     <string name="gpl_license">This program is free software: you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by the Free Software
         Foundation, either version 3 of the License, or (at your option) any later version.
@@ -545,37 +585,116 @@
         See the GNU General Public License for more details.
         You should have received a copy of the GNU General Public License along with this program.
         If not, see http://www.gnu.org/licenses/.</string>
+    <string name="hijack_session">Hijack Session</string>
+    <string name="initialization_error">Initialization Error</string>
+    <string name="initializing">Initializing…</string>
+    <string name="inspector">Inspector</string>
+    <string name="inspector_desc">Perform target operating system and services deep detection (slower than port scanner, but more accurate).</string>
+    <string name="install_error">Error during files installation!</string>
+    <string name="invalid_filename">Invalid file name.</string>
+    <string name="invalid_port">Invalid port specified.</string>
+    <string name="invalid_port_">Invalid port \'</string>
+    <string name="invalid_ports">Invalid ports specified.</string>
+    <string name="invalid_session">Invalid session name.</string>
+    <string name="invalid_target">Invalid target.</string>
     <string name="license">License</string>
+    <string name="loading_changelog">Loading changelog…</string>
+    <string name="login_cracker">Login Cracker</string>
+    <string name="login_cracker_desc">A very fast network logon cracker which support many different
+        services.</string>
     <string name="max_length">Max Length</string>
     <string name="menu_settings">Settings</string>
     <string name="min_length">Min Length</string>
+    <string name="mitm">MITM</string>
+    <string name="mitm_desc">Perform various man-in-the-middle attacks, such as network sniffing,
+        traffic manipulation, etc…</string>
+    <string name="net_discovery_started">Network discovery started.</string>
+    <string name="net_discovery_stopped">Network discovery stopped.</string>
+    <string name="network_subnet_mask">This is your network subnet mask</string>
+    <string name="new_session_started">New session started</string>
+    <string name="new_update_desc">A new update to version</string>
+    <string name="new_update_desc2">is available, do you want to download it ?</string>
+    <string name="new_version">New version</string>
+    <string name="new_version2">found!</string>
+    <string name="no">No</string>
+    <string name="no_activities_for_url">No activities to handle this type of url.</string>
+    <string name="no_connectivity">No connectivity available.</string>
+    <string name="no_infos_on_target">No specific informations about services running on target
+        machine, run the service inspector first.</string>
+    <string name="no_open_ports">No open ports detected on current target, run the service inspector
+        first.</string>
+    <string name="no_session_found">No session file found on sd card.</string>
+    <string name="no_updates_available">No updates available.</string>
+    <string name="no_wifi_available">No WiFi connection available, the application will just check for updates. #STATUS#</string>
+    <string name="nothing_found"><![CDATA[<small><i>Nothing Found</i></small>]]></string>
+    <string name="only_4_root">This application can run only on rooted devices.</string>
     <string name="os">OS</string>
+    <string name="packet_forger">Packet Forger</string>
+    <string name="packet_forger_desc">Craft and send a custom TCP or UDP packet to the target.</string>
     <string name="port">Port</string>
+    <string name="port_must_be_greater">Port must be greater than 0 and smaller than 65535.</string>
+    <string name="port_scanner">Port Scanner</string>
+    <string name="port_scanner_desc">Perform a SYN port scanning on target.</string>
+    <string name="press_back">Press back again to close this app.</string>
     <string name="protocol">Protocol</string>
     <string name="request">Request</string>
+    <string name="request_empty">The request can not be empty.</string>
+    <string name="request_sent">Request sent.</string>
     <string name="response">Response</string>
+    <string name="router_pwn">Router PWN</string>
+    <string name="router_pwn_desc">Launch the http://routerpwn.com/ service to pwn your router.</string>
+    <string name="save_session">Save Session</string>
+    <string name="scanning">Scanning…</string>
     <string name="select_module">Select a module to run</string>
+    <string name="select_ports">Select Ports</string>
+    <string name="select_session">Select Session</string>
+    <string name="select_session_file">Select a session file from the sd card :</string>
+    <string name="select_target">Select a target below by clicking on a row, or long click on it to enter an alias.</string>
+    <string name="selected">Selected</string>
+    <string name="selected_">Selected </string>
     <string name="send">Send</string>
     <string name="service">Service</string>
     <string name="services">Services</string>
+    <string name="session_saved_to">Session saved to  </string>
+    <string name="session_sniffer">Session Sniffer</string>
+    <string name="set_alias">Set an alias for this target:</string>
+    <string name="set_session_filename">Set the session file name:</string>
+    <string name="something_went_wrong">Something went wrong, please select again a valid target.</string>
+    <string name="something_went_wrong_changelog"><![CDATA[<html><body><p><b>Something went wrong while retrieving the changelog:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
     <string name="sort">Sort:</string>
     <string name="start">Start</string>
     <string name="start_hijack">Tap on a session to start hijacking, long tap to save it to file.</string>
+    <string name="start_hijacking">Stop sniffing and start session hijacking?</string>
+    <string name="start_hijacking2">Start session hijacking?</string>
+    <string name="start_monitor">Start Network Monitor</string>
     <string name="stop">Stop</string>
+    <string name="stop_monitor">Stop Network Monitor</string>
     <string name="stopped">Stopped…</string>
     <string name="target">Target</string>
+    <string name="target_alias">Target Alias</string>
+    <string name="this_device"> (This device)</string>
     <string name="title_activity_main">dSploit</string>
     <string name="to">To</string>
     <string name="toggle_button">ToggleButton</string>
+    <string name="trace">Trace</string>
+    <string name="trace_desc">Perform a traceroute on target.</string>
     <string name="unknown">unknown</string>
+    <string name="update_available">Update Available</string>
     <string name="username">Username</string>
+    <string name="vulnerability_finder">Vulnerability Finder</string>
+    <string name="vulnerability_finder_desc">Search for known vulnerabilities for target running services upon National Vulnerability Database.</string>
     <string name="wait_for_response">Wait for a response</string>
     <string name="wake_on_lan">Wake On Lan</string>
-    <!-- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/res/values/style.xml -->
+    <string name="warning">Warning</string>
+    <string name="warning_new_session">Starting a new session would delete the current one, continue?</string>
+    <string name="wifi_key_copied">WiFi key copied to clipboard.</string>
+    <string name="wifi_went_down">WiFi connectivity went down.</string>
+    <string name="yes">Yes</string>
+    <!-- From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/res/values/style.xml -->
     <style name="ActionBarStyle" parent="@style/Widget.Sherlock.Light.ActionBar.Solid.Inverse">
         <item name="android:background">@color/app_color</item>
     </style>
-    <!-- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml -->
+    <!-- From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml -->
     <style name="Sherlock.__TextAppearance.Small" parent="Widget">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">?android:attr/textColorSecondary</item>
@@ -762,12 +881,12 @@
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">normal</item>
     </style>
-    <!-- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/res/values/style.xml -->
-    <style name="Theme.DSploitActionBarStyle" parent="Theme.Sherlock.Light">
+    <!-- From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/res/values/style.xml -->
+    <style name="Theme.DSploitActionBarStyle" parent="Theme.Sherlock.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/ActionBarStyle</item>
         <item name="android:windowBackground">@color/background_window</item>
     </style>
-    <!-- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml -->
+    <!-- From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml -->
     <style name="Theme.Sherlock" parent="Sherlock.__Theme">
 
         <!-- Action bar styles (from Theme.Holo) -->

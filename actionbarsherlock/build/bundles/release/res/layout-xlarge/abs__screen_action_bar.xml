@@ -49,4 +49,4 @@ This is an optimized layout for a screen with the Action Bar enabled.
         android:foregroundGravity="fill_horizontal|top"
         android:foreground="?attr/windowContentOverlay" />
 </LinearLayout>
-<!-- From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/layout-xlarge/abs__screen_action_bar.xml -->
+<!-- From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/layout-xlarge/abs__screen_action_bar.xml -->

@@ -156,7 +156,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
          */
         public static int activityChooserViewStyle=0x7f01005f;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values/abs__attrs.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values/abs__attrs.xml 
          <p>May be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
 <p>May be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
@@ -674,27 +674,27 @@ containing a value of this type.
         public static int windowSplitActionBar=0x7f01005d;
     }
     public static final class bool {
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values/abs__bools.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values-w480dp/abs__bools.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values/abs__bools.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values-w480dp/abs__bools.xml 
          */
         public static int abs__action_bar_embed_tabs=0x7f040000;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values-sw600dp/abs__bools.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values-sw600dp/abs__bools.xml 
          */
         public static int abs__action_bar_expanded_action_views_exclusive=0x7f040001;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values/abs__config.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values/abs__config.xml 
          */
         public static int abs__config_actionMenuItemAllCaps=0x7f040002;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values-w480dp/abs__config.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values-w480dp/abs__config.xml 
          */
         public static int abs__config_allowActionMenuItemTextWithIcon=0x7f040003;
         public static int abs__config_showMenuShortcutsWhenKeyboardPresent=0x7f040004;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values/abs__bools.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values-w480dp/abs__bools.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values/abs__bools.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values-w480dp/abs__bools.xml 
          */
         public static int abs__split_action_bar_is_narrow=0x7f040005;
     }
     public static final class color {
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values/abs__colors.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values/abs__colors.xml 
          */
         public static int abs__background_holo_dark=0x7f050000;
         public static int abs__background_holo_light=0x7f050001;
@@ -708,14 +708,14 @@ containing a value of this type.
         public static int abs__primary_text_holo_light=0x7f050009;
     }
     public static final class dimen {
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values/abs__dimens.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values-land/abs__dimens.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values-large-hdpi-1024x600/abs__dimens.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values-large-mdpi-1024x600/abs__dimens.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values-large-land-hdpi-1024x600/abs__dimens.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values-large-land-mdpi-1024x600/abs__dimens.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values-xlarge/abs__dimens.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values-sw600dp/abs__dimens.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values/abs__dimens.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values-land/abs__dimens.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values-large-hdpi-1024x600/abs__dimens.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values-large-mdpi-1024x600/abs__dimens.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values-large-land-hdpi-1024x600/abs__dimens.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values-large-land-mdpi-1024x600/abs__dimens.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values-xlarge/abs__dimens.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values-sw600dp/abs__dimens.xml 
          */
         public static int abs__action_bar_default_height=0x7f070000;
         public static int abs__action_bar_icon_vertical_padding=0x7f070001;
@@ -724,12 +724,12 @@ containing a value of this type.
         public static int abs__action_bar_subtitle_top_margin=0x7f070004;
         public static int abs__action_bar_title_text_size=0x7f070005;
         public static int abs__action_button_min_width=0x7f070006;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values/abs__config.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values/abs__config.xml 
          */
         public static int abs__config_prefDialogWidth=0x7f070007;
         public static int abs__dialog_min_width_major=0x7f07000d;
         public static int abs__dialog_min_width_minor=0x7f07000e;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values/abs__dimens.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values/abs__dimens.xml 
          */
         public static int abs__dropdownitem_icon_width=0x7f070008;
         public static int abs__dropdownitem_text_padding_left=0x7f070009;
@@ -786,70 +786,71 @@ containing a value of this type.
         public static int abs__ic_menu_moreoverflow_holo_light=0x7f02002d;
         public static int abs__ic_menu_moreoverflow_normal_holo_dark=0x7f02002e;
         public static int abs__ic_menu_moreoverflow_normal_holo_light=0x7f02002f;
-        public static int abs__ic_menu_share_holo_dark=0x7f020030;
-        public static int abs__ic_menu_share_holo_light=0x7f020031;
-        public static int abs__ic_search=0x7f020032;
-        public static int abs__ic_search_api_holo_light=0x7f020033;
-        public static int abs__ic_voice_search=0x7f020034;
-        public static int abs__ic_voice_search_api_holo_light=0x7f020035;
-        public static int abs__item_background_holo_dark=0x7f020036;
-        public static int abs__item_background_holo_light=0x7f020037;
-        public static int abs__list_activated_holo=0x7f020038;
-        public static int abs__list_divider_holo_dark=0x7f020039;
-        public static int abs__list_divider_holo_light=0x7f02003a;
-        public static int abs__list_focused_holo=0x7f02003b;
-        public static int abs__list_longpressed_holo=0x7f02003c;
-        public static int abs__list_pressed_holo_dark=0x7f02003d;
-        public static int abs__list_pressed_holo_light=0x7f02003e;
-        public static int abs__list_selector_background_transition_holo_dark=0x7f02003f;
-        public static int abs__list_selector_background_transition_holo_light=0x7f020040;
-        public static int abs__list_selector_disabled_holo_dark=0x7f020041;
-        public static int abs__list_selector_disabled_holo_light=0x7f020042;
-        public static int abs__list_selector_holo_dark=0x7f020043;
-        public static int abs__list_selector_holo_light=0x7f020044;
-        public static int abs__menu_dropdown_panel_holo_dark=0x7f020045;
-        public static int abs__menu_dropdown_panel_holo_light=0x7f020046;
-        public static int abs__progress_bg_holo_dark=0x7f020047;
-        public static int abs__progress_bg_holo_light=0x7f020048;
-        public static int abs__progress_horizontal_holo_dark=0x7f020049;
-        public static int abs__progress_horizontal_holo_light=0x7f02004a;
-        public static int abs__progress_medium_holo=0x7f02004b;
-        public static int abs__progress_primary_holo_dark=0x7f02004c;
-        public static int abs__progress_primary_holo_light=0x7f02004d;
-        public static int abs__progress_secondary_holo_dark=0x7f02004e;
-        public static int abs__progress_secondary_holo_light=0x7f02004f;
-        public static int abs__search_dropdown_dark=0x7f020050;
-        public static int abs__search_dropdown_light=0x7f020051;
-        public static int abs__spinner_48_inner_holo=0x7f020052;
-        public static int abs__spinner_48_outer_holo=0x7f020053;
-        public static int abs__spinner_ab_default_holo_dark=0x7f020054;
-        public static int abs__spinner_ab_default_holo_light=0x7f020055;
-        public static int abs__spinner_ab_disabled_holo_dark=0x7f020056;
-        public static int abs__spinner_ab_disabled_holo_light=0x7f020057;
-        public static int abs__spinner_ab_focused_holo_dark=0x7f020058;
-        public static int abs__spinner_ab_focused_holo_light=0x7f020059;
-        public static int abs__spinner_ab_holo_dark=0x7f02005a;
-        public static int abs__spinner_ab_holo_light=0x7f02005b;
-        public static int abs__spinner_ab_pressed_holo_dark=0x7f02005c;
-        public static int abs__spinner_ab_pressed_holo_light=0x7f02005d;
-        public static int abs__tab_indicator_ab_holo=0x7f02005e;
-        public static int abs__tab_selected_focused_holo=0x7f02005f;
-        public static int abs__tab_selected_holo=0x7f020060;
-        public static int abs__tab_selected_pressed_holo=0x7f020061;
-        public static int abs__tab_unselected_pressed_holo=0x7f020062;
-        public static int abs__textfield_search_default_holo_dark=0x7f020063;
-        public static int abs__textfield_search_default_holo_light=0x7f020064;
-        public static int abs__textfield_search_right_default_holo_dark=0x7f020065;
-        public static int abs__textfield_search_right_default_holo_light=0x7f020066;
-        public static int abs__textfield_search_right_selected_holo_dark=0x7f020067;
-        public static int abs__textfield_search_right_selected_holo_light=0x7f020068;
-        public static int abs__textfield_search_selected_holo_dark=0x7f020069;
-        public static int abs__textfield_search_selected_holo_light=0x7f02006a;
-        public static int abs__textfield_searchview_holo_dark=0x7f02006b;
-        public static int abs__textfield_searchview_holo_light=0x7f02006c;
-        public static int abs__textfield_searchview_right_holo_dark=0x7f02006d;
-        public static int abs__textfield_searchview_right_holo_light=0x7f02006e;
-        public static int abs__toast_frame=0x7f02006f;
+        public static int abs__ic_menu_moreoverflow_normal_holo_light_backup=0x7f020030;
+        public static int abs__ic_menu_share_holo_dark=0x7f020031;
+        public static int abs__ic_menu_share_holo_light=0x7f020032;
+        public static int abs__ic_search=0x7f020033;
+        public static int abs__ic_search_api_holo_light=0x7f020034;
+        public static int abs__ic_voice_search=0x7f020035;
+        public static int abs__ic_voice_search_api_holo_light=0x7f020036;
+        public static int abs__item_background_holo_dark=0x7f020037;
+        public static int abs__item_background_holo_light=0x7f020038;
+        public static int abs__list_activated_holo=0x7f020039;
+        public static int abs__list_divider_holo_dark=0x7f02003a;
+        public static int abs__list_divider_holo_light=0x7f02003b;
+        public static int abs__list_focused_holo=0x7f02003c;
+        public static int abs__list_longpressed_holo=0x7f02003d;
+        public static int abs__list_pressed_holo_dark=0x7f02003e;
+        public static int abs__list_pressed_holo_light=0x7f02003f;
+        public static int abs__list_selector_background_transition_holo_dark=0x7f020040;
+        public static int abs__list_selector_background_transition_holo_light=0x7f020041;
+        public static int abs__list_selector_disabled_holo_dark=0x7f020042;
+        public static int abs__list_selector_disabled_holo_light=0x7f020043;
+        public static int abs__list_selector_holo_dark=0x7f020044;
+        public static int abs__list_selector_holo_light=0x7f020045;
+        public static int abs__menu_dropdown_panel_holo_dark=0x7f020046;
+        public static int abs__menu_dropdown_panel_holo_light=0x7f020047;
+        public static int abs__progress_bg_holo_dark=0x7f020048;
+        public static int abs__progress_bg_holo_light=0x7f020049;
+        public static int abs__progress_horizontal_holo_dark=0x7f02004a;
+        public static int abs__progress_horizontal_holo_light=0x7f02004b;
+        public static int abs__progress_medium_holo=0x7f02004c;
+        public static int abs__progress_primary_holo_dark=0x7f02004d;
+        public static int abs__progress_primary_holo_light=0x7f02004e;
+        public static int abs__progress_secondary_holo_dark=0x7f02004f;
+        public static int abs__progress_secondary_holo_light=0x7f020050;
+        public static int abs__search_dropdown_dark=0x7f020051;
+        public static int abs__search_dropdown_light=0x7f020052;
+        public static int abs__spinner_48_inner_holo=0x7f020053;
+        public static int abs__spinner_48_outer_holo=0x7f020054;
+        public static int abs__spinner_ab_default_holo_dark=0x7f020055;
+        public static int abs__spinner_ab_default_holo_light=0x7f020056;
+        public static int abs__spinner_ab_disabled_holo_dark=0x7f020057;
+        public static int abs__spinner_ab_disabled_holo_light=0x7f020058;
+        public static int abs__spinner_ab_focused_holo_dark=0x7f020059;
+        public static int abs__spinner_ab_focused_holo_light=0x7f02005a;
+        public static int abs__spinner_ab_holo_dark=0x7f02005b;
+        public static int abs__spinner_ab_holo_light=0x7f02005c;
+        public static int abs__spinner_ab_pressed_holo_dark=0x7f02005d;
+        public static int abs__spinner_ab_pressed_holo_light=0x7f02005e;
+        public static int abs__tab_indicator_ab_holo=0x7f02005f;
+        public static int abs__tab_selected_focused_holo=0x7f020060;
+        public static int abs__tab_selected_holo=0x7f020061;
+        public static int abs__tab_selected_pressed_holo=0x7f020062;
+        public static int abs__tab_unselected_pressed_holo=0x7f020063;
+        public static int abs__textfield_search_default_holo_dark=0x7f020064;
+        public static int abs__textfield_search_default_holo_light=0x7f020065;
+        public static int abs__textfield_search_right_default_holo_dark=0x7f020066;
+        public static int abs__textfield_search_right_default_holo_light=0x7f020067;
+        public static int abs__textfield_search_right_selected_holo_dark=0x7f020068;
+        public static int abs__textfield_search_right_selected_holo_light=0x7f020069;
+        public static int abs__textfield_search_selected_holo_dark=0x7f02006a;
+        public static int abs__textfield_search_selected_holo_light=0x7f02006b;
+        public static int abs__textfield_searchview_holo_dark=0x7f02006c;
+        public static int abs__textfield_searchview_holo_light=0x7f02006d;
+        public static int abs__textfield_searchview_right_holo_dark=0x7f02006e;
+        public static int abs__textfield_searchview_right_holo_light=0x7f02006f;
+        public static int abs__toast_frame=0x7f020070;
     }
     public static final class id {
         public static int abs__action_bar=0x7f060020;
@@ -857,7 +858,7 @@ containing a value of this type.
         public static int abs__action_bar_subtitle=0x7f060011;
         public static int abs__action_bar_title=0x7f060010;
         public static int abs__action_context_bar=0x7f060021;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values/abs__ids.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values/abs__ids.xml 
          */
         public static int abs__action_menu_divider=0x7f06000a;
         public static int abs__action_menu_presenter=0x7f06000b;
@@ -906,10 +907,10 @@ containing a value of this type.
         public static int wrap_content=0x7f060009;
     }
     public static final class integer {
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values/abs__dimens.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values-w360dp/abs__dimens.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values-w500dp/abs__dimens.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values-w600dp/abs__dimens.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values/abs__dimens.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values-w360dp/abs__dimens.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values-w500dp/abs__dimens.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values-w600dp/abs__dimens.xml 
          */
         public static int abs__max_action_buttons=0x7f080000;
     }
@@ -939,7 +940,7 @@ containing a value of this type.
         public static int sherlock_spinner_item=0x7f030016;
     }
     public static final class string {
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values/abs__strings.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values/abs__strings.xml 
          */
         public static int abs__action_bar_home_description=0x7f090000;
         public static int abs__action_bar_up_description=0x7f090001;
@@ -956,17 +957,17 @@ containing a value of this type.
         public static int abs__shareactionprovider_share_with_application=0x7f09000c;
     }
     public static final class style {
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values/abs__styles.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values/abs__styles.xml 
          */
         public static int Sherlock___TextAppearance_Small=0x7f0a0000;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values/abs__themes.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values-v11/abs__themes.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values-v14/abs__themes.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values/abs__themes.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values-v11/abs__themes.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values-v14/abs__themes.xml 
          */
         public static int Sherlock___Theme=0x7f0a0001;
         public static int Sherlock___Theme_DarkActionBar=0x7f0a0002;
         public static int Sherlock___Theme_Light=0x7f0a0003;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values/abs__styles.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values/abs__styles.xml 
          */
         public static int Sherlock___Widget_ActionBar=0x7f0a0004;
         public static int Sherlock___Widget_ActionMode=0x7f0a0005;
@@ -980,7 +981,7 @@ containing a value of this type.
         public static int TextAppearance_Sherlock_Light_SearchResult_Subtitle=0x7f0a000d;
         public static int TextAppearance_Sherlock_Light_SearchResult_Title=0x7f0a000e;
         public static int TextAppearance_Sherlock_Light_Small=0x7f0a000f;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values-v14/abs__styles.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values-v14/abs__styles.xml 
          */
         public static int TextAppearance_Sherlock_Light_Widget_PopupMenu_Large=0x7f0a0010;
         public static int TextAppearance_Sherlock_Light_Widget_PopupMenu_Small=0x7f0a0011;
@@ -1003,19 +1004,19 @@ containing a value of this type.
         public static int TextAppearance_Sherlock_Widget_PopupMenu_Large=0x7f0a0022;
         public static int TextAppearance_Sherlock_Widget_PopupMenu_Small=0x7f0a0023;
         public static int TextAppearance_Sherlock_Widget_TextView_SpinnerItem=0x7f0a0024;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values/abs__themes.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values/abs__themes.xml 
          */
         public static int Theme_Sherlock=0x7f0a0025;
         public static int Theme_Sherlock_Light=0x7f0a0026;
         public static int Theme_Sherlock_Light_DarkActionBar=0x7f0a0027;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values-v14/abs__themes.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values-v14/abs__themes.xml 
          */
         public static int Theme_Sherlock_Light_NoActionBar=0x7f0a0028;
         public static int Theme_Sherlock_NoActionBar=0x7f0a0029;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values/abs__styles.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values/abs__styles.xml 
          */
         public static int Widget=0x7f0a002a;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values-v14/abs__styles.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values-v14/abs__styles.xml 
          */
         public static int Widget_Sherlock_ActionBar=0x7f0a002b;
         public static int Widget_Sherlock_ActionBar_Solid=0x7f0a002c;
@@ -1065,7 +1066,7 @@ containing a value of this type.
         public static int Widget_Sherlock_TextView_SpinnerItem=0x7f0a0058;
     }
     public static final class styleable {
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/actionbarsherlock/res/values/abs__attrs.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/actionbarsherlock/res/values/abs__attrs.xml 
            <p>Includes the following attributes:</p>
            <table>
            <colgroup align="left" />

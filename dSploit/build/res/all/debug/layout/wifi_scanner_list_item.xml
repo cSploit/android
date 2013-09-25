@@ -1,52 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:orientation="horizontal"
-                android:padding="8dp">
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="horizontal"
+    android:padding="8dp">
 
     <ImageView
-            android:id="@+id/supported"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginRight="8dp"
-            android:adjustViewBounds="false"
-            android:baselineAlignBottom="false"
-            android:cropToPadding="false"
-            android:focusable="false"
-            android:scaleType="fitXY"
-            android:src="@drawable/ic_impossible"/>
+        android:id="@+id/supported"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginRight="8dp"
+        android:adjustViewBounds="false"
+        android:baselineAlignBottom="false"
+        android:cropToPadding="false"
+        android:focusable="false"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_impossible" />
 
     <ImageView
-            android:id="@+id/powerIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="16dp"
-            android:gravity="center_vertical"/>
+        android:id="@+id/powerIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="16dp"
+        android:gravity="center_vertical" />
 
     <TextView
-            android:id="@+id/ssid"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/bssid"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/powerIcon"
-            android:textColor="@color/app_color"
-            android:textSize="16sp"/>
+        android:id="@+id/ssid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/bssid"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/powerIcon"
+        android:textColor="@color/app_color"
+        android:textSize="16sp" />
 
     <TextView
-            android:id="@+id/bssid"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_toLeftOf="@+id/powerIcon"
-            android:layout_toRightOf="@+id/supported"
-            android:paddingTop="16dp"
-            android:textColor="@color/gray_text"
-            android:fontFamily="sans-serif-condensed"
-            android:textSize="14sp"/>
+        android:id="@+id/bssid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/powerIcon"
+        android:layout_toRightOf="@+id/supported"
+        android:paddingTop="16dp"
+        android:textColor="@color/gray_text"
+        android:fontFamily="sans-serif-condensed"
+        android:textSize="14sp" />
 
-</RelativeLayout><!-- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/res/layout/wifi_scanner_list_item.xml -->
+</RelativeLayout><!-- From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/res/layout/wifi_scanner_list_item.xml -->

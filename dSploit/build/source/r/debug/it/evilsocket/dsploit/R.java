@@ -13,7 +13,7 @@ public final class R {
         public static final int slide_out_left=0x7f040001;
     }
     public static final class attr {
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml 
          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
          */
@@ -580,10 +580,10 @@ containing a value of this type.
         public static final int windowSplitActionBar=0x7f01005f;
     }
     public static final class bool {
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-w480dp/values.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-w480dp/values.xml 
          */
         public static final int abs__action_bar_embed_tabs=0x7f070000;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-sw600dp/values.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-sw600dp/values.xml 
          */
         public static final int abs__action_bar_expanded_action_views_exclusive=0x7f070001;
         public static final int abs__config_actionMenuItemAllCaps=0x7f070002;
@@ -602,19 +602,19 @@ containing a value of this type.
         public static final int abs__primary_text_disable_only_holo_light=0x7f08000a;
         public static final int abs__primary_text_holo_dark=0x7f08000b;
         public static final int abs__primary_text_holo_light=0x7f08000c;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/dSploit/res/values/colors.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/res/values/colors.xml 
          */
         public static final int app_color=0x7f080006;
         public static final int background_window=0x7f080007;
         public static final int gray_text=0x7f080008;
     }
     public static final class dimen {
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-land/values.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-large-hdpi-1024x600/values.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-large-mdpi-1024x600/values.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-large-land-hdpi-1024x600/values.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-large-land-mdpi-1024x600/values.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-xlarge/values.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-land/values.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-large-hdpi-1024x600/values.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-large-mdpi-1024x600/values.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-large-land-hdpi-1024x600/values.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-large-land-mdpi-1024x600/values.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-xlarge/values.xml 
          */
         public static final int abs__action_bar_default_height=0x7f090000;
         public static final int abs__action_bar_icon_vertical_padding=0x7f090001;
@@ -681,128 +681,129 @@ containing a value of this type.
         public static final int abs__ic_menu_moreoverflow_holo_light=0x7f02002d;
         public static final int abs__ic_menu_moreoverflow_normal_holo_dark=0x7f02002e;
         public static final int abs__ic_menu_moreoverflow_normal_holo_light=0x7f02002f;
-        public static final int abs__ic_menu_share_holo_dark=0x7f020030;
-        public static final int abs__ic_menu_share_holo_light=0x7f020031;
-        public static final int abs__ic_search=0x7f020032;
-        public static final int abs__ic_search_api_holo_light=0x7f020033;
-        public static final int abs__ic_voice_search=0x7f020034;
-        public static final int abs__ic_voice_search_api_holo_light=0x7f020035;
-        public static final int abs__item_background_holo_dark=0x7f020036;
-        public static final int abs__item_background_holo_light=0x7f020037;
-        public static final int abs__list_activated_holo=0x7f020038;
-        public static final int abs__list_divider_holo_dark=0x7f020039;
-        public static final int abs__list_divider_holo_light=0x7f02003a;
-        public static final int abs__list_focused_holo=0x7f02003b;
-        public static final int abs__list_longpressed_holo=0x7f02003c;
-        public static final int abs__list_pressed_holo_dark=0x7f02003d;
-        public static final int abs__list_pressed_holo_light=0x7f02003e;
-        public static final int abs__list_selector_background_transition_holo_dark=0x7f02003f;
-        public static final int abs__list_selector_background_transition_holo_light=0x7f020040;
-        public static final int abs__list_selector_disabled_holo_dark=0x7f020041;
-        public static final int abs__list_selector_disabled_holo_light=0x7f020042;
-        public static final int abs__list_selector_holo_dark=0x7f020043;
-        public static final int abs__list_selector_holo_light=0x7f020044;
-        public static final int abs__menu_dropdown_panel_holo_dark=0x7f020045;
-        public static final int abs__menu_dropdown_panel_holo_light=0x7f020046;
-        public static final int abs__progress_bg_holo_dark=0x7f020047;
-        public static final int abs__progress_bg_holo_light=0x7f020048;
-        public static final int abs__progress_horizontal_holo_dark=0x7f020049;
-        public static final int abs__progress_horizontal_holo_light=0x7f02004a;
-        public static final int abs__progress_medium_holo=0x7f02004b;
-        public static final int abs__progress_primary_holo_dark=0x7f02004c;
-        public static final int abs__progress_primary_holo_light=0x7f02004d;
-        public static final int abs__progress_secondary_holo_dark=0x7f02004e;
-        public static final int abs__progress_secondary_holo_light=0x7f02004f;
-        public static final int abs__search_dropdown_dark=0x7f020050;
-        public static final int abs__search_dropdown_light=0x7f020051;
-        public static final int abs__spinner_48_inner_holo=0x7f020052;
-        public static final int abs__spinner_48_outer_holo=0x7f020053;
-        public static final int abs__spinner_ab_default_holo_dark=0x7f020054;
-        public static final int abs__spinner_ab_default_holo_light=0x7f020055;
-        public static final int abs__spinner_ab_disabled_holo_dark=0x7f020056;
-        public static final int abs__spinner_ab_disabled_holo_light=0x7f020057;
-        public static final int abs__spinner_ab_focused_holo_dark=0x7f020058;
-        public static final int abs__spinner_ab_focused_holo_light=0x7f020059;
-        public static final int abs__spinner_ab_holo_dark=0x7f02005a;
-        public static final int abs__spinner_ab_holo_light=0x7f02005b;
-        public static final int abs__spinner_ab_pressed_holo_dark=0x7f02005c;
-        public static final int abs__spinner_ab_pressed_holo_light=0x7f02005d;
-        public static final int abs__tab_indicator_ab_holo=0x7f02005e;
-        public static final int abs__tab_selected_focused_holo=0x7f02005f;
-        public static final int abs__tab_selected_holo=0x7f020060;
-        public static final int abs__tab_selected_pressed_holo=0x7f020061;
-        public static final int abs__tab_unselected_pressed_holo=0x7f020062;
-        public static final int abs__textfield_search_default_holo_dark=0x7f020063;
-        public static final int abs__textfield_search_default_holo_light=0x7f020064;
-        public static final int abs__textfield_search_right_default_holo_dark=0x7f020065;
-        public static final int abs__textfield_search_right_default_holo_light=0x7f020066;
-        public static final int abs__textfield_search_right_selected_holo_dark=0x7f020067;
-        public static final int abs__textfield_search_right_selected_holo_light=0x7f020068;
-        public static final int abs__textfield_search_selected_holo_dark=0x7f020069;
-        public static final int abs__textfield_search_selected_holo_light=0x7f02006a;
-        public static final int abs__textfield_searchview_holo_dark=0x7f02006b;
-        public static final int abs__textfield_searchview_holo_light=0x7f02006c;
-        public static final int abs__textfield_searchview_right_holo_dark=0x7f02006d;
-        public static final int abs__textfield_searchview_right_holo_light=0x7f02006e;
-        public static final int abs__toast_frame=0x7f02006f;
-        public static final int action_back=0x7f020070;
-        public static final int action_backward=0x7f020071;
-        public static final int action_backwards=0x7f020072;
-        public static final int action_explo=0x7f020073;
-        public static final int action_exploit=0x7f020074;
-        public static final int action_forge=0x7f020075;
-        public static final int action_forward=0x7f020076;
-        public static final int action_hijack=0x7f020077;
-        public static final int action_image=0x7f020078;
-        public static final int action_inject=0x7f020079;
-        public static final int action_injection=0x7f02007a;
-        public static final int action_inspect=0x7f02007b;
-        public static final int action_kill=0x7f02007c;
-        public static final int action_login=0x7f02007d;
-        public static final int action_mitm=0x7f02007e;
-        public static final int action_monitor=0x7f02007f;
-        public static final int action_open=0x7f020080;
-        public static final int action_passwords=0x7f020081;
-        public static final int action_plugin=0x7f020082;
-        public static final int action_redirect=0x7f020083;
-        public static final int action_refresh=0x7f020084;
-        public static final int action_routerpwn=0x7f020085;
-        public static final int action_scan=0x7f020086;
-        public static final int action_scanner=0x7f020087;
-        public static final int action_sniffer=0x7f020088;
-        public static final int action_traceroute=0x7f020089;
-        public static final int action_youtube=0x7f02008a;
-        public static final int actionbar_gradient=0x7f02008b;
-        public static final int arrow_right=0x7f02008c;
-        public static final int dsploit_icon=0x7f02008d;
-        public static final int favicon_amazon=0x7f02008e;
-        public static final int favicon_blogger=0x7f02008f;
-        public static final int favicon_facebook=0x7f020090;
-        public static final int favicon_generic=0x7f020091;
-        public static final int favicon_google=0x7f020092;
-        public static final int favicon_tumblr=0x7f020093;
-        public static final int favicon_twitter=0x7f020094;
-        public static final int favicon_xda=0x7f020095;
-        public static final int favicon_youtube=0x7f020096;
-        public static final int https_session=0x7f020097;
-        public static final int ic_impossible=0x7f020098;
-        public static final int ic_launcher=0x7f020099;
-        public static final int ic_possible=0x7f02009a;
-        public static final int ic_refresh=0x7f02009b;
-        public static final int ic_wifi_lock_signal_1=0x7f02009c;
-        public static final int ic_wifi_lock_signal_2=0x7f02009d;
-        public static final int ic_wifi_lock_signal_3=0x7f02009e;
-        public static final int ic_wifi_lock_signal_4=0x7f02009f;
-        public static final int ic_wifi_signal_1=0x7f0200a0;
-        public static final int ic_wifi_signal_2=0x7f0200a1;
-        public static final int ic_wifi_signal_3=0x7f0200a2;
-        public static final int ic_wifi_signal_4=0x7f0200a3;
-        public static final int target_add=0x7f0200a4;
-        public static final int target_endpoint=0x7f0200a5;
-        public static final int target_network=0x7f0200a6;
-        public static final int target_remote=0x7f0200a7;
-        public static final int target_router=0x7f0200a8;
-        public static final int target_self=0x7f0200a9;
+        public static final int abs__ic_menu_moreoverflow_normal_holo_light_backup=0x7f020030;
+        public static final int abs__ic_menu_share_holo_dark=0x7f020031;
+        public static final int abs__ic_menu_share_holo_light=0x7f020032;
+        public static final int abs__ic_search=0x7f020033;
+        public static final int abs__ic_search_api_holo_light=0x7f020034;
+        public static final int abs__ic_voice_search=0x7f020035;
+        public static final int abs__ic_voice_search_api_holo_light=0x7f020036;
+        public static final int abs__item_background_holo_dark=0x7f020037;
+        public static final int abs__item_background_holo_light=0x7f020038;
+        public static final int abs__list_activated_holo=0x7f020039;
+        public static final int abs__list_divider_holo_dark=0x7f02003a;
+        public static final int abs__list_divider_holo_light=0x7f02003b;
+        public static final int abs__list_focused_holo=0x7f02003c;
+        public static final int abs__list_longpressed_holo=0x7f02003d;
+        public static final int abs__list_pressed_holo_dark=0x7f02003e;
+        public static final int abs__list_pressed_holo_light=0x7f02003f;
+        public static final int abs__list_selector_background_transition_holo_dark=0x7f020040;
+        public static final int abs__list_selector_background_transition_holo_light=0x7f020041;
+        public static final int abs__list_selector_disabled_holo_dark=0x7f020042;
+        public static final int abs__list_selector_disabled_holo_light=0x7f020043;
+        public static final int abs__list_selector_holo_dark=0x7f020044;
+        public static final int abs__list_selector_holo_light=0x7f020045;
+        public static final int abs__menu_dropdown_panel_holo_dark=0x7f020046;
+        public static final int abs__menu_dropdown_panel_holo_light=0x7f020047;
+        public static final int abs__progress_bg_holo_dark=0x7f020048;
+        public static final int abs__progress_bg_holo_light=0x7f020049;
+        public static final int abs__progress_horizontal_holo_dark=0x7f02004a;
+        public static final int abs__progress_horizontal_holo_light=0x7f02004b;
+        public static final int abs__progress_medium_holo=0x7f02004c;
+        public static final int abs__progress_primary_holo_dark=0x7f02004d;
+        public static final int abs__progress_primary_holo_light=0x7f02004e;
+        public static final int abs__progress_secondary_holo_dark=0x7f02004f;
+        public static final int abs__progress_secondary_holo_light=0x7f020050;
+        public static final int abs__search_dropdown_dark=0x7f020051;
+        public static final int abs__search_dropdown_light=0x7f020052;
+        public static final int abs__spinner_48_inner_holo=0x7f020053;
+        public static final int abs__spinner_48_outer_holo=0x7f020054;
+        public static final int abs__spinner_ab_default_holo_dark=0x7f020055;
+        public static final int abs__spinner_ab_default_holo_light=0x7f020056;
+        public static final int abs__spinner_ab_disabled_holo_dark=0x7f020057;
+        public static final int abs__spinner_ab_disabled_holo_light=0x7f020058;
+        public static final int abs__spinner_ab_focused_holo_dark=0x7f020059;
+        public static final int abs__spinner_ab_focused_holo_light=0x7f02005a;
+        public static final int abs__spinner_ab_holo_dark=0x7f02005b;
+        public static final int abs__spinner_ab_holo_light=0x7f02005c;
+        public static final int abs__spinner_ab_pressed_holo_dark=0x7f02005d;
+        public static final int abs__spinner_ab_pressed_holo_light=0x7f02005e;
+        public static final int abs__tab_indicator_ab_holo=0x7f02005f;
+        public static final int abs__tab_selected_focused_holo=0x7f020060;
+        public static final int abs__tab_selected_holo=0x7f020061;
+        public static final int abs__tab_selected_pressed_holo=0x7f020062;
+        public static final int abs__tab_unselected_pressed_holo=0x7f020063;
+        public static final int abs__textfield_search_default_holo_dark=0x7f020064;
+        public static final int abs__textfield_search_default_holo_light=0x7f020065;
+        public static final int abs__textfield_search_right_default_holo_dark=0x7f020066;
+        public static final int abs__textfield_search_right_default_holo_light=0x7f020067;
+        public static final int abs__textfield_search_right_selected_holo_dark=0x7f020068;
+        public static final int abs__textfield_search_right_selected_holo_light=0x7f020069;
+        public static final int abs__textfield_search_selected_holo_dark=0x7f02006a;
+        public static final int abs__textfield_search_selected_holo_light=0x7f02006b;
+        public static final int abs__textfield_searchview_holo_dark=0x7f02006c;
+        public static final int abs__textfield_searchview_holo_light=0x7f02006d;
+        public static final int abs__textfield_searchview_right_holo_dark=0x7f02006e;
+        public static final int abs__textfield_searchview_right_holo_light=0x7f02006f;
+        public static final int abs__toast_frame=0x7f020070;
+        public static final int action_back=0x7f020071;
+        public static final int action_backward=0x7f020072;
+        public static final int action_backwards=0x7f020073;
+        public static final int action_explo=0x7f020074;
+        public static final int action_exploit=0x7f020075;
+        public static final int action_forge=0x7f020076;
+        public static final int action_forward=0x7f020077;
+        public static final int action_hijack=0x7f020078;
+        public static final int action_image=0x7f020079;
+        public static final int action_inject=0x7f02007a;
+        public static final int action_injection=0x7f02007b;
+        public static final int action_inspect=0x7f02007c;
+        public static final int action_kill=0x7f02007d;
+        public static final int action_login=0x7f02007e;
+        public static final int action_mitm=0x7f02007f;
+        public static final int action_monitor=0x7f020080;
+        public static final int action_open=0x7f020081;
+        public static final int action_passwords=0x7f020082;
+        public static final int action_plugin=0x7f020083;
+        public static final int action_redirect=0x7f020084;
+        public static final int action_refresh=0x7f020085;
+        public static final int action_routerpwn=0x7f020086;
+        public static final int action_scan=0x7f020087;
+        public static final int action_scanner=0x7f020088;
+        public static final int action_sniffer=0x7f020089;
+        public static final int action_traceroute=0x7f02008a;
+        public static final int action_youtube=0x7f02008b;
+        public static final int actionbar_gradient=0x7f02008c;
+        public static final int arrow_right=0x7f02008d;
+        public static final int dsploit_icon=0x7f02008e;
+        public static final int favicon_amazon=0x7f02008f;
+        public static final int favicon_blogger=0x7f020090;
+        public static final int favicon_facebook=0x7f020091;
+        public static final int favicon_generic=0x7f020092;
+        public static final int favicon_google=0x7f020093;
+        public static final int favicon_tumblr=0x7f020094;
+        public static final int favicon_twitter=0x7f020095;
+        public static final int favicon_xda=0x7f020096;
+        public static final int favicon_youtube=0x7f020097;
+        public static final int https_session=0x7f020098;
+        public static final int ic_impossible=0x7f020099;
+        public static final int ic_launcher=0x7f02009a;
+        public static final int ic_possible=0x7f02009b;
+        public static final int ic_refresh=0x7f02009c;
+        public static final int ic_wifi_lock_signal_1=0x7f02009d;
+        public static final int ic_wifi_lock_signal_2=0x7f02009e;
+        public static final int ic_wifi_lock_signal_3=0x7f02009f;
+        public static final int ic_wifi_lock_signal_4=0x7f0200a0;
+        public static final int ic_wifi_signal_1=0x7f0200a1;
+        public static final int ic_wifi_signal_2=0x7f0200a2;
+        public static final int ic_wifi_signal_3=0x7f0200a3;
+        public static final int ic_wifi_signal_4=0x7f0200a4;
+        public static final int target_add=0x7f0200a5;
+        public static final int target_endpoint=0x7f0200a6;
+        public static final int target_network=0x7f0200a7;
+        public static final int target_remote=0x7f0200a8;
+        public static final int target_router=0x7f0200a9;
+        public static final int target_self=0x7f0200aa;
     }
     public static final class id {
         public static final int ScrollView01=0x7f060010;
@@ -968,9 +969,9 @@ containing a value of this type.
         public static final int wrap_content=0x7f060000;
     }
     public static final class integer {
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-w360dp/values.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-w500dp/values.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-w600dp/values.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-w360dp/values.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-w500dp/values.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-w600dp/values.xml 
          */
         public static final int abs__max_action_buttons=0x7f0a0000;
     }
@@ -1038,76 +1039,205 @@ containing a value of this type.
         public static final int webdic=0x7f050001;
     }
     public static final class string {
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/dSploit/res/values/strings.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/res/values/strings.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/res/values-fr/strings.xml 
          */
         public static final int Charset=0x7f0b0000;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml 
+        public static final int about=0x7f0b00a7;
+        public static final int about_dsploit_v_=0x7f0b0001;
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml 
          */
-        public static final int abs__action_bar_home_description=0x7f0b0001;
-        public static final int abs__action_bar_up_description=0x7f0b0002;
-        public static final int abs__action_menu_overflow_description=0x7f0b0003;
-        public static final int abs__action_mode_done=0x7f0b0004;
-        public static final int abs__activity_chooser_view_see_all=0x7f0b0005;
-        public static final int abs__activitychooserview_choose_application=0x7f0b0006;
-        public static final int abs__searchview_description_clear=0x7f0b0007;
-        public static final int abs__searchview_description_query=0x7f0b0008;
-        public static final int abs__searchview_description_search=0x7f0b0009;
-        public static final int abs__searchview_description_submit=0x7f0b000a;
-        public static final int abs__searchview_description_voice=0x7f0b000b;
-        public static final int abs__shareactionprovider_share_with=0x7f0b000c;
-        public static final int abs__shareactionprovider_share_with_application=0x7f0b000d;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/dSploit/res/values/strings.xml 
+        public static final int abs__action_bar_home_description=0x7f0b0002;
+        public static final int abs__action_bar_up_description=0x7f0b0003;
+        public static final int abs__action_menu_overflow_description=0x7f0b0004;
+        public static final int abs__action_mode_done=0x7f0b0005;
+        public static final int abs__activity_chooser_view_see_all=0x7f0b0006;
+        public static final int abs__activitychooserview_choose_application=0x7f0b0007;
+        public static final int abs__searchview_description_clear=0x7f0b0008;
+        public static final int abs__searchview_description_query=0x7f0b0009;
+        public static final int abs__searchview_description_search=0x7f0b000a;
+        public static final int abs__searchview_description_submit=0x7f0b000b;
+        public static final int abs__searchview_description_voice=0x7f0b000c;
+        public static final int abs__shareactionprovider_share_with=0x7f0b000d;
+        public static final int abs__shareactionprovider_share_with_application=0x7f0b000e;
+        public static final int add=0x7f0b00a8;
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/res/values/strings.xml 
          */
-        public static final int address=0x7f0b000e;
-        public static final int app_name=0x7f0b000f;
-        public static final int choose=0x7f0b0010;
-        public static final int crash_toast_text=0x7f0b0011;
-        public static final int device_type=0x7f0b0012;
-        public static final int disclaimer=0x7f0b0013;
-        public static final int dsploit_catchphrase=0x7f0b0014;
-        public static final int dsploit_copyleft=0x7f0b0015;
-        public static final int dsploit_disclaimer=0x7f0b0016;
-        public static final int dsploit_url=0x7f0b0017;
-        public static final int enter_redirection_details=0x7f0b0018;
-        public static final int filter_desc=0x7f0b0019;
-        public static final int from=0x7f0b001a;
-        public static final int gpl_license=0x7f0b001b;
-        public static final int license=0x7f0b001c;
-        public static final int max_length=0x7f0b001d;
-        public static final int menu_settings=0x7f0b001e;
-        public static final int min_length=0x7f0b001f;
-        public static final int os=0x7f0b0020;
-        public static final int port=0x7f0b0021;
-        public static final int protocol=0x7f0b0022;
-        public static final int request=0x7f0b0023;
-        public static final int response=0x7f0b0024;
-        public static final int select_module=0x7f0b0025;
-        public static final int send=0x7f0b0026;
-        public static final int service=0x7f0b0027;
-        public static final int services=0x7f0b0028;
-        public static final int sort=0x7f0b0029;
-        public static final int start=0x7f0b002a;
-        public static final int start_hijack=0x7f0b002b;
-        public static final int stop=0x7f0b002c;
-        public static final int stopped=0x7f0b002d;
-        public static final int target=0x7f0b002e;
-        public static final int title_activity_main=0x7f0b002f;
-        public static final int to=0x7f0b0030;
-        public static final int toggle_button=0x7f0b0031;
-        public static final int unknown=0x7f0b0032;
-        public static final int username=0x7f0b0033;
-        public static final int wait_for_response=0x7f0b0034;
-        public static final int wake_on_lan=0x7f0b0035;
+        public static final int add_custom_target=0x7f0b000f;
+        public static final int address=0x7f0b0010;
+        public static final int app_name=0x7f0b0011;
+        public static final int arm_error=0x7f0b0012;
+        public static final int arm_error2=0x7f0b0013;
+        public static final int b=0x7f0b00a9;
+        public static final int busybox_required=0x7f0b0014;
+        public static final int cancel=0x7f0b0015;
+        public static final int cancel_dialog=0x7f0b0016;
+        public static final int checking=0x7f0b0017;
+        public static final int choose=0x7f0b0018;
+        public static final int choose_dir=0x7f0b0019;
+        public static final int close_confirm=0x7f0b001a;
+        public static final int connect=0x7f0b001b;
+        public static final int connected_to=0x7f0b001c;
+        public static final int connected_to2=0x7f0b001d;
+        public static final int connected_to3=0x7f0b001e;
+        public static final int connecting=0x7f0b001f;
+        public static final int connection_to=0x7f0b0020;
+        public static final int connection_to2=0x7f0b0021;
+        public static final int could_not_read_folder=0x7f0b0022;
+        public static final int couldnt_send_wol_packet=0x7f0b0023;
+        public static final int crack=0x7f0b0024;
+        public static final int crash_toast_text=0x7f0b0025;
+        public static final int custom_charset=0x7f0b0026;
+        public static final int customize_wol_port=0x7f0b0027;
+        public static final int device_type=0x7f0b0028;
+        public static final int disclaimer=0x7f0b0029;
+        public static final int downloading_update=0x7f0b002a;
+        public static final int dsploit_catchphrase=0x7f0b002b;
+        public static final int dsploit_copyleft=0x7f0b002c;
+        public static final int dsploit_disclaimer=0x7f0b002d;
+        public static final int dsploit_url=0x7f0b002e;
+        public static final int empty_port_list=0x7f0b002f;
+        public static final int enter_chars_wanted=0x7f0b0030;
+        public static final int enter_key_or_crack=0x7f0b0031;
+        public static final int enter_ports_list=0x7f0b0032;
+        public static final int enter_redirection_details=0x7f0b0033;
+        public static final int enter_session_name=0x7f0b0034;
+        public static final int enter_url=0x7f0b0035;
+        public static final int enter_wifi_key=0x7f0b0036;
+        public static final int error=0x7f0b0037;
+        public static final int error_occured=0x7f0b0038;
+        public static final int exit=0x7f0b0039;
+        public static final int f=0x7f0b00aa;
+        public static final int fatal_error_html=0x7f0b003a;
+        public static final int fatal_error_html2=0x7f0b003b;
+        public static final int filter_desc=0x7f0b003c;
+        public static final int from=0x7f0b003d;
+        public static final int gateway_router=0x7f0b003e;
+        public static final int generating_keys=0x7f0b003f;
+        public static final int github_issues=0x7f0b0040;
+        public static final int gpl_license=0x7f0b0041;
+        public static final int hijack_session=0x7f0b0042;
+        public static final int initialization_error=0x7f0b0043;
+        public static final int initializing=0x7f0b0044;
+        public static final int inspector=0x7f0b0045;
+        public static final int inspector_desc=0x7f0b0046;
+        public static final int install_error=0x7f0b0047;
+        public static final int invalid_filename=0x7f0b0048;
+        public static final int invalid_port=0x7f0b0049;
+        public static final int invalid_port_=0x7f0b004a;
+        public static final int invalid_ports=0x7f0b004b;
+        public static final int invalid_session=0x7f0b004c;
+        public static final int invalid_target=0x7f0b004d;
+        public static final int license=0x7f0b004e;
+        public static final int load_from_file=0x7f0b00ab;
+        public static final int loading_changelog=0x7f0b004f;
+        public static final int login_cracker=0x7f0b0050;
+        public static final int login_cracker_desc=0x7f0b0051;
+        public static final int max_length=0x7f0b0052;
+        public static final int menu_settings=0x7f0b0053;
+        public static final int min_length=0x7f0b0054;
+        public static final int mitm=0x7f0b0055;
+        public static final int mitm_desc=0x7f0b0056;
+        public static final int net_discovery_started=0x7f0b0057;
+        public static final int net_discovery_stopped=0x7f0b0058;
+        public static final int network_subnet_mask=0x7f0b0059;
+        public static final int new_session=0x7f0b00ac;
+        public static final int new_session_started=0x7f0b005a;
+        public static final int new_update_desc=0x7f0b005b;
+        public static final int new_update_desc2=0x7f0b005c;
+        public static final int new_version=0x7f0b005d;
+        public static final int new_version2=0x7f0b005e;
+        public static final int no=0x7f0b005f;
+        public static final int no_activities_for_url=0x7f0b0060;
+        public static final int no_connectivity=0x7f0b0061;
+        public static final int no_infos_on_target=0x7f0b0062;
+        public static final int no_open_ports=0x7f0b0063;
+        public static final int no_session_found=0x7f0b0064;
+        public static final int no_updates_available=0x7f0b0065;
+        public static final int no_wifi_available=0x7f0b0066;
+        public static final int nothing_found=0x7f0b0067;
+        public static final int only_4_root=0x7f0b0068;
+        public static final int os=0x7f0b0069;
+        public static final int packet_forger=0x7f0b006a;
+        public static final int packet_forger_desc=0x7f0b006b;
+        public static final int port=0x7f0b006c;
+        public static final int port_must_be_greater=0x7f0b006d;
+        public static final int port_scanner=0x7f0b006e;
+        public static final int port_scanner_desc=0x7f0b006f;
+        public static final int press_back=0x7f0b0070;
+        public static final int protocol=0x7f0b0071;
+        public static final int pwd_wordlist=0x7f0b00ad;
+        public static final int r=0x7f0b00ae;
+        public static final int request=0x7f0b0072;
+        public static final int request_empty=0x7f0b0073;
+        public static final int request_sent=0x7f0b0074;
+        public static final int response=0x7f0b0075;
+        public static final int restore_session=0x7f0b00af;
+        public static final int router_pwn=0x7f0b0076;
+        public static final int router_pwn_desc=0x7f0b0077;
+        public static final int save_session=0x7f0b0078;
+        public static final int scan=0x7f0b00b0;
+        public static final int scanning=0x7f0b0079;
+        public static final int select_custom_ports=0x7f0b00b1;
+        public static final int select_module=0x7f0b007a;
+        public static final int select_ports=0x7f0b007b;
+        public static final int select_session=0x7f0b007c;
+        public static final int select_session_file=0x7f0b007d;
+        public static final int select_target=0x7f0b007e;
+        public static final int select_target_below=0x7f0b00b2;
+        public static final int selected=0x7f0b007f;
+        public static final int selected_=0x7f0b0080;
+        public static final int send=0x7f0b0081;
+        public static final int service=0x7f0b0082;
+        public static final int services=0x7f0b0083;
+        public static final int session_saved_to=0x7f0b0084;
+        public static final int session_sniffer=0x7f0b0085;
+        public static final int set_alias=0x7f0b0086;
+        public static final int set_session_filename=0x7f0b0087;
+        public static final int something_went_wrong=0x7f0b0088;
+        public static final int something_went_wrong_changelog=0x7f0b0089;
+        public static final int sort=0x7f0b008a;
+        public static final int start=0x7f0b008b;
+        public static final int start_hijack=0x7f0b008c;
+        public static final int start_hijacking=0x7f0b008d;
+        public static final int start_hijacking2=0x7f0b008e;
+        public static final int start_monitor=0x7f0b008f;
+        public static final int stop=0x7f0b0090;
+        public static final int stop_monitor=0x7f0b0091;
+        public static final int stopped=0x7f0b0092;
+        public static final int submit_issue=0x7f0b00b3;
+        public static final int target=0x7f0b0093;
+        public static final int target_alias=0x7f0b0094;
+        public static final int this_device=0x7f0b0095;
+        public static final int title_activity_main=0x7f0b0096;
+        public static final int to=0x7f0b0097;
+        public static final int toggle_button=0x7f0b0098;
+        public static final int trace=0x7f0b0099;
+        public static final int trace_desc=0x7f0b009a;
+        public static final int unknown=0x7f0b009b;
+        public static final int update_available=0x7f0b009c;
+        public static final int user_wordlist=0x7f0b00b4;
+        public static final int username=0x7f0b009d;
+        public static final int vulnerability_finder=0x7f0b009e;
+        public static final int vulnerability_finder_desc=0x7f0b009f;
+        public static final int wait_for_response=0x7f0b00a0;
+        public static final int wake_on_lan=0x7f0b00a1;
+        public static final int warning=0x7f0b00a2;
+        public static final int warning_new_session=0x7f0b00a3;
+        public static final int wifi_key_copied=0x7f0b00a4;
+        public static final int wifi_scan=0x7f0b00b5;
+        public static final int wifi_went_down=0x7f0b00a5;
+        public static final int yes=0x7f0b00a6;
     }
     public static final class style {
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/dSploit/res/values/style.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/res/values/style.xml 
          */
         public static final int ActionBarStyle=0x7f0c0000;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml 
          */
         public static final int Sherlock___TextAppearance_Small=0x7f0c0001;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-v11/values.xml 
- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-v14/values.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-v11/values.xml 
+ From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-v14/values.xml 
          */
         public static final int Sherlock___Theme=0x7f0c0002;
         public static final int Sherlock___Theme_DarkActionBar=0x7f0c0003;
@@ -1145,10 +1275,10 @@ containing a value of this type.
         public static final int TextAppearance_Sherlock_Widget_PopupMenu_Large=0x7f0c0023;
         public static final int TextAppearance_Sherlock_Widget_PopupMenu_Small=0x7f0c0024;
         public static final int TextAppearance_Sherlock_Widget_TextView_SpinnerItem=0x7f0c0025;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/dSploit/res/values/style.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/res/values/style.xml 
          */
         public static final int Theme_DSploitActionBarStyle=0x7f0c0026;
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml 
          */
         public static final int Theme_Sherlock=0x7f0c0027;
         public static final int Theme_Sherlock_Light=0x7f0c0028;
@@ -1204,7 +1334,7 @@ containing a value of this type.
         public static final int Widget_Sherlock_TextView_SpinnerItem=0x7f0c005a;
     }
     public static final class styleable {
-        /**  From: /home/androguide/Development/Android/Projects/DSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml 
+        /**  From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values/values.xml 
  Specifies a layout to use for the "home" section of the action bar. 
  Specifies a style resource to use for an embedded progress bar. 
  Specifies a style resource to use for an indeterminate progress spinner. 

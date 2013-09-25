@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
- 
-  <item android:id="@+id/load"  android:title="Load From File" android:icon="@drawable/action_open" android:showAsAction="always"/>
 
-</menu><!-- From: /home/androguide/Development/Android/Projects/DSploit/dSploit/res/menu/hijacker.xml -->
+    <item
+        android:id="@+id/load"
+        android:title="Load From File"
+        android:icon="@drawable/action_open"
+        android:showAsAction="always" />
+
+</menu><!-- From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/res/menu/hijacker.xml -->
