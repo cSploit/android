@@ -32,30 +32,31 @@ import it.evilsocket.dsploit.net.Target.Vulnerability;
 public abstract class Plugin extends SherlockActivity {
     public static final int NO_LAYOUT = -1;
 
-    private String mName = null;
-    private String mDescription = null;
+    private int mNameStringId = -1;
+    private int mDescriptionStringId = -1;
     private Target.Type[] mAllowedTargetTypes = null;
     private int mLayoutId = 0;
     private int mIconId = 0;
 
-    public Plugin(String name, String description, Target.Type[] allowedTargetTypes, int layoutId, int iconResourceId) {
-        mName = name;
-        mDescription = description;
+    public Plugin( int nameStringId, int descStringId, Target.Type[] allowedTargetTypes, int layoutId, int iconResourceId) {
+        mNameStringId = nameStringId;
+        mDescriptionStringId = descStringId;
+
         mAllowedTargetTypes = allowedTargetTypes;
         mLayoutId = layoutId;
         mIconId = iconResourceId;
     }
 
-    public Plugin(String name, String description, Target.Type[] allowedTargetTypes, int layoutId) {
-        this(name, description, allowedTargetTypes, layoutId, R.drawable.action_plugin);
+    public Plugin(int nameStringId, int descStringId, Target.Type[] allowedTargetTypes, int layoutId) {
+        this(nameStringId, descStringId, allowedTargetTypes, layoutId, R.drawable.action_plugin);
     }
 
     public String getName() {
-        return mName;
+        return getString( mNameStringId );
     }
 
     public String getDescription() {
-        return mDescription;
+        return getString( mDescriptionStringId );
     }
 
     public Target.Type[] getAllowedTargetTypes() {
@@ -85,7 +86,7 @@ public abstract class Plugin extends SherlockActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTitle(System.getCurrentTarget() + " > " + mName);
+        setTitle(System.getCurrentTarget() + " > " + getName());
         setContentView(mLayoutId);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }

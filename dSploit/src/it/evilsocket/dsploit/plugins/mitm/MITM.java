@@ -149,13 +149,14 @@ public class MITM extends Plugin {
 
     public MITM() {
         super
-                (
-                        "MITM",
-                        "Perform various man-in-the-middle attacks, such as network sniffing, traffic manipulation, etc...",
-                        new Target.Type[]{Target.Type.ENDPOINT, Target.Type.NETWORK},
-                        R.layout.plugin_mitm,
-                        R.drawable.action_mitm
-                );
+        (
+                R.string.mitm,
+                R.string.mitm_desc,
+
+                new Target.Type[]{Target.Type.ENDPOINT, Target.Type.NETWORK},
+                R.layout.plugin_mitm,
+                R.drawable.action_mitm
+        );
     }
 
     @Override

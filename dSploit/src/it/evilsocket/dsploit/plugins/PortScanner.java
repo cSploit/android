@@ -63,8 +63,9 @@ public class PortScanner extends Plugin {
 
     public PortScanner() {
         super(
-                "Port Scanner",
-                "Perform a SYN port scanning on target.",
+                R.string.port_scanner,
+                R.string.port_scanner_desc,
+
                 new Target.Type[]{Target.Type.ENDPOINT, Target.Type.REMOTE},
                 R.layout.plugin_portscanner,
                 R.drawable.action_scanner
