@@ -39,8 +39,8 @@ local.properties
 .classpath
 .settings/
 .loadpath
-build
-actionbarsherlock/build
+actionbarsherlock/build/
+dSploit/build/
 
 # External tool builders
 .externalToolBuilders/
