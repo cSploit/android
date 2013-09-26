@@ -24,9 +24,7 @@
     <string name="wait_for_response">Wait for a response</string>
     <string name="protocol">Protocol</string>
     <string name="dsploit_catchphrase">dSploit - An Android network penetration suite.</string>
-    <string name="dsploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket, sponsored by
-        theBackBox Linux Project.
-    </string>
+    <string name="dsploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
     <string name="dsploit_url">http://www.dsploit.net/</string>
     <string name="disclaimer">Disclaimer</string>
     <string name="dsploit_disclaimer">

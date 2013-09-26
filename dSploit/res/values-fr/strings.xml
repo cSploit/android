@@ -22,7 +22,7 @@
     <string name="wait_for_response">Attendre une réponse</string>
     <string name="protocol">Protocole</string>
     <string name="dsploit_catchphrase">dSploit - Une suite de pénétration réseau pour Android.</string>
-    <string name="dsploit_copyleft">Copyleft de Simone Margaritelli aka evilsocket, sponsorisé par le projet BackBox Linux.</string>
+    <string name="dsploit_copyleft">Copyleft de Simone Margaritelli aka evilsocket.</string>
     <string name="dsploit_url">http://www.dsploit.net/</string>
     <string name="disclaimer">Conditions d\'utilisation</string>
     <string name="dsploit_disclaimer"><![CDATA[Cette application ne doit être utilisée pour aucun autre but que celui de démontrer ses possibilités, et uniquement sur des réseau pour lesquels vous avez la permission d\'en faire ainsi. N\'importe quel autre usage n\'est en aucun cas la responsabilité du développeur. En d\'autres mots, ne soyez pas stupide, et ne redirigez pas les personnes en colère vers moi.]]></string>
