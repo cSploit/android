@@ -34,6 +34,8 @@ local.properties
 .classpath
 .settings/
 .loadpath
+build
+actionbarsherlock/build
 
 # External tool builders
 .externalToolBuilders/
