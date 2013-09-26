@@ -174,8 +174,9 @@ public class LoginCracker extends Plugin {
 
     public LoginCracker() {
         super(
-                "Login Cracker",
-                "A very fast network logon cracker which support many different services.",
+                R.string.login_cracker,
+                R.string.login_cracker_desc,
+
                 new Target.Type[]{Target.Type.ENDPOINT, Target.Type.REMOTE},
                 R.layout.plugin_login_cracker,
                 R.drawable.action_login

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <!-- From: /home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-w500dp/values.xml -->
-    <integer name="abs__max_action_buttons">4</integer>
-
-</resources>

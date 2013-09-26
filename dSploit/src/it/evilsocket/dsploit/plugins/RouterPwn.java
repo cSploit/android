@@ -33,8 +33,9 @@ import it.evilsocket.dsploit.net.Target;
 public class RouterPwn extends Plugin {
     public RouterPwn() {
         super(
-                "Router PWN",
-                "Launch the http://routerpwn.com/ service to pwn your router",
+                R.string.router_pwn,
+                R.string.router_pwn_desc,
+
                 new Target.Type[]{Target.Type.ENDPOINT},
                 Plugin.NO_LAYOUT,
                 R.drawable.action_routerpwn
