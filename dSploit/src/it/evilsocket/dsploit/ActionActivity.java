@@ -84,7 +84,7 @@ public class ActionActivity extends SherlockListActivity {
             System.setCurrentPlugin(plugin);
 
             if (plugin.hasLayoutToShow()) {
-                Toast.makeText(ActionActivity.this, getString(R.string.selected) + plugin.getName(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ActionActivity.this, getString(R.string.selected) + getString(plugin.getName()), Toast.LENGTH_SHORT).show();
 
                 startActivity(new Intent(
                         ActionActivity.this,
@@ -128,8 +128,8 @@ public class ActionActivity extends SherlockListActivity {
             Plugin action = mAvailable.get(position);
 
             holder.icon.setImageResource(action.getIconResourceId());
-            holder.name.setText(action.getName());
-            holder.description.setText(action.getDescription());
+            holder.name.setText(getString(action.getName()));
+            holder.description.setText(getString(action.getDescription()));
 
             return row;
         }

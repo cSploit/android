@@ -51,12 +51,12 @@ public abstract class Plugin extends SherlockActivity {
         this(nameStringId, descStringId, allowedTargetTypes, layoutId, R.drawable.action_plugin);
     }
 
-    public String getName() {
-        return getString( mNameStringId );
+    public int getName() {
+        return mNameStringId;
     }
 
-    public String getDescription() {
-        return getString( mDescriptionStringId );
+    public int getDescription() {
+        return mDescriptionStringId;
     }
 
     public Target.Type[] getAllowedTargetTypes() {
