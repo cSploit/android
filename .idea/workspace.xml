@@ -11,7 +11,14 @@
     </shared>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e55937d6-683b-42ee-9226-16c207fff22d" name="Default" comment="" />
+    <list default="true" id="e55937d6-683b-42ee-9226-16c207fff22d" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/classes.jar" afterPath="$PROJECT_DIR$/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/classes.jar" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/source/r/debug/com/actionbarsherlock/R.java" afterPath="$PROJECT_DIR$/dSploit/build/source/r/debug/com/actionbarsherlock/R.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/source/r/debug/it/evilsocket/dsploit/R.java" afterPath="$PROJECT_DIR$/dSploit/build/source/r/debug/it/evilsocket/dsploit/R.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build.gradle" afterPath="$PROJECT_DIR$/dSploit/build.gradle" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dSploit/build/res/all/debug/values/values.xml" afterPath="$PROJECT_DIR$/dSploit/build/res/all/debug/values/values.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+    </list>
     <ignored path="dSploit.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -77,7 +84,7 @@
       <file leaf-file-name="Inspector.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/Inspector.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="48" column="123" selection-start="1822" selection-end="1822" vertical-scroll-proportion="0.0" vertical-offset="864" max-vertical-offset="3870">
+            <state line="49" column="39" selection-start="1864" selection-end="1864" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2790">
               <folding />
             </state>
           </provider>
@@ -86,16 +93,16 @@
       <file leaf-file-name="ConnectionKiller.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/mitm/ConnectionKiller.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="23" column="13" selection-start="911" selection-end="911" vertical-scroll-proportion="0.0" vertical-offset="414" max-vertical-offset="990">
+            <state line="22" column="0" selection-start="897" selection-end="897" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="666">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="strings.xml" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="strings.xml" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dSploit/res/values-fr/strings.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="178" column="54" selection-start="14170" selection-end="14170" vertical-scroll-proportion="0.85858583" vertical-offset="2439" max-vertical-offset="3330">
+            <state line="178" column="54" selection-start="14170" selection-end="14170" vertical-scroll-proportion="-28.333334" vertical-offset="2439" max-vertical-offset="3330">
               <folding />
             </state>
           </provider>
@@ -122,16 +129,16 @@
       <file leaf-file-name="DSploitApplication.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/DSploitApplication.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="61" column="46" selection-start="2181" selection-end="2181" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="810">
+            <state line="61" column="8" selection-start="2143" selection-end="2184" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="810">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Plugin.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="Plugin.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/core/Plugin.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="56" column="27" selection-start="1993" selection-end="1993" vertical-scroll-proportion="0.0" vertical-offset="1008" max-vertical-offset="2268">
+            <state line="46" column="5" selection-start="1414" selection-end="1708" vertical-scroll-proportion="0.32330826" vertical-offset="59" max-vertical-offset="1800">
               <folding />
             </state>
           </provider>
@@ -140,7 +147,7 @@
       <file leaf-file-name="Traceroute.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/Traceroute.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="43" column="48" selection-start="1622" selection-end="1622" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1890">
+            <state line="50" column="5" selection-start="1528" selection-end="1849" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1890">
               <folding />
             </state>
           </provider>
@@ -628,6 +635,11 @@
                 <option name="name" value="installDebug" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
+                <option name="description" value="Installs the Release build" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="installRelease" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
                 <option name="description" value="Installs the Test build for the Debug build" />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
                 <option name="name" value="installTest" />
@@ -750,6 +762,14 @@
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
                 <option name="name" value="validateDebugSigning" />
               </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="validateReleaseSigning" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/dSploit" />
+                <option name="name" value="zipalignRelease" />
+              </ExternalTaskPojo>
             </list>
           </value>
         </entry>
@@ -780,12 +800,12 @@
         <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/PortScanner.java" />
         <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/RouterPwn.java" />
         <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/PacketForger.java" />
-        <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/Traceroute.java" />
         <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/mitm/MITM.java" />
-        <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/Inspector.java" />
         <option value="$PROJECT_DIR$/dSploit/res/values/strings.xml" />
         <option value="$PROJECT_DIR$/dSploit/res/values-fr/strings.xml" />
         <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/mitm/Hijacker.java" />
+        <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/Traceroute.java" />
+        <option value="$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/Inspector.java" />
       </list>
     </option>
   </component>
@@ -851,6 +871,54 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dsploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dSploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dsploit" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1202,30 +1270,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/core/Plugin.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="56" column="27" selection-start="1993" selection-end="1993" vertical-scroll-proportion="0.0" vertical-offset="231" max-vertical-offset="1800">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/mitm/MITM.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="153" column="122" selection-start="6010" selection-end="6107" vertical-scroll-proportion="0.0" vertical-offset="1278" max-vertical-offset="13626">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/mitm/ConnectionKiller.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="13" selection-start="911" selection-end="911" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="666">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/Inspector.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="48" column="123" selection-start="1822" selection-end="1822" vertical-scroll-proportion="0.0" vertical-offset="144" max-vertical-offset="2826">
           <folding />
         </state>
       </provider>
@@ -1244,23 +1291,44 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/dSploit/res/values-fr/strings.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="178" column="54" selection-start="14170" selection-end="14170" vertical-scroll-proportion="-28.333334" vertical-offset="2439" max-vertical-offset="3330">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/mitm/ConnectionKiller.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="22" column="0" selection-start="897" selection-end="897" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="666">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/DSploitApplication.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="61" column="46" selection-start="2181" selection-end="2181" vertical-scroll-proportion="0.0" vertical-offset="141" max-vertical-offset="810">
+        <state line="61" column="8" selection-start="2143" selection-end="2184" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="810">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/Traceroute.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="43" column="48" selection-start="1622" selection-end="1622" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1890">
+        <state line="50" column="5" selection-start="1528" selection-end="1849" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1890">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dSploit/res/values-fr/strings.xml">
+    <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/plugins/Inspector.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="178" column="54" selection-start="14170" selection-end="14170" vertical-scroll-proportion="0.85858583" vertical-offset="2439" max-vertical-offset="3330">
+        <state line="49" column="39" selection-start="1864" selection-end="1864" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2790">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dSploit/src/it/evilsocket/dsploit/core/Plugin.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="46" column="5" selection-start="1414" selection-end="1708" vertical-scroll-proportion="0.32330826" vertical-offset="59" max-vertical-offset="1800">
           <folding />
         </state>
       </provider>

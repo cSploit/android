@@ -6,20 +6,17 @@
             <file
                 path="/home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-xlarge/values.xml"
                 qualifiers="xlarge" >
-                <dimen name="abs__action_bar_title_text_size" >18dp
-                </dimen>
-
                 <item
                     name="abs__dialog_min_width_minor"
                     type="dimen">
 72%
                 </item>
 
+                <dimen name="abs__action_bar_title_text_size" >18dp
+                </dimen>
                 <dimen name="abs__action_bar_subtitle_bottom_margin" >9dip
                 </dimen>
                 <dimen name="abs__action_button_min_width" >64dip
-                </dimen>
-                <dimen name="abs__action_bar_subtitle_top_margin" >-3dp
                 </dimen>
 
                 <item
@@ -28,11 +25,13 @@
 45%
                 </item>
 
+                <dimen name="abs__action_bar_subtitle_top_margin" >-3dp
+                </dimen>
                 <dimen name="abs__action_bar_default_height" >56dip
                 </dimen>
-                <dimen name="abs__action_bar_icon_vertical_padding" >4dip
-                </dimen>
                 <dimen name="abs__action_bar_subtitle_text_size" >14dp
+                </dimen>
+                <dimen name="abs__action_bar_icon_vertical_padding" >4dip
                 </dimen>
             </file>
             <file
@@ -550,38 +549,34 @@ bold
                 <attr
                     name="actionModeStyle"
                     format="reference" />
+                <attr
+                    name="titleTextStyle"
+                    format="reference" />
 
                 <dimen name="abs__dropdownitem_text_padding_right" >8dip
                 </dimen>
 
                 <attr
-                    name="titleTextStyle"
-                    format="reference" />
-                <attr
                     name="actionBarSplitStyle"
-                    format="reference" />
-                <attr
-                    name="actionBarDivider"
                     format="reference" />
 
                 <style name="Widget.Sherlock.Light.ActionBar.TabBar.Inverse" />
 
+                <attr
+                    name="actionBarDivider"
+                    format="reference" />
                 <attr
                     name="itemBackground"
                     format="color|reference" />
                 <attr
                     name="divider"
                     format="reference" />
-
-                <dimen name="abs__action_bar_title_text_size" >18dp
-                </dimen>
-
                 <attr
                     name="backgroundStacked"
                     format="reference|color" />
-                <attr
-                    name="spinnerDropDownItemStyle"
-                    format="reference" />
+
+                <dimen name="abs__action_bar_title_text_size" >18dp
+                </dimen>
 
                 <style name="Widget.Sherlock.Light.ActionBar.Solid" >
                     <item name="titleTextStyle">
@@ -616,6 +611,9 @@ bold
                     </item>
                 </style>
 
+                <attr
+                    name="spinnerDropDownItemStyle"
+                    format="reference" />
                 <attr
                     name="searchViewCloseIcon"
                     format="reference" />
@@ -870,6 +868,10 @@ true
                 <string name="abs__searchview_description_search" >Search
                 </string>
 
+                <attr
+                    name="actionModeBackground"
+                    format="reference" />
+
                 <style
                     name="Sherlock.__Theme"
                     parent="android:Theme.NoTitleBar" >
@@ -877,10 +879,6 @@ true
 @null
                     </item>
                 </style>
-
-                <attr
-                    name="actionModeBackground"
-                    format="reference" />
 
                 <bool name="abs__config_allowActionMenuItemTextWithIcon" >
 false
@@ -895,10 +893,10 @@ false
                 </style>
 
                 <attr
-                    name="actionOverflowButtonStyle"
+                    name="textAppearanceSearchResultSubtitle"
                     format="reference" />
                 <attr
-                    name="textAppearanceSearchResultSubtitle"
+                    name="actionOverflowButtonStyle"
                     format="reference" />
 
                 <declare-styleable name="SherlockActionMode" >
@@ -916,10 +914,10 @@ false
                 </declare-styleable>
 
                 <attr
-                    name="dividerVertical"
+                    name="homeLayout"
                     format="reference" />
                 <attr
-                    name="homeLayout"
+                    name="dividerVertical"
                     format="reference" />
 
                 <style name="Widget.Sherlock.Light.ActionButton.CloseMode" >
@@ -1108,6 +1106,9 @@ false
                 <attr
                     name="itemIconDisabledAlpha"
                     format="float" />
+                <attr
+                    name="listPopupWindowStyle"
+                    format="reference" />
 
                 <style
                     name="TextAppearance.Sherlock.Widget.ActionBar.Title"
@@ -1120,9 +1121,6 @@ false
                     </item>
                 </style>
 
-                <attr
-                    name="listPopupWindowStyle"
-                    format="reference" />
                 <attr
                     name="indeterminateProgressStyle"
                     format="reference" />
@@ -1268,7 +1266,6 @@ true
                     -->
                     <!-- Color for text that appears within action menu items. -->
 
-
                     <!-- =================== -->
                     <!-- Action mode styles -->
                     <!-- =================== -->
@@ -1278,9 +1275,7 @@ true
                     <!-- Drawable to use for the close action mode button -->
                     <!-- Drawable to use for the Share action button in WebView selection action modes -->
 
-
                     <!-- PopupWindow style to use for action modes when showing as a window overlay. -->
-
 
                     <!-- ============= -->
                     <!-- Button styles -->
@@ -1289,24 +1284,18 @@ true
 
                     <!-- Small Button style. -->
 
-
                     <!-- Background drawable for standalone items that need focus/pressed states. -->
-
 
                     <!--
              This Drawable is overlaid over the foreground of the Window's content area, usually
              to place a shadow below the title.
                     -->
 
-
                     <!-- Text color, typeface, size, and style for the text inside of a popup menu. -->
-
 
                     <!-- Text color, typeface, size, and style for small text inside of a popup menu. -->
 
-
                     <!-- Text color, typeface, size, and style for "small" text. Defaults to secondary text color. -->
-
 
                     <!-- ============================ -->
                     <!-- SearchView styles and assets -->
@@ -1327,7 +1316,6 @@ true
                     <!-- Text color, typeface, size, and style for system search result title. Defaults to primary inverse text color. -->
                     <!-- Text color, typeface, size, and style for system search result subtitle. Defaults to primary inverse text color. -->
 
-
                     <!-- =========== -->
                     <!-- List styles -->
                     <!-- =========== -->
@@ -1335,16 +1323,12 @@ true
 
                     <!-- A smaller, sleeker list item height. -->
 
-
                     <!-- The preferred padding along the left edge of list items. -->
                     <!-- The preferred padding along the right edge of list items. -->
 
-
                     <!-- The preferred TextAppearance for the primary text of small list items. -->
 
-
                     <!-- Drawable to use for generic vertical dividers. -->
-
 
                     <!-- Default ActivityChooserView style. -->
                     <!-- Drawable used as a background for activated items. -->
@@ -1370,13 +1354,13 @@ true
                     parent="Widget" />
 
                 <style
-                    name="TextAppearance.Sherlock.Widget.ActionBar.Subtitle"
-                    parent="Widget" >
-                    <item name="android:textSize">
-@dimen/abs__action_bar_subtitle_text_size
+                    name="Widget.Sherlock.Light.ActionMode"
+                    parent="Widget.Sherlock.ActionMode" >
+                    <item name="titleTextStyle">
+@style/TextAppearance.Sherlock.Widget.ActionMode.Title
                     </item>
-                    <item name="android:textColor">
-?android:attr/textColorSecondary
+                    <item name="subtitleTextStyle">
+@style/TextAppearance.Sherlock.Widget.ActionMode.Subtitle
                     </item>
                 </style>
 
@@ -1398,13 +1382,13 @@ true
                 </style>
 
                 <style
-                    name="Widget.Sherlock.Light.ActionMode"
-                    parent="Widget.Sherlock.ActionMode" >
-                    <item name="titleTextStyle">
-@style/TextAppearance.Sherlock.Widget.ActionMode.Title
+                    name="TextAppearance.Sherlock.Widget.ActionBar.Subtitle"
+                    parent="Widget" >
+                    <item name="android:textSize">
+@dimen/abs__action_bar_subtitle_text_size
                     </item>
-                    <item name="subtitleTextStyle">
-@style/TextAppearance.Sherlock.Widget.ActionMode.Subtitle
+                    <item name="android:textColor">
+?android:attr/textColorSecondary
                     </item>
                 </style>
 
@@ -1416,12 +1400,12 @@ true
                     name="Widget.Sherlock.Light.ActionBar.TabView"
                     parent="Widget.Sherlock.ActionBar.TabView" />
 
-                <dimen name="abs__action_button_min_width" >56dip
-                </dimen>
-
                 <attr
                     name="initialActivityCount"
                     format="string" />
+
+                <dimen name="abs__action_button_min_width" >56dip
+                </dimen>
 
                 <declare-styleable name="SherlockMenuGroup" >
 
@@ -2572,6 +2556,24 @@ marquee
                     format="color" />
 
                 <style
+                    name="Widget.Sherlock.ProgressBar.Horizontal"
+                    parent="android:Widget.ProgressBar.Horizontal" >
+                    <item name="android:progressDrawable">
+@drawable/abs__progress_horizontal_holo_dark
+                    </item>
+                    <!-- item name="android:indeterminateDrawable">@drawable/abs__progress_indeterminate_horizontal_holo</item -->
+                    <item name="android:minHeight">
+16dip
+                    </item>
+                    <item name="android:maxHeight">
+16dip
+                    </item>
+                </style>
+
+                <string name="abs__action_menu_overflow_description" >More options
+                </string>
+
+                <style
                     name="Sherlock.__Widget.Holo.DropDownItem"
                     parent="Widget" >
                     <item name="android:textAppearance">
@@ -2585,24 +2587,6 @@ marquee
                     </item>
                     <item name="android:gravity">
 center_vertical
-                    </item>
-                </style>
-
-                <string name="abs__action_menu_overflow_description" >More options
-                </string>
-
-                <style
-                    name="Widget.Sherlock.ProgressBar.Horizontal"
-                    parent="android:Widget.ProgressBar.Horizontal" >
-                    <item name="android:progressDrawable">
-@drawable/abs__progress_horizontal_holo_dark
-                    </item>
-                    <!-- item name="android:indeterminateDrawable">@drawable/abs__progress_indeterminate_horizontal_holo</item -->
-                    <item name="android:minHeight">
-16dip
-                    </item>
-                    <item name="android:maxHeight">
-16dip
                     </item>
                 </style>
 
@@ -2622,6 +2606,9 @@ center_vertical
                 <attr
                     name="verticalDivider"
                     format="reference" />
+                <attr
+                    name="actionButtonStyle"
+                    format="reference" />
 
                 <style
                     name="TextAppearance.Sherlock.Widget.ActionMode.Subtitle.Inverse"
@@ -2634,33 +2621,30 @@ center_vertical
                     </item>
                 </style>
 
-                <attr
-                    name="actionButtonStyle"
-                    format="reference" />
-
                 <style name="Widget.Sherlock.Light.ActionBar.TabView.Inverse" />
 
                 <attr
                     name="actionBarTabTextStyle"
                     format="reference" />
                 <attr
-                    name="iconifiedByDefault"
-                    format="boolean" />
-                <attr
                     name="searchResultListItemHeight"
                     format="dimension" />
+                <attr
+                    name="iconifiedByDefault"
+                    format="boolean" />
                 <attr
                     name="windowActionBar"
                     format="boolean" />
 
                 <dimen name="abs__search_view_text_min_width" >160dip
                 </dimen>
-                <dimen name="abs__action_bar_subtitle_text_size" >14dp
-                </dimen>
 
                 <attr
                     name="windowNoTitle"
                     format="boolean" />
+
+                <dimen name="abs__action_bar_subtitle_text_size" >14dp
+                </dimen>
 
                 <style
                     name="Widget.Sherlock.Light.SearchAutoCompleteTextView"
@@ -2684,12 +2668,14 @@ center_vertical
                     </item>
                 </style>
 
-                <dimen name="abs__action_bar_subtitle_top_margin" >-3dp
-                </dimen>
-
                 <attr
                     name="windowSplitActionBar"
                     format="boolean" />
+
+                <dimen name="abs__action_bar_subtitle_top_margin" >-3dp
+                </dimen>
+                <dimen name="abs__action_bar_subtitle_bottom_margin" >5dip
+                </dimen>
 
                 <style name="Theme.Sherlock.Light.NoActionBar" >
                     <item name="windowActionBar">
@@ -2699,9 +2685,6 @@ false
 true
                     </item>
                 </style>
-
-                <dimen name="abs__action_bar_subtitle_bottom_margin" >5dip
-                </dimen>
 
                 <style
                     name="Widget.Sherlock.Light.Button.Small"
@@ -2736,6 +2719,10 @@ normal
                     name="windowContentOverlay"
                     format="reference" />
 
+                <style
+                    name="Widget.Sherlock.Light.DropDownItem.Spinner"
+                    parent="Sherlock.__Widget.Holo.DropDownItem" />
+
                 <style name="TextAppearance.Sherlock.SearchResult.Subtitle" >
                     <item name="android:textSize">
 14sp
@@ -2744,10 +2731,6 @@ normal
 ?android:attr/textColorSecondary
                     </item>
                 </style>
-
-                <style
-                    name="Widget.Sherlock.Light.DropDownItem.Spinner"
-                    parent="Sherlock.__Widget.Holo.DropDownItem" />
 
                 <style
                     name="Widget.Sherlock.Light.ActionMode.Inverse"
@@ -2811,6 +2794,10 @@ wrap_content
                     format="reference" />
 
                 <style
+                    name="Widget.Sherlock.Light.ActionBar.TabText"
+                    parent="Widget.Sherlock.ActionBar.TabText" />
+
+                <style
                     name="TextAppearance.Sherlock.Widget.ActionMode.Title"
                     parent="Widget" >
                     <item name="android:textSize">
@@ -2821,21 +2808,18 @@ wrap_content
                     </item>
                 </style>
 
-                <style
-                    name="Widget.Sherlock.Light.ActionBar.TabText"
-                    parent="Widget.Sherlock.ActionBar.TabText" />
-
                 <bool name="abs__config_showMenuShortcutsWhenKeyboardPresent" >
 false
                 </bool>
+
+                <attr
+                    name="textAppearanceSmall"
+                    format="reference" />
 
                 <item
                     name="abs__home"
                     type="id"/>
 
-                <attr
-                    name="textAppearanceSmall"
-                    format="reference" />
                 <attr
                     name="windowActionBarOverlay"
                     format="boolean" />
@@ -3016,13 +3000,12 @@ false
                 </dimen>
                 <dimen name="abs__action_bar_default_height" >56dip
                 </dimen>
+                <dimen name="abs__action_bar_subtitle_text_size" >14dp
+                </dimen>
 
                 <bool name="abs__action_bar_expanded_action_views_exclusive" >
 false
                 </bool>
-
-                <dimen name="abs__action_bar_subtitle_text_size" >14dp
-                </dimen>
             </file>
             <file
                 name="abs__screen_action_bar_overlay"
@@ -3113,24 +3096,24 @@ false
                     parent="android:Widget.Holo.Spinner" />
 
                 <style
-                    name="TextAppearance.Sherlock.Widget.PopupMenu"
-                    parent="android:TextAppearance.Holo.Widget.PopupMenu" />
-
-                <style
                     name="Widget.Sherlock.ActionBar.TabView"
                     parent="android:Widget.Holo.ActionBar.TabView" />
+
+                <style
+                    name="TextAppearance.Sherlock.Widget.PopupMenu"
+                    parent="android:TextAppearance.Holo.Widget.PopupMenu" />
 
                 <style
                     name="Widget.Sherlock.Light.ActionButton.Overflow"
                     parent="android:Widget.Holo.Light.ActionButton.Overflow" />
 
                 <style
-                    name="Widget.Sherlock.Light.ProgressBar"
-                    parent="android:Widget.Holo.Light.ProgressBar" />
-
-                <style
                     name="Widget.Sherlock.Light.ActionBar.TabView"
                     parent="android:Widget.Holo.Light.ActionBar.TabView" />
+
+                <style
+                    name="Widget.Sherlock.Light.ProgressBar"
+                    parent="android:Widget.Holo.Light.ProgressBar" />
 
                 <style
                     name="Sherlock.__Theme"
@@ -3263,32 +3246,32 @@ true
                     parent="android:Widget.Holo.ListView.DropDown" />
 
                 <style
-                    name="Widget.Sherlock.Light.ActionBar"
-                    parent="android:Widget.Holo.Light.ActionBar" />
-
-                <style
                     name="Widget.Sherlock.ProgressBar.Horizontal"
                     parent="android:Widget.Holo.ProgressBar.Horizontal" />
+
+                <style
+                    name="Widget.Sherlock.Light.ActionBar"
+                    parent="android:Widget.Holo.Light.ActionBar" />
 
                 <style
                     name="Widget.Sherlock.Light.SearchAutoCompleteTextView"
                     parent="android:Widget.Holo.Light.AutoCompleteTextView" />
 
                 <style
-                    name="Widget.Sherlock.Light.ActionBar.Solid"
-                    parent="android:Widget.Holo.Light.ActionBar.Solid" />
-
-                <style
                     name="TextAppearance.Sherlock.Light.Widget.PopupMenu.Large"
                     parent="android:TextAppearance.Holo.Widget.PopupMenu.Large" />
 
                 <style
-                    name="TextAppearance.Sherlock.Widget.ActionMode.Title"
-                    parent="android:TextAppearance.Holo.Widget.ActionMode.Title" />
+                    name="Widget.Sherlock.Light.ActionBar.Solid"
+                    parent="android:Widget.Holo.Light.ActionBar.Solid" />
 
                 <style
                     name="TextAppearance.Sherlock.Widget.ActionBar.Subtitle"
                     parent="android:TextAppearance.Holo.Widget.ActionBar.Subtitle" />
+
+                <style
+                    name="TextAppearance.Sherlock.Widget.ActionMode.Title"
+                    parent="android:TextAppearance.Holo.Widget.ActionMode.Title" />
 
                 <style
                     name="Widget.Sherlock.SearchAutoCompleteTextView"
@@ -3301,9 +3284,9 @@ true
                 </dimen>
                 <dimen name="abs__action_bar_subtitle_text_size" >12dp
                 </dimen>
-                <dimen name="abs__action_bar_default_height" >40dip
-                </dimen>
                 <dimen name="abs__action_bar_subtitle_top_margin" >-2dp
+                </dimen>
+                <dimen name="abs__action_bar_default_height" >40dip
                 </dimen>
                 <dimen name="abs__action_bar_title_text_size" >16dp
                 </dimen>
@@ -3437,9 +3420,9 @@ true
                 qualifiers="large-land-mdpi-1024x600" >
                 <dimen name="abs__action_bar_default_height" >48dip
                 </dimen>
-                <dimen name="abs__action_bar_icon_vertical_padding" >8dip
-                </dimen>
                 <dimen name="abs__action_bar_subtitle_text_size" >14dp
+                </dimen>
+                <dimen name="abs__action_bar_icon_vertical_padding" >8dip
                 </dimen>
                 <dimen name="abs__action_bar_subtitle_bottom_margin" >5dip
                 </dimen>
@@ -3894,9 +3877,9 @@ true
                 </dimen>
                 <dimen name="abs__action_bar_icon_vertical_padding" >8dip
                 </dimen>
-                <dimen name="abs__action_bar_default_height" >48dip
-                </dimen>
                 <dimen name="abs__action_bar_subtitle_top_margin" >-3dp
+                </dimen>
+                <dimen name="abs__action_bar_default_height" >48dip
                 </dimen>
             </file>
             <file
@@ -3945,9 +3928,9 @@ true
                 </dimen>
                 <dimen name="abs__action_bar_icon_vertical_padding" >4dip
                 </dimen>
-                <dimen name="abs__action_bar_subtitle_bottom_margin" >4dip
-                </dimen>
                 <dimen name="abs__action_bar_subtitle_text_size" >12dp
+                </dimen>
+                <dimen name="abs__action_bar_subtitle_bottom_margin" >4dip
                 </dimen>
                 <dimen name="abs__action_bar_subtitle_top_margin" >-2dp
                 </dimen>
@@ -4398,9 +4381,9 @@ true
             <file
                 path="/home/androguide/Dropbox/Development/Android/Projects/dSploit/dSploit/build/exploded-bundles/DSploitActionbarsherlockUnspecified.aar/res/values-large-mdpi-1024x600/values.xml"
                 qualifiers="large-mdpi-1024x600" >
-                <dimen name="abs__action_bar_subtitle_bottom_margin" >9dip
-                </dimen>
                 <dimen name="abs__action_button_min_width" >64dip
+                </dimen>
+                <dimen name="abs__action_bar_subtitle_bottom_margin" >9dip
                 </dimen>
                 <dimen name="abs__action_bar_icon_vertical_padding" >4dip
                 </dimen>
@@ -4592,13 +4575,13 @@ true
                 qualifiers="fr" >
                 <string name="selected" >Sélectionné 
                 </string>
-                <string name="license" >License
-                </string>
                 <string name="pwd_wordlist" >Dictionnaire de mots de passe
                 </string>
-                <string name="empty_port_list" >Liste de ports vide.
+                <string name="license" >License
                 </string>
                 <string name="vulnerability_finder_desc" >Cherche des vulnérabilités depuis la National Vulnerability Database en fonction des services en cours d\'exécution sur la machine ciblée.
+                </string>
+                <string name="empty_port_list" >Liste de ports vide.
                 </string>
                 <string name="trace" >Trace
                 </string>
@@ -4606,15 +4589,15 @@ true
                 </string>
                 <string name="new_session" >Nouvelle Session
                 </string>
-                <string name="save_session" >Sauvegarder Session
+                <string name="restore_session" >Restaurer Session
                 </string>
                 <string name="menu_settings" >Paramètres
                 </string>
-                <string name="restore_session" >Restaurer Session
+                <string name="save_session" >Sauvegarder Session
                 </string>
-                <string name="something_went_wrong_changelog" ><![CDATA[<html><body><p><b>Oups! Le changelog n\'a pas pu être récupéré :</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
                 <string name="no" >Non
                 </string>
+                <string name="something_went_wrong_changelog" ><![CDATA[<html><body><p><b>Oups! Le changelog n\'a pas pu être récupéré :</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
                 <string name="connecting" >Connexion…
                 </string>
                 <string name="scan" >Scanner
@@ -4647,9 +4630,9 @@ true
                 </string>
                 <string name="fatal_error_html" ><![CDATA[<p>Votre ROM souffre du bug <b>LD_LIBRARY_PATH</b>, désolé mais elle n\'est pas compatible avec dSploit.</p>]]></string>
                 <string name="nothing_found" ><![CDATA[<small><i>Rien Trouvé :(</i></small>]]></string>
-                <string name="error_occured" >Une erreur est survenue pendant le téléchargement de la mise  à jour.
-                </string>
                 <string name="customize_wol_port" >Spécifiez le port WOL est appuyez sur Envoyer.
+                </string>
+                <string name="error_occured" >Une erreur est survenue pendant le téléchargement de la mise  à jour.
                 </string>
                 <string name="invalid_port" >Vous avez spécifié un port non-valide.
                 </string>
@@ -4659,9 +4642,9 @@ true
                 </string>
                 <string name="crash_toast_text" >Ooooops ! Un crash est survenu, mais le bug va être signalé au développeur :)
                 </string>
-                <string name="stop_monitor" >Arrêter la surveillance réseau
-                </string>
                 <string name="response" >Réponse
+                </string>
+                <string name="stop_monitor" >Arrêter la surveillance réseau
                 </string>
                 <string name="device_type" >Type d\'appareil
                 </string>
@@ -4669,25 +4652,25 @@ true
                 </string>
                 <string name="wifi_scan" >Scan Wi-Fi
                 </string>
-                <string name="initialization_error" >Erreur d\'initialisation
-                </string>
                 <string name="router_pwn" >Routeur PWN
+                </string>
+                <string name="initialization_error" >Erreur d\'initialisation
                 </string>
                 <string name="session_sniffer" >Sniffeur de Session
                 </string>
                 <string name="start_hijack" >Cliquez sur une session pour commencer le hijacking, restez appuyé pour sauvegarder la session dans un fichier.
                 </string>
-                <string name="invalid_session" >Nom de session invalide.
-                </string>
                 <string name="title_activity_main" >dSploit
+                </string>
+                <string name="invalid_session" >Nom de session invalide.
                 </string>
                 <string name="router_pwn_desc" >Lance le service de http://routerpwn.com/ afin de pown votre routeur.
                 </string>
                 <string name="enter_session_name" >Insérez le nom du fichier de session :
                 </string>
-                <string name="stop" >Arrêter
-                </string>
                 <string name="no_infos_on_target" >Aucune information spécifique à propos des services en cours sur la cible actuelle, veuillez d\'abord lancer l\'inspecteur.
+                </string>
+                <string name="stop" >Arrêter
                 </string>
                 <string name="gateway_router" >(Votre passerelle réseau / routeur)
                 </string>
@@ -4791,13 +4774,13 @@ true
                 </string>
                 <string name="request" >Requête
                 </string>
-                <string name="stopped" >Arrêté…
-                </string>
                 <string name="filter_desc" >Insérez une filtre de remplacement, ceci peut inclure du simple texte ou des expressions régulières (regex).
                 </string>
-                <string name="session_saved_to" >Session sauvegardée vers 
+                <string name="stopped" >Arrêté…
                 </string>
                 <string name="dsploit_url" >http://www.dsploit.net/
+                </string>
+                <string name="session_saved_to" >Session sauvegardée vers 
                 </string>
                 <string name="exit" >Quitter
                 </string>
@@ -4806,14 +4789,14 @@ true
                 <string name="connected_to" ><![CDATA[Connecté à <b>]]></string>
                 <string name="no_open_ports" >Aucun port ouvert détécté sur la cible actuelle, veuillez d\'abord lancer l\'inspecteur.
                 </string>
-                <string name="arm_error" ><![CDATA[<p>L\'architecture de votre processeur n\'est pas ARM, désolé mais dSploit n\'est pas compatible avec votre appareil.</p>]]></string>
                 <string name="submit_issue" >Soumettre un bug/problème
                 </string>
-                <string name="target" >Cible
+                <string name="arm_error" ><![CDATA[<p>L\'architecture de votre processeur n\'est pas ARM, désolé mais dSploit n\'est pas compatible avec votre appareil.</p>]]></string>
+                <string name="enter_ports_list" >Insérez une liste de ports séparés par une virgule : 
                 </string>
                 <string name="max_length" >Longueur Maximum
                 </string>
-                <string name="enter_ports_list" >Insérez une liste de ports séparés par une virgule : 
+                <string name="target" >Cible
                 </string>
                 <string name="inspector" >Inspecteur
                 </string>
@@ -4831,9 +4814,9 @@ true
                 </string>
                 <string name="net_discovery_stopped" >Découverte réseau arrêtée.
                 </string>
-                <string name="send" >Envoyer
-                </string>
                 <string name="request_sent" >Requête envoyée.
+                </string>
+                <string name="send" >Envoyer
                 </string>
                 <string name="dsploit_disclaimer" ><![CDATA[Cette application ne doit être utilisée pour aucun autre but que celui de démontrer ses possibilités, et uniquement sur des réseau pour lesquels vous avez la permission d\'en faire ainsi. N\'importe quel autre usage n\'est en aucun cas la responsabilité du développeur. En d\'autres mots, ne soyez pas stupide, et ne redirigez pas les personnes en colère vers moi.]]></string>
                 <string name="warning" >Avertissement
@@ -4842,20 +4825,20 @@ true
                 </string>
                 <string name="enter_redirection_details" >Insérez les détails de la redirection:
                 </string>
-                <string name="dsploit_catchphrase" >dSploit - Une suite de pénétration réseau pour Android.
-                </string>
                 <string name="choose" >Choisir
                 </string>
-                <string name="connection_to" ><![CDATA[Connexion à <b>]]></string>
-                <string name="net_discovery_started" >Découverte réseau en cours.
+                <string name="dsploit_catchphrase" >dSploit - Une suite de pénétration réseau pour Android.
                 </string>
+                <string name="connection_to" ><![CDATA[Connexion à <b>]]></string>
                 <string name="couldnt_send_wol_packet" >Impossible d\'envoyer un paquet WOL à une cible sans connaître son adresse MAC à l\'avance.
+                </string>
+                <string name="net_discovery_started" >Découverte réseau en cours.
                 </string>
                 <string name="new_session_started" >Nouvelle session démarrée
                 </string>
-                <string name="toggle_button" >Interrupteur
-                </string>
                 <string name="enter_chars_wanted" >Insérez les caractères que vous voulez utiliser dans votre jeu de caractères custom :
+                </string>
+                <string name="toggle_button" >Interrupteur
                 </string>
                 <string name="b" >B
                 </string>
@@ -4863,23 +4846,23 @@ true
                 </string>
                 <string name="address" >Adresse
                 </string>
-                <string name="only_4_root" >Cette application ne fonctionne que sur les appareils rootés.
+                <string name="crack" >Cracker
                 </string>
                 <string name="to" >Vers
                 </string>
-                <string name="crack" >Cracker
+                <string name="only_4_root" >Cette application ne fonctionne que sur les appareils rootés.
                 </string>
                 <string name="invalid_filename" >Nom de fichier invalide.
                 </string>
                 <string name="connected_to2" ><![CDATA[</b> avec la clef <b><font color=\"green\">]]></string>
                 <string name="connected_to3" ><![CDATA[</font></b> !]]></string>
-                <string name="no_session_found" >Aucune session trouvée sur la carte SD.
-                </string>
                 <string name="close_confirm" >Ceci arrêtera dSploit, voulez-vous vraiment continuer ?
                 </string>
-                <string name="github_issues" >https://github.com/evilsocket/dsploit/issues/new
+                <string name="no_session_found" >Aucune session trouvée sur la carte SD.
                 </string>
                 <string name="packet_forger" >Forgeur de Paquets
+                </string>
+                <string name="github_issues" >https://github.com/evilsocket/dsploit/issues/new
                 </string>
                 <string name="r" >R
                 </string>
@@ -4888,33 +4871,33 @@ true
                 </string>
                 <string name="enter_url" >Insérez une URL, un nom d\'hôte ou une adresse IP ci-dessous :
                 </string>
-                <string name="target_alias" >Alias de la cible
-                </string>
                 <string name="select_target_below" >Choisissez une cible ci-dessous en cliquant dessus, ou restez appuyé pour saisir un alias.
+                </string>
+                <string name="target_alias" >Alias de la cible
                 </string>
                 <string name="start_monitor" >Démarrer la surveillance réseau
                 </string>
                 <string name="disclaimer" >Conditions d\'utilisation
                 </string>
-                <string name="Charset" >Jeu de caractères
-                </string>
                 <string name="no_updates_available" >Aucune mise à jour disponible.
                 </string>
-                <string name="something_went_wrong" >Il y a eu un problème, veuillez re-sélectionner une cible valide.
+                <string name="Charset" >Jeu de caractères
                 </string>
                 <string name="port_scanner_desc" >Effectue un scan de port SYN sur la cible.
+                </string>
+                <string name="something_went_wrong" >Il y a eu un problème, veuillez re-sélectionner une cible valide.
                 </string>
                 <string name="error" >Erreur
                 </string>
                 <string name="start_hijacking2" >Commencer le hijacking de session ?
                 </string>
-                <string name="mitm_desc" >Effectue différentes attaques de type man-in-the-middle, tels que sniffing de réseau, manipulation de trafic, etc…
-                </string>
                 <string name="network_subnet_mask" >Ceci est votre masque de sous-réseau
                 </string>
-                <string name="wake_on_lan" >Wake On LAN
+                <string name="mitm_desc" >Effectue différentes attaques de type man-in-the-middle, tels que sniffing de réseau, manipulation de trafic, etc…
                 </string>
                 <string name="cancel_dialog" >Annuler
+                </string>
+                <string name="wake_on_lan" >Wake On LAN
                 </string>
                 <string name="app_name" >dSploit
                 </string>
@@ -4970,15 +4953,15 @@ true
                 </string>
                 <string name="checking" >Checking…
                 </string>
-                <string name="close_confirm" >This will close dSploit, are you sure you want to continue ?
-                </string>
                 <string name="login_cracker_desc" >A very fast network logon cracker which support many different
         services.
                 </string>
-                <string name="save_session" >Save Session
+                <string name="close_confirm" >This will close dSploit, are you sure you want to continue ?
                 </string>
                 <string name="mitm_desc" >Perform various man-in-the-middle attacks, such as network sniffing,
         traffic manipulation, etc…
+                </string>
+                <string name="save_session" >Save Session
                 </string>
                 <string name="busybox_required" >Full BusyBox installation required, killall binary not found(maybe you have an old busybox version).
                 </string>
@@ -5012,9 +4995,9 @@ true
         If not, see http://www.gnu.org/licenses/.
                 </string>
                 <string name="something_went_wrong_changelog" ><![CDATA[<html><body><p><b>Something went wrong while retrieving the changelog:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
-                <string name="error" >Error
-                </string>
                 <string name="no" >No
+                </string>
+                <string name="error" >Error
                 </string>
                 <string name="wifi_key_copied" >WiFi key copied to clipboard.
                 </string>
@@ -5032,9 +5015,9 @@ true
                 </string>
                 <string name="title_activity_main" >dSploit
                 </string>
-                <string name="enter_url" >Enter an URL, host name or ip address below:
-                </string>
                 <string name="connecting" >Connecting…
+                </string>
+                <string name="enter_url" >Enter an URL, host name or ip address below:
                 </string>
                 <string name="enter_wifi_key" >Enter WiFi Key:
                 </string>
@@ -5044,9 +5027,9 @@ true
                 </string>
                 <string name="inspector_desc" >Perform target operating system and services deep detection (slower than port scanner, but more accurate).
                 </string>
-                <string name="cancel" >Cancel
-                </string>
                 <string name="enter_redirection_details" >Enter redirection details below:
+                </string>
+                <string name="cancel" >Cancel
                 </string>
                 <string name="enter_chars_wanted" >Enter the chars you want to use in the custom charset:
                 </string>
@@ -5158,26 +5141,26 @@ true
                 </string>
                 <string name="about_dsploit_v_" >About dSploit v
                 </string>
-                <string name="invalid_filename" >Invalid file name.
+                <string name="router_pwn_desc" >Launch the http://routerpwn.com/ service to pwn your router.
                 </string>
-                <string name="connection_to2" ><![CDATA[</b> <b><font color=\"red\">FAILED</font></b>.]]></string>
                 <string name="stop" >Stop
                 </string>
-                <string name="router_pwn_desc" >Launch the http://routerpwn.com/ service to pwn your router.
+                <string name="connection_to2" ><![CDATA[</b> <b><font color=\"red\">FAILED</font></b>.]]></string>
+                <string name="invalid_filename" >Invalid file name.
                 </string>
                 <string name="choose_dir" >Choose 
                 </string>
-                <string name="install_error" >Error during files installation!
-                </string>
                 <string name="select_session_file" >Select a session file from the sd card :
+                </string>
+                <string name="install_error" >Error during files installation!
                 </string>
                 <string name="start_hijack" >Tap on a session to start hijacking, long tap to save it to file.
                 </string>
                 <string name="vulnerability_finder_desc" >Search for known vulnerabilities for target running services upon National Vulnerability Database.
                 </string>
-                <string name="dsploit_url" >http://www.dsploit.net/
-                </string>
                 <string name="login_cracker" >Login Cracker
+                </string>
+                <string name="dsploit_url" >http://www.dsploit.net/
                 </string>
                 <string name="invalid_session" >Invalid session name.
                 </string>
@@ -5187,9 +5170,9 @@ true
                 </string>
                 <string name="mitm" >MITM
                 </string>
-                <string name="arm_error" ><![CDATA[<p>It seems like your device processor is not an ARM, i\'m sorry but it\'s not compatible with dSploit.</p>]]></string>
                 <string name="router_pwn" >Router PWN
                 </string>
+                <string name="arm_error" ><![CDATA[<p>It seems like your device processor is not an ARM, i\'m sorry but it\'s not compatible with dSploit.</p>]]></string>
                 <string name="packet_forger_desc" >Craft and send a custom TCP or UDP packet to the target.
                 </string>
                 <string name="inspector" >Inspector
@@ -5211,11 +5194,11 @@ true
                 </string>
                 <string name="github_issues" >https://github.com/evilsocket/dsploit/issues/new
                 </string>
-                <string name="exit" >Exit
+                <string name="port_must_be_greater" >Port must be greater than 0 and smaller than 65535.
                 </string>
                 <string name="stopped" >Stopped…
                 </string>
-                <string name="port_must_be_greater" >Port must be greater than 0 and smaller than 65535.
+                <string name="exit" >Exit
                 </string>
                 <string name="nothing_found" ><![CDATA[<small><i>Nothing Found</i></small>]]></string>
                 <string name="connection_to" ><![CDATA[Connection to <b>]]></string>
@@ -5223,26 +5206,26 @@ true
                 </string>
                 <string name="add_custom_target" >Add custom target
                 </string>
-                <string name="new_update_desc" >A new update to version
-                </string>
                 <string name="no_open_ports" >No open ports detected on current target, run the service inspector
         first.
+                </string>
+                <string name="new_update_desc" >A new update to version
                 </string>
                 <string name="select_module" >Select a module to run
                 </string>
                 <string name="trace_desc" >Perform a traceroute on target.
                 </string>
-                <string name="only_4_root" >This application can run only on rooted devices.
-                </string>
-                <string name="no_session_found" >No session file found on sd card.
+                <string name="max_length" >Max Length
                 </string>
                 <string name="os" >OS
                 </string>
-                <string name="max_length" >Max Length
+                <string name="no_session_found" >No session file found on sd card.
                 </string>
-                <string name="target" >Target
+                <string name="only_4_root" >This application can run only on rooted devices.
                 </string>
                 <string name="select_target" >Select a target below by clicking on a row, or long click on it to enter an alias.
+                </string>
+                <string name="target" >Target
                 </string>
                 <string name="error_occured" >An error occurred while downloading the update.
                 </string>
@@ -5256,9 +5239,9 @@ true
                 </string>
                 <string name="invalid_ports" >Invalid ports specified.
                 </string>
-                <string name="protocol" >Protocol
-                </string>
                 <string name="wake_on_lan" >Wake On Lan
+                </string>
+                <string name="protocol" >Protocol
                 </string>
             </file>
             <file

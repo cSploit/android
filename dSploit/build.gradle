@@ -17,6 +17,24 @@ android {
     compileSdkVersion 18
     buildToolsVersion "18.0.1"
 
+    signingConfigs {
+        release {
+            storeFile file("keystore.keystore")
+            storePassword "YOUR_KEY_PASSWORD"
+            keyAlias "YOUR_KEY_ALIAS"
+            keyPassword "YOUR_KEY_PASSWORD"
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+        debug {
+            packageNameSuffix ".debug"
+        }
+    }
+
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
