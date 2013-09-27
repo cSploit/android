@@ -159,14 +159,14 @@
     <string name="mitm">MITM</string>
     <string name="mitm_desc">Εκτελέστε διάφορες man-in-the-middle επιθέσεις, όπως network sniffing, traffic manipulation, etc&#8230;
     </string>
-    <string name="network_subnet_mask">Αυτή είναι η μάσκα δικτύου σας</string>
-    <string name="gateway_router">(Αυτή είναι η πύλη δικτύου σας / router)</string>
+    <string name="network_subnet_mask">Η μάσκα δικτύου σας</string>
+    <string name="gateway_router">(Η πύλη δικτύου σας / router)</string>
     <string name="this_device">&#160;(Αυτή η συσκευή)</string>
     <string name="wifi_went_down">Το WiFi αποσυνδέθηκε.</string>
     <string name="hijack_session">Hijack Session</string>
-    <string name="start_hijacking">Stop sniffing and start session hijacking?</string>
-    <string name="start_hijacking2">Start session hijacking?</string>
-    <string name="set_session_filename">Set the session file name:</string>
+    <string name="start_hijacking">Σταματήστε το sniffing και ξεκινήστε το session hijacking;</string>
+    <string name="start_hijacking2">Ξεκινήστε το session hijacking;</string>
+    <string name="set_session_filename">Δηλώστε το όνομα του αρχείου συνεδρίας:</string>
     <string name="session_sniffer">Session Sniffer</string>
 
 </resources>
