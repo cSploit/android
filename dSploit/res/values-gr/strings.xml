@@ -93,19 +93,19 @@
     <string name="arm_error2"><![CDATA[<p>Για περισότερες πληροφορίες <a href=\"http://dsploit.net/#requirements\">απαιτήσεις</a></p>]]></string>
     <string name="busybox_required">Απαιτείται ολοκληρομένη εγκατάσταση του BusyBox, killall binary not found (πιθανόν να έχετε παλιό busybox).</string>
     <string name="only_4_root">To app τρέχει μόνο σε rooted συσκευή.</string>
-    <string name="initializing">Initializing&#8230;</string>
-    <string name="initialization_error">Initialization Error</string>
-    <string name="target_alias">Target Alias</string>
-    <string name="set_alias">Set an alias for this target:</string>
-    <string name="no_connectivity">No connectivity available.</string>
-    <string name="wifi_key_copied">WiFi key copied to clipboard.</string>
-    <string name="connected_to"><![CDATA[Connected to <b>]]></string>
-    <string name="connected_to2"><![CDATA[</b> with key <b><font color=\"green\">]]></string>
+    <string name="initializing">Φόρτωση&#8230;</string>
+    <string name="initialization_error">Σφάλμα στη φόρτωση</string>
+    <string name="target_alias">Όνομα στόχου</string>
+    <string name="set_alias">Δηλωστε όνομα για το στόχο:</string>
+    <string name="no_connectivity">Δεν υπάρχει σύνδεση.</string>
+    <string name="wifi_key_copied">Το κλέιδί του WiFi αντιγράφηκε.</string>
+    <string name="connected_to"><![CDATA[Συνδεση στο <b>]]></string>
+    <string name="connected_to2"><![CDATA[</b> με κλειδί <b><font color=\"green\">]]></string>
     <string name="connected_to3"><![CDATA[</font></b> !]]></string>
-    <string name="connection_to"><![CDATA[Connection to <b>]]></string>
+    <string name="connection_to"><![CDATA[Σύνδεση στο <b>]]></string>
     <string name="connection_to2">
-        <![CDATA[</b> <b><font color=\"red\">FAILED</font></b>.]]></string>
-    <string name="enter_key_or_crack">Enter WiFi Key or attempt cracking:</string>
+        <![CDATA[</b> <b><font color=\"red\">ΑΠEΤΥΧΕ</font></b>.]]></string>
+    <string name="enter_key_or_crack">Δηλώστε το κλειδί του WiFi ή προσπα:</string>
     <string name="enter_wifi_key">Enter WiFi Key:</string>
     <string name="scanning">Scanning&#8230;</string>
     <string name="invalid_filename">Invalid file name.</string>
