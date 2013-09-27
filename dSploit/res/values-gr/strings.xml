@@ -87,8 +87,8 @@
     <string name="warning">Προσοχή</string>
     <string name="warning_new_session">Ξεκινώντας μια νέα συνεδρία θα διαγράφεί η υφιστάμενη, να προχωρίσει</string>
     <string name="fatal_error_html"><![CDATA[<p>Φαίνεται πως το ROM σας έχει το <b>LD_LIBRARY_PATH bug</b>, συγνώμη αλλά δεν είναι συμβατό με το dSploit.</p>]]></string>
-    <string name="fatal_error_html2"><![CDATA[<p>For more info read the <a href=\"http://dsploit.net/#faq\">FAQ</a>.</p>]]></string>
-    <string name="install_error">Error during files installation!</string>
+    <string name="fatal_error_html2"><![CDATA[<p>Για περισότερες πληροφορίες <a href=\"http://dsploit.net/#faq\">FAQ</a>.</p>]]></string>
+    <string name="install_error">Σφάλμα κατά την εγκατάσταση των αρχείων!</string>
     <string name="arm_error"><![CDATA[<p>It seems like your device processor is not an ARM, i\'m sorry but it\'s not compatible with dSploit.</p>]]></string>
     <string name="arm_error2"><![CDATA[<p>For more info read the <a href=\"http://dsploit.net/#requirements\">requirements</a> section.</p>]]></string>
     <string name="busybox_required">Full BusyBox installation required, killall binary not found(maybe you have an old busybox version).
