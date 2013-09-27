@@ -27,18 +27,18 @@ import it.evilsocket.dsploit.wifi.Keygen;
  * it is just needed to add "b075d5" to last 6 characters
  * from the SSID
  */
-public class OteKeygen extends Keygen {
+public class OteKeygen extends Keygen{
 
-    private final String ssidIdentifier;
+  private final String ssidIdentifier;
 
-    public OteKeygen(String ssid, String mac, int level, String enc) {
-        super(ssid, mac, level, enc);
-        ssidIdentifier = ssid.substring(ssid.length() - 6);
-    }
+  public OteKeygen(String ssid, String mac, int level, String enc){
+    super(ssid, mac, level, enc);
+    ssidIdentifier = ssid.substring(ssid.length() - 6);
+  }
 
-    @Override
-    public List<String> getKeys() {
-        addPassword("b075d5" + ssidIdentifier);
-        return getResults();
-    }
+  @Override
+  public List<String> getKeys(){
+    addPassword("b075d5" + ssidIdentifier);
+    return getResults();
+  }
 }

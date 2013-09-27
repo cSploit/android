@@ -34,84 +34,92 @@ import com.actionbarsherlock.view.SubMenu;
 /**
  * @hide
  */
-public final class MenuItemImpl implements MenuItem {
-    private static final String TAG = "MenuItemImpl";
+public final class MenuItemImpl implements MenuItem{
+  private static final String TAG = "MenuItemImpl";
 
-    private static final int SHOW_AS_ACTION_MASK = SHOW_AS_ACTION_NEVER |
-            SHOW_AS_ACTION_IF_ROOM |
-            SHOW_AS_ACTION_ALWAYS;
+  private static final int SHOW_AS_ACTION_MASK = SHOW_AS_ACTION_NEVER |
+    SHOW_AS_ACTION_IF_ROOM |
+    SHOW_AS_ACTION_ALWAYS;
 
-    private final int mId;
-    private final int mGroup;
-    private final int mCategoryOrder;
-    private final int mOrdering;
-    private CharSequence mTitle;
-    private CharSequence mTitleCondensed;
-    private Intent mIntent;
-    private char mShortcutNumericChar;
-    private char mShortcutAlphabeticChar;
+  private final int mId;
+  private final int mGroup;
+  private final int mCategoryOrder;
+  private final int mOrdering;
+  private CharSequence mTitle;
+  private CharSequence mTitleCondensed;
+  private Intent mIntent;
+  private char mShortcutNumericChar;
+  private char mShortcutAlphabeticChar;
 
-    /** The icon's drawable which is only created as needed */
-    private Drawable mIconDrawable;
-    /**
-     * The icon's resource ID which is used to get the Drawable when it is
-     * needed (if the Drawable isn't already obtained--only one of the two is
-     * needed).
-     */
-    private int mIconResId = NO_ICON;
+  /**
+   * The icon's drawable which is only created as needed
+   */
+  private Drawable mIconDrawable;
+  /**
+   * The icon's resource ID which is used to get the Drawable when it is
+   * needed (if the Drawable isn't already obtained--only one of the two is
+   * needed).
+   */
+  private int mIconResId = NO_ICON;
 
-    /** The menu to which this item belongs */
-    private MenuBuilder mMenu;
-    /** If this item should launch a sub menu, this is the sub menu to launch */
-    private SubMenuBuilder mSubMenu;
+  /**
+   * The menu to which this item belongs
+   */
+  private MenuBuilder mMenu;
+  /**
+   * If this item should launch a sub menu, this is the sub menu to launch
+   */
+  private SubMenuBuilder mSubMenu;
 
-    private Runnable mItemCallback;
-    private MenuItem.OnMenuItemClickListener mClickListener;
+  private Runnable mItemCallback;
+  private MenuItem.OnMenuItemClickListener mClickListener;
 
-    private int mFlags = ENABLED;
-    private static final int CHECKABLE      = 0x00000001;
-    private static final int CHECKED        = 0x00000002;
-    private static final int EXCLUSIVE      = 0x00000004;
-    private static final int HIDDEN         = 0x00000008;
-    private static final int ENABLED        = 0x00000010;
-    private static final int IS_ACTION      = 0x00000020;
+  private int mFlags = ENABLED;
+  private static final int CHECKABLE = 0x00000001;
+  private static final int CHECKED = 0x00000002;
+  private static final int EXCLUSIVE = 0x00000004;
+  private static final int HIDDEN = 0x00000008;
+  private static final int ENABLED = 0x00000010;
+  private static final int IS_ACTION = 0x00000020;
 
-    private int mShowAsAction = SHOW_AS_ACTION_NEVER;
+  private int mShowAsAction = SHOW_AS_ACTION_NEVER;
 
-    private View mActionView;
-    private ActionProvider mActionProvider;
-    private OnActionExpandListener mOnActionExpandListener;
-    private boolean mIsActionViewExpanded = false;
+  private View mActionView;
+  private ActionProvider mActionProvider;
+  private OnActionExpandListener mOnActionExpandListener;
+  private boolean mIsActionViewExpanded = false;
 
-    /** Used for the icon resource ID if this item does not have an icon */
-    static final int NO_ICON = 0;
+  /**
+   * Used for the icon resource ID if this item does not have an icon
+   */
+  static final int NO_ICON = 0;
 
-    /**
-     * Current use case is for context menu: Extra information linked to the
-     * View that added this item to the context menu.
-     */
-    private ContextMenuInfo mMenuInfo;
+  /**
+   * Current use case is for context menu: Extra information linked to the
+   * View that added this item to the context menu.
+   */
+  private ContextMenuInfo mMenuInfo;
 
-    private static String sPrependShortcutLabel;
-    private static String sEnterShortcutLabel;
-    private static String sDeleteShortcutLabel;
-    private static String sSpaceShortcutLabel;
+  private static String sPrependShortcutLabel;
+  private static String sEnterShortcutLabel;
+  private static String sDeleteShortcutLabel;
+  private static String sSpaceShortcutLabel;
 
 
-    /**
-     * Instantiates this menu item.
-     *
-     * @param menu
-     * @param group Item ordering grouping control. The item will be added after
-     *            all other items whose order is <= this number, and before any
-     *            that are larger than it. This can also be used to define
-     *            groups of items for batch state changes. Normally use 0.
-     * @param id Unique item ID. Use 0 if you do not need a unique ID.
-     * @param categoryOrder The ordering for this item.
-     * @param title The text to display for the item.
-     */
-    MenuItemImpl(MenuBuilder menu, int group, int id, int categoryOrder, int ordering,
-            CharSequence title, int showAsAction) {
+  /**
+   * Instantiates this menu item.
+   *
+   * @param menu
+   * @param group         Item ordering grouping control. The item will be added after
+   *                      all other items whose order is <= this number, and before any
+   *                      that are larger than it. This can also be used to define
+   *                      groups of items for batch state changes. Normally use 0.
+   * @param id            Unique item ID. Use 0 if you do not need a unique ID.
+   * @param categoryOrder The ordering for this item.
+   * @param title         The text to display for the item.
+   */
+  MenuItemImpl(MenuBuilder menu, int group, int id, int categoryOrder, int ordering,
+               CharSequence title, int showAsAction){
 
         /* TODO if (sPrependShortcutLabel == null) {
             // This is instantiated from the UI thread, so no chance of sync issues
@@ -125,523 +133,523 @@ public final class MenuItemImpl implements MenuItem {
                     com.android.internal.R.string.menu_space_shortcut_label);
         }*/
 
-        mMenu = menu;
-        mId = id;
-        mGroup = group;
-        mCategoryOrder = categoryOrder;
-        mOrdering = ordering;
-        mTitle = title;
-        mShowAsAction = showAsAction;
-    }
+    mMenu = menu;
+    mId = id;
+    mGroup = group;
+    mCategoryOrder = categoryOrder;
+    mOrdering = ordering;
+    mTitle = title;
+    mShowAsAction = showAsAction;
+  }
 
-    /**
-     * Invokes the item by calling various listeners or callbacks.
-     *
-     * @return true if the invocation was handled, false otherwise
-     */
-    public boolean invoke() {
-        if (mClickListener != null &&
-            mClickListener.onMenuItemClick(this)) {
-            return true;
-        }
-
-        if (mMenu.dispatchMenuItemSelected(mMenu.getRootMenu(), this)) {
-            return true;
-        }
-
-        if (mItemCallback != null) {
-            mItemCallback.run();
-            return true;
-        }
-
-        if (mIntent != null) {
-            try {
-                mMenu.getContext().startActivity(mIntent);
-                return true;
-            } catch (ActivityNotFoundException e) {
-                Log.e(TAG, "Can't find activity to handle intent; ignoring", e);
-            }
-        }
-
-        if (mActionProvider != null && mActionProvider.onPerformDefaultAction()) {
-            return true;
-        }
-
-        return false;
+  /**
+   * Invokes the item by calling various listeners or callbacks.
+   *
+   * @return true if the invocation was handled, false otherwise
+   */
+  public boolean invoke(){
+    if(mClickListener != null &&
+      mClickListener.onMenuItemClick(this)){
+      return true;
     }
 
-    public boolean isEnabled() {
-        return (mFlags & ENABLED) != 0;
+    if(mMenu.dispatchMenuItemSelected(mMenu.getRootMenu(), this)){
+      return true;
     }
-
-    public MenuItem setEnabled(boolean enabled) {
-        if (enabled) {
-            mFlags |= ENABLED;
-        } else {
-            mFlags &= ~ENABLED;
-        }
-
-        mMenu.onItemsChanged(false);
 
-        return this;
+    if(mItemCallback != null){
+      mItemCallback.run();
+      return true;
     }
 
-    public int getGroupId() {
-        return mGroup;
+    if(mIntent != null){
+      try{
+        mMenu.getContext().startActivity(mIntent);
+        return true;
+      } catch(ActivityNotFoundException e){
+        Log.e(TAG, "Can't find activity to handle intent; ignoring", e);
+      }
     }
 
-    @ViewDebug.CapturedViewProperty
-    public int getItemId() {
-        return mId;
+    if(mActionProvider != null && mActionProvider.onPerformDefaultAction()){
+      return true;
     }
 
-    public int getOrder() {
-        return mCategoryOrder;
-    }
+    return false;
+  }
 
-    public int getOrdering() {
-        return mOrdering;
-    }
+  public boolean isEnabled(){
+    return (mFlags & ENABLED) != 0;
+  }
 
-    public Intent getIntent() {
-        return mIntent;
+  public MenuItem setEnabled(boolean enabled){
+    if(enabled){
+      mFlags |= ENABLED;
+    } else{
+      mFlags &= ~ENABLED;
     }
 
-    public MenuItem setIntent(Intent intent) {
-        mIntent = intent;
-        return this;
-    }
+    mMenu.onItemsChanged(false);
 
-    Runnable getCallback() {
-        return mItemCallback;
-    }
+    return this;
+  }
 
-    public MenuItem setCallback(Runnable callback) {
-        mItemCallback = callback;
-        return this;
-    }
+  public int getGroupId(){
+    return mGroup;
+  }
 
-    public char getAlphabeticShortcut() {
-        return mShortcutAlphabeticChar;
-    }
+  @ViewDebug.CapturedViewProperty
+  public int getItemId(){
+    return mId;
+  }
 
-    public MenuItem setAlphabeticShortcut(char alphaChar) {
-        if (mShortcutAlphabeticChar == alphaChar) return this;
+  public int getOrder(){
+    return mCategoryOrder;
+  }
 
-        mShortcutAlphabeticChar = Character.toLowerCase(alphaChar);
+  public int getOrdering(){
+    return mOrdering;
+  }
 
-        mMenu.onItemsChanged(false);
+  public Intent getIntent(){
+    return mIntent;
+  }
 
-        return this;
-    }
+  public MenuItem setIntent(Intent intent){
+    mIntent = intent;
+    return this;
+  }
 
-    public char getNumericShortcut() {
-        return mShortcutNumericChar;
-    }
+  Runnable getCallback(){
+    return mItemCallback;
+  }
 
-    public MenuItem setNumericShortcut(char numericChar) {
-        if (mShortcutNumericChar == numericChar) return this;
+  public MenuItem setCallback(Runnable callback){
+    mItemCallback = callback;
+    return this;
+  }
 
-        mShortcutNumericChar = numericChar;
+  public char getAlphabeticShortcut(){
+    return mShortcutAlphabeticChar;
+  }
 
-        mMenu.onItemsChanged(false);
+  public MenuItem setAlphabeticShortcut(char alphaChar){
+    if(mShortcutAlphabeticChar == alphaChar) return this;
 
-        return this;
-    }
+    mShortcutAlphabeticChar = Character.toLowerCase(alphaChar);
 
-    public MenuItem setShortcut(char numericChar, char alphaChar) {
-        mShortcutNumericChar = numericChar;
-        mShortcutAlphabeticChar = Character.toLowerCase(alphaChar);
+    mMenu.onItemsChanged(false);
 
-        mMenu.onItemsChanged(false);
+    return this;
+  }
 
-        return this;
-    }
+  public char getNumericShortcut(){
+    return mShortcutNumericChar;
+  }
 
-    /**
-     * @return The active shortcut (based on QWERTY-mode of the menu).
-     */
-    char getShortcut() {
-        return (mMenu.isQwertyMode() ? mShortcutAlphabeticChar : mShortcutNumericChar);
-    }
+  public MenuItem setNumericShortcut(char numericChar){
+    if(mShortcutNumericChar == numericChar) return this;
 
-    /**
-     * @return The label to show for the shortcut. This includes the chording
-     *         key (for example 'Menu+a'). Also, any non-human readable
-     *         characters should be human readable (for example 'Menu+enter').
-     */
-    String getShortcutLabel() {
-
-        char shortcut = getShortcut();
-        if (shortcut == 0) {
-            return "";
-        }
-
-        StringBuilder sb = new StringBuilder(sPrependShortcutLabel);
-        switch (shortcut) {
-
-            case '\n':
-                sb.append(sEnterShortcutLabel);
-                break;
-
-            case '\b':
-                sb.append(sDeleteShortcutLabel);
-                break;
-
-            case ' ':
-                sb.append(sSpaceShortcutLabel);
-                break;
-
-            default:
-                sb.append(shortcut);
-                break;
-        }
-
-        return sb.toString();
-    }
+    mShortcutNumericChar = numericChar;
 
-    /**
-     * @return Whether this menu item should be showing shortcuts (depends on
-     *         whether the menu should show shortcuts and whether this item has
-     *         a shortcut defined)
-     */
-    boolean shouldShowShortcut() {
-        // Show shortcuts if the menu is supposed to show shortcuts AND this item has a shortcut
-        return mMenu.isShortcutsVisible() && (getShortcut() != 0);
-    }
+    mMenu.onItemsChanged(false);
 
-    public SubMenu getSubMenu() {
-        return mSubMenu;
-    }
+    return this;
+  }
 
-    public boolean hasSubMenu() {
-        return mSubMenu != null;
-    }
+  public MenuItem setShortcut(char numericChar, char alphaChar){
+    mShortcutNumericChar = numericChar;
+    mShortcutAlphabeticChar = Character.toLowerCase(alphaChar);
 
-    void setSubMenu(SubMenuBuilder subMenu) {
-        mSubMenu = subMenu;
+    mMenu.onItemsChanged(false);
 
-        subMenu.setHeaderTitle(getTitle());
-    }
+    return this;
+  }
 
-    @ViewDebug.CapturedViewProperty
-    public CharSequence getTitle() {
-        return mTitle;
-    }
+  /**
+   * @return The active shortcut (based on QWERTY-mode of the menu).
+   */
+  char getShortcut(){
+    return (mMenu.isQwertyMode() ? mShortcutAlphabeticChar : mShortcutNumericChar);
+  }
+
+  /**
+   * @return The label to show for the shortcut. This includes the chording
+   * key (for example 'Menu+a'). Also, any non-human readable
+   * characters should be human readable (for example 'Menu+enter').
+   */
+  String getShortcutLabel(){
 
-    /**
-     * Gets the title for a particular {@link ItemView}
-     *
-     * @param itemView The ItemView that is receiving the title
-     * @return Either the title or condensed title based on what the ItemView
-     *         prefers
-     */
-    CharSequence getTitleForItemView(MenuView.ItemView itemView) {
-        return ((itemView != null) && itemView.prefersCondensedTitle())
-                ? getTitleCondensed()
-                : getTitle();
+    char shortcut = getShortcut();
+    if(shortcut == 0){
+      return "";
     }
 
-    public MenuItem setTitle(CharSequence title) {
-        mTitle = title;
+    StringBuilder sb = new StringBuilder(sPrependShortcutLabel);
+    switch(shortcut){
 
-        mMenu.onItemsChanged(false);
+      case '\n':
+        sb.append(sEnterShortcutLabel);
+        break;
 
-        if (mSubMenu != null) {
-            mSubMenu.setHeaderTitle(title);
-        }
+      case '\b':
+        sb.append(sDeleteShortcutLabel);
+        break;
 
-        return this;
-    }
+      case ' ':
+        sb.append(sSpaceShortcutLabel);
+        break;
 
-    public MenuItem setTitle(int title) {
-        return setTitle(mMenu.getContext().getString(title));
+      default:
+        sb.append(shortcut);
+        break;
     }
 
-    public CharSequence getTitleCondensed() {
-        return mTitleCondensed != null ? mTitleCondensed : mTitle;
-    }
+    return sb.toString();
+  }
 
-    public MenuItem setTitleCondensed(CharSequence title) {
-        mTitleCondensed = title;
+  /**
+   * @return Whether this menu item should be showing shortcuts (depends on
+   * whether the menu should show shortcuts and whether this item has
+   * a shortcut defined)
+   */
+  boolean shouldShowShortcut(){
+    // Show shortcuts if the menu is supposed to show shortcuts AND this item has a shortcut
+    return mMenu.isShortcutsVisible() && (getShortcut() != 0);
+  }
 
-        // Could use getTitle() in the loop below, but just cache what it would do here
-        if (title == null) {
-            title = mTitle;
-        }
+  public SubMenu getSubMenu(){
+    return mSubMenu;
+  }
 
-        mMenu.onItemsChanged(false);
+  public boolean hasSubMenu(){
+    return mSubMenu != null;
+  }
 
-        return this;
-    }
+  void setSubMenu(SubMenuBuilder subMenu){
+    mSubMenu = subMenu;
 
-    public Drawable getIcon() {
-        if (mIconDrawable != null) {
-            return mIconDrawable;
-        }
+    subMenu.setHeaderTitle(getTitle());
+  }
 
-        if (mIconResId != NO_ICON) {
-            return mMenu.getResources().getDrawable(mIconResId);
-        }
+  @ViewDebug.CapturedViewProperty
+  public CharSequence getTitle(){
+    return mTitle;
+  }
 
-        return null;
-    }
+  /**
+   * Gets the title for a particular {@link ItemView}
+   *
+   * @param itemView The ItemView that is receiving the title
+   * @return Either the title or condensed title based on what the ItemView
+   * prefers
+   */
+  CharSequence getTitleForItemView(MenuView.ItemView itemView){
+    return ((itemView != null) && itemView.prefersCondensedTitle())
+      ? getTitleCondensed()
+      : getTitle();
+  }
+
+  public MenuItem setTitle(CharSequence title){
+    mTitle = title;
 
-    public MenuItem setIcon(Drawable icon) {
-        mIconResId = NO_ICON;
-        mIconDrawable = icon;
-        mMenu.onItemsChanged(false);
+    mMenu.onItemsChanged(false);
 
-        return this;
+    if(mSubMenu != null){
+      mSubMenu.setHeaderTitle(title);
     }
 
-    public MenuItem setIcon(int iconResId) {
-        mIconDrawable = null;
-        mIconResId = iconResId;
+    return this;
+  }
 
-        // If we have a view, we need to push the Drawable to them
-        mMenu.onItemsChanged(false);
+  public MenuItem setTitle(int title){
+    return setTitle(mMenu.getContext().getString(title));
+  }
 
-        return this;
-    }
+  public CharSequence getTitleCondensed(){
+    return mTitleCondensed != null ? mTitleCondensed : mTitle;
+  }
 
-    public boolean isCheckable() {
-        return (mFlags & CHECKABLE) == CHECKABLE;
-    }
+  public MenuItem setTitleCondensed(CharSequence title){
+    mTitleCondensed = title;
 
-    public MenuItem setCheckable(boolean checkable) {
-        final int oldFlags = mFlags;
-        mFlags = (mFlags & ~CHECKABLE) | (checkable ? CHECKABLE : 0);
-        if (oldFlags != mFlags) {
-            mMenu.onItemsChanged(false);
-        }
-
-        return this;
+    // Could use getTitle() in the loop below, but just cache what it would do here
+    if(title == null){
+      title = mTitle;
     }
 
-    public void setExclusiveCheckable(boolean exclusive) {
-        mFlags = (mFlags & ~EXCLUSIVE) | (exclusive ? EXCLUSIVE : 0);
-    }
+    mMenu.onItemsChanged(false);
 
-    public boolean isExclusiveCheckable() {
-        return (mFlags & EXCLUSIVE) != 0;
-    }
+    return this;
+  }
 
-    public boolean isChecked() {
-        return (mFlags & CHECKED) == CHECKED;
+  public Drawable getIcon(){
+    if(mIconDrawable != null){
+      return mIconDrawable;
     }
 
-    public MenuItem setChecked(boolean checked) {
-        if ((mFlags & EXCLUSIVE) != 0) {
-            // Call the method on the Menu since it knows about the others in this
-            // exclusive checkable group
-            mMenu.setExclusiveItemChecked(this);
-        } else {
-            setCheckedInt(checked);
-        }
-
-        return this;
+    if(mIconResId != NO_ICON){
+      return mMenu.getResources().getDrawable(mIconResId);
     }
 
-    void setCheckedInt(boolean checked) {
-        final int oldFlags = mFlags;
-        mFlags = (mFlags & ~CHECKED) | (checked ? CHECKED : 0);
-        if (oldFlags != mFlags) {
-            mMenu.onItemsChanged(false);
-        }
-    }
+    return null;
+  }
 
-    public boolean isVisible() {
-        return (mFlags & HIDDEN) == 0;
-    }
+  public MenuItem setIcon(Drawable icon){
+    mIconResId = NO_ICON;
+    mIconDrawable = icon;
+    mMenu.onItemsChanged(false);
 
-    /**
-     * Changes the visibility of the item. This method DOES NOT notify the
-     * parent menu of a change in this item, so this should only be called from
-     * methods that will eventually trigger this change.  If unsure, use {@link #setVisible(boolean)}
-     * instead.
-     *
-     * @param shown Whether to show (true) or hide (false).
-     * @return Whether the item's shown state was changed
-     */
-    boolean setVisibleInt(boolean shown) {
-        final int oldFlags = mFlags;
-        mFlags = (mFlags & ~HIDDEN) | (shown ? 0 : HIDDEN);
-        return oldFlags != mFlags;
-    }
+    return this;
+  }
 
-    public MenuItem setVisible(boolean shown) {
-        // Try to set the shown state to the given state. If the shown state was changed
-        // (i.e. the previous state isn't the same as given state), notify the parent menu that
-        // the shown state has changed for this item
-        if (setVisibleInt(shown)) mMenu.onItemVisibleChanged(this);
+  public MenuItem setIcon(int iconResId){
+    mIconDrawable = null;
+    mIconResId = iconResId;
 
-        return this;
-    }
+    // If we have a view, we need to push the Drawable to them
+    mMenu.onItemsChanged(false);
 
-   public MenuItem setOnMenuItemClickListener(MenuItem.OnMenuItemClickListener clickListener) {
-        mClickListener = clickListener;
-        return this;
-    }
+    return this;
+  }
 
-    @Override
-    public String toString() {
-        return mTitle.toString();
-    }
+  public boolean isCheckable(){
+    return (mFlags & CHECKABLE) == CHECKABLE;
+  }
 
-    void setMenuInfo(ContextMenuInfo menuInfo) {
-        mMenuInfo = menuInfo;
+  public MenuItem setCheckable(boolean checkable){
+    final int oldFlags = mFlags;
+    mFlags = (mFlags & ~CHECKABLE) | (checkable ? CHECKABLE : 0);
+    if(oldFlags != mFlags){
+      mMenu.onItemsChanged(false);
     }
 
-    public ContextMenuInfo getMenuInfo() {
-        return mMenuInfo;
-    }
+    return this;
+  }
 
-    public void actionFormatChanged() {
-        mMenu.onItemActionRequestChanged(this);
-    }
+  public void setExclusiveCheckable(boolean exclusive){
+    mFlags = (mFlags & ~EXCLUSIVE) | (exclusive ? EXCLUSIVE : 0);
+  }
 
-    /**
-     * @return Whether the menu should show icons for menu items.
-     */
-    public boolean shouldShowIcon() {
-        return mMenu.getOptionalIconsVisible();
-    }
+  public boolean isExclusiveCheckable(){
+    return (mFlags & EXCLUSIVE) != 0;
+  }
 
-    public boolean isActionButton() {
-        return (mFlags & IS_ACTION) == IS_ACTION;
-    }
+  public boolean isChecked(){
+    return (mFlags & CHECKED) == CHECKED;
+  }
 
-    public boolean requestsActionButton() {
-        return (mShowAsAction & SHOW_AS_ACTION_IF_ROOM) == SHOW_AS_ACTION_IF_ROOM;
+  public MenuItem setChecked(boolean checked){
+    if((mFlags & EXCLUSIVE) != 0){
+      // Call the method on the Menu since it knows about the others in this
+      // exclusive checkable group
+      mMenu.setExclusiveItemChecked(this);
+    } else{
+      setCheckedInt(checked);
     }
 
-    public boolean requiresActionButton() {
-        return (mShowAsAction & SHOW_AS_ACTION_ALWAYS) == SHOW_AS_ACTION_ALWAYS;
-    }
+    return this;
+  }
 
-    public void setIsActionButton(boolean isActionButton) {
-        if (isActionButton) {
-            mFlags |= IS_ACTION;
-        } else {
-            mFlags &= ~IS_ACTION;
-        }
+  void setCheckedInt(boolean checked){
+    final int oldFlags = mFlags;
+    mFlags = (mFlags & ~CHECKED) | (checked ? CHECKED : 0);
+    if(oldFlags != mFlags){
+      mMenu.onItemsChanged(false);
     }
+  }
 
-    public boolean showsTextAsAction() {
-        return (mShowAsAction & SHOW_AS_ACTION_WITH_TEXT) == SHOW_AS_ACTION_WITH_TEXT;
-    }
+  public boolean isVisible(){
+    return (mFlags & HIDDEN) == 0;
+  }
 
-    public void setShowAsAction(int actionEnum) {
-        switch (actionEnum & SHOW_AS_ACTION_MASK) {
-            case SHOW_AS_ACTION_ALWAYS:
-            case SHOW_AS_ACTION_IF_ROOM:
-            case SHOW_AS_ACTION_NEVER:
-                // Looks good!
-                break;
-
-            default:
-                // Mutually exclusive options selected!
-                throw new IllegalArgumentException("SHOW_AS_ACTION_ALWAYS, SHOW_AS_ACTION_IF_ROOM,"
-                        + " and SHOW_AS_ACTION_NEVER are mutually exclusive.");
-        }
-        mShowAsAction = actionEnum;
-        mMenu.onItemActionRequestChanged(this);
-    }
+  /**
+   * Changes the visibility of the item. This method DOES NOT notify the
+   * parent menu of a change in this item, so this should only be called from
+   * methods that will eventually trigger this change.  If unsure, use {@link #setVisible(boolean)}
+   * instead.
+   *
+   * @param shown Whether to show (true) or hide (false).
+   * @return Whether the item's shown state was changed
+   */
+  boolean setVisibleInt(boolean shown){
+    final int oldFlags = mFlags;
+    mFlags = (mFlags & ~HIDDEN) | (shown ? 0 : HIDDEN);
+    return oldFlags != mFlags;
+  }
 
-    public MenuItem setActionView(View view) {
-        mActionView = view;
-        mActionProvider = null;
-        if (view != null && view.getId() == View.NO_ID && mId > 0) {
-            view.setId(mId);
-        }
-        mMenu.onItemActionRequestChanged(this);
-        return this;
-    }
+  public MenuItem setVisible(boolean shown){
+    // Try to set the shown state to the given state. If the shown state was changed
+    // (i.e. the previous state isn't the same as given state), notify the parent menu that
+    // the shown state has changed for this item
+    if(setVisibleInt(shown)) mMenu.onItemVisibleChanged(this);
+
+    return this;
+  }
+
+  public MenuItem setOnMenuItemClickListener(MenuItem.OnMenuItemClickListener clickListener){
+    mClickListener = clickListener;
+    return this;
+  }
+
+  @Override
+  public String toString(){
+    return mTitle.toString();
+  }
+
+  void setMenuInfo(ContextMenuInfo menuInfo){
+    mMenuInfo = menuInfo;
+  }
+
+  public ContextMenuInfo getMenuInfo(){
+    return mMenuInfo;
+  }
+
+  public void actionFormatChanged(){
+    mMenu.onItemActionRequestChanged(this);
+  }
+
+  /**
+   * @return Whether the menu should show icons for menu items.
+   */
+  public boolean shouldShowIcon(){
+    return mMenu.getOptionalIconsVisible();
+  }
+
+  public boolean isActionButton(){
+    return (mFlags & IS_ACTION) == IS_ACTION;
+  }
+
+  public boolean requestsActionButton(){
+    return (mShowAsAction & SHOW_AS_ACTION_IF_ROOM) == SHOW_AS_ACTION_IF_ROOM;
+  }
+
+  public boolean requiresActionButton(){
+    return (mShowAsAction & SHOW_AS_ACTION_ALWAYS) == SHOW_AS_ACTION_ALWAYS;
+  }
 
-    public MenuItem setActionView(int resId) {
-        final Context context = mMenu.getContext();
-        final LayoutInflater inflater = LayoutInflater.from(context);
-        setActionView(inflater.inflate(resId, new LinearLayout(context), false));
-        return this;
+  public void setIsActionButton(boolean isActionButton){
+    if(isActionButton){
+      mFlags |= IS_ACTION;
+    } else{
+      mFlags &= ~IS_ACTION;
     }
+  }
 
-    public View getActionView() {
-        if (mActionView != null) {
-            return mActionView;
-        } else if (mActionProvider != null) {
-            mActionView = mActionProvider.onCreateActionView();
-            return mActionView;
-        } else {
-            return null;
-        }
-    }
+  public boolean showsTextAsAction(){
+    return (mShowAsAction & SHOW_AS_ACTION_WITH_TEXT) == SHOW_AS_ACTION_WITH_TEXT;
+  }
 
-    public ActionProvider getActionProvider() {
-        return mActionProvider;
-    }
+  public void setShowAsAction(int actionEnum){
+    switch(actionEnum & SHOW_AS_ACTION_MASK){
+      case SHOW_AS_ACTION_ALWAYS:
+      case SHOW_AS_ACTION_IF_ROOM:
+      case SHOW_AS_ACTION_NEVER:
+        // Looks good!
+        break;
 
-    public MenuItem setActionProvider(ActionProvider actionProvider) {
-        mActionView = null;
-        mActionProvider = actionProvider;
-        mMenu.onItemsChanged(true); // Measurement can be changed
-        return this;
+      default:
+        // Mutually exclusive options selected!
+        throw new IllegalArgumentException("SHOW_AS_ACTION_ALWAYS, SHOW_AS_ACTION_IF_ROOM,"
+          + " and SHOW_AS_ACTION_NEVER are mutually exclusive.");
     }
+    mShowAsAction = actionEnum;
+    mMenu.onItemActionRequestChanged(this);
+  }
 
-    @Override
-    public MenuItem setShowAsActionFlags(int actionEnum) {
-        setShowAsAction(actionEnum);
-        return this;
+  public MenuItem setActionView(View view){
+    mActionView = view;
+    mActionProvider = null;
+    if(view != null && view.getId() == View.NO_ID && mId > 0){
+      view.setId(mId);
     }
+    mMenu.onItemActionRequestChanged(this);
+    return this;
+  }
 
-    @Override
-    public boolean expandActionView() {
-        if ((mShowAsAction & SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW) == 0 || mActionView == null) {
-            return false;
-        }
-
-        if (mOnActionExpandListener == null ||
-                mOnActionExpandListener.onMenuItemActionExpand(this)) {
-            return mMenu.expandItemActionView(this);
-        }
-
-        return false;
-    }
+  public MenuItem setActionView(int resId){
+    final Context context = mMenu.getContext();
+    final LayoutInflater inflater = LayoutInflater.from(context);
+    setActionView(inflater.inflate(resId, new LinearLayout(context), false));
+    return this;
+  }
 
-    @Override
-    public boolean collapseActionView() {
-        if ((mShowAsAction & SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW) == 0) {
-            return false;
-        }
-        if (mActionView == null) {
-            // We're already collapsed if we have no action view.
-            return true;
-        }
-
-        if (mOnActionExpandListener == null ||
-                mOnActionExpandListener.onMenuItemActionCollapse(this)) {
-            return mMenu.collapseItemActionView(this);
-        }
-
-        return false;
+  public View getActionView(){
+    if(mActionView != null){
+      return mActionView;
+    } else if(mActionProvider != null){
+      mActionView = mActionProvider.onCreateActionView();
+      return mActionView;
+    } else{
+      return null;
     }
+  }
+
+  public ActionProvider getActionProvider(){
+    return mActionProvider;
+  }
+
+  public MenuItem setActionProvider(ActionProvider actionProvider){
+    mActionView = null;
+    mActionProvider = actionProvider;
+    mMenu.onItemsChanged(true); // Measurement can be changed
+    return this;
+  }
 
-    @Override
-    public MenuItem setOnActionExpandListener(OnActionExpandListener listener) {
-        mOnActionExpandListener = listener;
-        return this;
+  @Override
+  public MenuItem setShowAsActionFlags(int actionEnum){
+    setShowAsAction(actionEnum);
+    return this;
+  }
+
+  @Override
+  public boolean expandActionView(){
+    if((mShowAsAction & SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW) == 0 || mActionView == null){
+      return false;
     }
 
-    public boolean hasCollapsibleActionView() {
-        return (mShowAsAction & SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW) != 0 && mActionView != null;
+    if(mOnActionExpandListener == null ||
+      mOnActionExpandListener.onMenuItemActionExpand(this)){
+      return mMenu.expandItemActionView(this);
     }
+
+    return false;
+  }
 
-    public void setActionViewExpanded(boolean isExpanded) {
-        mIsActionViewExpanded = isExpanded;
-        mMenu.onItemsChanged(false);
+  @Override
+  public boolean collapseActionView(){
+    if((mShowAsAction & SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW) == 0){
+      return false;
     }
+    if(mActionView == null){
+      // We're already collapsed if we have no action view.
+      return true;
+    }
 
-    public boolean isActionViewExpanded() {
-        return mIsActionViewExpanded;
+    if(mOnActionExpandListener == null ||
+      mOnActionExpandListener.onMenuItemActionCollapse(this)){
+      return mMenu.collapseItemActionView(this);
     }
+
+    return false;
+  }
+
+  @Override
+  public MenuItem setOnActionExpandListener(OnActionExpandListener listener){
+    mOnActionExpandListener = listener;
+    return this;
+  }
+
+  public boolean hasCollapsibleActionView(){
+    return (mShowAsAction & SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW) != 0 && mActionView != null;
+  }
+
+  public void setActionViewExpanded(boolean isExpanded){
+    mIsActionViewExpanded = isExpanded;
+    mMenu.onItemsChanged(false);
+  }
+
+  public boolean isActionViewExpanded(){
+    return mIsActionViewExpanded;
+  }
 }

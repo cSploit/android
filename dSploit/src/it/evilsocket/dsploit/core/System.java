@@ -91,936 +91,936 @@ import it.evilsocket.dsploit.tools.IPTables;
 import it.evilsocket.dsploit.tools.NMap;
 import it.evilsocket.dsploit.tools.TcpDump;
 
-public class System {
-    private static final String TAG = "SYSTEM";
-    private static final String ERROR_LOG_FILENAME = "dsploit-debug-error.log";
-    private static final String SESSION_MAGIC = "DSS";
-    private static final Pattern SERVICE_PARSER = Pattern.compile("^([^\\s]+)\\s+(\\d+).*$", Pattern.CASE_INSENSITIVE);
-    public static int HTTP_PROXY_PORT = 8080;
-    public static int HTTP_SERVER_PORT = 8081;
-    public static int HTTPS_REDIR_PORT = 8082;
+public class System{
+  private static final String TAG = "SYSTEM";
+  private static final String ERROR_LOG_FILENAME = "dsploit-debug-error.log";
+  private static final String SESSION_MAGIC = "DSS";
+  private static final Pattern SERVICE_PARSER = Pattern.compile("^([^\\s]+)\\s+(\\d+).*$", Pattern.CASE_INSENSITIVE);
+  public static int HTTP_PROXY_PORT = 8080;
+  public static int HTTP_SERVER_PORT = 8081;
+  public static int HTTPS_REDIR_PORT = 8082;
 
-    public static final String IPV4_FORWARD_FILEPATH = "/proc/sys/net/ipv4/ip_forward";
+  public static final String IPV4_FORWARD_FILEPATH = "/proc/sys/net/ipv4/ip_forward";
 
-    private static boolean mInitialized = false;
-    private static String mLastError = "";
-    private static String mSuPath = null;
-    private static UpdateManager mUpdateManager = null;
-    private static Context mContext = null;
-    private static WifiLock mWifiLock = null;
-    private static WakeLock mWakeLock = null;
-    private static Network mNetwork = null;
-    private static final Vector<Target> mTargets = new Vector<Target>();
-    private static int mCurrentTarget = 0;
-    private static Map<String, String> mServices = null;
-    private static Map<String, String> mPorts = null;
-    private static Map<String, String> mVendors = null;
-    private static SparseIntArray mOpenPorts = null;
+  private static boolean mInitialized = false;
+  private static String mLastError = "";
+  private static String mSuPath = null;
+  private static UpdateManager mUpdateManager = null;
+  private static Context mContext = null;
+  private static WifiLock mWifiLock = null;
+  private static WakeLock mWakeLock = null;
+  private static Network mNetwork = null;
+  private static final Vector<Target> mTargets = new Vector<Target>();
+  private static int mCurrentTarget = 0;
+  private static Map<String, String> mServices = null;
+  private static Map<String, String> mPorts = null;
+  private static Map<String, String> mVendors = null;
+  private static SparseIntArray mOpenPorts = null;
 
-    // registered plugins
-    private static ArrayList<Plugin> mPlugins = null;
-    private static Plugin mCurrentPlugin = null;
-    // tools singleton
-    private static NMap mNmap = null;
-    private static ArpSpoof mArpSpoof = null;
-    private static Ettercap mEttercap = null;
-    private static IPTables mIptables = null;
-    private static Hydra mHydra = null;
-    private static TcpDump mTcpdump = null;
+  // registered plugins
+  private static ArrayList<Plugin> mPlugins = null;
+  private static Plugin mCurrentPlugin = null;
+  // tools singleton
+  private static NMap mNmap = null;
+  private static ArpSpoof mArpSpoof = null;
+  private static Ettercap mEttercap = null;
+  private static IPTables mIptables = null;
+  private static Hydra mHydra = null;
+  private static TcpDump mTcpdump = null;
 
-    private static HTTPSRedirector mRedirector = null;
-    private static Proxy mProxy = null;
-    private static Server mServer = null;
+  private static HTTPSRedirector mRedirector = null;
+  private static Proxy mProxy = null;
+  private static Server mServer = null;
 
-    private static String mStoragePath = null;
-    private static String mSessionName = null;
+  private static String mStoragePath = null;
+  private static String mSessionName = null;
 
-    private static Object mCustomData = null;
+  private static Object mCustomData = null;
 
-    public static void init(Context context) throws Exception {
-        mContext = context;
-        try {
-            mStoragePath = getSettings().getString("PREF_SAVE_PATH", Environment.getExternalStorageDirectory().toString());
-            mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
-            mUpdateManager = new UpdateManager(mContext);
-            mPlugins = new ArrayList<Plugin>();
-            mOpenPorts = new SparseIntArray(3);
+  public static void init(Context context) throws Exception{
+    mContext = context;
+    try{
+      mStoragePath = getSettings().getString("PREF_SAVE_PATH", Environment.getExternalStorageDirectory().toString());
+      mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
+      mUpdateManager = new UpdateManager(mContext);
+      mPlugins = new ArrayList<Plugin>();
+      mOpenPorts = new SparseIntArray(3);
 
-            // if we are here, network initialization didn't throw any error, lock wifi
-            WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+      // if we are here, network initialization didn't throw any error, lock wifi
+      WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
 
-            if (mWifiLock == null)
-                mWifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "wifiLock");
+      if(mWifiLock == null)
+        mWifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "wifiLock");
 
-            if (!mWifiLock.isHeld())
-                mWifiLock.acquire();
+      if(!mWifiLock.isHeld())
+        mWifiLock.acquire();
 
-            // wake lock if enabled
-            if (getSettings().getBoolean("PREF_WAKE_LOCK", true)) {
-                PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+      // wake lock if enabled
+      if(getSettings().getBoolean("PREF_WAKE_LOCK", true)){
+        PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
 
-                if (mWakeLock == null)
-                    mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "wakeLock");
+        if(mWakeLock == null)
+          mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "wakeLock");
 
-                if (!mWakeLock.isHeld())
-                    mWakeLock.acquire();
-            }
+        if(!mWakeLock.isHeld())
+          mWakeLock.acquire();
+      }
 
-            // set ports
-            try {
-                HTTP_PROXY_PORT = Integer.parseInt(getSettings().getString("PREF_HTTP_PROXY_PORT", "8080"));
-                HTTP_SERVER_PORT = Integer.parseInt(getSettings().getString("PREF_HTTP_SERVER_PORT", "8081"));
-                HTTPS_REDIR_PORT = Integer.parseInt(getSettings().getString("PREF_HTTPS_REDIRECTOR_PORT", "8082"));
-            } catch (NumberFormatException e) {
-                HTTP_PROXY_PORT = 8080;
-                HTTP_SERVER_PORT = 8081;
-                HTTPS_REDIR_PORT = 8082;
-            }
+      // set ports
+      try{
+        HTTP_PROXY_PORT = Integer.parseInt(getSettings().getString("PREF_HTTP_PROXY_PORT", "8080"));
+        HTTP_SERVER_PORT = Integer.parseInt(getSettings().getString("PREF_HTTP_SERVER_PORT", "8081"));
+        HTTPS_REDIR_PORT = Integer.parseInt(getSettings().getString("PREF_HTTPS_REDIRECTOR_PORT", "8082"));
+      } catch(NumberFormatException e){
+        HTTP_PROXY_PORT = 8080;
+        HTTP_SERVER_PORT = 8081;
+        HTTPS_REDIR_PORT = 8082;
+      }
 
-            mNmap = new NMap(mContext);
-            mArpSpoof = new ArpSpoof(mContext);
-            mEttercap = new Ettercap(mContext);
-            mIptables = new IPTables();
-            mHydra = new Hydra(mContext);
-            mTcpdump = new TcpDump(mContext);
+      mNmap = new NMap(mContext);
+      mArpSpoof = new ArpSpoof(mContext);
+      mEttercap = new Ettercap(mContext);
+      mIptables = new IPTables();
+      mHydra = new Hydra(mContext);
+      mTcpdump = new TcpDump(mContext);
 
-            // initialize network data at the end
-            mNetwork = new Network(mContext);
+      // initialize network data at the end
+      mNetwork = new Network(mContext);
 
-            Target network = new Target(mNetwork),
-                    gateway = new Target(mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware()),
-                    device = new Target(mNetwork.getLocalAddress(), mNetwork.getLocalHardware());
+      Target network = new Target(mNetwork),
+        gateway = new Target(mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware()),
+        device = new Target(mNetwork.getLocalAddress(), mNetwork.getLocalHardware());
 
-            gateway.setAlias(mNetwork.getSSID());
-            device.setAlias(android.os.Build.MODEL);
+      gateway.setAlias(mNetwork.getSSID());
+      device.setAlias(android.os.Build.MODEL);
 
-            mTargets.add(network);
-            mTargets.add(gateway);
-            mTargets.add(device);
+      mTargets.add(network);
+      mTargets.add(gateway);
+      mTargets.add(device);
 
-            mInitialized = true;
-        } catch (Exception e) {
-            errorLogging(TAG, e);
+      mInitialized = true;
+    } catch(Exception e){
+      errorLogging(TAG, e);
 
-            throw e;
+      throw e;
+    }
+  }
+
+  public static void reloadNetworkMapping(){
+    try{
+      mNetwork = new Network(mContext);
+
+      Target network = new Target(mNetwork),
+        gateway = new Target(mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware()),
+        device = new Target(mNetwork.getLocalAddress(), mNetwork.getLocalHardware());
+
+      gateway.setAlias(mNetwork.getSSID());
+      device.setAlias(android.os.Build.MODEL);
+
+      mTargets.clear();
+      mTargets.add(network);
+      mTargets.add(gateway);
+      mTargets.add(device);
+
+      mInitialized = true;
+    } catch(NoRouteToHostException nrthe){
+      // swallow bitch
+    } catch(Exception e){
+      errorLogging(TAG, e);
+    }
+  }
+
+  public static boolean checkNetworking(final Activity current){
+    if(!Network.isWifiConnected(mContext)){
+      AlertDialog.Builder builder = new AlertDialog.Builder(current);
+
+      builder.setCancelable(false);
+      builder.setTitle(current.getString(R.string.error));
+      builder.setMessage(current.getString(R.string.wifi_went_down));
+      builder.setPositiveButton("Ok", new DialogInterface.OnClickListener(){
+        @Override
+        public void onClick(DialogInterface dialog, int which){
+          dialog.dismiss();
+
+          Bundle bundle = new Bundle();
+          bundle.putBoolean(WifiScannerActivity.CONNECTED, false);
+
+          Intent intent = new Intent();
+          intent.putExtras(bundle);
+
+          current.setResult(Activity.RESULT_OK, intent);
+          current.finish();
         }
+      });
+
+      AlertDialog alert = builder.create();
+      alert.show();
+
+      return false;
     }
 
-    public static void reloadNetworkMapping() {
-        try {
-            mNetwork = new Network(mContext);
+    return true;
+  }
 
-            Target network = new Target(mNetwork),
-                    gateway = new Target(mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware()),
-                    device = new Target(mNetwork.getLocalAddress(), mNetwork.getLocalHardware());
+  public static void setLastError(String error){
+    mLastError = error;
+  }
 
-            gateway.setAlias(mNetwork.getSSID());
-            device.setAlias(android.os.Build.MODEL);
+  public static String getLastError(){
+    return mLastError;
+  }
 
-            mTargets.clear();
-            mTargets.add(network);
-            mTargets.add(gateway);
-            mTargets.add(device);
+  public static synchronized void errorLogging(String tag, Exception e){
+    String message = "Unknown error.",
+      trace = "Unknown trace.",
+      filename = (new File(Environment.getExternalStorageDirectory().toString(), ERROR_LOG_FILENAME)).getAbsolutePath();
 
-            mInitialized = true;
-        } catch (NoRouteToHostException nrthe) {
-            // swallow bitch
-        } catch (Exception e) {
-            errorLogging(TAG, e);
+    if(e != null){
+      if(e.getMessage() != null && !e.getMessage().isEmpty())
+        message = e.getMessage();
+
+      else if(e.toString() != null)
+        message = e.toString();
+
+      Writer sWriter = new StringWriter();
+      PrintWriter pWriter = new PrintWriter(sWriter);
+
+      e.printStackTrace(pWriter);
+
+      trace = sWriter.toString();
+
+      if(mContext != null && getSettings().getBoolean("PREF_DEBUG_ERROR_LOGGING", false)){
+        try{
+          FileWriter fWriter = new FileWriter(filename, true);
+          BufferedWriter bWriter = new BufferedWriter(fWriter);
+
+          bWriter.write(trace);
+
+          bWriter.close();
+        } catch(IOException ioe){
+          Log.e(TAG, ioe.toString());
         }
+      }
     }
 
-    public static boolean checkNetworking(final Activity current) {
-        if (!Network.isWifiConnected(mContext)) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(current);
+    setLastError(message);
+    Log.e(tag, message);
+    Log.e(tag, trace);
+  }
 
-            builder.setCancelable(false);
-            builder.setTitle(current.getString(R.string.error));
-            builder.setMessage(current.getString(R.string.wifi_went_down));
-            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
+  public static synchronized void errorLog(String tag, String data){
+    String filename = (new File(Environment.getExternalStorageDirectory().toString(), ERROR_LOG_FILENAME)).getAbsolutePath();
 
-                    Bundle bundle = new Bundle();
-                    bundle.putBoolean(WifiScannerActivity.CONNECTED, false);
+    data = data.trim();
 
-                    Intent intent = new Intent();
-                    intent.putExtras(bundle);
+    if(mContext != null && getSettings().getBoolean("PREF_DEBUG_ERROR_LOGGING", false)){
+      try{
+        FileWriter fWriter = new FileWriter(filename, true);
+        BufferedWriter bWriter = new BufferedWriter(fWriter);
 
-                    current.setResult(Activity.RESULT_OK, intent);
-                    current.finish();
-                }
-            });
+        bWriter.write(data);
 
-            AlertDialog alert = builder.create();
-            alert.show();
+        bWriter.close();
+      } catch(IOException ioe){
+        Log.e(TAG, ioe.toString());
+      }
+    }
 
-            return false;
+    Log.e(tag, data);
+  }
+
+  public static boolean isARM(){
+    String abi = Build.CPU_ABI;
+
+    Log.d(TAG, "Build.CPU_ABI = " + abi);
+
+    return Build.CPU_ABI.toLowerCase().startsWith("armeabi");
+  }
+
+  public static synchronized void setCustomData(Object data){
+    mCustomData = data;
+  }
+
+  public static Object getCustomData(){
+    return mCustomData;
+  }
+
+  public static InputStream getRawResource(int id){
+    return mContext.getResources().openRawResource(id);
+  }
+
+  public static String getLibraryPath(){
+    //noinspection ConstantConditions
+    return mContext.getFilesDir().getAbsolutePath() + "/tools/libs";
+  }
+
+  public static String getSuPath(){
+
+    if(mSuPath != null)
+      return mSuPath;
+
+    try{
+      Process process = Runtime.getRuntime().exec("which su");
+      BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+      String line = null;
+
+      while((line = reader.readLine()) != null){
+        if(!line.isEmpty() && line.startsWith("/")){
+          mSuPath = line;
+          break;
+        }
+      }
+
+      return mSuPath;
+    } catch(Exception e){
+      errorLogging(TAG, e);
+    }
+
+    return "su";
+  }
+
+  private static void preloadServices(){
+    if(mServices == null || mPorts == null){
+      try{
+        // preload network service map and mac vendors
+        mServices = new HashMap<String, String>();
+        mPorts = new HashMap<String, String>();
+
+        @SuppressWarnings("ConstantConditions")
+        FileInputStream fstream = new FileInputStream(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-services");
+
+        DataInputStream in = new DataInputStream(fstream);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        String line;
+        Matcher matcher;
+
+        while((line = reader.readLine()) != null){
+          line = line.trim();
+
+          if((matcher = SERVICE_PARSER.matcher(line)) != null && matcher.find()){
+            String proto = matcher.group(1),
+              port = matcher.group(2);
+
+            mServices.put(proto, port);
+            mPorts.put(port, proto);
+          }
         }
 
+        in.close();
+      } catch(Exception e){
+        errorLogging(TAG, e);
+      }
+    }
+  }
+
+  private static void preloadVendors(){
+    if(mVendors == null){
+      try{
+        mVendors = new HashMap<String, String>();
+        @SuppressWarnings("ConstantConditions")
+        FileInputStream fstream = new FileInputStream(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-mac-prefixes");
+
+        DataInputStream in = new DataInputStream(fstream);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        String line;
+
+        while((line = reader.readLine()) != null){
+          line = line.trim();
+          if(!line.startsWith("#") && !line.isEmpty()){
+            String[] tokens = line.split(" ", 2);
+
+            if(tokens.length == 2)
+              mVendors.put(tokens[0], tokens[1]);
+          }
+        }
+
+        in.close();
+      } catch(Exception e){
+        errorLogging(TAG, e);
+      }
+    }
+  }
+
+  public static UpdateManager getUpdateManager(){
+    return mUpdateManager;
+  }
+
+  public static String getSessionName(){
+    return mSessionName;
+  }
+
+  public static String getStoragePath(){
+    return mStoragePath;
+  }
+
+  public static SharedPreferences getSettings(){
+    return PreferenceManager.getDefaultSharedPreferences(mContext);
+  }
+
+  public static String getAppVersionName(){
+    try{
+      PackageManager manager = mContext.getPackageManager();
+      PackageInfo info = manager != null ? manager.getPackageInfo(mContext.getPackageName(), 0) : null;
+
+      return info.versionName;
+    } catch(NameNotFoundException e){
+      errorLogging(TAG, e);
+    }
+
+    return "?";
+  }
+
+  public static boolean isServiceRunning(String name){
+    ActivityManager manager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+
+    //noinspection ConstantConditions
+    for(RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
+      if(name.equals(service.service.getClassName()))
         return true;
     }
 
-    public static void setLastError(String error) {
-        mLastError = error;
+    return false;
+  }
+
+  public static boolean isPortAvailable(int port){
+    boolean available = true;
+
+    int available_code = mOpenPorts.get(port);
+
+    if(available_code != 0)
+      return available_code != 1;
+
+    try{
+      // attempt 3 times since proxy and server could be still releasing
+      // their ports
+      for(int i = 0; i < 3; i++){
+        Socket channel = new Socket();
+        InetSocketAddress address = new InetSocketAddress(InetAddress.getByName(mNetwork.getLocalAddressAsString()), port);
+
+        channel.connect(address, 200);
+
+        available = !channel.isConnected();
+
+        channel.close();
+
+        if(available)
+          break;
+
+        Thread.sleep(200);
+      }
+    } catch(Exception e){
+      available = true;
     }
 
-    public static String getLastError() {
-        return mLastError;
+    mOpenPorts.put(port, available ? 2 : 1);
+
+    return available;
+  }
+
+  public static ArrayList<String> getAvailableSessionFiles(){
+    ArrayList<String> files = new ArrayList<String>();
+    File storage = new File(mStoragePath);
+
+    if(storage.exists()){
+      String[] children = storage.list();
+
+      if(children != null && children.length > 0){
+        for(String child : children){
+          if(child.endsWith(".dss"))
+            files.add(child);
+        }
+      }
     }
 
-    public static synchronized void errorLogging(String tag, Exception e) {
-        String message = "Unknown error.",
-                trace = "Unknown trace.",
-                filename = (new File(Environment.getExternalStorageDirectory().toString(), ERROR_LOG_FILENAME)).getAbsolutePath();
+    return files;
+  }
 
-        if (e != null) {
-            if (e.getMessage() != null && !e.getMessage().isEmpty())
-                message = e.getMessage();
+  public static String saveSession(String sessionName) throws IOException{
+    StringBuilder builder = new StringBuilder();
+    String filename = mStoragePath + '/' + sessionName + ".dss",
+      session;
 
-            else if (e.toString() != null)
-                message = e.toString();
+    builder.append(SESSION_MAGIC + "\n");
 
-            Writer sWriter = new StringWriter();
-            PrintWriter pWriter = new PrintWriter(sWriter);
+    // skip the network target
+    builder.append(mTargets.size() - 1).append("\n");
+    for(Target target : mTargets){
+      if(target.getType() != Target.Type.NETWORK)
+        target.serialize(builder);
+    }
+    builder.append(mCurrentTarget).append("\n");
 
-            e.printStackTrace(pWriter);
+    session = builder.toString();
 
-            trace = sWriter.toString();
+    FileOutputStream ostream = new FileOutputStream(filename);
+    GZIPOutputStream gzip = new GZIPOutputStream(ostream);
 
-            if (mContext != null && getSettings().getBoolean("PREF_DEBUG_ERROR_LOGGING", false)) {
-                try {
-                    FileWriter fWriter = new FileWriter(filename, true);
-                    BufferedWriter bWriter = new BufferedWriter(fWriter);
+    gzip.write(session.getBytes());
 
-                    bWriter.write(trace);
+    gzip.close();
 
-                    bWriter.close();
-                } catch (IOException ioe) {
-                    Log.e(TAG, ioe.toString());
-                }
+    mSessionName = sessionName;
+
+    return filename;
+  }
+
+  public static ArrayList<String> getAvailableHijackerSessionFiles(){
+    ArrayList<String> files = new ArrayList<String>();
+    File storage = new File(mStoragePath);
+
+    if(storage.exists()){
+      String[] children = storage.list();
+
+      if(children != null && children.length > 0){
+        for(String child : children){
+          if(child.endsWith(".dhs"))
+            files.add(child);
+        }
+      }
+    }
+
+    return files;
+  }
+
+  public static String saveHijackerSession(String sessionName, Session session) throws IOException{
+    StringBuilder builder = new StringBuilder();
+    String filename = mStoragePath + '/' + sessionName + ".dhs",
+      buffer = null;
+
+    builder.append(SESSION_MAGIC + "\n");
+
+    builder.append(session.mUserName == null ? "null" : session.mUserName).append("\n");
+    builder.append(session.mHTTPS).append("\n");
+    builder.append(session.mAddress).append("\n");
+    builder.append(session.mDomain).append("\n");
+    builder.append(session.mUserAgent).append("\n");
+    builder.append(session.mCookies.size()).append("\n");
+    for(BasicClientCookie cookie : session.mCookies.values()){
+      builder.append(cookie.getName()).append("=").append(cookie.getValue()).append("; domain=").append(cookie.getDomain()).append("; path=/").append(session.mHTTPS ? ";secure" : "").append("\n");
+    }
+
+    buffer = builder.toString();
+
+    FileOutputStream ostream = new FileOutputStream(filename);
+    GZIPOutputStream gzip = new GZIPOutputStream(ostream);
+
+    gzip.write(buffer.getBytes());
+    gzip.close();
+
+    mSessionName = sessionName;
+
+    return filename;
+  }
+
+  public static void loadSession(String filename) throws Exception{
+    File file = new File(mStoragePath + '/' + filename);
+
+    if(file.exists() && file.length() > 0){
+      BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
+      String line;
+
+      // begin decoding procedure
+      try{
+        line = reader.readLine();
+        if(line == null || !line.equals(SESSION_MAGIC))
+          throw new Exception("Not a dSploit session file.");
+
+        reset();
+
+        // read targets
+        int targets = Integer.parseInt(reader.readLine());
+        for(int i = 0; i < targets; i++){
+          Target target = new Target(reader);
+
+          if(!hasTarget(target)){
+            System.addOrderedTarget(target);
+          } else{
+            for(int j = 0; j < mTargets.size(); j++){
+              if(mTargets.get(j) != null && mTargets.get(j).equals(target)){
+                mTargets.set(j, target);
+                break;
+              }
             }
+          }
         }
 
-        setLastError(message);
-        Log.e(tag, message);
-        Log.e(tag, trace);
-    }
+        mCurrentTarget = Integer.parseInt(reader.readLine());
+        reader.close();
 
-    public static synchronized void errorLog(String tag, String data) {
-        String filename = (new File(Environment.getExternalStorageDirectory().toString(), ERROR_LOG_FILENAME)).getAbsolutePath();
+      } catch(Exception e){
+        reset();
+        reader.close();
+        throw e;
+      }
+    } else
+      throw new Exception(filename + " does not exists or is empty.");
+  }
 
-        data = data.trim();
+  public static Session loadHijackerSession(String filename) throws Exception{
+    Session session;
+    File file = new File(mStoragePath + '/' + filename);
 
-        if (mContext != null && getSettings().getBoolean("PREF_DEBUG_ERROR_LOGGING", false)) {
-            try {
-                FileWriter fWriter = new FileWriter(filename, true);
-                BufferedWriter bWriter = new BufferedWriter(fWriter);
+    if(file.exists() && file.length() > 0){
+      BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
+      String line;
 
-                bWriter.write(data);
+      // begin decoding procedure
+      try{
+        line = reader.readLine();
+        if(line == null || !line.equals(SESSION_MAGIC))
+          throw new Exception("Not a dSploit hijacker session file.");
 
-                bWriter.close();
-            } catch (IOException ioe) {
-                Log.e(TAG, ioe.toString());
-            }
+        session = new Session();
+
+        session.mUserName = reader.readLine();
+        session.mUserName = session.mUserName.equals("null") ? null : session.mUserName;
+        session.mHTTPS = Boolean.parseBoolean(reader.readLine());
+        session.mAddress = reader.readLine();
+        session.mDomain = reader.readLine();
+        session.mUserAgent = reader.readLine();
+
+        int ncookies = Integer.parseInt(reader.readLine());
+        for(int i = 0; i < ncookies; i++){
+          ArrayList<BasicClientCookie> cookies = RequestParser.parseRawCookie(reader.readLine());
+          for(BasicClientCookie cookie : cookies){
+            session.mCookies.put(cookie.getName(), cookie);
+          }
         }
 
-        Log.e(tag, data);
+        reader.close();
+      } catch(Exception e){
+        reader.close();
+
+        throw e;
+      }
+    } else
+      throw new Exception(filename + " does not exists or is empty.");
+
+    return session;
+  }
+
+  public static NMap getNMap(){
+    return mNmap;
+  }
+
+  public static ArpSpoof getArpSpoof(){
+    return mArpSpoof;
+  }
+
+  public static Ettercap getEttercap(){
+    return mEttercap;
+  }
+
+  public static IPTables getIPTables(){
+    return mIptables;
+  }
+
+  public static Hydra getHydra(){
+    return mHydra;
+  }
+
+  public static TcpDump getTcpDump(){
+    return mTcpdump;
+  }
+
+  public static Proxy getProxy(){
+    try{
+      if(mProxy == null)
+        mProxy = new Proxy(getNetwork().getLocalAddress(), HTTP_PROXY_PORT);
+    } catch(Exception e){
+      errorLogging(TAG, e);
     }
 
-    public static boolean isARM() {
-        String abi = Build.CPU_ABI;
+    return mProxy;
+  }
 
-        Log.d(TAG, "Build.CPU_ABI = " + abi);
-
-        return Build.CPU_ABI.toLowerCase().startsWith("armeabi");
+  public static HTTPSRedirector getHttpsRedirector(){
+    try{
+      if(mRedirector == null)
+        mRedirector = new HTTPSRedirector(mContext, getNetwork().getLocalAddress(), HTTPS_REDIR_PORT);
+    } catch(Exception e){
+      errorLogging(TAG, e);
     }
 
-    public static synchronized void setCustomData(Object data) {
-        mCustomData = data;
+    return mRedirector;
+  }
+
+  public static Server getServer(){
+    try{
+      if(mServer == null)
+        mServer = new Server(getNetwork().getLocalAddress(), HTTP_SERVER_PORT);
+    } catch(Exception e){
+      errorLogging(TAG, e);
     }
 
-    public static Object getCustomData() {
-        return mCustomData;
+    return mServer;
+  }
+
+  public static String getImageMimeType(String fileName){
+    String type = "image/jpeg",
+      name = fileName.toLowerCase();
+
+    if(name.endsWith(".jpeg") || name.endsWith(".jpg"))
+      type = "image/jpeg";
+
+    else if(name.endsWith(".png"))
+      type = "image/png";
+
+    else if(name.endsWith(".gif"))
+      type = "image/gif";
+
+    else if(name.endsWith(".tiff"))
+      type = "image/tiff";
+
+    return type;
+  }
+
+  public static void reset() throws NoRouteToHostException, SocketException{
+    mTargets.clear();
+
+    // local network
+    mTargets.add(new Target(System.getNetwork()));
+    // network gateway
+    mTargets.add(new Target(System.getNetwork().getGatewayAddress(), System.getNetwork().getGatewayHardware()));
+    // device network address
+    mTargets.add(new Target(System.getNetwork().getLocalAddress(), System.getNetwork().getLocalHardware()));
+
+    mCurrentTarget = 0;
+  }
+
+  public static boolean isInitialized(){
+    return mInitialized;
+  }
+
+  public static String getMacVendor(byte[] mac){
+    preloadVendors();
+
+    if(mac != null && mac.length >= 3)
+      return mVendors.get(String.format("%02X%02X%02X", mac[0], mac[1], mac[2]));
+    else
+      return null;
+  }
+
+  public static String getProtocolByPort(String port){
+    preloadServices();
+
+    return mPorts.containsKey(port) ? mPorts.get(port) : null;
+  }
+
+  public static int getPortByProtocol(String protocol){
+    preloadServices();
+
+    return mServices.containsKey(protocol) ? Integer.parseInt(mServices.get(protocol)) : 0;
+  }
+
+  public static Context getContext(){
+    return mContext;
+  }
+
+  public static Network getNetwork() throws NoRouteToHostException, SocketException{
+    return mNetwork;
+  }
+
+  public static Vector<Target> getTargets(){
+    return mTargets;
+  }
+
+  public static ArrayList<Target> getTargetsByType(Target.Type type){
+    ArrayList<Target> filtered = new ArrayList<Target>();
+
+    for(Target target : mTargets){
+      if(target.getType() == type)
+        filtered.add(target);
     }
 
-    public static InputStream getRawResource(int id) {
-        return mContext.getResources().openRawResource(id);
+    return filtered;
+  }
+
+  public static ArrayList<Endpoint> getNetworkEndpoints(){
+    ArrayList<Endpoint> filtered = new ArrayList<Endpoint>();
+
+    for(Target target : mTargets){
+      if(target.getType() == Type.ENDPOINT)
+        filtered.add(target.getEndpoint());
     }
 
-    public static String getLibraryPath() {
-        //noinspection ConstantConditions
-        return mContext.getFilesDir().getAbsolutePath() + "/tools/libs";
-    }
+    return filtered;
+  }
 
-    public static String getSuPath() {
+  public static void addTarget(int index, Target target){
+    mTargets.add(index, target);
+    // update current target index
+    if(mCurrentTarget >= index)
+      mCurrentTarget++;
+  }
 
-        if (mSuPath != null)
-            return mSuPath;
+  public static void addTarget(Target target){
+    mTargets.add(target);
+  }
 
-        try {
-            Process process = Runtime.getRuntime().exec("which su");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line = null;
-
-            while ((line = reader.readLine()) != null) {
-                if (!line.isEmpty() && line.startsWith("/")) {
-                    mSuPath = line;
-                    break;
-                }
-            }
-
-            return mSuPath;
-        } catch (Exception e) {
-            errorLogging(TAG, e);
+  public static boolean addOrderedTarget(Target target){
+    if(target != null && !hasTarget(target)){
+      for(int i = 0; i < getTargets().size(); i++){
+        if(getTarget(i).comesAfter(target)){
+          addTarget(i, target);
+          return true;
         }
+      }
 
-        return "su";
+      addTarget(target);
+
+      return true;
     }
 
-    private static void preloadServices() {
-        if (mServices == null || mPorts == null) {
-            try {
-                // preload network service map and mac vendors
-                mServices = new HashMap<String, String>();
-                mPorts = new HashMap<String, String>();
+    return false;
+  }
 
-                @SuppressWarnings("ConstantConditions")
-                FileInputStream fstream = new FileInputStream(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-services");
+  public static Target getTarget(int index){
+    return mTargets.get(index);
+  }
 
-                DataInputStream in = new DataInputStream(fstream);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                String line;
-                Matcher matcher;
+  public static boolean hasTarget(Target target){
+    return mTargets.contains(target);
+  }
 
-                while ((line = reader.readLine()) != null) {
-                    line = line.trim();
+  public static void setCurrentTarget(int index){
+    mCurrentTarget = index;
+  }
 
-                    if ((matcher = SERVICE_PARSER.matcher(line)) != null && matcher.find()) {
-                        String proto = matcher.group(1),
-                                port = matcher.group(2);
+  public static Target getCurrentTarget(){
+    return getTarget(mCurrentTarget);
+  }
 
-                        mServices.put(proto, port);
-                        mPorts.put(port, proto);
-                    }
-                }
+  public static Target getTargetByAddress(String address){
+    int i, size = mTargets.size();
 
-                in.close();
-            } catch (Exception e) {
-                errorLogging(TAG, e);
-            }
-        }
+    for(i = 0; i < size; i++){
+      synchronized(mTargets){
+        Target t = mTargets.get(i);
+
+        if(t != null && t.getAddress() != null && t.getAddress().getHostAddress().equals(address))
+          return t;
+      }
     }
 
-    private static void preloadVendors() {
-        if (mVendors == null) {
-            try {
-                mVendors = new HashMap<String, String>();
-                @SuppressWarnings("ConstantConditions")
-                FileInputStream fstream = new FileInputStream(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-mac-prefixes");
+    return null;
+  }
 
-                DataInputStream in = new DataInputStream(fstream);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                String line;
+  public static void registerPlugin(Plugin plugin){
+    mPlugins.add(plugin);
+  }
 
-                while ((line = reader.readLine()) != null) {
-                    line = line.trim();
-                    if (!line.startsWith("#") && !line.isEmpty()) {
-                        String[] tokens = line.split(" ", 2);
+  public static ArrayList<Plugin> getPlugins(){
+    return mPlugins;
+  }
 
-                        if (tokens.length == 2)
-                            mVendors.put(tokens[0], tokens[1]);
-                    }
-                }
+  public static ArrayList<Plugin> getPluginsForTarget(Target target){
+    ArrayList<Plugin> filtered = new ArrayList<Plugin>();
 
-                in.close();
-            } catch (Exception e) {
-                errorLogging(TAG, e);
-            }
-        }
+    if(target != null){
+      for(Plugin plugin : mPlugins)
+        if(plugin.isAllowedTarget(target))
+          filtered.add(plugin);
     }
 
-    public static UpdateManager getUpdateManager() {
-        return mUpdateManager;
+    return filtered;
+  }
+
+  public static ArrayList<Plugin> getPluginsForTarget(){
+    return getPluginsForTarget(getCurrentTarget());
+  }
+
+  public static void setCurrentPlugin(Plugin plugin){
+    Log.d(TAG, "Setting current plugin : " + plugin.getName());
+
+    mCurrentPlugin = plugin;
+  }
+
+  public static Plugin getCurrentPlugin(){
+    return mCurrentPlugin;
+  }
+
+  public static void addOpenPort(int port, Protocol protocol){
+    addOpenPort(port, protocol, null);
+  }
+
+  public static void addOpenPort(int port, Protocol protocol, String service){
+    Port p = new Port(port, protocol, service);
+
+    getCurrentTarget().addOpenPort(p);
+
+    for(Plugin plugin : getPluginsForTarget()){
+      plugin.onTargetNewOpenPort(getCurrentTarget(), p);
+    }
+  }
+
+  public static void addVulnerability(Port port, Vulnerability v){
+    getCurrentTarget().addVulnerability(port, v);
+
+    for(Plugin plugin : getPluginsForTarget()){
+      plugin.onTargetNewVulnerability(getCurrentTarget(), port, v);
+    }
+  }
+
+  public static String getGatewayAddress(){
+    return mNetwork.getGatewayAddress().getHostAddress();
+  }
+
+  public static boolean isForwardingEnabled(){
+    boolean forwarding = false;
+    BufferedReader reader;
+    String line;
+
+    try{
+      reader = new BufferedReader(new FileReader(IPV4_FORWARD_FILEPATH));
+      line = reader.readLine().trim();
+      forwarding = line.equals("1");
+
+      reader.close();
+
+    } catch(IOException e){
+      Log.w(TAG, e.toString());
     }
 
-    public static String getSessionName() {
-        return mSessionName;
+    return forwarding;
+  }
+
+  public static void setForwarding(boolean enabled){
+    Log.d(TAG, "Setting ipv4 forwarding to " + enabled);
+
+    String status = (enabled ? "1" : "0"),
+      cmd = "echo " + status + " > " + IPV4_FORWARD_FILEPATH;
+
+    try{
+      Shell.exec(cmd);
+    } catch(Exception e){
+      errorLogging(TAG, e);
     }
+  }
 
-    public static String getStoragePath() {
-        return mStoragePath;
+  public static void clean(boolean releaseLocks){
+    setForwarding(false);
+
+    try{
+      String tools = "";
+      for(String tool : ToolsInstaller.TOOLS)
+        tools += tool + " ";
+
+      Log.d(TAG, "Killing any running instance of " + tools);
+      Shell.exec("killall -9 " + tools.trim());
+
+      if(releaseLocks){
+        Log.d(TAG, "Releasing locks.");
+
+        if(mWifiLock != null && mWifiLock.isHeld())
+          mWifiLock.release();
+
+        if(mWakeLock != null && mWakeLock.isHeld())
+          mWakeLock.release();
+      }
+    } catch(Exception e){
+      errorLogging(TAG, e);
     }
-
-    public static SharedPreferences getSettings() {
-        return PreferenceManager.getDefaultSharedPreferences(mContext);
-    }
-
-    public static String getAppVersionName() {
-        try {
-            PackageManager manager = mContext.getPackageManager();
-            PackageInfo info = manager != null ? manager.getPackageInfo(mContext.getPackageName(), 0) : null;
-
-            return info.versionName;
-        } catch (NameNotFoundException e) {
-            errorLogging(TAG, e);
-        }
-
-        return "?";
-    }
-
-    public static boolean isServiceRunning(String name) {
-        ActivityManager manager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
-
-        //noinspection ConstantConditions
-        for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (name.equals(service.service.getClassName()))
-                return true;
-        }
-
-        return false;
-    }
-
-    public static boolean isPortAvailable(int port) {
-        boolean available = true;
-
-        int available_code = mOpenPorts.get(port);
-
-        if (available_code != 0)
-            return available_code != 1;
-
-        try {
-            // attempt 3 times since proxy and server could be still releasing
-            // their ports
-            for (int i = 0; i < 3; i++) {
-                Socket channel = new Socket();
-                InetSocketAddress address = new InetSocketAddress(InetAddress.getByName(mNetwork.getLocalAddressAsString()), port);
-
-                channel.connect(address, 200);
-
-                available = !channel.isConnected();
-
-                channel.close();
-
-                if (available)
-                    break;
-
-                Thread.sleep(200);
-            }
-        } catch (Exception e) {
-            available = true;
-        }
-
-        mOpenPorts.put(port, available ? 2 : 1);
-
-        return available;
-    }
-
-    public static ArrayList<String> getAvailableSessionFiles() {
-        ArrayList<String> files = new ArrayList<String>();
-        File storage = new File(mStoragePath);
-
-        if (storage.exists()) {
-            String[] children = storage.list();
-
-            if (children != null && children.length > 0) {
-                for (String child : children) {
-                    if (child.endsWith(".dss"))
-                        files.add(child);
-                }
-            }
-        }
-
-        return files;
-    }
-
-    public static String saveSession(String sessionName) throws IOException {
-        StringBuilder builder = new StringBuilder();
-        String filename = mStoragePath + '/' + sessionName + ".dss",
-                session;
-
-        builder.append(SESSION_MAGIC + "\n");
-
-        // skip the network target
-        builder.append(mTargets.size() - 1).append("\n");
-        for (Target target : mTargets) {
-            if (target.getType() != Target.Type.NETWORK)
-                target.serialize(builder);
-        }
-        builder.append(mCurrentTarget).append("\n");
-
-        session = builder.toString();
-
-        FileOutputStream ostream = new FileOutputStream(filename);
-        GZIPOutputStream gzip = new GZIPOutputStream(ostream);
-
-        gzip.write(session.getBytes());
-
-        gzip.close();
-
-        mSessionName = sessionName;
-
-        return filename;
-    }
-
-    public static ArrayList<String> getAvailableHijackerSessionFiles() {
-        ArrayList<String> files = new ArrayList<String>();
-        File storage = new File(mStoragePath);
-
-        if (storage.exists()) {
-            String[] children = storage.list();
-
-            if (children != null && children.length > 0) {
-                for (String child : children) {
-                    if (child.endsWith(".dhs"))
-                        files.add(child);
-                }
-            }
-        }
-
-        return files;
-    }
-
-    public static String saveHijackerSession(String sessionName, Session session) throws IOException {
-        StringBuilder builder = new StringBuilder();
-        String filename = mStoragePath + '/' + sessionName + ".dhs",
-                buffer = null;
-
-        builder.append(SESSION_MAGIC + "\n");
-
-        builder.append(session.mUserName == null ? "null" : session.mUserName).append("\n");
-        builder.append(session.mHTTPS).append("\n");
-        builder.append(session.mAddress).append("\n");
-        builder.append(session.mDomain).append("\n");
-        builder.append(session.mUserAgent).append("\n");
-        builder.append(session.mCookies.size()).append("\n");
-        for (BasicClientCookie cookie : session.mCookies.values()) {
-            builder.append(cookie.getName()).append("=").append(cookie.getValue()).append("; domain=").append(cookie.getDomain()).append("; path=/").append(session.mHTTPS ? ";secure" : "").append("\n");
-        }
-
-        buffer = builder.toString();
-
-        FileOutputStream ostream = new FileOutputStream(filename);
-        GZIPOutputStream gzip = new GZIPOutputStream(ostream);
-
-        gzip.write(buffer.getBytes());
-        gzip.close();
-
-        mSessionName = sessionName;
-
-        return filename;
-    }
-
-    public static void loadSession(String filename) throws Exception {
-        File file = new File(mStoragePath + '/' + filename);
-
-        if (file.exists() && file.length() > 0) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
-            String line;
-
-            // begin decoding procedure
-            try {
-                line = reader.readLine();
-                if (line == null || !line.equals(SESSION_MAGIC))
-                    throw new Exception("Not a dSploit session file.");
-
-                reset();
-
-                // read targets
-                int targets = Integer.parseInt(reader.readLine());
-                for (int i = 0; i < targets; i++) {
-                    Target target = new Target(reader);
-
-                    if (!hasTarget(target)) {
-                        System.addOrderedTarget(target);
-                    } else {
-                        for (int j = 0; j < mTargets.size(); j++) {
-                            if (mTargets.get(j) != null && mTargets.get(j).equals(target)) {
-                                mTargets.set(j, target);
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                mCurrentTarget = Integer.parseInt(reader.readLine());
-                reader.close();
-
-            } catch (Exception e) {
-                reset();
-                reader.close();
-                throw e;
-            }
-        } else
-            throw new Exception(filename + " does not exists or is empty.");
-    }
-
-    public static Session loadHijackerSession(String filename) throws Exception {
-        Session session;
-        File file = new File(mStoragePath + '/' + filename);
-
-        if (file.exists() && file.length() > 0) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
-            String line;
-
-            // begin decoding procedure
-            try {
-                line = reader.readLine();
-                if (line == null || !line.equals(SESSION_MAGIC))
-                    throw new Exception("Not a dSploit hijacker session file.");
-
-                session = new Session();
-
-                session.mUserName = reader.readLine();
-                session.mUserName = session.mUserName.equals("null") ? null : session.mUserName;
-                session.mHTTPS = Boolean.parseBoolean(reader.readLine());
-                session.mAddress = reader.readLine();
-                session.mDomain = reader.readLine();
-                session.mUserAgent = reader.readLine();
-
-                int ncookies = Integer.parseInt(reader.readLine());
-                for (int i = 0; i < ncookies; i++) {
-                    ArrayList<BasicClientCookie> cookies = RequestParser.parseRawCookie(reader.readLine());
-                    for (BasicClientCookie cookie : cookies) {
-                        session.mCookies.put(cookie.getName(), cookie);
-                    }
-                }
-
-                reader.close();
-            } catch (Exception e) {
-                reader.close();
-
-                throw e;
-            }
-        } else
-            throw new Exception(filename + " does not exists or is empty.");
-
-        return session;
-    }
-
-    public static NMap getNMap() {
-        return mNmap;
-    }
-
-    public static ArpSpoof getArpSpoof() {
-        return mArpSpoof;
-    }
-
-    public static Ettercap getEttercap() {
-        return mEttercap;
-    }
-
-    public static IPTables getIPTables() {
-        return mIptables;
-    }
-
-    public static Hydra getHydra() {
-        return mHydra;
-    }
-
-    public static TcpDump getTcpDump() {
-        return mTcpdump;
-    }
-
-    public static Proxy getProxy() {
-        try {
-            if (mProxy == null)
-                mProxy = new Proxy(getNetwork().getLocalAddress(), HTTP_PROXY_PORT);
-        } catch (Exception e) {
-            errorLogging(TAG, e);
-        }
-
-        return mProxy;
-    }
-
-    public static HTTPSRedirector getHttpsRedirector() {
-        try {
-            if (mRedirector == null)
-                mRedirector = new HTTPSRedirector(mContext, getNetwork().getLocalAddress(), HTTPS_REDIR_PORT);
-        } catch (Exception e) {
-            errorLogging(TAG, e);
-        }
-
-        return mRedirector;
-    }
-
-    public static Server getServer() {
-        try {
-            if (mServer == null)
-                mServer = new Server(getNetwork().getLocalAddress(), HTTP_SERVER_PORT);
-        } catch (Exception e) {
-            errorLogging(TAG, e);
-        }
-
-        return mServer;
-    }
-
-    public static String getImageMimeType(String fileName) {
-        String type = "image/jpeg",
-                name = fileName.toLowerCase();
-
-        if (name.endsWith(".jpeg") || name.endsWith(".jpg"))
-            type = "image/jpeg";
-
-        else if (name.endsWith(".png"))
-            type = "image/png";
-
-        else if (name.endsWith(".gif"))
-            type = "image/gif";
-
-        else if (name.endsWith(".tiff"))
-            type = "image/tiff";
-
-        return type;
-    }
-
-    public static void reset() throws NoRouteToHostException, SocketException {
-        mTargets.clear();
-
-        // local network
-        mTargets.add(new Target(System.getNetwork()));
-        // network gateway
-        mTargets.add(new Target(System.getNetwork().getGatewayAddress(), System.getNetwork().getGatewayHardware()));
-        // device network address
-        mTargets.add(new Target(System.getNetwork().getLocalAddress(), System.getNetwork().getLocalHardware()));
-
-        mCurrentTarget = 0;
-    }
-
-    public static boolean isInitialized() {
-        return mInitialized;
-    }
-
-    public static String getMacVendor(byte[] mac) {
-        preloadVendors();
-
-        if (mac != null && mac.length >= 3)
-            return mVendors.get(String.format("%02X%02X%02X", mac[0], mac[1], mac[2]));
-        else
-            return null;
-    }
-
-    public static String getProtocolByPort(String port) {
-        preloadServices();
-
-        return mPorts.containsKey(port) ? mPorts.get(port) : null;
-    }
-
-    public static int getPortByProtocol(String protocol) {
-        preloadServices();
-
-        return mServices.containsKey(protocol) ? Integer.parseInt(mServices.get(protocol)) : 0;
-    }
-
-    public static Context getContext() {
-        return mContext;
-    }
-
-    public static Network getNetwork() throws NoRouteToHostException, SocketException {
-        return mNetwork;
-    }
-
-    public static Vector<Target> getTargets() {
-        return mTargets;
-    }
-
-    public static ArrayList<Target> getTargetsByType(Target.Type type) {
-        ArrayList<Target> filtered = new ArrayList<Target>();
-
-        for (Target target : mTargets) {
-            if (target.getType() == type)
-                filtered.add(target);
-        }
-
-        return filtered;
-    }
-
-    public static ArrayList<Endpoint> getNetworkEndpoints() {
-        ArrayList<Endpoint> filtered = new ArrayList<Endpoint>();
-
-        for (Target target : mTargets) {
-            if (target.getType() == Type.ENDPOINT)
-                filtered.add(target.getEndpoint());
-        }
-
-        return filtered;
-    }
-
-    public static void addTarget(int index, Target target) {
-        mTargets.add(index, target);
-        // update current target index
-        if (mCurrentTarget >= index)
-            mCurrentTarget++;
-    }
-
-    public static void addTarget(Target target) {
-        mTargets.add(target);
-    }
-
-    public static boolean addOrderedTarget(Target target) {
-        if (target != null && !hasTarget(target)) {
-            for (int i = 0; i < getTargets().size(); i++) {
-                if (getTarget(i).comesAfter(target)) {
-                    addTarget(i, target);
-                    return true;
-                }
-            }
-
-            addTarget(target);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    public static Target getTarget(int index) {
-        return mTargets.get(index);
-    }
-
-    public static boolean hasTarget(Target target) {
-        return mTargets.contains(target);
-    }
-
-    public static void setCurrentTarget(int index) {
-        mCurrentTarget = index;
-    }
-
-    public static Target getCurrentTarget() {
-        return getTarget(mCurrentTarget);
-    }
-
-    public static Target getTargetByAddress(String address) {
-        int i, size = mTargets.size();
-
-        for (i = 0; i < size; i++) {
-            synchronized (mTargets) {
-                Target t = mTargets.get(i);
-
-                if (t != null && t.getAddress() != null && t.getAddress().getHostAddress().equals(address))
-                    return t;
-            }
-        }
-
-        return null;
-    }
-
-    public static void registerPlugin(Plugin plugin) {
-        mPlugins.add(plugin);
-    }
-
-    public static ArrayList<Plugin> getPlugins() {
-        return mPlugins;
-    }
-
-    public static ArrayList<Plugin> getPluginsForTarget(Target target) {
-        ArrayList<Plugin> filtered = new ArrayList<Plugin>();
-
-        if (target != null) {
-            for (Plugin plugin : mPlugins)
-                if (plugin.isAllowedTarget(target))
-                    filtered.add(plugin);
-        }
-
-        return filtered;
-    }
-
-    public static ArrayList<Plugin> getPluginsForTarget() {
-        return getPluginsForTarget(getCurrentTarget());
-    }
-
-    public static void setCurrentPlugin(Plugin plugin) {
-        Log.d(TAG, "Setting current plugin : " + plugin.getName());
-
-        mCurrentPlugin = plugin;
-    }
-
-    public static Plugin getCurrentPlugin() {
-        return mCurrentPlugin;
-    }
-
-    public static void addOpenPort(int port, Protocol protocol) {
-        addOpenPort(port, protocol, null);
-    }
-
-    public static void addOpenPort(int port, Protocol protocol, String service) {
-        Port p = new Port(port, protocol, service);
-
-        getCurrentTarget().addOpenPort(p);
-
-        for (Plugin plugin : getPluginsForTarget()) {
-            plugin.onTargetNewOpenPort(getCurrentTarget(), p);
-        }
-    }
-
-    public static void addVulnerability(Port port, Vulnerability v) {
-        getCurrentTarget().addVulnerability(port, v);
-
-        for (Plugin plugin : getPluginsForTarget()) {
-            plugin.onTargetNewVulnerability(getCurrentTarget(), port, v);
-        }
-    }
-
-    public static String getGatewayAddress() {
-        return mNetwork.getGatewayAddress().getHostAddress();
-    }
-
-    public static boolean isForwardingEnabled() {
-        boolean forwarding = false;
-        BufferedReader reader;
-        String line;
-
-        try {
-            reader = new BufferedReader(new FileReader(IPV4_FORWARD_FILEPATH));
-            line = reader.readLine().trim();
-            forwarding = line.equals("1");
-
-            reader.close();
-
-        } catch (IOException e) {
-            Log.w(TAG, e.toString());
-        }
-
-        return forwarding;
-    }
-
-    public static void setForwarding(boolean enabled) {
-        Log.d(TAG, "Setting ipv4 forwarding to " + enabled);
-
-        String status = (enabled ? "1" : "0"),
-                cmd = "echo " + status + " > " + IPV4_FORWARD_FILEPATH;
-
-        try {
-            Shell.exec(cmd);
-        } catch (Exception e) {
-            errorLogging(TAG, e);
-        }
-    }
-
-    public static void clean(boolean releaseLocks) {
-        setForwarding(false);
-
-        try {
-            String tools = "";
-            for (String tool : ToolsInstaller.TOOLS)
-                tools += tool + " ";
-
-            Log.d(TAG, "Killing any running instance of " + tools);
-            Shell.exec("killall -9 " + tools.trim());
-
-            if (releaseLocks) {
-                Log.d(TAG, "Releasing locks.");
-
-                if (mWifiLock != null && mWifiLock.isHeld())
-                    mWifiLock.release();
-
-                if (mWakeLock != null && mWakeLock.isHeld())
-                    mWakeLock.release();
-            }
-        } catch (Exception e) {
-            errorLogging(TAG, e);
-        }
-    }
+  }
 
 }

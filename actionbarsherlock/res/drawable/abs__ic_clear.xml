@@ -16,7 +16,7 @@
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_enabled="false"
-        android:drawable="@drawable/abs__ic_clear_disabled" />
+          android:drawable="@drawable/abs__ic_clear_disabled"/>
     <item
-         android:drawable="@drawable/abs__ic_clear_normal" />
+            android:drawable="@drawable/abs__ic_clear_normal"/>
 </selector>

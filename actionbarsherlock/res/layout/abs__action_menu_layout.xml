@@ -15,9 +15,9 @@
 -->
 
 <com.actionbarsherlock.internal.view.menu.ActionMenuView
-     xmlns:android="http://schemas.android.com/apk/res/android"
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     android:divider="?attr/actionBarDivider"
-     android:dividerPadding="12dip"
-     android:gravity="center_vertical" />
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:divider="?attr/actionBarDivider"
+        android:dividerPadding="12dip"
+        android:gravity="center_vertical"/>

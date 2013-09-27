@@ -19,7 +19,7 @@
 
 <!-- These resources are around just to allow their values to be customized
      for different hardware and product builds. -->
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<resources>
 
     <!-- Whether action menu items should obey the "withText" showAsAction
          flag. This may be set to false for situations where space is

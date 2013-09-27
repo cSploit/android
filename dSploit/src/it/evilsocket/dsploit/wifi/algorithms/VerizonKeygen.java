@@ -22,44 +22,44 @@ import java.util.List;
 
 import it.evilsocket.dsploit.wifi.Keygen;
 
-public class VerizonKeygen extends Keygen {
+public class VerizonKeygen extends Keygen{
 
 
-    public VerizonKeygen(String ssid, String mac, int level, String enc) {
-        super(ssid, mac, level, enc);
+  public VerizonKeygen(String ssid, String mac, int level, String enc){
+    super(ssid, mac, level, enc);
+  }
+
+  @Override
+  public List<String> getKeys(){
+    if(getSsidName().length() != 5){
+      setErrorMessage("Invalid ESSID! It must have 6 characters.");
+      return null;
+    }
+    char[] inverse = new char[5];
+    inverse[0] = getSsidName().charAt(4);
+    inverse[1] = getSsidName().charAt(3);
+    inverse[2] = getSsidName().charAt(2);
+    inverse[3] = getSsidName().charAt(1);
+    inverse[4] = getSsidName().charAt(0);
+
+    int result = 0;
+    try{
+      result = Integer.valueOf(String.copyValueOf(inverse), 36);
+    } catch(NumberFormatException e){
+      setErrorMessage("Error processing this SSID.");
+      return null;
     }
 
-    @Override
-    public List<String> getKeys() {
-        if (getSsidName().length() != 5) {
-            setErrorMessage("Invalid ESSID! It must have 6 characters.");
-            return null;
-        }
-        char[] inverse = new char[5];
-        inverse[0] = getSsidName().charAt(4);
-        inverse[1] = getSsidName().charAt(3);
-        inverse[2] = getSsidName().charAt(2);
-        inverse[3] = getSsidName().charAt(1);
-        inverse[4] = getSsidName().charAt(0);
-
-        int result = 0;
-        try {
-            result = Integer.valueOf(String.copyValueOf(inverse), 36);
-        } catch (NumberFormatException e) {
-            setErrorMessage("Error processing this SSID.");
-            return null;
-        }
-
-        String ssidKey = Integer.toHexString(result).toUpperCase();
-        while (ssidKey.length() < 6)
-            ssidKey = "0" + ssidKey;
-        if (!getMacAddress().equals("")) {
-            addPassword(getMacAddress().substring(3, 5) + getMacAddress().substring(6, 8) +
-                    ssidKey);
-        } else {
-            addPassword("1801" + ssidKey);
-            addPassword("1F90" + ssidKey);
-        }
-        return getResults();
+    String ssidKey = Integer.toHexString(result).toUpperCase();
+    while(ssidKey.length() < 6)
+      ssidKey = "0" + ssidKey;
+    if(!getMacAddress().equals("")){
+      addPassword(getMacAddress().substring(3, 5) + getMacAddress().substring(6, 8) +
+        ssidKey);
+    } else{
+      addPassword("1801" + ssidKey);
+      addPassword("1F90" + ssidKey);
     }
+    return getResults();
+  }
 }

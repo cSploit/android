@@ -30,107 +30,107 @@ import java.net.UnknownHostException;
 
 import it.evilsocket.dsploit.core.System;
 
-public class Server implements Runnable {
-    private static final String TAG = "HTTP.SERVER";
-    private static final int BACKLOG = 255;
-    private static final int MAX_FILE_SIZE = 10 * 1024 * 1024;
+public class Server implements Runnable{
+  private static final String TAG = "HTTP.SERVER";
+  private static final int BACKLOG = 255;
+  private static final int MAX_FILE_SIZE = 10 * 1024 * 1024;
 
-    private InetAddress mAddress = null;
-    private int mPort = System.HTTP_SERVER_PORT;
-    private boolean mRunning = false;
-    private ServerSocket mSocket = null;
-    private String mResourcePath = null;
-    private String mResourceContentType = null;
-    private byte[] mResourceData = null;
+  private InetAddress mAddress = null;
+  private int mPort = System.HTTP_SERVER_PORT;
+  private boolean mRunning = false;
+  private ServerSocket mSocket = null;
+  private String mResourcePath = null;
+  private String mResourceContentType = null;
+  private byte[] mResourceData = null;
 
-    public Server(InetAddress address, int port, String resourcePath, String resourceContentType) throws UnknownHostException, IOException {
-        mAddress = address;
-        mPort = port;
+  public Server(InetAddress address, int port, String resourcePath, String resourceContentType) throws UnknownHostException, IOException{
+    mAddress = address;
+    mPort = port;
+    mSocket = new ServerSocket(mPort, BACKLOG, mAddress);
+
+    if(resourcePath != null && resourceContentType != null)
+      setResource(resourcePath, resourceContentType);
+  }
+
+  public Server(String address, int port, String resourcePath, String resourceContentType) throws UnknownHostException, IOException{
+    this(InetAddress.getByName(address), port, resourcePath, resourceContentType);
+  }
+
+  public Server(String address, int port) throws UnknownHostException, IOException{
+    this(address, port, null, null);
+  }
+
+  public Server(InetAddress address, int port) throws UnknownHostException, IOException{
+    this(address, port, null, null);
+  }
+
+  public void setResource(String path, String contentType) throws IOException{
+    mResourcePath = path;
+    mResourceContentType = contentType;
+
+    // preload resource data
+    File file = new File(mResourcePath);
+    FileInputStream is = new FileInputStream(file);
+    long size = file.length();
+    int offset = 0,
+      read = 0;
+
+    if(size > MAX_FILE_SIZE)
+      throw new IOException("Max allowed file size is " + MAX_FILE_SIZE + " bytes.");
+
+    mResourceData = new byte[(int) size];
+
+    while(offset < size && (read = is.read(mResourceData, offset, (int) (size - offset))) >= 0){
+      offset += read;
+    }
+
+    if(offset < size)
+      throw new IOException("Could not completely read file " + file.getName() + " .");
+
+    is.close();
+  }
+
+  public String getResourceURL(){
+    return "http://" + mAddress.getHostAddress() + ":" + mPort + "/";
+  }
+
+  public void stop(){
+    Log.d(TAG, "Stopping server ...");
+
+    try{
+      if(mSocket != null)
+        mSocket.close();
+    } catch(IOException e){
+
+    }
+
+    mRunning = false;
+    mSocket = null;
+  }
+
+  public void run(){
+
+    try{
+      if(mSocket == null)
         mSocket = new ServerSocket(mPort, BACKLOG, mAddress);
 
-        if (resourcePath != null && resourceContentType != null)
-            setResource(resourcePath, resourceContentType);
-    }
+      Log.d(TAG, "Server started on " + mAddress + ":" + mPort);
 
-    public Server(String address, int port, String resourcePath, String resourceContentType) throws UnknownHostException, IOException {
-        this(InetAddress.getByName(address), port, resourcePath, resourceContentType);
-    }
+      mRunning = true;
 
-    public Server(String address, int port) throws UnknownHostException, IOException {
-        this(address, port, null, null);
-    }
+      while(mRunning){
+        try{
+          Socket client = mSocket.accept();
 
-    public Server(InetAddress address, int port) throws UnknownHostException, IOException {
-        this(address, port, null, null);
-    }
-
-    public void setResource(String path, String contentType) throws IOException {
-        mResourcePath = path;
-        mResourceContentType = contentType;
-
-        // preload resource data
-        File file = new File(mResourcePath);
-        FileInputStream is = new FileInputStream(file);
-        long size = file.length();
-        int offset = 0,
-                read = 0;
-
-        if (size > MAX_FILE_SIZE)
-            throw new IOException("Max allowed file size is " + MAX_FILE_SIZE + " bytes.");
-
-        mResourceData = new byte[(int) size];
-
-        while (offset < size && (read = is.read(mResourceData, offset, (int) (size - offset))) >= 0) {
-            offset += read;
+          new ServerThread(client, mResourceData, mResourceContentType).start();
+        } catch(IOException e){
+          System.errorLogging(TAG, e);
         }
+      }
 
-        if (offset < size)
-            throw new IOException("Could not completely read file " + file.getName() + " .");
-
-        is.close();
+      Log.d(TAG, "Server stopped.");
+    } catch(IOException e){
+      System.errorLogging(TAG, e);
     }
-
-    public String getResourceURL() {
-        return "http://" + mAddress.getHostAddress() + ":" + mPort + "/";
-    }
-
-    public void stop() {
-        Log.d(TAG, "Stopping server ...");
-
-        try {
-            if (mSocket != null)
-                mSocket.close();
-        } catch (IOException e) {
-
-        }
-
-        mRunning = false;
-        mSocket = null;
-    }
-
-    public void run() {
-
-        try {
-            if (mSocket == null)
-                mSocket = new ServerSocket(mPort, BACKLOG, mAddress);
-
-            Log.d(TAG, "Server started on " + mAddress + ":" + mPort);
-
-            mRunning = true;
-
-            while (mRunning) {
-                try {
-                    Socket client = mSocket.accept();
-
-                    new ServerThread(client, mResourceData, mResourceContentType).start();
-                } catch (IOException e) {
-                    System.errorLogging(TAG, e);
-                }
-            }
-
-            Log.d(TAG, "Server stopped.");
-        } catch (IOException e) {
-            System.errorLogging(TAG, e);
-        }
-    }
+  }
 }

@@ -33,40 +33,40 @@ import it.evilsocket.dsploit.wifi.Keygen;
  *  Use theses numbers, modulus 26, to find the correct letter
  *  and append to the key.
  */
-public class SkyV1Keygen extends Keygen {
+public class SkyV1Keygen extends Keygen{
 
-    private MessageDigest md;
+  private MessageDigest md;
 
-    public SkyV1Keygen(String ssid, String mac, int level, String enc) {
-        super(ssid, mac, level, enc);
+  public SkyV1Keygen(String ssid, String mac, int level, String enc){
+    super(ssid, mac, level, enc);
+  }
+
+  final static String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+
+  @Override
+  public List<String> getKeys(){
+    if(getMacAddress().length() != 12){
+      setErrorMessage("This key cannot be generated without MAC address.");
+      return null;
+    }
+    try{
+      md = MessageDigest.getInstance("MD5");
+    } catch(NoSuchAlgorithmException e1){
+      setErrorMessage("This phone cannot process a MD5 hash.");
+      return null;
+    }
+    md.reset();
+    md.update(getMacAddress().getBytes());
+    byte[] hash = md.digest();
+    String key = "";
+    for(int i = 1; i <= 15; i += 2){
+      int index = hash[i] & 0xFF;
+      index %= 26;
+      key += ALPHABET.substring(index, index + 1);
     }
 
-    final static String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-
-    @Override
-    public List<String> getKeys() {
-        if (getMacAddress().length() != 12) {
-            setErrorMessage("This key cannot be generated without MAC address.");
-            return null;
-        }
-        try {
-            md = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e1) {
-            setErrorMessage("This phone cannot process a MD5 hash.");
-            return null;
-        }
-        md.reset();
-        md.update(getMacAddress().getBytes());
-        byte[] hash = md.digest();
-        String key = "";
-        for (int i = 1; i <= 15; i += 2) {
-            int index = hash[i] & 0xFF;
-            index %= 26;
-            key += ALPHABET.substring(index, index + 1);
-        }
-
-        addPassword(key);
-        return getResults();
-    }
+    addPassword(key);
+    return getResults();
+  }
 }

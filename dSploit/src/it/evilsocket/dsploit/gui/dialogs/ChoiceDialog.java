@@ -28,44 +28,44 @@ import android.widget.LinearLayout.LayoutParams;
 
 import it.evilsocket.dsploit.R;
 
-public class ChoiceDialog extends AlertDialog {
-    public interface ChoiceDialogListener {
-        public void onChoice(int choice);
-    }
+public class ChoiceDialog extends AlertDialog{
+  public interface ChoiceDialogListener{
+    public void onChoice(int choice);
+  }
 
-    public ChoiceDialog(final Activity activity, String title, String[] choices, final ChoiceDialogListener listener) {
-        super(activity);
+  public ChoiceDialog(final Activity activity, String title, String[] choices, final ChoiceDialogListener listener){
+    super(activity);
 
-        this.setTitle(title);
+    this.setTitle(title);
 
-        LinearLayout layout = new LinearLayout(activity);
+    LinearLayout layout = new LinearLayout(activity);
 
-        layout.setPadding(10, 10, 10, 10);
+    layout.setPadding(10, 10, 10, 10);
 
-        for (int i = 0; i < choices.length; i++) {
-            Button choice = new Button(activity);
+    for(int i = 0; i < choices.length; i++){
+      Button choice = new Button(activity);
 
-            choice.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, 0.5f));
-            choice.setTag("" + i);
-            choice.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ChoiceDialog.this.dismiss();
-                    listener.onChoice(Integer.parseInt((String) v.getTag()));
-                }
-            });
-
-            choice.setText(choices[i]);
-            layout.addView(choice);
+      choice.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, 0.5f));
+      choice.setTag("" + i);
+      choice.setOnClickListener(new View.OnClickListener(){
+        @Override
+        public void onClick(View v){
+          ChoiceDialog.this.dismiss();
+          listener.onChoice(Integer.parseInt((String) v.getTag()));
         }
+      });
 
-        setView(layout);
-
-
-        this.setButton(activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
+      choice.setText(choices[i]);
+      layout.addView(choice);
     }
+
+    setView(layout);
+
+
+    this.setButton(activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener(){
+      public void onClick(DialogInterface dialog, int id){
+        dialog.dismiss();
+      }
+    });
+  }
 }

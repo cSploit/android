@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/load"
-        android:title="Load From File"
-        android:icon="@drawable/action_open"
-        android:showAsAction="always" />
+            android:id="@+id/load"
+            android:title="Load From File"
+            android:icon="@drawable/action_open"
+            android:showAsAction="always"/>
 
 </menu>

@@ -3,8 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/actionbarsherlock/actionbarsherlock.iml" filepath="$PROJECT_DIR$/actionbarsherlock/actionbarsherlock.iml" />
-      <module fileurl="file://$PROJECT_DIR$/dSploit.iml" filepath="$PROJECT_DIR$/dSploit.iml" />
-      <module fileurl="file://$PROJECT_DIR$/dSploit/dSploit-dSploit.iml" filepath="$PROJECT_DIR$/dSploit/dSploit-dSploit.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dSploit/dSploit.iml" filepath="$PROJECT_DIR$/dSploit/dSploit.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dsploit.iml" filepath="$PROJECT_DIR$/dsploit.iml" />
     </modules>
   </component>
 </project>

@@ -27,19 +27,19 @@ import android.view.View;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 
-public class AboutDialog extends AlertDialog {
-    public AboutDialog(Activity activity) {
-        super(activity);
+public class AboutDialog extends AlertDialog{
+  public AboutDialog(Activity activity){
+    super(activity);
 
-        final View view = LayoutInflater.from(activity).inflate(R.layout.about_dialog, null);
+    final View view = LayoutInflater.from(activity).inflate(R.layout.about_dialog, null);
 
-        this.setTitle(activity.getString(R.string.about_dsploit_v_) + System.getAppVersionName());
-        this.setView(view);
+    this.setTitle(activity.getString(R.string.about_dsploit_v_) + System.getAppVersionName());
+    this.setView(view);
 
-        this.setButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
-    }
+    this.setButton("Ok", new DialogInterface.OnClickListener(){
+      public void onClick(DialogInterface dialog, int id){
+        dialog.dismiss();
+      }
+    });
+  }
 }

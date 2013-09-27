@@ -2,7 +2,8 @@
     <string name="app_name">dSploit</string>
     <string name="menu_settings">Asetukset</string>
     <string name="title_activity_main">dSploit</string>
-    <string name="crash_toast_text">No hupsista. Kaaduin, mutta raportti lähetetään kehittäjälleni jotta hän voi korjata ongelman.
+    <string name="crash_toast_text">No hupsista. Kaaduin, mutta raportti lähetetään kehittäjälleni
+        jotta hän voi korjata ongelman.
     </string>
     <string name="toggle_button">VaihtoNäppäin</string>
     <string name="enter_redirection_details">Syötä uudelleenohjaus-tiedot:</string>
@@ -13,7 +14,8 @@
     <string name="services">Palvelut</string>
     <string name="os">Käyttöjärjestelmä</string>
     <string name="device_type">Laitteen tyyppi</string>
-    <string name="start_hijack">Näpäytä sivustoa aloittaaksesi kaappauksen, pidä sitä pohjassa tallentaaksesi sen tiedostoon.
+    <string name="start_hijack">Näpäytä sivustoa aloittaaksesi kaappauksen, pidä sitä pohjassa
+        tallentaaksesi sen tiedostoon.
     </string>
     <string name="sort">Lajittelu:</string>
     <string name="select_module">Valitse suoritettava moduuli</string>
@@ -30,14 +32,14 @@
         <![CDATA[Tätä sovellusta tulee käyttää vain demonstroimaan sen toimintoja, ja saa käyttää vain verkoissa joissa sinulla on oikeus tehdä niin. Mikään muu käyttötarkoitus ei ole kehittäjän vastuulla. Toisin sanoen, älä ole tyhmä ja lähetä vihaisia ihmisiä minulle]]></string>
     <string name="license">Lisenssi</string>
     <string name="gpl_license">Tämä ohjelma on vapaa sovellus: Voit jakaa ja/tai muokata sitä
-		GNU GPL lisenssin ehtojen mukaisesti, kuten Free Software Foundation on julkaissut sen, 
-		Joko version 3 mukaan, tai (sinun päätöksestäsi) minkä tahansa uudemman version.
+        GNU GPL lisenssin ehtojen mukaisesti, kuten Free Software Foundation on julkaissut sen,
+        Joko version 3 mukaan, tai (sinun päätöksestäsi) minkä tahansa uudemman version.
         Tämä ohjelma jaetaan toivossa että se on käytännöllinen, mutta ILMAN TAKUUTA;
         jopa ilman epäsuoraa takuuta LAADUSTA tai SOVELTUVUUDESTA SEN TARKOTUKSEEN.
         Katso GNU PGL lisenssi jos haluat lisätietoja.
         Sinun pitäisi saada kopio GNU GPL lisenssistä tämä ohjelman mukana.
         Jos et saa, katso http://www.gnu.org/licenses/. Epävirallinen suomennos
-		http://www.turre.com/licenses/gpl_fi.html
+        http://www.turre.com/licenses/gpl_fi.html
     </string>
     <string name="service">Palvelu</string>
     <string name="stopped">Pysäytetty&#8230;</string>
@@ -47,7 +49,8 @@
     <string name="min_length">Minimi Pituus</string>
     <string name="username">Käyttäjätunnus</string>
     <string name="Charset">Kirjainmerkistö</string>
-    <string name="filter_desc">Syötä muokattu, korvaava suodatin, mukaanlukien yksinkertainen rivin korvaaja tai
+    <string name="filter_desc">Syötä muokattu, korvaava suodatin, mukaanlukien yksinkertainen rivin
+        korvaaja tai
         tavallinen ilmaus.
     </string>
     <string name="from">Mistä</string>
@@ -90,12 +93,17 @@
     <string name="warning">Varoitus</string>
     <string name="warning_new_session">Uuden jakson aloittaminen poistaa nykyisen, jatketaanko?
     </string>
-    <string name="fatal_error_html"><![CDATA[<p>Vaikuttaa että ROM:issasi on <b>LD_LIBRARY_PATH vika</b>, olen pahoillani, mutta se ei ole yhteensopiva dSploitin kanssa.</p>]]></string>
-    <string name="fatal_error_html2"><![CDATA[<p>Jos haluat lisätietoja, lue <a href=\"http://dsploit.net/#faq\">UKK</a>.</p>]]></string>
+    <string name="fatal_error_html">
+        <![CDATA[<p>Vaikuttaa että ROM:issasi on <b>LD_LIBRARY_PATH vika</b>, olen pahoillani, mutta se ei ole yhteensopiva dSploitin kanssa.</p>]]></string>
+    <string name="fatal_error_html2">
+        <![CDATA[<p>Jos haluat lisätietoja, lue <a href=\"http://dsploit.net/#faq\">UKK</a>.</p>]]></string>
     <string name="install_error">Virhe tiedostojen asentamisessa!</string>
-    <string name="arm_error"><![CDATA[<p>Vaikuttaa siltä että prosessorisi ei ole ARM, olen pahoillani, mutta se ei ole yhteensopiva dSploitin kanssa.</p>]]></string>
-    <string name="arm_error2"><![CDATA[<p>Jos haluat lisätietoja, lue <a href=\"http://dsploit.net/#requirements\">vaatimukset</a> kohta.</p>]]></string>
-    <string name="busybox_required">Täysi BusyBox asennus vaaditaan, killall-binääriä ei löydy(ehkä sinulla on vanha busybox-versio?).
+    <string name="arm_error">
+        <![CDATA[<p>Vaikuttaa siltä että prosessorisi ei ole ARM, olen pahoillani, mutta se ei ole yhteensopiva dSploitin kanssa.</p>]]></string>
+    <string name="arm_error2">
+        <![CDATA[<p>Jos haluat lisätietoja, lue <a href=\"http://dsploit.net/#requirements\">vaatimukset</a> kohta.</p>]]></string>
+    <string name="busybox_required">Täysi BusyBox asennus vaaditaan, killall-binääriä ei löydy(ehkä
+        sinulla on vanha busybox-versio?).
     </string>
     <string name="only_4_root">Tämä sovellus vaatii Root oikeudet.</string>
     <string name="initializing">Alustetaan&#8230;</string>
@@ -118,10 +126,12 @@
     </string>
     <string name="selected">Valittu</string>
     <string name="nothing_found"><![CDATA[<small><i>Mitään ei löydetty</i></small>]]></string>
-    <string name="no_open_ports">Avoimia portteja ei löydetty nykyisestä kohteesta, suorita Palveluiden tutkija
+    <string name="no_open_ports">Avoimia portteja ei löydetty nykyisestä kohteesta, suorita
+        Palveluiden tutkija
         ensin.
     </string>
-    <string name="no_infos_on_target">Ei tarkkoja tietoja kohteessa olevista palveluista, suorita Palveluiden tutkija ensin.
+    <string name="no_infos_on_target">Ei tarkkoja tietoja kohteessa olevista palveluista, suorita
+        Palveluiden tutkija ensin.
     </string>
     <string name="custom_charset">Muokattu merkistö:</string>
     <string name="enter_chars_wanted">Syötä merkit joita haluat käyttää:
@@ -130,20 +140,28 @@
     <string name="request_empty">Pyyntö ei voi olla tyhjä.</string>
     <string name="request_sent">Pyyntö lähetetty.</string>
     <string name="customize_wol_port">Muokkaa WOL porttia ja paina lähetä.</string>
-    <string name="couldnt_send_wol_packet">Ei voitu lähettä WOL pakettia kohteeseen ilman MAC-osoitetta.</string>
+    <string name="couldnt_send_wol_packet">Ei voitu lähettä WOL pakettia kohteeseen ilman
+        MAC-osoitetta.
+    </string>
     <string name="no_activities_for_url">Ei toimintoa suorittaa täälaista URL:ia.</string>
     <string name="select_ports">Valitse portit</string>
     <string name="enter_ports_list">Syötä pilkulla erotettu lista porteista:</string>
     <string name="invalid_port_">Virheellinen portti \'</string>
-    <string name="port_must_be_greater">Portin täytyy olla isompi kuin 0 ja pienempi kuin 65535.</string>
+    <string name="port_must_be_greater">Portin täytyy olla isompi kuin 0 ja pienempi kuin 65535.
+    </string>
     <string name="invalid_ports">Virheellinen portti syötetty.</string>
     <string name="empty_port_list">Tyhjennä portti lista.</string>
     <string name="about_dsploit_v_">Tietoja dSploitista</string>
-    <string name="select_target">Valitse portti alta ja näpäytä riviä, tai pidä pitkään pohjassa antaaksesi aliaksen.</string>
+    <string name="select_target">Valitse portti alta ja näpäytä riviä, tai pidä pitkään pohjassa
+        antaaksesi aliaksen.
+    </string>
     <string name="generating_keys">Generoidaan avaimia&#8230;</string>
-    <string name="no_wifi_available">Ei WiFi yhteyttä saatavilla, sovellus tarkistaa vain päivitykset. #STATUS#</string>
+    <string name="no_wifi_available">Ei WiFi yhteyttä saatavilla, sovellus tarkistaa vain
+        päivitykset. #STATUS#
+    </string>
     <string name="loading_changelog">Ladataan muutoslokia&#8230;</string>
-    <string name="something_went_wrong_changelog"><![CDATA[<html><body><p><b>Jotain meni pieleen ladattaessa muutoslokia:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
+    <string name="something_went_wrong_changelog">
+        <![CDATA[<html><body><p><b>Jotain meni pieleen ladattaessa muutoslokia:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
     <string name="cancel_dialog">Peruuta</string>
     <string name="yes">Kyllä</string>
     <string name="no">Ei</string>
@@ -152,22 +170,30 @@
     <string name="could_not_read_folder">Ei voitu lukea kansion sisältöä.</string>
     <string name="choose_dir">Valitse&#160;</string>
     <string name="vulnerability_finder">Heikkouksien etsijä</string>
-    <string name="vulnerability_finder_desc">Etsi tiedettyä heikkouksia National Vulnerability Database:sta.</string>
+    <string name="vulnerability_finder_desc">Etsi tiedettyä heikkouksia National Vulnerability
+        Database:sta.
+    </string>
     <string name="inspector">Palveluiden tutkija</string>
-    <string name="inspector_desc">Suorita kohteen järjestelmän ja palveluidn syvä tutkinta (Hitaampi kuin Portti-skanneri, mutta tarkempi).</string>
+    <string name="inspector_desc">Suorita kohteen järjestelmän ja palveluidn syvä tutkinta (Hitaampi
+        kuin Portti-skanneri, mutta tarkempi).
+    </string>
     <string name="login_cracker">Tunnusten selvittäjä</string>
-    <string name="login_cracker_desc">Erittäin nopea verkkotunnusten selvittäjä, joka tukee useaa protokollaa.</string>
+    <string name="login_cracker_desc">Erittäin nopea verkkotunnusten selvittäjä, joka tukee useaa
+        protokollaa.
+    </string>
     <string name="packet_forger">Pakettien Luoja</string>
     <string name="packet_forger_desc">Luo ja lähetä omia TCP tai UDP paketteja kohteeseen.</string>
     <string name="port_scanner">Portti-skanneri</string>
     <string name="port_scanner_desc">Suorita SYN portti skannaus laitteelle.</string>
     <string name="router_pwn">Reititin PWN</string>
-    <string name="router_pwn_desc">Käynnistä http://routerpwn.com/ palvelu pwn:ataksesi reitittimesi.
+    <string name="router_pwn_desc">Käynnistä http://routerpwn.com/ palvelu pwn:ataksesi
+        reitittimesi.
     </string>
     <string name="trace">Jäljitä</string>
     <string name="trace_desc">Suorita traceroute-kohteeseen.</string>
     <string name="mitm">MITM</string>
-    <string name="mitm_desc">Suorita monenlaisia man-in-the-middle hyökkäyksiä, kuten verkkoliikenteen nuukimista,
+    <string name="mitm_desc">Suorita monenlaisia man-in-the-middle hyökkäyksiä, kuten
+        verkkoliikenteen nuukimista,
         liikenteen manipulointia, jne&#8230;
     </string>
     <string name="network_subnet_mask">Tämä on verkkosi aliverkkomaski</string>

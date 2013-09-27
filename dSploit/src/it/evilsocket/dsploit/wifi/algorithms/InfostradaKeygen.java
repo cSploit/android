@@ -27,19 +27,19 @@ import it.evilsocket.dsploit.wifi.Keygen;
  * as the key is calculated from the MAC 
  * address adding a '2' as the first character
  */
-public class InfostradaKeygen extends Keygen {
+public class InfostradaKeygen extends Keygen{
 
-    public InfostradaKeygen(String ssid, String mac, int level, String enc) {
-        super(ssid, mac, level, enc);
-    }
+  public InfostradaKeygen(String ssid, String mac, int level, String enc){
+    super(ssid, mac, level, enc);
+  }
 
-    @Override
-    public List<String> getKeys() {
-        if (getMacAddress().length() != 12) {
-            setErrorMessage("The MAC address is invalid.");
-            return null;
-        }
-        addPassword("2" + getMacAddress().toUpperCase());
-        return getResults();
+  @Override
+  public List<String> getKeys(){
+    if(getMacAddress().length() != 12){
+      setErrorMessage("The MAC address is invalid.");
+      return null;
     }
+    addPassword("2" + getMacAddress().toUpperCase());
+    return getResults();
+  }
 }

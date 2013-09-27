@@ -27,52 +27,52 @@ import java.net.Socket;
 
 import it.evilsocket.dsploit.core.System;
 
-public class ServerThread extends Thread {
-    private final static String TAG = "SERVERTHREAD";
-    private final static int MAX_REQUEST_SIZE = 8192;
+public class ServerThread extends Thread{
+  private final static String TAG = "SERVERTHREAD";
+  private final static int MAX_REQUEST_SIZE = 8192;
 
-    private Socket mSocket = null;
-    private BufferedOutputStream mWriter = null;
-    private InputStream mReader = null;
-    private byte[] mData = null;
-    private String mContentType = null;
+  private Socket mSocket = null;
+  private BufferedOutputStream mWriter = null;
+  private InputStream mReader = null;
+  private byte[] mData = null;
+  private String mContentType = null;
 
-    public ServerThread(Socket socket, byte[] data, String contentType) throws IOException {
-        super("ServerThread");
+  public ServerThread(Socket socket, byte[] data, String contentType) throws IOException{
+    super("ServerThread");
 
-        mSocket = socket;
-        mWriter = new BufferedOutputStream(mSocket.getOutputStream());
-        mReader = mSocket.getInputStream();
-        mData = data;
-        mContentType = contentType;
+    mSocket = socket;
+    mWriter = new BufferedOutputStream(mSocket.getOutputStream());
+    mReader = mSocket.getInputStream();
+    mData = data;
+    mContentType = contentType;
+  }
+
+  public void run(){
+
+    try{
+      // Apache's default header limit is 8KB.
+      byte[] request = new byte[MAX_REQUEST_SIZE];
+
+      // Read the request
+      if(mReader.read(request, 0, MAX_REQUEST_SIZE) > 0){
+        String header = "HTTP/1.1 200 OK\r\n" +
+          "Content-Type: " + mContentType + "\r\n" +
+          "Content-Length: " + mData.length + "\r\n\r\n";
+
+        mWriter.write(header.getBytes());
+        mWriter.write(mData);
+      } else
+        Log.w(TAG, "Empty HTTP request.");
+    } catch(IOException e){
+      System.errorLogging(TAG, e);
+    } finally{
+      try{
+        mWriter.flush();
+        mWriter.close();
+        mReader.close();
+      } catch(IOException e){
+        System.errorLogging(TAG, e);
+      }
     }
-
-    public void run() {
-
-        try {
-            // Apache's default header limit is 8KB.
-            byte[] request = new byte[MAX_REQUEST_SIZE];
-
-            // Read the request
-            if (mReader.read(request, 0, MAX_REQUEST_SIZE) > 0) {
-                String header = "HTTP/1.1 200 OK\r\n" +
-                        "Content-Type: " + mContentType + "\r\n" +
-                        "Content-Length: " + mData.length + "\r\n\r\n";
-
-                mWriter.write(header.getBytes());
-                mWriter.write(mData);
-            } else
-                Log.w(TAG, "Empty HTTP request.");
-        } catch (IOException e) {
-            System.errorLogging(TAG, e);
-        } finally {
-            try {
-                mWriter.flush();
-                mWriter.close();
-                mReader.close();
-            } catch (IOException e) {
-                System.errorLogging(TAG, e);
-            }
-        }
-    }
+  }
 }

@@ -20,31 +20,39 @@ the Action Bar enabled overlaying application content.
 -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:fitsSystemWindows="true"
-    android:splitMotionEvents="false">
-    <com.actionbarsherlock.internal.nineoldandroids.widget.NineFrameLayout android:id="@+id/abs__content"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
-    <com.actionbarsherlock.internal.widget.ActionBarContainer android:id="@+id/abs__action_bar_container"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        style="?attr/actionBarStyle"
-        android:gravity="top">
+                android:fitsSystemWindows="true"
+                android:splitMotionEvents="false">
+
+    <com.actionbarsherlock.internal.nineoldandroids.widget.NineFrameLayout
+            android:id="@+id/abs__content"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"/>
+
+    <com.actionbarsherlock.internal.widget.ActionBarContainer
+            android:id="@+id/abs__action_bar_container"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            style="?attr/actionBarStyle"
+            android:gravity="top">
+
         <com.actionbarsherlock.internal.widget.ActionBarView
-            android:id="@+id/abs__action_bar"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            style="?attr/actionBarStyle" />
+                android:id="@+id/abs__action_bar"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                style="?attr/actionBarStyle"/>
+
         <com.actionbarsherlock.internal.widget.ActionBarContextView
-            android:id="@+id/abs__action_context_bar"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            style="?attr/actionModeStyle" />
+                android:id="@+id/abs__action_context_bar"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                style="?attr/actionModeStyle"/>
     </com.actionbarsherlock.internal.widget.ActionBarContainer>
-    <ImageView android:src="?attr/windowContentOverlay"
-               android:scaleType="fitXY"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"
-               android:layout_below="@id/abs__action_bar_container" />
+
+    <ImageView
+            android:src="?attr/windowContentOverlay"
+            android:scaleType="fitXY"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/abs__action_bar_container"/>
 </RelativeLayout>

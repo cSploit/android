@@ -21,51 +21,51 @@ package it.evilsocket.dsploit.core;
 import android.util.Log;
 
 // a little class to profile network latency ^_^
-public class Profiler {
-    private static volatile Profiler mInstance = null;
+public class Profiler{
+  private static volatile Profiler mInstance = null;
 
-    public static Profiler instance() {
-        if (mInstance == null)
-            mInstance = new Profiler();
+  public static Profiler instance(){
+    if(mInstance == null)
+      mInstance = new Profiler();
 
-        return mInstance;
+    return mInstance;
+  }
+
+  private volatile boolean mEnabled = false;
+  private volatile long mTick = 0;
+  private volatile String mProfiling = null;
+
+  public Profiler(){
+    mEnabled = System.getSettings().getBoolean("PREF_ENABLE_PROFILER", false);
+  }
+
+  private String format(long delta){
+    if(delta < 1000)
+      return delta + " ms";
+
+    else if(delta < 60000)
+      return (delta / 1000.0) + " s";
+
+    else
+      return (delta / 60000.0) + " m";
+  }
+
+  public void emit(){
+    if(mEnabled && mTick > 0 && mProfiling != null){
+      long delta = java.lang.System.currentTimeMillis() - mTick;
+
+      Log.d("PROFILER", "[" + mProfiling + "] " + format(delta));
+
+      mProfiling = null;
+      mTick = 0;
     }
+  }
 
-    private volatile boolean mEnabled = false;
-    private volatile long mTick = 0;
-    private volatile String mProfiling = null;
-
-    public Profiler() {
-        mEnabled = System.getSettings().getBoolean("PREF_ENABLE_PROFILER", false);
+  public void profile(String label){
+    emit();
+    if(mEnabled){
+      mTick = java.lang.System.currentTimeMillis();
+      mProfiling = label;
     }
-
-    private String format(long delta) {
-        if (delta < 1000)
-            return delta + " ms";
-
-        else if (delta < 60000)
-            return (delta / 1000.0) + " s";
-
-        else
-            return (delta / 60000.0) + " m";
-    }
-
-    public void emit() {
-        if (mEnabled && mTick > 0 && mProfiling != null) {
-            long delta = java.lang.System.currentTimeMillis() - mTick;
-
-            Log.d("PROFILER", "[" + mProfiling + "] " + format(delta));
-
-            mProfiling = null;
-            mTick = 0;
-        }
-    }
-
-    public void profile(String label) {
-        emit();
-        if (mEnabled) {
-            mTick = java.lang.System.currentTimeMillis();
-            mProfiling = label;
-        }
-    }
+  }
 }

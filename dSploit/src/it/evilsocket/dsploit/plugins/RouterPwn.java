@@ -30,34 +30,34 @@ import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
 import it.evilsocket.dsploit.net.Target;
 
-public class RouterPwn extends Plugin {
-    public RouterPwn() {
-        super(
-                R.string.router_pwn,
-                R.string.router_pwn_desc,
+public class RouterPwn extends Plugin{
+  public RouterPwn(){
+    super(
+      R.string.router_pwn,
+      R.string.router_pwn_desc,
 
-                new Target.Type[]{Target.Type.ENDPOINT},
-                Plugin.NO_LAYOUT,
-                R.drawable.action_routerpwn
-        );
+      new Target.Type[]{Target.Type.ENDPOINT},
+      Plugin.NO_LAYOUT,
+      R.drawable.action_routerpwn
+    );
+  }
+
+  @Override
+  public boolean isAllowedTarget(Target target){
+    return target.isRouter();
+  }
+
+  @Override
+  public void onActionClick(Context context){
+    try{
+      String uri = "http://routerpwn.com/";
+      Intent browser = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+
+      context.startActivity(browser);
+    } catch(ActivityNotFoundException e){
+      System.errorLogging("ROUTERPWN", e);
+
+      new ErrorDialog(getString(R.string.error), getString(R.string.no_activities_for_url), (Activity) context).show();
     }
-
-    @Override
-    public boolean isAllowedTarget(Target target) {
-        return target.isRouter();
-    }
-
-    @Override
-    public void onActionClick(Context context) {
-        try {
-            String uri = "http://routerpwn.com/";
-            Intent browser = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-
-            context.startActivity(browser);
-        } catch (ActivityNotFoundException e) {
-            System.errorLogging("ROUTERPWN", e);
-
-            new ErrorDialog(getString(R.string.error), getString(R.string.no_activities_for_url), (Activity) context).show();
-        }
-    }
+  }
 }

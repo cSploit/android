@@ -21,29 +21,29 @@ package it.evilsocket.dsploit.plugins.mitm;
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 import it.evilsocket.dsploit.core.System;
 
-public class ConnectionKiller {
-    public static void start() {
-        System.getArpSpoof().spoof(System.getCurrentTarget(), new OutputReceiver() {
+public class ConnectionKiller{
+  public static void start(){
+    System.getArpSpoof().spoof(System.getCurrentTarget(), new OutputReceiver(){
 
-            @Override
-            public void onStart(String command) {
-                // just in case :)
-                System.setForwarding(false);
-            }
-
-            @Override
-            public void onNewLine(String line) {
-            }
-
-            @Override
-            public void onEnd(int exitCode) {
-            }
-        })
-                .start();
-    }
-
-    public static void stop() {
+      @Override
+      public void onStart(String command){
+        // just in case :)
         System.setForwarding(false);
-        System.getArpSpoof().kill();
-    }
+      }
+
+      @Override
+      public void onNewLine(String line){
+      }
+
+      @Override
+      public void onEnd(int exitCode){
+      }
+    })
+      .start();
+  }
+
+  public static void stop(){
+    System.setForwarding(false);
+    System.getArpSpoof().kill();
+  }
 }

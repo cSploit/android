@@ -31,30 +31,30 @@ import it.evilsocket.dsploit.wifi.Keygen;
  * The key is the 26 first characters from the SSID SHA1 hash.
  *  Link : http://rafale.org/~mattoufoutu/ebooks/Rafale-Mag/Rafale12/Rafale12.08.HTML
  */
-public class TecomKeygen extends Keygen {
+public class TecomKeygen extends Keygen{
 
-    private MessageDigest md;
+  private MessageDigest md;
 
-    public TecomKeygen(String ssid, String mac, int level, String enc) {
-        super(ssid, mac, level, enc);
+  public TecomKeygen(String ssid, String mac, int level, String enc){
+    super(ssid, mac, level, enc);
+  }
+
+  @Override
+  public List<String> getKeys(){
+    try{
+      md = MessageDigest.getInstance("SHA1");
+    } catch(NoSuchAlgorithmException e1){
+      setErrorMessage("This phone cannot process a SHA1 hash.");
+      return null;
     }
-
-    @Override
-    public List<String> getKeys() {
-        try {
-            md = MessageDigest.getInstance("SHA1");
-        } catch (NoSuchAlgorithmException e1) {
-            setErrorMessage("This phone cannot process a SHA1 hash.");
-            return null;
-        }
-        md.reset();
-        md.update(getSsidName().getBytes());
-        byte[] hash = md.digest();
-        try {
-            addPassword(getHexString(hash).substring(0, 26));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return getResults();
+    md.reset();
+    md.update(getSsidName().getBytes());
+    byte[] hash = md.digest();
+    try{
+      addPassword(getHexString(hash).substring(0, 26));
+    } catch(UnsupportedEncodingException e){
+      e.printStackTrace();
     }
+    return getResults();
+  }
 }

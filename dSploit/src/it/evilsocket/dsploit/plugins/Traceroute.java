@@ -32,113 +32,113 @@ import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.tools.NMap.TraceOutputReceiver;
 
-public class Traceroute extends Plugin {
-    private ToggleButton mTraceToggleButton = null;
-    private ProgressBar mTraceProgress = null;
-    private boolean mRunning = false;
-    private ArrayAdapter<String> mListAdapter = null;
-    private Receiver mTraceReceiver = null;
+public class Traceroute extends Plugin{
+  private ToggleButton mTraceToggleButton = null;
+  private ProgressBar mTraceProgress = null;
+  private boolean mRunning = false;
+  private ArrayAdapter<String> mListAdapter = null;
+  private Receiver mTraceReceiver = null;
 
-    public Traceroute() {
-        super(
-                R.string.trace,
-                R.string.trace_desc,
+  public Traceroute(){
+    super(
+      R.string.trace,
+      R.string.trace_desc,
 
-                new Target.Type[]{Target.Type.ENDPOINT, Target.Type.REMOTE},
-                R.layout.plugin_traceroute,
-                R.drawable.action_traceroute
-        );
+      new Target.Type[]{Target.Type.ENDPOINT, Target.Type.REMOTE},
+      R.layout.plugin_traceroute,
+      R.drawable.action_traceroute
+    );
 
-        mTraceReceiver = new Receiver();
+    mTraceReceiver = new Receiver();
+  }
+
+  private void setStoppedState(){
+    System.getNMap().kill();
+    mTraceProgress.setVisibility(View.INVISIBLE);
+    mRunning = false;
+    mTraceToggleButton.setChecked(false);
+  }
+
+  private void setStartedState(){
+    mListAdapter.clear();
+
+    System.getNMap().trace(System.getCurrentTarget(), mTraceReceiver).start();
+
+    mRunning = true;
+  }
+
+  @Override
+  public void onCreate(Bundle savedInstanceState){
+    super.onCreate(savedInstanceState);
+
+    mTraceToggleButton = (ToggleButton) findViewById(R.id.traceToggleButton);
+    mTraceProgress = (ProgressBar) findViewById(R.id.traceActivity);
+
+    mTraceToggleButton.setOnClickListener(new OnClickListener(){
+      @Override
+      public void onClick(View v){
+        if(mRunning){
+          setStoppedState();
+        } else{
+          setStartedState();
+        }
+      }
     }
+    );
 
-    private void setStoppedState() {
-        System.getNMap().kill();
-        mTraceProgress.setVisibility(View.INVISIBLE);
-        mRunning = false;
-        mTraceToggleButton.setChecked(false);
-    }
+    ListView mTraceList = (ListView) findViewById(R.id.traceListView);
 
-    private void setStartedState() {
-        mListAdapter.clear();
+    mListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+    mTraceList.setAdapter(mListAdapter);
+  }
 
-        System.getNMap().trace(System.getCurrentTarget(), mTraceReceiver).start();
+  @Override
+  public void onBackPressed(){
+    setStoppedState();
+    super.onBackPressed();
+  }
 
-        mRunning = true;
+  private class Receiver extends TraceOutputReceiver{
+    @Override
+    public void onStart(String commandLine){
+      super.onStart(commandLine);
+
+      Traceroute.this.runOnUiThread(new Runnable(){
+        @Override
+        public void run(){
+          mRunning = true;
+          mTraceProgress.setVisibility(View.VISIBLE);
+        }
+      });
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onEnd(int exitCode){
+      super.onEnd(exitCode);
 
-        mTraceToggleButton = (ToggleButton) findViewById(R.id.traceToggleButton);
-        mTraceProgress = (ProgressBar) findViewById(R.id.traceActivity);
-
-        mTraceToggleButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mRunning) {
-                    setStoppedState();
-                } else {
-                    setStartedState();
-                }
-            }
+      Traceroute.this.runOnUiThread(new Runnable(){
+        @Override
+        public void run(){
+          setStoppedState();
         }
-        );
-
-        ListView mTraceList = (ListView) findViewById(R.id.traceListView);
-
-        mListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
-        mTraceList.setAdapter(mListAdapter);
+      });
     }
 
     @Override
-    public void onBackPressed() {
-        setStoppedState();
-        super.onBackPressed();
+    public void onHop(final String hop, final String time, final String address){
+
+      Traceroute.this.runOnUiThread(new Runnable(){
+        @Override
+        public void run(){
+          if(!time.equals("..."))
+            mListAdapter.add(address + " ( " + time + " )");
+
+          else
+            mListAdapter.add(address + getString(R.string.untraced_hops));
+
+          mListAdapter.notifyDataSetChanged();
+        }
+      });
     }
-
-    private class Receiver extends TraceOutputReceiver {
-        @Override
-        public void onStart(String commandLine) {
-            super.onStart(commandLine);
-
-            Traceroute.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mRunning = true;
-                    mTraceProgress.setVisibility(View.VISIBLE);
-                }
-            });
-        }
-
-        @Override
-        public void onEnd(int exitCode) {
-            super.onEnd(exitCode);
-
-            Traceroute.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    setStoppedState();
-                }
-            });
-        }
-
-        @Override
-        public void onHop(final String hop, final String time, final String address) {
-
-            Traceroute.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (!time.equals("..."))
-                        mListAdapter.add(address + " ( " + time + " )");
-
-                    else
-                        mListAdapter.add(address + " untraced hops");
-
-                    mListAdapter.notifyDataSetChanged();
-                }
-            });
-        }
-    }
+  }
 }

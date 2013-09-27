@@ -25,35 +25,35 @@ import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.widget.TextView;
 
-public class FatalDialog extends AlertDialog {
-    public FatalDialog(String title, String message, boolean html, final Activity activity) {
-        super(activity);
+public class FatalDialog extends AlertDialog{
+  public FatalDialog(String title, String message, boolean html, final Activity activity){
+    super(activity);
 
-        this.setTitle(title);
+    this.setTitle(title);
 
-        if (!html)
-            this.setMessage(message);
+    if(!html)
+      this.setMessage(message);
 
-        else {
-            TextView text = new TextView(activity);
+    else{
+      TextView text = new TextView(activity);
 
-            text.setMovementMethod(LinkMovementMethod.getInstance());
-            text.setText(Html.fromHtml(message));
-            text.setPadding(10, 10, 10, 10);
+      text.setMovementMethod(LinkMovementMethod.getInstance());
+      text.setText(Html.fromHtml(message));
+      text.setPadding(10, 10, 10, 10);
 
-            this.setView(text);
-        }
-
-        this.setCancelable(false);
-        this.setButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                activity.finish();
-                System.exit(0xFF);
-            }
-        });
+      this.setView(text);
     }
 
-    public FatalDialog(String title, String message, final Activity activity) {
-        this(title, message, false, activity);
-    }
+    this.setCancelable(false);
+    this.setButton("Ok", new DialogInterface.OnClickListener(){
+      public void onClick(DialogInterface dialog, int id){
+        activity.finish();
+        System.exit(0xFF);
+      }
+    });
+  }
+
+  public FatalDialog(String title, String message, final Activity activity){
+    this(title, message, false, activity);
+  }
 }

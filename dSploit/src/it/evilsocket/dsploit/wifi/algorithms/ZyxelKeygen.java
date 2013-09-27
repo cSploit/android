@@ -25,41 +25,41 @@ import java.util.List;
 
 import it.evilsocket.dsploit.wifi.Keygen;
 
-public class ZyxelKeygen extends Keygen {
+public class ZyxelKeygen extends Keygen{
 
-    final private String ssidIdentifier;
-    private MessageDigest md;
+  final private String ssidIdentifier;
+  private MessageDigest md;
 
-    public ZyxelKeygen(String ssid, String mac, int level, String enc) {
-        super(ssid, mac, level, enc);
-        ssidIdentifier = ssid.substring(ssid.length() - 4);
+  public ZyxelKeygen(String ssid, String mac, int level, String enc){
+    super(ssid, mac, level, enc);
+    ssidIdentifier = ssid.substring(ssid.length() - 4);
+  }
+
+  @Override
+  public List<String> getKeys(){
+    try{
+      md = MessageDigest.getInstance("MD5");
+    } catch(NoSuchAlgorithmException e1){
+      setErrorMessage("This phone cannot process a MD5 hash.");
+      return null;
     }
-
-    @Override
-    public List<String> getKeys() {
-        try {
-            md = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e1) {
-            setErrorMessage("This phone cannot process a MD5 hash.");
-            return null;
-        }
-        final String mac = getMacAddress();
-        if (mac.length() != 12) {
-            setErrorMessage("The MAC address is invalid.");
-            return null;
-        }
-        try {
-
-            final String macMod = mac.substring(0, 8) + ssidIdentifier;
-            md.reset();
-            md.update(macMod.toLowerCase().getBytes("ASCII"));
-
-            byte[] hash = md.digest();
-            addPassword(getHexString(hash).substring(0, 20)
-                    .toUpperCase());
-            return getResults();
-        } catch (UnsupportedEncodingException e) {
-        }
-        return null;
+    final String mac = getMacAddress();
+    if(mac.length() != 12){
+      setErrorMessage("The MAC address is invalid.");
+      return null;
     }
+    try{
+
+      final String macMod = mac.substring(0, 8) + ssidIdentifier;
+      md.reset();
+      md.update(macMod.toLowerCase().getBytes("ASCII"));
+
+      byte[] hash = md.digest();
+      addPassword(getHexString(hash).substring(0, 20)
+        .toUpperCase());
+      return getResults();
+    } catch(UnsupportedEncodingException e){
+    }
+    return null;
+  }
 }

@@ -46,155 +46,155 @@ import javax.net.ssl.SSLSocket;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.http.RequestParser;
 
-public class HTTPSRedirector implements Runnable {
-    private static final String TAG = "HTTPS.REDIRECTOR";
-    private static final int BACKLOG = 255;
+public class HTTPSRedirector implements Runnable{
+  private static final String TAG = "HTTPS.REDIRECTOR";
+  private static final int BACKLOG = 255;
 
-    private static final String KEYSTORE_FILE = "dsploit.keystore";
-    private static final String KEYSTORE_PASS = "dsploit";
+  private static final String KEYSTORE_FILE = "dsploit.keystore";
+  private static final String KEYSTORE_PASS = "dsploit";
 
-    private Context mContext = null;
-    private InetAddress mAddress = null;
-    private int mPort = System.HTTPS_REDIR_PORT;
-    private boolean mRunning = false;
-    private SSLServerSocket mSocket = null;
+  private Context mContext = null;
+  private InetAddress mAddress = null;
+  private int mPort = System.HTTPS_REDIR_PORT;
+  private boolean mRunning = false;
+  private SSLServerSocket mSocket = null;
 
-    public HTTPSRedirector(Context context, InetAddress address, int port) throws UnknownHostException, IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException {
-        mContext = context;
-        mAddress = address;
-        mPort = port;
+  public HTTPSRedirector(Context context, InetAddress address, int port) throws UnknownHostException, IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException{
+    mContext = context;
+    mAddress = address;
+    mPort = port;
+    mSocket = getSSLSocket();
+  }
+
+  private SSLServerSocket getSSLSocket() throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException{
+    KeyStore keyStore = KeyStore.getInstance("PKCS12");
+    keyStore.load(mContext.getAssets().open(KEYSTORE_FILE), KEYSTORE_PASS.toCharArray());
+
+    KeyManagerFactory keyMan = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+    keyMan.init(keyStore, KEYSTORE_PASS.toCharArray());
+
+    SSLContext sslContext = SSLContext.getInstance("TLS");
+    sslContext.init(keyMan.getKeyManagers(), null, null);
+
+    SSLServerSocketFactory sslFactory = sslContext.getServerSocketFactory();
+
+    return (SSLServerSocket) sslFactory.createServerSocket(mPort, BACKLOG, mAddress);
+  }
+
+  public void stop(){
+    Log.d(TAG, "Stopping HTTPS redirector ...");
+
+    try{
+      if(mSocket != null)
+        mSocket.close();
+    } catch(IOException e){
+
+    }
+
+    mRunning = false;
+    mSocket = null;
+  }
+
+  @Override
+  public void run(){
+    try{
+      Log.d(TAG, "HTTPS redirector started on " + mAddress + ":" + mPort);
+
+      if(mSocket == null)
         mSocket = getSSLSocket();
-    }
 
-    private SSLServerSocket getSSLSocket() throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException {
-        KeyStore keyStore = KeyStore.getInstance("PKCS12");
-        keyStore.load(mContext.getAssets().open(KEYSTORE_FILE), KEYSTORE_PASS.toCharArray());
+      mRunning = true;
 
-        KeyManagerFactory keyMan = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        keyMan.init(keyStore, KEYSTORE_PASS.toCharArray());
+      while(mRunning && mSocket != null){
+        try{
+          final SSLSocket client = (SSLSocket) mSocket.accept();
 
-        SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(keyMan.getKeyManagers(), null, null);
+          new Thread(new Runnable(){
+            @Override
+            public void run(){
+              try{
+                String clientAddress = client.getInetAddress().getHostAddress();
 
-        SSLServerSocketFactory sslFactory = sslContext.getServerSocketFactory();
+                Log.d(TAG, "Incoming connection from " + clientAddress);
 
-        return (SSLServerSocket) sslFactory.createServerSocket(mPort, BACKLOG, mAddress);
-    }
+                InputStream reader = client.getInputStream();
 
-    public void stop() {
-        Log.d(TAG, "Stopping HTTPS redirector ...");
+                // Apache's default header limit is 8KB.
+                byte[] buffer = new byte[8192];
+                int read = 0;
+                String serverName = null;
 
-        try {
-            if (mSocket != null)
-                mSocket.close();
-        } catch (IOException e) {
+                // Read the header and rebuild it
+                if((read = reader.read(buffer, 0, 8192)) > 0){
+                  ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(buffer, 0, read);
+                  BufferedReader bReader = new BufferedReader(new InputStreamReader(byteArrayInputStream));
+                  StringBuilder builder = new StringBuilder();
+                  String line = null;
+                  ArrayList<String> headers = new ArrayList<String>();
+                  boolean headersProcessed = false;
 
-        }
+                  while((line = bReader.readLine()) != null){
+                    if(headersProcessed == false){
+                      headers.add(line);
 
-        mRunning = false;
-        mSocket = null;
-    }
+                      // \r\n\r\n received ?
+                      if(line.trim().isEmpty())
+                        headersProcessed = true;
 
-    @Override
-    public void run() {
-        try {
-            Log.d(TAG, "HTTPS redirector started on " + mAddress + ":" + mPort);
+                      else if(line.indexOf(':') != -1){
+                        String[] split = line.split(":", 2);
+                        String header = split[0].trim(),
+                          value = split[1].trim();
 
-            if (mSocket == null)
-                mSocket = getSSLSocket();
+                        // Extract the real request target.
+                        if(header.equals("Host"))
+                          serverName = value;
 
-            mRunning = true;
+                        if(header != null)
+                          line = header + ": " + value;
+                      }
+                    }
 
-            while (mRunning && mSocket != null) {
-                try {
-                    final SSLSocket client = (SSLSocket) mSocket.accept();
-
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                String clientAddress = client.getInetAddress().getHostAddress();
-
-                                Log.d(TAG, "Incoming connection from " + clientAddress);
-
-                                InputStream reader = client.getInputStream();
-
-                                // Apache's default header limit is 8KB.
-                                byte[] buffer = new byte[8192];
-                                int read = 0;
-                                String serverName = null;
-
-                                // Read the header and rebuild it
-                                if ((read = reader.read(buffer, 0, 8192)) > 0) {
-                                    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(buffer, 0, read);
-                                    BufferedReader bReader = new BufferedReader(new InputStreamReader(byteArrayInputStream));
-                                    StringBuilder builder = new StringBuilder();
-                                    String line = null;
-                                    ArrayList<String> headers = new ArrayList<String>();
-                                    boolean headersProcessed = false;
-
-                                    while ((line = bReader.readLine()) != null) {
-                                        if (headersProcessed == false) {
-                                            headers.add(line);
-
-                                            // \r\n\r\n received ?
-                                            if (line.trim().isEmpty())
-                                                headersProcessed = true;
-
-                                            else if (line.indexOf(':') != -1) {
-                                                String[] split = line.split(":", 2);
-                                                String header = split[0].trim(),
-                                                        value = split[1].trim();
-
-                                                // Extract the real request target.
-                                                if (header.equals("Host"))
-                                                    serverName = value;
-
-                                                if (header != null)
-                                                    line = header + ": " + value;
-                                            }
-                                        }
-
-                                        // build the patched request
-                                        builder.append(line + "\n");
-                                    }
+                    // build the patched request
+                    builder.append(line + "\n");
+                  }
 
 
-                                    if (serverName != null) {
-                                        BufferedOutputStream writer = new BufferedOutputStream(client.getOutputStream());
+                  if(serverName != null){
+                    BufferedOutputStream writer = new BufferedOutputStream(client.getOutputStream());
 
-                                        String request = builder.toString(),
-                                                url = RequestParser.getUrlFromRequest(serverName, request),
-                                                response = "HTTP/1.1 302 Found\n" +
-                                                        "Location: " + url + "\n" +
-                                                        "Connection: close\n\n";
+                    String request = builder.toString(),
+                      url = RequestParser.getUrlFromRequest(serverName, request),
+                      response = "HTTP/1.1 302 Found\n" +
+                        "Location: " + url + "\n" +
+                        "Connection: close\n\n";
 
-                                        CookieCleaner.getInstance().addCleaned(clientAddress, serverName);
-                                        HTTPSMonitor.getInstance().addURL(clientAddress, url);
+                    CookieCleaner.getInstance().addCleaned(clientAddress, serverName);
+                    HTTPSMonitor.getInstance().addURL(clientAddress, url);
 
-                                        Log.w(TAG, "Redirecting " + clientAddress + " to " + url);
+                    Log.w(TAG, "Redirecting " + clientAddress + " to " + url);
 
-                                        writer.write(response.getBytes());
-                                        writer.flush();
+                    writer.write(response.getBytes());
+                    writer.flush();
 
-                                        writer.close();
-                                    }
-                                }
-
-                                reader.close();
-                            } catch (IOException e) {
-                                System.errorLogging(TAG, e);
-                            }
-                        }
-                    }).start();
-                } catch (Exception e) {
-
+                    writer.close();
+                  }
                 }
-            }
 
-            Log.d(TAG, "HTTPS redirector stopped.");
-        } catch (Exception e) {
-            System.errorLogging(TAG, e);
+                reader.close();
+              } catch(IOException e){
+                System.errorLogging(TAG, e);
+              }
+            }
+          }).start();
+        } catch(Exception e){
+
         }
+      }
+
+      Log.d(TAG, "HTTPS redirector stopped.");
+    } catch(Exception e){
+      System.errorLogging(TAG, e);
     }
+  }
 }

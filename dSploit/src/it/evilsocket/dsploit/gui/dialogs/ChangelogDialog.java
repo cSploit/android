@@ -30,71 +30,71 @@ import android.webkit.WebViewClient;
 
 import it.evilsocket.dsploit.R;
 
-public class ChangelogDialog extends AlertDialog {
-    private final String ERROR_HTML = getContext().getString(R.string.something_went_wrong_changelog);
+public class ChangelogDialog extends AlertDialog{
+  private final String ERROR_HTML = getContext().getString(R.string.something_went_wrong_changelog);
 
-    private ProgressDialog mLoader = null;
+  private ProgressDialog mLoader = null;
 
-    @SuppressLint("SetJavaScriptEnabled")
-    public ChangelogDialog(final Activity activity) {
-        super(activity);
+  @SuppressLint("SetJavaScriptEnabled")
+  public ChangelogDialog(final Activity activity){
+    super(activity);
 
-        this.setTitle("Changelog");
+    this.setTitle("Changelog");
 
 
-        WebView view = new WebView(activity);
-        WebSettings settings = view.getSettings();
+    WebView view = new WebView(activity);
+    WebSettings settings = view.getSettings();
 
-        settings.setJavaScriptEnabled(true);
-        settings.setAppCacheEnabled(false);
+    settings.setJavaScriptEnabled(true);
+    settings.setAppCacheEnabled(false);
 
-        view.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                if (mLoader == null)
-                    mLoader = ProgressDialog.show(activity, "", getContext().getString(R.string.loading_changelog));
+    view.setWebViewClient(new WebViewClient(){
+      @Override
+      public void onPageStarted(WebView view, String url, Bitmap favicon){
+        if(mLoader == null)
+          mLoader = ProgressDialog.show(activity, "", getContext().getString(R.string.loading_changelog));
 
-                super.onPageStarted(view, url, favicon);
-            }
+        super.onPageStarted(view, url, favicon);
+      }
 
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                mLoader.dismiss();
-            }
+      @Override
+      public void onPageFinished(WebView view, String url){
+        super.onPageFinished(view, url);
+        mLoader.dismiss();
+      }
 
-            @Override
-            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                try {
-                    mLoader.dismiss();
-                } catch (Exception e) {
-                }
+      @Override
+      public void onReceivedError(WebView view, int errorCode, String description, String failingUrl){
+        try{
+          mLoader.dismiss();
+        } catch(Exception e){
+        }
 
-                try {
-                    view.stopLoading();
-                } catch (Exception e) {
-                }
+        try{
+          view.stopLoading();
+        } catch(Exception e){
+        }
 
-                try {
-                    view.clearView();
-                } catch (Exception e) {
-                }
+        try{
+          view.clearView();
+        } catch(Exception e){
+        }
 
-                view.loadData(ERROR_HTML.replace("{DESCRIPTION}", description), "text/html", "UTF-8");
+        view.loadData(ERROR_HTML.replace("{DESCRIPTION}", description), "text/html", "UTF-8");
 
-                super.onReceivedError(view, errorCode, description, failingUrl);
-            }
-        });
+        super.onReceivedError(view, errorCode, description, failingUrl);
+      }
+    });
 
-        this.setView(view);
+    this.setView(view);
 
-        view.loadUrl("http://www.dsploit.net/changelog.php");
+    view.loadUrl("http://www.dsploit.net/changelog.php");
 
-        this.setCancelable(false);
-        this.setButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
-    }
+    this.setCancelable(false);
+    this.setButton("Ok", new DialogInterface.OnClickListener(){
+      public void onClick(DialogInterface dialog, int id){
+        dialog.dismiss();
+      }
+    });
+  }
 }

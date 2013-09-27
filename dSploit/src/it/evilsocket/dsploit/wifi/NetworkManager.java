@@ -25,90 +25,90 @@ import android.net.wifi.WifiManager;
 import java.util.Comparator;
 import java.util.List;
 
-public class NetworkManager {
-    public static void cleanPreviousConfiguration(WifiManager wifiMgr, WifiInfo info) {
-        WifiConfiguration config;
-        do {
-            config = getWifiConfiguration(wifiMgr, info);
-            if (config != null)
-                wifiMgr.removeNetwork(config.networkId);
-        } while (config != null);
+public class NetworkManager{
+  public static void cleanPreviousConfiguration(WifiManager wifiMgr, WifiInfo info){
+    WifiConfiguration config;
+    do{
+      config = getWifiConfiguration(wifiMgr, info);
+      if(config != null)
+        wifiMgr.removeNetwork(config.networkId);
+    } while(config != null);
+  }
+
+  public static int getMaxPriority(WifiManager wifiManager){
+    List<WifiConfiguration> configurations = wifiManager.getConfiguredNetworks();
+    int pri = 0;
+    for(WifiConfiguration config : configurations){
+      if(config.priority > pri){
+        pri = config.priority;
+      }
+    }
+    return pri;
+  }
+
+  public static void sortByPriority(List<WifiConfiguration> configurations){
+    java.util.Collections.sort(configurations,
+      new Comparator<WifiConfiguration>(){
+        public int compare(WifiConfiguration object1, WifiConfiguration object2){
+          return object1.priority - object2.priority;
+        }
+      }
+    );
+  }
+
+  public static int shiftPriorityAndSave(final WifiManager wifiMgr){
+    final List<WifiConfiguration> configurations = wifiMgr
+      .getConfiguredNetworks();
+    sortByPriority(configurations);
+    final int size = configurations.size();
+    for(int i = 0; i < size; i++){
+      final WifiConfiguration config = configurations.get(i);
+      config.priority = i;
+      wifiMgr.updateNetwork(config);
+    }
+    wifiMgr.saveConfiguration();
+    return size;
+  }
+
+  public static WifiConfiguration getWifiConfiguration(WifiManager wifiMgr, WifiInfo info){
+    final String ssid = info.getSSID();
+    if(ssid.length() == 0){
+      return null;
     }
 
-    public static int getMaxPriority(WifiManager wifiManager) {
-        List<WifiConfiguration> configurations = wifiManager.getConfiguredNetworks();
-        int pri = 0;
-        for (WifiConfiguration config : configurations) {
-            if (config.priority > pri) {
-                pri = config.priority;
-            }
-        }
-        return pri;
+    String bssid = info.getBSSID();
+    List<WifiConfiguration> configurations = wifiMgr.getConfiguredNetworks();
+
+    for(final WifiConfiguration config : configurations){
+      if(config.SSID == null || !ssid.equals(config.SSID)){
+        continue;
+      }
+      if(config.BSSID == null || bssid == null
+        || bssid.equals(config.BSSID)){
+        return config;
+      }
+    }
+    return null;
+  }
+
+  public static WifiConfiguration getWifiConfiguration(WifiManager wifiMgr, WifiConfiguration configToFind){
+    final String ssid = configToFind.SSID;
+    if(ssid.length() == 0){
+      return null;
     }
 
-    public static void sortByPriority(List<WifiConfiguration> configurations) {
-        java.util.Collections.sort(configurations,
-                new Comparator<WifiConfiguration>() {
-                    public int compare(WifiConfiguration object1, WifiConfiguration object2) {
-                        return object1.priority - object2.priority;
-                    }
-                }
-        );
+    String bssid = configToFind.BSSID;
+    List<WifiConfiguration> configurations = wifiMgr.getConfiguredNetworks();
+
+    for(final WifiConfiguration config : configurations){
+      if(config.SSID == null || !ssid.equals(config.SSID)){
+        continue;
+      }
+      if(config.BSSID == null || bssid == null
+        || bssid.equals(config.BSSID)){
+        return config;
+      }
     }
-
-    public static int shiftPriorityAndSave(final WifiManager wifiMgr) {
-        final List<WifiConfiguration> configurations = wifiMgr
-                .getConfiguredNetworks();
-        sortByPriority(configurations);
-        final int size = configurations.size();
-        for (int i = 0; i < size; i++) {
-            final WifiConfiguration config = configurations.get(i);
-            config.priority = i;
-            wifiMgr.updateNetwork(config);
-        }
-        wifiMgr.saveConfiguration();
-        return size;
-    }
-
-    public static WifiConfiguration getWifiConfiguration(WifiManager wifiMgr, WifiInfo info) {
-        final String ssid = info.getSSID();
-        if (ssid.length() == 0) {
-            return null;
-        }
-
-        String bssid = info.getBSSID();
-        List<WifiConfiguration> configurations = wifiMgr.getConfiguredNetworks();
-
-        for (final WifiConfiguration config : configurations) {
-            if (config.SSID == null || !ssid.equals(config.SSID)) {
-                continue;
-            }
-            if (config.BSSID == null || bssid == null
-                    || bssid.equals(config.BSSID)) {
-                return config;
-            }
-        }
-        return null;
-    }
-
-    public static WifiConfiguration getWifiConfiguration(WifiManager wifiMgr, WifiConfiguration configToFind) {
-        final String ssid = configToFind.SSID;
-        if (ssid.length() == 0) {
-            return null;
-        }
-
-        String bssid = configToFind.BSSID;
-        List<WifiConfiguration> configurations = wifiMgr.getConfiguredNetworks();
-
-        for (final WifiConfiguration config : configurations) {
-            if (config.SSID == null || !ssid.equals(config.SSID)) {
-                continue;
-            }
-            if (config.BSSID == null || bssid == null
-                    || bssid.equals(config.BSSID)) {
-                return config;
-            }
-        }
-        return null;
-    }
+    return null;
+  }
 }

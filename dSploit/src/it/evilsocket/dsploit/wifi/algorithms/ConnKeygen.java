@@ -26,15 +26,15 @@ import it.evilsocket.dsploit.wifi.Keygen;
  * This is not actual an algorithm as
  * it is just a default WEP password
  */
-public class ConnKeygen extends Keygen {
+public class ConnKeygen extends Keygen{
 
-    public ConnKeygen(String ssid, String mac, int level, String enc) {
-        super(ssid, mac, level, enc);
-    }
+  public ConnKeygen(String ssid, String mac, int level, String enc){
+    super(ssid, mac, level, enc);
+  }
 
-    @Override
-    public List<String> getKeys() {
-        addPassword("1234567890123");
-        return getResults();
-    }
+  @Override
+  public List<String> getKeys(){
+    addPassword("1234567890123");
+    return getResults();
+  }
 }

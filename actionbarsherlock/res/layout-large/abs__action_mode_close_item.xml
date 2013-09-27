@@ -15,26 +15,30 @@
 -->
 
 <com.actionbarsherlock.internal.nineoldandroids.widget.NineLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/abs__action_mode_close_button"
-        android:focusable="true"
-        android:clickable="true"
-        android:paddingLeft="8dip"
-        style="?attr/actionModeCloseButtonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginRight="16dip">
-    <ImageView android:layout_width="48dip"
-               android:layout_height="wrap_content"
-               android:layout_gravity="center"
-               android:scaleType="center"
-               android:src="?attr/actionModeCloseDrawable" />
-    <TextView android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_gravity="center"
-              android:layout_marginLeft="4dip"
-              android:layout_marginRight="16dip"
-              android:textAppearance="?android:attr/textAppearanceSmall"
-              android:textSize="12sp"
-              android:textAllCaps="true"
-              android:text="@string/abs__action_mode_done" />
+                                                                        android:id="@+id/abs__action_mode_close_button"
+                                                                        android:focusable="true"
+                                                                        android:clickable="true"
+                                                                        android:paddingLeft="8dip"
+                                                                        style="?attr/actionModeCloseButtonStyle"
+                                                                        android:layout_width="wrap_content"
+                                                                        android:layout_height="match_parent"
+                                                                        android:layout_marginRight="16dip">
+
+    <ImageView
+            android:layout_width="48dip"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:scaleType="center"
+            android:src="?attr/actionModeCloseDrawable"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="4dip"
+            android:layout_marginRight="16dip"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textSize="12sp"
+            android:textAllCaps="true"
+            android:text="@string/abs__action_mode_done"/>
 </com.actionbarsherlock.internal.nineoldandroids.widget.NineLinearLayout>

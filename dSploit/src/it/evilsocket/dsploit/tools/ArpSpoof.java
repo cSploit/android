@@ -25,31 +25,31 @@ import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Target.Type;
 
-public class ArpSpoof extends Tool {
-    private static final String TAG = "ARPSPOOF";
+public class ArpSpoof extends Tool{
+  private static final String TAG = "ARPSPOOF";
 
-    public ArpSpoof(Context context) {
-        super("arpspoof/arpspoof", context);
+  public ArpSpoof(Context context){
+    super("arpspoof/arpspoof", context);
+  }
+
+  public Thread spoof(Target target, OutputReceiver receiver){
+    String commandLine = "";
+
+    try{
+      if(target.getType() == Type.NETWORK)
+        commandLine = "-i " + System.getNetwork().getInterface().getDisplayName() + " " + System.getGatewayAddress();
+
+      else
+        commandLine = "-i " + System.getNetwork().getInterface().getDisplayName() + " -t " + target.getCommandLineRepresentation() + " " + System.getGatewayAddress();
+    } catch(Exception e){
+      System.errorLogging(TAG, e);
     }
 
-    public Thread spoof(Target target, OutputReceiver receiver) {
-        String commandLine = "";
+    return super.asyncStatic(commandLine, receiver);
+  }
 
-        try {
-            if (target.getType() == Type.NETWORK)
-                commandLine = "-i " + System.getNetwork().getInterface().getDisplayName() + " " + System.getGatewayAddress();
-
-            else
-                commandLine = "-i " + System.getNetwork().getInterface().getDisplayName() + " -t " + target.getCommandLineRepresentation() + " " + System.getGatewayAddress();
-        } catch (Exception e) {
-            System.errorLogging(TAG, e);
-        }
-
-        return super.asyncStatic(commandLine, receiver);
-    }
-
-    public boolean kill() {
-        // arpspoof needs SIGINT ( ctrl+c ) to restore arp table.
-        return super.kill("SIGINT");
-    }
+  public boolean kill(){
+    // arpspoof needs SIGINT ( ctrl+c ) to restore arp table.
+    return super.kill("SIGINT");
+  }
 }

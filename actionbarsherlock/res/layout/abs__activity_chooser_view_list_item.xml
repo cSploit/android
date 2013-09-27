@@ -15,38 +15,38 @@
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/abs__list_item"
-    android:layout_width="match_parent"
-    android:layout_height="?attr/dropdownListPreferredItemHeight"
-    android:paddingLeft="16dip"
-    android:paddingRight="16dip"
-    android:minWidth="196dip"
-    android:background="?attr/activatedBackgroundIndicator"
-    android:orientation="vertical" >
+              android:id="@+id/abs__list_item"
+              android:layout_width="match_parent"
+              android:layout_height="?attr/dropdownListPreferredItemHeight"
+              android:paddingLeft="16dip"
+              android:paddingRight="16dip"
+              android:minWidth="196dip"
+              android:background="?attr/activatedBackgroundIndicator"
+              android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:duplicateParentState="true" >
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:duplicateParentState="true">
 
         <ImageView
-            android:id="@+id/abs__icon"
-            android:layout_width="32dip"
-            android:layout_height="32dip"
-            android:layout_gravity="center_vertical"
-            android:layout_marginRight="8dip"
-            android:duplicateParentState="true" />
+                android:id="@+id/abs__icon"
+                android:layout_width="32dip"
+                android:layout_height="32dip"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="8dip"
+                android:duplicateParentState="true"/>
 
         <TextView
-            android:id="@+id/abs__title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:textAppearance="?attr/textAppearanceLargePopupMenu"
-            android:duplicateParentState="true"
-            android:singleLine="true"
-            android:ellipsize="marquee"
-            android:fadingEdge="horizontal" />
+                android:id="@+id/abs__title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:textAppearance="?attr/textAppearanceLargePopupMenu"
+                android:duplicateParentState="true"
+                android:singleLine="true"
+                android:ellipsize="marquee"
+                android:fadingEdge="horizontal"/>
 
     </LinearLayout>
 

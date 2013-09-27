@@ -15,29 +15,33 @@
 -->
 
 <com.actionbarsherlock.internal.view.menu.ActionMenuItemView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:addStatesFromChildren="true"
-    android:gravity="center"
-    android:focusable="true"
-    android:paddingLeft="4dip"
-    android:paddingRight="4dip"
-    style="?attr/actionButtonStyle">
-    <ImageButton android:id="@+id/abs__imageButton"
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:layout_gravity="center"
-                 android:visibility="gone"
-                 android:layout_marginTop="4dip"
-                 android:layout_marginBottom="4dip"
-                 android:layout_marginLeft="4dip"
-                 android:layout_marginRight="4dip"
-                 android:scaleType="fitCenter"
-                 android:adjustViewBounds="true"
-                 android:background="@null"
-                 android:focusable="false" />
-    <com.actionbarsherlock.internal.widget.CapitalizingButton android:id="@+id/abs__textButton"
+                                                             android:layout_width="wrap_content"
+                                                             android:layout_height="wrap_content"
+                                                             android:layout_gravity="center"
+                                                             android:addStatesFromChildren="true"
+                                                             android:gravity="center"
+                                                             android:focusable="true"
+                                                             android:paddingLeft="4dip"
+                                                             android:paddingRight="4dip"
+                                                             style="?attr/actionButtonStyle">
+
+    <ImageButton
+            android:id="@+id/abs__imageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:layout_marginTop="4dip"
+            android:layout_marginBottom="4dip"
+            android:layout_marginLeft="4dip"
+            android:layout_marginRight="4dip"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:background="@null"
+            android:focusable="false"/>
+
+    <com.actionbarsherlock.internal.widget.CapitalizingButton
+            android:id="@+id/abs__textButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -52,5 +56,5 @@
             android:paddingBottom="4dip"
             android:paddingLeft="4dip"
             android:paddingRight="4dip"
-            android:focusable="false" />
+            android:focusable="false"/>
 </com.actionbarsherlock.internal.view.menu.ActionMenuItemView>

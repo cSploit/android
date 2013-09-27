@@ -29,39 +29,39 @@ import it.evilsocket.dsploit.wifi.Keygen;
  * Eircom algorithm published here:
  * http://www.bacik.org/eircomwep/howto.html
  */
-public class EircomKeygen extends Keygen {
+public class EircomKeygen extends Keygen{
 
-    private MessageDigest md;
+  private MessageDigest md;
 
-    public EircomKeygen(String ssid, String mac, int level, String enc) {
-        super(ssid, mac, level, enc);
+  public EircomKeygen(String ssid, String mac, int level, String enc){
+    super(ssid, mac, level, enc);
+  }
+
+  @Override
+  public List<String> getKeys(){
+    String mac = getMacAddress().substring(6);
+    try{
+      md = MessageDigest.getInstance("SHA1");
+    } catch(NoSuchAlgorithmException e1){
+      setErrorMessage("This phone cannot process a SHA1 hash.");
+      return null;
     }
-
-    @Override
-    public List<String> getKeys() {
-        String mac = getMacAddress().substring(6);
-        try {
-            md = MessageDigest.getInstance("SHA1");
-        } catch (NoSuchAlgorithmException e1) {
-            setErrorMessage("This phone cannot process a SHA1 hash.");
-            return null;
-        }
-        byte[] routerMAC = new byte[4];
-        routerMAC[0] = 1;
-        for (int i = 0; i < 6; i += 2)
-            routerMAC[i / 2 + 1] = (byte) ((Character.digit(mac.charAt(i), 16) << 4)
-                    + Character.digit(mac.charAt(i + 1), 16));
-        int macDec = ((0xFF & routerMAC[0]) << 24) | ((0xFF & routerMAC[1]) << 16) |
-                ((0xFF & routerMAC[2]) << 8) | (0xFF & routerMAC[3]);
-        mac = dectoString(macDec) + "Although your world wonders me, ";
-        md.reset();
-        md.update(mac.getBytes());
-        byte[] hash = md.digest();
-        try {
-            addPassword(getHexString(hash).substring(0, 26));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return getResults();
+    byte[] routerMAC = new byte[4];
+    routerMAC[0] = 1;
+    for(int i = 0; i < 6; i += 2)
+      routerMAC[i / 2 + 1] = (byte) ((Character.digit(mac.charAt(i), 16) << 4)
+        + Character.digit(mac.charAt(i + 1), 16));
+    int macDec = ((0xFF & routerMAC[0]) << 24) | ((0xFF & routerMAC[1]) << 16) |
+      ((0xFF & routerMAC[2]) << 8) | (0xFF & routerMAC[3]);
+    mac = dectoString(macDec) + "Although your world wonders me, ";
+    md.reset();
+    md.update(mac.getBytes());
+    byte[] hash = md.digest();
+    try{
+      addPassword(getHexString(hash).substring(0, 26));
+    } catch(UnsupportedEncodingException e){
+      e.printStackTrace();
     }
+    return getResults();
+  }
 }

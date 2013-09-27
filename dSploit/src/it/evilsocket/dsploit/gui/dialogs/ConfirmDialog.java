@@ -24,32 +24,32 @@ import android.content.DialogInterface;
 
 import it.evilsocket.dsploit.R;
 
-public class ConfirmDialog extends AlertDialog {
-    public interface ConfirmDialogListener {
-        public void onConfirm();
+public class ConfirmDialog extends AlertDialog{
+  public interface ConfirmDialogListener{
+    public void onConfirm();
 
-        public void onCancel();
-    }
+    public void onCancel();
+  }
 
-    public ConfirmDialog(String title, String message, Activity activity, ConfirmDialogListener confirmDialogListener) {
-        super(activity);
+  public ConfirmDialog(String title, String message, Activity activity, ConfirmDialogListener confirmDialogListener){
+    super(activity);
 
-        this.setTitle(title);
-        this.setMessage(message);
+    this.setTitle(title);
+    this.setMessage(message);
 
-        final ConfirmDialogListener listener = confirmDialogListener;
+    final ConfirmDialogListener listener = confirmDialogListener;
 
-        this.setButton(activity.getString(R.string.yes), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                listener.onConfirm();
-            }
-        });
+    this.setButton(activity.getString(R.string.yes), new DialogInterface.OnClickListener(){
+      public void onClick(DialogInterface dialog, int id){
+        listener.onConfirm();
+      }
+    });
 
-        this.setButton2(activity.getString(R.string.no), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-                listener.onCancel();
-            }
-        });
-    }
+    this.setButton2(activity.getString(R.string.no), new DialogInterface.OnClickListener(){
+      public void onClick(DialogInterface dialog, int id){
+        dialog.dismiss();
+        listener.onCancel();
+      }
+    });
+  }
 }

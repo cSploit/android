@@ -43,6 +43,8 @@
     <string name="stopped">Stopped&#8230;</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
+    <string name="stopped_dots">Stopped ...</string>
+    <string name="starting_dots">Starting ...</string>
     <string name="max_length">Max Length</string>
     <string name="min_length">Min Length</string>
     <string name="username">Username</string>
@@ -88,14 +90,20 @@
     <string name="enter_session_name">Enter the name of the session file :</string>
     <string name="new_session_started">New session started</string>
     <string name="warning">Warning</string>
-    <string name="warning_new_session">Starting a new session would delete the current one, continue?
+    <string name="warning_new_session">Starting a new session would delete the current one,
+        continue?
     </string>
-    <string name="fatal_error_html"><![CDATA[<p>It seems like your ROM has the <b>LD_LIBRARY_PATH bug</b>, i\'m sorry but it\'s not compatible with dSploit.</p>]]></string>
-    <string name="fatal_error_html2"><![CDATA[<p>For more info read the <a href=\"http://dsploit.net/#faq\">FAQ</a>.</p>]]></string>
+    <string name="fatal_error_html">
+        <![CDATA[<p>It seems like your ROM has the <b>LD_LIBRARY_PATH bug</b>, i\'m sorry but it\'s not compatible with dSploit.</p>]]></string>
+    <string name="fatal_error_html2">
+        <![CDATA[<p>For more info read the <a href=\"http://dsploit.net/#faq\">FAQ</a>.</p>]]></string>
     <string name="install_error">Error during files installation!</string>
-    <string name="arm_error"><![CDATA[<p>It seems like your device processor is not an ARM, i\'m sorry but it\'s not compatible with dSploit.</p>]]></string>
-    <string name="arm_error2"><![CDATA[<p>For more info read the <a href=\"http://dsploit.net/#requirements\">requirements</a> section.</p>]]></string>
-    <string name="busybox_required">Full BusyBox installation required, killall binary not found(maybe you have an old busybox version).
+    <string name="arm_error">
+        <![CDATA[<p>It seems like your device processor is not an ARM, i\'m sorry but it\'s not compatible with dSploit.</p>]]></string>
+    <string name="arm_error2">
+        <![CDATA[<p>For more info read the <a href=\"http://dsploit.net/#requirements\">requirements</a> section.</p>]]></string>
+    <string name="busybox_required">Full BusyBox installation required, killall binary not
+        found(maybe you have an old busybox version).
     </string>
     <string name="only_4_root">This application can run only on rooted devices.</string>
     <string name="initializing">Initializing&#8230;</string>
@@ -131,7 +139,9 @@
     <string name="request_empty">The request can not be empty.</string>
     <string name="request_sent">Request sent.</string>
     <string name="customize_wol_port">Customize WOL port and press Send.</string>
-    <string name="couldnt_send_wol_packet">Could not send a WOL packet to a target without a known MAC address.</string>
+    <string name="couldnt_send_wol_packet">Could not send a WOL packet to a target without a known
+        MAC address.
+    </string>
     <string name="no_activities_for_url">No activities to handle this type of url.</string>
     <string name="select_ports">Select Ports</string>
     <string name="enter_ports_list">Enter a comma separated list of ports:</string>
@@ -140,11 +150,16 @@
     <string name="invalid_ports">Invalid ports specified.</string>
     <string name="empty_port_list">Empty port list.</string>
     <string name="about_dsploit_v_">About dSploit v</string>
-    <string name="select_target">Select a target below by clicking on a row, or long click on it to enter an alias.</string>
+    <string name="select_target">Select a target below by clicking on a row, or long click on it to
+        enter an alias.
+    </string>
     <string name="generating_keys">Generating keys&#8230;</string>
-    <string name="no_wifi_available">No WiFi connection available, the application will just check for updates. #STATUS#</string>
+    <string name="no_wifi_available">No WiFi connection available, the application will just check
+        for updates. #STATUS#
+    </string>
     <string name="loading_changelog">Loading changelog&#8230;</string>
-    <string name="something_went_wrong_changelog"><![CDATA[<html><body><p><b>Something went wrong while retrieving the changelog:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
+    <string name="something_went_wrong_changelog">
+        <![CDATA[<html><body><p><b>Something went wrong while retrieving the changelog:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
     <string name="cancel_dialog">Cancel</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
@@ -153,15 +168,20 @@
     <string name="could_not_read_folder">Could not read folder contents.</string>
     <string name="choose_dir">Choose&#160;</string>
     <string name="vulnerability_finder">Vulnerability Finder</string>
-    <string name="vulnerability_finder_desc">Search for known vulnerabilities for target running services upon National Vulnerability Database.</string>
+    <string name="vulnerability_finder_desc">Search for known vulnerabilities for target running
+        services upon National Vulnerability Database.
+    </string>
     <string name="inspector">Inspector</string>
-    <string name="inspector_desc">Perform target operating system and services deep detection (slower than port scanner, but more accurate).</string>
+    <string name="inspector_desc">Perform target operating system and services deep detection
+        (slower than port scanner, but more accurate).
+    </string>
     <string name="login_cracker">Login Cracker</string>
     <string name="login_cracker_desc">A very fast network logon cracker which support many different
         services.
     </string>
     <string name="packet_forger">Packet Forger</string>
-    <string name="packet_forger_desc">Craft and send a custom TCP or UDP packet to the target.</string>
+    <string name="packet_forger_desc">Craft and send a custom TCP or UDP packet to the target.
+    </string>
     <string name="port_scanner">Port Scanner</string>
     <string name="port_scanner_desc">Perform a SYN port scanning on target.</string>
     <string name="router_pwn">Router PWN</string>
@@ -183,4 +203,13 @@
     <string name="set_session_filename">Set the session file name:</string>
     <string name="session_sniffer">Session Sniffer</string>
 
+    <string name="untraced_hops">untraced hops</string>
+    <string name="add_username">Add username</string>
+    <string name="enter_username">Enter the username you want to use:</string>
+    <string name="select_wordlist">Select Wordlist</string>
+    <string name="error_filepath">Could not determine file path, please use a different file
+        manager.
+    </string>
+    <string name="trying">Trying</string>
+    <string name="left">left</string>
 </resources>
