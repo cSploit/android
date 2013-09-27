@@ -14,7 +14,7 @@
     <string name="os">Λειτουργικό</string>
     <string name="device_type">Τύπος συσκευής</string>
     <string name="start_hijack">Επιλέξτε το session που θέλετε να κάνετε hijack, διαρκές πάτημα για να το φυλαξετε σε αρχείο.
-    </string>
+    </string>χα
     <string name="sort">Ταξινόμηση:</string>
     <string name="select_module">Επιλέξτε ενότητα:</string>
     <string name="choose">Επιλογή</string>
@@ -45,7 +45,7 @@
     <string name="max_length">Μέγιστο μήκος</string>
     <string name="min_length">Ελάχιστο μήκος</string>
     <string name="username">Όνομα Χρήστη</string>
-    <string name="Charset">Σύνολο Χαρακτήρων</string>
+    <string name="Charset">Charset</string>
     <string name="filter_desc">Εισάγετε ένα προσαρμοσμένο φίλτρο αντικατάστασης, συμπεριλαμβανομένου απλής αντικατάσταση συμβολοσειράς ή κανονικής εκφράσης.
     </string>
     <string name="from">Από</string>
@@ -105,37 +105,31 @@
     <string name="connection_to"><![CDATA[Σύνδεση στο <b>]]></string>
     <string name="connection_to2">
         <![CDATA[</b> <b><font color=\"red\">ΑΠEΤΥΧΕ</font></b>.]]></string>
-    <string name="enter_key_or_crack">Δηλώστε το κλειδί του WiFi ή προσπα:</string>
-    <string name="enter_wifi_key">Enter WiFi Key:</string>
-    <string name="scanning">Scanning&#8230;</string>
-    <string name="invalid_filename">Invalid file name.</string>
-    <string name="something_went_wrong">Something went wrong, please select again a valid target.
-    </string>
-    <string name="selected">Selected</string>
-    <string name="nothing_found"><![CDATA[<small><i>Nothing Found</i></small>]]></string>
-    <string name="no_open_ports">No open ports detected on current target, run the service inspector
-        first.
-    </string>
-    <string name="no_infos_on_target">No specific informations about services running on target
-        machine, run the service inspector first.
-    </string>
-    <string name="custom_charset">Custom Charset</string>
-    <string name="enter_chars_wanted">Enter the chars you want to use in the custom charset:
-    </string>
-    <string name="invalid_port">Invalid port specified.</string>
-    <string name="request_empty">The request can not be empty.</string>
-    <string name="request_sent">Request sent.</string>
-    <string name="customize_wol_port">Customize WOL port and press Send.</string>
-    <string name="couldnt_send_wol_packet">Could not send a WOL packet to a target without a known MAC address.</string>
-    <string name="no_activities_for_url">No activities to handle this type of url.</string>
-    <string name="select_ports">Select Ports</string>
-    <string name="enter_ports_list">Enter a comma separated list of ports:</string>
-    <string name="invalid_port_">Invalid port \'</string>
-    <string name="port_must_be_greater">Port must be greater than 0 and smaller than 65535.</string>
-    <string name="invalid_ports">Invalid ports specified.</string>
-    <string name="empty_port_list">Empty port list.</string>
-    <string name="about_dsploit_v_">About dSploit v</string>
-    <string name="select_target">Select a target below by clicking on a row, or long click on it to enter an alias.</string>
+    <string name="enter_key_or_crack">Εισάγετε το κλειδί του WiFi ή προσπάθειστε να το σπάσετε:</string>
+    <string name="enter_wifi_key">Εισάγετε το WiFi Key:</string>
+    <string name="scanning">Ανεύρεση&#8230;</string>
+    <string name="invalid_filename">Λανθασμένο όνομα αρχείου.</string>
+    <string name="something_went_wrong">Κάτι πήγε στραβά, επιλέξτε και ένα έγκυρο στόχο.</string>
+    <string name="selected">Επιλέγθηκε</string>
+    <string name="nothing_found"><![CDATA[<small><i>Τίποτα δεν βρέθηκε</i></small>]]></string>
+    <string name="no_open_ports">Δεν εντοπίστηκαν ανοιχτές θύρες στο στόχο, εκτελέστε τον Επιθεωρητή Υπηρεσιών πρώτα.</string>
+    <string name="no_infos_on_target">Δεν υπάρχουν ειδικές πληροφορίες για τις υπηρεσίες που τρέχουν στον στόχο, εκτελέστε τον Επιθεωρητή Υπηρεσιών πρώτα.</string>
+    <string name="custom_charset">Προσαρμοσμένο Charset</string>
+    <string name="enter_chars_wanted">Εισάγετε τους χαρακτήρες που θέλετε να χρησιμοποιήσετε στο προσαρμοσμένο charset:</string>
+    <string name="invalid_port">Δηλωθηκε άκυρη θύρα.</string>
+    <string name="request_empty">Η αίτηση δεν μπορεί να είναι κενή.</string>
+    <string name="request_sent">Η αίτηση αποστάληκε.</string>
+    <string name="customize_wol_port">Αλλάξτε τη θύρα του WOL και πατήστε αποστολή.</string>
+    <string name="couldnt_send_wol_packet">Δεν μπορεί να αποσταλέι WOL πακέτο στο στόχο χωρίς τη διεύθυνση της MAC.</string>
+    <string name="no_activities_for_url">Δεν υπάρχουν τρόποι χείρισης αυτού του είδους του URL.</string>
+    <string name="select_ports">Επιλέξτε Θύρες</string>
+    <string name="enter_ports_list">Προσθέστε τις θύρες χωρισμένες με κόμα:</string>
+    <string name="invalid_port_">Λαθος θύρα \'</string>
+    <string name="port_must_be_greater">Η Θύρα θα πρέπει να είναι μεγαλύτερη του 0 και μικρότερη του 65535.</string>
+    <string name="invalid_ports">Δηλώθηκε λάθος θύρα.</string>
+    <string name="empty_port_list">Κενή λίστα θύρων.</string>
+    <string name="about_dsploit_v_">Σχετικά με το dSploit v</string>
+    <string name="select_target">Επιλέξτε στόχο πιο πάκω κάνοντας κλικ σε μία γραμή, συνεχόμενο κλικ για να προσθέσετε όνομα.</string>
     <string name="generating_keys">Generating keys&#8230;</string>
     <string name="no_wifi_available">No WiFi connection available, the application will just check for updates. #STATUS#</string>
     <string name="loading_changelog">Loading changelog&#8230;</string>
