@@ -13,22 +13,22 @@
     <string name="services">Υπηρεσίες</string>
     <string name="os">Λειτουργικό</string>
     <string name="device_type">Τύπος συσκευής</string>
-    <string name="start_hijack">Tap on a session to start hijacking, long tap to save it to file.
+    <string name="start_hijack">Επιλέξτε το session που θέλετε να κάνετε hijack, διαρκές πάτημα για να το φυλαξετε σε αρχείο.
     </string>
-    <string name="sort">Sort:</string>
-    <string name="select_module">Select a module to run</string>
-    <string name="choose">Choose</string>
-    <string name="response">Response</string>
-    <string name="request">Request</string>
-    <string name="wait_for_response">Wait for a response</string>
-    <string name="protocol">Protocol</string>
-    <string name="dsploit_catchphrase">dSploit - An Android network penetration suite.</string>
-    <string name="dsploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
+    <string name="sort">Ταξινόμηση:</string>
+    <string name="select_module">Επιλέξτε ενότητα:</string>
+    <string name="choose">Επιλογή</string>
+    <string name="response">Απάντηση</string>
+    <string name="request">Αίτηση</string>
+    <string name="wait_for_response">Αναμονή για απάντηση</string>
+    <string name="protocol">Πρωτόκολλο</string>
+    <string name="dsploit_catchphrase">dSploit - Μία σουίτα δικτυακής διείσδυσης για Android.</string>
+    <string name="dsploit_copyleft">Copyleft του Simone Margaritelli άλλος evilsocket.</string>
     <string name="dsploit_url">http://www.dsploit.net/</string>
-    <string name="disclaimer">Disclaimer</string>
+    <string name="disclaimer">Αποποίηση ευθύνης</string>
     <string name="dsploit_disclaimer">
-        <![CDATA[This application is not to be used for any purposes other than to demonstrate its functions, and must only be used on networks for which you have permission to do so. Any other use is not the responsibility of the developer.In other words, don&apos;t be stupid, and don&apos;t direct angry people towards me.]]></string>
-    <string name="license">License</string>
+        <![CDATA[Η εφαρμογή αυτή δεν πρέπει να χρησιμοποιηθεί για σκοπούς άλλους από το να αποδείξει τις λειτουργίες της, και πρέπει να χρησιμοποιείται μόνο σε δίκτυα για τα οποία έχετε το δικαίωμα. Οποιαδήποτε άλλη χρήση δεν είναι η ευθύνη των developer. Με άλλα λόγια, μην είστε ηλίθιοι, και μην κατευθύνετε θυμωμένους ανθρώπους απέναντί μου.]]></string>
+    <string name="license">Άδεια</string>
     <string name="gpl_license">This program is free software: you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by the Free Software
         Foundation, either version 3 of the License, or (at your option) any later version.
@@ -38,24 +38,23 @@
         You should have received a copy of the GNU General Public License along with this program.
         If not, see http://www.gnu.org/licenses/.
     </string>
-    <string name="service">Service</string>
-    <string name="stopped">Stopped&#8230;</string>
-    <string name="start">Start</string>
-    <string name="stop">Stop</string>
-    <string name="max_length">Max Length</string>
-    <string name="min_length">Min Length</string>
-    <string name="username">Username</string>
-    <string name="Charset">Charset</string>
-    <string name="filter_desc">Enter a custom replace filter, including simple string replacement or
-        regular expressions.
+    <string name="service">Υπηρεσίες</string>
+    <string name="stopped">Σταμάτησε&#8230;</string>
+    <string name="start">Ξεκίνημα</string>
+    <string name="stop">Σταμάτημα</string>
+    <string name="max_length">Μέγιστο μήκος</string>
+    <string name="min_length">Ελάχιστο μήκος</string>
+    <string name="username">Όνομα Χρήστη</string>
+    <string name="Charset">Σύνολο Χαρακτήρων</string>
+    <string name="filter_desc">Εισάγετε ένα προσαρμοσμένο φίλτρο αντικατάστασης, συμπεριλαμβανομένου απλής αντικατάσταση συμβολοσειράς ή κανονικής εκφράσης.
     </string>
-    <string name="from">From</string>
-    <string name="to">To</string>
+    <string name="from">Από</string>
+    <string name="to">Πρός</string>
     <string name="wake_on_lan">Wake On Lan</string>
-    <string name="send">Send</string>
-    <string name="update_available">Update Available</string>
-    <string name="new_update_desc">A new update to version</string>
-    <string name="new_update_desc2">is available, do you want to download it ?</string>
+    <string name="send">Αποστολή</string>
+    <string name="update_available">Διαθέσιμη ενημέρωση</string>
+    <string name="new_update_desc">Καινούργια ενημέρωση στην έκδοση</string>
+    <string name="new_update_desc2">είναι διαθέσημη, do you want to download it ?</string>
     <string name="checking">Checking&#8230;</string>
     <string name="no_updates_available">No updates available.</string>
     <string name="new_version">New version</string>
