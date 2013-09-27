@@ -2,9 +2,7 @@
     <string name="app_name">dSploit</string>
     <string name="menu_settings">Impostazioni</string>
     <string name="title_activity_main">dSploit</string>
-    <string name="crash_toast_text">Ooooops ! Sono crashato, ma un report verrà inviato al mio sviluppatore
-        in modo tale che il problema venga risolto.
-    </string>
+    <string name="crash_toast_text">Ooooops ! Sono crashato, ma un report verrà inviato al mio sviluppatore in modo tale che il problema venga risolto.</string>
     <string name="toggle_button">ToggleButton</string>
     <string name="enter_redirection_details">Inserisci i dettagli della redirezione qui sotto:</string>
     <string name="address">Indirizzo</string>
@@ -14,8 +12,7 @@
     <string name="services">Servizi</string>
     <string name="os">OS</string>
     <string name="device_type">Tipo Dispositivo</string>
-    <string name="start_hijack">Tocca una sessione per iniziare l'hijacking, tieni premuto per salvarla su file.
-    </string>
+    <string name="start_hijack">Tocca una sessione per iniziare l\'hijacking, tieni premuto per salvarla su file.</string>
     <string name="sort">Ordina:</string>
     <string name="select_module">Seleziona un modulo da eseguire</string>
     <string name="choose">Scegli</string>
@@ -29,7 +26,10 @@
     <string name="dsploit_url">http://www.dsploit.net/</string>
     <string name="disclaimer">Disclaimer</string>
     <string name="dsploit_disclaimer">
-        <![CDATA[This application is not to be used for any purposes other than to demonstrate its functions, and must only be used on networks for which you have permission to do so. Any other use is not the responsibility of the developer.In other words, don&apos;t be stupid, and don&apos;t direct angry people towards me.]]></string>
+        <![CDATA[Questa applicazione non è concepita per alcuno scopo se non come dimostrazione delle sue funzionalità e deve essere utilizzata solamente su reti
+        per le quali si dispone del permesso di farlo.
+        Ogni altro utilizzo non potrà quindi essere considerata una responsabilità dello sviluppaotre, in poche parole, non siate stupidi, e soprattutto
+        non indirizzate le persone arrabbiate verso di me.]]></string>
     <string name="license">Licenza</string>
     <string name="gpl_license">This program is free software: you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by the Free Software
@@ -60,11 +60,11 @@
     <string name="no_updates_available">Nessun aggiornamento disponibile.</string>
     <string name="new_version">Nuova versione</string>
     <string name="new_version2">trovata!</string>
-    <string name="downloading_update">Scarico l'aggiornamento&#8230;</string>
+    <string name="downloading_update">Scarico l\'aggiornamento&#8230;</string>
     <string name="connecting">Connessione&#8230;</string>
     <string name="cancel">Cancella</string>
     <string name="error">Errore</string>
-    <string name="error_occured">Si è verificato un errore durante il download dell'aggiornamento.</string>
+    <string name="error_occured">Si è verificato un errore durante il download dell\'aggiornamento.</string>
     <string name="invalid_target">Obiettivo non valido.</string>
     <string name="add_custom_target">Aggiungi un obiettivo custom</string>
     <string name="enter_url">Inserisci un URL, un nome host o un indirizzo qui sotto:</string>
@@ -74,7 +74,7 @@
     <string name="stop_monitor">Ferma Monitor di Rete</string>
     <string name="exit">Esci</string>
     <string name="close_confirm">Questa azione chiuderà dSploit, sei sicuro di voler continuare ?</string>
-    <string name="press_back">Premi nuovamente il tasto indietro per chiudere l'app.</string>
+    <string name="press_back">Premi nuovamente il tasto indietro per chiudere l\'app.</string>
     <string name="selected_">Selezionato&#160;</string>
     <string name="github_issues">https://github.com/evilsocket/dsploit/issues/new</string>
     <string name="no_session_found">Nessun file di sessione trovato sulla sd card.</string>
@@ -89,10 +89,10 @@
     <string name="warning_new_session">Iniziare una nuova sessione cancellerebbe quella corrente, continuare?</string>
     <string name="fatal_error_html"><![CDATA[<p>Sembra che la tua ROM sia affetta dal <b>bug LD_LIBRARY_PATH</b>, mi dispiace ma non è compatibile con dSploit.</p>]]></string>
     <string name="fatal_error_html2"><![CDATA[<p>Per ulteriori informazioni, leggi le <a href=\"http://dsploit.net/#faq\">FAQ</a>.</p>]]></string>
-    <string name="install_error">Errore durante l'installazione dei file!</string>
+    <string name="install_error">Errore durante l\'installazione dei file!</string>
     <string name="arm_error"><![CDATA[<p>Sembra che il processore del tuo dispositivo non sia un ARM, mi dispiace ma non è compatibile con dSploit.</p>]]></string>
     <string name="arm_error2"><![CDATA[<p>Per ulteriori informazioni leggi la sezione dei <a href=\"http://dsploit.net/#requirements\">requisiti</a>.</p>]]></string>
-    <string name="busybox_required">E' richiesta un installazione completa di BusyBox, l'eseguibile killall non è stato trovato(potresti avere una vecchia versione di busybox).</string>
+    <string name="busybox_required">E\' richiesta un installazione completa di BusyBox, l\'eseguibile killall non è stato trovato(potresti avere una vecchia versione di busybox).</string>
     <string name="only_4_root">Questa applicazione può essere eseguita solo su dispositivi con il root.</string>
     <string name="initializing">Inizializzazione&#8230;</string>
     <string name="initialization_error">Errore di inizializzazione.</string>
@@ -112,15 +112,15 @@
     <string name="something_went_wrong">Qualcosa è andato storto, per favore seleziona di nuovo un obiettivo valido.</string>
     <string name="selected">Selezionato</string>
     <string name="nothing_found"><![CDATA[<small><i>Nessun Risultato</i></small>]]></string>
-    <string name="no_open_ports">Nessuna porta aperta rilevata sull'obiettivo, esegui il service inspector prima.</string>
-    <string name="no_infos_on_target">Nessuna informazione specifica sui servizi in esecuzione sull'obiettivo, esegui il service inspector prima</string>
+    <string name="no_open_ports">Nessuna porta aperta rilevata sull\'obiettivo, esegui il service inspector prima.</string>
+    <string name="no_infos_on_target">Nessuna informazione specifica sui servizi in esecuzione sull\'obiettivo, esegui il service inspector prima</string>
     <string name="custom_charset">Charset Custom</string>
     <string name="enter_chars_wanted">Inserisci i caratteri che vuoi usare nel charset:</string>
     <string name="invalid_port">Porta specificata non valida.</string>
     <string name="request_empty">La richiesta non può essere vuota.</string>
     <string name="request_sent">Richiesta inviata.</string>
     <string name="customize_wol_port">Personalizza la porta per il WOL e premi Invia.</string>
-    <string name="couldnt_send_wol_packet">Impossibile inviare un pacchetto WOL all'indirizzo senza conoscerne il MAC address.</string>
+    <string name="couldnt_send_wol_packet">Impossibile inviare un pacchetto WOL all\'indirizzo senza conoscerne il MAC address.</string>
     <string name="no_activities_for_url">Nessuna activity per gestire questo tipo di URL.</string>
     <string name="select_ports">Seleziona Porte</string>
     <string name="enter_ports_list">Inserisci una lista di porte separate da una virgola:</string>
@@ -131,7 +131,7 @@
     <string name="about_dsploit_v_">About dSploit v</string>
     <string name="select_target">Seleziona un obiettivo qui sotto cliccando su una riga, o tieni premuto su di essa per inserire un alias.</string>
     <string name="generating_keys">Generazione chiavi&#8230;</string>
-    <string name="no_wifi_available">Nessuna connessione WiFi disponibile, l'applicazione si limiterà a controllare gli aggiornamenti. #STATUS#</string>
+    <string name="no_wifi_available">Nessuna connessione WiFi disponibile, l\'applicazione si limiterà a controllare gli aggiornamenti. #STATUS#</string>
     <string name="loading_changelog">Carico il changelog&#8230;</string>
     <string name="something_went_wrong_changelog"><![CDATA[<html><body><p><b>Qualcosa è andato storto mentre caricavo il changelog:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
     <string name="cancel_dialog">Cancella</string>
@@ -142,19 +142,19 @@
     <string name="could_not_read_folder">Impossibile leggere il contenuto della cartella.</string>
     <string name="choose_dir">Scegli&#160;</string>
     <string name="vulnerability_finder">Vulnerability Finder</string>
-    <string name="vulnerability_finder_desc">Cerca le vulnerabilità conosciute dell'obiettivo sul National Vulnerability Database.</string>
+    <string name="vulnerability_finder_desc">Cerca le vulnerabilità conosciute dell\'obiettivo sul National Vulnerability Database.</string>
     <string name="inspector">Inspector</string>
-    <string name="inspector_desc">Esegui un controllo approfondito dei servizi e del sistema operativo dell'obiettivo (è più lento del port scanner, ma più preciso).</string>
+    <string name="inspector_desc">Esegui un controllo approfondito dei servizi e del sistema operativo dell\'obiettivo (è più lento del port scanner, ma più preciso).</string>
     <string name="login_cracker">Login Cracker</string>
     <string name="login_cracker_desc">Un cracker di protocolli di rete che supporta una vasta gamma di servizi.</string>
     <string name="packet_forger">Packet Forger</string>
-    <string name="packet_forger_desc">Crea ed invia un pacchetto TCP or UDP all'obiettivo.</string>
+    <string name="packet_forger_desc">Crea ed invia un pacchetto TCP or UDP all\'obiettivo.</string>
     <string name="port_scanner">Port Scanner</string>
-    <string name="port_scanner_desc">Esegue una scansione SYN sulle porte dell'obiettivo.</string>
+    <string name="port_scanner_desc">Esegue una scansione SYN sulle porte dell\'obiettivo.</string>
     <string name="router_pwn">Router PWN</string>
     <string name="router_pwn_desc">Lancia il servizio http://routerpwn.com/ per pwnare il router.</string>
     <string name="trace">Trace</string>
-    <string name="trace_desc">Esegue un traceroute sull'obiettivo.</string>
+    <string name="trace_desc">Esegue un traceroute sull\'obiettivo.</string>
     <string name="mitm">MITM</string>
     <string name="mitm_desc">Esegue vari attacchi man-in-the-middle come lo sniffing di rete, la manipolazione del traffico, ecc&#8230;</string>
     <string name="network_subnet_mask">Questa è la tua maschera di sottorete</string>
@@ -162,8 +162,8 @@
     <string name="this_device">&#160;(Questo dispositivo)</string>
     <string name="wifi_went_down">La connessione WiFi è caduta.</string>
     <string name="hijack_session">Hijack Sessione</string>
-    <string name="start_hijacking">Fermare lo sniffing e iniziare l'hijacking di sessione?</string>
-    <string name="start_hijacking2">Eseguire l'hijacking di sessione?</string>
+    <string name="start_hijacking">Fermare lo sniffing e iniziare l\'hijacking di sessione?</string>
+    <string name="start_hijacking2">Eseguire l\'hijacking di sessione?</string>
     <string name="set_session_filename">Imposta il nome del file di sessione:</string>
     <string name="session_sniffer">Sniffer di Sessione</string>
 </resources>
