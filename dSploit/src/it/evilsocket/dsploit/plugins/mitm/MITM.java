@@ -184,7 +184,7 @@ public class MITM extends Plugin{
 
         if(fileName == null){
           setStoppedState();
-          new ErrorDialog("Error", "Could not determine file path.", MITM.this).show();
+          new ErrorDialog( getString(R.string.error), getString(R.string.error_filepath2), MITM.this).show();
         } else{
           mimeType = System.getImageMimeType(fileName);
           mSpoofSession = new SpoofSession(true, true, fileName, mimeType);
@@ -221,7 +221,7 @@ public class MITM extends Plugin{
                     }
                   });
 
-                  Toast.makeText(MITM.this, "Tap again to stop.", Toast.LENGTH_LONG).show();
+                  Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
                 }
               });
             }
@@ -242,7 +242,7 @@ public class MITM extends Plugin{
         fileName = intent.getData().getPath();
 
       if(fileName == null){
-        new ErrorDialog("Error", "Could not determine file path, please use a different file manager.", MITM.this).show();
+        new ErrorDialog( getString(R.string.error), getString(R.string.error_filepath), MITM.this).show();
       } else{
         try{
 
@@ -264,7 +264,7 @@ public class MITM extends Plugin{
 
           mCurrentActivity.setVisibility(View.VISIBLE);
 
-          Toast.makeText(MITM.this, "Tap again to stop.", Toast.LENGTH_LONG).show();
+          Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
 
           final String code = js;
           mSpoofSession = new SpoofSession();
@@ -285,7 +285,7 @@ public class MITM extends Plugin{
             }
           });
         } catch(Exception e){
-          new ErrorDialog("Error", "Unexpected error while reading the file : " + e.getMessage(), MITM.this).show();
+          new ErrorDialog(getString(R.string.error), getString(R.string.unexpected_file_error) + e.getMessage(), MITM.this).show();
         }
       }
     } else if(request == SettingsActivity.SETTINGS_DONE){
@@ -302,13 +302,13 @@ public class MITM extends Plugin{
              * Check if needed ports are available, otherwise inform the user.
 	         */
       if(System.isPortAvailable(System.HTTP_PROXY_PORT) == false)
-        mMessage = "Port " + System.HTTP_PROXY_PORT + " which is needed by the transparent proxy is taken from another process, open application settings ?";
+        mMessage = getString(R.string.the_port) + System.HTTP_PROXY_PORT + getString(R.string.error_proxy_port);
 
       else if(System.isPortAvailable(System.HTTP_SERVER_PORT) == false)
-        mMessage = "Port " + System.HTTP_SERVER_PORT + " which is needed by the mitm server is taken from another process, open application settings ?";
+        mMessage = getString(R.string.the_port) + System.HTTP_SERVER_PORT + getString(R.string.error_mitm_port);
 
       else if(System.getSettings().getBoolean("PREF_HTTPS_REDIRECT", true) && System.isPortAvailable(System.HTTPS_REDIR_PORT) == false)
-        mMessage = "Port " + System.HTTPS_REDIR_PORT + " which is needed by the mitm https redirector is taken from another process, open application settings ?";
+        mMessage = getString(R.string.the_port) + System.HTTPS_REDIR_PORT + getString(R.string.error_https_port);
 
       else
         mMessage = null;
@@ -319,7 +319,7 @@ public class MITM extends Plugin{
     @Override
     protected void onPostExecute(Boolean result){
       if(mMessage != null){
-        new ConfirmDialog("Warning", mMessage, MITM.this, new ConfirmDialogListener(){
+        new ConfirmDialog( getString(R.string.warning), mMessage, MITM.this, new ConfirmDialogListener(){
           @Override
           public void onConfirm(){
             startActivityForResult(new Intent(MITM.this, SettingsActivity.class), SettingsActivity.SETTINGS_DONE);
@@ -327,7 +327,7 @@ public class MITM extends Plugin{
 
           @Override
           public void onCancel(){
-            new FinishDialog("Error", "MITM modules need all ports available.", MITM.this).show();
+            new FinishDialog(getString(R.string.error), getString(R.string.error_mitm_ports), MITM.this).show();
           }
         }).show();
       }
@@ -338,7 +338,7 @@ public class MITM extends Plugin{
     MITM.this.runOnUiThread(new Runnable(){
       @Override
       public void run(){
-        new ErrorDialog("Error", error, MITM.this).show();
+        new ErrorDialog(getString(R.string.error), error, MITM.this).show();
 
         mCurrentActivity = null;
         setStoppedState();
@@ -400,159 +400,331 @@ public class MITM extends Plugin{
     mScriptPicker.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
 
     mActions.add(new Action
-      (
-        "Simple Sniff",
-        "Redirect target's traffic through this device and show some stats while dumping it to a pcap file.",
-        R.drawable.action_sniffer,
-        new OnClickListener(){
-          @Override
-          public void onClick(View v){
-            if(System.checkNetworking(MITM.this) == false)
-              return;
+    (
+      getString(R.string.mitm_simple_sniff),
+      getString(R.string.mitm_simple_sniff_desc),
+      R.drawable.action_sniffer,
+      new OnClickListener(){
+        @Override
+        public void onClick(View v){
+          if(System.checkNetworking(MITM.this) == false)
+            return;
 
-            setStoppedState();
+          setStoppedState();
 
-            startActivity
-              (
-                new Intent
-                  (
-                    MITM.this,
-                    Sniffer.class
-                  )
-              );
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-          }
-        }));
-
-    mActions.add(new Action
-      (
-        "Password Sniffer",
-        "Sniff passwords of many protocols such as http, ftp, imap, imaps, irc, msn, etc from the target.",
-        R.drawable.action_passwords,
-        new OnClickListener(){
-          @Override
-          public void onClick(View v){
-            if(System.checkNetworking(MITM.this) == false)
-              return;
-
-            setStoppedState();
-
-            startActivity
-              (
-                new Intent
-                  (
-                    MITM.this,
-                    PasswordSniffer.class
-                  )
-              );
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-          }
-        }));
+          startActivity
+            (
+              new Intent
+                (
+                  MITM.this,
+                  Sniffer.class
+                )
+            );
+          overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+        }
+      }));
 
     mActions.add(new Action
-      (
-        "Session Hijacker",
-        "Listen for cookies on the network and hijack sessions.",
-        R.drawable.action_hijack,
-        new OnClickListener(){
-          @Override
-          public void onClick(View v){
-            if(System.checkNetworking(MITM.this) == false)
-              return;
+    (
+      getString(R.string.mitm_password_sniff),
+      getString(R.string.mitm_password_sniff_desc),
+      R.drawable.action_passwords,
+      new OnClickListener(){
+        @Override
+        public void onClick(View v){
+          if(System.checkNetworking(MITM.this) == false)
+            return;
 
-            setStoppedState();
+          setStoppedState();
 
-            startActivity
-              (
-                new Intent
-                  (
-                    MITM.this,
-                    Hijacker.class
-                  )
-              );
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-          }
-        }));
-
-    mActions.add(new Action
-      (
-        "Kill Connections",
-        "Kill connections preventing the target to reach any website or server.",
-        R.drawable.action_kill,
-        new OnClickListener(){
-          @Override
-          public void onClick(View v){
-            if(System.checkNetworking(MITM.this) == false)
-              return;
-
-            ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);
-
-            if(activity.getVisibility() == View.INVISIBLE){
-              if(System.getCurrentTarget().getType() != Target.Type.ENDPOINT)
-                new ErrorDialog("Error", "Connection killer can be used only against single endpoints.", MITM.this).show();
-
-              else{
-                setStoppedState();
-
-                activity.setVisibility(View.VISIBLE);
-
-                Toast.makeText(MITM.this, "Tap again to stop.", Toast.LENGTH_LONG).show();
-
-                ConnectionKiller.start();
-              }
-            } else{
-
-              ConnectionKiller.stop();
-
-              activity.setVisibility(View.INVISIBLE);
-            }
-          }
-        }));
+          startActivity
+            (
+              new Intent
+                (
+                  MITM.this,
+                  PasswordSniffer.class
+                )
+            );
+          overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+        }
+      }));
 
     mActions.add(new Action
-      (
-        "Redirect",
-        "Redirect all the http traffic to another address.",
-        R.drawable.action_redirect,
-        new OnClickListener(){
-          @Override
-          public void onClick(View v){
-            if(System.checkNetworking(MITM.this) == false)
-              return;
+    (
+      getString(R.string.mitm_session_hijack),
+      getString(R.string.mitm_session_hijack_desc),
+      R.drawable.action_hijack,
+      new OnClickListener(){
+        @Override
+        public void onClick(View v){
+          if(System.checkNetworking(MITM.this) == false)
+            return;
 
-            final ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);
+          setStoppedState();
 
-            if(activity.getVisibility() == View.INVISIBLE){
+          startActivity
+            (
+              new Intent
+                (
+                  MITM.this,
+                  Hijacker.class
+                )
+            );
+          overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+        }
+      }));
+
+    mActions.add(new Action
+    (
+      getString(R.string.mitm_connection_kill),
+      getString(R.string.mitm_connection_kill_desc),
+      R.drawable.action_kill,
+      new OnClickListener(){
+        @Override
+        public void onClick(View v){
+          if(System.checkNetworking(MITM.this) == false)
+            return;
+
+          ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);
+
+          if(activity.getVisibility() == View.INVISIBLE){
+            if(System.getCurrentTarget().getType() != Target.Type.ENDPOINT)
+              new ErrorDialog(getString(R.string.error), getString(R.string.mitm_connection_kill_error), MITM.this).show();
+
+            else{
               setStoppedState();
 
-              new RedirectionDialog("Redirection", MITM.this, new RedirectionDialogListener(){
-                @Override
-                public void onInputEntered(String address, String port){
-                  if(address.isEmpty() == false && port.isEmpty() == false){
-                    try{
-                      int iport = Integer.parseInt(port);
+              activity.setVisibility(View.VISIBLE);
 
-                      if(iport <= 0 || iport > 65535)
-                        throw new Exception("Port out of range.");
+              Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
 
-                      address = address.startsWith("http") ? address : "http://" + address;
+              ConnectionKiller.start();
+            }
+          } else{
 
-                      URL url = new URL(address);
-                      address = url.getHost();
+            ConnectionKiller.stop();
+
+            activity.setVisibility(View.INVISIBLE);
+          }
+        }
+      }));
+
+    mActions.add(new Action
+    (
+      getString(R.string.mitm_redirect),
+      getString(R.string.mitm_redirect_desc),
+      R.drawable.action_redirect,
+      new OnClickListener(){
+        @Override
+        public void onClick(View v){
+          if(System.checkNetworking(MITM.this) == false)
+            return;
+
+          final ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);
+
+          if(activity.getVisibility() == View.INVISIBLE){
+            setStoppedState();
+
+            new RedirectionDialog( getString(R.string.mitm_redirection), MITM.this, new RedirectionDialogListener(){
+              @Override
+              public void onInputEntered(String address, String port){
+                if(address.isEmpty() == false && port.isEmpty() == false){
+                  try{
+                    int iport = Integer.parseInt(port);
+
+                    if(iport <= 0 || iport > 65535)
+                      throw new Exception(getString(R.string.error_port_outofrange));
+
+                    address = address.startsWith("http") ? address : "http://" + address;
+
+                    URL url = new URL(address);
+                    address = url.getHost();
+
+                    activity.setVisibility(View.VISIBLE);
+                    Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
+
+
+                    final String faddress = address;
+                    final int fport = iport;
+
+                    mSpoofSession = new SpoofSession();
+
+                    mSpoofSession.start(new OnSessionReadyListener(){
+                      @Override
+                      public void onSessionReady(){
+                        System.getProxy().setRedirection(faddress, fport);
+                      }
+
+                      @Override
+                      public void onError(String error){
+                        setSpoofErrorState(error);
+                      }
+                    });
+
+                  } catch(Exception e){
+                    new ErrorDialog(getString(R.string.error), e.getMessage(), MITM.this).show();
+                  }
+                } else
+                  new ErrorDialog(getString(R.string.error), getString(R.string.error_invalid_address_or_port), MITM.this).show();
+              }
+            }).show();
+          } else
+            setStoppedState();
+        }
+      }));
+
+    mActions.add(new Action
+    (
+      getString(R.string.mitm_image_replace),
+      getString(R.string.mitm_image_replace_desc),
+      R.drawable.action_image,
+      new OnClickListener(){
+        @Override
+        public void onClick(View v){
+          if(System.checkNetworking(MITM.this) == false)
+            return;
+
+          final ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);
+
+          if(activity.getVisibility() == View.INVISIBLE){
+            setStoppedState();
+
+            new ChoiceDialog(MITM.this, getString(R.string.choose_source), new String[]{ getString(R.string.local_images), "Web URL"}, new ChoiceDialogListener(){
+              @Override
+              public void onChoice(int choice){
+                if(choice == 0){
+                  try{
+                    mCurrentActivity = activity;
+                    startActivityForResult(mImagePicker, SELECT_PICTURE);
+                  } catch(ActivityNotFoundException e){
+                    new ErrorDialog(getString(R.string.error), getString(R.string.error_image_intent), MITM.this).show();
+                  }
+                } else{
+                  new InputDialog
+                    (
+                      getString(R.string.image),
+                      getString(R.string.enter_image_url),
+                      "",
+                      true,
+                      false,
+                      MITM.this,
+                      new InputDialogListener(){
+                        @Override
+                        public void onInputEntered(String input){
+                          String image = input.trim();
+
+                          if(image.isEmpty() == false){
+                            image = image.startsWith("http") ? image : "http://" + image;
+
+                            activity.setVisibility(View.VISIBLE);
+
+                            final String resource = image;
+                            mSpoofSession = new SpoofSession();
+                            mSpoofSession.start(new OnSessionReadyListener(){
+                              @Override
+                              public void onSessionReady(){
+                                System.getProxy().setFilter(new Proxy.ProxyFilter(){
+                                  @Override
+                                  public String onDataReceived(String headers, String data){
+                                    // handle img tags
+                                    data = data.replaceAll
+                                      (
+                                        "(?i)<img([^/]+)src=(['\"])[^'\"]+(['\"])",
+                                        "<img$1src=$2" + resource + "$3"
+                                      );
+
+                                    // handle css background declarations
+                                    data = data.replaceAll
+                                      (
+                                        "(?i)background\\s*(:|-)\\s*url\\s*[\\(|:][^\\);]+\\)?.*",
+                                        "background: url(" + resource + ")"
+                                      );
+
+                                    return data;
+                                  }
+                                });
+                              }
+
+                              @Override
+                              public void onError(String error){
+                                setSpoofErrorState(error);
+                              }
+                            });
+
+                            Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
+                          } else
+                            new ErrorDialog(getString(R.string.error), getString(R.string.error_image_url), MITM.this).show();
+                        }
+                      }
+                    ).show();
+                }
+              }
+            }).show();
+
+
+          } else{
+            mCurrentActivity = null;
+            setStoppedState();
+          }
+        }
+      }));
+
+    mActions.add(new Action
+    (
+      getString(R.string.mitm_video_replace),
+      getString(R.string.mitm_video_replace_desc),
+      R.drawable.action_youtube,
+      new OnClickListener(){
+        @Override
+        public void onClick(View v){
+          if(System.checkNetworking(MITM.this) == false)
+            return;
+
+          final ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);
+
+          if(activity.getVisibility() == View.INVISIBLE){
+            setStoppedState();
+
+            new InputDialog
+              (
+                getString(R.string.video),
+                getString(R.string.enter_video_url),
+                "http://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                true,
+                false,
+                MITM.this,
+                new InputDialogListener(){
+                  @Override
+                  public void onInputEntered(String input){
+                    final String video = input.trim();
+                    Matcher matcher = YOUTUBE_PATTERN.matcher(input);
+
+                    if(video.isEmpty() == false && matcher != null && matcher.find()){
+                      final String videoId = matcher.group(1);
 
                       activity.setVisibility(View.VISIBLE);
-                      Toast.makeText(MITM.this, "Tap again to stop.", Toast.LENGTH_LONG).show();
 
-
-                      final String faddress = address;
-                      final int fport = iport;
+                      Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
 
                       mSpoofSession = new SpoofSession();
-
                       mSpoofSession.start(new OnSessionReadyListener(){
                         @Override
                         public void onSessionReady(){
-                          System.getProxy().setRedirection(faddress, fport);
+                          System.getProxy().setFilter(new Proxy.ProxyFilter(){
+                            @Override
+                            public String onDataReceived(String headers, String data){
+                              if(data.matches("(?s).+/v=[a-zA-Z0-9_-]+.+"))
+                                data = data.replaceAll("(?s)/v=[a-zA-Z0-9_-]+", "/v=" + videoId);
+
+                              else if(data.matches("(?s).+/v/[a-zA-Z0-9_-]+.+"))
+                                data = data.replaceAll("(?s)/v/[a-zA-Z0-9_-]+", "/v/" + videoId);
+
+                              else if(data.matches("(?s).+/embed/[a-zA-Z0-9_-]+.+"))
+                                data = data.replaceAll("(?s)/embed/[a-zA-Z0-9_-]+", "/embed/" + videoId);
+
+                              return data;
+                            }
+                          });
                         }
 
                         @Override
@@ -560,268 +732,100 @@ public class MITM extends Plugin{
                           setSpoofErrorState(error);
                         }
                       });
-
-                    } catch(Exception e){
-                      new ErrorDialog("Error", e.getMessage(), MITM.this).show();
-                    }
-                  } else
-                    new ErrorDialog("Error", "Invalid address and/or port specified.", MITM.this).show();
-                }
-              }).show();
-            } else
-              setStoppedState();
-          }
-        }));
-
-    mActions.add(new Action
-      (
-        "Replace Images",
-        "Replace all images on webpages with the specified one.",
-        R.drawable.action_image,
-        new OnClickListener(){
-          @Override
-          public void onClick(View v){
-            if(System.checkNetworking(MITM.this) == false)
-              return;
-
-            final ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);
-
-            if(activity.getVisibility() == View.INVISIBLE){
-              setStoppedState();
-
-              new ChoiceDialog(MITM.this, "Choose a source:", new String[]{"Local Images", "Web URL"}, new ChoiceDialogListener(){
-                @Override
-                public void onChoice(int choice){
-                  if(choice == 0){
-                    try{
-                      mCurrentActivity = activity;
-                      startActivityForResult(mImagePicker, SELECT_PICTURE);
-                    } catch(ActivityNotFoundException e){
-                      new ErrorDialog("Error", "This is weird, seems like you have no application to handle image browsing.", MITM.this).show();
-                    }
-                  } else{
-                    new InputDialog
-                      (
-                        "Image",
-                        "Enter the url of the image :",
-                        "",
-                        true,
-                        false,
-                        MITM.this,
-                        new InputDialogListener(){
-                          @Override
-                          public void onInputEntered(String input){
-                            String image = input.trim();
-
-                            if(image.isEmpty() == false){
-                              image = image.startsWith("http") ? image : "http://" + image;
-
-                              activity.setVisibility(View.VISIBLE);
-
-                              final String resource = image;
-                              mSpoofSession = new SpoofSession();
-                              mSpoofSession.start(new OnSessionReadyListener(){
-                                @Override
-                                public void onSessionReady(){
-                                  System.getProxy().setFilter(new Proxy.ProxyFilter(){
-                                    @Override
-                                    public String onDataReceived(String headers, String data){
-                                      // handle img tags
-                                      data = data.replaceAll
-                                        (
-                                          "(?i)<img([^/]+)src=(['\"])[^'\"]+(['\"])",
-                                          "<img$1src=$2" + resource + "$3"
-                                        );
-
-                                      // handle css background declarations
-                                      data = data.replaceAll
-                                        (
-                                          "(?i)background\\s*(:|-)\\s*url\\s*[\\(|:][^\\);]+\\)?.*",
-                                          "background: url(" + resource + ")"
-                                        );
-
-                                      return data;
-                                    }
-                                  });
-                                }
-
-                                @Override
-                                public void onError(String error){
-                                  setSpoofErrorState(error);
-                                }
-                              });
-
-                              Toast.makeText(MITM.this, "Tap again to stop.", Toast.LENGTH_LONG).show();
-                            } else
-                              new ErrorDialog("Error", "Invalid image url.", MITM.this).show();
-                          }
-                        }
-                      ).show();
+                    } else
+                      new ErrorDialog(getString(R.string.error), getString(R.string.error_video_url), MITM.this).show();
                   }
                 }
-              }).show();
-
-
-            } else{
-              mCurrentActivity = null;
-              setStoppedState();
-            }
-          }
-        }));
+              ).show();
+          } else
+            setStoppedState();
+        }
+      }));
 
     mActions.add(new Action
-      (
-        "Replace Videos",
-        "Replace all youtube videos on webpages with the specified one.",
-        R.drawable.action_youtube,
-        new OnClickListener(){
-          @Override
-          public void onClick(View v){
-            if(System.checkNetworking(MITM.this) == false)
-              return;
+    (
+      getString(R.string.mitm_script_injection),
+      getString(R.string.mitm_script_injection_desc),
+      R.drawable.action_injection,
+      new OnClickListener(){
+        @Override
+        public void onClick(View v){
+          if(System.checkNetworking(MITM.this) == false)
+            return;
 
-            final ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);
+          final ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);
 
-            if(activity.getVisibility() == View.INVISIBLE){
-              setStoppedState();
+          if(activity.getVisibility() == View.INVISIBLE){
+            setStoppedState();
 
-              new InputDialog
-                (
-                  "Video",
-                  "Enter the url of the video :",
-                  "http://www.youtube.com/watch?v=dQw4w9WgXcQ",
-                  true,
-                  false,
-                  MITM.this,
-                  new InputDialogListener(){
-                    @Override
-                    public void onInputEntered(String input){
-                      final String video = input.trim();
-                      Matcher matcher = YOUTUBE_PATTERN.matcher(input);
+            new ChoiceDialog(MITM.this, getString(R.string.choose_method), new String[]{ getString(R.string.local_files), getString(R.string.custom_code)}, new ChoiceDialogListener(){
+              @Override
+              public void onChoice(int choice){
+                if(choice == 0){
+                  try{
+                    mCurrentActivity = activity;
+                    startActivityForResult(mScriptPicker, SELECT_SCRIPT);
+                  } catch(ActivityNotFoundException e){
+                    new ErrorDialog(getString(R.string.error), getString(R.string.error_file_intent), MITM.this).show();
+                  }
+                } else{
+                  new InputDialog
+                    (
+                      "Javascript",
+                      getString(R.string.enter_js_code),
+                      "<script type=\"text/javascript\">\n" +
+                        "  alert('This site has been hacked with dSploit!');\n" +
+                        "</script>",
+                      true,
+                      false,
+                      MITM.this,
+                      new InputDialogListener(){
+                        @Override
+                        public void onInputEntered(String input){
+                          final String js = input.trim();
+                          if(js.isEmpty() == false || js.startsWith("<script") == false){
+                            activity.setVisibility(View.VISIBLE);
 
-                      if(video.isEmpty() == false && matcher != null && matcher.find()){
-                        final String videoId = matcher.group(1);
+                            Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
 
-                        activity.setVisibility(View.VISIBLE);
-
-                        Toast.makeText(MITM.this, "Tap again to stop.", Toast.LENGTH_LONG).show();
-
-                        mSpoofSession = new SpoofSession();
-                        mSpoofSession.start(new OnSessionReadyListener(){
-                          @Override
-                          public void onSessionReady(){
-                            System.getProxy().setFilter(new Proxy.ProxyFilter(){
+                            mSpoofSession = new SpoofSession();
+                            mSpoofSession.start(new OnSessionReadyListener(){
                               @Override
-                              public String onDataReceived(String headers, String data){
-                                if(data.matches("(?s).+/v=[a-zA-Z0-9_-]+.+"))
-                                  data = data.replaceAll("(?s)/v=[a-zA-Z0-9_-]+", "/v=" + videoId);
+                              public void onSessionReady(){
+                                System.getProxy().setFilter(new Proxy.ProxyFilter(){
+                                  @Override
+                                  public String onDataReceived(String headers, String data){
+                                    return data.replaceAll("(?i)</head>", js + "</head>");
+                                  }
+                                });
+                              }
 
-                                else if(data.matches("(?s).+/v/[a-zA-Z0-9_-]+.+"))
-                                  data = data.replaceAll("(?s)/v/[a-zA-Z0-9_-]+", "/v/" + videoId);
-
-                                else if(data.matches("(?s).+/embed/[a-zA-Z0-9_-]+.+"))
-                                  data = data.replaceAll("(?s)/embed/[a-zA-Z0-9_-]+", "/embed/" + videoId);
-
-                                return data;
+                              @Override
+                              public void onError(String error){
+                                setSpoofErrorState(error);
                               }
                             });
-                          }
+                          } else
+                            new ErrorDialog(getString(R.string.error), getString(R.string.error_js_code), MITM.this).show();
+                        }
+                      }
+                    ).show();
+                }
+              }
 
-                          @Override
-                          public void onError(String error){
-                            setSpoofErrorState(error);
-                          }
-                        });
-                      } else
-                        new ErrorDialog("Error", "Invalid youtube video.", MITM.this).show();
-                    }
-                  }
-                ).show();
-            } else
-              setStoppedState();
+            }).show();
+          } else{
+            mCurrentActivity = null;
+            setStoppedState();
           }
-        }));
+        }
+      }));
 
     mActions.add(new Action
-      (
-        "Script Injection",
-        "Inject a javascript in every visited webpage.",
-        R.drawable.action_injection,
-        new OnClickListener(){
-          @Override
-          public void onClick(View v){
-            if(System.checkNetworking(MITM.this) == false)
-              return;
-
-            final ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);
-
-            if(activity.getVisibility() == View.INVISIBLE){
-              setStoppedState();
-
-              new ChoiceDialog(MITM.this, "Choose a method:", new String[]{"Local files", "Custom Code"}, new ChoiceDialogListener(){
-                @Override
-                public void onChoice(int choice){
-                  if(choice == 0){
-                    try{
-                      mCurrentActivity = activity;
-                      startActivityForResult(mScriptPicker, SELECT_SCRIPT);
-                    } catch(ActivityNotFoundException e){
-                      new ErrorDialog("Error", "Seems like you have no file manager capable of browsing files, please install one.", MITM.this).show();
-                    }
-                  } else{
-                    new InputDialog
-                      (
-                        "Javascript",
-                        "Enter the js code to inject :",
-                        "<script type=\"text/javascript\">\n" +
-                          "  alert('This site has been hacked with dSploit!');\n" +
-                          "</script>",
-                        true,
-                        false,
-                        MITM.this,
-                        new InputDialogListener(){
-                          @Override
-                          public void onInputEntered(String input){
-                            final String js = input.trim();
-                            if(js.isEmpty() == false || js.startsWith("<script") == false){
-                              activity.setVisibility(View.VISIBLE);
-
-                              Toast.makeText(MITM.this, "Tap again to stop.", Toast.LENGTH_LONG).show();
-
-                              mSpoofSession = new SpoofSession();
-                              mSpoofSession.start(new OnSessionReadyListener(){
-                                @Override
-                                public void onSessionReady(){
-                                  System.getProxy().setFilter(new Proxy.ProxyFilter(){
-                                    @Override
-                                    public String onDataReceived(String headers, String data){
-                                      return data.replaceAll("(?i)</head>", js + "</head>");
-                                    }
-                                  });
-                                }
-
-                                @Override
-                                public void onError(String error){
-                                  setSpoofErrorState(error);
-                                }
-                              });
-                            } else
-                              new ErrorDialog("Error", "Invalid javascript code, remember to use <script></script> enclosing tags.", MITM.this).show();
-                          }
-                        }
-                      ).show();
-                  }
-                }
-
-              }).show();
-            } else{
-              mCurrentActivity = null;
-              setStoppedState();
-            }
-          }
-        }));
-
-    mActions.add(new Action("Custom Filter", "Replace custom text on webpages with the specified one.", new OnClickListener(){
+    (
+      getString(R.string.mitm_custom),
+      getString(R.string.mitm_custom_desc),
+      new OnClickListener(){
       @Override
       public void onClick(View v){
         if(System.checkNetworking(MITM.this) == false)
@@ -832,7 +836,7 @@ public class MITM extends Plugin{
         if(activity.getVisibility() == View.INVISIBLE){
           setStoppedState();
 
-          new CustomFilterDialog("Custom Filter", MITM.this, new CustomFilterDialogListener(){
+          new CustomFilterDialog( getString(R.string.custom_filter), MITM.this, new CustomFilterDialogListener(){
             @Override
             public void onInputEntered(final ArrayList<String> from, final ArrayList<String> to){
 
@@ -844,7 +848,7 @@ public class MITM extends Plugin{
 
                   activity.setVisibility(View.VISIBLE);
 
-                  Toast.makeText(MITM.this, "Tap again to stop.", Toast.LENGTH_LONG).show();
+                  Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
 
                   mSpoofSession = new SpoofSession();
                   mSpoofSession.start(new OnSessionReadyListener(){
@@ -868,10 +872,10 @@ public class MITM extends Plugin{
                     }
                   });
                 } catch(PatternSyntaxException e){
-                  new ErrorDialog("Error", "Invalid regular expression: " + e.getDescription() + " .", MITM.this).show();
+                  new ErrorDialog(getString(R.string.error), getString(R.string.error_filter) + ": " + e.getDescription() + " .", MITM.this).show();
                 }
               } else
-                new ErrorDialog("Error", "Invalid regular expression.", MITM.this).show();
+                new ErrorDialog(getString(R.string.error), getString(R.string.error_filter), MITM.this).show();
             }
           }
           ).show();

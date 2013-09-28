@@ -212,4 +212,56 @@
     </string>
     <string name="trying">Trying</string>
     <string name="left">left</string>
+    <string name="error_filepath2">Could not determine file path.</string>
+    <string name="tap_again">Tap again to stop.</string>
+    <string name="unexpected_file_error">Unexpected error while reading the file : </string>
+    <string name="the_port">The port</string>
+    <string name="error_proxy_port"> which is needed by the transparent proxy is taken from another process, open application settings ?</string>
+    <string name="error_mitm_port"> which is needed by the mitm server is taken from another process, open application settings ?</string>
+    <string name="error_https_port"> which is needed by the mitm https redirector is taken from another process, open application settings ?</string>
+    <string name="error_mitm_ports">MITM modules need all ports available.</string>
+
+    <!-- mitm modules -->
+    <string name="mitm_simple_sniff">Simple Sniff</string>
+    <string name="mitm_simple_sniff_desc">Redirect target\'s traffic through this device and show some stats while dumping it to a pcap file.</string>
+    <string name="mitm_password_sniff">Password Sniffer</string>
+    <string name="mitm_password_sniff_desc">Sniff passwords of many protocols such as http, ftp, imap, imaps, irc, msn, etc from the target.</string>
+    <string name="mitm_session_hijack">Session Hijacker</string>
+    <string name="mitm_session_hijack_desc">Listen for cookies on the network and hijack sessions.</string>
+    <string name="mitm_connection_kill">Kill Connections</string>
+    <string name="mitm_connection_kill_desc">Kill connections preventing the target to reach any website or server.</string>
+    <string name="mitm_connection_kill_error">Connection killer can be used only against single endpoints.</string>
+    <string name="mitm_redirect">Redirect</string>
+    <string name="mitm_redirect_desc">Redirect all the http traffic to another address.</string>
+    <string name="mitm_redirection">Redirection</string>
+    <string name="error_port_outofrange">Port out of range.</string>
+    <string name="error_invalid_address_or_port">Invalid address and/or port specified.</string>
+    <string name="mitm_image_replace">Replace Images</string>
+    <string name="mitm_image_replace_desc">Replace all images on webpages with the specified one.</string>
+    <string name="choose_source">Choose a source:</string>
+    <string name="local_images">Local Images</string>
+    <string name="error_image_intent">This is weird, seems like you have no application to handle image browsing.</string>
+    <string name="image">Image</string>
+    <string name="enter_image_url">Enter the url of the image :</string>
+    <string name="error_image_url">Invalid image url.</string>
+    <string name="mitm_video_replace">Replace Videos</string>
+    <string name="mitm_video_replace_desc">Replace all youtube videos on webpages with the specified one.</string>
+    <string name="video">Video</string>
+    <string name="enter_video_url">Enter the url of the video :</string>
+    <string name="error_video_url">Invalid youtube video.</string>
+    <string name="mitm_script_injection">Script Injection</string>
+    <string name="mitm_script_injection_desc">Inject a javascript in every visited webpage.</string>
+    <string name="choose_method">Choose a method:</string>
+    <string name="local_files">Local files</string>
+    <string name="custom_code">Custom Code</string>
+    <string name="error_file_intent">Seems like you have no file manager capable of browsing files, please install one.</string>
+    <string name="enter_js_code">Enter the js code to inject :</string>
+    <string name="error_js_code"><![CDATA[Invalid javascript code, remember to use <script></script> enclosing tags.]]></string>
+    <string name="mitm_custom">Custom Filter</string>
+    <string name="mitm_custom_desc">Replace custom text on webpages with the specified one.</string>
+    <string name="custom_filter">Custom Filter</string>
+    <string name="error_filter">Invalid regular expression</string>
+    <string name="file_output">File Output</string>
+    <string name="question_save_to_pcap">Do you want to save sniffed traffic to a pcap file ?</string>
+    <string name="dumping_traffic_to">Dumping traffic to </string>
 </resources>

@@ -316,7 +316,7 @@ public class Sniffer extends SherlockActivity{
     }
     );
 
-    new ConfirmDialog("File Output", "Do you want to save sniffed traffic to a pcap file ?", this, new ConfirmDialogListener(){
+    new ConfirmDialog( getString(R.string.file_output), getString(R.string.question_save_to_pcap), this, new ConfirmDialogListener(){
       @Override
       public void onConfirm(){
         mDumpToFile = true;
@@ -375,7 +375,7 @@ public class Sniffer extends SherlockActivity{
     System.getTcpDump().kill();
 
     if(mDumpToFile)
-      Toast.makeText(Sniffer.this, "Dumping traffic to " + mPcapFileName, Toast.LENGTH_SHORT).show();
+      Toast.makeText(Sniffer.this, getString(R.string.dumping_traffic_to) + mPcapFileName, Toast.LENGTH_SHORT).show();
 
     mSpoofSession.start(new OnSessionReadyListener(){
       @Override

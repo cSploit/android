@@ -222,5 +222,56 @@
     </string>
     <string name="trying">Provo</string>
     <string name="left">rimasti</string>
+    <string name="error_filepath2">Impossibile determinare il percorso del file.</string>
+    <string name="tap_again">Premi di nuovo per fermare.</string>
+    <string name="unexpected_file_error">Errore inatteso durante la lettura del file : </string>
+    <string name="the_port">La porta</string>
+    <string name="error_proxy_port"> della quale ha bisogno il transparent proxy è occupata da un altro processo, aprire le impostazioni ?</string>
+    <string name="error_mitm_port"> della quale ha bisogno il server mitm è occupata da un altro processo, aprire le impostazioni ?</string>
+    <string name="error_https_port"> della quale ha bisogno il redirezionatore https è occupata da un altro processo, aprire le impostazioni ?</string>
+    <string name="error_mitm_ports">Le porte devono essere disponibili per poter utilizzare i moduli MITM.</string>
 
+    <!-- mitm modules -->
+    <string name="mitm_simple_sniff">Sniffer Semplice</string>
+    <string name="mitm_simple_sniff_desc">Redireziona il traffico dell\'obiettivo attraverso questo dispositivo e mostra alcune statistiche mentre lo salva su un file pcap.</string>
+    <string name="mitm_password_sniff">Sniffer di Password</string>
+    <string name="mitm_password_sniff_desc">Intercetta le password di diversi protocolli come http, ftp, imap, imaps, irc, msn, ecc dal dispositivo.</string>
+    <string name="mitm_session_hijack">Hijacker di Sessione</string>
+    <string name="mitm_session_hijack_desc">Intercetta i cookie e le sessioni nella rete per consentire l\'hijacking.</string>
+    <string name="mitm_connection_kill">Killa Connessioni</string>
+    <string name="mitm_connection_kill_desc">Interrompe la connettività dell\'obiettivo impedendone la navigazione verso qualsiasi sito web.</string>
+    <string name="mitm_connection_kill_error">Questo modulo può essere utilizzato solo contro singoli obiettivi.</string>
+    <string name="mitm_redirect">Redirect</string>
+    <string name="mitm_redirect_desc">Redireziona tutto il traffico http verso un altro indirizzo.</string>
+    <string name="mitm_redirection">Redirezione</string>
+    <string name="error_port_outofrange">Porta fuori dall\'intervallo consentito.</string>
+    <string name="error_invalid_address_or_port">Indirizzo e/o porta specificati non validi.</string>
+    <string name="mitm_image_replace">Sostituisci Immagini</string>
+    <string name="mitm_image_replace_desc">Sostituisce tutte le immagini dei siti web navigati con quella specificata.</string>
+    <string name="choose_source">Seleziona una sorgente:</string>
+    <string name="local_images">Immagini Locali</string>
+    <string name="error_image_intent">Questo è strano, sembrerebbe che non hai un applicazione che gestisca il browsing delle immagini.</string>
+    <string name="image">Immagine</string>
+    <string name="enter_image_url">Inserisci l\'url dell\'immagine :</string>
+    <string name="error_image_url">URL dell\'immagine non valido.</string>
+    <string name="mitm_video_replace">Sostituisci Video</string>
+    <string name="mitm_video_replace_desc">Sostituisce tutti i video di youtube sulle pagine navigate con quello specificato.</string>
+    <string name="video">Video</string>
+    <string name="enter_video_url">Inserisci l\'url del video :</string>
+    <string name="error_video_url">URL del video non valido.</string>
+    <string name="mitm_script_injection">Iniezione di Script</string>
+    <string name="mitm_script_injection_desc">Inietta un javascript in ogni pagina visitata.</string>
+    <string name="choose_method">Seleziona un Metodo:</string>
+    <string name="local_files">File Locali</string>
+    <string name="custom_code">Codice Personalizzato</string>
+    <string name="error_file_intent">Sembrerebbe che non hai un file manager in grado di sfogliare i file, per favore installane uno.</string>
+    <string name="enter_js_code">Inserisci il codice js da iniettare :</string>
+    <string name="error_js_code"><![CDATA[Codice javascript non valido, ricordati di usare i tag <script></script> .]]></string>
+    <string name="mitm_custom">Filtro Personalizzato</string>
+    <string name="mitm_custom_desc">Sostituisce del testo arbitrario con quello personalizzato.</string>
+    <string name="custom_filter">Filtro Personalizzato</string>
+    <string name="error_filter">Espressione regolare non valida</string>
+    <string name="file_output">Output su File</string>
+    <string name="question_save_to_pcap">Vuoi che il traffico intercettato venga salvato in un file pcap ?</string>
+    <string name="dumping_traffic_to">Traffico dumpato su </string>
 </resources>
