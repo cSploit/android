@@ -22,6 +22,7 @@ import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.tools.Ettercap.OnAccountListener;
+import it.evilsocket.dsploit.R;
 
 public class SpoofSession{
   private static final String TAG = "SPOOFSESSION";
@@ -33,8 +34,7 @@ public class SpoofSession{
 
   public static abstract interface OnSessionReadyListener{
     public void onSessionReady();
-
-    public void onError(String error);
+    public void onError(String errorString, int errorStringId);
   }
 
   public SpoofSession(boolean withProxy, boolean withServer, String serverFileName, String serverMimeType){
@@ -54,13 +54,13 @@ public class SpoofSession{
 
     if(mWithProxy){
       if(System.getProxy() == null){
-        listener.onError("Unable to create the proxy, please check your connection and port availability.");
+        listener.onError( null, R.string.error_mitm_proxy );
         return;
       }
 
       if(System.getSettings().getBoolean("PREF_HTTPS_REDIRECT", true)){
         if(System.getHttpsRedirector() == null){
-          listener.onError("Unable to create the HTTPS redirector, please check your connection and port availability.");
+          listener.onError( null, R.string.error_mitm_https_redirector );
           return;
         }
         new Thread(System.getHttpsRedirector()).start();
@@ -72,7 +72,7 @@ public class SpoofSession{
     if(mWithServer){
       try{
         if(System.getServer() == null){
-          listener.onError("Unable to create the resource server, please check your connection and port availability.");
+          listener.onError( null, R.string.error_mitm_resource_server );
           return;
         }
 
@@ -105,7 +105,7 @@ public class SpoofSession{
         // android.util.Log.d( "ARPSPOOF", line );
 
         if(line.startsWith("[ERROR]"))
-          listener.onError(line.substring("[ERROR]".length() + 1).trim());
+          listener.onError(line.substring("[ERROR]".length() + 1).trim(),-1);
       }
 
       @Override

@@ -274,4 +274,8 @@
     <string name="file_output">Output su File</string>
     <string name="question_save_to_pcap">Vuoi che il traffico intercettato venga salvato in un file pcap ?</string>
     <string name="dumping_traffic_to">Traffico dumpato su </string>
+
+    <string name="error_mitm_proxy">Impossibile avviare il proxy, controlla la connessione e la disponibilità delle porte.</string>
+    <string name="error_mitm_https_redirector">Impossibile avviare il redirezionatore HTTPS, controlla la connessione e la disponibilità delle porte.</string>
+    <string name="error_mitm_resource_server">Impossibile avviare il server delle risorse, controlla la connessione e la disponibilità delle porte.</string>
 </resources>

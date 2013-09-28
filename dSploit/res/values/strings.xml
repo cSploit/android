@@ -264,4 +264,8 @@
     <string name="file_output">File Output</string>
     <string name="question_save_to_pcap">Do you want to save sniffed traffic to a pcap file ?</string>
     <string name="dumping_traffic_to">Dumping traffic to </string>
+
+    <string name="error_mitm_proxy">Unable to create the proxy, please check your connection and port availability.</string>
+    <string name="error_mitm_https_redirector">Unable to create the HTTPS redirector, please check your connection and port availability.</string>
+    <string name="error_mitm_resource_server">Unable to create the resource server, please check your connection and port availability.</string>
 </resources>

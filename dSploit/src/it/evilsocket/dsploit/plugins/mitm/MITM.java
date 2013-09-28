@@ -227,7 +227,8 @@ public class MITM extends Plugin{
             }
 
             @Override
-            public void onError(String error){
+            public void onError(String error, int resId){
+              error = error == null ? getString(resId) : error;
               setSpoofErrorState(error);
             }
           });
@@ -280,7 +281,8 @@ public class MITM extends Plugin{
             }
 
             @Override
-            public void onError(String error){
+            public void onError(String error, int resId){
+              error = error == null ? getString(resId) : error;
               setSpoofErrorState(error);
             }
           });
@@ -556,7 +558,8 @@ public class MITM extends Plugin{
                       }
 
                       @Override
-                      public void onError(String error){
+                      public void onError(String error, int resId){
+                        error = error == null ? getString(resId) : error;
                         setSpoofErrorState(error);
                       }
                     });
@@ -646,7 +649,8 @@ public class MITM extends Plugin{
                               }
 
                               @Override
-                              public void onError(String error){
+                              public void onError(String error, int resId){
+                                error = error == null ? getString(resId) : error;
                                 setSpoofErrorState(error);
                               }
                             });
@@ -728,7 +732,8 @@ public class MITM extends Plugin{
                         }
 
                         @Override
-                        public void onError(String error){
+                        public void onError(String error, int resId){
+                          error = error == null ? getString(resId) : error;
                           setSpoofErrorState(error);
                         }
                       });
@@ -801,7 +806,8 @@ public class MITM extends Plugin{
                               }
 
                               @Override
-                              public void onError(String error){
+                              public void onError(String error, int resId){
+                                error = error == null ? getString(resId) : error;
                                 setSpoofErrorState(error);
                               }
                             });
@@ -867,7 +873,8 @@ public class MITM extends Plugin{
                     }
 
                     @Override
-                    public void onError(String error){
+                    public void onError(String error, int resId){
+                      error = error == null ? getString(resId) : error;
                       setSpoofErrorState(error);
                     }
                   });

@@ -36,6 +36,7 @@ import com.actionbarsherlock.view.MenuItem;
 import java.util.ArrayList;
 
 import it.evilsocket.dsploit.core.Plugin;
+import it.evilsocket.dsploit.core.Profiler;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.dialogs.FinishDialog;
 
@@ -77,10 +78,8 @@ public class ActionActivity extends SherlockListActivity{
   protected void onListItemClick(ListView l, View v, int position, long id){
     super.onListItemClick(l, v, position, id);
 
-
     if(System.checkNetworking(this)){
       Plugin plugin = mAvailable.get(position);
-
       System.setCurrentPlugin(plugin);
 
       if(plugin.hasLayoutToShow()){
