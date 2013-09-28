@@ -53,6 +53,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import it.evilsocket.dsploit.core.ManagedReceiver;
+import it.evilsocket.dsploit.core.Profiler;
 import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.ToolsInstaller;
@@ -226,15 +227,14 @@ public class MainActivity extends SherlockListActivity{
       if(connectivityAvailable)
         createUpdateLayout();
 
-        // no connectivity at all
+       // no connectivity at all
       else
         createOfflineLayout();
     }
     // we are online, and the system was already initialized
     else if(mTargetAdapter != null)
       createOnlineLayout();
-
-      // initialize the ui for the first time
+    // initialize the ui for the first time
     else{
       final ProgressDialog dialog = ProgressDialog.show(this, "", getString(R.string.initializing), true, false);
 
@@ -291,7 +291,8 @@ public class MainActivity extends SherlockListActivity{
               }
               try{
                 createOnlineLayout();
-              } catch(Exception e){
+              }
+              catch(Exception e){
                 new FatalDialog(getString(R.string.error), e.getMessage(), MainActivity.this).show();
               }
             }
@@ -354,14 +355,16 @@ public class MainActivity extends SherlockListActivity{
       Toast.makeText(this, getString(R.string.net_discovery_started), Toast.LENGTH_SHORT).show();
   }
 
-  public void stopNetworkDiscovery(boolean silent){
+  public void stopNetworkDiscovery(boolean silent, boolean joinThreads){
     if(mNetworkDiscovery != null){
       if(mNetworkDiscovery.isRunning()){
         mNetworkDiscovery.exit();
-        try{
-          mNetworkDiscovery.join();
-        } catch(Exception e){
-          // swallow
+
+        if( joinThreads ) {
+          try{
+            mNetworkDiscovery.join();
+          } catch(Exception e){
+          }
         }
 
         if(!silent)
@@ -372,9 +375,12 @@ public class MainActivity extends SherlockListActivity{
     }
   }
 
+  public void stopNetworkDiscovery(boolean silent) {
+    stopNetworkDiscovery(silent,true);
+  }
+
   @Override
   public boolean onOptionsItemSelected(MenuItem item){
-
     int itemId = item.getItemId();
 
     if(itemId == R.id.add){
@@ -392,14 +398,16 @@ public class MainActivity extends SherlockListActivity{
                 }
               }
             });
-          } else
+          }
+          else
             new ErrorDialog(getString(R.string.error), getString(R.string.invalid_target), MainActivity.this).show();
         }
       }
       ).show();
 
       return true;
-    } else if(itemId == R.id.scan){
+    }
+    else if(itemId == R.id.scan){
       if(mMenu != null)
         mMenu.findItem(R.id.scan).setActionView(new ProgressBar(this));
 
@@ -421,7 +429,8 @@ public class MainActivity extends SherlockListActivity{
       item.setTitle(getString(R.string.stop_monitor));
 
       return true;
-    } else if(itemId == R.id.wifi_scan){
+    }
+    else if(itemId == R.id.wifi_scan){
       stopNetworkDiscovery(true);
 
       if(mEndpointReceiver != null)
@@ -433,7 +442,8 @@ public class MainActivity extends SherlockListActivity{
       startActivityForResult(new Intent(MainActivity.this, WifiScannerActivity.class), WIFI_CONNECTION_REQUEST);
 
       return true;
-    } else if(itemId == R.id.new_session){
+    }
+    else if(itemId == R.id.new_session){
       new ConfirmDialog(getString(R.string.warning), getString(R.string.warning_new_session), this, new ConfirmDialogListener(){
         @Override
         public void onConfirm(){
@@ -442,7 +452,8 @@ public class MainActivity extends SherlockListActivity{
             mTargetAdapter.notifyDataSetChanged();
 
             Toast.makeText(MainActivity.this, getString(R.string.new_session_started), Toast.LENGTH_SHORT).show();
-          } catch(Exception e){
+          }
+          catch(Exception e){
             new FatalDialog(getString(R.string.error), e.toString(), MainActivity.this).show();
           }
         }
@@ -454,7 +465,8 @@ public class MainActivity extends SherlockListActivity{
       }).show();
 
       return true;
-    } else if(itemId == R.id.save_session){
+    }
+    else if(itemId == R.id.save_session){
       new InputDialog(getString(R.string.save_session), getString(R.string.enter_session_name), System.getSessionName(), true, false, MainActivity.this, new InputDialogListener(){
         @Override
         public void onInputEntered(String input){
@@ -465,17 +477,20 @@ public class MainActivity extends SherlockListActivity{
               String filename = System.saveSession(name);
 
               Toast.makeText(MainActivity.this, getString(R.string.session_saved_to) + filename + " .", Toast.LENGTH_SHORT).show();
-            } catch(IOException e){
+            }
+            catch(IOException e){
               new ErrorDialog(getString(R.string.error), e.toString(), MainActivity.this).show();
             }
-          } else
+          }
+          else
             new ErrorDialog(getString(R.string.error), getString(R.string.invalid_session), MainActivity.this).show();
         }
       }
       ).show();
 
       return true;
-    } else if(itemId == R.id.restore_session){
+    }
+    else if(itemId == R.id.restore_session){
       final ArrayList<String> sessions = System.getAvailableSessionFiles();
 
       if(sessions != null && sessions.size() > 0){
@@ -487,44 +502,52 @@ public class MainActivity extends SherlockListActivity{
             try{
               System.loadSession(session);
               mTargetAdapter.notifyDataSetChanged();
-            } catch(Exception e){
+            }
+            catch(Exception e){
               e.printStackTrace();
               new ErrorDialog(getString(R.string.error), e.getMessage(), MainActivity.this).show();
             }
           }
         }).show();
-      } else
+      }
+      else
         new ErrorDialog(getString(R.string.error), getString(R.string.no_session_found), MainActivity.this).show();
 
       return true;
-    } else if(itemId == R.id.settings){
+    }
+    else if(itemId == R.id.settings){
       startActivity(new Intent(MainActivity.this, SettingsActivity.class));
 
       return true;
-    } else if(itemId == R.id.ss_monitor){
+    }
+    else if(itemId == R.id.ss_monitor){
       if(mNetworkDiscovery != null && mNetworkDiscovery.isRunning()){
         stopNetworkDiscovery(false);
 
         item.setTitle(getString(R.string.start_monitor));
-      } else{
+      }
+      else {
         startNetworkDiscovery(false);
 
         item.setTitle(getString(R.string.stop_monitor));
       }
 
       return true;
-    } else if(itemId == R.id.submit_issue){
+    }
+    else if(itemId == R.id.submit_issue){
       String uri = getString(R.string.github_issues);
       Intent browser = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
 
       startActivity(browser);
 
       return true;
-    } else if(itemId == R.id.about){
+    }
+    else if(itemId == R.id.about){
       new AboutDialog(this).show();
 
       return true;
-    } else
+    }
+    else
       return super.onOptionsItemSelected(item);
   }
 
@@ -535,8 +558,14 @@ public class MainActivity extends SherlockListActivity{
     new Thread(new Runnable(){
       @Override
       public void run(){
-        stopNetworkDiscovery(true);
+        /*
+         * Do not wait network discovery threads to exit since this would cause
+         * a long waiting when it's scanning big networks.
+         */
+        stopNetworkDiscovery(true, false);
+
         startActivityForResult(new Intent(MainActivity.this, ActionActivity.class), WIFI_CONNECTION_REQUEST);
+
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
       }
     }).start();
@@ -551,8 +580,9 @@ public class MainActivity extends SherlockListActivity{
       mToast = Toast.makeText(this, getString(R.string.press_back), Toast.LENGTH_SHORT);
       mToast.show();
       mLastBackPressTime = java.lang.System.currentTimeMillis();
-    } else{
-      if(mToast != null)
+    }
+    else {
+      if( mToast != null )
         mToast.cancel();
 
       new ConfirmDialog(getString(R.string.exit), getString(R.string.close_confirm), this, new ConfirmDialogListener(){
@@ -562,8 +592,7 @@ public class MainActivity extends SherlockListActivity{
         }
 
         @Override
-        public void onCancel(){
-        }
+        public void onCancel(){ }
       }).show();
 
       mLastBackPressTime = 0;
@@ -617,14 +646,15 @@ public class MainActivity extends SherlockListActivity{
 
         if(row != null)
           row.setTag(holder);
-
-      } else
+      }
+      else
         holder = (TargetHolder) row.getTag();
 
       Target target = System.getTarget(position);
 
       if(target.hasAlias())
         holder.itemTitle.setText(Html.fromHtml("<b>" + target.getAlias() + "</b> <small>( " + target.getDisplayAddress() + " )</small>"));
+
       else
         holder.itemTitle.setText(target.toString());
 
@@ -662,8 +692,8 @@ public class MainActivity extends SherlockListActivity{
       if(intent.getAction() != null)
         if(intent.getAction().equals(NEW_ENDPOINT)){
           String address = (String) intent.getExtras().get(ENDPOINT_ADDRESS),
-            hardware = (String) intent.getExtras().get(ENDPOINT_HARDWARE),
-            name = (String) intent.getExtras().get(ENDPOINT_NAME);
+                 hardware = (String) intent.getExtras().get(ENDPOINT_HARDWARE),
+                 name = (String) intent.getExtras().get(ENDPOINT_NAME);
           final Target target = Target.getFromString(address);
 
           if(target != null && target.getEndpoint() != null){
@@ -682,7 +712,8 @@ public class MainActivity extends SherlockListActivity{
               }
             });
           }
-        } else if(intent.getAction().equals(ENDPOINT_UPDATE)){
+        }
+        else if(intent.getAction().equals(ENDPOINT_UPDATE)){
           // refresh the target listview
           MainActivity.this.runOnUiThread(new Runnable(){
             @Override
@@ -714,9 +745,11 @@ public class MainActivity extends SherlockListActivity{
     public void onReceive(Context context, Intent intent){
       if(mUpdateStatus != null && intent.getAction().equals(UPDATE_CHECKING) && mUpdateStatus != null){
         mUpdateStatus.setText(NO_WIFI_UPDATE_MESSAGE.replace("#STATUS#", getString(R.string.checking)));
-      } else if(mUpdateStatus != null && intent.getAction().equals(UPDATE_NOT_AVAILABLE) && mUpdateStatus != null){
+      }
+      else if(mUpdateStatus != null && intent.getAction().equals(UPDATE_NOT_AVAILABLE) && mUpdateStatus != null){
         mUpdateStatus.setText(NO_WIFI_UPDATE_MESSAGE.replace("#STATUS#", getString(R.string.no_updates_available)));
-      } else if(intent.getAction().equals(UPDATE_AVAILABLE)){
+      }
+      else if(intent.getAction().equals(UPDATE_AVAILABLE)){
         final String remoteVersion = (String) intent.getExtras().get(AVAILABLE_VERSION);
 
         if(mUpdateStatus != null)
