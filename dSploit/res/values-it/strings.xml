@@ -214,7 +214,7 @@
     <string name="untraced_hops">hops non tracciati</string>
     <string name="stopped_dots">Fermo ...</string>
     <string name="starting_dots">In esecuzione ...</string>
-    <string name="add_username">Imposta l'username</string>
+    <string name="add_username">Imposta l\'username</string>
     <string name="enter_username">Inserisci il nome utente che desideri utilizzare:</string>
     <string name="select_wordlist">Seleziona una Wordlist</string>
     <string name="error_filepath">Impossibile determinare il percorso del file, per favore utilizza
