@@ -41,7 +41,7 @@ local.properties
 .loadpath
 actionbarsherlock/build/
 dSploit/build/
-.gradle
+.gradle/
 .idea/workspace.xml
 
 # External tool builders
