@@ -11,10 +11,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:layout_below="@+id/statusText"></ListView>
+            android:layout_below="@+id/scanStatusText"></ListView>
 
     <TextView
-            android:id="@+id/statusText"
+            android:id="@+id/scanStatusText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/android:list"

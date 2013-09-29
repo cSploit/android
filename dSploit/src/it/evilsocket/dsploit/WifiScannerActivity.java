@@ -134,7 +134,7 @@ public class WifiScannerActivity extends SherlockListActivity{
     mWifiMatcher = new WirelessMatcher(getResources().openRawResource(R.raw.alice));
     mScanReceiver = new ScanReceiver();
     mConnectionReceiver = new ConnectionReceiver();
-    mStatusText = (TextView) findViewById(R.id.statusText);
+    mStatusText = (TextView) findViewById(R.id.scanStatusText);
     mAdapter = new ScanAdapter();
     mKeyList = new ArrayList<String>();
 
