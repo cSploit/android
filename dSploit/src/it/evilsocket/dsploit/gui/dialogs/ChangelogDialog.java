@@ -88,7 +88,7 @@ public class ChangelogDialog extends AlertDialog{
 
     this.setView(view);
 
-    view.loadUrl("http://www.dsploit.net/changelog.php");
+    view.loadUrl("http://update.dsploit.net/changelog.html");
 
     this.setCancelable(false);
     this.setButton("Ok", new DialogInterface.OnClickListener(){

@@ -37,8 +37,8 @@ import it.evilsocket.dsploit.MainActivity;
 
 public class UpdateManager{
   private static final String TAG = "UPDATEMANAGER";
-  private static final String REMOTE_VERSION_URL = "http://www.dsploit.net/getlatestversion.php";
-  private static final String REMOTE_DOWNLOAD_URL = "http://www.dsploit.net/getlatest.php";
+  private static final String REMOTE_VERSION_URL = "http://update.dsploit.net/version";
+  private static final String REMOTE_DOWNLOAD_URL = "http://update.dsploit.net/apk";
   private static final String VERSION_CHAR_MAP = "zyxwvutsrqponmlkjihgfedcba";
 
   private Context mContext = null;
@@ -81,7 +81,8 @@ public class UpdateManager{
         }
 
         code += ((Integer.parseInt(digit) + 1) * coeff) - ((VERSION_CHAR_MAP.indexOf(letter.toLowerCase()) + 1) / 100.0);
-      } else if(item.matches("\\d+"))
+      }
+      else if(item.matches("\\d+"))
         code += (Integer.parseInt(item) + 1) * coeff;
 
       else
@@ -194,7 +195,7 @@ public class UpdateManager{
         sampled = 0;
       long time = java.lang.System.currentTimeMillis();
       double speed = 0.0,
-        deltat;
+             deltat;
 
       while(progress.isShowing() && (read = reader.read(buffer)) != -1){
         writer.write(buffer, 0, read);
@@ -217,8 +218,8 @@ public class UpdateManager{
         activity.runOnUiThread(new Runnable(){
           @Override
           public void run(){
-            progress.setMessage("[ " + formatSpeed((int) fspeed) + " ] " + formatSize(fdown) + " / " + formatSize(ftot) + " ...");
-            progress.setProgress((100 * fdown) / ftot);
+          progress.setMessage("[ " + formatSpeed((int) fspeed) + " ] " + formatSize(fdown) + " / " + formatSize(ftot) + " ...");
+          progress.setProgress((100 * fdown) / ftot);
           }
         });
 
@@ -233,11 +234,13 @@ public class UpdateManager{
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         mContext.startActivity(intent);
-      } else
+      }
+      else
         Log.d(TAG, "Download cancelled.");
 
       return true;
-    } catch(Exception e){
+    }
+    catch(Exception e){
       System.errorLogging(TAG, e);
     }
 

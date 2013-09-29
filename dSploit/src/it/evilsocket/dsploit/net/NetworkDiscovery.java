@@ -74,7 +74,8 @@ public class NetworkDiscovery extends Thread
   private ArpReader mArpReader = null;
   private boolean mRunning = false;
 
-  private class ArpReader extends Thread{
+  private class ArpReader extends Thread
+  {
     private static final int RESOLVER_THREAD_POOL_SIZE = 25;
 
     private ThreadPoolExecutor mExecutor = null;
@@ -194,7 +195,8 @@ public class NetworkDiscovery extends Thread
     }
   }
 
-  private class NBResolver extends Thread{
+  private class NBResolver extends Thread
+  {
     private static final int MAX_RETRIES = 3;
 
     private InetAddress mAddress = null;
@@ -262,7 +264,8 @@ public class NetworkDiscovery extends Thread
     }
   }
 
-  private class UdpProber extends Thread{
+  private class UdpProber extends Thread
+  {
     private static final int PROBER_THREAD_POOL_SIZE = 25;
 
     private class SingleProber extends Thread{
