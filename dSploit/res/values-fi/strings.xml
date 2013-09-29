@@ -152,7 +152,7 @@
     <string name="invalid_ports">Virheellinen portti syötetty.</string>
     <string name="empty_port_list">Tyhjennä portti lista.</string>
     <string name="about_dsploit_v_">Tietoja dSploitista</string>
-    <string name="select_target">Valitse portti alta ja näpäytä riviä, tai pidä pitkään pohjassa
+    <string name="select_target">Valitse kohda alta ja näpäytä riviä, tai pidä pitkään pohjassa
         antaaksesi aliaksen.
     </string>
     <string name="generating_keys">Generoidaan avaimia &#8230;</string>
