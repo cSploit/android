@@ -16,7 +16,7 @@
     <string name="device_type">Τύπος συσκευής</string>
     <string name="start_hijack">Επιλέξτε το session που θέλετε να κάνετε hijack, διαρκές πάτημα για
         να το φυλαξετε σε αρχείο.
-    </string>χα
+    </string>
     <string name="sort">Ταξινόμηση:</string>
     <string name="select_module">Επιλέξτε ενότητα:</string>
     <string name="choose">Επιλογή</string>
