@@ -18,19 +18,18 @@
  */
 package it.evilsocket.dsploit.net.http.proxy;
 
-import android.util.Log;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import it.evilsocket.dsploit.core.Profiler;
 import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.net.ByteBuffer;
 import it.evilsocket.dsploit.net.http.RequestParser;
 
-public class StreamThread implements Runnable{
-  private final static String TAG = "PROXYSTREAMTHREAD";
+public class StreamThread implements Runnable
+{
   private final static String[] FILTERED_CONTENT_TYPES = new String[]
     {
       "/html",
@@ -104,7 +103,7 @@ public class StreamThread implements Runnable{
           if(isHandledContentType == false){
             Profiler.instance().profile("Fast streaming");
 
-            Log.d(TAG, "Content type " + contentType + " not handled, start fast streaming ...");
+            Logger.debug("Content type " + contentType + " not handled, start fast streaming ...");
 
             mWriter.write(mBuffer.getData());
             mWriter.flush();
@@ -135,7 +134,7 @@ public class StreamThread implements Runnable{
 
         // handle relocations for https support
         if(location != null && location.startsWith("https://") && System.getSettings().getBoolean("PREF_HTTPS_REDIRECT", true) == true){
-          Log.w(TAG, "Patching 302 HTTPS redirect : " + location);
+          Logger.warning("Patching 302 HTTPS redirect : " + location);
 
           // update variables for further filtering
           mBuffer.replace("Location: https://".getBytes(), "Location: http://".getBytes());
@@ -167,18 +166,20 @@ public class StreamThread implements Runnable{
 
         Profiler.instance().emit();
       }
-    } catch(OutOfMemoryError ome){
-      Log.e(TAG, ome.toString());
-    } catch(Exception e){
-      System.errorLogging(TAG, e);
-    } finally{
+    }
+    catch(OutOfMemoryError ome){
+      Logger.error(ome.toString());
+    }
+    catch(Exception e){
+      System.errorLogging(e);
+    }
+    finally{
       try{
         mWriter.flush();
         mWriter.close();
         mReader.close();
-      } catch(IOException e){
-        // swallow
       }
+      catch(IOException e){ }
     }
   }
 }

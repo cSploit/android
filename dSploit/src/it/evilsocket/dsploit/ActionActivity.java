@@ -36,11 +36,11 @@ import com.actionbarsherlock.view.MenuItem;
 import java.util.ArrayList;
 
 import it.evilsocket.dsploit.core.Plugin;
-import it.evilsocket.dsploit.core.Profiler;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.dialogs.FinishDialog;
 
-public class ActionActivity extends SherlockListActivity{
+public class ActionActivity extends SherlockListActivity
+{
   private ArrayList<Plugin> mAvailable = null;
 
   @Override

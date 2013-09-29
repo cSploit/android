@@ -54,9 +54,9 @@ public class RouterPwn extends Plugin{
       Intent browser = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
 
       context.startActivity(browser);
-    } catch(ActivityNotFoundException e){
-      System.errorLogging("ROUTERPWN", e);
-
+    }
+    catch(ActivityNotFoundException e){
+      System.errorLogging(e);
       new ErrorDialog(getString(R.string.error), getString(R.string.no_activities_for_url), (Activity) context).show();
     }
   }

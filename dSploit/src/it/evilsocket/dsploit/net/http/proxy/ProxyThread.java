@@ -18,8 +18,6 @@
  */
 package it.evilsocket.dsploit.net.http.proxy;
 
-import android.util.Log;
-
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -35,13 +33,14 @@ import java.util.regex.Pattern;
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 
+import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.core.Profiler;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.http.RequestParser;
 import it.evilsocket.dsploit.net.http.proxy.Proxy.OnRequestListener;
 
-public class ProxyThread extends Thread{
-  private final static String TAG = "PROXYTHREAD";
+public class ProxyThread extends Thread
+{
   private final static int MAX_REQUEST_SIZE = 8192;
   private final static int HTTP_SERVER_PORT = 80;
   private final static int HTTPS_SERVER_PORT = 443;
@@ -82,7 +81,7 @@ public class ProxyThread extends Thread{
 
       final String client = mSocket.getInetAddress().getHostAddress();
 
-      Log.d(TAG, "Connection from " + client);
+      Logger.debug("Connection from " + client);
 
       Profiler.instance().profile("proxy request read");
 
@@ -140,7 +139,7 @@ public class ProxyThread extends Thread{
           Profiler.instance().profile("getUrlFromRequest");
 
           long millis = java.lang.System.currentTimeMillis();
-          Log.d(TAG, "Connection to " + mServerName);
+          Logger.debug("Connection to " + mServerName);
 
           String request = builder.toString(),
             url = RequestParser.getUrlFromRequest(mServerName, request),
@@ -152,10 +151,10 @@ public class ProxyThread extends Thread{
           // connect to host
           if(mHostRedirect == null){
             if(url != null && System.getSettings().getBoolean("PREF_HTTPS_REDIRECT", true) == true && HTTPSMonitor.getInstance().hasURL(client, url) == true){
-              Log.w(TAG, "Found stripped HTTPS url : " + url);
+              Logger.warning("Found stripped HTTPS url : " + url);
 
               if(CookieCleaner.getInstance().isClean(client, mServerName, request) == false){
-                Log.w(TAG, "Sending expired cookie for " + mServerName);
+                Logger.warning("Sending expired cookie for " + mServerName);
 
                 response = CookieCleaner.getInstance().getExpiredResponse(request, mServerName);
 
@@ -164,10 +163,11 @@ public class ProxyThread extends Thread{
 
               https = true;
               mServer = DNSCache.getInstance().connect(mSocketFactory, mServerName, HTTPS_SERVER_PORT);
-            } else{
+            }
+            else{
               mServer = DNSCache.getInstance().connect(mServerName, HTTP_SERVER_PORT);
 
-              Log.d(TAG, client + " > " + mServerName + " [�" + (java.lang.System.currentTimeMillis() - millis) + " ms ]");
+              Logger.debug(client + " > " + mServerName + " [�" + (java.lang.System.currentTimeMillis() - millis) + " ms ]");
 
               millis = java.lang.System.currentTimeMillis();
             }
@@ -231,11 +231,11 @@ public class ProxyThread extends Thread{
             Profiler.instance().emit();
           }
         }
-      } else{
+      }
+      else{
         mReader.close();
       }
-    } catch(IOException e){
-      // System.errorLogging( TAG, e );
     }
+    catch(IOException e){ }
   }
 }

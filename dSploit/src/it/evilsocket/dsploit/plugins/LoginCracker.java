@@ -59,8 +59,8 @@ import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Target.Port;
 import it.evilsocket.dsploit.tools.Hydra;
 
-public class LoginCracker extends Plugin{
-  private static final String TAG = "LOGINCRACKER";
+public class LoginCracker extends Plugin
+{
   private static final int SELECT_USER_WORDLIST = 1012;
   private static final int SELECT_PASS_WORDLIST = 1013;
   private static final String[] PROTOCOLS = new String[]
@@ -413,13 +413,16 @@ public class LoginCracker extends Plugin{
 
         if(fileName == null){
           new ErrorDialog(getString(R.string.error), getString(R.string.error_filepath), LoginCracker.this).show();
-        } else{
+        }
+        else{
           mUserWordlist = fileName;
         }
-      } catch(Exception e){
-        System.errorLogging(TAG, e);
       }
-    } else if(request == SELECT_PASS_WORDLIST && result == RESULT_OK){
+      catch(Exception e){
+        System.errorLogging(e);
+      }
+    }
+    else if(request == SELECT_PASS_WORDLIST && result == RESULT_OK){
       try{
         String fileName = null;
 
@@ -428,11 +431,13 @@ public class LoginCracker extends Plugin{
 
         if(fileName == null){
           new ErrorDialog(getString(R.string.error), getString(R.string.error_filepath), LoginCracker.this).show();
-        } else{
+        }
+        else{
           mPassWordlist = fileName;
         }
-      } catch(Exception e){
-        System.errorLogging(TAG, e);
+      }
+      catch(Exception e){
+        System.errorLogging(e);
       }
     }
   }

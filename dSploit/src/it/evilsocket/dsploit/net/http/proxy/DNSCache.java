@@ -18,8 +18,6 @@
  */
 package it.evilsocket.dsploit.net.http.proxy;
 
-import android.util.Log;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -27,9 +25,10 @@ import java.util.HashMap;
 
 import javax.net.SocketFactory;
 
-public class DNSCache{
-  private static final String TAG = "PROXY.DNSCACHE";
+import it.evilsocket.dsploit.core.Logger;
 
+public class DNSCache
+{
   private static DNSCache mInstance = null;
 
   private HashMap<String, InetAddress> mCache = null;
@@ -52,9 +51,10 @@ public class DNSCache{
       address = InetAddress.getByName(server);
       mCache.put(server, address);
 
-      Log.d(TAG, server + " resolved to " + address.getHostAddress());
-    } else
-      Log.d(TAG, "Returning a cached DSN result for " + server + " : " + address.getHostAddress());
+      Logger.debug(server + " resolved to " + address.getHostAddress());
+    }
+    else
+      Logger.debug("Returning a cached DSN result for " + server + " : " + address.getHostAddress());
 
     return address;
   }

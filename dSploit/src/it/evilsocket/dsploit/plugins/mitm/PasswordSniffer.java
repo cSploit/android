@@ -46,9 +46,8 @@ import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
 import it.evilsocket.dsploit.tools.Ettercap.OnAccountListener;
 
-public class PasswordSniffer extends SherlockActivity{
-  private static final String TAG = "PASSWORDSNIFFER";
-
+public class PasswordSniffer extends SherlockActivity
+{
   private ToggleButton mSniffToggleButton = null;
   private ProgressBar mSniffProgress = null;
   private ExpandableListView mListView = null;
@@ -229,8 +228,9 @@ public class PasswordSniffer extends SherlockActivity{
     try{
       if(mBufferedWriter != null)
         mBufferedWriter.close();
-    } catch(IOException e){
-      System.errorLogging(TAG, e);
+    }
+    catch(IOException e){
+      System.errorLogging(e);
     }
 
     mSniffProgress.setVisibility(View.INVISIBLE);
@@ -258,8 +258,9 @@ public class PasswordSniffer extends SherlockActivity{
             if(mAdapter.hasChild(protocol, line) == false){
               try{
                 mBufferedWriter.write(line + "\n");
-              } catch(IOException e){
-                System.errorLogging(TAG, e);
+              }
+              catch(IOException e){
+                System.errorLogging(e);
               }
 
               mAdapter.addChild(protocol, line);

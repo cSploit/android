@@ -32,7 +32,8 @@ import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.tools.NMap.TraceOutputReceiver;
 
-public class Traceroute extends Plugin{
+public class Traceroute extends Plugin
+{
   private ToggleButton mTraceToggleButton = null;
   private ProgressBar mTraceProgress = null;
   private boolean mRunning = false;

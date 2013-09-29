@@ -3,6 +3,6 @@
 
     <item
             android:id="@+id/select_ports"
-            android:title="Select Custom Ports"/>
+            android:title="@string/scanner_select_ports"/>
 
 </menu>

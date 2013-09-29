@@ -3,11 +3,11 @@
 
     <item
             android:id="@+id/user_wordlist"
-            android:title="User Wordlist"
+            android:title="@string/login_user_wordlist"
             android:showAsAction="always"/>
     <item
             android:id="@+id/pass_wordlist"
-            android:title="Password Wordlist"
+            android:title="@string/login_pass_wordlist"
             android:showAsAction="always"/>
 
 </menu>

@@ -53,8 +53,8 @@ import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.plugins.mitm.SpoofSession.OnSessionReadyListener;
 
-public class Sniffer extends SherlockActivity{
-  private static final String TAG = "SNIFFER";
+public class Sniffer extends SherlockActivity
+{
   private static final String[] SORT = {
     "Bandwidth ↓",
     "Bandwidth ↑",
@@ -409,7 +409,8 @@ public class Sniffer extends SherlockActivity{
 
                 if(System.getNetwork().isInternal(source)){
                   stats = mAdapter.getStats(source);
-                } else if(System.getNetwork().isInternal(dest)){
+                }
+                else if(System.getNetwork().isInternal(dest)){
                   source = dest;
                   stats = mAdapter.getStats(dest);
                 }
@@ -418,7 +419,8 @@ public class Sniffer extends SherlockActivity{
                   stats = new AddressStats(source);
                   stats.mPackets = ilength;
                   stats.mSampledTime = now;
-                } else{
+                }
+                else{
                   stats.mPackets += ilength;
 
                   deltat = (now - stats.mSampledTime) / 1000.0;
@@ -439,8 +441,9 @@ public class Sniffer extends SherlockActivity{
                   }
                 });
               }
-            } catch(Exception e){
-              System.errorLogging(TAG, e);
+            }
+            catch(Exception e){
+              System.errorLogging(e);
             }
           }
 

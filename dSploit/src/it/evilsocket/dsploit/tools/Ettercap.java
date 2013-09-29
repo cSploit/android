@@ -27,14 +27,14 @@ import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.Target;
 
-public class Ettercap extends Tool{
-  private static final String TAG = "ETTERCAP";
-
+public class Ettercap extends Tool
+{
   public Ettercap(Context context){
     super("ettercap/ettercap", context);
   }
 
-  public static abstract class OnAccountListener implements OutputReceiver{
+  public static abstract class OnAccountListener implements OutputReceiver
+  {
     private static final Pattern ACCOUNT_PATTERN = Pattern.compile("^([^\\s]+)\\s+:\\s+([^\\:]+):(\\d+).+", Pattern.CASE_INSENSITIVE);
 
     @Override
@@ -81,8 +81,9 @@ public class Ettercap extends Tool{
     try{
       // passive dissection, spoofing is performed by arpspoof which is more reliable
       commandLine = "-Tq -i " + System.getNetwork().getInterface().getDisplayName() + " " + commandLine;
-    } catch(Exception e){
-      System.errorLogging(TAG, e);
+    }
+    catch(Exception e){
+      System.errorLogging(e);
     }
 
     return super.async(commandLine, listener);

@@ -55,8 +55,8 @@ import it.evilsocket.dsploit.wifi.algorithms.ZyxelKeygen;
 import it.evilsocket.dsploit.wifi.algorithms.helpers.AliceHandle;
 import it.evilsocket.dsploit.wifi.algorithms.helpers.AliceMagicInfo;
 
-public class WirelessMatcher{
-
+public class WirelessMatcher
+{
   private final Map<String, ArrayList<AliceMagicInfo>> supportedAlices;
 
   public WirelessMatcher(InputStream aliceXml){

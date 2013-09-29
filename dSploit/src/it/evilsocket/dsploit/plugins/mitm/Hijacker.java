@@ -147,8 +147,9 @@ public class Hijacker extends SherlockActivity{
 
           reader.close();
           input.close();
-        } catch(IOException e){
-          System.errorLogging("HIJACKER", e);
+        }
+        catch(IOException e){
+          System.errorLogging(e);
         }
 
         return image;
@@ -175,8 +176,9 @@ public class Hijacker extends SherlockActivity{
           JSONObject response = new JSONObject(data);
 
           username = response.getString("name");
-        } catch(Exception e){
-          System.errorLogging("HIJACKER", e);
+        }
+        catch(Exception e){
+          System.errorLogging(e);
         }
 
         return username;
@@ -220,8 +222,9 @@ public class Hijacker extends SherlockActivity{
 
           reader.close();
           input.close();
-        } catch(IOException e){
-          System.errorLogging("HIJACKER", e);
+        }
+        catch(IOException e){
+          System.errorLogging( e);
         }
 
         return image;
@@ -570,7 +573,8 @@ public class Hijacker extends SherlockActivity{
                   mAdapter.addSession(session);
                   mAdapter.notifyDataSetChanged();
                 }
-              } catch(Exception e){
+              }
+              catch(Exception e){
                 e.printStackTrace();
                 new ErrorDialog("Error", e.getMessage(), Hijacker.this).show();
               }

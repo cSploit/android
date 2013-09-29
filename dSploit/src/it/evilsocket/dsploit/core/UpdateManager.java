@@ -35,8 +35,8 @@ import java.util.Arrays;
 
 import it.evilsocket.dsploit.MainActivity;
 
-public class UpdateManager{
-  private static final String TAG = "UPDATEMANAGER";
+public class UpdateManager
+{
   private static final String REMOTE_VERSION_URL = "http://update.dsploit.net/version";
   private static final String REMOTE_DOWNLOAD_URL = "http://update.dsploit.net/apk";
   private static final String VERSION_CHAR_MAP = "zyxwvutsrqponmlkjihgfedcba";
@@ -121,7 +121,7 @@ public class UpdateManager{
           return true;
       }
     } catch(Exception e){
-      System.errorLogging(TAG, e);
+      System.errorLogging(e);
     }
 
     return false;
@@ -236,12 +236,12 @@ public class UpdateManager{
         mContext.startActivity(intent);
       }
       else
-        Log.d(TAG, "Download cancelled.");
+        Logger.debug("Download cancelled.");
 
       return true;
     }
     catch(Exception e){
-      System.errorLogging(TAG, e);
+      System.errorLogging(e);
     }
 
     if(progress.isShowing())

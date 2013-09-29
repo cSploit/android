@@ -149,7 +149,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:textOff="@string/send"
-            android:textOn=" @string/stop"
+            android:textOn="@string/stop"
             android:textAllCaps="true"
             android:paddingLeft="24dp"
             android:paddingRight="24dp"

@@ -20,7 +20,6 @@ package it.evilsocket.dsploit.net;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -40,11 +39,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.core.Logger;
 
 public class NetworkDiscovery extends Thread
 {
-  public static final String TAG = "NetworkDiscovery";
-
   public static final String NEW_ENDPOINT = "NetworkDiscovery.action.NEW_ENDPOINT";
   public static final String ENDPOINT_UPDATE = "NetworkDiscovery.action.ENDPOINT_UPDATE";
   public static final String ENDPOINT_ADDRESS = "NetworkDiscovery.data.ENDPOINT_ADDRESS";
@@ -95,7 +93,7 @@ public class NetworkDiscovery extends Thread
 
     @Override
     public void run(){
-      Log.d(TAG, "ArpReader started ...");
+      Logger.debug("ArpReader started ...");
 
       mNetBiosMap.clear();
       mStopped = false;
@@ -103,8 +101,9 @@ public class NetworkDiscovery extends Thread
 
       try{
         iface = System.getNetwork().getInterface().getDisplayName();
-      } catch(Exception e){
-        System.errorLogging(TAG, e);
+      }
+      catch(Exception e){
+        System.errorLogging(e);
       }
 
       while(!mStopped){
@@ -150,7 +149,7 @@ public class NetworkDiscovery extends Thread
                       name = endpoint.getAddress().getHostName();
 
                       if(!name.equals(address)){
-                        Log.d("NETBIOS", address + " was DNS resolved to " + name);
+                        Logger.debug(address + " was DNS resolved to " + name);
 
                         synchronized(mNetBiosMap){
                           mNetBiosMap.put(address, name);
@@ -178,8 +177,9 @@ public class NetworkDiscovery extends Thread
           reader.close();
 
           Thread.sleep(500);
-        } catch(Exception e){
-          System.errorLogging(TAG, e);
+        }
+        catch(Exception e){
+          System.errorLogging(e);
         }
       }
     }
@@ -232,7 +232,7 @@ public class NetworkDiscovery extends Thread
             // i know this is horrible, but i really need only the netbios name
             name = response.substring(57, 73).trim();
 
-            Log.d("NETBIOS", address + " was resolved to " + name);
+            Logger.debug(address + " was resolved to " + name);
 
             // update netbios cache
             mArpReader.addNetBiosName(address, name);
@@ -246,15 +246,19 @@ public class NetworkDiscovery extends Thread
 
             break;
           }
-        } catch(SocketTimeoutException ste){
+        }
+        catch(SocketTimeoutException ste){
           // swallow timeout error
-        } catch(IOException e){
-          System.errorLogging("NBResolver", e);
-        } finally{
+        }
+        catch(IOException e){
+          System.errorLogging(e);
+        }
+        finally{
           try{
             // send again a query
             mSocket.send(query);
-          } catch(Exception e){
+          }
+          catch(Exception e){
             // swallow error
           }
         }
@@ -285,8 +289,8 @@ public class NetworkDiscovery extends Thread
           socket.send(packet);
 
           socket.close();
-        } catch(Exception ignored){
         }
+        catch(Exception ignored){ }
       }
     }
 
@@ -300,7 +304,7 @@ public class NetworkDiscovery extends Thread
 
     @Override
     public void run(){
-      Log.d(TAG, "UdpProber started ...");
+      Logger.debug("UdpProber started ...");
 
       mStopped = false;
 
@@ -311,7 +315,7 @@ public class NetworkDiscovery extends Thread
         mNetwork = System.getNetwork();
         nhosts = mNetwork.getNumberOfAddresses();
       } catch(Exception e){
-        System.errorLogging(TAG, e);
+        System.errorLogging(e);
       }
 
       while(!mStopped && mNetwork != null && nhosts > 0){
@@ -334,9 +338,8 @@ public class NetworkDiscovery extends Thread
           }
 
           Thread.sleep(1000);
-        } catch(Exception e){
-          // swallow
         }
+        catch(Exception e){ }
       }
     }
 
@@ -346,8 +349,8 @@ public class NetworkDiscovery extends Thread
         mExecutor.shutdown();
         mExecutor.awaitTermination(30, TimeUnit.SECONDS);
         mExecutor.shutdownNow();
-      } catch(Exception ignored){
       }
+      catch(Exception ignored){ }
     }
   }
 
@@ -380,7 +383,7 @@ public class NetworkDiscovery extends Thread
 
   @Override
   public void run(){
-    Log.d(TAG, "Network monitor started ...");
+    Logger.debug("Network monitor started ...");
 
     mRunning = true;
 
@@ -391,11 +394,11 @@ public class NetworkDiscovery extends Thread
       mProber.join();
       mArpReader.join();
 
-      Log.d(TAG, "Network monitor stopped.");
+      Logger.debug("Network monitor stopped.");
 
       mRunning = false;
     } catch(Exception e){
-      System.errorLogging(TAG, e);
+      System.errorLogging(e);
     }
   }
 
@@ -404,7 +407,7 @@ public class NetworkDiscovery extends Thread
       mProber.exit();
       mArpReader.exit();
     } catch(Exception e){
-      System.errorLogging(TAG, e);
+      System.errorLogging(e);
     }
   }
 }

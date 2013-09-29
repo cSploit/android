@@ -36,7 +36,8 @@ import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.DirectoryPicker;
 
 @SuppressWarnings("deprecation")
-public class SettingsActivity extends SherlockPreferenceActivity implements OnSharedPreferenceChangeListener{
+public class SettingsActivity extends SherlockPreferenceActivity implements OnSharedPreferenceChangeListener
+{
   public static final int SETTINGS_DONE = 101285;
   private Preference mSavePath = null;
   private EditTextPreference mSnifferSampleTime = null;
@@ -78,10 +79,10 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
       File folder = new File(path);
 
       if(!folder.exists())
-        Toast.makeText(SettingsActivity.this, "Folder " + path + " does not exists.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(SettingsActivity.this, getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_exists), Toast.LENGTH_SHORT).show();
 
       else if(!folder.canWrite())
-        Toast.makeText(SettingsActivity.this, "Folder " + path + " is not writable.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(SettingsActivity.this, getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_writable), Toast.LENGTH_SHORT).show();
 
       else
         //noinspection ConstantConditions
@@ -111,15 +112,13 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 
       try{
         sampleTime = Double.parseDouble(mSnifferSampleTime.getText());
-        if(sampleTime < 0.4){
-          message = "Sample time can't be less than 0.4.";
-          sampleTime = 1.0;
-        } else if(sampleTime > 1.0){
-          message = "Sample time can't be greater than 1.0.";
+        if(sampleTime < 0.4 || sampleTime > 1.0){
+          message = getString(R.string.pref_err_sample_time);
           sampleTime = 1.0;
         }
-      } catch(Throwable t){
-        message = "Invalid number.";
+      }
+      catch(Throwable t){
+        message = getString(R.string.pref_err_invalid_number);
         sampleTime = 1.0;
       }
 
@@ -127,23 +126,23 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
         Toast.makeText(SettingsActivity.this, message, Toast.LENGTH_SHORT).show();
 
       mSnifferSampleTime.setText(Double.toString(sampleTime));
-    } else if(key.equals("PREF_HTTP_PROXY_PORT")){
+    }
+    else if(key.equals("PREF_HTTP_PROXY_PORT")){
       int proxyPort;
 
       try{
         proxyPort = Integer.parseInt(mProxyPort.getText());
-        if(proxyPort < 1024){
-          message = "Proxy port can't be less than 1024.";
-          proxyPort = 8080;
-        } else if(proxyPort > 65535){
-          message = "Proxy port can't be greater than 65535.";
-          proxyPort = 8080;
-        } else if(!System.isPortAvailable(proxyPort)){
-          message = "Another process is listening on this port, please use another one.";
+        if(proxyPort < 1024 || proxyPort > 65536){
+          message = getString(R.string.pref_err_proxy_port);
           proxyPort = 8080;
         }
-      } catch(Throwable t){
-        message = "Invalid number.";
+        else if(!System.isPortAvailable(proxyPort)){
+          message = getString(R.string.pref_err_busy_port);
+          proxyPort = 8080;
+        }
+      }
+      catch(Throwable t){
+        message = getString(R.string.pref_err_invalid_number);
         proxyPort = 8080;
       }
 
@@ -152,23 +151,23 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 
       mProxyPort.setText(Integer.toString(proxyPort));
       System.HTTP_PROXY_PORT = proxyPort;
-    } else if(key.equals("PREF_HTTP_SERVER_PORT")){
+    }
+    else if(key.equals("PREF_HTTP_SERVER_PORT")){
       int serverPort;
 
       try{
         serverPort = Integer.parseInt(mServerPort.getText());
-        if(serverPort < 1024){
-          message = "Server port can't be less than 1024.";
-          serverPort = 8081;
-        } else if(serverPort > 65535){
-          message = "Server port can't be greater than 65535.";
-          serverPort = 8081;
-        } else if(!System.isPortAvailable(serverPort)){
-          message = "Another process is listening on this port, please use another one.";
+        if(serverPort < 1024 || serverPort > 65535){
+          message = getString(R.string.pref_err_server_port);
           serverPort = 8081;
         }
-      } catch(Throwable t){
-        message = "Invalid number.";
+        else if(!System.isPortAvailable(serverPort)){
+          message = getString(R.string.pref_err_busy_port);
+          serverPort = 8081;
+        }
+      }
+      catch(Throwable t){
+        message = getString(R.string.pref_err_invalid_number);
         serverPort = 8081;
       }
 
@@ -177,23 +176,23 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 
       mServerPort.setText(Integer.toString(serverPort));
       System.HTTP_SERVER_PORT = serverPort;
-    } else if(key.equals("PREF_HTTPS_REDIRECTOR_PORT")){
+    }
+    else if(key.equals("PREF_HTTPS_REDIRECTOR_PORT")){
       int redirPort;
 
       try{
         redirPort = Integer.parseInt(mRedirectorPort.getText());
-        if(redirPort < 1024){
-          message = "Redirector port can't be less than 1024.";
-          redirPort = 8082;
-        } else if(redirPort > 65535){
-          message = "Redirector port can't be greater than 65535.";
-          redirPort = 8082;
-        } else if(!System.isPortAvailable(redirPort)){
-          message = "Another process is listening on this port, please use another one.";
+        if(redirPort < 1024 || redirPort > 65535){
+          message = getString(R.string.pref_err_redirector_port);
           redirPort = 8082;
         }
-      } catch(Throwable t){
-        message = "Invalid number.";
+        else if(!System.isPortAvailable(redirPort)){
+          message = getString(R.string.pref_err_busy_port);
+          redirPort = 8082;
+        }
+      }
+      catch(Throwable t){
+        message = getString(R.string.pref_err_invalid_number);
         redirPort = 8082;
       }
 
@@ -202,20 +201,19 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 
       mRedirectorPort.setText(Integer.toString(redirPort));
       System.HTTPS_REDIR_PORT = redirPort;
-    } else if(key.equals("PREF_HTTP_MAX_BUFFER_SIZE")){
+    }
+    else if(key.equals("PREF_HTTP_MAX_BUFFER_SIZE")){
       int maxBufferSize;
 
       try{
         maxBufferSize = Integer.parseInt(mHttpBufferSize.getText());
-        if(maxBufferSize < 1024){
-          message = "Buffer size can't be less than 1024.";
-          maxBufferSize = 10485760;
-        } else if(maxBufferSize > 104857600){
-          message = "Buffer size can't be greater than 10485760.";
+        if(maxBufferSize < 1024 || maxBufferSize > 104857600){
+          message = getString(R.string.pref_err_buffer_size);
           maxBufferSize = 10485760;
         }
-      } catch(Throwable t){
-        message = "Invalid number.";
+      }
+      catch(Throwable t){
+        message = getString(R.string.pref_err_invalid_number);
         maxBufferSize = 10485760;
       }
 
@@ -223,7 +221,8 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
         Toast.makeText(SettingsActivity.this, message, Toast.LENGTH_SHORT).show();
 
       mHttpBufferSize.setText(Integer.toString(maxBufferSize));
-    } else if(key.equals("PREF_PASSWORD_FILENAME")){
+    }
+    else if(key.equals("PREF_PASSWORD_FILENAME")){
       String passFileName;
 
       try{
@@ -232,7 +231,8 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
           message = getString(R.string.invalid_filename);
           passFileName = "dsploit-password-sniff.log";
         }
-      } catch(Throwable t){
+      }
+      catch(Throwable t){
         message = getString(R.string.invalid_filename);
         passFileName = "dsploit-password-sniff.log";
       }

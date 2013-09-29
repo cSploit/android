@@ -53,7 +53,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import it.evilsocket.dsploit.core.ManagedReceiver;
-import it.evilsocket.dsploit.core.Profiler;
 import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.ToolsInstaller;
@@ -83,7 +82,8 @@ import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_NAME;
 import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_UPDATE;
 import static it.evilsocket.dsploit.net.NetworkDiscovery.NEW_ENDPOINT;
 
-public class MainActivity extends SherlockListActivity{
+public class MainActivity extends SherlockListActivity
+{
   private String NO_WIFI_UPDATE_MESSAGE;
   private static final int WIFI_CONNECTION_REQUEST = 1012;
   private boolean isWifiAvailable = false;

@@ -19,7 +19,6 @@
 package it.evilsocket.dsploit.net;
 
 import android.os.StrictMode;
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.net.InetAddress;
@@ -32,11 +31,11 @@ import java.util.regex.Pattern;
 
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.net.Network.Protocol;
 
-public class Target{
-  private static final String TAG = "TARGET";
-
+public class Target
+{
   public enum Type{
     NETWORK,
     ENDPOINT,
@@ -214,8 +213,9 @@ public class Target{
             target = new Target(address, port);
         }
       }
-    } catch(Exception e){
-      System.errorLogging(TAG, e);
+    }
+    catch(Exception e){
+      System.errorLogging(e);
     }
 
     // determine if the target is reachable.
@@ -226,7 +226,8 @@ public class Target{
         StrictMode.setThreadPolicy(policy);
 
         InetAddress.getByName(target.getCommandLineRepresentation());
-      } catch(Exception e){
+      }
+      catch(Exception e){
         target = null;
       }
     }
@@ -245,9 +246,11 @@ public class Target{
 
     if(mType == Type.NETWORK){
       return;
-    } else if(mType == Type.ENDPOINT){
+    }
+    else if(mType == Type.ENDPOINT){
       mEndpoint = new Endpoint(reader);
-    } else if(mType == Type.REMOTE){
+    }
+    else if(mType == Type.REMOTE){
       mHostname = reader.readLine();
       mHostname = mHostname.equals("null") ? null : mHostname;
       if(mHostname != null){
@@ -264,11 +267,11 @@ public class Target{
       String key = reader.readLine();
       String[] parts = key.split("\\|", 3);
       Port port = new Port
-        (
-          Integer.parseInt(parts[1]),
-          Protocol.fromString(parts[0]),
-          parts[2]
-        );
+      (
+        Integer.parseInt(parts[1]),
+        Protocol.fromString(parts[0]),
+        parts[2]
+      );
 
       mPorts.add(port);
       mVulnerabilities.put(key, new ArrayList<Vulnerability>());
@@ -291,9 +294,11 @@ public class Target{
     // a network can't be saved in a session file
     if(mType == Type.NETWORK){
       return;
-    } else if(mType == Type.ENDPOINT){
+    }
+    else if(mType == Type.ENDPOINT){
       mEndpoint.serialize(builder);
-    } else if(mType == Type.REMOTE){
+    }
+    else if(mType == Type.REMOTE){
       builder.append(mHostname).append("\n");
     }
 
@@ -306,7 +311,8 @@ public class Target{
         for(Vulnerability v : mVulnerabilities.get(key)){
           builder.append(v.toString()).append("\n");
         }
-      } else
+      }
+      else
         builder.append("0\n");
     }
   }
@@ -412,8 +418,9 @@ public class Target{
 
         else if(mEndpoint.getAddress().equals(System.getNetwork().getLocalAddress()))
           desc += System.getContext().getString(R.string.this_device);
-      } catch(SocketException e){
-        System.errorLogging(TAG, e);
+      }
+      catch(SocketException e){
+        System.errorLogging(e);
       }
 
       return desc.trim();
@@ -440,8 +447,9 @@ public class Target{
   public boolean isRouter(){
     try{
       return (mType == Type.ENDPOINT && mEndpoint.getAddress().equals(System.getNetwork().getGatewayAddress()));
-    } catch(Exception e){
-      System.errorLogging(TAG, e);
+    }
+    catch(Exception e){
+      System.errorLogging(e);
     }
 
     return false;
@@ -464,8 +472,9 @@ public class Target{
 
       else if(mType == Type.REMOTE)
         return R.drawable.target_remote;
-    } catch(Exception e){
-      System.errorLogging(TAG, e);
+    }
+    catch(Exception e){
+      System.errorLogging(e);
     }
 
     return R.drawable.target_network;
@@ -498,7 +507,7 @@ public class Target{
 
       mAddress = InetAddress.getByName(mHostname);
     } catch(Exception e){
-      Log.d("Target.setHostname()", e.toString());
+      Logger.debug(e.toString());
     }
   }
 
@@ -594,7 +603,8 @@ public class Target{
   public void addVulnerability(Port port, Vulnerability v){
     if(!mVulnerabilities.containsKey(port.toString())){
       mVulnerabilities.put(port.toString(), new ArrayList<Vulnerability>());
-    } else{
+    }
+    else{
       for(Vulnerability vuln : mVulnerabilities.get(port.toString()))
         if(vuln.getIdentifier().equals(v.getIdentifier()))
           return;

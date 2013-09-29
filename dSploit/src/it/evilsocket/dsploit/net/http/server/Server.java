@@ -18,20 +18,18 @@
  */
 package it.evilsocket.dsploit.net.http.server;
 
-import android.util.Log;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.core.Logger;
 
-public class Server implements Runnable{
-  private static final String TAG = "HTTP.SERVER";
+public class Server implements Runnable
+{
   private static final int BACKLOG = 255;
   private static final int MAX_FILE_SIZE = 10 * 1024 * 1024;
 
@@ -43,7 +41,7 @@ public class Server implements Runnable{
   private String mResourceContentType = null;
   private byte[] mResourceData = null;
 
-  public Server(InetAddress address, int port, String resourcePath, String resourceContentType) throws UnknownHostException, IOException{
+  public Server(InetAddress address, int port, String resourcePath, String resourceContentType) throws IOException{
     mAddress = address;
     mPort = port;
     mSocket = new ServerSocket(mPort, BACKLOG, mAddress);
@@ -52,19 +50,19 @@ public class Server implements Runnable{
       setResource(resourcePath, resourceContentType);
   }
 
-  public Server(String address, int port, String resourcePath, String resourceContentType) throws UnknownHostException, IOException{
+  public Server(String address, int port, String resourcePath, String resourceContentType) throws IOException{
     this(InetAddress.getByName(address), port, resourcePath, resourceContentType);
   }
 
-  public Server(String address, int port) throws UnknownHostException, IOException{
+  public Server(String address, int port) throws IOException{
     this(address, port, null, null);
   }
 
-  public Server(InetAddress address, int port) throws UnknownHostException, IOException{
+  public Server(InetAddress address, int port) throws IOException{
     this(address, port, null, null);
   }
 
-  public void setResource(String path, String contentType) throws IOException{
+  public void setResource(String path, String contentType) throws IOException {
     mResourcePath = path;
     mResourceContentType = contentType;
 
@@ -95,7 +93,7 @@ public class Server implements Runnable{
   }
 
   public void stop(){
-    Log.d(TAG, "Stopping server ...");
+    Logger.debug("Stopping server ...");
 
     try{
       if(mSocket != null)
@@ -114,7 +112,7 @@ public class Server implements Runnable{
       if(mSocket == null)
         mSocket = new ServerSocket(mPort, BACKLOG, mAddress);
 
-      Log.d(TAG, "Server started on " + mAddress + ":" + mPort);
+      Logger.debug("Server started on " + mAddress + ":" + mPort);
 
       mRunning = true;
 
@@ -123,14 +121,16 @@ public class Server implements Runnable{
           Socket client = mSocket.accept();
 
           new ServerThread(client, mResourceData, mResourceContentType).start();
-        } catch(IOException e){
-          System.errorLogging(TAG, e);
+        }
+        catch(IOException e){
+          System.errorLogging(e);
         }
       }
 
-      Log.d(TAG, "Server stopped.");
-    } catch(IOException e){
-      System.errorLogging(TAG, e);
+      Logger.debug("Server stopped.");
+    }
+    catch(IOException e){
+      System.errorLogging(e);
     }
   }
 }

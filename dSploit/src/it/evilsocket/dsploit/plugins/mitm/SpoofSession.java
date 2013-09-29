@@ -24,9 +24,8 @@ import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.tools.Ettercap.OnAccountListener;
 import it.evilsocket.dsploit.R;
 
-public class SpoofSession{
-  private static final String TAG = "SPOOFSESSION";
-
+public class SpoofSession
+{
   private boolean mWithProxy = false;
   private boolean mWithServer = false;
   private String mServerFileName = null;
@@ -79,7 +78,7 @@ public class SpoofSession{
         System.getServer().setResource(mServerFileName, mServerMimeType);
         new Thread(System.getServer()).start();
       } catch(Exception e){
-        System.errorLogging(TAG, e);
+        System.errorLogging(e);
         mWithServer = false;
       }
     }
@@ -87,7 +86,6 @@ public class SpoofSession{
     System.getArpSpoof().spoof(target, new OutputReceiver(){
       @Override
       public void onStart(String command){
-        // android.util.Log.d( "ARPSPOOF", command );
         System.setForwarding(true);
 
         if(mWithProxy){

@@ -22,7 +22,6 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -42,6 +41,7 @@ import java.util.ArrayList;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
 import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
@@ -52,7 +52,8 @@ import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Target.Port;
 import it.evilsocket.dsploit.tools.NMap.SynScanOutputReceiver;
 
-public class PortScanner extends Plugin{
+public class PortScanner extends Plugin
+{
   private ToggleButton mScanToggleButton = null;
   private ProgressBar mScanProgress = null;
   private boolean mRunning = false;
@@ -155,7 +156,7 @@ public class PortScanner extends Plugin{
 
                 PortScanner.this.startActivity(browser);
               } catch(ActivityNotFoundException e){
-                System.errorLogging("PORTSCANNER", e);
+                System.errorLogging(e);
 
                 new ErrorDialog(getString(R.string.error), getString(R.string.no_activities_for_url), PortScanner.this).show();
               }
@@ -202,7 +203,8 @@ public class PortScanner extends Plugin{
                     if(iport <= 0 || iport > 65535)
                       throw new Exception(getString(R.string.port_must_be_greater));
                   }
-                } catch(Exception e){
+                }
+                catch(Exception e){
                   new ErrorDialog("Error", e.toString(), PortScanner.this).show();
                   return;
                 }
@@ -220,8 +222,9 @@ public class PortScanner extends Plugin{
                 new ErrorDialog(getString(R.string.error), getString(R.string.invalid_ports), PortScanner.this).show();
               }
 
-              Log.d("PORT", "mCustomPorts = " + mCustomPorts);
-            } else
+              Logger.debug("mCustomPorts = " + mCustomPorts);
+            }
+            else
               new ErrorDialog(getString(R.string.error), getString(R.string.empty_port_list), PortScanner.this).show();
           }
         }).show();

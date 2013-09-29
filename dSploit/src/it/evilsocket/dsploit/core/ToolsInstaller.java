@@ -31,7 +31,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class ToolsInstaller{
-  private final static String TAG = "TOOLSINSTALLER";
   private final static String TOOLS_FILENAME = "tools.zip";
   private final static int BUFFER_SIZE = 4096;
 
@@ -75,7 +74,7 @@ public class ToolsInstaller{
   }
 
   public boolean needed(){
-    Log.d(TAG, "Checking version file " + mVersionFile);
+    Logger.debug("Checking version file " + mVersionFile);
 
     File file = new File(mVersionFile);
     BufferedReader reader;
@@ -90,15 +89,16 @@ public class ToolsInstaller{
 
         reader.close();
       }
-    } catch(IOException e){
-      Log.w(TAG, e.toString());
+    }
+    catch(IOException e){
+      Logger.warning(e.toString());
     }
 
     return needed;
   }
 
   public boolean install(){
-    Log.d(TAG, "Installing tools ...");
+    Logger.debug("Installing tools ...");
 
     // Avoid some binary file being busy as a running process.
     System.clean(false);
@@ -146,8 +146,9 @@ public class ToolsInstaller{
       Shell.exec("echo '" + mAppVersion + "' > '" + mVersionFile + "' && chmod 777 '" + mVersionFile + "'");
 
       return true;
-    } catch(Exception e){
-      System.errorLogging(TAG, e);
+    }
+    catch(Exception e){
+      System.errorLogging(e);
 
       return false;
     }

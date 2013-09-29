@@ -195,7 +195,7 @@
     <string name="mitm_desc">Suorita monenlaisia mies-välissä -hyökkäyksiä, kuten
         verkkoliikenteen nuukimista,
         liikenteen manipulointia, jne&#8230;
-    </strin>g
+    </string>
     <string name="network_subnet_mask">Tämä on verkkosi aliverkkomaski</string>
     <string name="gateway_router">(Tämä on gatewaysi tai reitittimesi)</string>
     <string name="this_device">&#160;(Tämä laite)</string>

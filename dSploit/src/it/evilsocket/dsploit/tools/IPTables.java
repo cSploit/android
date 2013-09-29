@@ -18,39 +18,39 @@
  */
 package it.evilsocket.dsploit.tools;
 
-import android.util.Log;
-
 import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.core.Logger;
 
-public class IPTables extends Tool{
-  private static final String TAG = "IPTABLES";
-
+public class IPTables extends Tool
+{
   public IPTables(){
     super("iptables");
   }
 
   public void trafficRedirect(String to){
-    Log.d(TAG, "Redirecting traffic to " + to);
+    Logger.debug("Redirecting traffic to " + to);
 
     try{
       super.run("-t nat -A PREROUTING -j DNAT -p tcp --to " + to);
-    } catch(Exception e){
-      System.errorLogging(TAG, e);
+    }
+    catch(Exception e){
+      System.errorLogging(e);
     }
   }
 
   public void undoTrafficRedirect(String to){
-    Log.d(TAG, "Undoing traffic redirection");
+    Logger.debug("Undoing traffic redirection");
 
     try{
       super.run("-t nat -D PREROUTING -j DNAT -p tcp --to " + to);
-    } catch(Exception e){
-      System.errorLogging(TAG, e);
+    }
+    catch(Exception e){
+      System.errorLogging(e);
     }
   }
 
   public void portRedirect(int from, int to){
-    Log.d(TAG, "Redirecting traffic from port " + from + " to port " + to);
+    Logger.debug("Redirecting traffic from port " + from + " to port " + to);
 
     try{
       // clear nat
@@ -63,13 +63,14 @@ public class IPTables extends Tool{
       super.run("-P FORWARD ACCEPT");
       // add rule
       super.run("-t nat -A PREROUTING -j DNAT -p tcp --dport " + from + " --to " + System.getNetwork().getLocalAddressAsString() + ":" + to);
-    } catch(Exception e){
-      System.errorLogging(TAG, e);
+    }
+    catch(Exception e){
+      System.errorLogging(e);
     }
   }
 
   public void undoPortRedirect(int from, int to){
-    Log.d(TAG, "Undoing port redirection");
+    Logger.debug("Undoing port redirection");
 
     try{
       // clear nat
@@ -80,9 +81,9 @@ public class IPTables extends Tool{
       super.run("-t nat -D POSTROUTING -s 0/0 -j MASQUERADE");
       // remove rule
       super.run("-t nat -D PREROUTING -j DNAT -p tcp --dport " + from + " --to " + System.getNetwork().getLocalAddressAsString() + ":" + to);
-    } catch(Exception e){
-      System.errorLogging(TAG, e);
+    }
+    catch(Exception e){
+      System.errorLogging(e);
     }
   }
-
 }

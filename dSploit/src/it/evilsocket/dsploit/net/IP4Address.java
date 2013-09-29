@@ -23,7 +23,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteOrder;
 
-public class IP4Address{
+public class IP4Address
+{
   private byte[] mByteArray = null;
   private String mString = "";
   private int mInteger = 0;

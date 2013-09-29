@@ -33,9 +33,8 @@ import java.net.UnknownHostException;
 
 import it.evilsocket.dsploit.core.System;
 
-public class Network{
-  private static final String TAG = "NETWORK";
-
+public class Network
+{
   public enum Protocol{
     TCP,
     UDP,
@@ -93,10 +92,11 @@ public class Network{
         mInterface = NetworkInterface.getByInetAddress(getLocalAddress());
         if(mInterface == null)
           throw new IllegalStateException("Error retrieving network interface.");
-      } catch(SocketException e){
-        System.errorLogging(TAG, e);
-                /*
-                 * Issue #26: Initialization error in ColdFusionX ROM
+      }
+      catch(SocketException e){
+        System.errorLogging(e);
+        /*
+         * Issue #26: Initialization error in ColdFusionX ROM
 				 * 
 				 * It seems it's a ROM issue which doesn't correctly populate device descriptors.
 				 * This rom maps the default wifi interface to a generic usb device 
@@ -130,8 +130,9 @@ public class Network{
           return false;
 
       return true;
-    } catch(UnknownHostException e){
-      System.errorLogging(TAG, e);
+    }
+    catch(UnknownHostException e){
+      System.errorLogging(e);
     }
 
     return false;
@@ -196,8 +197,9 @@ public class Network{
   public byte[] getLocalHardware(){
     try{
       return mInterface.getHardwareAddress();
-    } catch(SocketException e){
-      System.errorLogging(TAG, e);
+    }
+    catch(SocketException e){
+      System.errorLogging(e);
     }
 
     return null;

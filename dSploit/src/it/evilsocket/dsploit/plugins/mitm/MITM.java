@@ -26,7 +26,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore.MediaColumns;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -66,9 +65,10 @@ import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.http.proxy.Proxy;
 import it.evilsocket.dsploit.net.http.proxy.Proxy.ProxyFilter;
 import it.evilsocket.dsploit.plugins.mitm.SpoofSession.OnSessionReadyListener;
+import it.evilsocket.dsploit.core.Logger;
 
-public class MITM extends Plugin{
-  private static final String TAG = "MITM";
+public class MITM extends Plugin
+{
   private static final int SELECT_PICTURE = 1010;
   private static final int SELECT_SCRIPT = 1011;
   private static final Pattern YOUTUBE_PATTERN = Pattern.compile("youtube\\.com/.*\\?v=([a-z0-9_-]+)", Pattern.CASE_INSENSITIVE);
@@ -233,8 +233,9 @@ public class MITM extends Plugin{
             }
           });
         }
-      } catch(Exception e){
-        System.errorLogging(TAG, e);
+      }
+      catch(Exception e){
+        System.errorLogging(e);
       }
     } else if(request == SELECT_SCRIPT && result == RESULT_OK){
       String fileName = null;
@@ -364,7 +365,7 @@ public class MITM extends Plugin{
     }
 
     if(somethingIsRunning){
-      Log.d(TAG, "Stopping current jobs ...");
+      Logger.debug("Stopping current jobs ...");
 
       if(mSpoofSession != null){
         mSpoofSession.stop();

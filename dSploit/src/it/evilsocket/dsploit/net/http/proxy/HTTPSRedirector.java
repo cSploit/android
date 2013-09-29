@@ -19,7 +19,6 @@
 package it.evilsocket.dsploit.net.http.proxy;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -28,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -45,9 +43,10 @@ import javax.net.ssl.SSLSocket;
 
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.http.RequestParser;
+import it.evilsocket.dsploit.core.Logger;
 
-public class HTTPSRedirector implements Runnable{
-  private static final String TAG = "HTTPS.REDIRECTOR";
+public class HTTPSRedirector implements Runnable
+{
   private static final int BACKLOG = 255;
 
   private static final String KEYSTORE_FILE = "dsploit.keystore";
@@ -59,7 +58,7 @@ public class HTTPSRedirector implements Runnable{
   private boolean mRunning = false;
   private SSLServerSocket mSocket = null;
 
-  public HTTPSRedirector(Context context, InetAddress address, int port) throws UnknownHostException, IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException{
+  public HTTPSRedirector(Context context, InetAddress address, int port) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException{
     mContext = context;
     mAddress = address;
     mPort = port;
@@ -82,14 +81,13 @@ public class HTTPSRedirector implements Runnable{
   }
 
   public void stop(){
-    Log.d(TAG, "Stopping HTTPS redirector ...");
+    Logger.debug("Stopping HTTPS redirector ...");
 
     try{
       if(mSocket != null)
         mSocket.close();
-    } catch(IOException e){
-
     }
+    catch(IOException e){ }
 
     mRunning = false;
     mSocket = null;
@@ -98,7 +96,7 @@ public class HTTPSRedirector implements Runnable{
   @Override
   public void run(){
     try{
-      Log.d(TAG, "HTTPS redirector started on " + mAddress + ":" + mPort);
+      Logger.debug("HTTPS redirector started on " + mAddress + ":" + mPort);
 
       if(mSocket == null)
         mSocket = getSSLSocket();
@@ -115,7 +113,7 @@ public class HTTPSRedirector implements Runnable{
               try{
                 String clientAddress = client.getInetAddress().getHostAddress();
 
-                Log.d(TAG, "Incoming connection from " + clientAddress);
+                Logger.debug("Incoming connection from " + clientAddress);
 
                 InputStream reader = client.getInputStream();
 
@@ -172,7 +170,7 @@ public class HTTPSRedirector implements Runnable{
                     CookieCleaner.getInstance().addCleaned(clientAddress, serverName);
                     HTTPSMonitor.getInstance().addURL(clientAddress, url);
 
-                    Log.w(TAG, "Redirecting " + clientAddress + " to " + url);
+                    Logger.warning("Redirecting " + clientAddress + " to " + url);
 
                     writer.write(response.getBytes());
                     writer.flush();
@@ -182,19 +180,20 @@ public class HTTPSRedirector implements Runnable{
                 }
 
                 reader.close();
-              } catch(IOException e){
-                System.errorLogging(TAG, e);
+              }
+              catch(IOException e){
+                System.errorLogging(e);
               }
             }
           }).start();
-        } catch(Exception e){
-
         }
+        catch(Exception e){ }
       }
 
-      Log.d(TAG, "HTTPS redirector stopped.");
-    } catch(Exception e){
-      System.errorLogging(TAG, e);
+      Logger.debug("HTTPS redirector stopped.");
+    }
+    catch(Exception e){
+      System.errorLogging(e);
     }
   }
 }

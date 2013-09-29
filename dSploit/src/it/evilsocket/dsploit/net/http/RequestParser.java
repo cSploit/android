@@ -27,7 +27,8 @@ import java.util.Iterator;
 
 import it.evilsocket.dsploit.net.ByteBuffer;
 
-public class RequestParser{
+public class RequestParser
+{
   public final static String HOST_HEADER = "Host";
   public final static String ACCEPT_ENCODING_HEADER = "Accept-Encoding";
   public final static String CONNECTION_HEADER = "Connection";

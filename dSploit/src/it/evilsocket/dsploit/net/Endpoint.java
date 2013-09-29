@@ -25,9 +25,8 @@ import java.net.UnknownHostException;
 
 import it.evilsocket.dsploit.core.System;
 
-public class Endpoint{
-  private static final String TAG = "ENDPOINT";
-
+public class Endpoint
+{
   private InetAddress mAddress = null;
   private byte[] mHardware = null;
 
@@ -63,8 +62,9 @@ public class Endpoint{
     try{
       mAddress = InetAddress.getByName(address);
       mHardware = hardware != null ? parseMacAddress(hardware) : null;
-    } catch(UnknownHostException e){
-      System.errorLogging(TAG, e);
+    }
+    catch(UnknownHostException e){
+      System.errorLogging(e);
       mAddress = null;
     }
   }

@@ -69,9 +69,9 @@ import static android.net.wifi.WifiManager.SCAN_RESULTS_AVAILABLE_ACTION;
 import static android.net.wifi.WifiManager.SUPPLICANT_STATE_CHANGED_ACTION;
 
 @SuppressWarnings("deprecation")
-public class WifiScannerActivity extends SherlockListActivity{
+public class WifiScannerActivity extends SherlockListActivity
+{
   public static final String CONNECTED = "WifiScannerActivity.CONNECTED";
-  private static final String TAG = "WIFISCANNER";
   private WifiManager mWifiManager = null;
   private WirelessMatcher mWifiMatcher = null;
   private TextView mStatusText = null;
@@ -140,12 +140,12 @@ public class WifiScannerActivity extends SherlockListActivity{
 
     getListView().setAdapter(mAdapter);
 
-    mStatusText.setText("Initializing ...");
+    mStatusText.setText( getString(R.string.wifi_initializing) );
 
     if(!mWifiManager.isWifiEnabled()){
-      mStatusText.setText("Activating WiFi interface ...");
+      mStatusText.setText( getString(R.string.wifi_activating_iface) );
       mWifiManager.setWifiEnabled(true);
-      mStatusText.setText("WiFi activated.");
+      mStatusText.setText(getString(R.string.wifi_activated));
     }
 
     if(Network.isWifiConnected(this)){
@@ -158,7 +158,7 @@ public class WifiScannerActivity extends SherlockListActivity{
     if(mMenu != null)
       mMenu.findItem(R.id.scan).setActionView(new ProgressBar(this));
 
-    mStatusText.setText("Scanning ...");
+    mStatusText.setText( getString(R.string.wifi_scanning) );
     mScanning = true;
 
     mWifiManager.startScan();
@@ -174,9 +174,9 @@ public class WifiScannerActivity extends SherlockListActivity{
       @Override
       public void run(){
         if(key != null)
-          mStatusText.setText(Html.fromHtml("Attempting connection to <b>" + ap.SSID + "</b> with key <b>" + key + "</b> ..."));
+          mStatusText.setText(Html.fromHtml( getString(R.string.wifi_attempting_to) + " <b>" + ap.SSID + "</b> " + getString(R.string.wifi_with_key) + " <b>" + key + "</b> ..."));
         else
-          mStatusText.setText(Html.fromHtml("Connecting to <b>" + ap.SSID + "</b> ..."));
+          mStatusText.setText(Html.fromHtml( getString(R.string.wifi_connecting_to) + " <b>" + ap.SSID + "</b> ..."));
       }
     });
 
@@ -277,17 +277,19 @@ public class WifiScannerActivity extends SherlockListActivity{
             WifiScannerActivity.this.runOnUiThread(new Runnable(){
               @Override
               public void run(){
-                new ErrorDialog("Error", keygen.getErrorMessage().isEmpty() ? "Could not generate keys." : keygen.getErrorMessage(), WifiScannerActivity.this).show();
+                new ErrorDialog( getString(R.string.error), keygen.getErrorMessage().isEmpty() ? getString(R.string.wifi_error_keys) : keygen.getErrorMessage(), WifiScannerActivity.this).show();
               }
             });
-          } else{
+          }
+          else{
             mCurrentAp = ap;
             mKeyList = keys;
 
             nextConnectionAttempt();
           }
-        } catch(Exception e){
-          System.errorLogging(TAG, e);
+        }
+        catch(Exception e){
+          System.errorLogging(e);
         } finally{
           dialog.dismiss();
         }
@@ -573,7 +575,7 @@ public class WifiScannerActivity extends SherlockListActivity{
           }
 
           mScanning = false;
-          mStatusText.setText("Scanning finished.");
+          mStatusText.setText( getString(R.string.wifi_scan_finished) );
         }
 
         mAdapter.notifyDataSetChanged();

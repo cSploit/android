@@ -19,27 +19,29 @@
 package it.evilsocket.dsploit.tools;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 import it.evilsocket.dsploit.net.Target;
+import it.evilsocket.dsploit.core.Logger;
 
-public class Hydra extends Tool{
+public class Hydra extends Tool
+{
   public Hydra(Context context){
     super("hydra/hydra", context);
   }
 
-  public static abstract class AttemptReceiver implements OutputReceiver{
+  public static abstract class AttemptReceiver implements OutputReceiver
+  {
     private final Pattern ATTEMPT_PATTERN = Pattern.compile("^\\[ATTEMPT\\].+login\\s+\"([^\"]+)\".+pass\\s+\"([^\"]+)\"\\s+-\\s+(\\d+)\\s+of\\s+(\\d+)\\s+\\[child\\s+\\d+]$", Pattern.CASE_INSENSITIVE);
     private final Pattern ERROR_PATTERN = Pattern.compile("^\\[Error\\]\\s+(.+)$");
     private final Pattern FATAL_PATTERN = Pattern.compile("^\\[ERROR\\]\\s+(.+)$");
     private final Pattern ACCOUNT_PATTERN = Pattern.compile("^\\[\\d+\\]\\[[^\\]]+\\]\\s+host:\\s+[\\d\\.]+\\s+login:\\s+([^\\s]+)\\s+password:\\s+(.+)", Pattern.CASE_INSENSITIVE);
 
     public void onStart(String commandLine){
-      Log.d("HYDRA", "Started '" + commandLine + "'");
+      Logger.debug("Started '" + commandLine + "'");
     }
 
     public void onNewLine(String line){
@@ -76,7 +78,7 @@ public class Hydra extends Tool{
     }
 
     public void onEnd(int exitCode){
-      Log.d("Hydra", "Ended with exit code '" + exitCode + "'");
+      Logger.debug("Ended with exit code '" + exitCode + "'");
     }
 
     public abstract void onNewAttempt(String login, String password, int progress, int total);

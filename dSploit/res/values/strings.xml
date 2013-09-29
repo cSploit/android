@@ -268,4 +268,66 @@
     <string name="error_mitm_proxy">Unable to create the proxy, please check your connection and port availability.</string>
     <string name="error_mitm_https_redirector">Unable to create the HTTPS redirector, please check your connection and port availability.</string>
     <string name="error_mitm_resource_server">Unable to create the resource server, please check your connection and port availability.</string>
+
+    <string name="hijacker_load_from_file">Load From File</string>
+    <string name="login_user_wordlist">User Wordlist</string>
+    <string name="login_pass_wordlist">Password Wordlist</string>
+
+    <string name="menu_new_session">New Session</string>
+    <string name="menu_save_session">Save Session</string>
+    <string name="menu_restore_session">Restore Session</string>
+    <string name="menu_stop_monitor">Stop Network Monitor</string>
+    <string name="menu_submit_issue">Submit Issue</string>
+    <string name="menu_about">About</string>
+
+    <string name="scanner_select_ports">Select Custom Ports</string>
+
+    <string name="wifi_initializing">Initializing ...</string>
+    <string name="wifi_activating_iface">Activating WiFi interface ...</string>
+    <string name="wifi_activated">WiFi activated.</string>
+    <string name="wifi_scanning">Scanning ...</string>
+    <string name="wifi_attempting_to">Attempting connection to</string>
+    <string name="wifi_with_key">with key</string>
+    <string name="wifi_connecting_to">Connecting to</string>
+    <string name="wifi_error_keys">Could not generate keys.</string>
+    <string name="wifi_scan_finished">Scanning finished.</string>
+
+    <string name="pref_general">General</string>
+    <string name="pref_modules">Modules</string>
+    <string name="pref_check_updates">Check for Updates</string>
+    <string name="pref_wake_lock">Wake Lock</string>
+    <string name="pref_save_path">Save Path</string>
+    <string name="pref_debug_error_logging">Debug Error Logging</string>
+    <string name="pref_enable_profiler">Code Profiler</string>
+    <string name="pref_sniffer_sample_time">Sniffer Sample Time</string>
+    <string name="pref_http_proxy_port">HTTP Proxy Port</string>
+    <string name="pref_http_server_port">HTTP Server Port</string>
+    <string name="pref_https_redirect">SSL Stripping</string>
+    <string name="pref_https_redirector_port">HTTPS Redirector Port</string>
+    <string name="pref_http_max_buffer_size">HTTP Max Buffer Size</string>
+    <string name="pref_password_filename">Password Sniffer File</string>
+    <string name="pref_check_updates_desc">Check for updates everytime the application is started.</string>
+    <string name="pref_wake_lock_desc">Prevents the device going in sleep mode while the application is running.</string>
+    <string name="pref_save_path_desc">Global save path to put every log file.</string>
+    <string name="pref_debug_error_logging_desc">Enable or disable error logging on a debug file.</string>
+    <string name="pref_enable_profiler_desc">Enable or disable network code profiler logging.</string>
+    <string name="pref_sniffer_sample_time_desc">Sample time in seconds of the sniffer module network statistics.</string>
+    <string name="pref_http_proxy_port_desc">MITM transparent proxy port to listen on, change this if you have problems starting the proxy.</string>
+    <string name="pref_http_server_port_desc">MITM http server port to listen on, change this if you have problems starting the server.</string>
+    <string name="pref_https_redirect_desc">Redirect traffic from HTTPS to HTTP.</string>
+    <string name="pref_https_redirector_port_desc">MITM https redirection server port to listen on.</string>
+    <string name="pref_http_max_buffer_size_desc">Max buffer size of HTTP requests handled by the transparent proxy.</string>
+    <string name="pref_password_filename_desc">Name of the file to use to log passwords and cookies.</string>
+
+    <string name="pref_folder">Folder</string>
+    <string name="pref_err_exists">does not exists.</string>
+    <string name="pref_err_writable">is not writable.</string>
+    <string name="pref_err_sample_time">Sample time must be between 0.4 and 1.0.</string>
+    <string name="pref_err_invalid_number">Invalid number.</string>
+    <string name="pref_err_proxy_port">Proxy port must be between 1024 and 65535.</string>
+    <string name="pref_err_server_port">Server port must be between 1024 and 65535.</string>
+    <string name="pref_err_redirector_port">Server port must be between 1024 and 65535.</string>
+    <string name="pref_err_busy_port">Another process is listening on this port, please use another one.</string>
+    <string name="pref_err_buffer_size">Buffer size must be between 1024 and 104857600.</string>
+
 </resources>

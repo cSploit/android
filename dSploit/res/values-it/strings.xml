@@ -278,4 +278,66 @@
     <string name="error_mitm_proxy">Impossibile avviare il proxy, controlla la connessione e la disponibilità delle porte.</string>
     <string name="error_mitm_https_redirector">Impossibile avviare il redirezionatore HTTPS, controlla la connessione e la disponibilità delle porte.</string>
     <string name="error_mitm_resource_server">Impossibile avviare il server delle risorse, controlla la connessione e la disponibilità delle porte.</string>
+
+    <string name="hijacker_load_from_file">Carica da File</string>
+    <string name="login_user_wordlist">Wordlist Utenti</string>
+    <string name="login_pass_wordlist">Wordlist Password</string>
+
+    <string name="menu_new_session">Nuova Sessione</string>
+    <string name="menu_save_session">Salva Sessione</string>
+    <string name="menu_restore_session">Ripristina Sessione</string>
+    <string name="menu_stop_monitor">Ferma il Monitor di Rete</string>
+    <string name="menu_submit_issue">Invia Issue</string>
+    <string name="menu_about">About</string>
+
+    <string name="scanner_select_ports">Seleziona Porte Personalizzate</string>
+
+    <string name="wifi_initializing">Inizializzazione ...</string>
+    <string name="wifi_activating_iface">Attivo l\'interfaccia WiFi ...</string>
+    <string name="wifi_activated">WiFi attivato.</string>
+    <string name="wifi_scanning">Scansione ...</string>
+    <string name="wifi_attempting_to">Tento di connettermi a</string>
+    <string name="wifi_with_key">con la chiave</string>
+    <string name="wifi_connecting_to">In connessione a</string>
+    <string name="wifi_error_keys">Non ho potuto generare le chiavi.</string>
+    <string name="wifi_scan_finished">Scansione completata.</string>
+
+    <string name="pref_general">Generale</string>
+    <string name="pref_modules">Moduli</string>
+    <string name="pref_check_updates">Controllo Aggiornamenti</string>
+    <string name="pref_wake_lock">Wake Lock</string>
+    <string name="pref_save_path">Path di Salvataggio</string>
+    <string name="pref_debug_error_logging">Error Logging di Debug</string>
+    <string name="pref_enable_profiler">Profiler di Codice</string>
+    <string name="pref_sniffer_sample_time">Tempo di Campionamento dello Sniffer</string>
+    <string name="pref_http_proxy_port">Porta del Proxy HTTP</string>
+    <string name="pref_http_server_port">Porta del Server HTTP</string>
+    <string name="pref_https_redirect">SSL Stripping</string>
+    <string name="pref_https_redirector_port">Porta del Redirezionatore HTTPS</string>
+    <string name="pref_http_max_buffer_size">Grandezza massima buffer HTTP</string>
+    <string name="pref_password_filename">File del Password Sniffer</string>
+    <string name="pref_check_updates_desc">Controlla gli aggiornamenti ogni volta che l\'applicazione viene avviata.</string>
+    <string name="pref_wake_lock_desc">Impedisce che il dispositivo vada in modalità sleep mentre l\'applicazione è in esecuzione.</string>
+    <string name="pref_save_path_desc">Percorso di salvataggio globale per i file di log.</string>
+    <string name="pref_debug_error_logging_desc">Abilita o disabilita il log degli errori su un file di debug.</string>
+    <string name="pref_enable_profiler_desc">Abilita o disabilita il logging del profiling di rete.</string>
+    <string name="pref_sniffer_sample_time_desc">Intervallo di campionamento in secondi per le statistiche di rete dello Sniffer.</string>
+    <string name="pref_http_proxy_port_desc">Porta sulla quale far mettere in ascolto il proxy trasparente MITM, cambiala se hai problemi ad avviare il proxy.</string>
+    <string name="pref_http_server_port_desc">Porta sulla quale far mettere in ascolto il server http MITM, cambiala se hai problemi ad avviare il server.</string>
+    <string name="pref_https_redirect_desc">Redireziona tutto il traffico da HTTPS a HTTP.</string>
+    <string name="pref_https_redirector_port_desc">Porta sulla quale il redirezionatore HTTPS deve mettersi in ascolto.</string>
+    <string name="pref_http_max_buffer_size_desc">Grandezza massima del buffer HTTP che il proxy trasparente può gestire.</string>
+    <string name="pref_password_filename_desc">Nome del file da usare per loggare password e cookie.</string>
+
+    <string name="pref_folder">La cartella</string>
+    <string name="pref_err_exists">non esiste.</string>
+    <string name="pref_err_writable">non è scrivibile.</string>
+    <string name="pref_err_sample_time">Il tempo di campionamento deve essere compreso tra 0.4 e 1.0.</string>
+    <string name="pref_err_invalid_number">Numero non valido.</string>
+    <string name="pref_err_proxy_port">La porta del proxy deve essere compresa tra 1024 e 65535.</string>
+    <string name="pref_err_server_port">La porta del server deve essere compresa tra 1024 e 65535.</string>
+    <string name="pref_err_redirector_port">La porta del redirector deve essere compresa tra 1024 e 65535.</string>
+    <string name="pref_err_busy_port">Un altro processo è in ascolto su questa porta, per favore specificane un altra.</string>
+    <string name="pref_err_buffer_size">La grandezza del buffer deve essere compresa tra 1024 e 104857600.</string>
+
 </resources>

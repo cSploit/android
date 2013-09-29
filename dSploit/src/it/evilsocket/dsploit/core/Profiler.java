@@ -54,7 +54,7 @@ public class Profiler{
     if(mEnabled && mTick > 0 && mProfiling != null){
       long delta = java.lang.System.currentTimeMillis() - mTick;
 
-      Log.d("PROFILER", "[" + mProfiling + "] " + format(delta));
+      Logger.debug("[" + mProfiling + "] " + format(delta));
 
       mProfiling = null;
       mTick = 0;

@@ -42,14 +42,14 @@ public class DSploitApplication extends Application{
     try{
       BugSenseHandler.initAndStartSession(this, "d5d1ed80");
     } catch(Exception e){
-      System.errorLogging("DSPLOIT", e);
+      System.errorLogging(e);
     }
 
     // initialize the system
     try{
       System.init(this);
     } catch(Exception e){
-      System.errorLogging("DSPLOIT", e);
+      System.errorLogging(e);
 
       // ignore exception when the user has wifi off
       if(!(e instanceof NoRouteToHostException))

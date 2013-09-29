@@ -20,27 +20,27 @@
     <group android:id="@+id/session_group">
         <item
                 android:id="@+id/new_session"
-                android:title="New Session"/>
+                android:title="@string/menu_new_session"/>
         <item
                 android:id="@+id/save_session"
-                android:title="Save Session"/>
+                android:title="@string/menu_save_session"/>
         <item
                 android:id="@+id/restore_session"
-                android:title="Restore Session"/>
+                android:title="@string/menu_restore_session"/>
         <item
                 android:id="@+id/settings"
-                android:title="Settings"/>
+                android:title="@string/menu_settings"/>
     </group>
     <group android:id="@+id/misc_group">
         <item
                 android:id="@+id/ss_monitor"
-                android:title="Stop Network Monitor"/>
+                android:title="@string/menu_stop_monitor"/>
         <item
                 android:id="@+id/submit_issue"
-                android:title="Submit Issue"/>
+                android:title="@string/menu_submit_issue"/>
         <item
                 android:id="@+id/about"
-                android:title="About"/>
+                android:title="@string/menu_about"/>
     </group>
 
 </menu>

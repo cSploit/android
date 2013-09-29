@@ -119,7 +119,7 @@ public class ByteBuffer{
         return new String(mBuffer, charset != null ? charset : "UTF-8");
       }
     } catch(UnsupportedEncodingException e){
-      System.errorLogging("BYTEBUFFER", e);
+      System.errorLogging(e);
     }
 
     return new String(mBuffer);

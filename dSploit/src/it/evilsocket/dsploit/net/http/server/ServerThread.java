@@ -18,17 +18,16 @@
  */
 package it.evilsocket.dsploit.net.http.server;
 
-import android.util.Log;
-
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 
 import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.core.Logger;
 
-public class ServerThread extends Thread{
-  private final static String TAG = "SERVERTHREAD";
+public class ServerThread extends Thread
+{
   private final static int MAX_REQUEST_SIZE = 8192;
 
   private Socket mSocket = null;
@@ -61,17 +60,21 @@ public class ServerThread extends Thread{
 
         mWriter.write(header.getBytes());
         mWriter.write(mData);
-      } else
-        Log.w(TAG, "Empty HTTP request.");
-    } catch(IOException e){
-      System.errorLogging(TAG, e);
-    } finally{
+      }
+      else
+        Logger.warning("Empty HTTP request.");
+    }
+    catch(IOException e){
+      System.errorLogging(e);
+    }
+    finally{
       try{
         mWriter.flush();
         mWriter.close();
         mReader.close();
-      } catch(IOException e){
-        System.errorLogging(TAG, e);
+      }
+      catch(IOException e){
+        System.errorLogging(e);
       }
     }
   }

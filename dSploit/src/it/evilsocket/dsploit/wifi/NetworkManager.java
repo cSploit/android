@@ -25,7 +25,8 @@ import android.net.wifi.WifiManager;
 import java.util.Comparator;
 import java.util.List;
 
-public class NetworkManager{
+public class NetworkManager
+{
   public static void cleanPreviousConfiguration(WifiManager wifiMgr, WifiInfo info){
     WifiConfiguration config;
     do{

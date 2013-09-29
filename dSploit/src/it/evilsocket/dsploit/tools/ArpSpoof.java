@@ -25,9 +25,8 @@ import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Target.Type;
 
-public class ArpSpoof extends Tool{
-  private static final String TAG = "ARPSPOOF";
-
+public class ArpSpoof extends Tool
+{
   public ArpSpoof(Context context){
     super("arpspoof/arpspoof", context);
   }
@@ -41,8 +40,9 @@ public class ArpSpoof extends Tool{
 
       else
         commandLine = "-i " + System.getNetwork().getInterface().getDisplayName() + " -t " + target.getCommandLineRepresentation() + " " + System.getGatewayAddress();
-    } catch(Exception e){
-      System.errorLogging(TAG, e);
+    }
+    catch(Exception e){
+      System.errorLogging(e);
     }
 
     return super.asyncStatic(commandLine, receiver);

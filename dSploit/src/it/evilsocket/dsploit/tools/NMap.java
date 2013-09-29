@@ -19,17 +19,16 @@
 package it.evilsocket.dsploit.tools;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 import it.evilsocket.dsploit.net.Target;
+import it.evilsocket.dsploit.core.Logger;
 
-public class NMap extends Tool{
-  private static final String TAG = "NMAP";
-
+public class NMap extends Tool
+{
   public NMap(Context context){
     super("nmap/nmap", context);
   }
@@ -50,7 +49,7 @@ public class NMap extends Tool{
 
     public void onEnd(int exitCode){
       if(exitCode != 0)
-        Log.e(TAG, "nmap exited with code " + exitCode);
+        Logger.error("nmap exited with code " + exitCode);
     }
 
     public abstract void onHop(String hop, String time, String address);
@@ -77,7 +76,7 @@ public class NMap extends Tool{
 
     public void onEnd(int exitCode){
       if(exitCode != 0)
-        Log.e(TAG, "nmap exited with code " + exitCode);
+        Logger.error("nmap exited with code " + exitCode);
     }
 
     public abstract void onPortFound(String port, String protocol);
@@ -94,7 +93,8 @@ public class NMap extends Tool{
     return super.async(command, receiver);
   }
 
-  public static abstract class InspectionReceiver implements OutputReceiver{
+  public static abstract class InspectionReceiver implements OutputReceiver
+  {
     private static final Pattern OPEN_PORT_PATTERN = Pattern.compile("^discovered open port (\\d+)/([^\\s]+).+", Pattern.CASE_INSENSITIVE);
     private static final Pattern SERVICE_PATTERN = Pattern.compile("^(\\d+)/([a-z]+)\\s+[a-z]+\\s+[a-z]+\\s+(.*)$", Pattern.CASE_INSENSITIVE);
     private static final Pattern OS_PATTERN = Pattern.compile("^Running:\\s+(.+)$", Pattern.CASE_INSENSITIVE);
@@ -142,7 +142,7 @@ public class NMap extends Tool{
 
     public void onEnd(int exitCode){
       if(exitCode != 0)
-        Log.e(TAG, "nmap exited with code " + exitCode);
+        Logger.error("nmap exited with code " + exitCode);
     }
   }
 

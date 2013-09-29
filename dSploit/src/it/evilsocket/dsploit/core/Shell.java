@@ -27,7 +27,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map;
 
-public class Shell{
+public class Shell
+{
   private static final String TAG = "SHELL";
 
   /*
@@ -65,7 +66,7 @@ public class Shell{
             mReceiver.onNewLine(line);
         }
       } catch(IOException e){
-        System.errorLogging(TAG, e);
+        System.errorLogging(e);
       } finally{
         try{
           mReader.close();
@@ -130,7 +131,7 @@ public class Shell{
       process.waitFor();
 
     } catch(Exception e){
-      System.errorLogging(TAG, e);
+      System.errorLogging(e);
     } finally{
       try{
         if(writer != null)
@@ -172,7 +173,7 @@ public class Shell{
           return true;
       }
     } catch(Exception e){
-      System.errorLogging(TAG, e);
+      System.errorLogging(e);
     }
 
     return false;
@@ -220,7 +221,7 @@ public class Shell{
 
       process.waitFor();
     } catch(Exception e){
-      System.errorLogging(TAG, e);
+      System.errorLogging(e);
 
       return !linkerError;
     }
@@ -274,15 +275,16 @@ public class Shell{
       writer.flush();
 
 			/* 
-             * The following catastrophe of code seems to be the best way to ensure
+       * The following catastrophe of code seems to be the best way to ensure
 			 * this thread can be interrupted.
 			 */
       while(!Thread.currentThread().isInterrupted()){
         try{
           exit = process.exitValue();
           Thread.currentThread().interrupt();
-        } catch(IllegalThreadStateException e){
-                    /*
+        }
+        catch(IllegalThreadStateException e){
+          /*
            * Just sleep, the process hasn't terminated yet but sleep should (but doesn't) cause
 					 * InterruptedException to be thrown if interrupt() has been called.
 					 * 
@@ -291,15 +293,18 @@ public class Shell{
           Thread.sleep(250);
         }
       }
-    } catch(IOException e){
-      System.errorLogging(TAG, e);
-    } catch(InterruptedException e){
+    }
+    catch(IOException e){
+      System.errorLogging(e);
+    }
+    catch(InterruptedException e){
       try{
         // key to killing executable and process
         writer.close();
         reader.close();
         error.close();
-      } catch(IOException ex){
+      }
+      catch(IOException ex){
         // swallow error
       }
     }
@@ -323,12 +328,12 @@ public class Shell{
       public void run(){
         try{
           exec(command, receiver, overrideLibraryPath);
-        } catch(Exception e){
-          System.errorLogging(TAG, e);
+        }
+        catch(Exception e){
+          System.errorLogging(e);
         }
       }
-    }
-    );
+    });
 
     launcher.setDaemon(true);
 

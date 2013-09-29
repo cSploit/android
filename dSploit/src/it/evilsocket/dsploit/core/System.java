@@ -91,8 +91,8 @@ import it.evilsocket.dsploit.tools.IPTables;
 import it.evilsocket.dsploit.tools.NMap;
 import it.evilsocket.dsploit.tools.TcpDump;
 
-public class System{
-  private static final String TAG = "SYSTEM";
+public class System
+{
   private static final String ERROR_LOG_FILENAME = "dsploit-debug-error.log";
   private static final String SESSION_MAGIC = "DSS";
   private static final Pattern SERVICE_PARSER = Pattern.compile("^([^\\s]+)\\s+(\\d+).*$", Pattern.CASE_INSENSITIVE);
@@ -199,8 +199,9 @@ public class System{
       mTargets.add(device);
 
       mInitialized = true;
-    } catch(Exception e){
-      errorLogging(TAG, e);
+    }
+    catch(Exception e){
+      errorLogging(e);
 
       throw e;
     }
@@ -223,10 +224,12 @@ public class System{
       mTargets.add(device);
 
       mInitialized = true;
-    } catch(NoRouteToHostException nrthe){
+    }
+    catch(NoRouteToHostException nrthe){
       // swallow bitch
-    } catch(Exception e){
-      errorLogging(TAG, e);
+    }
+    catch(Exception e){
+      errorLogging(e);
     }
   }
 
@@ -270,7 +273,7 @@ public class System{
     return mLastError;
   }
 
-  public static synchronized void errorLogging(String tag, Exception e){
+  public static synchronized void errorLogging(Exception e){
     String message = "Unknown error.",
       trace = "Unknown trace.",
       filename = (new File(Environment.getExternalStorageDirectory().toString(), ERROR_LOG_FILENAME)).getAbsolutePath();
@@ -297,15 +300,16 @@ public class System{
           bWriter.write(trace);
 
           bWriter.close();
-        } catch(IOException ioe){
-          Log.e(TAG, ioe.toString());
+        }
+        catch(IOException ioe){
+          Logger.error(ioe.toString());
         }
       }
     }
 
     setLastError(message);
-    Log.e(tag, message);
-    Log.e(tag, trace);
+    Logger.error(message);
+    Logger.error(trace);
   }
 
   public static synchronized void errorLog(String tag, String data){
@@ -321,18 +325,19 @@ public class System{
         bWriter.write(data);
 
         bWriter.close();
-      } catch(IOException ioe){
-        Log.e(TAG, ioe.toString());
+      }
+      catch(IOException ioe){
+        Logger.error(ioe.toString());
       }
     }
 
-    Log.e(tag, data);
+    Logger.error(data);
   }
 
   public static boolean isARM(){
     String abi = Build.CPU_ABI;
 
-    Log.d(TAG, "Build.CPU_ABI = " + abi);
+    Logger.debug("Build.CPU_ABI = " + abi);
 
     return Build.CPU_ABI.toLowerCase().startsWith("armeabi");
   }
@@ -372,8 +377,9 @@ public class System{
       }
 
       return mSuPath;
-    } catch(Exception e){
-      errorLogging(TAG, e);
+    }
+    catch(Exception e){
+      errorLogging(e);
     }
 
     return "su";
@@ -407,8 +413,9 @@ public class System{
         }
 
         in.close();
-      } catch(Exception e){
-        errorLogging(TAG, e);
+      }
+      catch(Exception e){
+        errorLogging(e);
       }
     }
   }
@@ -435,8 +442,9 @@ public class System{
         }
 
         in.close();
-      } catch(Exception e){
-        errorLogging(TAG, e);
+      }
+      catch(Exception e){
+        errorLogging(e);
       }
     }
   }
@@ -463,8 +471,9 @@ public class System{
       PackageInfo info = manager != null ? manager.getPackageInfo(mContext.getPackageName(), 0) : null;
 
       return info.versionName;
-    } catch(NameNotFoundException e){
-      errorLogging(TAG, e);
+    }
+    catch(NameNotFoundException e){
+      errorLogging(e);
     }
 
     return "?";
@@ -508,7 +517,8 @@ public class System{
 
         Thread.sleep(200);
       }
-    } catch(Exception e){
+    }
+    catch(Exception e){
       available = true;
     }
 
@@ -727,8 +737,9 @@ public class System{
     try{
       if(mProxy == null)
         mProxy = new Proxy(getNetwork().getLocalAddress(), HTTP_PROXY_PORT);
-    } catch(Exception e){
-      errorLogging(TAG, e);
+    }
+    catch(Exception e){
+      errorLogging(e);
     }
 
     return mProxy;
@@ -738,8 +749,9 @@ public class System{
     try{
       if(mRedirector == null)
         mRedirector = new HTTPSRedirector(mContext, getNetwork().getLocalAddress(), HTTPS_REDIR_PORT);
-    } catch(Exception e){
-      errorLogging(TAG, e);
+    }
+    catch(Exception e){
+      errorLogging(e);
     }
 
     return mRedirector;
@@ -749,8 +761,9 @@ public class System{
     try{
       if(mServer == null)
         mServer = new Server(getNetwork().getLocalAddress(), HTTP_SERVER_PORT);
-    } catch(Exception e){
-      errorLogging(TAG, e);
+    }
+    catch(Exception e){
+      errorLogging(e);
     }
 
     return mServer;
@@ -931,7 +944,7 @@ public class System{
   }
 
   public static void setCurrentPlugin(Plugin plugin){
-    Log.d(TAG, "Setting current plugin : " + plugin.getName());
+    Logger.debug( "Setting current plugin : " + mContext.getString( plugin.getName() ) );
 
     mCurrentPlugin = plugin;
   }
@@ -978,23 +991,25 @@ public class System{
 
       reader.close();
 
-    } catch(IOException e){
-      Log.w(TAG, e.toString());
+    }
+    catch(IOException e){
+      Logger.warning(e.toString());
     }
 
     return forwarding;
   }
 
   public static void setForwarding(boolean enabled){
-    Log.d(TAG, "Setting ipv4 forwarding to " + enabled);
+    Logger.debug("Setting ipv4 forwarding to " + enabled);
 
     String status = (enabled ? "1" : "0"),
       cmd = "echo " + status + " > " + IPV4_FORWARD_FILEPATH;
 
     try{
       Shell.exec(cmd);
-    } catch(Exception e){
-      errorLogging(TAG, e);
+    }
+    catch(Exception e){
+      errorLogging(e);
     }
   }
 
@@ -1006,11 +1021,11 @@ public class System{
       for(String tool : ToolsInstaller.TOOLS)
         tools += tool + " ";
 
-      Log.d(TAG, "Killing any running instance of " + tools);
+      Logger.debug("Killing any running instance of " + tools);
       Shell.exec("killall -9 " + tools.trim());
 
       if(releaseLocks){
-        Log.d(TAG, "Releasing locks.");
+        Logger.debug("Releasing locks.");
 
         if(mWifiLock != null && mWifiLock.isHeld())
           mWifiLock.release();
@@ -1018,8 +1033,9 @@ public class System{
         if(mWakeLock != null && mWakeLock.isHeld())
           mWakeLock.release();
       }
-    } catch(Exception e){
-      errorLogging(TAG, e);
+    }
+    catch(Exception e){
+      errorLogging(e);
     }
   }
 

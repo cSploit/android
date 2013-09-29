@@ -22,9 +22,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-public class UpdateChecker extends Thread{
-  private static final String TAG = "UpdateChecker";
-
+public class UpdateChecker extends Thread
+{
   public static final String UPDATE_CHECKING = "UpdateChecker.action.CHECKING";
   public static final String UPDATE_AVAILABLE = "UpdateChecker.action.UPDATE_AVAILABLE";
   public static final String UPDATE_NOT_AVAILABLE = "UpdateChecker.action.UPDATE_NOT_AVAILABLE";
@@ -51,13 +50,14 @@ public class UpdateChecker extends Thread{
 
     send(UPDATE_CHECKING, null, null);
 
-    Log.d(TAG, "Service started.");
+    Logger.debug("Service started.");
 
-    if(System.getUpdateManager().isUpdateAvailable()){
+    if(System.getUpdateManager().isUpdateAvailable())
       send(UPDATE_AVAILABLE, AVAILABLE_VERSION, System.getUpdateManager().getRemoteVersion());
-    } else
+
+    else
       send(UPDATE_NOT_AVAILABLE, null, null);
 
-    Log.d(TAG, "Service stopped.");
+    Logger.debug("Service stopped.");
   }
 }

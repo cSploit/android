@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import it.evilsocket.dsploit.core.Profiler;
@@ -51,14 +50,14 @@ public class Proxy implements Runnable{
     public void onRequest(boolean https, String address, String hostname, ArrayList<String> headers);
   }
 
-  public Proxy(InetAddress address, int port) throws UnknownHostException, IOException{
+  public Proxy(InetAddress address, int port) throws IOException{
     mAddress = address;
     mPort = port;
     mSocket = new ServerSocket(mPort, BACKLOG, mAddress);
     mFilters = new ArrayList<ProxyFilter>();
   }
 
-  public Proxy(String address, int port) throws UnknownHostException, IOException{
+  public Proxy(String address, int port) throws IOException{
     this(InetAddress.getByName(address), port);
   }
 
@@ -122,7 +121,7 @@ public class Proxy implements Runnable{
 
       Log.d(TAG, "Proxy stopped.");
     } catch(IOException e){
-      System.errorLogging(TAG, e);
+      System.errorLogging(e);
     }
   }
 }

@@ -27,9 +27,8 @@ import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 import it.evilsocket.dsploit.core.System;
 
-public class Tool{
-  private static final String TAG = "Tool";
-
+public class Tool
+{
   protected File mFile = null;
   protected String mName = null;
   protected String mDirName = null;
@@ -97,8 +96,9 @@ public class Tool{
       Shell.exec("killall -" + signal + " " + mName);
 
       return true;
-    } catch(Exception e){
-      System.errorLogging(TAG, e);
+    }
+    catch(Exception e){
+      System.errorLogging(e);
     }
 
     return false;

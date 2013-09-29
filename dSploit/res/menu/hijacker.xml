@@ -3,7 +3,7 @@
 
     <item
             android:id="@+id/load"
-            android:title="Load From File"
+            android:title="@string/hijacker_load_from_file"
             android:icon="@drawable/action_open"
             android:showAsAction="always"/>
 
