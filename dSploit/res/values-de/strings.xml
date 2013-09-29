@@ -145,7 +145,7 @@
     <string name="inspector">Inspector</string>
     <string name="inspector_desc">Führe tiefere Erkennung des Zielbetriebssystems und den -diensten durch (langsamer als der Portscanner, aber genauer).</string>
     <string name="login_cracker">Login Cracker</string>
-    <string name="login_cracker_desc">Ein sehr schneller Netzwerklogin-Cracker, der viele verschiedene Dienste unterstützt.<string>
+    <string name="login_cracker_desc">Ein sehr schneller Netzwerklogin-Cracker, der viele verschiedene Dienste unterstützt.</string>
     <string name="packet_forger">Paketfälscher</string>
     <string name="packet_forger_desc">Erzeuge und versende ein angepasstes TCP- oder UDP-Paket an das Ziel.</string>
     <string name="port_scanner">Portscanner</string>
