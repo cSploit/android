@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with dSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.evilsocket.dsploit.plugins.mitm;
+package it.evilsocket.dsploit.plugins.mitm.hijacker;
 
 import android.os.Bundle;
 import android.webkit.CookieManager;
@@ -36,7 +36,6 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
-import it.evilsocket.dsploit.plugins.mitm.Hijacker.Session;
 
 public class HijackerWebView extends SherlockActivity
 {

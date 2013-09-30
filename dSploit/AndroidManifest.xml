@@ -88,11 +88,11 @@
                 android:label="@string/title_activity_main">
         </activity>
         <activity
-                android:name=".plugins.mitm.Hijacker"
+                android:name=".plugins.mitm.hijacker.Hijacker"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
-                android:name=".plugins.mitm.HijackerWebView"
+                android:name=".plugins.mitm.hijacker.HijackerWebView"
                 android:label="@string/title_activity_main">
         </activity>
         <activity

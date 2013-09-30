@@ -66,6 +66,7 @@ import it.evilsocket.dsploit.net.http.proxy.Proxy;
 import it.evilsocket.dsploit.net.http.proxy.Proxy.ProxyFilter;
 import it.evilsocket.dsploit.plugins.mitm.SpoofSession.OnSessionReadyListener;
 import it.evilsocket.dsploit.core.Logger;
+import it.evilsocket.dsploit.plugins.mitm.hijacker.Hijacker;
 
 public class MITM extends Plugin
 {

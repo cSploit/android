@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with dSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.evilsocket.dsploit.plugins.mitm;
+package it.evilsocket.dsploit.plugins.mitm.hijacker;
 
 import android.content.Context;
 import android.content.Intent;
@@ -69,6 +69,7 @@ import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog;
 import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog.SpinnerDialogListener;
 import it.evilsocket.dsploit.net.http.RequestParser;
 import it.evilsocket.dsploit.net.http.proxy.Proxy.OnRequestListener;
+import it.evilsocket.dsploit.plugins.mitm.SpoofSession;
 import it.evilsocket.dsploit.plugins.mitm.SpoofSession.OnSessionReadyListener;
 
 public class Hijacker extends SherlockActivity{
@@ -78,26 +79,6 @@ public class Hijacker extends SherlockActivity{
   private boolean mRunning = false;
   private RequestListener mRequestListener = null;
   private SpoofSession mSpoof = null;
-
-  public static class Session{
-    public Bitmap mPicture = null;
-    public String mUserName = null;
-    public boolean mInited = false;
-    public boolean mHTTPS = false;
-    public String mAddress = "";
-    public String mDomain = "";
-    public String mUserAgent = "";
-    public HashMap<String, BasicClientCookie> mCookies = null;
-
-    public Session(){
-      mCookies = new HashMap<String, BasicClientCookie>();
-    }
-
-    public String getFileName(){
-      String name = mDomain + "-" + (mUserName != null ? mUserName : mAddress);
-      return name.replaceAll("[ .\\\\/:*?\"<>|\\\\/:*?\"<>|]", "-");
-    }
-  }
 
   private static int getFaviconFromDomain(String domain){
     if(domain.contains("amazon."))
@@ -128,7 +109,8 @@ public class Hijacker extends SherlockActivity{
       return R.drawable.favicon_generic;
   }
 
-  public class SessionListAdapter extends ArrayAdapter<Session>{
+  public class SessionListAdapter extends ArrayAdapter<Session>
+  {
     private int mLayoutId = 0;
     private HashMap<String, Session> mSessions = null;
 
@@ -351,7 +333,8 @@ public class Hijacker extends SherlockActivity{
     }
   }
 
-  class RequestListener implements OnRequestListener{
+  class RequestListener implements OnRequestListener
+  {
     @Override
     public void onRequest(boolean https, String address, String hostname, ArrayList<String> headers){
       ArrayList<BasicClientCookie> cookies = RequestParser.getCookiesFromHeaders(headers);
@@ -456,7 +439,7 @@ public class Hijacker extends SherlockActivity{
                   if(!name.isEmpty()){
 
                     try{
-                      String filename = System.saveHijackerSession(name, session);
+                      String filename = session.save(name);
 
                       Toast.makeText(Hijacker.this, getString(R.string.session_saved_to) + filename + " .", Toast.LENGTH_SHORT).show();
                     } catch(IOException e){
@@ -567,7 +550,7 @@ public class Hijacker extends SherlockActivity{
               String filename = sessions.get(index);
 
               try{
-                Session session = System.loadHijackerSession(filename);
+                Session session = Session.load(filename);
 
                 if(session != null){
                   mAdapter.addSession(session);
