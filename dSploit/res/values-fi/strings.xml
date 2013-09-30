@@ -152,7 +152,7 @@
     <string name="invalid_ports">Virheellinen portti syötetty.</string>
     <string name="empty_port_list">Tyhjennä portti lista.</string>
     <string name="about_dsploit_v_">Tietoja dSploitista</string>
-    <string name="select_target">Valitse kohda alta ja näpäytä riviä, tai pidä pitkään pohjassa
+    <string name="select_target">Valitse kohde alta ja näpäytä riviä, tai pidä pitkään pohjassa
         antaaksesi aliaksen.
     </string>
     <string name="generating_keys">Generoidaan avaimia &#8230;</string>
@@ -170,7 +170,7 @@
     <string name="could_not_read_folder">Ei voitu lukea kansion sisältöä.</string>
     <string name="choose_dir">Valitse &#160;</string>
     <string name="vulnerability_finder">Heikkouksien etsijä</string>
-    <string name="vulnerability_finder_desc">Etsi tiedettyä heikkouksia National Vulnerability
+    <string name="vulnerability_finder_desc">Etsi tiedettyjä heikkouksia National Vulnerability
         Database:sta.
     </string>
     <string name="inspector">Palveluiden tutkija</string>
@@ -252,7 +252,7 @@
     <string name="video">Video</string>
     <string name="enter_video_url">Syötä videon URL-osoite :</string>
     <string name="error_video_url">Virheellinen Youtube-video.</string>
-    <string name="mitm_script_injection">Skriptin injektio</string>
+    <string name="mitm_script_injection">Skriptin injektointi</string>
     <string name="mitm_script_injection_desc">Injektoi javascriptiä jokaiseen vierailtuun sivuun.</string>
     <string name="choose_method">Valitse keino:</string>
     <string name="local_files">Paikalliset tiedostot</string>
