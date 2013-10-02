@@ -23,7 +23,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
+import android.widget.CheckBox;
 
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.Plugin;
@@ -42,6 +44,7 @@ public class Inspector extends Plugin{
   private TextView mDeviceServices = null;
   private boolean mRunning = false;
   private Receiver mReceiver = null;
+  private CheckBox mAdvancedScan = null;
 
   public Inspector(){
     super(
@@ -61,11 +64,37 @@ public class Inspector extends Plugin{
     mStartButton.setChecked(false);
   }
 
+  private void write_services()
+  {
+    mDeviceServices.setText("");
+    if(System.getCurrentTarget().hasOpenPortsWithService()) {
+      for(Port port : System.getCurrentTarget().getOpenPorts()) {
+        if( port.service!=null && !port.service.isEmpty() )
+          if( port.version!=null && !port.version.isEmpty() )
+            mDeviceServices.append( port.number + " ( " + port.protocol.toString() + " ) : " + port.service + " - " + port.version +  "\n" );
+          else
+            mDeviceServices.append( port.number + " ( " + port.protocol.toString() + " ) : " + port.service + "\n" );
+      }
+    }
+    else
+      mDeviceServices.setText("unknown");
+  }
+
   private void setStartedState(){
     mActivity.setVisibility(View.VISIBLE);
     mRunning = true;
 
-    System.getNMap().inpsect(System.getCurrentTarget(), mReceiver).start();
+    write_services();
+
+    boolean AdvancedScan = mAdvancedScan.isChecked();
+    Target target = System.getCurrentTarget();
+
+    if( AdvancedScan && target.getOpenPorts().size() == 0 ){
+      setStoppedState();
+      Toast.makeText(this, "No open ports found, run the port scanner before selecting a focused scan.", Toast.LENGTH_LONG).show();
+    }
+    else
+      System.getNMap().inpsect( target, mReceiver, AdvancedScan ).start();
   }
 
   @Override
@@ -78,6 +107,7 @@ public class Inspector extends Plugin{
     mDeviceType = (TextView) findViewById(R.id.deviceType);
     mDeviceOS = (TextView) findViewById(R.id.deviceOS);
     mDeviceServices = (TextView) findViewById(R.id.deviceServices);
+    mAdvancedScan = (CheckBox)findViewById(R.id.advancedScan);
 
     mDeviceName.setText(System.getCurrentTarget().toString());
 
@@ -87,15 +117,9 @@ public class Inspector extends Plugin{
     if(System.getCurrentTarget().getDeviceOS() != null)
       mDeviceOS.setText(System.getCurrentTarget().getDeviceOS());
 
-    if(System.getCurrentTarget().hasOpenPortsWithService()){
-      mDeviceServices.setText("");
-
-      for(Port port : System.getCurrentTarget().getOpenPorts()){
-        if(port.service != null && !port.service.isEmpty()){
-          mDeviceServices.append(port.number + " ( " + port.protocol.toString().toLowerCase() + " ) : " + port.service + "\n");
-        }
-      }
-    }
+    write_services();
+    mAdvancedScan.setEnabled(System.getCurrentTarget().hasOpenPorts());
+    mAdvancedScan.setClickable(mAdvancedScan.isEnabled());
 
     mStartButton.setOnClickListener(new OnClickListener(){
       @Override
@@ -120,8 +144,9 @@ public class Inspector extends Plugin{
 
   private class Receiver extends InspectionReceiver{
     @Override
-    public void onServiceFound(final int port, final String protocol, final String service){
+    public void onServiceFound( final int port, final String protocol, final String service, final String version ){
       final boolean hasServiceDescription = !service.trim().isEmpty();
+      final boolean hasVersion = (version != null && !version.isEmpty());
 
       Inspector.this.runOnUiThread(new Runnable(){
         @SuppressWarnings("ConstantConditions")
@@ -130,15 +155,23 @@ public class Inspector extends Plugin{
           if(mDeviceServices.getText().equals("unknown"))
             mDeviceServices.setText("");
 
-          if(hasServiceDescription)
-            mDeviceServices.append(port + " ( " + protocol + " ) : " + service + "\n");
+          if(hasServiceDescription){
+            if(hasVersion)
+              mDeviceServices.append( port + " ( " + protocol + " ) : " + service + " - v" + version +  "\n" );
+            else
+              mDeviceServices.append( port + " ( " + protocol + " ) : " + service + "\n" );
+          }
           else
             mDeviceServices.append(port + " ( " + protocol + " )\n");
         }
       });
 
-      if(hasServiceDescription)
-        System.addOpenPort(port, Network.Protocol.fromString(protocol), service);
+      if(hasServiceDescription){
+        if(hasVersion)
+          System.addOpenPort( port, Network.Protocol.fromString(protocol), service, version );
+        else
+          System.addOpenPort( port, Network.Protocol.fromString(protocol), service );
+      }
       else
         System.addOpenPort(port, Network.Protocol.fromString(protocol));
     }

@@ -86,4 +86,42 @@
                 android:title="@string/pref_password_filename"/>
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="Performance" >
+
+        <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="SEARCH_OSVDB_ONLY"
+                android:summary="does not search for CVE vulnerabilities"
+                android:title="Use only OSV DataBase" />
+
+        <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="SEARCH_MSF_ONLY"
+                android:summary="Search only for metasploit exploits."
+                android:title="Search only MSF exploits" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="MetasploitFramework" >
+
+        <EditTextPreference
+                android:defaultValue="/data/gentoo_msf"
+                android:key="MSF_CHROOT_PATH"
+                android:summary="Path to MSF system image"
+                android:title="Chroot Path" />
+
+        <EditTextPreference
+                android:defaultValue="msf"
+                android:key="MSF_RPC_USER"
+                android:summary="the username for login into MSF."
+                android:title="username" />
+
+        <EditTextPreference
+                android:defaultValue="msf"
+                android:key="MSF_RPC_PSWD"
+                android:summary="the password to login into MSF."
+                android:title="password" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

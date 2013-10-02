@@ -76,11 +76,11 @@ import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Target.Port;
 import it.evilsocket.dsploit.net.Target.Type;
 import it.evilsocket.dsploit.net.Target.Vulnerability;
-import it.evilsocket.dsploit.net.http.RequestParser;
+import it.evilsocket.dsploit.net.Target.Exploit;
+import it.evilsocket.dsploit.net.msfrpc;
 import it.evilsocket.dsploit.net.http.proxy.HTTPSRedirector;
 import it.evilsocket.dsploit.net.http.proxy.Proxy;
 import it.evilsocket.dsploit.net.http.server.Server;
-import it.evilsocket.dsploit.plugins.mitm.hijacker.Session;
 import it.evilsocket.dsploit.tools.ArpSpoof;
 import it.evilsocket.dsploit.tools.Ettercap;
 import it.evilsocket.dsploit.tools.Hydra;
@@ -134,6 +134,8 @@ public class System
   private static String mSessionName = null;
 
   private static Object mCustomData = null;
+
+  private static msfrpc mMsfRpc      = null;
 
   public static void init(Context context) throws Exception{
     mContext = context;
@@ -658,6 +660,14 @@ public class System
     return mTcpdump;
   }
 
+  public static msfrpc getMsfRpc() {
+    return mMsfRpc;
+  }
+
+  public static void setMsfRpc(msfrpc value){
+    mMsfRpc = value;
+  }
+
   public static Proxy getProxy(){
     try{
       if(mProxy == null)
@@ -878,17 +888,21 @@ public class System
     return mCurrentPlugin;
   }
 
-  public static void addOpenPort(int port, Protocol protocol){
-    addOpenPort(port, protocol, null);
+  public static void addOpenPort( int port, Protocol protocol ) {
+    addOpenPort( port, protocol, null, null );
   }
 
-  public static void addOpenPort(int port, Protocol protocol, String service){
-    Port p = new Port(port, protocol, service);
+  public static void addOpenPort( int port, Protocol protocol, String service ) {
+    addOpenPort(port, protocol, service, null);
+  }
 
-    getCurrentTarget().addOpenPort(p);
+  public static void addOpenPort( int port, Protocol protocol, String service, String version ) {
+    Port p = new Port( port, protocol, service, version );
 
-    for(Plugin plugin : getPluginsForTarget()){
-      plugin.onTargetNewOpenPort(getCurrentTarget(), p);
+    getCurrentTarget().addOpenPort( p );
+
+    for( Plugin plugin : getPluginsForTarget() ) {
+      plugin.onTargetNewOpenPort( getCurrentTarget(), p );
     }
   }
 
@@ -898,6 +912,18 @@ public class System
     for(Plugin plugin : getPluginsForTarget()){
       plugin.onTargetNewVulnerability(getCurrentTarget(), port, v);
     }
+  }
+
+  public static void addExploit( Vulnerability v, Exploit ex) {
+    getCurrentTarget().addExploit( v, ex );
+
+    for( Plugin plugin : getPluginsForTarget() ) {
+      plugin.onTargetNewExploit( getCurrentTarget(), v, ex );
+    }
+  }
+
+  public static ArrayList<Exploit> getCurrentExploits() {
+    return getCurrentTarget().getExploits();
   }
 
   public static String getGatewayAddress(){

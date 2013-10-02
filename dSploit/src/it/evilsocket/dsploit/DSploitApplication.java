@@ -33,6 +33,8 @@ import it.evilsocket.dsploit.plugins.PortScanner;
 import it.evilsocket.dsploit.plugins.RouterPwn;
 import it.evilsocket.dsploit.plugins.Traceroute;
 import it.evilsocket.dsploit.plugins.mitm.MITM;
+import it.evilsocket.dsploit.plugins.Sessions;
+import it.evilsocket.dsploit.plugins.VulnerabilityFinder;
 
 public class DSploitApplication extends Application{
   @Override
@@ -61,8 +63,10 @@ public class DSploitApplication extends Application{
     System.registerPlugin(new Traceroute());
     System.registerPlugin(new PortScanner());
     System.registerPlugin(new Inspector());
+    System.registerPlugin(new VulnerabilityFinder());
     System.registerPlugin(new ExploitFinder());
     System.registerPlugin(new LoginCracker());
+    System.registerPlugin(new Sessions());
     System.registerPlugin(new MITM());
     System.registerPlugin(new PacketForger());
 

@@ -27,14 +27,13 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import it.evilsocket.dsploit.net.Target.Vulnerability;
 
-public class NVDatabase{
+public class NVDatabase
+{
   private final static Pattern ID_PATTERN = Pattern.compile(">(CVE-[^<]+)</a>", Pattern.MULTILINE | Pattern.DOTALL);
   private final static Pattern SUMMARY_PATTERN = Pattern.compile("Summary:</span>\\s*([^<]+)<", Pattern.MULTILINE | Pattern.DOTALL);
   private final static Pattern SEVERITY_PATTERN = Pattern.compile("version=[\\d\\.]+[\"']>([\\d\\.]+)<", Pattern.MULTILINE | Pattern.DOTALL);
@@ -89,29 +88,19 @@ public class NVDatabase{
           Vulnerability cve = new Vulnerability();
 
           cve.setIdentifier(identifiers.get(i));
-          cve.setSummary(summaries.get(i));
-          cve.setSeverity(Double.parseDouble(severities.get(i)));
+          cve.summary = summaries.get(i);
+          cve.severity = Double.parseDouble( severities.get(i) );
 
           results.add(cve);
         }
-
-        Collections.sort(results, new Comparator<Vulnerability>(){
-          public int compare(Vulnerability o1, Vulnerability o2){
-            if(o1.getSeverity() > o2.getSeverity())
-              return -1;
-
-            else if(o1.getSeverity() < o2.getSeverity())
-              return 1;
-
-            else
-              return 0;
-          }
-        });
-      } else
+      }
+      else
         results = null;
-    } catch(MalformedURLException mue){
+    }
+    catch(MalformedURLException mue){
       mue.printStackTrace();
-    } catch(IOException ioe){
+    }
+    catch(IOException ioe){
       ioe.printStackTrace();
     }
 

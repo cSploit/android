@@ -62,6 +62,23 @@ public class Network
 
       return UNKNOWN;
     }
+
+    public String toString()
+    {
+      switch(this)
+      {
+        case ICMP:
+          return "icmp";
+        case IGMP:
+          return "igmp";
+        case TCP:
+          return "tcp";
+        case UDP:
+          return "udp";
+        default:
+          return "unknown";
+      }
+    }
   }
 
   private ConnectivityManager mConnectivityManager = null;

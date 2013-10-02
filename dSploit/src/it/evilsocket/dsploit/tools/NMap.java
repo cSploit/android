@@ -18,135 +18,177 @@
  */
 package it.evilsocket.dsploit.tools;
 
-import android.content.Context;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
-import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.core.Logger;
+import it.evilsocket.dsploit.net.Target;
+import it.evilsocket.dsploit.net.Target.Port;
+import android.content.Context;
+//import android.net.wifi.WifiConfiguration.Protocol;
+import android.util.Log;
+import it.evilsocket.dsploit.net.Network.Protocol;
+
 
 public class NMap extends Tool
 {
-  public NMap(Context context){
-    super("nmap/nmap", context);
+  private static final String TAG = "NMAP";
+
+  public NMap( Context context ){
+    super( "nmap/nmap", context );
   }
 
-  public static abstract class TraceOutputReceiver implements OutputReceiver{
-    private static final Pattern HOP_PATTERN = Pattern.compile("^(\\d+)\\s+(\\.\\.\\.|[0-9\\.]+\\s[ms]+)\\s+([\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}|[\\d]+).*", Pattern.CASE_INSENSITIVE);
+  public static abstract class TraceOutputReceiver implements OutputReceiver
+  {
+    private static final Pattern HOP_PATTERN = Pattern.compile( "^(\\d+)\\s+(\\.\\.\\.|[0-9\\.]+\\s[ms]+)\\s+([\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}|[\\d]+).*", Pattern.CASE_INSENSITIVE );
 
-    public void onStart(String commandLine){
-    }
+    public void onStart( String commandLine ) { }
 
-    public void onNewLine(String line){
+    public void onNewLine( String line ) {
       Matcher matcher;
 
-      if((matcher = HOP_PATTERN.matcher(line)) != null && matcher.find()){
-        onHop(matcher.group(1), matcher.group(2), matcher.group(3));
+      if( ( matcher = HOP_PATTERN.matcher( line ) ) != null && matcher.find() )
+      {
+        onHop( matcher.group( 1 ), matcher.group( 2 ), matcher.group( 3 ) );
       }
     }
 
-    public void onEnd(int exitCode){
-      if(exitCode != 0)
-        Logger.error("nmap exited with code " + exitCode);
+    public void onEnd( int exitCode ) {
+      if( exitCode != 0 )
+        Log.e( TAG, "nmap exited with code " + exitCode );
     }
 
-    public abstract void onHop(String hop, String time, String address);
+    public abstract void onHop( String hop, String time, String address );
   }
 
-  public Thread trace(Target target, TraceOutputReceiver receiver){
-    return super.async("-sn --traceroute --privileged --send-ip --system-dns " + target.getCommandLineRepresentation(), receiver);
+  public Thread trace( Target target, TraceOutputReceiver receiver ) {
+    return super.async( "-sn --traceroute --privileged --send-ip --system-dns " + target.getCommandLineRepresentation(), receiver );
   }
 
-  public static abstract class SynScanOutputReceiver implements OutputReceiver{
-    private static final Pattern PORT_PATTERN = Pattern.compile("^discovered open port (\\d+)/([^\\s]+).+", Pattern.CASE_INSENSITIVE);
+  public static abstract class SynScanOutputReceiver implements OutputReceiver
+  {
+    private static final Pattern PORT_PATTERN = Pattern.compile( "^discovered open port (\\d+)/([^\\s]+).+", Pattern.CASE_INSENSITIVE );
 
-    public void onStart(String commandLine){
+    public void onStart( String commandLine ) {
 
     }
 
-    public void onNewLine(String line){
+    public void onNewLine( String line ) {
+      Logger.debug( "NMAP: " + line );
       Matcher matcher;
 
-      if((matcher = PORT_PATTERN.matcher(line)) != null && matcher.find()){
-        onPortFound(matcher.group(1), matcher.group(2));
+      if( ( matcher = PORT_PATTERN.matcher( line ) ) != null && matcher.find() )
+      {
+        onPortFound( matcher.group( 1 ), matcher.group( 2 ) );
       }
     }
 
-    public void onEnd(int exitCode){
-      if(exitCode != 0)
-        Logger.error("nmap exited with code " + exitCode);
+    public void onEnd( int exitCode ) {
+      if( exitCode != 0 )
+        Logger.error( "nmap exited with code " + exitCode );
     }
 
-    public abstract void onPortFound(String port, String protocol);
+    public abstract void onPortFound( String port, String protocol );
   }
 
-  public Thread synScan(Target target, SynScanOutputReceiver receiver, String custom){
+  public Thread synScan( Target target, SynScanOutputReceiver receiver, String custom ) {
     String command = "-sS -P0 --privileged --send-ip --system-dns -vvv ";
 
-    if(custom != null)
+    if( custom != null )
       command += "-p " + custom + " ";
 
     command += target.getCommandLineRepresentation();
 
-    return super.async(command, receiver);
+    Logger.debug( "synScan - " + command );
+
+    return super.async( command, receiver );
   }
 
   public static abstract class InspectionReceiver implements OutputReceiver
   {
-    private static final Pattern OPEN_PORT_PATTERN = Pattern.compile("^discovered open port (\\d+)/([^\\s]+).+", Pattern.CASE_INSENSITIVE);
-    private static final Pattern SERVICE_PATTERN = Pattern.compile("^(\\d+)/([a-z]+)\\s+[a-z]+\\s+[a-z]+\\s+(.*)$", Pattern.CASE_INSENSITIVE);
-    private static final Pattern OS_PATTERN = Pattern.compile("^Running:\\s+(.+)$", Pattern.CASE_INSENSITIVE);
-    private static final Pattern OS_GUESS_PATTERN = Pattern.compile("^Running\\s+\\(JUST\\s+GUESSING\\):\\s+(.+)$", Pattern.CASE_INSENSITIVE);
-    private static final Pattern SERVICE_INFO_PATTERN = Pattern.compile("^Service\\s+Info:\\s+OS:\\s+([^;]+).*$", Pattern.CASE_INSENSITIVE);
-    private static final Pattern DEVICE_PATTERN = Pattern.compile("^Device\\s+type:\\s+(.+)$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PORT_PATTERN 		  = Pattern.compile( "<port protocol=\"([^\"]+)\" portid=\"([^\"]+)\"><state state=\"open\"[^>]+><service.+product=\"([^\"]+)\" version=\"([^\"]+)\"", Pattern.CASE_INSENSITIVE);
+    private static final Pattern OS_PATTERN 		  = Pattern.compile( "<osclass type=\"([^\"]+)\".+osfamily=\"([^\"]+)\".+accuracy=\"([^\"]+)\"", Pattern.CASE_INSENSITIVE);
 
-    public void onStart(String commandLine){
+    private static final int 	proto = 1,
+      number = 2,
+      name = 3,
+      version = 4,
+      device_type = 1,
+      osfamily = 2,
+      accuracy = 3;
+    private static int last_accuracy;
 
+    public void onStart( String commandLine ) {
+      last_accuracy=0;
     }
 
-    public void onNewLine(String line){
+    public void onNewLine( String line ) {
+      Logger.debug( "NMAP: " + line );
+
       Matcher matcher = null;
 
-      if((matcher = OPEN_PORT_PATTERN.matcher(line)) != null && matcher.find())
-        onOpenPortFound(Integer.parseInt(matcher.group(1)), matcher.group(2));
+      if((matcher = PORT_PATTERN.matcher(line)) != null && matcher.find())
+      {
+        int port_number = Integer.parseInt(matcher.group(number));
+        String protocol = matcher.group(proto);
 
-      else if((matcher = SERVICE_PATTERN.matcher(line)) != null && matcher.find())
-        onServiceFound(Integer.parseInt(matcher.group(1)), matcher.group(2), matcher.group(3));
+        onOpenPortFound(port_number, protocol);
+        for( String _version : matcher.group(version).split("-"))
+        {
+          onServiceFound(port_number, protocol, matcher.group(name), _version);
+        }
 
-      else if((matcher = OS_PATTERN.matcher(line)) != null && matcher.find())
-        onOsFound(matcher.group(1));
-
-      else if((matcher = OS_GUESS_PATTERN.matcher(line)) != null && matcher.find())
-        onGuessOsFound(matcher.group(1));
-
-      else if((matcher = DEVICE_PATTERN.matcher(line)) != null && matcher.find())
-        onDeviceFound(matcher.group(1).replace("|", ",  "));
-
-      else if((matcher = SERVICE_INFO_PATTERN.matcher(line)) != null && matcher.find())
-        onServiceInfoFound(matcher.group(1));
+      }
+      else if( ( matcher = OS_PATTERN.matcher(line) ) != null && matcher.find() )
+      {
+        int found_accuracy;
+        if((found_accuracy = Integer.parseInt(matcher.group(accuracy))) > last_accuracy)
+        {
+          last_accuracy = found_accuracy;
+          onOsFound(matcher.group(osfamily));
+          onDeviceFound(matcher.group(device_type));
+        }
+      }
     }
 
-    public abstract void onOpenPortFound(int port, String protocol);
+    public abstract void onOpenPortFound( int port, String protocol );
+    public abstract void onServiceFound( int port, String protocol, String service, String version );
+    public abstract void onOsFound( String os );
+    public abstract void onGuessOsFound( String os );
+    public abstract void onDeviceFound( String device );
+    public abstract void onServiceInfoFound( String info );
 
-    public abstract void onServiceFound(int port, String protocol, String service);
-
-    public abstract void onOsFound(String os);
-
-    public abstract void onGuessOsFound(String os);
-
-    public abstract void onDeviceFound(String device);
-
-    public abstract void onServiceInfoFound(String info);
-
-    public void onEnd(int exitCode){
-      if(exitCode != 0)
-        Logger.error("nmap exited with code " + exitCode);
+    public void onEnd( int exitCode ) {
+      if( exitCode != 0 )
+        Logger.error( "nmap exited with code " + exitCode );
     }
   }
 
-  public Thread inpsect(Target target, InspectionReceiver receiver){
-    return super.async("-T4 -F -O -sV --privileged --send-ip --system-dns -vvv " + target.getCommandLineRepresentation(), receiver);
+  public Thread inpsect( Target target, InspectionReceiver receiver, boolean advanced_scan ) {
+    String tcp_ports,udp_ports, cmd;
+
+    if(advanced_scan)
+    {
+      tcp_ports = "";
+      udp_ports = "";
+      for( Port p : target.getOpenPorts())
+        if(p.protocol.equals(Protocol.TCP))
+          tcp_ports += Integer.toString(p.number) + ",";
+        else if(p.protocol.equals(Protocol.UDP))
+          udp_ports += Integer.toString(p.number) + ",";
+      if(udp_ports.length()>0)
+        udp_ports = "U:" + udp_ports;
+      if(tcp_ports.length()>0)
+        tcp_ports = "T:" + tcp_ports;
+
+      cmd = "-T4 -sV -O --privileged --send-ip --system-dns -Pn -oX - -p " + tcp_ports + udp_ports + " " + target.getCommandLineRepresentation();
+    }
+    else
+      cmd = "-T4 -F -O -sV --privileged --send-ip --system-dns -oX - " + target.getCommandLineRepresentation();
+
+    Logger.debug( "Inspect - " + cmd );
+
+    return super.async( cmd, receiver );
   }
 }

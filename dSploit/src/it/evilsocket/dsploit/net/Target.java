@@ -24,10 +24,10 @@ import java.io.BufferedReader;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Locale;
 
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
@@ -36,6 +36,9 @@ import it.evilsocket.dsploit.net.Network.Protocol;
 
 public class Target
 {
+  // remove "dev" "rc" and other extra version infos
+  private final static Pattern VERSION_PATTERN = Pattern.compile( "(([0-9]+\\.)+[0-9]+)[a-zA-Z]+");
+
   public enum Type{
     NETWORK,
     ENDPOINT,
@@ -43,7 +46,7 @@ public class Target
 
     public static Type fromString(String type) throws Exception{
       if(type != null){
-        type = type.trim().toLowerCase();
+        type = type = type.trim().toLowerCase(Locale.US);
         if(type.equals("network"))
           return Type.NETWORK;
 
@@ -62,31 +65,37 @@ public class Target
     public Protocol protocol;
     public int number;
     public String service;
+    public String	version;
+    private ArrayList<Vulnerability> vulns = new ArrayList<Target.Vulnerability>();
 
-    public Port(int port, Protocol proto, String service){
+    public Port( int port, Protocol proto, String service, String version) {
       this.number = port;
       this.protocol = proto;
-      this.service = service != null ? (service.equals("null") ? null : service) : null;
+      this.service = service;
+      this.version = version;
     }
 
-    public Port(int port, Protocol proto){
-      this(port, proto, null);
+    public Port( int port, Protocol proto, String service ) {
+      this(port, proto, service, null);
     }
 
-    public String getServiceQuery(){
+    public Port( int port, Protocol proto ) {
+      this( port, proto, null, null );
+    }
+
+    public String getServiceQuery() {
       String query = "";
+      Matcher matcher	  = null;
 
-      if(service != null){
-        query = service;
+      if( service != null )
+      {
+        query += service;
 
-        // remove version numbers
-        query = query.replaceAll("[\\d\\.]+", " ");
-        // remove everything but letters, digits upper and under scores
-        query = query.replaceAll("[^a-zA-Z0-9\\-_]", " ");
-        // remove multiple spaces
-        query = query.replaceAll("[\\s]{2,}", " ");
-        // trim
-        query = query.trim();
+        if(version!=null)
+          if((matcher = VERSION_PATTERN.matcher(version)) != null && matcher.find())
+            query += " " + matcher.group(1);
+          else
+            query += " " + version;
       }
 
       return query;
@@ -94,65 +103,169 @@ public class Target
 
     // needed for vulnerabilities hashmap
     public String toString(){
-      return protocol.toString() + "|" + number + "|" + service;
+      return protocol.toString() + "|" + number + "|" + service + "|" + version;
+    }
+
+    public void addVulnerability(Vulnerability vuln)
+    {
+      if(!vulns.contains(vuln))
+        vulns.add(vuln);
+    }
+
+    public void delVulnerability(Vulnerability vuln)
+    {
+      if(vulns.contains(vuln))
+        vulns.remove(vuln);
+    }
+
+    public void clearVulnerabilities()
+    {
+      vulns.clear();
+    }
+
+    public ArrayList<Vulnerability> getVulnerabilities()
+    {
+      return vulns;
     }
   }
 
-  public static class Vulnerability{
-    private String mIdentifier = null;
-    private double mSeverity = 0;
-    private String mSummary = null;
+  public static class Vulnerability
+  {
+    public String cve_id = null;
+    public int osvdb_id = 0;
+    public double severity   = 0;
+    public String summary	   = null;
+    private Port mPort = null;
+    public boolean has_msf_exploit = false; // used for speedup search
+    private ArrayList<Exploit> mExploits = new ArrayList<Target.Exploit>();
 
     public Vulnerability(){
 
     }
 
-    public Vulnerability(BufferedReader reader) throws Exception{
+    public Vulnerability( BufferedReader reader ) throws Exception {
       String serialized = reader.readLine();
-      String[] parts = serialized.split("\\|", 3);
+      String[] parts	  = serialized.split( "\\|", 3 );
 
-      mIdentifier = parts[0];
-      mSeverity = Double.parseDouble(parts[1]);
-      mSummary = parts[2];
+      cve_id = parts[0];
+      severity   = Double.parseDouble( parts[1] );
+      summary	= parts[2];
     }
 
-    public String getIdentifier(){
-      return mIdentifier;
+    public void from_osvdb( int id, double _severity, String _summary ) {
+      osvdb_id = id;
+      severity   = _severity;
+      summary	= _summary;
     }
 
-    public double getSeverity(){
-      return mSeverity;
+    public String getIdentifier() {
+      if(osvdb_id>0)
+        return Integer.toString(osvdb_id);
+      else
+        return cve_id;
     }
 
-    public String getSummary(){
-      return mSummary;
+    public void setIdentifier( String identifier ) {
+      this.cve_id = identifier;
     }
 
-    public void setIdentifier(String identifier){
-      this.mIdentifier = identifier;
-    }
 
-    public void setSeverity(double severity){
-      this.mSeverity = severity;
-    }
-
-    public void setSummary(String summary){
-      this.mSummary = summary;
-    }
 
     public String toString(){
-      return mIdentifier + "|" + mSeverity + "|" + mSummary;
+      if(osvdb_id>0)
+        return Integer.toString(osvdb_id) + "|" + severity + "|" + summary;
+      else
+        return cve_id + "|" + severity + "|" + summary;
     }
 
-    public String getHtmlColor(){
-      if(mSeverity < 5.0)
+    public String getHtmlColor( )
+    {
+      if( severity < 5.0 )
         return "#59FF00";
 
-      else if(mSeverity < 7)
+      else if( severity < 7 )
         return "#FFD732";
 
       else
         return "#FF0000";
+    }
+
+    public Port getPort()
+    {
+      return mPort;
+    }
+
+    public void setPort(Port port)
+    {
+      if(mPort==port)
+        return;
+      if(mPort!=null)
+        mPort.delVulnerability(this);
+      mPort = port;
+    }
+
+    public ArrayList<Exploit> getExploits()
+    {
+      return mExploits;
+    }
+
+    public void clearExploit()
+    {
+      mExploits.clear();
+    }
+
+    public void addExploit(Exploit ex)
+    {
+      if(!mExploits.contains(ex))
+        mExploits.add(ex);
+    }
+
+    public void delExploit(Exploit ex)
+    {
+      if(mExploits.contains(ex))
+        mExploits.remove(ex);
+    }
+  }
+
+  public static class Exploit
+  {
+    public String url;
+    public String name;
+    public String msf_name;
+    public int payload_size;
+    public boolean started = false;
+    private Vulnerability mVuln = null;
+    //TODO: get payload_size
+
+    public String toString()
+    {
+      if(msf_name!=null)
+        return msf_name;
+      return name;
+    }
+
+    public int getDrawableResourceId() {
+      if(msf_name!=null)
+        return R.drawable.exploit_msf;
+      return R.drawable.exploit;
+    }
+
+    public String getDescription() {
+      return url;
+    }
+
+    public void setVulnerability(Vulnerability vuln)
+    {
+      if(mVuln==vuln)
+        return;
+      if(mVuln!=null)
+        mVuln.delExploit(this);
+      mVuln=vuln;
+    }
+
+    public Vulnerability getVulnerability()
+    {
+      return mVuln;
     }
   }
 
@@ -166,7 +279,8 @@ public class Target
   private String mDeviceType = null;
   private String mDeviceOS = null;
   private String mAlias = null;
-  private HashMap<String, ArrayList<Vulnerability>> mVulnerabilities = new HashMap<String, ArrayList<Vulnerability>>();
+  private ArrayList<Vulnerability> mVulnerabilities 					 = new ArrayList<Vulnerability>();
+  private ArrayList<Exploit> mExploits								 = new ArrayList<Target.Exploit>();
 
   public static Target getFromString(String string){
     final Pattern PARSE_PATTERN = Pattern.compile("^(([a-z]+)://)?([0-9a-z\\-\\.]+)(:([\\d]+))?[0-9a-z\\-\\./]*$", Pattern.CASE_INSENSITIVE);
@@ -183,7 +297,7 @@ public class Target
           address = matcher.group(3),
           sport = matcher.group(4);
 
-        protocol = protocol != null ? protocol.toLowerCase() : null;
+        protocol = protocol != null ? protocol.toLowerCase(Locale.US) : null;
         sport = sport != null ? sport.substring(1) : null;
 
         if(address != null){
@@ -265,22 +379,24 @@ public class Target
     int ports = Integer.parseInt(reader.readLine());
     for(int i = 0; i < ports; i++){
       String key = reader.readLine();
-      String[] parts = key.split("\\|", 3);
+      String[] parts = key.split("\\|", 4);
       Port port = new Port
       (
         Integer.parseInt(parts[1]),
         Protocol.fromString(parts[0]),
-        parts[2]
+        parts[2],
+        parts[3]
       );
 
       mPorts.add(port);
-      mVulnerabilities.put(key, new ArrayList<Vulnerability>());
 
       int nvulns = Integer.parseInt(reader.readLine());
       for(int j = 0; j < nvulns; j++){
         Vulnerability v = new Vulnerability(reader);
 
-        mVulnerabilities.get(key).add(v);
+        v.setPort(port);
+        port.addVulnerability(v);
+        mVulnerabilities.add(v);
       }
     }
   }
@@ -303,17 +419,14 @@ public class Target
     }
 
     builder.append(mPorts.size()).append("\n");
-    for(Port port : mPorts){
+    builder.append( mPorts.size() + "\n" );
+    for( Port port : mPorts )
+    {
       String key = port.toString();
-      builder.append(key).append("\n");
-      if(mVulnerabilities.containsKey(key)){
-        builder.append(mVulnerabilities.get(key).size()).append("\n");
-        for(Vulnerability v : mVulnerabilities.get(key)){
-          builder.append(v.toString()).append("\n");
-        }
-      }
-      else
-        builder.append("0\n");
+      builder.append( key + "\n" );
+      builder.append(port.getVulnerabilities().size()+"\n");
+      for(Vulnerability vuln : port.getVulnerabilities())
+        builder.append(vuln.toString() + "\n");
     }
   }
 
@@ -536,16 +649,20 @@ public class Target
   }
 
   public void addOpenPort(Port port){
-    for(Port mPort1 : mPorts){
-      if(mPort1.number == port.number){
-        if(port.service != null)
-          mPort1.service = port.service;
+    for( int i = 0; i < mPorts.size(); i++ )
+    {
+      if( mPorts.get(i).number == port.number )
+      {
+        if( port.service != null )
+          mPorts.get(i).service = port.service;
+        if( port.version != null )
+          mPorts.get(i).version = port.version;
 
         return;
       }
     }
 
-    mPorts.add(port);
+    mPorts.add( port );
   }
 
   public void addOpenPort(int port, Protocol protocol){
@@ -584,6 +701,10 @@ public class Target
     return false;
   }
 
+  public boolean hasVulnerabilities() {
+    return !mVulnerabilities.isEmpty();
+  }
+
   public void setDeviceType(String type){
     mDeviceType = type;
   }
@@ -600,20 +721,29 @@ public class Target
     return mDeviceOS;
   }
 
-  public void addVulnerability(Port port, Vulnerability v){
-    if(!mVulnerabilities.containsKey(port.toString())){
-      mVulnerabilities.put(port.toString(), new ArrayList<Vulnerability>());
-    }
-    else{
-      for(Vulnerability vuln : mVulnerabilities.get(port.toString()))
-        if(vuln.getIdentifier().equals(v.getIdentifier()))
-          return;
-    }
-
-    mVulnerabilities.get(port.toString()).add(v);
+  public void addVulnerability( Port port, Vulnerability v ) {
+    if(mVulnerabilities.contains(v))
+      return;
+    mVulnerabilities.add(v);
+    port.addVulnerability(v);
+    v.setPort(port);
   }
 
-  public HashMap<String, ArrayList<Vulnerability>> getVulnerabilities(){
+  public ArrayList< Vulnerability > getVulnerabilities() {
     return mVulnerabilities;
+  }
+
+  public void addExploit(Vulnerability v, Exploit ex)
+  {
+    if(mExploits.contains(ex) || !mVulnerabilities.contains(v))
+      return;
+    mExploits.add(ex);
+    v.addExploit(ex);
+    ex.setVulnerability(v);
+  }
+
+  public ArrayList<Exploit> getExploits()
+  {
+    return mExploits;
   }
 }
