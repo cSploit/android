@@ -4,13 +4,13 @@
     <string name="title_activity_main">dSploit</string>
     <string name="crash_toast_text">Oooops! Eu dei crash, mas um relatório será enviado para o meu desenvolvedor para ajudar a corrigir o problema :)</string>
     <string name="toggle_button">Botão de Alternância</string>
-    <string name="enter_redirection_details">Digite os detalhes de redirecionamento abaixo:</string>
+    <string name="enter_redirection_details">Digite os detalhes de redirecionamento abaixo::</string>
     <string name="address">Endereço</string>
     <string name="port">Porta</string>
     <string name="target">Alvo</string>
     <string name="unknown">Desconhecido</string>
     <string name="services">Serviços</string>
-    <string name="os">SO</string>
+    <string name="os">So</string>
     <string name="device_type">Tipo de Dispositivo</string>
     <string name="start_hijack">Toque em uma sessão para iniciar seqüestro, toque longo para salvá-lo para o arquivo.</string>
     <string name="sort">Tipo:</string>
@@ -25,10 +25,9 @@
     <string name="dsploit_url">http://www.dsploit.net/</string>
     <string name="disclaimer">Disclaimer</string>
     <string name="dsploit_disclaimer">
-        <![CDATA[Esta aplicação não é para ser usada para quaisquer fins que não para demonstrar suas funções, e só deve ser utilizado em redes para as quais você tem permissão para fazer isso. Qualquer outro uso não é de responsabilidade do desenvolvedor.Em outras palavras, Não seja estúpido, e não direcionar as pessoas com raiva para mim.]]></string>
+        <![CDATA[ Esta aplicação não é para ser usada para quaisquer fins que não para demonstrar suas funções, e só deve ser utilizado em redes para as quais você tem permissão para fazer isso. Qualquer outro uso não é de responsabilidade do desenvolvedor.Em outras palavras, Não seja estúpido, e não direcionar as pessoas com raiva para mim.]]></string>
     <string name="license">Licença</string>
-    <string name="gpl_license">Este programa é software livre: você pode redistribuí-lo e / ou modificá-lo sob os termos da GNU General Public License como publicado pela Free Software Foundation, tanto a versão 3 da Licença, ou (a seu critério) qualquer versão posterior.Este programa é distribuído na esperança que será útil, mas SEM NENHUMA GARANTIA;sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou ADEQUAÇÃO A UM DETERMINADO FIM.Veja a GNU General Public License para mais detalhes.Você deve ter recebido uma cópia da GNU General Public License juntamente com este programa.Se não, veja http://www.gnu.org/licenses/.
-    </string>
+    <string name="gpl_license">Este programa é software livre: você pode redistribuí-lo e / ou modificá-lo sob os termos da GNU General Public License como publicado pela Free Software Foundation, tanto a versão 3 da Licença, ou (a seu critério) qualquer versão posterior.Este programa é distribuído na esperança que será útil, mas SEM NENHUMA GARANTIA;sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou ADEQUAÇÃO A UM DETERMINADO FIM.Veja a GNU General Public License para mais detalhes.Você deve ter recebido uma cópia da GNU General Public License juntamente com este programa.Se não, veja http://www.gnu.org/licenses/.</string>
     <string name="service">Serviço</string>
     <string name="stopped">Parado&#8230;</string>
     <string name="start">Iniciar</string>
@@ -63,11 +62,13 @@
     <string name="net_discovery_started">A descoberta de rede Iniciou.</string>
     <string name="start_monitor">Iniciar o Monitor de Rede</string>
     <string name="stop_monitor">Parar o Monitor de Rede</string>
+    <string name="start_msfrpcd">Iniciar MetaSploit RPCD</string>
+    <string name="stop_msfrpcd">Parar MetaSploit RPCD</string>
     <string name="exit">Sair</string>
     <string name="close_confirm">Isto irá fechar dSploit, você tem certeza que deseja continuar ?
     </string>
     <string name="press_back">Pressione voltar novamente para fechar este aplicativo.</string>
-    <string name="selected_">selecionado&#160;</string>
+    <string name="selected_">Selecionado&#160;</string>
     <string name="github_issues">https://github.com/evilsocket/dsploit/issues/new</string>
     <string name="no_session_found">Nenhum arquivo de sessão encontrado no cartão SD.</string>
     <string name="select_session_file">Selecione um arquivo de sessão a partir do cartão SD :</string>
@@ -88,7 +89,8 @@
         <![CDATA[<p>Parece que o processador do dispositivo não é um ARM,desculpe,mas não é compatível com dSploit.</p>]]></string>
     <string name="arm_error2">
         <![CDATA[<p>Para mais informações, leia o <a href=\"http://dsploit.net/#requirements\">requirements</a> section.</p>]]></string>
-    <string name="busybox_required">Necessária a instalação completa BusyBox, binário killall não encontrado (talvez você tenha uma versão antiga busybox)</string>
+    <string name="busybox_required">Necessária a instalação completa do BusyBox, binário killall não encontrado (talvez você tenha uma versão antiga busybox).
+    </string>
     <string name="only_4_root">Este aplicativo pode ser executado apenas em dispositivos com Root.</string>
     <string name="initializing">inicializar&#8230;</string>
     <string name="initialization_error">Erro de inicialização</string>
@@ -106,41 +108,52 @@
     <string name="enter_wifi_key">Digite a senha WiFi:</string>
     <string name="scanning">Escaneando&#8230;</string>
     <string name="invalid_filename">Nome do Arquivo Inválido.</string>
-    <string name="something_went_wrong">Algo deu errado, por favor selecione novamente um alvo válido.</string>
+    <string name="something_went_wrong">Algo deu errado, por favor selecione novamente um alvo válido.
+    </string>
     <string name="selected">Selecionado</string>
     <string name="nothing_found"><![CDATA[<small><i>Nada encontrado</i></small>]]></string>
     <string name="no_open_ports">Não há portas abertas detectadas no alvo atual, execute o inspetor de serviço primeiro.</string>
-    <string name="no_infos_on_target">Não há informações específicas sobre os serviços executados na máquina alvo, execute o inspetor de serviço primeiro.</string>
+    <string name="no_open_ports_focused_scan">Não há portas abertas, execute o scanner de portas antes de selecionar uma varredura focada.</string>
+    <string name="no_open_ports_exploitfinder">Nenhum exploit encontrado neste destino, executar o Localizador de Exploit primeiro.</string>
+    <string name="no_exploit_started">Nenhum exploit foi iniciado.</string>
+
+    <string name="no_infos_on_target">Não há informações específicas sobre os serviços executados na máquina alvo, execute o inspetor de serviço primeiro.
+    </string>
     <string name="custom_charset">Conjunto de Caracteres personalizados</string>
-    <string name="enter_chars_wanted">Digite os caracteres que você deseja usar no conjunto de caracteres personalizado:</string>
+    <string name="enter_chars_wanted">Digite os caracteres que você deseja usar no conjunto de caracteres personalizado:
+    </string>
     <string name="invalid_port">porta especificada Inválida.</string>
     <string name="request_empty">O pedido não pode ser vazio.</string>
-    <string name="request_sent">pedido enviado.</string>
+    <string name="request_sent">Pedido Enviado.</string>
     <string name="customize_wol_port">Customize a porta WOL e pressione Enviar.</string>
-    <string name="couldnt_send_wol_packet">Não foi possível enviar um pacote WOL para um alvo sem um endereço MAC conhecido.</string>
+    <string name="couldnt_send_wol_packet">Não foi possível enviar um pacote WOL para um alvo sem um endereço MAC conhecido.
+    </string>
     <string name="no_activities_for_url">Não há atividades para lidar com este tipo de url.</string>
-    <string name="select_ports">Selecione Portas</string>
+    <string name="select_ports">Selecionar Portas</string>
     <string name="enter_ports_list">Digite uma lista de portas separada por vírgula:</string>
     <string name="invalid_port_">Porta Invalida \'</string>
     <string name="port_must_be_greater">Porta tem de ser maior que 0 e menor do que 65535.</string>
     <string name="invalid_ports">Portas especificadas inválidas.</string>
     <string name="empty_port_list">Lista de porta vazia.</string>
     <string name="about_dsploit_v_">Sobre dSploit v</string>
-    <string name="select_target">Selecione um alvo abaixo, clicando em uma linha ou longo clique nele para escrever um nome.</string>
+    <string name="select_target">Selecione um alvo abaixo, clicando em uma linha ou longo clique nele para escrever um nome.
+    </string>
     <string name="generating_keys">gerando chaves&#8230;</string>
-    <string name="no_wifi_available">Não há conexão Wi-Fi disponível, a aplicação irá apenas verificar se há atualizações. #STATUS#</string>
+    <string name="no_wifi_available">Não há conexão Wi-Fi disponível, a aplicação irá apenas verificar se há atualizações. #STATUS#
+    </string>
     <string name="loading_changelog">Carregando log de alterações&#8230;</string>
     <string name="something_went_wrong_changelog">
         <![CDATA[<html><body><p><b>Algo deu errado ao recuperar o log de alterações:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
     <string name="cancel_dialog">Cancelar</string>
     <string name="yes">Sim</string>
     <string name="no">Não</string>
-    <string name="connect">conectar</string>
+    <string name="connect">Conectar</string>
     <string name="crack">Crackear</string>
     <string name="could_not_read_folder">Não foi possível ler o conteúdo da pasta.</string>
     <string name="choose_dir">Escolher&#160;</string>
     <string name="vulnerability_finder">Encontrar Vulnerabilidade</string>
-    <string name="vulnerability_finder_desc">Busca de vulnerabilidades conhecidas para serviços executados alvo sobre National Vulnerability Database.</string>
+    <string name="vulnerability_finder_desc">Busca de vulnerabilidades conhecidas para serviços executados alvo sobre National Vulnerability Database.
+    </string>
     <string name="inspector">Inspetor</string>
     <string name="inspector_desc">Executar o sistema operacional alvo e serviços de detecção de profundidade (mais lento do que o scanner de portas, mas mais preciso).
     </string>
@@ -148,8 +161,7 @@
     <string name="login_cracker_desc">Um rápido cracker de logon de rede que suporta muitos diferentes serviços.
     </string>
     <string name="packet_forger">Falsificador de Pacotes</string>
-    <string name="packet_forger_desc">Elaborar e enviar um pacote TCP ou UDP para o alvo.
-    </string>
+    <string name="packet_forger_desc">Elaborar e enviar um pacote TCP ou UDP para o alvo.</string>
     <string name="port_scanner">Escanear porta</string>
     <string name="port_scanner_desc">Realize uma varredura de portas SYN no alvo.</string>
     <string name="router_pwn">Router PWN</string>
@@ -161,30 +173,41 @@
     <string name="mitm_desc">Executar vários ataques man-in-the-middle, como sniffing da rede,manipulação de tráfego, etc&#8230;
     </string>
     <string name="network_subnet_mask">Esta é a sua máscara de sub-rede</string>
-    <string name="gateway_router">(O seu gateway de rede / router)</string>
+    <string name="gateway_router">(O seu Gateway de Rede / Router)</string>
     <string name="this_device">&#160;(Este Dispositivo)</string>
     <string name="wifi_went_down">conectividade WiFi Caiu.</string>
     <string name="hijack_session">Hijack de Sessão</string>
     <string name="start_hijacking">Parar sniff e iniciar sessão de Sequestro ?</string>
-    <string name="start_hijacking2">Começar seqüestro de sessão?</string>
+    <string name="start_hijacking2">Começar seqüestro de sessão ?</string>
     <string name="set_session_filename">Defina o nome do arquivo de sessão:</string>
     <string name="session_sniffer">Sniffer de sessão</string>
 
     <string name="untraced_hops">untraced hops</string>
     <string name="add_username">Add nome de usuário</string>
     <string name="enter_username">Digite o nome de usuário que você deseja usar:</string>
-    <string name="select_wordlist">Select Wordlist</string>
-    <string name="error_filepath">Não foi possível determinar o caminho do arquivo, por favor, use um gerenciador de arquivos diferente.</string>
-    <string name="trying">tentando</string>
+    <string name="select_wordlist">Selecione Lista de palavras</string>
+    <string name="error_filepath">Não foi possível determinar o caminho do arquivo, por favor, use um gerenciador de arquivos diferente.
+    </string>
+    <string name="trying">Tentando</string>
     <string name="left">left</string>
     <string name="error_filepath2">Não foi possível determinar o caminho do arquivo.</string>
     <string name="tap_again">Toque novamente para parar.</string>
     <string name="unexpected_file_error">Erro inesperado ao ler o arquivo : </string>
-    <string name="the_port">A porta</string>
+    <string name="the_port">A Porta</string>
     <string name="error_proxy_port"> o que é necessário para o proxy transparente é tomada a partir de um outro processo, abrir as configurações do aplicativo ?</string>
-    <string name="error_mitm_port"> que é necessário para o servidor MITM é tomado de outro processo, abrir as configurações do aplicativo ?</string>
+    <string name="error_mitm_port"> O que é necessário para o servidor MITM é tomado de outro processo, abrir as configurações do aplicativo ?</string>
     <string name="error_https_port"> o que é necessário para o MITM https redirecionador é tirado de outro processo, abrir as configurações do aplicativo ?</string>
     <string name="error_mitm_ports">Módulos MITM precisa de todas as portas disponíveis.</string>
+
+    <!-- rpc stuff -->
+    <string name="error-rpc">Erro de RPC</string>
+    <string name="error-rpcd-inval">Configurações Ruins</string>
+    <string name="error-rpcd-shell">Não Pode Executar Shell</string>
+    <string name="rpcd-starting">Iniciando Metasploit RPCD...</string>
+    <string name="rpcd-started">Metasploit RPCD Iniciou</string>
+    <string name="rpcd-stopped">MetaSploit RPCD Parado</string>
+    <string name="rpcd-running">MetaSploit RPCD já está em execução</string>
+    <string name="rpcd-timedout">MetaSploit RPCD não responde</string>
 
     <!-- mitm modules -->
     <string name="mitm_simple_sniff">Sniff Simples</string>
@@ -201,32 +224,32 @@
     <string name="mitm_redirection">Redirecionamento</string>
     <string name="error_port_outofrange">Porta fora de alcance.</string>
     <string name="error_invalid_address_or_port">Endereço inválido e /ou porta especificada.</string>
-    <string name="mitm_image_replace">Substitua Imagens</string>
+    <string name="mitm_image_replace">Substituir Imagens</string>
     <string name="mitm_image_replace_desc">Substitua todas as imagens em páginas web com o especificado.</string>
-    <string name="choose_source">Escolher uma fonte :</string>
+    <string name="choose_source">Escolher uma fonte:</string>
     <string name="local_images">Imagens Locais</string>
     <string name="error_image_intent">Isso é estranho, parece que você não tem nenhum aplicativo para manipular a navegação de imagens.</string>
     <string name="image">Imagem</string>
     <string name="enter_image_url">Digite a URL da imagem :</string>
     <string name="error_image_url">Url da imagem inválido.</string>
-    <string name="mitm_video_replace">Substitua Vídeos</string>
+    <string name="mitm_video_replace">Substituir Vídeos</string>
     <string name="mitm_video_replace_desc">Substituir todos os vídeos do youtube em páginas web com o especificado.</string>
     <string name="video">Vídeo</string>
     <string name="enter_video_url">Digite a URL do vídeo :</string>
     <string name="error_video_url">Vídeo do youtube inválido.</string>
     <string name="mitm_script_injection">injetar Script</string>
-    <string name="mitm_script_injection_desc">Injetar um javascript em cada página visitada.</string>
-    <string name="choose_method">Escolha um método :</string>
-    <string name="local_files">arquivos locais</string>
+    <string name="mitm_script_injection_desc">Injetar um javascript em cada página da Web visitada.</string>
+    <string name="choose_method">Escolha um método:</string>
+    <string name="local_files">Arquivos Locais</string>
     <string name="custom_code">Código personalizado</string>
     <string name="error_file_intent">Parece que você não tem nenhum gerenciador de arquivos capaz de navegar pelos arquivos, instale um.</string>
     <string name="enter_js_code">Digite o código js para injetar :</string>
     <string name="error_js_code"><![CDATA[Código javascript inválido, lembre-se de usar <script></script> marcas que encerram.]]></string>
-    <string name="mitm_custom">Filtro personalizado</string>
+    <string name="mitm_custom">Filtro Personalizado</string>
     <string name="mitm_custom_desc">Substituir texto personalizado em páginas da Web com o especificado.</string>
-    <string name="custom_filter">Filtro personalizado</string>
+    <string name="custom_filter">Filtro Personalizado</string>
     <string name="error_filter">Expressão regular inválida</string>
-    <string name="file_output">arquivo de saída</string>
+    <string name="file_output">Arquivo de Saída</string>
     <string name="question_save_to_pcap">Você quer salvar o tráfego sniffed para um arquivo pcap ?</string>
     <string name="dumping_traffic_to">Despejar tráfego para </string>
 
@@ -247,23 +270,23 @@
 
     <string name="scanner_select_ports">Selecione portas personalizadas</string>
 
-    <string name="wifi_initializing">inicializar ...</string>
+    <string name="wifi_initializing">Inicializar ...</string>
     <string name="wifi_activating_iface">Ativação da interface WiFi ...</string>
     <string name="wifi_activated">WiFi ativado.</string>
     <string name="wifi_scanning">Escaneando ...</string>
     <string name="wifi_attempting_to">Preparando Conexão Para</string>
-    <string name="wifi_with_key">com chave</string>
+    <string name="wifi_with_key">Com a Chave</string>
     <string name="wifi_connecting_to">conectando-se a</string>
     <string name="wifi_error_keys">Não foi possível gerar as chaves.</string>
     <string name="wifi_scan_finished">Escaneamento Terminado.</string>
 
     <string name="pref_general">Geral</string>
     <string name="pref_modules">Modulos</string>
-    <string name="pref_check_updates">Checar por Atualizações</string>
-    <string name="pref_wake_lock">Wake Lock</string>
+    <string name="pref_check_updates">Check for Updates</string>
+    <string name="pref_wake_lock">Checar por Atualizações</string>
     <string name="pref_save_path">Salvar Caminho</string>
     <string name="pref_debug_error_logging">Erro Debug Logging</string>
-    <string name="pref_enable_profiler">Perfil código</string>
+    <string name="pref_enable_profiler">Perfil Código</string>
     <string name="pref_sniffer_sample_time">Sniffer Amostra Tempo</string>
     <string name="pref_http_proxy_port">Porta HTTP Proxy</string>
     <string name="pref_http_server_port">Porta HTTP Server</string>
@@ -285,14 +308,18 @@
     <string name="pref_password_filename_desc">Nome do arquivo a ser usado para registrar senhas e cookies.</string>
 
     <string name="pref_folder">Pasta</string>
-    <string name="pref_err_exists">não existe.</string>
+    <string name="pref_err_exists">Não Existe.</string>
     <string name="pref_err_writable">não é gravável.</string>
     <string name="pref_err_sample_time">Tempo da amostra deve estar entre 0.4 e 1.0.</string>
-    <string name="pref_err_invalid_number">Número inválido.</string>
+    <string name="pref_err_invalid_number">Número Inválido.</string>
     <string name="pref_err_proxy_port">Porta de proxy deve estar entre 1024 e 65535.</string>
     <string name="pref_err_server_port">Porta do servidor deve estar entre 1024 e 65535.</string>
     <string name="pref_err_redirector_port">Porta do servidor deve estar entre 1024 e 65535.</string>
     <string name="pref_err_busy_port">Outro processo está escutando nessa porta, utilize o outro.</string>
     <string name="pref_err_buffer_size">Tamanho do buffer deve estar entre 1024 e 104857600.</string>
 
+    <string name="exploit_finder">Localizar Exploit</string>
+    <string name="exploit_finder_desc">Procurar exploit que corresponde as vulnerabilidades encontradas.</string>
+    <string name="sessions">Sessões</string>
+    <string name="sessions_desc">Sessões no alvo pwned.</string>
 </resources>
