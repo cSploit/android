@@ -22,52 +22,38 @@ package it.evilsocket.dsploit.net.metasploit;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
+import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Logger;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
-
-import com.actionbarsherlock.R;
 
 import java.util.Date;
 
 public class RPCServer extends Thread
 {
-  public static final String 	STARTED			= "RPCServer.action.STARTED";
-  public static final String 	RUNNING			= "RPCServer.action.RUNNING";
-  public static final String 	STOPPED			= "RPCServer.action.STOPPED";
-  public static final String 	STARTING		= "RPCServer.action.STARTING";
-  public static final String 	FAILED			= "RPCServer.action.FAILED";
-  public static final String 	ERROR			= "RPCServer.data.ERROR";
+  public static final String 	TOAST 			= "RPCServer.action.TOAST";
+  public static final String 	ERROR       = "RPCServer.action.ERROR";
+  public static final String  STRINGID    = "RPCServer.data.STRINGID";
   private final static long 	TIMEOUT			= 540000; // 4 minutes
-  private final static int 	DELAY 			= 5000; // poll every 5 secs
+  private final static int    DELAY 			= 5000; // poll every 5 secs
 
   private Context   			mContext	 		= null;
-  private int 				mPort				= 55553;
 
   private boolean   			mRunning	 		= false;
 
-  public RPCServer(Context context, int port) {
+  public RPCServer(Context context) {
     super("RPCServer");
-
     mContext   = context;
-    mPort = port;
   }
 
-  private void sendDaemonNotification(String action)
+  private void sendDaemonNotification(String action, int message)
   {
-    mContext.sendBroadcast(new Intent(action));
-  }
-
-  private void sendErrorMessageNotification(String message)
-  {
-    Intent intent = new Intent(FAILED);
-
-    intent.putExtra(ERROR, message);
-    mContext.sendBroadcast(intent);
+    Intent i = new Intent(action);
+    i.putExtra(STRINGID, message);
+    mContext.sendBroadcast(i);
   }
 
   public boolean isRunning() {
@@ -76,9 +62,18 @@ public class RPCServer extends Thread
 
   @Override
   public void run( ) {
+    final String msfChrootPath,msfUser,msfPassword;
+    final int msfPort;
+    long start;
+
     Logger.debug("RPCServer started");
 
     mRunning = true;
+
+    msfChrootPath = System.getSettings().getString("MSF_CHROOT_PATH", "/data/gentoo_msf");
+    msfUser = System.getSettings().getString("MSF_RPC_USER", "msf");
+    msfPassword = System.getSettings().getString("MSF_RPC_PSWD", "pswd");
+    msfPort = System.getSettings().getInt("MSF_RPC_PORT", 55553);
 
     try
     {
@@ -86,15 +81,15 @@ public class RPCServer extends Thread
       {
         try
         {
-          System.setMsfRpc(new RPCClient("127.0.0.1",System.getSettings().getString("MSF_RPC_USER", "msf"),System.getSettings().getString("MSF_RPC_PSWD", "pswd"),mPort));
-          sendDaemonNotification(RUNNING);
+          System.setMsfRpc(new RPCClient("127.0.0.1",msfUser,msfPassword,msfPort));
+          sendDaemonNotification(TOAST, R.string.rpcd_running);
           mRunning = false;
           return;
         }
         catch ( MalformedURLException mue)
         {
           System.errorLogging(mue);
-          sendErrorMessageNotification(mue.getMessage());
+          sendDaemonNotification(ERROR,R.string.error_rpcd_inval);
           mRunning = false;
           return;
         }
@@ -106,23 +101,19 @@ public class RPCServer extends Thread
         catch ( RPCClient.MSFException me)
         {
           System.errorLogging(me);
-          sendErrorMessageNotification(me.getMessage());
+          sendDaemonNotification(ERROR,R.string.error_rpcd_inval);
           mRunning = false;
           return;
         }
       }
-      sendDaemonNotification(STARTING);
+      sendDaemonNotification(TOAST,R.string.rpcd_starting);
 
-      String msfChrootPath = System.getSettings().getString("MSF_CHROOT_PATH", "/data/gentoo"),
-             msfUser = System.getSettings().getString("MSF_RPC_USER", "msf"),
-             msfPassword = System.getSettings().getString("MSF_RPC_PSWD", "pswd");
-
-      Shell.exec( "chroot \"" + msfChrootPath + "\" /start_msfrpcd.sh -P \"" + msfPassword + "\" -U \"" + msfUser + "\" -p " + mPort + " -a 127.0.0.1 -n -S -t Msg\n" );
+      Shell.exec( "chroot \"" + msfChrootPath + "\" /start_msfrpcd.sh -P \"" + msfPassword + "\" -U \"" + msfUser + "\" -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg\n" );
     }
     catch ( IOException ioe )
     {
       System.errorLogging(ioe);
-      sendErrorMessageNotification(ioe.getMessage());
+      sendDaemonNotification(ERROR,R.string.error_rpcd_shell);
       mRunning = false;
       return;
     }
@@ -132,15 +123,15 @@ public class RPCServer extends Thread
       return;
     }
 
-    long start = new Date().getTime();
+    start = new Date().getTime();
 
     do
     {
       try
       {
         Thread.sleep(DELAY);
-        System.setMsfRpc(new RPCClient("127.0.0.1",System.getSettings().getString("MSF_RPC_USER", "msf"),System.getSettings().getString("MSF_RPC_PSWD", "pswd"),mPort));
-        sendDaemonNotification(STARTED);
+        System.setMsfRpc(new RPCClient("127.0.0.1",msfUser,msfPassword,msfPort));
+        sendDaemonNotification(TOAST,R.string.rpcd_started);
         break;
       }
       catch ( InterruptedException iex)
@@ -150,7 +141,7 @@ public class RPCServer extends Thread
       catch ( MalformedURLException mue)
       {
         System.errorLogging(mue);
-        sendErrorMessageNotification(mue.getMessage());
+        sendDaemonNotification(ERROR,R.string.error_rpcd_inval);
         break;
       }
       catch ( IOException ioe)
@@ -158,15 +149,15 @@ public class RPCServer extends Thread
         // not running...
         if(((new Date().getTime()) - start) > TIMEOUT)
         {
-          Logger.warning("timeout");
-          sendErrorMessageNotification("timeout");
+          Logger.warning("ETIMEDOUT");
+          sendDaemonNotification(TOAST,R.string.rpcd_timedout);
           break;
         }
       }
       catch ( RPCClient.MSFException me )
       {
         System.errorLogging(me);
-        sendErrorMessageNotification(me.getMessage());
+        sendDaemonNotification(ERROR,R.string.error_rpcd_inval);
         break;
       }
     }while(mRunning);

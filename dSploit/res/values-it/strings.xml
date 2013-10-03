@@ -231,6 +231,16 @@
     <string name="error_https_port"> della quale ha bisogno il redirezionatore https è occupata da un altro processo, aprire le impostazioni ?</string>
     <string name="error_mitm_ports">Le porte devono essere disponibili per poter utilizzare i moduli MITM.</string>
 
+    <!-- rpc stuff -->
+    <string name="error-rpc">errore RPC</string>
+    <string name="error-rpcd-inval">impostazioni errate</string>
+    <string name="error-rpcd-shell">impossibile eseguire shells</string>
+    <string name="rpcd-starting">Avvio MetaSploit RPCD...</string>
+    <string name="rpcd-started">MetaSploit RPCD avviato</string>
+    <string name="rpcd-stopped">MetaSploit RPCD fermato</string>
+    <string name="rpcd-running">MetaSploit RPCD in esecuzione</string>
+    <string name="rpcd-timedout">MetaSploit RPCD non risponde</string>
+
     <!-- mitm modules -->
     <string name="mitm_simple_sniff">Sniffer Semplice</string>
     <string name="mitm_simple_sniff_desc">Redireziona il traffico dell\'obiettivo attraverso questo dispositivo e mostra alcune statistiche mentre lo salva su un file pcap.</string>

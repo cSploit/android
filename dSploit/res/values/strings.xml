@@ -227,6 +227,16 @@
     <string name="error_https_port"> which is needed by the mitm https redirector is taken from another process, open application settings ?</string>
     <string name="error_mitm_ports">MITM modules need all ports available.</string>
 
+    <!-- rpc stuff -->
+    <string name="error-rpc">RPC error</string>
+    <string name="error-rpcd-inval">bad settings</string>
+    <string name="error-rpcd-shell">cannot execute shell</string>
+    <string name="rpcd-starting">Starting MetaSploit RPCD...</string>
+    <string name="rpcd-started">MetaSploit RPCD started</string>
+    <string name="rpcd-stopped">MetaSploit RPCD stopped</string>
+    <string name="rpcd-running">MetaSploit RPCD is already running</string>
+    <string name="rpcd-timedout">MetaSploit RPCD does not respond</string>
+
     <!-- mitm modules -->
     <string name="mitm_simple_sniff">Simple Sniff</string>
     <string name="mitm_simple_sniff_desc">Redirect target\'s traffic through this device and show some stats while dumping it to a pcap file.</string>

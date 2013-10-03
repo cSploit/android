@@ -213,6 +213,7 @@ public class RPCClient
    * @param src MessagePack response
    * @return decoded object
    */
+  @SuppressWarnings("unchecked")
   private Object unMsg(Value src) throws MsgpackException, MSFException
   {
     Object out = src;

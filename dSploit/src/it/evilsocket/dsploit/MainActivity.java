@@ -18,7 +18,6 @@
  */
 package it.evilsocket.dsploit;
 
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -84,7 +83,6 @@ import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_NAME;
 import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_UPDATE;
 import static it.evilsocket.dsploit.net.NetworkDiscovery.NEW_ENDPOINT;
 
-@SuppressLint("NewApi")
 public class MainActivity extends SherlockListActivity
 {
   private String NO_WIFI_UPDATE_MESSAGE;
@@ -205,7 +203,7 @@ public class MainActivity extends SherlockListActivity
 
     startUpdateChecker();
     startNetworkDiscovery(false);
-    StartMsfRpcd();
+    StartRPCServer();
 
     // if called for the second time after wifi connection
     invalidateOptionsMenu();
@@ -345,7 +343,6 @@ public class MainActivity extends SherlockListActivity
 
     if(mNetworkDiscovery != null && mNetworkDiscovery.isRunning())
       item.setTitle(getString(R.string.stop_monitor));
-
     else
       item.setTitle(getString(R.string.start_monitor));
 
@@ -402,8 +399,7 @@ public class MainActivity extends SherlockListActivity
     stopNetworkDiscovery(silent,true);
   }
 
-  public void StartMsfRpcd()
-  {
+  public void StartRPCServer() {
     try
     {
       if(mRPCServer !=null)
@@ -417,12 +413,11 @@ public class MainActivity extends SherlockListActivity
     {
       // woop
     }
-    mRPCServer = new RPCServer(this, 55553);
+    mRPCServer = new RPCServer(this);
     mRPCServer.start();
   }
 
-  public void StopMsfRpcd()
-  {
+  public void StopRPCServer() {
     try
     {
       if(mRPCServer !=null)
@@ -439,7 +434,6 @@ public class MainActivity extends SherlockListActivity
       // woop
     }
   }
-
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item){
@@ -600,12 +594,12 @@ public class MainActivity extends SherlockListActivity
     {
       if(System.getMsfRpc()!=null)
       {
-        StopMsfRpcd();
+        StopRPCServer();
         item.setTitle("Start msfrpcd");
       }
       else
       {
-        StartMsfRpcd();
+        StartRPCServer();
         item.setTitle("Stop msfrpcd");
       }
       return true;
@@ -678,7 +672,7 @@ public class MainActivity extends SherlockListActivity
   @Override
   public void onDestroy(){
     stopNetworkDiscovery(true);
-    StopMsfRpcd();
+    StopRPCServer();
 
     if(mEndpointReceiver != null)
       mEndpointReceiver.unregister();
@@ -805,18 +799,14 @@ public class MainActivity extends SherlockListActivity
     }
   }
 
-  private class MsfrpcdReceiver extends ManagedReceiver
-  {
+  private class MsfrpcdReceiver extends ManagedReceiver{
     private IntentFilter mFilter = null;
 
     public MsfrpcdReceiver() {
       mFilter = new IntentFilter();
 
-      mFilter.addAction( RPCServer.STARTING );
-      mFilter.addAction( RPCServer.STARTED );
-      mFilter.addAction( RPCServer.RUNNING );
-      mFilter.addAction( RPCServer.STOPPED );
-      mFilter.addAction( RPCServer.FAILED );
+      mFilter.addAction( RPCServer.ERROR );
+      mFilter.addAction( RPCServer.TOAST );
     }
 
     public IntentFilter getFilter( ) {
@@ -824,52 +814,31 @@ public class MainActivity extends SherlockListActivity
     }
 
     @Override
-    public void onReceive( Context context, Intent intent )
-    {
-      MenuItem item = mMenu.findItem( R.id.ss_msfrpcd );
+    public void onReceive( Context context, Intent intent ){
+      /* optimization NOTES
+       * see?! no extra if(intent.getAction(...)) required!
+       * just take the R.string.id to show from the intent extra,
+       * easy, fast and portable ;)
+       * we should use it for every ManagedReceiver, IMHO
+       * -- tux_mind
+       */
+      final int message_id = intent.getIntExtra( RPCServer.STRINGID, R.string.error );
 
-      if( intent.getAction().equals( RPCServer.FAILED ) )
+      if( intent.getAction().equals( RPCServer.ERROR ) )
       {
-        final String message = ( String )intent.getExtras().get( RPCServer.ERROR );
         MainActivity.this.runOnUiThread(new Runnable() {
           @Override
           public void run() {
-            new ErrorDialog("RPCServer error", message, MainActivity.this);
-          }
-        });
-        item.setEnabled( false );
-        item.setTitle("msfrpcd KO");
-        MainActivity.this.runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            Toast.makeText( MainActivity.this, "unable to connect to msfrpcd, check settings", Toast.LENGTH_SHORT ).show();
+            new ErrorDialog(getString(R.string.error_rpc) ,getString(message_id), MainActivity.this);
           }
         });
       }
       else
       {
-        String status = "";
-        String action = "Stop";
-        mMenu.findItem( R.id.ss_msfrpcd ).setEnabled( true );
-
-        if(intent.getAction().equals( RPCServer.STARTING))
-          status = "Starting RPCServer";
-        else if(intent.getAction().equals( RPCServer.STARTED))
-          status = "RPCServer started";
-        else if(intent.getAction().equals(RPCServer.RUNNING))
-          status = "RPCServer is already running";
-        else if(intent.getAction().equals( RPCServer.STOPPED))
-        {
-          status = "RPCServer stopped";
-          action = "Start";
-        }
-        item.setTitle(action + " msfrpcd");
-        item.setEnabled(true); // should never change...
-        final String final_status = status;
         MainActivity.this.runOnUiThread(new Runnable() {
           @Override
           public void run() {
-            Toast.makeText( MainActivity.this, final_status, Toast.LENGTH_SHORT ).show();
+            Toast.makeText( MainActivity.this, getString(message_id), Toast.LENGTH_SHORT ).show();
           }
         });
       }
