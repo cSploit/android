@@ -6,6 +6,8 @@ Copyleft of Simone Margaritelli aka evilsocket.
 - <http://www.dsploit.net/>
 - <http://www.evilsocket.net/>
 
+[![Click here to lend your support to: dSploit and make a donation at www.pledgie.com](http://www.pledgie.com/campaigns/22257.png?skin_name=chrome)](http://www.pledgie.com/campaigns/22257)
+
 -------------
 
 dSploit is an Android network analysis and penetration suite which aims to offer to IT security experts/geeks
