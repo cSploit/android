@@ -122,7 +122,7 @@
     <string name="enter_wifi_key">Syötä WiFi avain:</string>
     <string name="scanning">Skannataan&#8230;</string>
     <string name="invalid_filename">Virheellinen tiedostonimi.</string>
-    <string name="something_went_wrong">Jotain meni vikaan, ole hyvä ja valits oikea kohde.
+    <string name="something_went_wrong">Jotain meni vikaan, ole hyvä ja valitse oikea kohde.
     </string>
     <string name="selected">Valittu </string>
     <string name="nothing_found"><![CDATA[<small><i>Mitään ei löytynyt</i></small>]]></string>
@@ -214,7 +214,7 @@
     <string name="error_filepath">Ei voitu selvittää tiedoston polkua, ole hyvä ja käytä eri tiedostonhallinta ohjelmaa.
     </string>
     <string name="trying">Yritetään</string>
-    <string name="left">vasen</string>
+    <string name="left">jäljellä</string>
     <string name="error_filepath2">Ei voitu selvittää tiedoston polkua.</string>
     <string name="tap_again">Näpäytä uudelleen pysäyttääksesi.</string>
     <string name="unexpected_file_error">Odottamaton virhe lukiessa tiedstoa : </string>
@@ -271,5 +271,71 @@
     <string name="error_mitm_proxy">Ei voida luoda välityspalvelinta, ole hyvä ja tarkista verkkoyhteytesi ja portin käytettävyys.</string>
     <string name="error_mitm_https_redirector">Ei voida luoda HTTPS-uudelleenohjausta, ole hyvä ja tarkista verkkoyhteytesi ja portin käytettävyys.</string>
     <string name="error_mitm_resource_server">Ei voida luoda resurssipalvelinta, ole hyvä ja tarkista verkkoyhteytesi ja portin käytettävyys.</string>
+    
+    <string name="hijacker_load_from_file">Lataa Tiedostosta</string>
+    <string name="login_user_wordlist">Käyttäjä -Sanakirja</string>
+    <string name="login_pass_wordlist">Salasana -Sanakirja</string>
+
+    <string name="menu_new_session">Uusi Tilanne</string>
+    <string name="menu_save_session">Tallenna Tilanne</string>
+    <string name="menu_restore_session">Palauta Tilanne</string>
+    <string name="menu_stop_monitor">Lopeta Verkon Valvominen</string>
+    <string name="menu_submit_issue">Lähetä virheilmoitus</string>
+    <string name="menu_about">Lisätietoja</string>
+
+    <string name="scanner_select_ports">Valitse omat portit</string>
+
+    <string name="wifi_initializing">Alustetaan ...</string>
+    <string name="wifi_activating_iface">Aktivoidaan WiFi rajapinta ...</string>
+    <string name="wifi_activated">WiFi aktivoitu.</string>
+    <string name="wifi_scanning">Skannataan ...</string>
+    <string name="wifi_attempting_to">Yritetään yhdistää kohteeseen</string>
+    <string name="wifi_with_key">avaimella</string>
+    <string name="wifi_connecting_to">Yhdistetään kohteeseen</string>
+    <string name="wifi_error_keys">Avaimen luonti ei onnistu.</string>
+    <string name="wifi_scan_finished">Skannaus valmis.</string>
+
+    <string name="pref_general">Yleiset</string>
+    <string name="pref_modules">Moduulit</string>
+    <string name="pref_check_updates">Tarkista päivitykset</string>
+    <string name="pref_wake_lock">Estä nukkuminen</string>
+    <string name="pref_save_path">Tallennuspolku</string>
+    <string name="pref_debug_error_logging">Virhetietojen tiedostoon vienti</string>
+    <string name="pref_enable_profiler">Koodin profiloija</string>
+    <string name="pref_sniffer_sample_time">Nuuhkijan näyte aika</string>
+    <string name="pref_http_proxy_port">HTTP Välityspalvelimen Portti</string>
+    <string name="pref_http_server_port">HTTP Palvelimen Portti</string>
+    <string name="pref_https_redirect">SSL Riisuminen</string>
+    <string name="pref_https_redirector_port">HTTPS Uudelleenohjausksen Portti</string>
+    <string name="pref_http_max_buffer_size">HTTP Välimuistin Maksimi Koko</string>
+    <string name="pref_password_filename">Salasana -Nuuhkijan Tiedosto</string>
+    <string name="pref_check_updates_desc">Tarkista päivitykset aina kun sovellus avataan.</string>
+    <string name="pref_wake_lock_desc">Estää laitteen menemisen nukkumis-tilaan kun sovellus on auki.</string>
+    <string name="pref_save_path_desc">Yleinen lokien tallennussijainti.</string>
+    <string name="pref_debug_error_logging_desc">Ota käyttöön tai poista käytöstä virhelokien tiedostoon kirjoittaminen.</string>
+    <string name="pref_enable_profiler_desc">Ota käyttöön tai poista käytöstä verkon profiilien lokiin kirjoittaminen.</string>
+    <string name="pref_sniffer_sample_time_desc">Näytteenottoaika sekunneissa nuuhkimismoduulin verkko tilastoissa.</string>
+    <string name="pref_http_proxy_port_desc">Kuunneltava Mies-välissä läpinäkyvän välityspalvelimen portti, muuta jos sinulla on onglemia välityspalvelimen käynnistyksessä.</string>
+    <string name="pref_http_server_port_desc">Kuunneltava Mies-välissä HTTP palvelimen portti, muuta jos sinulla on onglemia palvelimen käynnistyksessä.</string>
+    <string name="pref_https_redirect_desc">Uudelleenohjaa HTTPS liikenne HTTP:ksi.</string>
+    <string name="pref_https_redirector_port_desc">Kuunneltava Mies-välissä HTTPS uudelleenohjaus portti.</string>
+    <string name="pref_http_max_buffer_size_desc">Maksimi välimuistin koko HTTP pyynnöille, jotka läpinäkyvä välityspalvelin käsittelee.</string>
+    <string name="pref_password_filename_desc">Tiedoston nimi johon salasanat ja evästeet kirjoitetaan.</string>
+
+    <string name="pref_folder">Kansio</string>
+    <string name="pref_err_exists">ei ole olemassa.</string>
+    <string name="pref_err_writable">ei ole kirjoitettava.</string>
+    <string name="pref_err_sample_time">Näytteenottoajan täytyy olla väliltä 0.4 ja 1.0.</string>
+    <string name="pref_err_invalid_number">Epäkelpo numero.</string>
+    <string name="pref_err_proxy_port">Välityspalvelimen portin täytyy olla väliltä 1024 - 65535.</string>
+    <string name="pref_err_server_port">Palvelimen portin täytyy olla väliltä 1024 - 65535.</string>
+    <string name="pref_err_redirector_port">Palvelimen portin täytyy olla väliltä 1024 - 65535.</string>
+    <string name="pref_err_busy_port">Toinen palvelu käyttää tätä porttia. Ole hyvä ja valitse eri portti.</string>
+    <string name="pref_err_buffer_size">Välimuistin maksimi koon täytyy olla väliltä 1024 - 104857600.</string>
+
+    <string name="exploit_finder">Hyödyntäjien Etsijä</string>
+    <string name="exploit_finder_desc">Etsi keinoja hyödyntää löydettyjä heikkouksia.</string>
+    <string name="sessions">Tilanteet</string>
+    <string name="sessions_desc">Tilanteet pwnatussa kohteessa.</string>
     
 </resources>
