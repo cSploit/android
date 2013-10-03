@@ -279,8 +279,8 @@ public class Target
   private String mDeviceType = null;
   private String mDeviceOS = null;
   private String mAlias = null;
-  private ArrayList<Vulnerability> mVulnerabilities 					 = new ArrayList<Vulnerability>();
-  private ArrayList<Exploit> mExploits								 = new ArrayList<Target.Exploit>();
+  private ArrayList<Vulnerability> mVulnerabilities = new ArrayList<Vulnerability>();
+  private ArrayList<Exploit> mExploits = new ArrayList<Target.Exploit>();
 
   public static Target getFromString(String string){
     final Pattern PARSE_PATTERN = Pattern.compile("^(([a-z]+)://)?([0-9a-z\\-\\.]+)(:([\\d]+))?[0-9a-z\\-\\./]*$", Pattern.CASE_INSENSITIVE);

@@ -91,7 +91,7 @@ public class Inspector extends Plugin{
 
     if( AdvancedScan && target.getOpenPorts().size() == 0 ){
       setStoppedState();
-      Toast.makeText(this, "No open ports found, run the port scanner before selecting a focused scan.", Toast.LENGTH_LONG).show();
+      Toast.makeText(this, getString(R.string.no_open_ports_focused_scan), Toast.LENGTH_LONG).show();
     }
     else
       System.getNMap().inpsect( target, mReceiver, AdvancedScan ).start();

@@ -69,7 +69,7 @@ import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
 import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog;
 import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog.SpinnerDialogListener;
 import it.evilsocket.dsploit.net.Endpoint;
-import it.evilsocket.dsploit.net.MsfRpcd;
+import it.evilsocket.dsploit.net.metasploit.RPCServer;
 import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.NetworkDiscovery;
 import it.evilsocket.dsploit.net.Target;
@@ -94,7 +94,7 @@ public class MainActivity extends SherlockListActivity
   private NetworkDiscovery mNetworkDiscovery = null;
   private EndpointReceiver mEndpointReceiver = null;
   private UpdateReceiver mUpdateReceiver = null;
-  private MsfRpcd mMsfRpcd = null;
+  private RPCServer mRPCServer = null;
   private MsfrpcdReceiver  mMsfRpcdReceiver	= null;
   private Menu mMenu = null;
   private TextView mUpdateStatus = null;
@@ -352,9 +352,9 @@ public class MainActivity extends SherlockListActivity
     item = menu.findItem(R.id.ss_msfrpcd);
 
     if(System.getMsfRpc()!=null)
-      item.setTitle("Stop msfrpcd");
+      item.setTitle( getString(R.string.stop_msfrpcd) );
     else
-      item.setTitle("Start msfrpcd");
+      item.setTitle( getString(R.string.start_msfrpcd) );
 
     mMenu = menu;
 
@@ -406,30 +406,30 @@ public class MainActivity extends SherlockListActivity
   {
     try
     {
-      if(mMsfRpcd!=null)
+      if(mRPCServer !=null)
       {
-        mMsfRpcd.exit();
-        mMsfRpcd.join();
-        mMsfRpcd = null;
+        mRPCServer.exit();
+        mRPCServer.join();
+        mRPCServer = null;
       }
     }
     catch ( InterruptedException ie)
     {
       // woop
     }
-    mMsfRpcd = new MsfRpcd(this, 55553);
-    mMsfRpcd.start();
+    mRPCServer = new RPCServer(this, 55553);
+    mRPCServer.start();
   }
 
   public void StopMsfRpcd()
   {
     try
     {
-      if(mMsfRpcd!=null)
+      if(mRPCServer !=null)
       {
-        mMsfRpcd.exit();
-        mMsfRpcd.join();
-        mMsfRpcd = null;
+        mRPCServer.exit();
+        mRPCServer.join();
+        mRPCServer = null;
       }
       System.setMsfRpc(null);
       Shell.exec("killall msfrpcd");
@@ -812,11 +812,11 @@ public class MainActivity extends SherlockListActivity
     public MsfrpcdReceiver() {
       mFilter = new IntentFilter();
 
-      mFilter.addAction( MsfRpcd.STARTING );
-      mFilter.addAction( MsfRpcd.STARTED );
-      mFilter.addAction( MsfRpcd.RUNNING );
-      mFilter.addAction( MsfRpcd.STOPPED );
-      mFilter.addAction( MsfRpcd.FAILED );
+      mFilter.addAction( RPCServer.STARTING );
+      mFilter.addAction( RPCServer.STARTED );
+      mFilter.addAction( RPCServer.RUNNING );
+      mFilter.addAction( RPCServer.STOPPED );
+      mFilter.addAction( RPCServer.FAILED );
     }
 
     public IntentFilter getFilter( ) {
@@ -828,13 +828,13 @@ public class MainActivity extends SherlockListActivity
     {
       MenuItem item = mMenu.findItem( R.id.ss_msfrpcd );
 
-      if( intent.getAction().equals( MsfRpcd.FAILED ) )
+      if( intent.getAction().equals( RPCServer.FAILED ) )
       {
-        final String message = ( String )intent.getExtras().get( MsfRpcd.ERROR );
+        final String message = ( String )intent.getExtras().get( RPCServer.ERROR );
         MainActivity.this.runOnUiThread(new Runnable() {
           @Override
           public void run() {
-            new ErrorDialog("MsfRpcd error", message, MainActivity.this);
+            new ErrorDialog("RPCServer error", message, MainActivity.this);
           }
         });
         item.setEnabled( false );
@@ -852,15 +852,15 @@ public class MainActivity extends SherlockListActivity
         String action = "Stop";
         mMenu.findItem( R.id.ss_msfrpcd ).setEnabled( true );
 
-        if(intent.getAction().equals( MsfRpcd.STARTING))
-          status = "Starting MsfRpcd";
-        else if(intent.getAction().equals( MsfRpcd.STARTED))
-          status = "MsfRpcd started";
-        else if(intent.getAction().equals(MsfRpcd.RUNNING))
-          status = "MsfRpcd is already running";
-        else if(intent.getAction().equals( MsfRpcd.STOPPED))
+        if(intent.getAction().equals( RPCServer.STARTING))
+          status = "Starting RPCServer";
+        else if(intent.getAction().equals( RPCServer.STARTED))
+          status = "RPCServer started";
+        else if(intent.getAction().equals(RPCServer.RUNNING))
+          status = "RPCServer is already running";
+        else if(intent.getAction().equals( RPCServer.STOPPED))
         {
-          status = "MsfRpcd stopped";
+          status = "RPCServer stopped";
           action = "Start";
         }
         item.setTitle(action + " msfrpcd");

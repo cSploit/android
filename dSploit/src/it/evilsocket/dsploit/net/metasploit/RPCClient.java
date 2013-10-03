@@ -1,4 +1,4 @@
-package it.evilsocket.dsploit.net;
+package it.evilsocket.dsploit.net.metasploit;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +33,7 @@ import android.util.Log;
 */
 
 @SuppressWarnings("rawtypes")
-public class msfrpc
+public class RPCClient
 {
   private URL u;
   private URLConnection huc;
@@ -44,9 +44,9 @@ public class msfrpc
 
   private static final Pattern 	GET_FILENAME 	= Pattern.compile("[^/]+$");
   private static final Pattern 	GET_FUNC 		= Pattern.compile("`([^']+)");
-  private static final String		TAG				= "msfrpc";
+  private static final String		TAG				= "RPCClient";
 
-  public msfrpc(final String host, final String username, final String password, final int port) throws MalformedURLException, IOException, MSFException
+  public RPCClient(final String host, final String username, final String password, final int port) throws MalformedURLException, IOException, MSFException
   {
     u = new URL("http", host, port, "/api/");
 

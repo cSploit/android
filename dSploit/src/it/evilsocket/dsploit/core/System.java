@@ -77,7 +77,7 @@ import it.evilsocket.dsploit.net.Target.Port;
 import it.evilsocket.dsploit.net.Target.Type;
 import it.evilsocket.dsploit.net.Target.Vulnerability;
 import it.evilsocket.dsploit.net.Target.Exploit;
-import it.evilsocket.dsploit.net.msfrpc;
+import it.evilsocket.dsploit.net.metasploit.RPCClient;
 import it.evilsocket.dsploit.net.http.proxy.HTTPSRedirector;
 import it.evilsocket.dsploit.net.http.proxy.Proxy;
 import it.evilsocket.dsploit.net.http.server.Server;
@@ -135,7 +135,7 @@ public class System
 
   private static Object mCustomData = null;
 
-  private static msfrpc mMsfRpc      = null;
+  private static RPCClient mMsfRpc      = null;
 
   public static void init(Context context) throws Exception{
     mContext = context;
@@ -660,11 +660,11 @@ public class System
     return mTcpdump;
   }
 
-  public static msfrpc getMsfRpc() {
+  public static RPCClient getMsfRpc() {
     return mMsfRpc;
   }
 
-  public static void setMsfRpc(msfrpc value){
+  public static void setMsfRpc(RPCClient value){
     mMsfRpc = value;
   }
 

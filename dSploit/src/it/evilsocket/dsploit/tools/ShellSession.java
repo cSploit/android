@@ -19,7 +19,7 @@
  */
 package it.evilsocket.dsploit.tools;
 
-import it.evilsocket.dsploit.net.msfrpc;
+import it.evilsocket.dsploit.net.metasploit.RPCClient;
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 import java.util.*;
 
@@ -31,14 +31,14 @@ import android.util.Log;
 /* Implements a class for writing commands to a shell and firing an
    event when the command is successfully executed (with its output) */
 public class ShellSession extends Thread {
-  protected msfrpc 						connection;
+  protected RPCClient connection;
   protected OutputReceiver				receiver;
   protected LinkedList<String>   			commands  = new LinkedList<String>();
   protected String        				session;
   private   SecureRandom 					random	  = new SecureRandom();
   private	  ArrayList<String>				array_buffer = new ArrayList<String>();
 
-  public ShellSession(msfrpc connection, String session, OutputReceiver receiver) {
+  public ShellSession(RPCClient connection, String session, OutputReceiver receiver) {
     this.connection = connection;
     this.session = session;
     this.receiver = receiver;

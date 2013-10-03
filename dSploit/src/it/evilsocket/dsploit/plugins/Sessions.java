@@ -32,8 +32,6 @@ import it.evilsocket.dsploit.net.Target.Exploit;
 
 public class Sessions extends Plugin
 {
-  //private final static String  TAG = "SESSIONS";
-
   private ListView 			mListView		   = null;
   private ArrayList<Exploit> results = new ArrayList<Target.Exploit>();
   private ArrayAdapter<Exploit> mAdapter = null;
@@ -55,7 +53,7 @@ public class Sessions extends Plugin
     @Override
     public void run()
     {
-      //TODO: find and add sessions to mAdapted
+      // TODO: find and add sessions to mAdapted
     }
   });
 
@@ -73,13 +71,16 @@ public class Sessions extends Plugin
     }
 
     if( System.getCurrentTarget().hasOpenPorts() == false )
-      new FinishDialog( "Warning", "No open ports detected on current target, run the service inspector first.", this ).show();
+      new FinishDialog( getString(R.string.warning), getString(R.string.no_open_ports), this ).show();
+
     else if( nEx == 0)
-      new FinishDialog( "Warning", "No exploits found on this target, run the ExploitFinder first.", this ).show();
+      new FinishDialog( getString(R.string.warning), getString(R.string.no_open_ports_exploitfinder), this ).show();
+
     else if(i>=nEx)
-      new FinishDialog( "Warning", "No exploit has been started.", this ).show();
-    mListView		   = ( ListView )findViewById( android.R.id.list );
-    mAdapter		   = new ArrayAdapter<Exploit>(this, android.R.layout.simple_list_item_1, results);
+      new FinishDialog( getString(R.string.warning), getString(R.string.no_exploit_started), this ).show();
+
+    mListView = ( ListView )findViewById( android.R.id.list );
+    mAdapter  = new ArrayAdapter<Exploit>(this, android.R.layout.simple_list_item_1, results);
 
     mAdapter.clear();
 
