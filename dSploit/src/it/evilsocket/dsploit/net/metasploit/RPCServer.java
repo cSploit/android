@@ -31,6 +31,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import java.util.Date;
+import java.util.concurrent.TimeoutException;
 
 public class RPCServer extends Thread
 {
@@ -40,14 +41,45 @@ public class RPCServer extends Thread
   private final static long 	TIMEOUT			= 540000; // 4 minutes
   private final static int    DELAY 			= 5000; // poll every 5 secs
 
-  private Context   			mContext	 		= null;
-
-  private boolean   			mRunning	 		= false;
+  private Context         mContext	 		  = null;
+  private boolean         mRunning	 		  = false;
+  private String          msfUser,
+                          msfPassword,
+                          msfChrootPath;
+  private int             msfPort;
+  private long            timeout         = 0;
+  private ShellReceiver   mShellReceiver  = null;
+  private Thread          ShellThread     = null;
 
   public RPCServer(Context context) {
     super("RPCServer");
     mContext   = context;
   }
+
+  /* WARNING: horrible code workarounds here.
+   * after many hours of debugging, coding, and coffe i found a workaround for issue #313
+   * i use a Thread and call start() join() everytime
+   * please help me find a better way to do this.
+  */
+
+  private class ShellReceiver implements Shell.OutputReceiver {
+    public boolean verbose=false;
+    public int exit_code = -1;
+    @Override
+    public void onStart(String command) { }
+
+    @Override
+    public void onNewLine(String line) {
+      if(verbose)
+        Logger.debug(line);
+    }
+
+    @Override
+    public void onEnd(int exitCode) {
+      exit_code = exitCode;
+    }
+  }
+
 
   private void sendDaemonNotification(String action, int message)
   {
@@ -60,12 +92,129 @@ public class RPCServer extends Thread
     return mRunning;
   }
 
+  private boolean connect_to_running_server()
+          throws RuntimeException, IOException, InterruptedException {
+  boolean ret = false;
+
+  ShellThread = Shell.async("pidof msfrpcd",mShellReceiver);
+  ShellThread.start();
+  ShellThread.join();
+  if(mShellReceiver.exit_code==0)
+  {
+    try
+    {
+      System.setMsfRpc(new RPCClient("127.0.0.1",msfUser,msfPassword,msfPort));
+      ret = true;
+    }
+    catch ( MalformedURLException mue)
+    {
+      System.errorLogging(mue);
+      throw new RuntimeException();
+    }
+    catch ( IOException ioe)
+    {
+      Logger.debug(ioe.getMessage());
+    }
+    catch ( RPCClient.MSFException me)
+    {
+      System.errorLogging(me);
+      throw new RuntimeException();
+    }
+    finally {
+      if(!ret)
+      {
+        ShellThread = Shell.async("killall msfrpcd ");
+        ShellThread.start();
+        ShellThread.join();
+      }
+    }
+  }
+  return ret;
+  }
+
+  /* WARNING: this method will hang forever if msfrpcd start successfully,
+   * use it only for report server crashes.
+   * NOTE: it can be useful if we decide to own the msfrpcd process
+  */
+  private void start_daemon_fg() {
+
+    mShellReceiver.verbose=true;
+    ShellThread = Shell.async("chroot \"" + msfChrootPath + "\" /start_msfrpcd.sh -P \"" + msfPassword + "\" -U \"" + msfUser + "\" -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg -f", mShellReceiver);
+
+    try
+    {
+      ShellThread.start();
+      ShellThread.join();
+      if(mShellReceiver.exit_code != 0) {
+        Logger.error("chroot failed");
+      }
+    }
+    catch ( Exception e)
+    {
+      System.errorLogging(e);
+    }
+    finally {
+      mShellReceiver.verbose=false;
+    }
+  }
+
+  private void start_daemon()
+          throws RuntimeException, IOException, InterruptedException {
+
+    ShellThread = Shell.async( "chroot \"" + msfChrootPath + "\" /start_msfrpcd.sh -P \"" + msfPassword + "\" -U \"" + msfUser + "\" -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg\n",mShellReceiver );
+    ShellThread.start();
+    ShellThread.join();
+    if(mShellReceiver.exit_code!=0) {
+      throw new RuntimeException("chroot failed");
+    }
+  }
+
+  private void wait_for_connection()
+          throws RuntimeException, IOException, InterruptedException, TimeoutException {
+
+    // keep watching if server exists
+    ShellThread = Shell.async("pidof msfrpcd",mShellReceiver);
+
+    do {
+      ShellThread.start();
+      ShellThread.join();
+      if(mShellReceiver.exit_code!=0)
+      {
+        // OMG, server crashed!
+        // start server in foreground and log errors.
+        sendDaemonNotification(ERROR,R.string.error_rcpd_fatal);
+        start_daemon_fg();
+        throw new InterruptedException("exiting due to server crash");
+      }
+      try
+      {
+        Thread.sleep(DELAY);
+        System.setMsfRpc(new RPCClient("127.0.0.1",msfUser,msfPassword,msfPort));
+        return;
+      }
+      catch ( MalformedURLException mue)
+      {
+        System.errorLogging(mue);
+        throw new RuntimeException();
+      }
+      catch ( IOException ioe)
+      {
+        // cannot connect now...
+      }
+      catch ( RPCClient.MSFException me )
+      {
+        System.errorLogging(me);
+        throw new RuntimeException();
+      }
+    } while(new Date().getTime() < timeout);
+    throw new TimeoutException();
+  }
+
   @Override
   public void run( ) {
-    final String msfChrootPath,msfUser,msfPassword;
-    final int msfPort;
-    long start;
 
+    mShellReceiver = new ShellReceiver();
+    timeout = new Date().getTime() + TIMEOUT;
     Logger.debug("RPCServer started");
 
     mRunning = true;
@@ -77,94 +226,32 @@ public class RPCServer extends Thread
 
     try
     {
-      if(Shell.exec("pidof msfrpcd") == 0)
-      {
-        try
-        {
-          System.setMsfRpc(new RPCClient("127.0.0.1",msfUser,msfPassword,msfPort));
-          sendDaemonNotification(TOAST, R.string.rpcd_running);
-          mRunning = false;
-          return;
-        }
-        catch ( MalformedURLException mue)
-        {
-          System.errorLogging(mue);
-          sendDaemonNotification(ERROR,R.string.error_rpcd_inval);
-          mRunning = false;
-          return;
-        }
-        catch ( IOException ioe)
-        {
-          Logger.debug(ioe.getMessage());
-          Shell.exec("killall msfrpcd");
-        }
-        catch ( RPCClient.MSFException me)
-        {
-          System.errorLogging(me);
-          sendDaemonNotification(ERROR,R.string.error_rpcd_inval);
-          mRunning = false;
-          return;
-        }
-      }
-      sendDaemonNotification(TOAST,R.string.rpcd_starting);
-
-      Shell.exec( "chroot \"" + msfChrootPath + "\" /start_msfrpcd.sh -P \"" + msfPassword + "\" -U \"" + msfUser + "\" -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg\n" );
-    }
-    catch ( IOException ioe )
-    {
-      System.errorLogging(ioe);
-      sendDaemonNotification(ERROR,R.string.error_rpcd_shell);
-      mRunning = false;
-      return;
-    }
-    catch ( InterruptedException ie)
-    {
-      mRunning = false;
-      return;
-    }
-
-    start = new Date().getTime();
-
-    do
-    {
-      try
-      {
-        Thread.sleep(DELAY);
-        System.setMsfRpc(new RPCClient("127.0.0.1",msfUser,msfPassword,msfPort));
+      if(!connect_to_running_server()) {
+        sendDaemonNotification(TOAST,R.string.rpcd_starting);
+        start_daemon();
+        wait_for_connection();
         sendDaemonNotification(TOAST,R.string.rpcd_started);
-        break;
       }
-      catch ( InterruptedException iex)
-      {
-        break;
-      }
-      catch ( MalformedURLException mue)
-      {
-        System.errorLogging(mue);
-        sendDaemonNotification(ERROR,R.string.error_rpcd_inval);
-        break;
-      }
-      catch ( IOException ioe)
-      {
-        // not running...
-        if(((new Date().getTime()) - start) > TIMEOUT)
-        {
-          Logger.warning("ETIMEDOUT");
-          sendDaemonNotification(TOAST,R.string.rpcd_timedout);
-          break;
-        }
-      }
-      catch ( RPCClient.MSFException me )
-      {
-        System.errorLogging(me);
-        sendDaemonNotification(ERROR,R.string.error_rpcd_inval);
-        break;
-      }
-    }while(mRunning);
+      else
+        sendDaemonNotification(TOAST, R.string.rpcd_running);
+    } catch ( IOException ioe ) {
+      Logger.error(ioe.getMessage());
+      sendDaemonNotification(ERROR,R.string.error_rpcd_shell);
+    } catch ( InterruptedException e ) {
+      if(e.getMessage()!=null)
+        Logger.debug(e.getMessage());
+      else
+        System.errorLogging(e);
+    } catch ( RuntimeException e ) {
+      sendDaemonNotification(ERROR,R.string.error_rpcd_inval);
+    } catch (TimeoutException e) {
+      sendDaemonNotification(TOAST,R.string.rpcd_timedout);
+    }
     mRunning = false;
   }
 
   public void exit() {
-    this.interrupt();
+    if(this.isAlive())
+      this.interrupt();
   }
 }

@@ -240,6 +240,10 @@
     <string name="rpcd_stopped">MetaSploit RPCD fermato</string>
     <string name="rpcd_running">MetaSploit RPCD in esecuzione</string>
     <string name="rpcd_timedout">MetaSploit RPCD non risponde</string>
+    <string name="error_rcpd_fatal">errore fatale, sto cercando il problema per inviarlo ai miei sviluppatori.
+        se mi bloccassi vai in preferenze->applicazioni e chiudimi da lì,
+        e AVVISA I MIEI SVILUPPATORI.
+    </string>
 
     <!-- mitm modules -->
     <string name="mitm_simple_sniff">Sniffer Semplice</string>

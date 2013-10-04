@@ -428,6 +428,7 @@ public class MainActivity extends SherlockListActivity
       }
       System.setMsfRpc(null);
       Shell.exec("killall msfrpcd");
+      Toast.makeText(this, getString(R.string.rpcd_stopped), Toast.LENGTH_SHORT).show();
     }
     catch ( Exception e)
     {

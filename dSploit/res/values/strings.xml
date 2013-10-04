@@ -237,6 +237,10 @@
     <string name="rpcd_stopped">MetaSploit RPCD stopped</string>
     <string name="rpcd_running">MetaSploit RPCD is already running</string>
     <string name="rpcd_timedout">MetaSploit RPCD does not respond</string>
+    <string name="error_rcpd_fatal">fatal error occurred, i\'m searching that bug for send it to my developers.
+        if i won\'t exit please close me from preferences->applications,
+        and ALERT MY DEVELOPERS.
+    </string>
 
     <!-- mitm modules -->
     <string name="mitm_simple_sniff">Simple Sniff</string>
