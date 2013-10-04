@@ -51,24 +51,18 @@ public class UpdateManager
   }
 
   private static double getVersionCode(String version){
-    String[] padded = new String[3],
-      parts = version.split("[^0-9a-zA-Z]");
-    String item, digit, letter;
-    double code = 0, coeff;
+    double code = 0,
+           multipliers[] = { 1000, 100, 1 };
+    String parts[] = version.split( "[^0-9a-zA-Z]", 3 ),
+           item, digit, letter;
     int i, j;
     char c;
 
-    Arrays.fill(padded, 0, 3, "0");
+    for( i = 0; i < 3; i++ )
+    {
+      item = parts[i];
 
-    for(i = 0; i < Math.min(3, parts.length); i++){
-      padded[i] = parts[i];
-    }
-
-    for(i = padded.length - 1; i >= 0; i--){
-      item = padded[i];
-      coeff = Math.pow(10, padded.length - i);
-
-      if(item.matches("\\d+[a-zA-Z]")){
+      if( item.matches("\\d+[a-zA-Z]")){
         digit = "";
         letter = "";
 
@@ -80,13 +74,13 @@ public class UpdateManager
             letter += c;
         }
 
-        code += ((Integer.parseInt(digit) + 1) * coeff) - ((VERSION_CHAR_MAP.indexOf(letter.toLowerCase()) + 1) / 100.0);
+        code += multipliers[i] * ( Integer.parseInt(digit) + 1 ) - ((VERSION_CHAR_MAP.indexOf(letter.toLowerCase()) + 1) / 100.0);
       }
       else if(item.matches("\\d+"))
-        code += (Integer.parseInt(item) + 1) * coeff;
+        code += multipliers[i] * ( Integer.parseInt(item) + 1 );
 
       else
-        code += coeff;
+        code += multipliers[i];
     }
 
     return code;
@@ -116,6 +110,9 @@ public class UpdateManager
         // Compare versions
         double installedVersionCode = getVersionCode(mInstalledVersion),
           remoteVersionCode = getVersionCode(mRemoteVersion);
+
+        Logger.debug( "mInstalledVersion = " + mInstalledVersion + " ( " + getVersionCode(mInstalledVersion)+ " ) " );
+        Logger.debug( "mRemoteVersion    = " + mRemoteVersion + " ( " + getVersionCode(mRemoteVersion)+ " ) " );
 
         if(remoteVersionCode > installedVersionCode)
           return true;
