@@ -232,14 +232,14 @@
     <string name="error_mitm_ports">Le porte devono essere disponibili per poter utilizzare i moduli MITM.</string>
 
     <!-- rpc stuff -->
-    <string name="error-rpc">errore RPC</string>
-    <string name="error-rpcd-inval">impostazioni errate</string>
-    <string name="error-rpcd-shell">impossibile eseguire shells</string>
-    <string name="rpcd-starting">Avvio MetaSploit RPCD...</string>
-    <string name="rpcd-started">MetaSploit RPCD avviato</string>
-    <string name="rpcd-stopped">MetaSploit RPCD fermato</string>
-    <string name="rpcd-running">MetaSploit RPCD in esecuzione</string>
-    <string name="rpcd-timedout">MetaSploit RPCD non risponde</string>
+    <string name="error_rpc">errore RPC</string>
+    <string name="error_rpcd_inval">impostazioni errate</string>
+    <string name="error_rpcd_shell">impossibile eseguire shells</string>
+    <string name="rpcd_starting">Avvio MetaSploit RPCD...</string>
+    <string name="rpcd_started">MetaSploit RPCD avviato</string>
+    <string name="rpcd_stopped">MetaSploit RPCD fermato</string>
+    <string name="rpcd_running">MetaSploit RPCD in esecuzione</string>
+    <string name="rpcd_timedout">MetaSploit RPCD non risponde</string>
 
     <!-- mitm modules -->
     <string name="mitm_simple_sniff">Sniffer Semplice</string>
@@ -338,7 +338,23 @@
     <string name="pref_https_redirector_port_desc">Porta sulla quale il redirezionatore HTTPS deve mettersi in ascolto.</string>
     <string name="pref_http_max_buffer_size_desc">Grandezza massima del buffer HTTP che il proxy trasparente può gestire.</string>
     <string name="pref_password_filename_desc">Nome del file da usare per loggare password e cookie.</string>
-
+    <string name="pref_rpc_user_desc">Username per connettersi MetaSploit.</string>
+    <string name="pref_rpc_pswd_desc">Password per connettersi a MetaSploit.</string>
+    <string name="pref_rpc_port">porta RPC</string>
+    <string name="pref_rpc_port_desc">Porta per connettersi a MetaSploit.</string>
+    <string name="pref_chroot_desc">La directory contenete il sistema gentoo.</string>
+    <string name="pref_performance_vuln_title">Tipologie di vulnerabilità ricercate</string>
+    <string-array name="pref_performance_vuln" >
+        <item>OSVDB</item>
+        <item>CVE</item>
+        <item>sia CVE che OSVDB</item>
+    </string-array>
+    <string name="pref_performance_exploit_desc">Tipologia di exploit ricercati</string>
+    <string-array name="pref_performance_exploit" >
+        <item>solo compatibili con MSF</item>
+        <item>da exploitdb</item>
+        <item>sia da exploitdb che compatibili con MSF</item>
+    </string-array>
     <string name="pref_folder">La cartella</string>
     <string name="pref_err_exists">non esiste.</string>
     <string name="pref_err_writable">non è scrivibile.</string>

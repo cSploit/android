@@ -95,7 +95,7 @@ public class RPCServer extends Thread
         }
         catch ( IOException ioe)
         {
-          System.errorLogging(ioe);
+          Logger.debug(ioe.getMessage());
           Shell.exec("killall msfrpcd");
         }
         catch ( RPCClient.MSFException me)

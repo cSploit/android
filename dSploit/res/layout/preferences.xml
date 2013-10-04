@@ -86,41 +86,45 @@
                 android:title="@string/pref_password_filename"/>
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Performance" >
+    <PreferenceCategory android:title="@string/pref_performance" >
 
-        <CheckBoxPreference
-                android:defaultValue="false"
-                android:key="SEARCH_OSVDB_ONLY"
-                android:summary="does not search for CVE vulnerabilities"
-                android:title="Use only OSV DataBase" />
+        <ListPreference
+                android:defaultValue="BOTH"
+                android:key="SEARCH_OSVDB"
+                android:summary="@string/choose_method"
+                android:title="@string/pref_performance_vuln_desc"
+                android:entries="@array/pref_performance_vuln"
+                android:entryValues="@array/pref_performance_vuln_values" />
 
-        <CheckBoxPreference
-                android:defaultValue="false"
-                android:key="SEARCH_MSF_ONLY"
-                android:summary="Search only for metasploit exploits."
-                android:title="Search only MSF exploits" />
+        <ListPreference
+                android:defaultValue="BOTH"
+                android:key="SEARCH_EXDB"
+                android:summary="@string/choose_method"
+                android:title="@string/pref_performance_exploit_desc"
+                android:entries="@array/pref_performance_exploit"
+                android:entryValues="@array/pref_performance_exploit_values" />
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="MetasploitFramework" >
+    <PreferenceCategory android:title="@string/pref_msf" >
 
         <EditTextPreference
                 android:defaultValue="/data/gentoo_msf"
                 android:key="MSF_CHROOT_PATH"
-                android:summary="Path to MSF system image"
-                android:title="Chroot Path" />
+                android:summary="@string/pref_chroot_desc"
+                android:title="@string/pref_chroot" />
 
         <EditTextPreference
                 android:defaultValue="msf"
                 android:key="MSF_RPC_USER"
-                android:summary="the username for login into MSF."
-                android:title="username" />
+                android:summary="@string/pref_rpc_user_desc"
+                android:title="@string/pref_rpc_user" />
 
         <EditTextPreference
                 android:defaultValue="msf"
                 android:key="MSF_RPC_PSWD"
-                android:summary="the password to login into MSF."
-                android:title="password" />
+                android:summary="@string/pref_rpc_pswd_desc"
+                android:title="@string/pref_rpc_pswd" />
 
     </PreferenceCategory>
 

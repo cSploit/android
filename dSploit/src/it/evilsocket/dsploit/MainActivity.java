@@ -348,7 +348,7 @@ public class MainActivity extends SherlockListActivity
 
     item = menu.findItem(R.id.ss_msfrpcd);
 
-    if(System.getMsfRpc()!=null)
+    if(System.getMsfRpc()!=null || (mRPCServer!=null && mRPCServer.isRunning()))
       item.setTitle( getString(R.string.stop_msfrpcd) );
     else
       item.setTitle( getString(R.string.start_msfrpcd) );
