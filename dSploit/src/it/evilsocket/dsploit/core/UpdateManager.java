@@ -18,22 +18,10 @@
  */
 package it.evilsocket.dsploit.core;
 
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.util.Log;
-
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Arrays;
-
-import it.evilsocket.dsploit.MainActivity;
 
 public class UpdateManager
 {
@@ -41,12 +29,10 @@ public class UpdateManager
   private static final String REMOTE_DOWNLOAD_URL = "http://update.dsploit.net/apk";
   private static final String VERSION_CHAR_MAP = "zyxwvutsrqponmlkjihgfedcba";
 
-  private Context mContext = null;
   private String mInstalledVersion = null;
   private String mRemoteVersion = null;
 
-  public UpdateManager(Context context){
-    mContext = context;
+  public UpdateManager(){
     mInstalledVersion = System.getAppVersionName();
   }
 
@@ -134,116 +120,5 @@ public class UpdateManager
 
   public String getRemoteVersionUrl(){
     return REMOTE_DOWNLOAD_URL;
-  }
-
-  private String formatSize(int size){
-    if(size < 1024)
-      return size + " B";
-
-    else if(size < (1024 * 1024))
-      return (size / 1024) + " KB";
-
-    else if(size < (1024 * 1024 * 1024))
-      return (size / (1024 * 1024)) + " MB";
-
-    else
-      return (size / (1024 * 1024 * 1024)) + " GB";
-  }
-
-  private String formatSpeed(int speed){
-    if(speed < 1024)
-      return speed + " B/s";
-
-    else if(speed < (1024 * 1024))
-      return (speed / 1024) + " KB/s";
-
-    else if(speed < (1024 * 1024 * 1024))
-      return (speed / (1024 * 1024)) + " MB/s";
-
-    else
-      return (speed / (1024 * 1024 * 1024)) + " GB/s";
-  }
-
-  public boolean downloadUpdate(MainActivity activity, final ProgressDialog progress){
-    try{
-      HttpURLConnection.setFollowRedirects(true);
-
-      URL url = new URL(getRemoteVersionUrl());
-      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-      File file = new File(System.getStoragePath());
-      String fileName = getRemoteVersionFileName();
-      byte[] buffer = new byte[1024];
-      int read = 0;
-
-      connection.connect();
-
-      //noinspection ResultOfMethodCallIgnored
-      file.mkdirs();
-      file = new File(file, fileName);
-      if(file.exists())
-        //noinspection ResultOfMethodCallIgnored
-        file.delete();
-
-      FileOutputStream writer = new FileOutputStream(file);
-      InputStream reader = connection.getInputStream();
-
-      int total = connection.getContentLength(),
-        downloaded = 0,
-        sampled = 0;
-      long time = java.lang.System.currentTimeMillis();
-      double speed = 0.0,
-             deltat;
-
-      while(progress.isShowing() && (read = reader.read(buffer)) != -1){
-        writer.write(buffer, 0, read);
-
-        downloaded += read;
-
-        deltat = (java.lang.System.currentTimeMillis() - time) / 1000.0;
-
-        if(deltat > 1.0){
-          speed = (downloaded - sampled) / deltat;
-          time = java.lang.System.currentTimeMillis();
-          sampled = downloaded;
-        }
-
-        // update the progress ui
-        final int fdown = downloaded,
-          ftot = total;
-        final double fspeed = speed;
-
-        activity.runOnUiThread(new Runnable(){
-          @Override
-          public void run(){
-          progress.setMessage("[ " + formatSpeed((int) fspeed) + " ] " + formatSize(fdown) + " / " + formatSize(ftot) + " ...");
-          progress.setProgress((100 * fdown) / ftot);
-          }
-        });
-
-      }
-
-      writer.close();
-      reader.close();
-
-      if(progress.isShowing()){
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        mContext.startActivity(intent);
-      }
-      else
-        Logger.debug("Download cancelled.");
-
-      return true;
-    }
-    catch(Exception e){
-      System.errorLogging(e);
-    }
-
-    if(progress.isShowing())
-      progress.dismiss();
-
-    return false;
   }
 }

@@ -20,7 +20,6 @@ package it.evilsocket.dsploit;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences.Editor;
@@ -51,7 +50,9 @@ import com.bugsense.trace.BugSenseHandler;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.io.File;
 
+import it.evilsocket.dsploit.core.DownloadManager;
 import it.evilsocket.dsploit.core.ManagedReceiver;
 import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.System;
@@ -846,7 +847,8 @@ public class MainActivity extends SherlockListActivity
     }
   }
 
-  private class UpdateReceiver extends ManagedReceiver{
+  private class UpdateReceiver extends ManagedReceiver
+  {
     private IntentFilter mFilter = null;
 
     public UpdateReceiver(){
@@ -885,36 +887,38 @@ public class MainActivity extends SherlockListActivity
               MainActivity.this,
               new ConfirmDialogListener(){
                 @Override
-                public void onConfirm(){
-                  final ProgressDialog dialog = new ProgressDialog(MainActivity.this);
-                  dialog.setTitle(getString(R.string.downloading_update));
-                  dialog.setMessage(getString(R.string.connecting));
-                  dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                  dialog.setMax(100);
-                  dialog.setCancelable(false);
-                  dialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel), new DialogInterface.OnClickListener(){
+                public void onConfirm()
+                {
+                  DownloadManager manager = new DownloadManager( MainActivity.this, R.string.downloading_update, R.string.connecting );
+                  String remote = System.getUpdateManager().getRemoteVersionUrl(),
+                         local = System.getStoragePath() + "/" + System.getUpdateManager().getRemoteVersionFileName();
+
+                  manager.download( remote, local, new DownloadManager.StatusReceiver() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which){
-                      dialog.dismiss();
+                    public void onStart() { }
+
+                    @Override
+                    public void onCanceled() { }
+
+                    @Override
+                    public void onError(Exception e) {
+                      MainActivity.this.runOnUiThread(new Runnable(){
+                        @Override
+                        public void run(){
+                          new ErrorDialog(getString(R.string.error), getString(R.string.error_occured), MainActivity.this).show();
+                        }
+                      });
+                    }
+
+                    @Override
+                    public void onFinished( File file ) {
+                      Intent intent = new Intent(Intent.ACTION_VIEW);
+                      intent.setDataAndType( Uri.fromFile(file), "application/vnd.android.package-archive");
+                      intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                      System.getContext().startActivity(intent);
                     }
                   });
-                  dialog.show();
-
-                  new Thread(new Runnable(){
-                    @Override
-                    public void run(){
-                      if(!System.getUpdateManager().downloadUpdate(MainActivity.this, dialog)){
-                        MainActivity.this.runOnUiThread(new Runnable(){
-                          @Override
-                          public void run(){
-                            new ErrorDialog(getString(R.string.error), getString(R.string.error_occured), MainActivity.this).show();
-                          }
-                        });
-                      }
-
-                      dialog.dismiss();
-                    }
-                  }).start();
                 }
 
                 @Override
