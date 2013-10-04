@@ -76,6 +76,8 @@
     <string name="net_discovery_started">Verkko hakeminen aloitettu.</string>
     <string name="start_monitor">Aloita verkon valvominen</string>
     <string name="stop_monitor">Lopeta verkon valvominen</string>
+    <string name="start_msfrpcd">Käynnistä MetaSploit RPCD</string>
+    <string name="stop_msfrpcd">Lopeta MetaSploit RPCD</string>
     <string name="exit">Poistu</string>
     <string name="close_confirm">Tämä sulkee dSploitin, Oletko varma että haluat jatkaa?
     </string>
@@ -173,6 +175,9 @@
     <string name="vulnerability_finder_desc">Etsi tiedettyjä heikkouksia National Vulnerability
         Database:sta.
     </string>
+    <string name="no_open_ports_focused_scan">Avoimia portteja ei löytynyt, suorita portti skanneri ennen kuin teet keskittyneen skannauksen.</string>
+    <string name="no_open_ports_exploitfinder">Heikkouksia ei löytynyt, suorita Heikkouksien etsijä ensin.</string>
+    <string name="no_exploit_started">Heikkouden käyttämistä ei ole aloitettu.</string> 
     <string name="inspector">Palveluiden tutkija</string>
     <string name="inspector_desc">Suorita kohteen järjestelmän ja palveluiden syvä tutkinta (Hitaampi
         kuin Portti-skanneri, mutta tarkempi).
@@ -223,6 +228,15 @@
     <string name="error_mitm_port"> jonka mies välissä -palvelin tarvitsee on toisen prosessin käytössä, avaa sovelluksen asetukset? ?</string>
     <string name="error_https_port"> jonka mies välissä HTTPS uudelleenohjaus tarvitsee on toisen prosessin käytössä, avaa sovelluksen asetukset ?</string>
     <string name="error_mitm_ports">Mies Välissä -moduulit vaativat kaikki portit käytettäviksi.</string>
+    <!--RPC stuff -->
+    <string name="error_rpc">RPC virhe</string>
+    <string name="error_rpcd_inval">Väärät asetukset</string>
+    <string name="error_rpcd_shell">Komentorivin suorittaminen ei onnistu</string>
+    <string name="rpcd_starting">Käynnistetään MetaSploit RPCD...</string>
+    <string name="rpcd_started">MetaSploit RPCD käynnistetty</string>
+    <string name="rpcd_stopped">MetaSploit RPCD lopetettu</string>
+    <string name="rpcd_running">MetaSploit RPCD on jo käynnissä</string>
+    <string name="rpcd_timedout">MetaSploit RPCD ei vastaa</string>
 
     <!-- mitm modules -->
     <string name="mitm_simple_sniff">Yksinkertainen nuuhkiminen</string>
@@ -297,6 +311,8 @@
 
     <string name="pref_general">Yleiset</string>
     <string name="pref_modules">Moduulit</string>
+    <string name="pref_msf">MetaSploitFramework</string>
+    <string name="pref_performance">Suorituskyky</string>
     <string name="pref_check_updates">Tarkista päivitykset</string>
     <string name="pref_wake_lock">Estä nukkuminen</string>
     <string name="pref_save_path">Tallennuspolku</string>
@@ -321,7 +337,26 @@
     <string name="pref_https_redirector_port_desc">Kuunneltava Mies-välissä HTTPS uudelleenohjaus portti.</string>
     <string name="pref_http_max_buffer_size_desc">Maksimi välimuistin koko HTTP pyynnöille, jotka läpinäkyvä välityspalvelin käsittelee.</string>
     <string name="pref_password_filename_desc">Tiedoston nimi johon salasanat ja evästeet kirjoitetaan.</string>
-
+    <string name="pref_rpc_user">RPC Käyttäjänimi</string>
+    <string name="pref_rpc_user_desc">Käyttäjänimi jota käytetään MetaSploit RPCD:hen yhdistäessä.</string>
+    <string name="pref_rpc_pswd">RPC Salasana</string>
+    <string name="pref_rpc_pswd_desc">Salasana jota käytetään MetaSploit RPCD:hen yhdistäessä.</string>
+    <string name="pref_rpc_port">RPC Portti</string>
+    <string name="pref_rpc_port_desc">Portti jota käytetään MetaSploit RPCD:hen yhdistäessä.</string>
+    <string name="pref_chroot">Gentoo:n kansio</string>
+    <string name="pref_chroot_desc">Kansio jossa Gentoo:n järjestelmä on.</string>
+    <string name="pref_performance_vuln_desc">Etsi heikkouksia kohteesta</string>
+    <string-array name="pref_performance_vuln" >
+        <item>OSVDB</item>
+        <item>CVE</item>
+        <item>CVE ja OSVDB</item>
+    </string-array>
+    <string name="pref_performance_exploit_desc">Etsi heikkouksia</string>
+    <string-array name="pref_performance_exploit" >
+        <item>Vain MSF yhteensopivia</item>
+        <item>Vain exploitdb</item>
+        <item>exploitdb ja MSF</item>
+    </string-array>
     <string name="pref_folder">Kansio</string>
     <string name="pref_err_exists">ei ole olemassa.</string>
     <string name="pref_err_writable">ei ole kirjoitettava.</string>
@@ -337,5 +372,5 @@
     <string name="exploit_finder_desc">Etsi keinoja hyödyntää löydettyjä heikkouksia.</string>
     <string name="sessions">Tilanteet</string>
     <string name="sessions_desc">Tilanteet pwnatussa kohteessa.</string>
-    
+
 </resources>
