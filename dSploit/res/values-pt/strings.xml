@@ -200,14 +200,14 @@
     <string name="error_mitm_ports">Módulos MITM precisa de todas as portas disponíveis.</string>
 
     <!-- rpc stuff -->
-    <string name="error-rpc">Erro de RPC</string>
-    <string name="error-rpcd-inval">Configurações Ruins</string>
-    <string name="error-rpcd-shell">Não Pode Executar Shell</string>
-    <string name="rpcd-starting">Iniciando Metasploit RPCD...</string>
-    <string name="rpcd-started">Metasploit RPCD Iniciou</string>
-    <string name="rpcd-stopped">MetaSploit RPCD Parado</string>
-    <string name="rpcd-running">MetaSploit RPCD já está em execução</string>
-    <string name="rpcd-timedout">MetaSploit RPCD não responde</string>
+    <string name="error_rpc">Erro de RPC</string>
+    <string name="error_rpcd_inval">Configurações Ruins</string>
+    <string name="error_rpcd_shell">Não Pode Executar Shell</string>
+    <string name="rpcd_starting">Iniciando Metasploit RPCD...</string>
+    <string name="rpcd_started">Metasploit RPCD Iniciou</string>
+    <string name="rpcd_stopped">MetaSploit RPCD Parado</string>
+    <string name="rpcd_running">MetaSploit RPCD já está em execução</string>
+    <string name="rpcd_timedout">MetaSploit RPCD não responde</string>
 
     <!-- mitm modules -->
     <string name="mitm_simple_sniff">Sniff Simples</string>
