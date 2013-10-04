@@ -283,8 +283,6 @@ public class MainActivity extends SherlockListActivity
           dialog.dismiss();
 
           if(fatal != null){
-            BugSenseHandler.sendException(new Exception(fatal));
-
             final String ffatal = fatal;
             MainActivity.this.runOnUiThread(new Runnable(){
               @Override
