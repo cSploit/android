@@ -76,7 +76,7 @@
     <string name="start_monitor">Start Network Monitor</string>
     <string name="stop_monitor">Stop Network Monitor</string>
     <string name="start_msfrpcd">Start MetaSploit RPCD</string>
-    <string name="stop_msfrpcd">Stpp MetaSploit RPCD</string>
+    <string name="stop_msfrpcd">Stop MetaSploit RPCD</string>
     <string name="exit">Exit</string>
     <string name="close_confirm">This will close dSploit, are you sure you want to continue ?
     </string>
