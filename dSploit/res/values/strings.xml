@@ -128,14 +128,12 @@
     </string>
     <string name="selected">Selected</string>
     <string name="nothing_found"><![CDATA[<small><i>Nothing Found</i></small>]]></string>
-    <string name="no_open_ports">No open ports detected on current target, run the service inspector
-        first.
-    </string>
+    <string name="no_open_ports">No open ports detected on current target, run the service inspector first.</string>
     <string name="no_exploits_found">No exploits found.</string>
     <string name="no_open_ports_focused_scan">No open ports found, run the port scanner before selecting a focused scan.</string>
     <string name="no_open_ports_exploitfinder">No exploits found on this target, run the ExploitFinder first.</string>
     <string name="no_exploit_started">No exploit has been started.</string>
-
+    <string name="no_vulnerabilities_found">No vulnerabilities found about this target. run the Vulnerability Finder first.</string>
     <string name="no_infos_on_target">No specific informations about services running on target
         machine, run the service inspector first.
     </string>
