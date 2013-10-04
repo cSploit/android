@@ -30,7 +30,8 @@ import android.webkit.WebViewClient;
 
 import it.evilsocket.dsploit.R;
 
-public class ChangelogDialog extends AlertDialog{
+public class ChangelogDialog extends AlertDialog
+{
   private final String ERROR_HTML = getContext().getString(R.string.something_went_wrong_changelog);
 
   private ProgressDialog mLoader = null;
@@ -88,7 +89,7 @@ public class ChangelogDialog extends AlertDialog{
 
     this.setView(view);
 
-    view.loadUrl("http://update.dsploit.net/changelog.html");
+    view.loadUrl("http://update.dsploit.net/changelog");
 
     this.setCancelable(false);
     this.setButton("Ok", new DialogInterface.OnClickListener(){
