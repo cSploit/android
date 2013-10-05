@@ -363,7 +363,7 @@
     <string-array name="pref_performance_exploit" >
         <item>MSF compatible only</item>
         <item>on exploitdb only</item>
-        <item>from both exploitd and MSF</item>
+        <item>from both exploitdb and MSF</item>
     </string-array>
     <string-array name="pref_performance_exploit_values">
         <item>MSF</item>
