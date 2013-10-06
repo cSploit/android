@@ -234,7 +234,7 @@
     <string name="error_rpc">RPC virhe</string>
     <string name="error_rpcd_inval">Väärät asetukset</string>
     <string name="error_rpcd_shell">Komentorivin suorittaminen ei onnistu</string>
-    <string name="rpcd_starting">Käynnistetään MetaSploit RPCD...</string>
+    <string name="rpcd_starting">Käynnistetään MetaSploit RPCD&#8230;</string>
     <string name="rpcd_started">MetaSploit RPCD käynnistetty</string>
     <string name="rpcd_stopped">MetaSploit RPCD lopetettu</string>
     <string name="rpcd_running">MetaSploit RPCD on jo käynnissä</string>
@@ -305,10 +305,10 @@
 
     <string name="scanner_select_ports">Valitse omat portit</string>
 
-    <string name="wifi_initializing">Alustetaan ...</string>
-    <string name="wifi_activating_iface">Aktivoidaan WiFi rajapinta ...</string>
+    <string name="wifi_initializing">Alustetaan&#8230;</string>
+    <string name="wifi_activating_iface">Aktivoidaan WiFi rajapinta&#8230;</string>
     <string name="wifi_activated">WiFi aktivoitu.</string>
-    <string name="wifi_scanning">Skannataan ...</string>
+    <string name="wifi_scanning">Skannataan&#8230;</string>
     <string name="wifi_attempting_to">Yritetään yhdistää kohteeseen</string>
     <string name="wifi_with_key">avaimella</string>
     <string name="wifi_connecting_to">Yhdistetään kohteeseen</string>
