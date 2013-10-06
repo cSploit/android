@@ -39,8 +39,8 @@
     <string name="stopped">Parado&#8230;</string>
     <string name="start">Iniciar</string>
     <string name="stop">Parar</string>
-    <string name="stopped_dots">Parado...</string>
-    <string name="starting_dots">Iniciando...</string>
+    <string name="stopped_dots">Parado&#8230;</string>
+    <string name="starting_dots">Iniciando&#8230;</string>
     <string name="max_length">Longitud máx.</string>
     <string name="min_length">Longitud mín.</string>
     <string name="username">Nombre de usuario</string>
@@ -192,7 +192,7 @@
     <string name="error-rpc">Error RPC</string>
     <string name="error-rpcd-inval">Mala configuración</string>
     <string name="error-rpcd-shell">No es posible ejecutar la shell</string>
-    <string name="rpcd-starting">Iniciando MetaSploit RPCD...</string>
+    <string name="rpcd-starting">Iniciando MetaSploit RPCD&#8230;</string>
     <string name="rpcd-started">MetaSploit RPCD iniciado</string>
     <string name="rpcd-stopped">MetaSploit RPCD detenido</string>
     <string name="rpcd-running">MetaSploit RPCD ya está en ejecución</string>
@@ -260,10 +260,10 @@
 
     <string name="scanner_select_ports">Seleccionar puertos personalizados</string>
 
-    <string name="wifi_initializing">Iniciando...</string>
-    <string name="wifi_activating_iface">Activando el interfaz WiFi...</string>
+    <string name="wifi_initializing">Iniciando&#8230;</string>
+    <string name="wifi_activating_iface">Activando el interfaz WiFi&#8230;</string>
     <string name="wifi_activated">WiFi activado.</string>
-    <string name="wifi_scanning">Escaneando...</string>
+    <string name="wifi_scanning">Escaneando&#8230;</string>
     <string name="wifi_attempting_to">Intentando conectarse a</string>
     <string name="wifi_with_key">con la clave</string>
     <string name="wifi_connecting_to">conectando a</string>
@@ -286,7 +286,7 @@
     <string name="pref_https_redirect">SSL Stripping</string>
     <string name="pref_https_redirector_port">Puerto redirector HTTPS</string>
     <string name="pref_http_max_buffer_size">Tamaño máximo del búfer HTTP</string>
-    <string name="pref_password_filename">Archivo del Sniffer de contraseñas</string>>
+    <string name="pref_password_filename">Archivo del Sniffer de contraseñas</string>
     <string name="pref_check_updates_desc">Busca actualizaciones cada vez que se inicia la aplicación.</string>
     <string name="pref_wake_lock_desc">Evita que el dispositivo entre en modo espera mientras se ejecuta la aplicación.</string>
     <string name="pref_save_path_desc">Ruta global en la que guardar todos los archivos de registro.</string>
