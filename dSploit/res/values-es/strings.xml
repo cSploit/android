@@ -189,14 +189,14 @@
     <string name="error_mitm_ports">Los módulos MITM necesitan todos los puertos disponibles.</string>
 
     <!-- rpc stuff -->
-    <string name="error-rpc">Error RPC</string>
-    <string name="error-rpcd-inval">Mala configuración</string>
-    <string name="error-rpcd-shell">No es posible ejecutar la shell</string>
-    <string name="rpcd-starting">Iniciando MetaSploit RPCD&#8230;</string>
-    <string name="rpcd-started">MetaSploit RPCD iniciado</string>
-    <string name="rpcd-stopped">MetaSploit RPCD detenido</string>
-    <string name="rpcd-running">MetaSploit RPCD ya está en ejecución</string>
-    <string name="rpcd-timedout">MetaSploit RPCD no responde</string>
+    <string name="error_rpc">Error RPC</string>
+    <string name="error_rpcd_inval">Mala configuración</string>
+    <string name="error_rpcd_shell">No es posible ejecutar la shell</string>
+    <string name="rpcd_starting">Iniciando MetaSploit RPCD&#8230;</string>
+    <string name="rpcd_started">MetaSploit RPCD iniciado</string>
+    <string name="rpcd_stopped">MetaSploit RPCD detenido</string>
+    <string name="rpcd_running">MetaSploit RPCD ya está en ejecución</string>
+    <string name="rpcd_timedout">MetaSploit RPCD no responde</string>
     <string name="error_rcpd_fatal">Ha ocurrido un error fatal. Estoy buscando ese error para enviarlo a mis desarrolladores. Si no es posible salir, por favor ciérrame desde Preferencias->Aplicaciones y ALERTE A MIS DESARROLLADORES.</string>
 
     <!-- mitm modules -->
