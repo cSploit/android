@@ -14,8 +14,8 @@
     <string name="services">Palvelut</string>
     <string name="os">Käyttöjärjestelmä</string>
     <string name="device_type">Laitteen tyyppi</string>
-    <string name="start_hijack">Näpäytä sivustoa aloittaaksesi kaappauksen, pidä sitä pohjassa
-        tallentaaksesi sen tiedostoon.
+    <string name="start_hijack">Näpäytä tilannetta kaapataksesi sen,
+		pidä pohjassa tallentaaksesi sen tiedostoon.
     </string>
     <string name="sort">Lajittelu:</string>
     <string name="select_module">Valitse suoritettava moduuli</string>
@@ -42,7 +42,7 @@
         http://www.turre.com/licenses/gpl_fi.html
     </string>
     <string name="service">Palvelu</string>
-    <string name="stopped">Pysäytetty&#8230;</string>
+    <string name="stopped">Pysäytetty &#8230;</string>
     <string name="start">Aloita</string>
     <string name="stop">Lopeta</string>
     <string name="max_length">Maksimi Pituus</string>
@@ -60,12 +60,12 @@
     <string name="update_available">Päivitys saatavilla</string>
     <string name="new_update_desc">Uusi päivitys versioon</string>
     <string name="new_update_desc2">on saatavilla. Haluatko ladata sen?</string>
-    <string name="checking">Tarkistetaan &#8230;</string>
+    <string name="checking">Tarkistetaan&#8230;</string>
     <string name="no_updates_available">Ei päivityksiä saatavilla.</string>
     <string name="new_version">Uusi versio</string>
     <string name="new_version2">löydetty!</string>
-    <string name="downloading_update">Ladataan päivitystä &#8230;</string>
-    <string name="connecting">Yhdistetään &#8230;</string>
+    <string name="downloading_update">Ladataan päivitystä&#8230;</string>
+    <string name="connecting">Yhdistetään&#8230;</string>
     <string name="cancel">Peruuta</string>
     <string name="error">Virhe</string>
     <string name="error_occured">Tapahtui virhe kun ladattiin päivitystä.</string>
@@ -82,7 +82,7 @@
     <string name="close_confirm">Tämä sulkee dSploitin, Oletko varma että haluat jatkaa?
     </string>
     <string name="press_back">Paina takaisin-näppäintä vielä kerran poistuaksesi.</string>
-    <string name="selected_">Valittu &#160;</string>
+    <string name="selected_">Valittu&#160;</string>
     <string name="github_issues">https://github.com/evilsocket/dsploit/issues/new</string>
     <string name="no_session_found">Tilanteita ei löydetty SD-kortilta.</string>
     <string name="select_session_file">Valitse Tilanne-tiedosto SD-kortilta :</string>
@@ -132,6 +132,11 @@
         Palveluiden tutkija
         ensin.
     </string>
+	<string name="no_exploits_found">Heikkouksia ei löytynyt.</string>
+    <string name="no_open_ports_focused_scan">Avoimia portteja ei löytynyt, suorita portti skanneri ennen kuin teet keskittyneen skannauksen.</string>
+    <string name="no_open_ports_exploitfinder">Heikkouksia ei löytynyt, suorita Heikkouksien etsijä ensin.</string>
+    <string name="no_exploit_started">Heikkouden käyttämistä ei ole aloitettu.</string> 
+    <string name="no_vulnerabilities_found">Kohteesta ei löytynyt heikkouksia. Suorita Heikkouksien etsijä ensin.</string>
     <string name="no_infos_on_target">Ei tarkkoja tietoja kohteessa olevista palveluista, suorita
         Palveluiden tutkija ensin.
     </string>
@@ -157,11 +162,11 @@
     <string name="select_target">Valitse kohde alta ja näpäytä riviä, tai pidä pitkään pohjassa
         antaaksesi aliaksen.
     </string>
-    <string name="generating_keys">Generoidaan avaimia &#8230;</string>
+    <string name="generating_keys">Generoidaan avaimia&#8230;</string>
     <string name="no_wifi_available">Ei WiFi-yhteyttä saatavilla, sovellus tarkistaa vain
         päivitykset. #STATUS#
     </string>
-    <string name="loading_changelog">Ladataan muutoslokia &#8230;</string>
+    <string name="loading_changelog">Ladataan muutoslokia&#8230;</string>
     <string name="something_went_wrong_changelog">
         <![CDATA[<html><body><p><b>Jotain meni pieleen ladattaessa muutoslokia:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
     <string name="cancel_dialog">Peruuta</string>
@@ -170,14 +175,11 @@
     <string name="connect">Yhdistä</string>
     <string name="crack">Murtaudu</string>
     <string name="could_not_read_folder">Ei voitu lukea kansion sisältöä.</string>
-    <string name="choose_dir">Valitse &#160;</string>
+    <string name="choose_dir">Valitse&#160;</string>
     <string name="vulnerability_finder">Heikkouksien etsijä</string>
     <string name="vulnerability_finder_desc">Etsi tiedettyjä heikkouksia National Vulnerability
         Database:sta.
     </string>
-    <string name="no_open_ports_focused_scan">Avoimia portteja ei löytynyt, suorita portti skanneri ennen kuin teet keskittyneen skannauksen.</string>
-    <string name="no_open_ports_exploitfinder">Heikkouksia ei löytynyt, suorita Heikkouksien etsijä ensin.</string>
-    <string name="no_exploit_started">Heikkouden käyttämistä ei ole aloitettu.</string> 
     <string name="inspector">Palveluiden tutkija</string>
     <string name="inspector_desc">Suorita kohteen järjestelmän ja palveluiden syvä tutkinta (Hitaampi
         kuin Portti-skanneri, mutta tarkempi).
@@ -211,7 +213,6 @@
     <string name="set_session_filename">Anna tilanteen tiedostonimi:</string>
     <string name="session_sniffer">Tilanteen nuuhkija</string>
 
-
     <string name="untraced_hops">jäljittämättömät hypyt</string>
     <string name="add_username">Lisää käyttäjätunnus</string>
     <string name="enter_username">Syötä käyttäjätunnus jota haluat käyttää:</string>
@@ -228,7 +229,8 @@
     <string name="error_mitm_port"> jonka mies välissä -palvelin tarvitsee on toisen prosessin käytössä, avaa sovelluksen asetukset? ?</string>
     <string name="error_https_port"> jonka mies välissä HTTPS uudelleenohjaus tarvitsee on toisen prosessin käytössä, avaa sovelluksen asetukset ?</string>
     <string name="error_mitm_ports">Mies Välissä -moduulit vaativat kaikki portit käytettäviksi.</string>
-    <!--RPC stuff -->
+
+    <!--RPC tavaraa -->
     <string name="error_rpc">RPC virhe</string>
     <string name="error_rpcd_inval">Väärät asetukset</string>
     <string name="error_rpcd_shell">Komentorivin suorittaminen ei onnistu</string>
@@ -237,8 +239,12 @@
     <string name="rpcd_stopped">MetaSploit RPCD lopetettu</string>
     <string name="rpcd_running">MetaSploit RPCD on jo käynnissä</string>
     <string name="rpcd_timedout">MetaSploit RPCD ei vastaa</string>
-
-    <!-- mitm modules -->
+    <string name="error_rcpd_fatal">Tappava virhe tapahtui!, Etsin tätä virhettä, joten lähetä se kehittäjilleni.
+        jos en sulkeudu, sulje minut Asetukset->sovellukset->dSploit "Pakota Lopetus",
+        ja ILMOITA KEHITTÄJILLENI.
+    </string>
+	
+    <!-- Mies-välissä moduulit -->
     <string name="mitm_simple_sniff">Yksinkertainen nuuhkiminen</string>
     <string name="mitm_simple_sniff_desc">Ohjaa kohteen liikenteen tämän laitteen läpi ja näyttää joitan tilastoja samalla kuin kirjoittaa niitä .pcap tiedostoon.</string>
     <string name="mitm_password_sniff">Salasanan nuuhkija</string>
@@ -308,7 +314,7 @@
     <string name="wifi_connecting_to">Yhdistetään kohteeseen</string>
     <string name="wifi_error_keys">Avaimen luonti ei onnistu.</string>
     <string name="wifi_scan_finished">Skannaus valmis.</string>
-
+	<!-- asetukset -->
     <string name="pref_general">Yleiset</string>
     <string name="pref_modules">Moduulit</string>
     <string name="pref_msf">MetaSploitFramework</string>
