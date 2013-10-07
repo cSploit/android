@@ -23,6 +23,7 @@ import android.content.Context;
 import java.io.File;
 import java.io.IOException;
 
+import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 import it.evilsocket.dsploit.core.System;
@@ -51,14 +52,7 @@ public class Tool
   }
 
   public void run(String args, OutputReceiver receiver) throws IOException, InterruptedException{
-    String cmd = null;
-
-    if(mAppContext != null)
-      cmd = "cd " + mDirName + " && ./" + mName + " " + args;
-    else
-      cmd = mName + " " + args;
-
-    Shell.exec(cmd, receiver);
+    Shell.exec(mName + " " + args, receiver);
   }
 
   public void run(String args) throws IOException, InterruptedException{
@@ -66,25 +60,11 @@ public class Tool
   }
 
   public Thread async(String args, OutputReceiver receiver){
-    String cmd = null;
-
-    if(mAppContext != null)
-      cmd = "cd " + mDirName + " && ./" + mName + " " + args;
-    else
-      cmd = mName + " " + args;
-
-    return Shell.async(cmd, receiver);
+    return Shell.async(mName + " " + args, receiver);
   }
 
   public Thread asyncStatic(String args, OutputReceiver receiver){
-    String cmd = null;
-
-    if(mAppContext != null)
-      cmd = "cd " + mDirName + " && ./" + mName + " " + args;
-    else
-      cmd = mName + " " + args;
-
-    return Shell.async(cmd, receiver, false);
+    return Shell.async(mName + " " + args, receiver, false);
   }
 
   public boolean kill(){

@@ -48,36 +48,10 @@ public class RPCServer extends Thread
                           msfChrootPath;
   private int             msfPort;
   private long            mTimeout = 0;
-  private ShellReceiver   mShellReceiver  = null;
-  private Thread          mShellThread = null;
 
   public RPCServer(Context context) {
     super("RPCServer");
     mContext   = context;
-  }
-
-  /* WARNING: horrible code workarounds here.
-   * after many hours of debugging, coding, and coffe i found a workaround for issue #313
-   * i use a Thread and call start() join() everytime
-   * please help me find a better way to do this.
-  */
-
-  private class ShellReceiver implements Shell.OutputReceiver {
-    public boolean verbose=false;
-    public int exit_code = -1;
-    @Override
-    public void onStart(String command) { }
-
-    @Override
-    public void onNewLine(String line) {
-      if(verbose)
-        Logger.debug(line);
-    }
-
-    @Override
-    public void onEnd(int exitCode) {
-      exit_code = exitCode;
-    }
   }
 
 
@@ -95,10 +69,7 @@ public class RPCServer extends Thread
   private boolean connect_to_running_server() throws RuntimeException, IOException, InterruptedException {
     boolean ret = false;
 
-    mShellThread = Shell.async("pidof msfrpcd",mShellReceiver);
-    mShellThread.start();
-    mShellThread.join();
-    if(mShellReceiver.exit_code==0)
+    if(Shell.exec("pidof msfrpcd")==0)
     {
       try
       {
@@ -121,11 +92,7 @@ public class RPCServer extends Thread
       }
       finally {
         if(!ret)
-        {
-          mShellThread = Shell.async("killall msfrpcd ");
-          mShellThread.start();
-          mShellThread.join();
-        }
+          Shell.exec("killall msfrpcd");
       }
     }
     return ret;
@@ -136,14 +103,26 @@ public class RPCServer extends Thread
    * NOTE: it can be useful if we decide to own the msfrpcd process
   */
   private void start_daemon_fg() {
-    mShellReceiver.verbose = true;
-    mShellThread = Shell.async( "chroot \"" + msfChrootPath + "\" /start_msfrpcd.sh -P \"" + msfPassword + "\" -U \"" + msfUser + "\" -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg -f", mShellReceiver );
+    class debug_receiver implements Shell.OutputReceiver {
+      @Override
+      public void onStart(String command) {
+        Logger.debug("running \""+command+"\"");
+      }
+
+      @Override
+      public void onNewLine(String line) {
+        Logger.debug(line);
+      }
+
+      @Override
+      public void onEnd(int exitCode) {
+        Logger.debug("exit_code="+exitCode);
+      }
+    }
 
     try
     {
-      mShellThread.start();
-      mShellThread.join();
-      if(mShellReceiver.exit_code != 0) {
+      if(Shell.exec( "chroot \"" + msfChrootPath + "\" /start_msfrpcd.sh -P \"" + msfPassword + "\" -U \"" + msfUser + "\" -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg -f", new debug_receiver()) != 0) {
         Logger.error("chroot failed");
       }
     }
@@ -151,28 +130,18 @@ public class RPCServer extends Thread
     {
       System.errorLogging(e);
     }
-    finally {
-      mShellReceiver.verbose=false;
-    }
   }
 
   private void start_daemon() throws RuntimeException, IOException, InterruptedException {
-    mShellThread = Shell.async( "chroot \"" + msfChrootPath + "\" /start_msfrpcd.sh -P \"" + msfPassword + "\" -U \"" + msfUser + "\" -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg\n",mShellReceiver );
-    mShellThread.start();
-    mShellThread.join();
-    if(mShellReceiver.exit_code!=0) {
+    if(Shell.exec( "chroot \"" + msfChrootPath + "\" /start_msfrpcd.sh -P \"" + msfPassword + "\" -U \"" + msfUser + "\" -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg\n")!=0) {
       throw new RuntimeException("chroot failed");
     }
   }
 
   private void wait_for_connection() throws RuntimeException, IOException, InterruptedException, TimeoutException {
-    // keep watching if server exists
-    mShellThread = Shell.async("pidof msfrpcd",mShellReceiver);
 
     do {
-      mShellThread.start();
-      mShellThread.join();
-      if(mShellReceiver.exit_code!=0)
+      if(Shell.exec("pidof msfrpcd")!=0)
       {
         // OMG, server crashed!
         // start server in foreground and log errors.
@@ -206,8 +175,6 @@ public class RPCServer extends Thread
 
   @Override
   public void run( ) {
-
-    mShellReceiver = new ShellReceiver();
     mTimeout = new Date().getTime() + TIMEOUT;
     Logger.debug("RPCServer started");
 

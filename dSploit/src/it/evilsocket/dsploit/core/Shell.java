@@ -19,35 +19,51 @@
 package it.evilsocket.dsploit.core;
 
 import android.content.Context;
+import android.content.Entity;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.UUID;
 
 public class Shell
 {
-  private static final String TAG = "SHELL";
+  private static Process shell = null;
+  private static DataOutputStream writer = null;
+  //private static BufferedReader reader = null, error = null;
+  private final static ArrayList<Integer> usedfifo = new ArrayList<Integer>();
 
   /*
    * "gobblers" seem to be the recommended way to ensure the streams
    * don't cause issues
    */
-  private static class StreamGobbler extends Thread{
+  private static class StreamGobbler extends Thread {
     private BufferedReader mReader = null;
     private OutputReceiver mReceiver = null;
+    private String mToken = null;
+    private String fifo_path = null;
+    private int fifonum = -1;
+    public int exit_code = -1;
 
-    public StreamGobbler(BufferedReader reader, OutputReceiver receiver){
-      mReader = reader;
+    public StreamGobbler(String _fifo_path, OutputReceiver receiver, String token, int _fifonum) throws IOException {
+      fifo_path = _fifo_path;
       mReceiver = receiver;
-
+      mToken = token;
+      fifonum = _fifonum;
       setDaemon(true);
     }
 
     public void run(){
       try{
+        while(!(new File(fifo_path).exists())) // let mkfifo finish
+          Thread.sleep(200);
+        // this will hang until someone will connect to the other side of the pipe.
+        mReader = new BufferedReader(new InputStreamReader(new FileInputStream(fifo_path)));
         while(true){
           String line = "";
           if(mReader.ready()){
@@ -62,14 +78,30 @@ public class Shell
             continue;
           }
 
-          if(line != null && line.isEmpty() == false && mReceiver != null)
-            mReceiver.onNewLine(line);
+          if(!line.isEmpty())
+          {
+            if(line.startsWith(mToken)) {
+              exit_code = Integer.parseInt(line.substring(mToken.length()));
+              if(mReceiver!=null)
+                mReceiver.onEnd(exit_code);
+              break;
+            }
+            else if(mReceiver!=null) {
+              mReceiver.onNewLine(line);
+            }
+          }
         }
       } catch(IOException e){
         System.errorLogging(e);
+      } catch(InterruptedException e) {
+        Logger.error(e.getMessage());
       } finally{
         try{
-          mReader.close();
+          if(mReader!=null)
+            mReader.close();
+          synchronized (usedfifo) {
+            usedfifo.remove(usedfifo.indexOf(fifonum));
+          }
         } catch(IOException e){
           //swallow error
         }
@@ -77,36 +109,11 @@ public class Shell
     }
   }
 
-  private static Process spawnShell(String command, boolean bUpdateLibraryPath, boolean bRedirectErrorStream) throws IOException{
-    ProcessBuilder builder = new ProcessBuilder().command(command);
-    Map<String, String> environment = builder.environment();
-
-    builder.redirectErrorStream(bRedirectErrorStream);
-
-    if(bUpdateLibraryPath){
-      boolean found = false;
-      String libPath = System.getLibraryPath();
-
-      for(Map.Entry<String, String> entry : environment.entrySet()){
-        if(entry.getKey().equals("LD_LIBRARY_PATH")){
-          environment.put("LD_LIBRARY_PATH", entry.getValue() + ":" + libPath);
-          found = true;
-          break;
-        }
-      }
-
-      if(found == false)
-        environment.put("LD_LIBRARY_PATH", libPath);
-    }
-
-    return builder.start();
+  private static Process spawnShell(String command) throws IOException {
+    return new ProcessBuilder().command(command).start();
   }
 
-  private static Process spawnShell(String command) throws IOException{
-    return spawnShell(command, false, true);
-  }
-
-  public static boolean isRootGranted(){
+  public static boolean isRootGranted() {
     Process process = null;
     DataOutputStream writer = null;
     BufferedReader reader = null;
@@ -147,7 +154,7 @@ public class Shell
     return granted;
   }
 
-  public interface OutputReceiver{
+  public interface OutputReceiver {
     public void onStart(String command);
 
     public void onNewLine(String line);
@@ -155,11 +162,10 @@ public class Shell
     public void onEnd(int exitCode);
   }
 
-  public static boolean isBinaryAvailable(String binary){
+  public static boolean isBinaryAvailable(String binary) {
     try{
       Process process = spawnShell("sh");
       DataOutputStream writer = new DataOutputStream(process.getOutputStream());
-      ;
       BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
       String line = null;
 
@@ -179,7 +185,7 @@ public class Shell
     return false;
   }
 
-  public static boolean isLibraryPathOverridable(Context context){
+  public static boolean isLibraryPathOverridable(Context context) {
     boolean linkerError = false;
 
     try{
@@ -188,7 +194,7 @@ public class Shell
       File file = new File(fileName);
       String dirName = file.getParent(),
         command = "cd " + dirName + " && ./nmap --version";
-      Process process = spawnShell("su", true, false);
+      Process process = spawnShell("su");
       DataOutputStream writer = null;
       BufferedReader reader = null,
         stderr = null;
@@ -229,122 +235,121 @@ public class Shell
     return !linkerError;
   }
 
-  public static int exec(String command, OutputReceiver receiver, boolean overrideLibraryPath) throws IOException, InterruptedException{
-    Process process = spawnShell("su", overrideLibraryPath, false);
-    DataOutputStream writer = null;
-    BufferedReader reader = null,
-      error = null;
-    String libPath = System.getLibraryPath();
-    int exit = -1;
+  private static void check_binaries() throws IOException {
+    File bin_dir = new File(System.getBinaryPath());
+    File tools_dir = new File(System.getToolsPath());
+    String dirname,bindir,filename;
 
-    if(receiver != null) receiver.onStart(command);
-
-    writer = new DataOutputStream(process.getOutputStream());
-    reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-    error = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-
-    // is this really needed ?
-    if(overrideLibraryPath){
-      writer.writeBytes("export LD_LIBRARY_PATH=" + libPath + ":$LD_LIBRARY_PATH\n");
-      writer.flush();
+    bindir = System.getBinaryPath();
+    if(!bin_dir.exists())
+      bin_dir.mkdir();
+    else if(!bin_dir.isDirectory()) {
+      bin_dir.delete();
+      bin_dir.mkdir();
     }
+    if(!bin_dir.isDirectory())
+      throw new IOException("cannot make binaries directory");
+    for(File d1 : tools_dir.listFiles()) {
+      if(!d1.isDirectory())
+        continue;
+      dirname = d1.getName();
+      for(File f : d1.listFiles()) {
+        if(!f.canExecute() || f.isDirectory())
+          continue;
+        filename = f.getName();
+        if(!new File(bindir+filename).exists())
+          try {
+            Process p = new ProcessBuilder().command("ln", "-s", "../"+dirname+"/"+filename, bindir+filename).start();
+            int exit_code;
+            synchronized (p) {
+              exit_code = p.waitFor();
+            }
+            if(exit_code!=0)
+              throw new IOException("cannot create symlinks");
+          } catch (InterruptedException e) {
+            Logger.warning("interrupted while executing: ln -s \"../"+dirname+"/"+filename+"\" \""+bindir+"/"+filename+"\"");
+            throw new IOException("interrupted while creating symlinks");
+          }
+      }
+    }
+  }
 
-    // split cd working-directory && ./command
-    if(command.startsWith("cd /") && command.contains("&&")){
-      String[] split = command.split("&&", 2);
+  private static void clear_fifos() throws IOException {
+    File d = new File(System.getFifosPath());
+    if(!d.exists())
+      d.mkdir();
+    else if(!d.isDirectory()) {
+      d.delete();
+      d.mkdir();
+    }
+    if(d.isDirectory()) {
+      for(File f : d.listFiles()) {
+        f.delete();
+      }
+    } else {
+      throw new IOException("cannot create fifos directory");
+    }
+  }
 
-      if(split != null && split.length == 2){
-        writer.writeBytes(split[0] + "\n");
+  public static int exec(String command, OutputReceiver receiver) throws IOException, InterruptedException {
+    StreamGobbler g = (StreamGobbler)async(command, receiver);
+    g.start();
+    g.join();
+    return  g.exit_code;
+  }
+
+  public static int exec(String command) throws IOException, InterruptedException {
+    return exec(command, null);
+  }
+
+  /**
+   * @deprecated
+   */
+  public static Thread async(String cmd, OutputReceiver receiver, boolean b) {
+    return async(cmd,receiver);
+  }
+
+  public static Thread async(final String command, final OutputReceiver receiver) {
+    int fifonum;
+    String fifo_path;
+    String token = UUID.randomUUID().toString().toUpperCase();
+    StreamGobbler gobbler = null;
+    try
+    {
+      if(shell==null)
+      {
+        shell = spawnShell("su");
+        writer = new DataOutputStream(shell.getOutputStream());
+        writer.writeBytes("export LD_LIBRARY_PATH=\""+System.getLibraryPath()+":$LD_LIBRARY_PATH\"\n");
+        writer.writeBytes("export PATH=\""+System.getBinaryPath()+":$PATH\"\n");
         writer.flush();
-
-        command = split[1].trim();
+        // this 2 reader are useful for debugging purposes
+        //reader = new BufferedReader(new InputStreamReader(shell.getInputStream()));
+        //error = new BufferedReader(new InputStreamReader(shell.getErrorStream()));
+        clear_fifos();
+        check_binaries();
       }
-    }
-
-    try{
-      writer.writeBytes(command + "\n");
-      writer.flush();
-
-      StreamGobbler outGobbler = new StreamGobbler(reader, receiver),
-        errGobbler = new StreamGobbler(error, receiver);
-
-      outGobbler.start();
-      errGobbler.start();
-
-      writer.writeBytes("exit\n");
-      writer.flush();
-
-			/* 
-       * The following catastrophe of code seems to be the best way to ensure
-			 * this thread can be interrupted.
-			 */
-      while(!Thread.currentThread().isInterrupted()){
-        try{
-          exit = process.exitValue();
-          Thread.currentThread().interrupt();
-        }
-        catch(IllegalThreadStateException e){
-          /*
-           * Just sleep, the process hasn't terminated yet but sleep should (but doesn't) cause
-					 * InterruptedException to be thrown if interrupt() has been called.
-					 * 
-					 * .25 seconds seems reasonable
-					 */
-          Thread.sleep(250);
-        }
+      if(receiver != null) receiver.onStart(command);
+      synchronized (usedfifo) {
+        for(fifonum=0;fifonum<1024&& usedfifo.contains(fifonum);fifonum++);
+        if(fifonum==1024)
+          throw new IOException("maximum number of fifo reached");
+        usedfifo.add(fifonum);
       }
-    }
-    catch(IOException e){
+      fifo_path = String.format("%s%d",System.getFifosPath(),fifonum);
+      writer.writeBytes(String.format("mkfifo -m 666 \"%s\"\n",fifo_path));
+      writer.flush();
+      gobbler = new StreamGobbler(fifo_path, receiver, token, fifonum);
+      writer.writeBytes(String.format("(out=$(%s) ; echo -e \"$out\\n%s$?\") 2>&1 >%s &\n", command, token, fifo_path));
+      writer.flush();
+    } catch ( IOException e) {
       System.errorLogging(e);
     }
-    catch(InterruptedException e){
-      try{
-        // key to killing executable and process
-        writer.close();
-        reader.close();
-        error.close();
-      }
-      catch(IOException ex){
-        // swallow error
-      }
-    }
 
-    if(receiver != null) receiver.onEnd(exit);
-
-    return exit;
+    return gobbler;
   }
 
-  public static int exec(String command, OutputReceiver reciever) throws IOException, InterruptedException{
-    return exec(command, reciever, true);
-  }
-
-  public static int exec(String command) throws IOException, InterruptedException{
-    return exec(command, null, true);
-  }
-
-  public static Thread async(final String command, final OutputReceiver receiver, final boolean overrideLibraryPath){
-    Thread launcher = new Thread(new Runnable(){
-      @Override
-      public void run(){
-        try{
-          exec(command, receiver, overrideLibraryPath);
-        }
-        catch(Exception e){
-          System.errorLogging(e);
-        }
-      }
-    });
-
-    launcher.setDaemon(true);
-
-    return launcher;
-  }
-
-  public static Thread async(String command){
-    return async(command, null, true);
-  }
-
-  public static Thread async(final String command, final OutputReceiver receiver){
-    return async(command, receiver, true);
+  public static Thread async(String command) {
+    return async(command, null);
   }
 }

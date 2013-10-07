@@ -356,7 +356,19 @@ public class System
 
   public static String getLibraryPath(){
     //noinspection ConstantConditions
-    return mContext.getFilesDir().getAbsolutePath() + "/tools/libs";
+    return getToolsPath() + "libs/";
+  }
+
+  public static String getBinaryPath(){
+    return getToolsPath() + "bin/";
+  }
+
+  public static String getFifosPath() {
+    return mContext.getFilesDir().getAbsolutePath() + "/fifos/";
+  }
+
+  public static String getToolsPath() {
+    return mContext.getFilesDir().getAbsolutePath() + "/tools/";
   }
 
   public static String getSuPath(){
