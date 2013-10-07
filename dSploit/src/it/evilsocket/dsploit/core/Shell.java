@@ -19,24 +19,24 @@
 package it.evilsocket.dsploit.core;
 
 import android.content.Context;
-import android.content.Entity;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.UUID;
 
 public class Shell
 {
-  private static Process shell = null;
-  private static DataOutputStream writer = null;
+  private static Process mRootShell = null;
+  private static DataOutputStream mWriter = null;
   //private static BufferedReader reader = null, error = null;
-  private final static ArrayList<Integer> usedfifo = new ArrayList<Integer>();
+  private final static ArrayList<Integer> mFIFOS = new ArrayList<Integer>();
 
   /*
    * "gobblers" seem to be the recommended way to ensure the streams
@@ -46,61 +46,86 @@ public class Shell
     private BufferedReader mReader = null;
     private OutputReceiver mReceiver = null;
     private String mToken = null;
-    private String fifo_path = null;
-    private int fifonum = -1;
-    public int exit_code = -1;
+    private String mFIFOPath = null;
+    private int mFIFONum = -1;
+    public int mExitCode = -1;
 
-    public StreamGobbler(String _fifo_path, OutputReceiver receiver, String token, int _fifonum) throws IOException {
-      fifo_path = _fifo_path;
+    public StreamGobbler(String fifoPath, OutputReceiver receiver, String token, int fifoNum) throws IOException {
+      mFIFOPath = fifoPath;
       mReceiver = receiver;
       mToken = token;
-      fifonum = _fifonum;
+      mFIFONum = fifoNum;
       setDaemon(true);
     }
 
     public void run(){
-      try{
-        while(!(new File(fifo_path).exists())) // let mkfifo finish
+      try
+      {
+        String line = null;
+
+        Logger.debug( "Waiting for " + mFIFOPath + " ( " + mFIFONum + " ) ..." );
+
+        // wait for the FIFO to be created
+        while(!(new File(mFIFOPath).exists()))
           Thread.sleep(200);
+
+        Logger.debug( "Creating reader" );
+
         // this will hang until someone will connect to the other side of the pipe.
-        mReader = new BufferedReader(new InputStreamReader(new FileInputStream(fifo_path)));
+        mReader = new BufferedReader(new FileReader(mFIFOPath));
+
+        Logger.debug( "Reader on FIFO " + mFIFOPath + " attached, streaming ..." );
+
         while(true){
-          String line = "";
           if(mReader.ready()){
-            if((line = mReader.readLine()) == null)
+            Logger.debug( "Reader is ready" );
+            if((line = mReader.readLine()) == null){
+              Logger.debug( "readLine == null" );
               continue;
-          } else{
-            try{
-              Thread.sleep(200);
-            } catch(InterruptedException e){
             }
+          }
+          else {
+            Logger.debug( "Reader not ready" );
+
+            try
+            {
+              Thread.sleep(200);
+            }
+            catch(InterruptedException e){ }
 
             continue;
           }
 
           if(!line.isEmpty())
           {
+            Logger.debug( "line : " + line );
+
             if(line.startsWith(mToken)) {
-              exit_code = Integer.parseInt(line.substring(mToken.length()));
+              mExitCode = Integer.parseInt(line.substring(mToken.length()));
               if(mReceiver!=null)
-                mReceiver.onEnd(exit_code);
+                mReceiver.onEnd(mExitCode);
               break;
             }
             else if(mReceiver!=null) {
               mReceiver.onNewLine(line);
             }
           }
+          else
+            Logger.debug( "line is empty" );
         }
-      } catch(IOException e){
+      }
+      catch(IOException e){
         System.errorLogging(e);
-      } catch(InterruptedException e) {
-        Logger.error(e.getMessage());
-      } finally{
+      }
+      catch(InterruptedException e) {
+        System.errorLogging(e);
+      }
+      finally{
         try{
           if(mReader!=null)
             mReader.close();
-          synchronized (usedfifo) {
-            usedfifo.remove(usedfifo.indexOf(fifonum));
+          synchronized (mFIFOS) {
+            mFIFOS.remove(mFIFOS.indexOf(mFIFONum));
           }
         } catch(IOException e){
           //swallow error
@@ -235,49 +260,69 @@ public class Shell
     return !linkerError;
   }
 
-  private static void check_binaries() throws IOException {
-    File bin_dir = new File(System.getBinaryPath());
+  private static void checkBinaries() throws IOException {
+    String binaryPath = System.getBinaryPath();
+    File bin_dir = new File(binaryPath);
     File tools_dir = new File(System.getToolsPath());
-    String dirname,bindir,filename;
+    String dirname,filename,fullpath;
 
-    bindir = System.getBinaryPath();
     if(!bin_dir.exists())
       bin_dir.mkdir();
+
     else if(!bin_dir.isDirectory()) {
       bin_dir.delete();
       bin_dir.mkdir();
     }
+
     if(!bin_dir.isDirectory())
       throw new IOException("cannot make binaries directory");
-    for(File d1 : tools_dir.listFiles()) {
-      if(!d1.isDirectory())
+
+    for( File toolFolder : tools_dir.listFiles() )
+    {
+      // skip files in the root
+      if(!toolFolder.isDirectory())
         continue;
-      dirname = d1.getName();
-      for(File f : d1.listFiles()) {
-        if(!f.canExecute() || f.isDirectory())
+
+      dirname = toolFolder.getName();
+
+      for( File toolFile : toolFolder.listFiles() )
+      {
+        // skip subfolders and not executables
+        if( !toolFile.canExecute() || toolFile.isDirectory() )
           continue;
-        filename = f.getName();
-        if(!new File(bindir+filename).exists())
-          try {
-            Process p = new ProcessBuilder().command("ln", "-s", "../"+dirname+"/"+filename, bindir+filename).start();
+
+        filename = toolFile.getName();
+        fullpath = binaryPath + filename;
+
+        if( !new File( fullpath ).exists() )
+        {
+          try
+          {
+            // symlink it!
+            Process p = new ProcessBuilder().command( "ln", "-s", "../" + dirname + "/" + filename, fullpath ).start();
             int exit_code;
             synchronized (p) {
               exit_code = p.waitFor();
             }
             if(exit_code!=0)
               throw new IOException("cannot create symlinks");
-          } catch (InterruptedException e) {
-            Logger.warning("interrupted while executing: ln -s \"../"+dirname+"/"+filename+"\" \""+bindir+"/"+filename+"\"");
+
+          }
+          catch (InterruptedException e)
+          {
+            Logger.warning("interrupted while executing: ln -s \"../"+dirname+"/"+filename+"\" \""+binaryPath+"/"+filename+"\"");
             throw new IOException("interrupted while creating symlinks");
           }
+        }
       }
     }
   }
 
-  private static void clear_fifos() throws IOException {
+  private static void clearFifos() throws IOException {
     File d = new File(System.getFifosPath());
     if(!d.exists())
       d.mkdir();
+
     else if(!d.isDirectory()) {
       d.delete();
       d.mkdir();
@@ -286,7 +331,8 @@ public class Shell
       for(File f : d.listFiles()) {
         f.delete();
       }
-    } else {
+    }
+    else {
       throw new IOException("cannot create fifos directory");
     }
   }
@@ -295,7 +341,7 @@ public class Shell
     StreamGobbler g = (StreamGobbler)async(command, receiver);
     g.start();
     g.join();
-    return  g.exit_code;
+    return  g.mExitCode;
   }
 
   public static int exec(String command) throws IOException, InterruptedException {
@@ -314,35 +360,47 @@ public class Shell
     String fifo_path;
     String token = UUID.randomUUID().toString().toUpperCase();
     StreamGobbler gobbler = null;
+
     try
     {
-      if(shell==null)
+      // first time spawn the shell
+      if( mRootShell == null )
       {
-        shell = spawnShell("su");
-        writer = new DataOutputStream(shell.getOutputStream());
-        writer.writeBytes("export LD_LIBRARY_PATH=\""+System.getLibraryPath()+":$LD_LIBRARY_PATH\"\n");
-        writer.writeBytes("export PATH=\""+System.getBinaryPath()+":$PATH\"\n");
-        writer.flush();
+        mRootShell = spawnShell("su");
+        mWriter = new DataOutputStream(mRootShell.getOutputStream());
+        mWriter.writeBytes("export LD_LIBRARY_PATH=\"" + System.getLibraryPath() + ":$LD_LIBRARY_PATH\"\n");
+        mWriter.writeBytes("export PATH=\"" + System.getBinaryPath() + ":$PATH\"\n");
+        mWriter.flush();
         // this 2 reader are useful for debugging purposes
-        //reader = new BufferedReader(new InputStreamReader(shell.getInputStream()));
-        //error = new BufferedReader(new InputStreamReader(shell.getErrorStream()));
-        clear_fifos();
-        check_binaries();
+        //reader = new BufferedReader(new InputStreamReader(mRootShell.getInputStream()));
+        //error = new BufferedReader(new InputStreamReader(mRootShell.getErrorStream()));
+        clearFifos();
+        checkBinaries();
       }
-      if(receiver != null) receiver.onStart(command);
-      synchronized (usedfifo) {
-        for(fifonum=0;fifonum<1024&& usedfifo.contains(fifonum);fifonum++);
+
+      if(receiver != null)
+        receiver.onStart(command);
+
+      synchronized (mFIFOS)
+      {
+        // check for next available FIFO number
+        for( fifonum = 0; fifonum < 1024 && mFIFOS.contains(fifonum); fifonum++ );
         if(fifonum==1024)
           throw new IOException("maximum number of fifo reached");
-        usedfifo.add(fifonum);
+
+        mFIFOS.add(fifonum);
       }
+
       fifo_path = String.format("%s%d",System.getFifosPath(),fifonum);
-      writer.writeBytes(String.format("mkfifo -m 666 \"%s\"\n",fifo_path));
-      writer.flush();
+
+      mWriter.writeBytes(String.format("mkfifo -m 666 \"%s\"\n", fifo_path));
+      mWriter.flush();
+      mWriter.writeBytes(String.format("(out=$(%s) ; echo -e \"$out\\n%s$?\") 2>&1 >%s &\n", command, token, fifo_path));
+      mWriter.flush();
+
       gobbler = new StreamGobbler(fifo_path, receiver, token, fifonum);
-      writer.writeBytes(String.format("(out=$(%s) ; echo -e \"$out\\n%s$?\") 2>&1 >%s &\n", command, token, fifo_path));
-      writer.flush();
-    } catch ( IOException e) {
+    }
+    catch ( IOException e) {
       System.errorLogging(e);
     }
 

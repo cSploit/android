@@ -116,7 +116,7 @@ public class RPCServer extends Thread
 
       @Override
       public void onEnd(int exitCode) {
-        Logger.debug("exit_code="+exitCode);
+        Logger.debug("mExitCode="+exitCode);
       }
     }
 

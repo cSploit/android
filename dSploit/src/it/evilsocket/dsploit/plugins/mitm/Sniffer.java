@@ -45,6 +45,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
@@ -390,10 +391,12 @@ public class Sniffer extends SherlockActivity
         System.getTcpDump().sniff(PCAP_FILTER, mPcapFileName, new OutputReceiver(){
           @Override
           public void onStart(String command){
+            Logger.debug( "TCPDUMP: " + command );
           }
 
           @Override
           public void onNewLine(String line){
+            Logger.debug( line );
 
             try{
               Matcher matcher = PARSER.matcher(line.trim());
