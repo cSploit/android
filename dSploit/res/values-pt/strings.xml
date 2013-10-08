@@ -12,7 +12,7 @@
     <string name="services">Serviços</string>
     <string name="os">So</string>
     <string name="device_type">Tipo de Dispositivo</string>
-    <string name="start_hijack">Toque em uma sessão para iniciar seqüestro, toque longo para salvá-lo para o arquivo.</string>
+    <string name="start_hijack">Toque em uma sessão para iniciar sequestro, ou um toque longo para salvá-lo para o arquivo.</string>
     <string name="sort">Tipo:</string>
     <string name="select_module">Selecione um módulo para executar</string>
     <string name="choose">Escolher</string>
@@ -306,6 +306,36 @@
     <string name="pref_https_redirector_port_desc">Porta do servidor de redirecionamento https MITM.</string>
     <string name="pref_http_max_buffer_size_desc">Tamanho do buffer máximo de solicitações HTTP manipulados pelo proxy transparente.</string>
     <string name="pref_password_filename_desc">Nome do arquivo a ser usado para registrar senhas e cookies.</string>
+    <string name="pref_rpc_user">Nome de Usuário RPC</string>
+    <string name="pref_rpc_user_desc">Nome de usuário para se conectar ao Metasploit RPCD.</string>
+    <string name="pref_rpc_pswd">Senha RPC</string>
+    <string name="pref_rpc_pswd_desc">Senha para se conectar ao Metasploit RPCD.</string>
+    <string name="pref_rpc_port">Porta RPC</string>
+    <string name="pref_rpc_port_desc">Porta para conectar ao Metasploit RPCD.</string>
+    <string name="pref_chroot">Raiz gentoo</string>
+    <string name="pref_chroot_desc">Diretório contendo sistema Gentoo.</string>
+    <string name="pref_performance_vuln_desc">Pesquisar vulnerabilidade usando</string>
+    <string-array name="pref_performance_vuln" >
+        <item>OSVDB</item>
+        <item>CVE</item>
+        <item>Tanto CVE e OSVDB</item>
+    </string-array>
+    <string-array name="pref_performance_vuln_values">
+        <item>OSVDB</item>
+        <item>CVE</item>
+        <item>Ambos</item>
+    </string-array>
+    <string name="pref_performance_exploit_desc">busca de exploits</string>
+    <string-array name="pref_performance_exploit" >
+        <item>MSF compatível apenas</item>
+        <item>apenas exploitdb</item>
+        <item>Tanto exploitdb e MSF</item>
+    </string-array>
+    <string-array name="pref_performance_exploit_values">
+        <item>MSF</item>
+        <item>EXDB</item>
+        <item>Ambos</item>
+    </string-array>
 
     <string name="pref_folder">Pasta</string>
     <string name="pref_err_exists">Não Existe.</string>
