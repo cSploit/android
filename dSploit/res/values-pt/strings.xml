@@ -4,7 +4,7 @@
     <string name="title_activity_main">dSploit</string>
     <string name="crash_toast_text">Oooops! Eu dei crash, mas um relatório será enviado para o meu desenvolvedor para ajudar a corrigir o problema :)</string>
     <string name="toggle_button">Botão de Alternância</string>
-    <string name="enter_redirection_details">Digite os detalhes de redirecionamento abaixo::</string>
+    <string name="enter_redirection_details">Digite os Detalhes de Redirecionamento abaixo::</string>
     <string name="address">Endereço</string>
     <string name="port">Porta</string>
     <string name="target">Alvo</string>
@@ -12,9 +12,9 @@
     <string name="services">Serviços</string>
     <string name="os">So</string>
     <string name="device_type">Tipo de Dispositivo</string>
-    <string name="start_hijack">Toque em uma sessão para iniciar hijacking, ou um toque longo para salvá-lo para o arquivo.</string>
+    <string name="start_hijack">Toque em uma Sessão para iniciar o hijacking, ou um toque longo para salvá-lo para o arquivo.</string>
     <string name="sort">Tipo:</string>
-    <string name="select_module">Selecione um módulo para executar</string>
+    <string name="select_module">Selecione um Módulo para Executar</string>
     <string name="choose">Escolher</string>
     <string name="response">Resposta</string>
     <string name="request">Pedir</string>
@@ -27,7 +27,7 @@
     <string name="dsploit_disclaimer">
         <![CDATA[ Esta aplicação não é para ser usada para quaisquer fins que não para demonstrar suas funções, e só deve ser utilizado em redes para as quais você tem permissão para fazer isso. Qualquer outro uso não é de responsabilidade do desenvolvedor.Em outras palavras, Não seja estúpido, e não direcionar as pessoas com raiva para mim.]]></string>
     <string name="license">Licença</string>
-    <string name="gpl_license">Este programa é software livre: você pode redistribuí-lo e / ou modificá-lo sob os termos da GNU General Public License como publicado pela Free Software Foundation, tanto a versão 3 da Licença, ou (a seu critério) qualquer versão posterior.Este programa é distribuído na esperança que será útil, mas SEM NENHUMA GARANTIA;sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou ADEQUAÇÃO A UM DETERMINADO FIM.Veja a GNU General Public License para mais detalhes.Você deve ter recebido uma cópia da GNU General Public License juntamente com este programa.Se não, veja http://www.gnu.org/licenses/.</string>
+    <string name="gpl_license">Este programa é um software livre: você pode redistribuí-lo e / ou modificá-lo sob os termos da GNU General Public License como publicado pela Free Software Foundation, tanto a versão 3 da Licença, ou (a seu critério) qualquer versão posterior.Este programa é distribuído na esperança que será útil, mas SEM NENHUMA GARANTIA;sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou ADEQUAÇÃO A UM DETERMINADO FIM.Veja a GNU General Public License para mais detalhes.Você deve ter recebido uma cópia da GNU General Public License juntamente com este programa.Se não, veja http://www.gnu.org/licenses/.</string>
     <string name="service">Serviço</string>
     <string name="stopped">Parado&#8230;</string>
     <string name="start">Iniciar</string>
@@ -38,15 +38,15 @@
     <string name="min_length">Tamanho Min</string>
     <string name="username">Nome de Usuário</string>
     <string name="Charset">conjunto de Caracteres</string>
-    <string name="filter_desc">Digite um filtro de substituição personalizado, incluindo um string simples ou expressões regulares.</string>
+    <string name="filter_desc">Digite um Filtro de Substituição Personalizado, Incluindo um String simples ou expressões regulares.</string>
     <string name="from">De</string>
     <string name="to">Para</string>
     <string name="wake_on_lan">Wake On Lan</string>
     <string name="send">Enviar</string>
     <string name="update_available">Atualização Disponível</string>
     <string name="new_update_desc">Uma nova atualização para a versão</string>
-    <string name="new_update_desc2">está disponível, deseja fazer o download?</string>
-    <string name="checking">checagem&#8230;</string>
+    <string name="new_update_desc2">Está disponível, deseja fazer o download?</string>
+    <string name="checking">Checagem&#8230;</string>
     <string name="no_updates_available">Não há atualizações disponíveis.</string>
     <string name="new_version">Nova Versão</string>
     <string name="new_version2">Encontrada!</string>
@@ -62,10 +62,10 @@
     <string name="net_discovery_started">A descoberta de rede Iniciou.</string>
     <string name="start_monitor">Iniciar o Monitor de Rede</string>
     <string name="stop_monitor">Parar o Monitor de Rede</string>
-    <string name="start_msfrpcd">Iniciar MetaSploit RPCD</string>
-    <string name="stop_msfrpcd">Parar MetaSploit RPCD</string>
+    <string name="start_msfrpcd">Iniciar o MetaSploit RPCD</string>
+    <string name="stop_msfrpcd">Parar o MetaSploit RPCD</string>
     <string name="exit">Sair</string>
-    <string name="close_confirm">Isto irá fechar dSploit, você tem certeza que deseja continuar ?
+    <string name="close_confirm">Isto irá fechar o dSploit, você tem certeza que deseja continuar ?
     </string>
     <string name="press_back">Pressione voltar novamente para fechar este aplicativo.</string>
     <string name="selected_">Selecionado&#160;</string>
@@ -79,12 +79,12 @@
     <string name="enter_session_name">Digite o nome do arquivo de sessão :</string>
     <string name="new_session_started">Nova sessão iniciada</string>
     <string name="warning">Aviso</string>
-    <string name="warning_new_session">Iniciando uma nova sessão irá apagar a atual, continuar ?</string>
+    <string name="warning_new_session">Iniciar uma nova sessão irá apagar a atual, continuar ?</string>
     <string name="fatal_error_html">
         <![CDATA[<p>Parece que sua ROM tem o <b>LD_LIBRARY_PATH bug</b>, desculpe mas não é compatível com dSploit.</p>]]></string>
     <string name="fatal_error_html2">
         <![CDATA[<p>Para mais informações, leia o <a href=\"http://dsploit.net/#faq\">FAQ</a>.</p>]]></string>
-    <string name="install_error">Erro durante a instalação de arquivos!</string>
+    <string name="install_error">Erro durante a instalação dos arquivos!</string>
     <string name="arm_error">
         <![CDATA[<p>Parece que o processador do dispositivo não é um ARM,desculpe,mas não é compatível com dSploit.</p>]]></string>
     <string name="arm_error2">
@@ -112,15 +112,15 @@
     </string>
     <string name="selected">Selecionado</string>
     <string name="nothing_found"><![CDATA[<small><i>Nada encontrado</i></small>]]></string>
-    <string name="no_open_ports">Não há portas abertas detectadas no alvo atual, execute o inspetor de serviço primeiro.</string>
+    <string name="no_open_ports">Não há portas abertas detectadas no alvo atual, execute o Inspetor de Serviços Primeiro.</string>
     <string name="no_open_ports_focused_scan">Não há portas abertas, execute o scanner de portas antes de selecionar uma varredura focada.</string>
     <string name="no_open_ports_exploitfinder">Nenhum exploit encontrado neste destino, executar o Localizador de Exploit primeiro.</string>
     <string name="no_exploit_started">Nenhum exploit foi iniciado.</string>
 
     <string name="no_infos_on_target">Não há informações específicas sobre os serviços executados na máquina alvo, execute o inspetor de serviço primeiro.
     </string>
-    <string name="custom_charset">Conjunto de Caracteres personalizados</string>
-    <string name="enter_chars_wanted">Digite os caracteres que você deseja usar no conjunto de caracteres personalizado:
+    <string name="custom_charset">Conjunto de Caractéres personalizados</string>
+    <string name="enter_chars_wanted">Digite os caractéres que você deseja usar no conjunto de caractéres personalizado:
     </string>
     <string name="invalid_port">Porta especificada Inválida.</string>
     <string name="request_empty">O pedido não pode ser vazio.</string>
@@ -130,15 +130,15 @@
     </string>
     <string name="no_activities_for_url">Não há atividades para lidar com este tipo de url.</string>
     <string name="select_ports">Selecionar Portas</string>
-    <string name="enter_ports_list">Digite uma lista de portas separada por vírgula:</string>
-    <string name="invalid_port_">Porta Invalida \'</string>
+    <string name="enter_ports_list">Digite uma lista de portas separadas por vírgula:</string>
+    <string name="invalid_port_">Porta Inválida \'</string>
     <string name="port_must_be_greater">Porta tem de ser maior que 0 e menor do que 65535.</string>
     <string name="invalid_ports">Portas especificadas inválidas.</string>
-    <string name="empty_port_list">Lista de porta vazia.</string>
-    <string name="about_dsploit_v_">Sobre dSploit v</string>
+    <string name="empty_port_list">Lista de portas vazia.</string>
+    <string name="about_dsploit_v_">Sobre o dSploit v</string>
     <string name="select_target">Selecione um alvo abaixo, clicando em uma linha ou longo clique nele para escrever um nome.
     </string>
-    <string name="generating_keys">gerando chaves&#8230;</string>
+    <string name="generating_keys">Gerando chaves&#8230;</string>
     <string name="no_wifi_available">Não há conexão Wi-Fi disponível, a aplicação irá apenas verificar se há atualizações. #STATUS#
     </string>
     <string name="loading_changelog">Carregando log de alterações&#8230;</string>
@@ -158,7 +158,7 @@
     <string name="inspector_desc">Executar o sistema operacional alvo e serviços de detecção de profundidade (mais lento do que o scanner de portas, mas mais preciso).
     </string>
     <string name="login_cracker">Cracker de Login</string>
-    <string name="login_cracker_desc">Um rápido cracker de logon de rede que suporta diferentes serviços.
+    <string name="login_cracker_desc">Um rápido Cracker de logon de rede que suporta diferentes serviços.
     </string>
     <string name="packet_forger">Falsificador de Pacotes</string>
     <string name="packet_forger_desc">Elaborar e enviar um pacote TCP ou UDP para o alvo.</string>
@@ -173,7 +173,7 @@
     <string name="mitm_desc">Executar vários ataques man-in-the-middle, como sniffing da rede,manipulação de tráfego, etc&#8230;
     </string>
     <string name="network_subnet_mask">Esta é a sua máscara de sub-rede</string>
-    <string name="gateway_router">(O seu Gateway de Rede / Router)</string>
+    <string name="gateway_router">(O seu Gateway de Rede / Roteador)</string>
     <string name="this_device">&#160;(Este Dispositivo)</string>
     <string name="wifi_went_down">conectividade WiFi Caiu.</string>
     <string name="hijack_session">Hijack de Sessão</string>
@@ -211,14 +211,14 @@
 
     <!-- mitm modules -->
     <string name="mitm_simple_sniff">Sniff Simples</string>
-    <string name="mitm_simple_sniff_desc">Redirecionar o tráfego alvo através deste dispositivo e mostrar algumas estatísticas enquanto despejá-la em um arquivo pcap.</string>
+    <string name="mitm_simple_sniff_desc">Redirecionar o tráfego alvo através deste dispositivo e mostrar algumas estatísticas enquanto copia em um arquivo pcap.</string>
     <string name="mitm_password_sniff">Sniffer de Senha</string>
     <string name="mitm_password_sniff_desc">Capturar senhas de vários protocólos como HTTP, FTP, IMAP, imaps, irc, msn, etc a partir do alvo.</string>
     <string name="mitm_session_hijack">Hijacker de Sessão</string>
     <string name="mitm_session_hijack_desc">Listar os cookies na rede e seqüestrar sessões.</string>
     <string name="mitm_connection_kill">Matar Conexões</string>
     <string name="mitm_connection_kill_desc">Matar conexões impedindo o alvo de chegar a qualquer site ou servidor.</string>
-    <string name="mitm_connection_kill_error">Matar Conexão só pode ser usado contra os objectivos individuais.</string>
+    <string name="mitm_connection_kill_error">Matar Conexão só pode ser usado contra os objetivos individuais.</string>
     <string name="mitm_redirect">Redirecionar</string>
     <string name="mitm_redirect_desc">Redirecionar todo o tráfego HTTP para outro endereço.</string>
     <string name="mitm_redirection">Redirecionamento</string>
@@ -231,7 +231,7 @@
     <string name="error_image_intent">Isso é estranho, parece que você não tem nenhum aplicativo para manipular a navegação de imagens.</string>
     <string name="image">Imagem</string>
     <string name="enter_image_url">Digite a URL da imagem :</string>
-    <string name="error_image_url">Url da imagem inválido.</string>
+    <string name="error_image_url">Url da imagem inválida.</string>
     <string name="mitm_video_replace">Substituir Vídeos</string>
     <string name="mitm_video_replace_desc">Substituir todos os vídeos do youtube em páginas web com o especificado.</string>
     <string name="video">Vídeo</string>
@@ -282,12 +282,12 @@
 
     <string name="pref_general">Geral</string>
     <string name="pref_modules">Modulos</string>
-    <string name="pref_check_updates">Check for Updates</string>
-    <string name="pref_wake_lock">Checar por Atualizações</string>
+    <string name="pref_check_updates">Checar por Atualizações</string>
+    <string name="pref_wake_lock">Wake Lock</string>
     <string name="pref_save_path">Salvar Caminho</string>
     <string name="pref_debug_error_logging">Erro Debug Logging</string>
-    <string name="pref_enable_profiler">Perfil Código</string>
-    <string name="pref_sniffer_sample_time">Sniffer Amostra Tempo</string>
+    <string name="pref_enable_profiler">Perfil de Código</string>
+    <string name="pref_sniffer_sample_time">Amostra Tempo do Sniffer</string>
     <string name="pref_http_proxy_port">Porta HTTP Proxy</string>
     <string name="pref_http_server_port">Porta HTTP Server</string>
     <string name="pref_https_redirect">SSL Stripping</string>
@@ -297,9 +297,9 @@
     <string name="pref_check_updates_desc">Verificar se há atualizações toda vez que o aplicativo é iniciado.</string>
     <string name="pref_wake_lock_desc">Impede que o dispositivo entre no modo de suspensão, enquanto o aplicativo está sendo executado.</string>
     <string name="pref_save_path_desc">Caminho global para salvar cada arquivo de log.</string>
-    <string name="pref_debug_error_logging_desc">Ativar ou desativar o log de ​​erro em um arquivo de depuração.</string>
+    <string name="pref_debug_error_logging_desc">Ativar ou desativar o log de​erro em um arquivo de depuração.</string>
     <string name="pref_enable_profiler_desc">Ativar ou desativar registro de perfil de código de rede.</string>
-    <string name="pref_sniffer_sample_time_desc">Tempo da amostra em segundos estatísticas de rede módulo sniffer.</string>
+    <string name="pref_sniffer_sample_time_desc">Tempo da amostra em segundos para estatísticas de rede do módulo sniffer.</string>
     <string name="pref_http_proxy_port_desc">MITM porta proxy transparente para listar,, mudar isso se você tiver problemas ao iniciar o proxy.</string>
     <string name="pref_http_server_port_desc">MITM http server port to listen on, mudar isso se você tiver problemas ao iniciar o server.</string>
     <string name="pref_https_redirect_desc">Redirecionar o tráfego de HTTPS para HTTP.</string>
@@ -339,13 +339,13 @@
 
     <string name="pref_folder">Pasta</string>
     <string name="pref_err_exists">Não Existe.</string>
-    <string name="pref_err_writable">não é gravável.</string>
+    <string name="pref_err_writable">Não é gravável.</string>
     <string name="pref_err_sample_time">Tempo da amostra deve estar entre 0.4 e 1.0.</string>
     <string name="pref_err_invalid_number">Número Inválido.</string>
     <string name="pref_err_proxy_port">Porta de proxy deve estar entre 1024 e 65535.</string>
     <string name="pref_err_server_port">Porta do servidor deve estar entre 1024 e 65535.</string>
     <string name="pref_err_redirector_port">Porta do servidor deve estar entre 1024 e 65535.</string>
-    <string name="pref_err_busy_port">Outro processo está escutando nessa porta, utilize o outro.</string>
+    <string name="pref_err_busy_port">Outro processo está Executando nessa porta, utilize o outro.</string>
     <string name="pref_err_buffer_size">Tamanho do buffer deve estar entre 1024 e 104857600.</string>
 
     <string name="exploit_finder">Localizar Exploit</string>
