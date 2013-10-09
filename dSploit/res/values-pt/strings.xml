@@ -12,7 +12,7 @@
     <string name="services">Serviços</string>
     <string name="os">So</string>
     <string name="device_type">Tipo de Dispositivo</string>
-    <string name="start_hijack">Toque em uma sessão para iniciar sequestro, ou um toque longo para salvá-lo para o arquivo.</string>
+    <string name="start_hijack">Toque em uma sessão para iniciar hijacking, ou um toque longo para salvá-lo para o arquivo.</string>
     <string name="sort">Tipo:</string>
     <string name="select_module">Selecione um módulo para executar</string>
     <string name="choose">Escolher</string>
@@ -45,11 +45,11 @@
     <string name="send">Enviar</string>
     <string name="update_available">Atualização Disponível</string>
     <string name="new_update_desc">Uma nova atualização para a versão</string>
-    <string name="new_update_desc2">está disponível, você quer fazer o download ?</string>
+    <string name="new_update_desc2">está disponível, deseja fazer o download?</string>
     <string name="checking">checagem&#8230;</string>
     <string name="no_updates_available">Não há atualizações disponíveis.</string>
     <string name="new_version">Nova Versão</string>
-    <string name="new_version2">Encontrado!</string>
+    <string name="new_version2">Encontrada!</string>
     <string name="downloading_update">Baixando Atualização&#8230;</string>
     <string name="connecting">Conectando&#8230;</string>
     <string name="cancel">Cancelar</string>
@@ -122,7 +122,7 @@
     <string name="custom_charset">Conjunto de Caracteres personalizados</string>
     <string name="enter_chars_wanted">Digite os caracteres que você deseja usar no conjunto de caracteres personalizado:
     </string>
-    <string name="invalid_port">porta especificada Inválida.</string>
+    <string name="invalid_port">Porta especificada Inválida.</string>
     <string name="request_empty">O pedido não pode ser vazio.</string>
     <string name="request_sent">Pedido Enviado.</string>
     <string name="customize_wol_port">Customize a porta WOL e pressione Enviar.</string>
@@ -158,7 +158,7 @@
     <string name="inspector_desc">Executar o sistema operacional alvo e serviços de detecção de profundidade (mais lento do que o scanner de portas, mas mais preciso).
     </string>
     <string name="login_cracker">Cracker de Login</string>
-    <string name="login_cracker_desc">Um rápido cracker de logon de rede que suporta muitos diferentes serviços.
+    <string name="login_cracker_desc">Um rápido cracker de logon de rede que suporta diferentes serviços.
     </string>
     <string name="packet_forger">Falsificador de Pacotes</string>
     <string name="packet_forger_desc">Elaborar e enviar um pacote TCP ou UDP para o alvo.</string>
@@ -178,7 +178,7 @@
     <string name="wifi_went_down">conectividade WiFi Caiu.</string>
     <string name="hijack_session">Hijack de Sessão</string>
     <string name="start_hijacking">Parar sniff e iniciar sessão de Sequestro ?</string>
-    <string name="start_hijacking2">Começar seqüestro de sessão ?</string>
+    <string name="start_hijacking2">Começar hijacking  de sessão ?</string>
     <string name="set_session_filename">Defina o nome do arquivo de sessão:</string>
     <string name="session_sniffer">Sniffer de sessão</string>
 
