@@ -4,9 +4,11 @@
 /* OpenSSL was configured with the following options: */
 #ifndef OPENSSL_DOING_MAKEDEPEND
 
+/*
 #ifndef OPENSSL_NO_BF
 # define OPENSSL_NO_BF
 #endif
+*/
 #ifndef OPENSSL_NO_CAMELLIA
 # define OPENSSL_NO_CAMELLIA
 #endif

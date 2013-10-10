@@ -1,0 +1,240 @@
+==============================================================================
+==============================================================================
+
+
+       @@@@@@@ @@@@@@@ @@@@@@@ @@@@@@@ @@@@@@@ @@@@@@@ @@@@@@@ @@@@@@@
+       @@        @@@     @@@   @@      @@   @@ @@      @@   @@ @@   @@
+       @@@@@@    @@@     @@@   @@@@@@  @@@@@@  @@      @@@@@@@ @@@@@@
+       @@        @@@     @@@   @@      @@  @@  @@      @@   @@ @@
+       @@@@@@@   @@@     @@@   @@@@@@@ @@  @@@ @@@@@@@ @@   @@ @@     NG
+
+                      Copyright 2001-2004 ALoR & NaGA
+
+==============================================================================
+                        P O R T I N G   S T A T U S
+==============================================================================
+
+
+SYSTEM                  STATUS                NOTES
+==============================================================================
+
+LINUX
+------------------------------------------------------------------------------
+   Linux 2.6.x          FULL           (primary development platform) 
+
+   Linux 2.4.x          FULL           (primary development platform)
+   
+   Linux 2.2.x          FULL
+   
+
+SOLARIS
+------------------------------------------------------------------------------
+   SunOS 5.8 (sparc)    FULL           tested on a SunFire V100 sparc64
+   
+   Solaris 8 (intel)    FULL           tested on SunOS solaris 5.8 (i386) 
+
+
+*BSD
+------------------------------------------------------------------------------
+   FreeBSD 5.x          FULL           tested on FreeBSD 5.1-RELEASE (i386)
+   
+   FreeBSD 4.x          untested
+
+   OpenBSD 3.x          FULL           tested on OpenBSD 3.4 GENERIC#18 i386
+   
+   OpenBSD 2.x          untested
+
+   NetBSD 1.5.x         untested
+
+
+MAC OS X (Darwin)
+------------------------------------------------------------------------------
+   Darwin 7.x           FULL           tested on darwin 7.0.0 (powerpc)
+   
+   Darwin 6.x           untested 
+   
+
+WINDOWS (native/mingw)                 thanks to G. Vanem <giva@bgnett.no>
+------------------------------------------------------------------------------
+   Windows 2000         untested
+   
+   Windows XP           FULL
+   
+   Windows 2003         FULL
+
+
+WINDOWS (cygwin)
+------------------------------------------------------------------------------
+   Windows 2000         in progress...
+   
+   Windows XP           in progress...
+
+
+
+
+==============================================================================
+                P L A T F O R M   S P E C I F I C   I S S U E
+==============================================================================
+
+------------------------------------------------------------------------------
+   L I N U X
+------------------------------------------------------------------------------
+
+No known issue, just be sure to have all the required components. (see README)
+
+
+
+------------------------------------------------------------------------------
+   S O L A R I S
+------------------------------------------------------------------------------
+
+After installing the following packages from http://http://www.sunfreeware.com
+
+   - libtool   1.5      (needed for libltdl)
+   - libpcap   0.8.1
+   - gcc       3.3.1
+   - binutils  2.11.2
+   - make      3.80
+
+ettercap NG configures and compiles without any issue.
+
+libnet 1.1.2.1 should be downloaded from http://www.packetfactory.net and
+compiled by your own.
+
+If you want to compile from the CVS, you will need to install the autotools in
+order to be able to generate configuration scripts:
+
+   - autoconf  2.57
+   - automake  1.7.2
+
+
+------------------------------------------------------------------------------
+   M A C  O S  X
+------------------------------------------------------------------------------
+
+thanks to 'rgovostes' for this instructions.
+
+Launch FinkCommander and search for the following software. Select the
+appropriate files and press command-shift-i to begin installing them - it'll
+take a long time, don't let your machine fall asleep. There may be additional
+packages which you should install, such as ones with -dev or -shlibs
+extensions. There may be multiple versions of the software available - if in
+doubt, go with the latest copy.
+
+   autoconf >= 2.57-2
+   automake >= 1.7.6-2
+   bison >= 1.875-1
+   dlcompat >= 20030629-15
+   libnet >= 1.1.2.1-1
+   libpcap >= 0.8.1-1
+   libpoll >= 1.4-11
+   libtool >= 1.5-1
+   ncurses >= 5.3-20031018-2
+   openssl >= 0.9.7c-3
+   pcre >= 4.3-1
+   pkgconfig >= 0.15.0-2
+
+
+------------------------------------------------------------------------------
+   B S D
+------------------------------------------------------------------------------
+
+ + FREEBSD
+   
+   In order to have plugins support you have to install the following package:
+
+      - libltdl (part of libtool 1.5)
+   
+   all the other libs can be installed from ports (except for libnet 1.1.2.1, 
+   at the moment)
+
+   if you encounter some linking problem compiling the tarball, it is due to
+   the libtool version provided within our tarball. to solve the problem
+   re-libtoolize the package and recompile it or download the cvs version and 
+   run the autogen.sh script.
+
+   probably you will have to append the --with-iconv=/usr/local to the
+   configure command line.
+
+ + OPENBSD
+
+   Same recommendations as for FreeBSD, but you have to find a way to install
+   libltdl since it seems that newer version of libtool aren't in the ports
+   collection.
+
+   Furthermode OpenBSD requires libpcap 0.8.3 since it fixed a segfault in
+   pcap_findalldevs();
+
+   probably you will have to append the --with-iconv=/usr/local to the
+   configure command line.
+
+------------------------------------------------------------------------------
+   W I N D O W S
+------------------------------------------------------------------------------
+
+ + MINGW / MSYS (suggested)
+   
+   1) download the wpdpack from the winpcap website
+      - install the drivers (version >= 3.1 beta)
+   2) download the libnet tarball from packetfactory.net
+        apply this patch:
+        http://ettercap.sf.net/devel/libnet-1.1.2.1-mingw.tar.gz
+   3) download pthreads from: ftp://sources.redhat.com/pub/pthreads-win32
+   4) download all the other required library from: 
+         http://gnuwin32.sourceforge.net/packages.html
+            - openssl
+            - libgw32c
+            - libz
+            - libregex
+            - libiconv
+   5) download the gtk development and runtime packages from:
+         http://www.gimp.org/~tml/gimp/win32/downloads.html
+   4) unpak all the packages as shown in the following tree:
+
+      .
+      |-> ettercap_ng
+      |-> gtk
+      |-> gw32c
+      |-> libiconv
+      |-> libnet
+      |-> openssl
+      |-> pthreads
+      |-> regex
+      |-> winpcap
+      |-> zlib
+  
+      make sure each directory contains an 'include' dir with the .h files and a
+      'lib' directory with the .a/.dll files.
+  
+   5) enter the ettercap_ng directory and execute the configure script
+   6) issue the 'make' command and have fun :)
+
+   *) probably you'll have some difficulties compiling it. you have to modify
+   the makefile a bit to suite your environment. don't forget to install all
+   the required .dll since the .dll.a are only wrapper to the real .dll file.
+
+   
+   if you want precompiled packages:
+      http://sourceforge.net/project/showfiles.php?group_id=17435
+
+
+ + CYGWIN (deprecated)
+
+   1) download the wpdpack from the winpcap website
+      - install the drivers (version >= 3.1 beta)
+   2) download the libnet tarball from packetfactory.net
+   3) copy the libs in Wpdpack/lib into /usr/lib
+      copy the includes in Wpdpack/include into /usr/include/pcap
+      rename the /usr/include/pcap/pthread.h to /usr/include/pcap/_pthread.h
+   4) compile the libnet source...
+         you have to search in the mailing list for the patch for cygwin.
+         this is the hardest part... since libnet porting to cygwin is not
+         fully working... my bad :(
+   5) run the ettercap NG configure script
+   6) issue the 'make' command and have fun
+
+
+==============================================================================
+
+vim:ts=3:expandtab
+

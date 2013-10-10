@@ -1,0 +1,150 @@
+
+----------------------------------------------
+  People who helped us developing ettercap NG
+----------------------------------------------
+
+   Gigi Sullivan <sullivan@sikurezza.org>    for hours of discussion on ettercap internals
+                                             and for giving me the ideas for the new plugins
+                                             engine and for some data structures that helped
+                                             me to speed up the whole process... BIG THANKS !!
+
+   Mathieu Masseboeuf <math.m@promac.org>    for the invaluable effort in the Mac OS X porting
+
+   G. Vanem <giva@bgnett.no>                 for the native win32 porting
+                                             for many other patches
+
+   Will Jenkins <will@swproductions.co.uk>   for testing under Mac OS X
+
+   Claudio Agosti <vecna@s0ftpj.org>         for the idea of DNS passive queries
+
+   Michele De Martin                         has provided me a token ring dump
+
+   Iceman <iceman@northernfortress.net>      for the fixes to the man pages
+
+   rgovostes <ryan@roogroup.com>             for the redir_command for Mac Os X
+   bartocc <julien.palmas@mac.com>
+   hack101 <hack101@glock.co.uk>
+
+   Hex <hex@thepurplebuffalo.net>            for the redir_command for Open BSD
+   Crizack <otacon@octo.sytes.net>
+   
+   Johannes Bauer <JohannesBauer@gmx.de>     for the prism2 dump
+
+   Massimo Chiodini <m.chiodini@hackingteam.it> for the help in portstealing mitm method
+
+   Jon Oberheide <jon@oberheide.org>         for gcc 3.5 fixes
+
+   Kev <kev@bournemouthbynight.co.uk>        for the invaluable effort to the ettercap forum
+                                             for many of the site FAQ
+   
+---------------------------------------
+  Copyrighted part of code or stuff...
+---------------------------------------
+
+   Fyodor <fyodor@insecure.org>              for the services database
+
+   Michal Zalewski <lcamtuf@tpi.pl>          for some passive os fingerprint (form p0f)
+
+   Subterrain Security Group                 for some passive os fingerprint (from siphon)
+
+   Nicola Bonelli <awgn@antifork.org>        for the TTL_PREDICTOR function
+   
+   Dug Song <dugsong@monkey.org>             for hex.c (part of dsniff source)
+                                             from which I took the hex_print function.
+
+   OpenSSH team                              for the match_pattern function
+   
+   The Apache group                          for the base64_decode function
+                                             (took from ap_base64.c)
+
+   Ethereal team                             for the in_cksum_shouldbe function
+
+   
+if you think you should be in the list, please mail me.
+
+
+
+==============================================================================
+
+----------------------------------------------------------
+  People who helped us developing ettercap (old versions)
+----------------------------------------------------------
+
+   Max3232 <max3232@ComPorts.com>            for cleaning up makefile, specfile et similia...
+
+   Gigi Sullivan <sullivan@sikurezza.org>    for beta testing with glibc 2.0.x
+
+   Lorenzo Porro (LnZ) <lporro@libero.it>    for beta testing on Linux 2.0.36
+
+   Raptor <raptor@0xdeadbeef.eu.org>         for the help in the port on OpenBSD 2.7 VOODOO
+
+   Nicola Bonelli <awgn@antifork.org>        for the help porting plugins to OpenBSD
+
+   George Reid <greid@ukug.uk.freebsd.org>   FreeBSD ports maintainer
+
+   Murat Demirten <murat@debian.org>         Debian package maintainer
+
+   Alter Eric <estabroo@talkware.net>        for a patch in the Makefile.in dealing with ($LIBS)
+
+   Niilo Kajander <nk@bsdirc.net>            has provided me a NetBSD shell...
+
+   Lee Hobart <lostngone@gci.net>            has provided me a MacOsX root shell... wow !
+
+   Paulo Madeira <acelent@hotmail.com>       has coded the arpcop plugin
+
+   Cristian Ionescu-Idbohrn                  for pointing out some configure 'not configurable' stuff
+   <cristian.ionescu-idbohrn@axis.com>       and providing me the idea for tune up the configure script
+
+   Georg Hofstetter <geggo@donau-ries.de>    for the HL-RCON dissector and for the TEXT only view
+                                             in the data sniffing window
+
+   Giorgio Zoppi <zoppi@cli.di.unipi.it>     for some security patch of the code
+
+   A_D <jor111188@lokmail.net>               has provided me a MacOsX root shell... wow !
+
+   downtime <peter@slagheap.net>             for helping me with the plugin problem on Mac OS X
+
+   Dax Kelson <dax@gurulabs.com>             has provided me a Solaris root shell... yeah !
+
+   CAT <micio@anti-idle.com>                 Slackware package maintainer
+
+   tavi <dev_tavi@mymail.ro>                 for the Windows 9x porting
+
+   Carlo Perassi <carlo@linux.it>            for reviewing the plugin documentation
+
+   Garph0 <garph0@gmx.co.uk>                 plugin porting for windows
+
+--------------------------------------------
+  Documentation Translators
+--------------------------------------------
+
+   Francisco Peralta Aguaron (10t8or)        for the initial documentation.
+
+   vacuum <vacuum@technotronic.com>          for fixing the grammar in the documentation :)
+
+   Julien Bordet <zejames@yahoo.fr>          for the french translation of the documentation
+
+   Matteo Carlo Sala (Ares) <ares@inwind.it> for the italian translation
+
+   Joker <joker_ppc@mac.com>                 for the polish translation
+
+   Log C <logc@satumail.com>                 for the indonesian translation
+
+   Roxann Voss <RVoss@telfor.nl>             for the dutch translation
+
+   Rick Farina <farinard@muohio.edu>         for the patch to my horrible english :)
+
+---------------------------------------------
+  Betatesting Team (only the active one)...
+---------------------------------------------
+
+   Crusher 4            <crusher4@mac.com>
+   Downtime             <peter@slagheap.net>
+   Drygol               <drygol@osi.gda.pl>
+   Angel Georgiev       <manch0@bia-bg.com>              great job guy !
+   Martin Nenov         <cableguy@iname.com>             a very big thanks to him !! ;)
+   Paulo Madeira        <acelent@hotmail.com>            your plugin rocks !
+   Rick Farina          <farinard@muohio.edu>            many thanks to you my friends !
+   Java JVM             <sunjvm@yahoo.com>               very big thanks!!!!		 
+
+

@@ -1,0 +1,15 @@
+This is a port of the famous suite Ettercap-NG 0.7.3 for the iPhone.
+It took me a lot of time and it was a *really* hard work, but it is now completed: we have a full-featured ettercap with plugins support, ncurses gui, text gui, etc, etc. Obviously no GTK support!
+If you decide to compile it by yourself you will have to satisfy all dependencies and get rid of all those iPhone things that don't let you compile the tool. At the end you probably won't have the MITM support working as expected, because of a libnet bug: you will have to get and compile libnet from http://github.com/sam-github/libnet because the version you find in Cydia doesn't solve the problem.
+
+If you want to get ettercap already compiled and packaged, add http://theworm.altervista.org/cydia/ in your Cydia app as a source and download it from my TW Repo.
+
+
+## BUGS
+MITM attack may fail to work correctly because of a libnet bug: get the latest version from http://github.com/sam-github/libnet/.
+
+### ATTENTION 
+Porting this was a HARD work, donations are appreciated: Donate button above or http://theworm.altervista.org/cydia/. Thanks!!
+
+
+TheWorm

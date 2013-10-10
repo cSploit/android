@@ -8,3 +8,4 @@ include $(MY_LOCAL_PATH)/libpcap/Android.mk
 include $(MY_LOCAL_PATH)/libnet/Android.mk
 include $(MY_LOCAL_PATH)/openssl/Android.mk
 include $(MY_LOCAL_PATH)/tcpdump/Android.mk
+include $(MY_LOCAL_PATH)/ettercap-ng/Android.mk

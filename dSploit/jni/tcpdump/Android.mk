@@ -1,5 +1,4 @@
 LOCAL_PATH := $(call my-dir)
-MY_LOCAL_PATH := $(LOCAL_PATH)
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES:=\

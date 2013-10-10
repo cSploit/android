@@ -1,0 +1,37 @@
+=============================================================================
+=============================================================================
+
+
+       @@@@@@@ @@@@@@@ @@@@@@@ @@@@@@@ @@@@@@@ @@@@@@@ @@@@@@@ @@@@@@@
+       @@        @@@     @@@   @@      @@   @@ @@      @@   @@ @@   @@
+       @@@@@@    @@@     @@@   @@@@@@  @@@@@@  @@      @@@@@@@ @@@@@@
+       @@        @@@     @@@   @@      @@  @@  @@      @@   @@ @@
+       @@@@@@@   @@@     @@@   @@@@@@@ @@  @@@ @@@@@@@ @@   @@ @@     NG
+
+                      Copyright 2001-2004 ALoR & NaGA
+
+=============================================================================
+=============================================================================
+
+                 !!!   I M P O R T A N T   N O T I C E !!!
+
+Ettercap is distributed officially ONLY in source code. Binary packages in ANY
+form are NOT officially supported. Although it is not prohibited to distribute
+binary packages, the authors will not respond on bugs found in them. If you 
+use one of these packages downloaded from Internet, redirect your bug report
+to /dev/null. The authors will reply to bug reports and will be happy to find 
+a solution only for hand compiled executables. Every Linux distribution, but
+even *BSD or Windows is different from another. What is compiled on my machine
+may not work on yours because of a different version of a system library. To
+avoid this type of missing dependencies, we will not distribute any binary for
+any operating system. Most of the popular distributions (Debian, RedHat,
+FreeBSD, OpenBSD, ecc) provide the binary packages for ettercap. Use these
+packages, since they are build to work on your distribution and should have 
+the dependencies resolved correctly. Refer to the binary packager of your 
+distribution for problems regarding these packages.
+
+
+=============================================================================
+
+vim:ts=3:expandtab
+

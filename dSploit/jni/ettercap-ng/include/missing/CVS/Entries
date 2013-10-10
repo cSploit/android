@@ -1,0 +1,14 @@
+/getopt.h/1.1.1.1/Sat Mar  8 13:53:38 2003//
+/scandir.h/1.2/Fri Apr 25 12:22:57 2003//
+/strlcat.h/1.1.1.1/Sat Mar  8 13:53:38 2003//
+/strlcpy.h/1.1.1.1/Sat Mar  8 13:53:38 2003//
+/nameser_compat.h/1.1/Sun Apr  4 14:14:09 2004//
+/nameser.h/1.2/Fri Jul  9 07:48:56 2004//
+/ncurses_mingw.h/1.1/Tue Jul 13 12:02:35 2004//
+/termios_mingw.h/1.1/Tue Jul 13 12:02:18 2004//
+/inet_aton.h/1.2/Thu Jul 29 14:23:16 2004//
+/memmem.h/1.2/Thu Jul 29 14:23:16 2004//
+/strcasestr.h/1.2/Thu Jul 29 14:23:16 2004//
+/strsep.h/1.3/Thu Jul 29 14:23:16 2004//
+/basename.h/1.1/Fri Nov  5 10:10:32 2004//
+D
