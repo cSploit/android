@@ -32,8 +32,8 @@
     <string name="stopped">Parado&#8230;</string>
     <string name="start">Iniciar</string>
     <string name="stop">Parar</string>
-    <string name="stopped_dots">Parado ...</string>
-    <string name="starting_dots">Iniciando ...</string>
+    <string name="stopped_dots">Parado &#8230;</string>
+    <string name="starting_dots">Iniciando &#8230;</string>
     <string name="max_length">Tamanho Max</string>
     <string name="min_length">Tamanho Min</string>
     <string name="username">Nome de Usuário</string>
@@ -203,7 +203,7 @@
     <string name="error_rpc">Erro de RPC</string>
     <string name="error_rpcd_inval">Configurações Ruins</string>
     <string name="error_rpcd_shell">Não Pode Executar Shell</string>
-    <string name="rpcd_starting">Iniciando Metasploit RPCD...</string>
+    <string name="rpcd_starting">Iniciando Metasploit RPCD&#8230;</string>
     <string name="rpcd_started">Metasploit RPCD Iniciou</string>
     <string name="rpcd_stopped">MetaSploit RPCD Parado</string>
     <string name="rpcd_running">MetaSploit RPCD já está em execução</string>
@@ -270,10 +270,10 @@
 
     <string name="scanner_select_ports">Selecione portas personalizadas</string>
 
-    <string name="wifi_initializing">Inicializar ...</string>
-    <string name="wifi_activating_iface">Ativação da interface WiFi ...</string>
+    <string name="wifi_initializing">Inicializar &#8230;</string>
+    <string name="wifi_activating_iface">Ativação da interface WiFi &#8230;</string>
     <string name="wifi_activated">WiFi ativado.</string>
-    <string name="wifi_scanning">Escaneando ...</string>
+    <string name="wifi_scanning">Escaneando &#8230;</string>
     <string name="wifi_attempting_to">Preparando Conexão Para</string>
     <string name="wifi_with_key">Com a Chave</string>
     <string name="wifi_connecting_to">conectando-se a</string>
@@ -352,4 +352,10 @@
     <string name="exploit_finder_desc">Procurar exploit que corresponde as vulnerabilidades encontradas.</string>
     <string name="sessions">Sessões</string>
     <string name="sessions_desc">Sessões no alvo pwned.</string>
+    
+    <string name="menu_add">Add</string>
+    <string name="menu_scan">Scan</string>
+    <string name="menu_wifi_scan">WiFi Scan</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_stop_msfrpcd">Stop msfrpcd</string>
 </resources>

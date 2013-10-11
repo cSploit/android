@@ -227,4 +227,10 @@
     <string name="start_hijacking2">Commencer le hijacking de session ?</string>
     <string name="set_session_filename">Entrez le nom du fichier de session :&#160;</string>
     <string name="session_sniffer">Sniffeur de Session</string>
+    
+    <string name="menu_add">Ajouter</string>
+    <string name="menu_scan">Scanner</string>
+    <string name="menu_wifi_scan">Scan WiFi</string>
+    <string name="menu_settings">Paramètres</string>
+    <string name="menu_stop_msfrpcd">Arrêter le msfrpcd</string>
 </resources>

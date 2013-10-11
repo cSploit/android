@@ -43,8 +43,8 @@
     <string name="stopped">Zaustavljen&#8230;</string>
     <string name="start">Započni</string>
     <string name="stop">Zaustavi</string>
-    <string name="stopped_dots">Zaustavljeno ...</string>
-    <string name="starting_dots">Pokretanje ...</string>
+    <string name="stopped_dots">Zaustavljeno &#8230;</string>
+    <string name="starting_dots">Pokretanje &#8230;</string>
     <string name="max_length">Maksimalna duljina</string>
     <string name="min_length">Minimalna duljina</string>
     <string name="username">Korisničko ime</string>
@@ -230,7 +230,7 @@
     <string name="error_rpc">RPC greška</string>
     <string name="error_rpcd_inval">loše postavke</string>
     <string name="error_rpcd_shell">nemoguće pokrenuti ljusku</string>
-    <string name="rpcd_starting">Pokretanje MetaSploit RPCD...</string>
+    <string name="rpcd_starting">Pokretanje MetaSploit RPCD&#8230;</string>
     <string name="rpcd_started">MetaSploit RPCD pokrenut</string>
     <string name="rpcd_stopped">MetaSploit RPCD zaustavljen</string>
     <string name="rpcd_running">MetaSploit RPCD je već pokrenut</string>
@@ -301,10 +301,10 @@
 
     <string name="scanner_select_ports">Odaberi Prilagođene Portove</string>
 
-    <string name="wifi_initializing">Pokretanje ...</string>
-    <string name="wifi_activating_iface">Pokretanje WiFi sučelja ...</string>
+    <string name="wifi_initializing">Pokretanje &#8230;</string>
+    <string name="wifi_activating_iface">Pokretanje WiFi sučelja &#8230;</string>
     <string name="wifi_activated">WiFi uključen.</string>
-    <string name="wifi_scanning">Pretraživanje ...</string>
+    <string name="wifi_scanning">Pretraživanje &#8230;</string>
     <string name="wifi_attempting_to">Pokušaj spajanja na</string>
     <string name="wifi_with_key">sa ključem</string>
     <string name="wifi_connecting_to">Spajanje na</string>
@@ -385,4 +385,10 @@
     <string name="exploit_finder_desc">Traži exploite koji koriste pronađene ranjivosti.</string>
     <string name="sessions">Sesije</string>
     <string name="sessions_desc">Sesije na zaposjednutoj meti.</string>
+    
+    <string name="menu_add">Add</string>
+    <string name="menu_scan">Scan</string>
+    <string name="menu_wifi_scan">WiFi Scan</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_stop_msfrpcd">Stop msfrpcd</string>
 </resources>
