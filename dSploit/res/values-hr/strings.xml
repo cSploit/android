@@ -6,7 +6,7 @@
         razvijaču da pokuša riješiti problem :)
     </string>
     <string name="toggle_button">PreklopniGumb</string>
-    <string name="enter_redirection_details">Unesi detalje za preusmjeravanje dolje:</string>
+    <string name="enter_redirection_details">Unesi detalje za preusmjeravanje:</string>
     <string name="address">Adresa</string>
     <string name="port">Port</string>
     <string name="target">Meta</string>
@@ -96,7 +96,7 @@
         nastaviti?
     </string>
     <string name="fatal_error_html">
-        <![CDATA[<p>Izgleda da vaš ROM (susta) sadrži <b>LD_LIBRARY_PATH bug (grešku)</b>, žao mi je ali vaš uređaj ne podržava dSploit.</p>]]></string>
+        <![CDATA[<p>Izgleda da vaš ROM (susta) sadrži <b>LD_LIBRARY_PATH bug</b>, žao mi je ali vaš uređaj ne podržava dSploit.</p>]]></string>
     <string name="fatal_error_html2">
         <![CDATA[<p>Za više informacija pročitajte <a href=\"http://dsploit.net/#faq\">Često Postavljena Pitanja</a>.</p>]]></string>
     <string name="install_error">Greška prilikom instalacije datoteka!</string>
@@ -244,7 +244,7 @@
     <string name="mitm_simple_sniff">Jednostavno Osluškivanje</string>
     <string name="mitm_simple_sniff_desc">Preusmjeri promet mete/meta kroz ovaj uređaj i pokaži neke statistike dok se podaci zapisuju u pcap datoteku.</string>
     <string name="mitm_password_sniff">Osluškivač Za Prijave</string>
-    <string name="mitm_password_sniff_desc">Osluškuj prijave sa mnogo protokola uključujući HTP, FTP, IMAP, IMAPS, IRC, MSN, itd sa mete.</string>
+    <string name="mitm_password_sniff_desc">Osluškuj prijave sa mnogo protokola uključujući HTTP, FTP, IMAP, IMAPS, IRC, MSN, itd sa mete.</string>
     <string name="mitm_session_hijack">Krađa Sesija</string>
     <string name="mitm_session_hijack_desc">Osluškuj kolačiće na mreži i ukradi sesije.</string>
     <string name="mitm_connection_kill">Ubijanje Veza</string>
