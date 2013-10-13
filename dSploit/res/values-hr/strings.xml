@@ -41,7 +41,7 @@
     </string>
     <string name="service">Servis</string>
     <string name="stopped">Zaustavljen&#8230;</string>
-    <string name="start">Započni</string>
+    <string name="start">Pokreni</string>
     <string name="stop">Zaustavi</string>
     <string name="stopped_dots">Zaustavljeno &#8230;</string>
     <string name="starting_dots">Pokretanje &#8230;</string>
@@ -49,7 +49,7 @@
     <string name="min_length">Minimalna duljina</string>
     <string name="username">Korisničko ime</string>
     <string name="Charset">Skup znakova</string>
-    <string name="filter_desc">Napiši vlastiti zamjenski filter, uključujući jednostavnu zamjenu niza ili
+    <string name="filter_desc">Napiši zamjenski filter, uključujući jednostavnu zamjenu niza ili
         standardne izraze.
     </string>
     <string name="from">Iz</string>
@@ -72,7 +72,7 @@
     <string name="add_custom_target">Dodaj posebnu metu</string>
     <string name="enter_url">Napiši URL, ime hosta (uređaja) ili IP adresu ispod:</string>
     <string name="net_discovery_stopped">Pretraga mreže zaustavljena.</string>
-    <string name="net_discovery_started">Pretraga mreže započeta.</string>
+    <string name="net_discovery_started">Pretraga mreže pokrenuta.</string>
     <string name="start_monitor">Pokreni Pretragu Mreže</string>
     <string name="stop_monitor">Zaustavi Pretragu Mreže</string>
     <string name="start_msfrpcd">Pokreni MetaSploit RPCD</string>
@@ -87,8 +87,8 @@
     <string name="select_session_file">Odaberi sesiju sa SD kartice :</string>
     <string name="select_session">Izabrana Sesija</string>
     <string name="invalid_session">Netočno ime sesije.</string>
-    <string name="session_saved_to">Sesija spašena u &#160;</string>
-    <string name="save_session">Spasi Sesiju</string>
+    <string name="session_saved_to">Sesija spremljena u &#160;</string>
+    <string name="save_session">Spremi Sesiju</string>
     <string name="enter_session_name">Napiši ime datoteke za sesiju :</string>
     <string name="new_session_started">Nova sesija započeta</string>
     <string name="warning">Upozorenje</string>
@@ -96,7 +96,7 @@
         nastaviti?
     </string>
     <string name="fatal_error_html">
-        <![CDATA[<p>Izgleda da vaš ROM (susta) sadrži <b>LD_LIBRARY_PATH bug</b>, žao mi je ali vaš uređaj ne podržava dSploit.</p>]]></string>
+        <![CDATA[<p>Izgleda da vaš ROM (sustav) sadrži <b>LD_LIBRARY_PATH bug</b>, žao mi je ali vaš uređaj ne podržava dSploit.</p>]]></string>
     <string name="fatal_error_html2">
         <![CDATA[<p>Za više informacija pročitajte <a href=\"http://dsploit.net/#faq\">Često Postavljena Pitanja</a>.</p>]]></string>
     <string name="install_error">Greška prilikom instalacije datoteka!</string>
@@ -111,13 +111,13 @@
     <string name="initializing">Pokretanje&#8230;</string>
     <string name="initialization_error">Greška Pri Pokretanju</string>
     <string name="target_alias">Nadimak Mete</string>
-    <string name="set_alias">Postavi nadimak za ovu metu:</string>
+    <string name="set_alias">Postavi nadimak za metu:</string>
     <string name="no_connectivity">Nema povezanosti.</string>
     <string name="wifi_key_copied">WiFi ključ kopiran u međuspremnik.</string>
     <string name="connected_to"><![CDATA[Povezan sa <b>]]></string>
     <string name="connected_to2"><![CDATA[</b> sa ključem <b><font color=\"green\">]]></string>
     <string name="connected_to3"><![CDATA[</font></b> !]]></string>
-    <string name="connection_to"><![CDATA[Connection to <b>]]></string>
+    <string name="connection_to"><![CDATA[Povezan na <b>]]></string>
     <string name="connection_to2">
         <![CDATA[</b> <b><font color=\"red\">NEUSPJEŠNO</font></b>.]]></string>
     <string name="enter_key_or_crack">Napiši WiFi Ključ or pokušaj probiti:</string>
@@ -143,19 +143,19 @@
     <string name="invalid_port">Napisan je netočan port.</string>
     <string name="request_empty">Ovaj zahtjev ne može biti prazan.</string>
     <string name="request_sent">Zahtjev poslan.</string>
-    <string name="customize_wol_port">Prilagod WOL(Buđenje Preko LAN-a) port i pritisni Pošalji.</string>
+    <string name="customize_wol_port">Prilagodi WOL(Buđenje Preko LAN-a) port i pritisni Pošalji.</string>
     <string name="couldnt_send_wol_packet">Nemoguće poslati WOL(Buđenje Preko LAN-a) paket meti bez poznate
         MAC adrese.
     </string>
-    <string name="no_activities_for_url">No activities to handle this type of url.</string>
+    <string name="no_activities_for_url">Nema aktivnosti za obradu ovog tipa URL-a.</string>
     <string name="select_ports">Odaberi Portove</string>
-    <string name="enter_ports_list">Zapiši portove koji su odvojeni zarezom:</string>
+    <string name="enter_ports_list">Napiši portove koji su odvojeni zarezom:</string>
     <string name="invalid_port_">Netočan port \'</string>
     <string name="port_must_be_greater">Port mora biti veći od 0 i manji od 65535.</string>
     <string name="invalid_ports">Netočni portovi napisani.</string>
     <string name="empty_port_list">Prazan popis portova.</string>
-    <string name="about_dsploit_v_">Inforkacije o dSploit v</string>
-    <string name="select_target">Odaberi metu ispod pritiskanjem na red, ili drži prst da
+    <string name="about_dsploit_v_">Informacije o dSploit v</string>
+    <string name="select_target">Odaberi metu ispod dodirom na red ili drži prst da
         napišeš nadimak.
     </string>
     <string name="generating_keys">Stvaranje ključeva&#8230;</string>
@@ -173,7 +173,7 @@
     <string name="could_not_read_folder">Nemoguće pročitati sadržaj mape.</string>
     <string name="choose_dir">Odaberi&#160;</string>
     <string name="vulnerability_finder">Pretraživač Ranjivosti</string>
-    <string name="vulnerability_finder_desc">Pretraži poznate ranjivosti na National Vulnerability Database(Nacionalna Baza Ranjivosti)
+    <string name="vulnerability_finder_desc">Pretraži poznate ranjivosti na National Vulnerability Database(Nacionalnoj Bazi Ranjivosti)
         na meti koja ima pokrenute servise.
     </string>
     <string name="inspector">Pretraživač</string>
@@ -198,7 +198,7 @@
     <string name="mitm_desc">Izvrši razne man-in-the-middle (čovjek-u-sredini) napade, kao što su osluškivanje mreže,
         upravljanje mrežnim prometom, itd&#8230;
     </string>
-    <string name="network_subnet_mask">Ovo je tvoja maska podmreže</string>
+    <string name="network_subnet_mask">Tvoja maska podmreže</string>
     <string name="gateway_router">(Tvoj mrežni gateway / router)</string>
     <string name="this_device">&#160;(Ovaj uređaj)</string>
     <string name="wifi_went_down">Nema WiFi povezanosti.</string>
@@ -218,24 +218,24 @@
     <string name="trying">Pokušavanje</string>
     <string name="left">ostalo</string>
     <string name="error_filepath2">Nemoguće pronaći navedeni put.</string>
-    <string name="tap_again">Pritisni opet za zaustavljanje.</string>
+    <string name="tap_again">Dodirni opet za zaustavljanje.</string>
     <string name="unexpected_file_error">Neočekivana greška pri čitanju datoteke : </string>
     <string name="the_port">Port</string>
     <string name="error_proxy_port"> koji je potreban prozirnom proxyju je zauzeo drugi proces, otvori postavke ?</string>
-    <string name="error_mitm_port"> koji je potreban mitm serveru je zauzeo drugi proces, otvori postavke ?</string>
-    <string name="error_https_port"> koji je potreban mitm https preusmjerivaču je zauzeo drugi proces, otvori postavke ?</string>
+    <string name="error_mitm_port"> koji je potreban MITM serveru je zauzeo drugi proces, otvori postavke ?</string>
+    <string name="error_https_port"> koji je potreban MITM HTTPS preusmjerivaču je zauzeo drugi proces, otvori postavke ?</string>
     <string name="error_mitm_ports">MITM modulima je potrebno da su svi portovi otvoreni.</string>
 
     <!-- rpc stuff -->
     <string name="error_rpc">RPC greška</string>
-    <string name="error_rpcd_inval">loše postavke</string>
+    <string name="error_rpcd_inval">Loše postavke</string>
     <string name="error_rpcd_shell">nemoguće pokrenuti ljusku</string>
     <string name="rpcd_starting">Pokretanje MetaSploit RPCD&#8230;</string>
     <string name="rpcd_started">MetaSploit RPCD pokrenut</string>
     <string name="rpcd_stopped">MetaSploit RPCD zaustavljen</string>
     <string name="rpcd_running">MetaSploit RPCD je već pokrenut</string>
     <string name="rpcd_timedout">MetaSploit RPCD ne reagira</string>
-    <string name="error_rcpd_fatal">fatalna greška se pojavila, upravo pretražujem grešku da je pošaljem mojem razvijatelju,
+    <string name="error_rcpd_fatal">Fatalna greška se pojavila, upravo pretražujem grešku da je pošaljem mojem razvijatelju,
         ako se ne ugasim ugasi me preko postavke->aplikacije,
         i UPOZORI MOJE RAZVIJATELJE.
     </string>
@@ -314,7 +314,7 @@
     <!-- preferences -->
     <string name="pref_general">Osnovno</string>
     <string name="pref_modules">Moduli</string>
-    <string name="pref_msf">MetaSploitFramework</string>
+    <string name="pref_msf">MetaSploit Framework</string>
     <string name="pref_performance">Performanse</string>
     <string name="pref_check_updates">Provjeri Ažuriranja</string>
     <string name="pref_wake_lock">Ostani Budan</string>
@@ -329,7 +329,7 @@
     <string name="pref_http_max_buffer_size">HTTP Maksimalna Veličina Međuspremnika</string>
     <string name="pref_password_filename">Datoteka Osluškivača Za Prijave</string>
     <string name="pref_check_updates_desc">Provjera ažuriranja pri pokretanju.</string>
-    <string name="pref_wake_lock_desc">Sprječava uređaj da spava dok je aplikacija pokrenuta.</string>
+    <string name="pref_wake_lock_desc">Spriječava uređaj da spava dok je aplikacija pokrenuta.</string>
     <string name="pref_save_path_desc">Globalna putanja za spašavanje u koju se spremaju svi zapisi.</string>
     <string name="pref_debug_error_logging_desc">Uključi ili isključi zapisivanje grešaka u datoteku za ispravljanje grešaka.</string>
     <string name="pref_enable_profiler_desc">Uključi ili isključi zapisivanje koda za mrežni profiler.</string>
@@ -352,23 +352,23 @@
     <string-array name="pref_performance_vuln" >
         <item>OSVDB</item>
         <item>CVE</item>
-        <item>CVE i OSVDB</item>
+        <item>OSVDB i CVE</item>
     </string-array>
     <string-array name="pref_performance_vuln_values">
         <item>OSVDB</item>
         <item>CVE</item>
-        <item>OBOJE</item>
+        <item>OSVDB i CVE</item>
     </string-array>
     <string name="pref_performance_exploit_desc">Traži exploite</string>
     <string-array name="pref_performance_exploit" >
         <item>samo koje podržava MSF</item>
         <item>samo sa exploitdb</item>
-        <item>sa exploitdb i MSF</item>
+        <item>sa MSF i exploitdb</item>
     </string-array>
     <string-array name="pref_performance_exploit_values">
         <item>MSF</item>
         <item>EXDB</item>
-        <item>OBOJE</item>
+        <item>MSF i EXDB</item>
     </string-array>
     <string name="pref_folder">Mapa</string>
     <string name="pref_err_exists">ne postoji.</string>
@@ -386,9 +386,9 @@
     <string name="sessions">Sesije</string>
     <string name="sessions_desc">Sesije na zaposjednutoj meti.</string>
     
-    <string name="menu_add">Add</string>
-    <string name="menu_scan">Scan</string>
-    <string name="menu_wifi_scan">WiFi Scan</string>
-    <string name="menu_settings">Settings</string>
-    <string name="menu_stop_msfrpcd">Stop msfrpcd</string>
+    <string name="menu_add">Dodaj/string>
+    <string name="menu_scan">Pretraži</string>
+    <string name="menu_wifi_scan">WiFi Pretraživanje</string>
+    <string name="menu_settings">Postavke</string>
+    <string name="menu_stop_msfrpcd">Zaustavi msfrpcd</string>
 </resources>
