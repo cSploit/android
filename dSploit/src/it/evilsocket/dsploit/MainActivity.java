@@ -18,11 +18,47 @@
  */
 package it.evilsocket.dsploit;
 
+import static it.evilsocket.dsploit.core.UpdateChecker.AVAILABLE_VERSION;
+import static it.evilsocket.dsploit.core.UpdateChecker.UPDATE_AVAILABLE;
+import static it.evilsocket.dsploit.core.UpdateChecker.UPDATE_CHECKING;
+import static it.evilsocket.dsploit.core.UpdateChecker.UPDATE_NOT_AVAILABLE;
+import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_ADDRESS;
+import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_HARDWARE;
+import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_NAME;
+import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_UPDATE;
+import static it.evilsocket.dsploit.net.NetworkDiscovery.NEW_ENDPOINT;
+import it.evilsocket.dsploit.core.DownloadManager;
+import it.evilsocket.dsploit.core.ManagedReceiver;
+import it.evilsocket.dsploit.core.Shell;
+import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.core.ToolsInstaller;
+import it.evilsocket.dsploit.core.UpdateChecker;
+import it.evilsocket.dsploit.gui.dialogs.AboutDialog;
+import it.evilsocket.dsploit.gui.dialogs.ChangelogDialog;
+import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
+import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
+import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
+import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
+import it.evilsocket.dsploit.gui.dialogs.InputDialog;
+import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
+import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog;
+import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog.SpinnerDialogListener;
+import it.evilsocket.dsploit.net.Endpoint;
+import it.evilsocket.dsploit.net.Network;
+import it.evilsocket.dsploit.net.NetworkDiscovery;
+import it.evilsocket.dsploit.net.Target;
+import it.evilsocket.dsploit.net.metasploit.RPCServer;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -49,42 +85,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.io.File;
-
-import it.evilsocket.dsploit.core.DownloadManager;
-import it.evilsocket.dsploit.core.ManagedReceiver;
-import it.evilsocket.dsploit.core.Shell;
-import it.evilsocket.dsploit.core.System;
-import it.evilsocket.dsploit.core.ToolsInstaller;
-import it.evilsocket.dsploit.core.UpdateChecker;
-import it.evilsocket.dsploit.gui.dialogs.AboutDialog;
-import it.evilsocket.dsploit.gui.dialogs.ChangelogDialog;
-import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
-import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
-import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
-import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
-import it.evilsocket.dsploit.gui.dialogs.InputDialog;
-import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
-import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog;
-import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog.SpinnerDialogListener;
-import it.evilsocket.dsploit.net.Endpoint;
-import it.evilsocket.dsploit.net.metasploit.RPCServer;
-import it.evilsocket.dsploit.net.Network;
-import it.evilsocket.dsploit.net.NetworkDiscovery;
-import it.evilsocket.dsploit.net.Target;
-
-import static it.evilsocket.dsploit.core.UpdateChecker.AVAILABLE_VERSION;
-import static it.evilsocket.dsploit.core.UpdateChecker.UPDATE_AVAILABLE;
-import static it.evilsocket.dsploit.core.UpdateChecker.UPDATE_CHECKING;
-import static it.evilsocket.dsploit.core.UpdateChecker.UPDATE_NOT_AVAILABLE;
-import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_ADDRESS;
-import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_HARDWARE;
-import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_NAME;
-import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_UPDATE;
-import static it.evilsocket.dsploit.net.NetworkDiscovery.NEW_ENDPOINT;
 
 @SuppressLint("NewApi")
 public class MainActivity extends SherlockListActivity {
@@ -225,11 +225,20 @@ public class MainActivity extends SherlockListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+		Boolean isDark = themePrefs.getBoolean("isDark", false);
+		if (isDark)
+			setTheme(R.style.Sherlock___Theme);
+		else
+			setTheme(R.style.AppTheme);
+		
+	
 		setContentView(R.layout.target_layout);
 		NO_WIFI_UPDATE_MESSAGE = getString(R.string.no_wifi_available);
 		isWifiAvailable = Network.isWifiConnected(this);
 		boolean connectivityAvailable = isWifiAvailable
 				|| Network.isConnectivityAvailable(this);
+		
 
 		// make sure system object was correctly initialized during application
 		// startup
@@ -642,8 +651,6 @@ public class MainActivity extends SherlockListActivity {
 			new AboutDialog(this).show();
 			return true;
 
-		case R.id.app_settings:
-			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 

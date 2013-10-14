@@ -6,6 +6,12 @@
     <PreferenceCategory android:title="@string/pref_general">
 
         <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="PREF_DARK_THEME"
+            android:summary="@string/pref_choose_theme"
+            android:title="@string/pref_theme" />
+        
+        <CheckBoxPreference
                 android:defaultValue="true"
                 android:key="PREF_CHECK_UPDATES"
                 android:summary="@string/pref_check_updates_desc"

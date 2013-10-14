@@ -20,6 +20,8 @@
 package it.evilsocket.dsploit.plugins;
 
 import java.util.ArrayList;
+
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -30,96 +32,95 @@ import it.evilsocket.dsploit.gui.dialogs.FinishDialog;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Target.Exploit;
 
-public class Sessions extends Plugin
-{
-  private ListView 			mListView		   = null;
-  private ArrayList<Exploit> results = new ArrayList<Target.Exploit>();
-  private ArrayAdapter<Exploit> mAdapter = null;
+public class Sessions extends Plugin {
+	private ListView mListView = null;
+	private ArrayList<Exploit> results = new ArrayList<Target.Exploit>();
+	private ArrayAdapter<Exploit> mAdapter = null;
 
-  public Sessions() {
-    super
-    (
-      R.string.sessions,
-      R.string.sessions_desc,
+	public Sessions() {
+		super(R.string.sessions, R.string.sessions_desc,
 
-      new Target.Type[]{ Target.Type.ENDPOINT, Target.Type.REMOTE },
-      R.layout.plugin_sessions_layout,
-      R.drawable.action_session
-    );
-  }
+		new Target.Type[] { Target.Type.ENDPOINT, Target.Type.REMOTE },
+				R.layout.plugin_sessions_layout, R.drawable.action_session);
+	}
 
+	private Thread mThread = new Thread(new Runnable() {
+		@Override
+		public void run() {
+			// TODO: find and add sessions to mAdapted
+		}
+	});
 
-  private Thread mThread = new Thread( new Runnable() {
-    @Override
-    public void run()
-    {
-      // TODO: find and add sessions to mAdapted
-    }
-  });
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+		Boolean isDark = themePrefs.getBoolean("isDark", false);
+		if (isDark)
+			setTheme(R.style.Sherlock___Theme);
+		else
+			setTheme(R.style.AppTheme);
+		super.onCreate(savedInstanceState);
+		int nEx, i;
 
-  @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    int nEx,i;
-
-    i=nEx=0;
-    nEx = System.getCurrentTarget().getExploits().size();
-    for(i=0;i<nEx;i++)
-    {
-      if(System.getCurrentExploits().get(i).started)
-        break;
-    }
-
-    if( System.getCurrentTarget().hasOpenPorts() == false )
-      new FinishDialog( getString(R.string.warning), getString(R.string.no_open_ports), this ).show();
-
-    else if( nEx == 0)
-      new FinishDialog( getString(R.string.warning), getString(R.string.no_open_ports_exploitfinder), this ).show();
-
-    else if(i>=nEx)
-      new FinishDialog( getString(R.string.warning), getString(R.string.no_exploit_started), this ).show();
-
-    mListView = ( ListView )findViewById( android.R.id.list );
-    mAdapter  = new ArrayAdapter<Exploit>(this, android.R.layout.simple_list_item_1, results);
-
-    mAdapter.clear();
-
-    mListView.setAdapter( mAdapter );
-
-    mThread.start();
-
-     /*TODO: open shell....how? maybe we can use android-terminal-emulator
-
-      mListView.setOnChildClickListener( new OnChildClickListener(){
-			@Override
-			public boolean onChildClick( ExpandableListView parent, View v, int groupPosition, int childPosition, long id ) {
-				Vulnerability cve = ( Vulnerability )mAdapter.getChild(groupPosition, childPosition);
-
-				if( cve != null )
-				{
-					String uri     = "http://web.nvd.nist.gov/view/vuln/detail?vulnId=" + cve.getIdentifier();
-					Intent browser = new Intent( Intent.ACTION_VIEW, Uri.parse( uri ) );
-
-					startActivity( browser );
-				}
-
-				return true;
-			}}
-        );
-
-		for( int i = 0; i < mAdapter.getGroupCount(); i++ )
-		{
-			mListView.expandGroup( i );
+		i = nEx = 0;
+		nEx = System.getCurrentTarget().getExploits().size();
+		for (i = 0; i < nEx; i++) {
+			if (System.getCurrentExploits().get(i).started)
+				break;
 		}
 
-		*/
-  }
+		if (System.getCurrentTarget().hasOpenPorts() == false)
+			new FinishDialog(getString(R.string.warning),
+					getString(R.string.no_open_ports), this).show();
 
-  @Override
-  public void onBackPressed() {
-    super.onBackPressed();
-    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-    mThread.interrupt();
-    mThread.stop();
-  }
+		else if (nEx == 0)
+			new FinishDialog(getString(R.string.warning),
+					getString(R.string.no_open_ports_exploitfinder), this)
+					.show();
+
+		else if (i >= nEx)
+			new FinishDialog(getString(R.string.warning),
+					getString(R.string.no_exploit_started), this).show();
+
+		mListView = (ListView) findViewById(android.R.id.list);
+		mAdapter = new ArrayAdapter<Exploit>(this,
+				android.R.layout.simple_list_item_1, results);
+
+		mAdapter.clear();
+
+		mListView.setAdapter(mAdapter);
+
+		mThread.start();
+
+		/*
+		 * TODO: open shell....how? maybe we can use android-terminal-emulator
+		 * 
+		 * mListView.setOnChildClickListener( new OnChildClickListener(){
+		 * 
+		 * @Override public boolean onChildClick( ExpandableListView parent,
+		 * View v, int groupPosition, int childPosition, long id ) {
+		 * Vulnerability cve = ( Vulnerability )mAdapter.getChild(groupPosition,
+		 * childPosition);
+		 * 
+		 * if( cve != null ) { String uri =
+		 * "http://web.nvd.nist.gov/view/vuln/detail?vulnId=" +
+		 * cve.getIdentifier(); Intent browser = new Intent( Intent.ACTION_VIEW,
+		 * Uri.parse( uri ) );
+		 * 
+		 * startActivity( browser ); }
+		 * 
+		 * return true; }} );
+		 * 
+		 * for( int i = 0; i < mAdapter.getGroupCount(); i++ ) {
+		 * mListView.expandGroup( i ); }
+		 */
+	}
+
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+		mThread.interrupt();
+		mThread.stop();
+	}
 }

@@ -22,6 +22,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.net.wifi.ScanResult;
 import android.net.wifi.SupplicantState;
@@ -126,6 +127,12 @@ public class WifiScannerActivity extends SherlockListActivity
   @Override
   public void onCreate(Bundle savedInstanceState){
     super.onCreate(savedInstanceState);
+    SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+	Boolean isDark = themePrefs.getBoolean("isDark", false);
+	if (isDark)
+		setTheme(R.style.Sherlock___Theme);
+	else
+		setTheme(R.style.AppTheme);
     setContentView(R.layout.wifi_scanner);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 

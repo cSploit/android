@@ -4,5 +4,4 @@
     <item
         android:id="@+id/select_ports"
         android:title="@string/scanner_select_ports"/>
-
 </menu>

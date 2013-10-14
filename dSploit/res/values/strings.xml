@@ -391,4 +391,8 @@
     <string name="menu_wifi_scan">WiFi Scan</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_stop_msfrpcd">Stop msfrpcd</string>
+    
+    <string name="pref_theme">Dark Theme</string>
+    <string name="pref_choose_theme">Enable the dark theme, which is easier on the eyes</string>
+    <string name="please_restart">The new theme will not be applied until you restart the app</string>
 </resources>

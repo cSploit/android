@@ -21,6 +21,7 @@ package it.evilsocket.dsploit.plugins.mitm;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -384,6 +385,12 @@ public class MITM extends Plugin
 
   @Override
   public void onCreate(Bundle savedInstanceState){
+	  SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+		Boolean isDark = themePrefs.getBoolean("isDark", false);
+		if (isDark)
+			setTheme(R.style.Sherlock___Theme);
+		else
+			setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);
 
     new CheckForOpenPortsTask().execute();

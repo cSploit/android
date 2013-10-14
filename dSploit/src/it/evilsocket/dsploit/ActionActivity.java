@@ -20,6 +20,7 @@ package it.evilsocket.dsploit;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,7 +47,13 @@ public class ActionActivity extends SherlockListActivity
   @Override
   public void onCreate(Bundle savedInstanceState){
     super.onCreate(savedInstanceState);
-
+    SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+	Boolean isDark = themePrefs.getBoolean("isDark", false);
+	if (isDark)
+		setTheme(R.style.Sherlock___Theme);
+	else
+		setTheme(R.style.AppTheme);
+	
     if(System.getTargets() != null && System.getTargets().size() > 0 && System.getCurrentTarget() != null){
       setTitle("dSploit > " + System.getCurrentTarget());
       setContentView(R.layout.actions_layout);

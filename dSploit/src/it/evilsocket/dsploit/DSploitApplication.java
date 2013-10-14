@@ -19,6 +19,7 @@
 package it.evilsocket.dsploit;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 
 import com.bugsense.trace.BugSenseHandler;
 
@@ -39,6 +40,13 @@ import it.evilsocket.dsploit.plugins.VulnerabilityFinder;
 public class DSploitApplication extends Application{
   @Override
   public void onCreate(){
+	  SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+		Boolean isDark = themePrefs.getBoolean("isDark", false);
+		if (isDark)
+			setTheme(R.style.Sherlock___Theme);
+		else
+			setTheme(R.style.AppTheme);
+		
     super.onCreate();
 
     try{
