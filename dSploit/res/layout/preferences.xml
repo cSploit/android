@@ -1,137 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
 
-    <PreferenceCategory android:title="@string/pref_general">
+    <PreferenceCategory android:title="@string/pref_general" >
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="PREF_CHECK_UPDATES"
+            android:summary="@string/pref_check_updates_desc"
+            android:title="@string/pref_check_updates" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="PREF_WAKE_LOCK"
+            android:summary="@string/pref_wake_lock_desc"
+            android:title="@string/pref_wake_lock" />
+
+        <Preference
+            android:key="PREF_SAVE_PATH"
+            android:summary="@string/pref_save_path_desc"
+            android:title="@string/pref_save_path" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="PREF_DEBUG_ERROR_LOGGING"
+            android:summary="@string/pref_debug_error_logging_desc"
+            android:title="@string/pref_debug_error_logging" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="PREF_ENABLE_PROFILER"
+            android:summary="@string/pref_enable_profiler_desc"
+            android:title="@string/pref_enable_profiler" />
 
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="PREF_DARK_THEME"
             android:summary="@string/pref_choose_theme"
             android:title="@string/pref_theme" />
-        
-        <CheckBoxPreference
-                android:defaultValue="true"
-                android:key="PREF_CHECK_UPDATES"
-                android:summary="@string/pref_check_updates_desc"
-                android:title="@string/pref_check_updates"/>
-
-        <CheckBoxPreference
-                android:defaultValue="true"
-                android:key="PREF_WAKE_LOCK"
-                android:summary="@string/pref_wake_lock_desc"
-                android:title="@string/pref_wake_lock"/>
-
-        <Preference
-                android:key="PREF_SAVE_PATH"
-                android:summary="@string/pref_save_path_desc"
-                android:title="@string/pref_save_path"/>
-
-        <CheckBoxPreference
-                android:defaultValue="false"
-                android:key="PREF_DEBUG_ERROR_LOGGING"
-                android:summary="@string/pref_debug_error_logging_desc"
-                android:title="@string/pref_debug_error_logging"/>
-
-        <CheckBoxPreference
-                android:defaultValue="false"
-                android:key="PREF_ENABLE_PROFILER"
-                android:summary="@string/pref_enable_profiler_desc"
-                android:title="@string/pref_enable_profiler"/>
-
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/pref_modules">
+    <PreferenceCategory android:title="@string/pref_modules" >
 
         <EditTextPreference
-                android:defaultValue="1.0"
-                android:inputType="numberDecimal"
-                android:key="PREF_SNIFFER_SAMPLE_TIME"
-                android:summary="@string/pref_sniffer_sample_time_desc"
-                android:title="@string/pref_sniffer_sample_time"/>
+            android:defaultValue="1.0"
+            android:inputType="numberDecimal"
+            android:key="PREF_SNIFFER_SAMPLE_TIME"
+            android:summary="@string/pref_sniffer_sample_time_desc"
+            android:title="@string/pref_sniffer_sample_time" />
 
         <EditTextPreference
-                android:defaultValue="8080"
-                android:inputType="number"
-                android:key="PREF_HTTP_PROXY_PORT"
-                android:summary="@string/pref_http_proxy_port_desc"
-                android:title="@string/pref_http_proxy_port"/>
+            android:defaultValue="8080"
+            android:inputType="number"
+            android:key="PREF_HTTP_PROXY_PORT"
+            android:summary="@string/pref_http_proxy_port_desc"
+            android:title="@string/pref_http_proxy_port" />
 
         <EditTextPreference
-                android:defaultValue="8081"
-                android:inputType="number"
-                android:key="PREF_HTTP_SERVER_PORT"
-                android:summary="@string/pref_http_server_port_desc"
-                android:title="@string/pref_http_server_port"/>
+            android:defaultValue="8081"
+            android:inputType="number"
+            android:key="PREF_HTTP_SERVER_PORT"
+            android:summary="@string/pref_http_server_port_desc"
+            android:title="@string/pref_http_server_port" />
 
         <CheckBoxPreference
-                android:defaultValue="true"
-                android:key="PREF_HTTPS_REDIRECT"
-                android:summary="@string/pref_https_redirect_desc"
-                android:title="@string/pref_https_redirect"/>
+            android:defaultValue="true"
+            android:key="PREF_HTTPS_REDIRECT"
+            android:summary="@string/pref_https_redirect_desc"
+            android:title="@string/pref_https_redirect" />
 
         <EditTextPreference
-                android:defaultValue="8082"
-                android:inputType="number"
-                android:key="PREF_HTTPS_REDIRECTOR_PORT"
-                android:summary="@string/pref_https_redirector_port_desc"
-                android:title="@string/pref_https_redirector_port"/>
+            android:defaultValue="8082"
+            android:inputType="number"
+            android:key="PREF_HTTPS_REDIRECTOR_PORT"
+            android:summary="@string/pref_https_redirector_port_desc"
+            android:title="@string/pref_https_redirector_port" />
 
         <EditTextPreference
-                android:defaultValue="10485760"
-                android:inputType="number"
-                android:key="PREF_HTTP_MAX_BUFFER_SIZE"
-                android:summary="@string/pref_http_max_buffer_size_desc"
-                android:title="@string/pref_http_max_buffer_size"/>
+            android:defaultValue="10485760"
+            android:inputType="number"
+            android:key="PREF_HTTP_MAX_BUFFER_SIZE"
+            android:summary="@string/pref_http_max_buffer_size_desc"
+            android:title="@string/pref_http_max_buffer_size" />
 
         <EditTextPreference
-                android:defaultValue="dsploit-password-sniff.log"
-                android:key="PREF_PASSWORD_FILENAME"
-                android:summary="@string/pref_password_filename_desc"
-                android:title="@string/pref_password_filename"/>
+            android:defaultValue="dsploit-password-sniff.log"
+            android:key="PREF_PASSWORD_FILENAME"
+            android:summary="@string/pref_password_filename_desc"
+            android:title="@string/pref_password_filename" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_performance" >
 
         <ListPreference
-                android:defaultValue="BOTH"
-                android:key="SEARCH_OSVDB"
-                android:summary="@string/choose_method"
-                android:title="@string/pref_performance_vuln_desc"
-                android:entries="@array/pref_performance_vuln"
-                android:entryValues="@array/pref_performance_vuln_values" />
+            android:defaultValue="BOTH"
+            android:entries="@array/pref_performance_vuln"
+            android:entryValues="@array/pref_performance_vuln_values"
+            android:key="SEARCH_OSVDB"
+            android:summary="@string/choose_method"
+            android:title="@string/pref_performance_vuln_desc" />
 
         <ListPreference
-                android:defaultValue="BOTH"
-                android:key="SEARCH_EXDB"
-                android:summary="@string/choose_method"
-                android:title="@string/pref_performance_exploit_desc"
-                android:entries="@array/pref_performance_exploit"
-                android:entryValues="@array/pref_performance_exploit_values" />
-
+            android:defaultValue="BOTH"
+            android:entries="@array/pref_performance_exploit"
+            android:entryValues="@array/pref_performance_exploit_values"
+            android:key="SEARCH_EXDB"
+            android:summary="@string/choose_method"
+            android:title="@string/pref_performance_exploit_desc" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_msf" >
 
         <EditTextPreference
-                android:defaultValue="/data/gentoo_msf"
-                android:key="MSF_CHROOT_PATH"
-                android:summary="@string/pref_chroot_desc"
-                android:title="@string/pref_chroot" />
+            android:defaultValue="/data/gentoo_msf"
+            android:key="MSF_CHROOT_PATH"
+            android:summary="@string/pref_chroot_desc"
+            android:title="@string/pref_chroot" />
 
         <EditTextPreference
-                android:defaultValue="msf"
-                android:key="MSF_RPC_USER"
-                android:summary="@string/pref_rpc_user_desc"
-                android:title="@string/pref_rpc_user" />
+            android:defaultValue="msf"
+            android:key="MSF_RPC_USER"
+            android:summary="@string/pref_rpc_user_desc"
+            android:title="@string/pref_rpc_user" />
 
         <EditTextPreference
-                android:defaultValue="msf"
-                android:key="MSF_RPC_PSWD"
-                android:summary="@string/pref_rpc_pswd_desc"
-                android:title="@string/pref_rpc_pswd" />
-
+            android:defaultValue="msf"
+            android:key="MSF_RPC_PSWD"
+            android:summary="@string/pref_rpc_pswd_desc"
+            android:title="@string/pref_rpc_pswd" />
     </PreferenceCategory>
 
 </PreferenceScreen>
