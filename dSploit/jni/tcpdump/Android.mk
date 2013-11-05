@@ -123,7 +123,11 @@ LOCAL_CFLAGS := -O2 -g
 LOCAL_CFLAGS += -DHAVE_CONFIG_H -D_U_="__attribute__((unused))"
 
 LOCAL_C_INCLUDES += \
-	libpcap libnet/include include openssl openssl/include
+	libpcap\
+	libnet/include\
+	include\
+	openssl\
+	openssl/include
 
 LOCAL_STATIC_LIBRARIES := libpcap libssl
 

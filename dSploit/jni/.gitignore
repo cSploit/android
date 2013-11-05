@@ -1,0 +1,6 @@
+libs
+*.[oda]
+*.l[oa]
+*.ao
+*.so[^.]*
+!.gitignore

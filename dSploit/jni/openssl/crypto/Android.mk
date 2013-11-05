@@ -457,7 +457,6 @@ LOCAL_SRC_FILES+= \
 	dh/dh_key.c \
 	dh/dh_lib.c \
 	dsa/dsa_asn1.c \
-	dsa/dsa_depr.c \
 	dsa/dsa_err.c \
 	dsa/dsa_gen.c \
 	dsa/dsa_key.c \
@@ -491,7 +490,7 @@ ifneq ($(TARGET_SIMULATOR),true)
 	LOCAL_STATIC_LIBRARIES += libdl
 endif
 
-LOCAL_LDLIBS += -ldl
+# LOCAL_LDLIBS += -ldl
 
 LOCAL_MODULE:= libcrypto
 

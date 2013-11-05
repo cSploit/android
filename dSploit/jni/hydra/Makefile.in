@@ -1,0 +1,8 @@
+XDEFINES= -DLIBOPENSSL -DLIBNCURSES -DLIBIDN -DHAVE_PR29_H -DHAVE_PCRE -DLIBMYSQLCLIENT -DLIBPOSTGRES -DLIBSVN -DLIBSSH -DHAVE_MATH_H
+XLIBS= -lcurses -lssl -lidn -lpcre -lmysqlclient -lpq -lsvn_client-1 -lapr-1 -laprutil-1 -lsvn_subr-1 -lssh -lcrypto
+XLIBPATHS=-L/usr/lib -L/usr/local/lib -L/lib -L/usr/lib
+XIPATHS= -I/usr/include/subversion-1 -I/usr/include/apr-1 -I/usr/include/subversion-1 -I/usr/include/mysql
+PREFIX=/opt/android-ndk/platforms/android-18/arch-arm/usr
+XHYDRA_SUPPORT=xhydra
+STRIP=strip
+
