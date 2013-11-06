@@ -3,7 +3,7 @@ LOCAL_PATH := $(call my-dir)
 #original path: subversion/libsvn_subr/libsvn_subr-1.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	subversion/subversion/include\
@@ -95,7 +95,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: subversion/libsvn_delta/libsvn_delta-1.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	subversion/subversion/include\
@@ -131,7 +131,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: subversion/libsvn_fs_util/libsvn_fs_util-1.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	subversion/subversion/include\
@@ -156,7 +156,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: subversion/libsvn_diff/libsvn_diff-1.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	subversion/subversion/include\
@@ -190,7 +190,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: subversion/libsvn_fs_fs/libsvn_fs_fs-1.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	subversion/subversion/include\
@@ -226,7 +226,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: subversion/libsvn_ra_svn/libsvn_ra_svn-1.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	subversion/subversion/include\
@@ -259,7 +259,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: subversion/libsvn_wc/libsvn_wc-1.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	subversion/subversion/include\
@@ -319,7 +319,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: subversion/libsvn_ra_neon/libsvn_ra_neon-1.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	subversion/subversion/include\
@@ -365,7 +365,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: subversion/libsvn_fs/libsvn_fs-1.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	subversion/subversion/include\
@@ -394,7 +394,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: subversion/libsvn_repos/libsvn_repos-1.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	subversion/subversion/include\
@@ -436,7 +436,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: subversion/libsvn_ra_local/libsvn_ra_local-1.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	subversion/subversion/include\
@@ -465,7 +465,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: subversion/tests/libsvn_test-1.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	subversion/subversion/include\
@@ -494,7 +494,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: subversion/mod_dav_svn/mod_dav_svn.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	subversion/subversion/include\
@@ -541,7 +541,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: subversion/mod_authz_svn/mod_authz_svn.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	subversion/subversion/include\
@@ -565,7 +565,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: tools/server-side/mod_dontdothat/mod_dontdothat.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	subversion/subversion/include\
@@ -589,7 +589,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: subversion/libsvn_ra/libsvn_ra-1.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	subversion/subversion/include\
@@ -624,7 +624,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: subversion/libsvn_client/libsvn_client-1.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DLINUX -D_REENTRANT -D_GNU_SOURCE -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	subversion/subversion/include\

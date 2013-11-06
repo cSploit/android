@@ -14,9 +14,8 @@ LOCAL_SRC_FILES:= hydra.c hydra-vnc.c hydra-pcnfs.c hydra-rexec.c hydra-nntp.c h
 
 LOCAL_CFLAGS:=-O3 -DLIBOPENSSL -DNO_RINDEX -DHAVE_MATH_H -DLIBFIREBIRD -DLIBIDN -DHAVE_PCRE
 LOCAL_CFLAGS+=-DHAVE_PR29_H -DLIBMYSQLCLIENT -DLIBNCP -DLIBPOSTGRES -DLIBSVN -DLIBSSH
-LOCAL_CFLAGS+=-fdata-sections -ffunction-sections
-LOCAL_LDFLAGS:=-lm
-#LOCAL_LDFLAGS+=-Wl,--gc-sections -Wl,--print-gc-sections
+LOCAL_CFLAGS+=-fdata-sections -ffunction-sections -static
+LOCAL_LDFLAGS:=-lm -Wl,--gc-sections
 
 LOCAL_C_INCLUDES:= 	hydra\
 					openssl/include\

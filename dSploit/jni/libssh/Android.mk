@@ -3,7 +3,8 @@ LOCAL_PATH := $(call my-dir)
 #original path: libs/armeabi-v7a/libssh.so.4.2.3
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DANDROID -DLIBSSH_EXPORTS -D_FORTIFY_SOURCE=2 
+LOCAL_CFLAGS:= -DANDROID -DLIBSSH_EXPORTS -D_FORTIFY_SOURCE=2 \
+-ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	libssh/androidbuild/src\

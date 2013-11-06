@@ -3,7 +3,7 @@ LOCAL_PATH := $(call my-dir)
 #original path: libs/armeabi-v7a/libzlib.a
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DANDROID -DHAVE_CONFIG_H -DDBUG_OFF 
+LOCAL_CFLAGS:= -DANDROID -DHAVE_CONFIG_H -DDBUG_OFF -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	mysql/androidbuild/include\
@@ -32,7 +32,7 @@ include $(CLEAR_VARS)
 
 LOCAL_CFLAGS:= -DANDROID -DHAVE_CONFIG_H -Dget_tty_password=yassl_mysql_get_tty_password \
 -Dget_tty_password_ext=yassl_mysql_get_tty_password_ext -DDBUG_OFF -DHAVE_YASSL \
--DYASSL_PREFIX -DHAVE_OPENSSL -DMULTI_THREADED 
+-DYASSL_PREFIX -DHAVE_OPENSSL -DMULTI_THREADED -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	mysql/androidbuild/include\
@@ -63,7 +63,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CFLAGS:= -DANDROID -DHAVE_CONFIG_H -DDBUG_OFF -DHAVE_YASSL -DYASSL_PREFIX -DHAVE_OPENSSL \
--DMULTI_THREADED 
+-DMULTI_THREADED -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	mysql/androidbuild/include\
@@ -101,7 +101,8 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: libs/armeabi-v7a/libstrings.a
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DANDROID -DDISABLE_MYSQL_THREAD_H -DHAVE_CONFIG_H -DDBUG_OFF 
+LOCAL_CFLAGS:= -DANDROID -DDISABLE_MYSQL_THREAD_H -DHAVE_CONFIG_H -DDBUG_OFF \
+-ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	mysql/androidbuild/include\
@@ -158,7 +159,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: libs/armeabi-v7a/libmysys.a
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DANDROID -DHAVE_CONFIG_H -DDBUG_OFF 
+LOCAL_CFLAGS:= -DANDROID -DHAVE_CONFIG_H -DDBUG_OFF -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	mysql/androidbuild/include\
@@ -269,7 +270,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: libs/armeabi-v7a/libdbug.a
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DANDROID -DHAVE_CONFIG_H -DDBUG_OFF 
+LOCAL_CFLAGS:= -DANDROID -DHAVE_CONFIG_H -DDBUG_OFF -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	mysql/androidbuild/include\
@@ -286,7 +287,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CFLAGS:= -DANDROID -DHAVE_CONFIG_H -DDBUG_OFF -DHAVE_YASSL -DYASSL_PREFIX -DHAVE_OPENSSL \
--DMULTI_THREADED 
+-DMULTI_THREADED -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	mysql/androidbuild/include\
@@ -308,7 +309,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: libs/armeabi-v7a/libregex.a
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DANDROID -DHAVE_CONFIG_H -DDBUG_OFF 
+LOCAL_CFLAGS:= -DANDROID -DHAVE_CONFIG_H -DDBUG_OFF -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	mysql/androidbuild/include\
@@ -328,7 +329,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CFLAGS:= -DANDROID -DHAVE_CONFIG_H -DDBUG_OFF -DHAVE_YASSL -DYASSL_PREFIX -DHAVE_OPENSSL \
--DMULTI_THREADED 
+-DMULTI_THREADED -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	mysql/androidbuild/include\
@@ -358,7 +359,7 @@ include $(CLEAR_VARS)
 
 LOCAL_CPP_EXTENSION := .cc
 LOCAL_CFLAGS:= -DANDROID -DHAVE_CONFIG_H -DDBUG_OFF -DHAVE_YASSL -DYASSL_PREFIX -DHAVE_OPENSSL \
--DMULTI_THREADED -D CLIENT_PROTOCOL_TRACING 
+-DMULTI_THREADED -D CLIENT_PROTOCOL_TRACING -ffunction-sections -fdata-sections
 LOCAL_C_INCLUDES:= \
 	mysql/androidbuild/include\
 	mysql/include\
@@ -425,7 +426,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CFLAGS:= -DANDROID -DHAVE_CONFIG_H -DDBUG_OFF -DHAVE_YASSL -DYASSL_PREFIX -DHAVE_OPENSSL \
--DMULTI_THREADED -D CLIENT_PROTOCOL_TRACING 
+-DMULTI_THREADED -D CLIENT_PROTOCOL_TRACING -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	mysql/androidbuild/include\

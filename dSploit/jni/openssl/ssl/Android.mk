@@ -46,6 +46,8 @@ LOCAL_C_INCLUDES += \
 	openssl \
 	openssl/include \
 	openssl/crypto
+	
+LOCAL_CFLAGS+= -ffunction-sections -fdata-sections
 
 LOCAL_STATIC_LIBRARIES += libcrypto
 

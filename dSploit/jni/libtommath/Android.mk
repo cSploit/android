@@ -3,7 +3,7 @@ LOCAL_PATH := $(call my-dir)
 #original path: libtommath.a
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -funroll-loops -fomit-frame-pointer 
+LOCAL_CFLAGS:= -funroll-loops -fomit-frame-pointer -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	libtommath

@@ -1,9 +1,9 @@
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -Wall -Wmissing-prototypes -Wstrict-prototypes -fexceptions -DHAVE_EXPAT_CONFIG_H
+LOCAL_CFLAGS:= -Wall -Wmissing-prototypes -Wstrict-prototypes -fexceptions -ffunction-sections -fdata-sections -DHAVE_EXPAT_CONFIG_H
 
-LOCAL_CXXFLAGS:=-Wall -fexceptions
+LOCAL_CXXFLAGS:=-Wall -fexceptions -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:=	expat\
 					expat/lib

@@ -3,7 +3,7 @@ LOCAL_PATH := $(call my-dir)
 #original path: extras/libodbcextraslc.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DHAVE_STDARG_H
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DHAVE_STDARG_H -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	unixODBC/extras\
@@ -19,7 +19,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: log/libloglc.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DHAVE_STDARG_H
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DHAVE_STDARG_H -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	unixODBC/log\
@@ -41,7 +41,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: lst/liblstlc.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DHAVE_STDARG_H
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DHAVE_STDARG_H -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	unixODBC/lst\
@@ -80,7 +80,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: ini/libinilc.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DHAVE_STDARG_H
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DHAVE_STDARG_H -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	unixODBC/ini\
@@ -134,7 +134,8 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: libltdl/dlopen.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DLT_CONFIG_H='<config.h>' -DLTDL -DLTDLOPEN=libltdlc 
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DLT_CONFIG_H='<config.h>' -DLTDL -DLTDLOPEN=libltdlc \
+-ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	unixODBC/libltdl\
@@ -165,7 +166,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: odbcinst/libodbcinst.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DHAVE_STDARG_H
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DHAVE_STDARG_H -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	unixODBC/odbcinst\
@@ -224,6 +225,8 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: odbcinst/libodbcinstlc.la
 include $(CLEAR_VARS)
 
+LOCAL_CFLAGS:=-ffunction-sections -fdata-sections
+
 LOCAL_SRC_FILES:= \
 	odbcinst/ODBCINSTConstructProperties.c\
 	odbcinst/ODBCINSTDestructProperties.c\
@@ -271,7 +274,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: DriverManager/libodbc.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DHAVE_STDARG_H
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DHAVE_STDARG_H -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	unixODBC/DriverManager\
@@ -415,7 +418,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: cur/libodbccr.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DHAVE_STDARG_H
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DHAVE_STDARG_H -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	unixODBC/cur\

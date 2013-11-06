@@ -119,8 +119,10 @@ LOCAL_SRC_FILES:=\
 	missing/strlcat.c\
 	missing/strlcpy.c
 
-LOCAL_CFLAGS := -O2 -g
+LOCAL_CFLAGS := -O2 -g -ffunction-sections -fdata-sections -static
 LOCAL_CFLAGS += -DHAVE_CONFIG_H -D_U_="__attribute__((unused))"
+
+LOCAL_LDFLAGS:= -Wl,--gc-sections
 
 LOCAL_C_INCLUDES += \
 	libpcap\

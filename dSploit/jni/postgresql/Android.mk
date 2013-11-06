@@ -1,7 +1,8 @@
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DFRONTEND -DSO_MAJOR_VERSION=5 -DUNSAFE_STAT_OK
+LOCAL_CFLAGS:= -DFRONTEND -DSO_MAJOR_VERSION=5 -DUNSAFE_STAT_OK -ffunction-sections \
+-fdata-sections
 
 LOCAL_C_INCLUDES:= 	postgresql/src/backend\
 										postgresql/src/port\

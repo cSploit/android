@@ -9,6 +9,10 @@ LOCAL_SRC_FILES := hashmap.c \
                    arpspoof.c
                    
 APP_OPTIM := release
+
+LOCAL_CFLAGS:= -static -ffunction-sections -fdata-sections
+LOCAL_LDFLAGS += -Wl,--gc-sections
+
 LOCAL_C_INCLUDES := libpcap libnet/include include
 LOCAL_STATIC_LIBRARIES := libpcap libnet
 

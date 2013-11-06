@@ -83,8 +83,8 @@ LOCAL_C_INCLUDES:=	apr\
 					apr/include/arch/unix/\
 					apr/include/
 
-LOCAL_CFLAGS:=-g -O2 -pthread -DHAVE_CONFIG_H -DLINUX -D_REENTRANT -D_GNU_SOURCE
-
+LOCAL_CFLAGS:=-g -O2 -pthread -DHAVE_CONFIG_H -DLINUX -D_REENTRANT -D_GNU_SOURCE \
+-ffunction-sections -fdata-sections
 
 LOCAL_MODULE:= libapr-1
 

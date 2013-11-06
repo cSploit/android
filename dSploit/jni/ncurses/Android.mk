@@ -3,7 +3,7 @@ LOCAL_PATH := $(call my-dir)
 #original path: lib/libncurses.a
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DNDEBUG 
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DNDEBUG -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	ncurses/ncurses\
@@ -107,7 +107,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: lib/libtinfo.a
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DNDEBUG -DUSE_TERMLIB 
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DNDEBUG -DUSE_TERMLIB -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	ncurses/ncurses\
@@ -174,7 +174,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: lib/libpanel.a
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DNDEBUG 
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DNDEBUG -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	ncurses/ncurses\
@@ -204,7 +204,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: lib/libmenu.a
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DNDEBUG 
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DNDEBUG -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	ncurses/ncurses\
@@ -245,7 +245,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: lib/libform.a
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DNDEBUG 
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DNDEBUG -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	ncurses/ncurses\
@@ -300,7 +300,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: lib/libncurses++.a
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DNDEBUG 
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DNDEBUG -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	ncurses/c++\

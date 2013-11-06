@@ -26,7 +26,7 @@ LOCAL_PATH := $(call my-dir)
 #original path: lib/gl/libgnu.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -fvisibility=hidden 
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -fvisibility=hidden -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	libidn/lib/gl\
@@ -53,7 +53,7 @@ include $(CLEAR_VARS)
 
 LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DLIBIDN_BUILDING \
 -DLOCALEDIR=\"/opt/android-ndk/platforms/android-18/arch-arm/usr/share/locale\" \
--fvisibility=hidden 
+-fvisibility=hidden -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	libidn/lib\
@@ -90,7 +90,8 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CFLAGS:= -DHAVE_CONFIG_H \
--DLOCALEDIR=\"/opt/android-ndk/platforms/android-18/arch-arm/usr/share/locale\" 
+-DLOCALEDIR=\"/opt/android-ndk/platforms/android-18/arch-arm/usr/share/locale\" \
+-ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	libidn/src\

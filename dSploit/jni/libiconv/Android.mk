@@ -7,7 +7,7 @@ LOCAL_CFLAGS:= -DLIBDIR=\"/opt/android-ndk/platforms/android-18/arch-arm/usr/lib
 -DBUILDING_LIBCHARSET -DBUILDING_DLL -DENABLE_RELOCATABLE=1 -DIN_LIBRARY \
 -DINSTALLDIR=\"/opt/android-ndk/platforms/android-18/arch-arm/usr/lib\" \
 -DNO_XMALLOC -Dset_relocation_prefix=libcharset_set_relocation_prefix \
--Drelocate=libcharset_relocate -DHAVE_CONFIG_H -DPIC 
+-Drelocate=libcharset_relocate -DHAVE_CONFIG_H -DPIC -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	libiconv/libcharset/lib\
@@ -28,7 +28,7 @@ LOCAL_CFLAGS:= -DLIBDIR=\"/opt/android-ndk/platforms/android-18/arch-arm/usr/lib
 -DBUILDING_LIBICONV -DBUILDING_DLL -DENABLE_RELOCATABLE=1 -DIN_LIBRARY \
 -DINSTALLDIR=\"/opt/android-ndk/platforms/android-18/arch-arm/usr/lib\" \
 -DNO_XMALLOC -Dset_relocation_prefix=libiconv_set_relocation_prefix \
--Drelocate=libiconv_relocate -DHAVE_CONFIG_H -DPIC 
+-Drelocate=libiconv_relocate -DHAVE_CONFIG_H -DPIC -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	libiconv/lib\

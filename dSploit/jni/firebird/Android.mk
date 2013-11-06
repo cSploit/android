@@ -21,7 +21,7 @@ LOCAL_PATH := $(call my-dir)
 #original path: extern/editline/src/.libs/libedit.a
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H 
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	firebird/extern/editline/src\
@@ -66,8 +66,8 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CFLAGS:= -DBOOT_BUILD -DNAMESPACE=Vulcan -DNDEBUG -DLINUX -DARM \
--fPIC -fsigned-char -fmessage-length=0
-LOCAL_CPPFLAGS:= -fexceptions
+-fPIC -fsigned-char -fmessage-length=0 -ffunction-sections -fdata-sections
+LOCAL_CPPFLAGS:= -fexceptions -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	icu/androidbuild/icu_build/include\
@@ -235,7 +235,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CPPFLAGS:= -DSUPERCLIENT -DNAMESPACE=Vulcan -DNDEBUG -DLINUX -DARM \
--fPIC -fsigned-char -fmessage-length=0
+-fPIC -fsigned-char -fmessage-length=0 -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	icu/androidbuild/icu_build/include\
@@ -301,7 +301,7 @@ include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CPPFLAGS:= -DNAMESPACE=Vulcan -DNDEBUG -DLINUX -DARM -fPIC \
--fsigned-char -fmessage-length=0
+-fsigned-char -fmessage-length=0 -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	icu/androidbuild/icu_build/include\
@@ -321,7 +321,7 @@ include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CPPFLAGS:= -DNAMESPACE=Vulcan -DNDEBUG -DLINUX -DARM -fPIC \
--fsigned-char -fmessage-length=0 
+-fsigned-char -fmessage-length=0 -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	icu/androidbuild/icu_build/include\
@@ -343,7 +343,7 @@ include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CFLAGS:= -DBOOT_BUILD -DNAMESPACE=Vulcan -DNDEBUG -DLINUX -DARM \
--fPIC -fsigned-char -fmessage-length=0 
+-fPIC -fsigned-char -fmessage-length=0 -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	icu/androidbuild/icu_build/include\
@@ -571,8 +571,8 @@ include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CFLAGS:= -DBOOT_BUILD -DNAMESPACE=Vulcan -DNDEBUG -DLINUX -DARM \
--fPIC -fsigned-char -fmessage-length=0 
-LOCAL_CPPFLAGS:= -DSUPERCLIENT -fexceptions
+-fPIC -fsigned-char -fmessage-length=0 -ffunction-sections -fdata-sections
+LOCAL_CPPFLAGS:= -DSUPERCLIENT -fexceptions -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	icu/androidbuild/icu_build/include\
@@ -654,7 +654,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CPPFLAGS:= -DSUPERCLIENT -DNAMESPACE=Vulcan -DNDEBUG -DLINUX -DARM \
--fPIC -fsigned-char -fmessage-length=0 
+-fPIC -fsigned-char -fmessage-length=0 -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	icu/androidbuild/icu_build/include\
@@ -677,7 +677,7 @@ include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CFLAGS:= -DBOOT_BUILD -DNAMESPACE=Vulcan -DNDEBUG -DLINUX -DARM \
--fPIC -fsigned-char -fmessage-length=0 
+-fPIC -fsigned-char -fmessage-length=0 -ffunction-sections -fdata-sections
 LOCAL_CPPFLAGS:= -DSUPERCLIENT 
 
 LOCAL_C_INCLUDES:= \

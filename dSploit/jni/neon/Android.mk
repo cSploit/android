@@ -3,7 +3,7 @@ LOCAL_PATH := $(call my-dir)
 #original path: src/libneon.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DNE_PRIVATE=extern 
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DNE_PRIVATE=extern -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	openssl/include\

@@ -3,7 +3,7 @@ LOCAL_PATH := $(call my-dir)
 #original path: build_unix/libdb-6.0.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -D_GNU_SOURCE -D_REENTRANT -DPIC 
+LOCAL_CFLAGS:= -D_GNU_SOURCE -D_REENTRANT -DPIC -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	bdb/build_unix\

@@ -3,7 +3,8 @@ LOCAL_PATH := $(call my-dir)
 #original path: libaprutil-1.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DLINUX -D_REENTRANT -D_GNU_SOURCE  -D_LIBC
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DLINUX -D_REENTRANT -D_GNU_SOURCE -D_LIBC\
+-ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	apr-util/include\
@@ -76,7 +77,8 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: dbm/apr_dbm_db.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DLINUX -D_REENTRANT -D_GNU_SOURCE \
+-ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	apr-util/include\
@@ -99,7 +101,8 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: dbd/apr_dbd_pgsql.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DLINUX -D_REENTRANT -D_GNU_SOURCE \
+-ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	apr-util/include\
@@ -122,7 +125,8 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: dbd/apr_dbd_sqlite3.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DLINUX -D_REENTRANT -D_GNU_SOURCE \
+-ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	apr-util/include\
@@ -145,7 +149,8 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: dbd/apr_dbd_mysql.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DLINUX -D_REENTRANT -D_GNU_SOURCE \
+-ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	apr-util/include\
@@ -168,7 +173,8 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: dbd/apr_dbd_odbc.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DLINUX -D_REENTRANT -D_GNU_SOURCE 
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DLINUX -D_REENTRANT -D_GNU_SOURCE \
+-ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	apr-util/include\

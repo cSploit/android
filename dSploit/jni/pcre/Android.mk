@@ -3,7 +3,7 @@ LOCAL_PATH := $(call my-dir)
 #original path: libpcre.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H 
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	pcre
@@ -37,7 +37,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: libpcreposix.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H 
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	pcre
@@ -54,7 +54,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 APP_STL := gnustl_static
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H 
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	pcre
@@ -72,7 +72,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: libpcre16.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H 
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	pcre
@@ -108,7 +108,7 @@ include $(BUILD_STATIC_LIBRARY)
 #original path: libpcre32.la
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -DHAVE_CONFIG_H 
+LOCAL_CFLAGS:= -DHAVE_CONFIG_H -ffunction-sections -fdata-sections
 
 LOCAL_C_INCLUDES:= \
 	pcre

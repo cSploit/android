@@ -476,7 +476,7 @@ LOCAL_SRC_FILES+= \
 	rsa/rsa_depr.c \
 	bn/bn_depr.c
 
-LOCAL_CFLAGS += -DNO_WINDOWS_BRAINDEATH 
+LOCAL_CFLAGS += -DNO_WINDOWS_BRAINDEATH -ffunction-sections -fdata-sections
 
 include $(LOCAL_PATH)/../android-config.mk
 
