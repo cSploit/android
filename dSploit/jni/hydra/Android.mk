@@ -24,7 +24,7 @@ LOCAL_C_INCLUDES:= 	hydra\
 					mysql/include\
 					subversion/subversion/include\
 					apr/include\
-					firebird/gen/firebird/include\
+					firebird/include\
 					ncpfs/include\
 					pcre\
 					
