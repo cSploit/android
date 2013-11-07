@@ -54,6 +54,9 @@ static void time_check(void);
 
 int main(int argc, char *argv[])
 {
+    // unbuffered stdout
+    setbuf(stdout,NULL);
+    
    /*
     * Alloc the global structures
     * We can access these structs via the macro in ec_globals.h

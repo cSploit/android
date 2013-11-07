@@ -95,6 +95,9 @@ int main(int argc, char *argv[])
 	iface			 = NULL;
 	gateway_ip = target_ip = 0;
 
+	// unbuffered stdout
+	setbuf(stdout,NULL);
+
 	printf( "dSploit ArpSpoofer.\n\n" );
 
 	while( (c = getopt(argc, argv, "i:t:h?V")) != -1)

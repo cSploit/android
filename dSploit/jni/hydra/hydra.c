@@ -1972,6 +1972,9 @@ int main(int argc, char *argv[]) {
   struct sockaddr_in6 *ipv6 = NULL;
   struct sockaddr_in *ipv4 = NULL;
 
+  //unbuffered stdout
+  setbuf(stdout,NULL);
+  
   printf("%s %s (c)2013 by %s & %s - for legal purposes only\n\n", PROGRAM, VERSION, AUTHOR, AUTHOR2);
 #ifndef LIBPOSTGRES
   SERVICES = hydra_string_replace(SERVICES, "postgres ", "");
