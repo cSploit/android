@@ -8,6 +8,8 @@ rm ./tools/tcpdump/tcpdump && \
 mv ../libs/armeabi/tcpdump ./tools/tcpdump/ && \
 rm ./tools/ettercap/ettercap && \
 mv ../libs/armeabi/ettercap ./tools/ettercap/ && \
+rm ./tools/hydra/hydra && \
+mv ../libs/armeabi/hydra ./tools/hydra/ && \
 zip -r tools.zip tools && \
 rm -rf tools && \
 mv tools.zip ../assets/
