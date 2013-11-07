@@ -57,10 +57,10 @@ function find_toolchain()
   
   case $(uname -m) in
     x86_64)
-      host_arch="x86_64"
+      host_arch="x86_64 x86"
       ;;
     i[3456]86)
-      host_arch="x32"
+      host_arch="x86"
       ;;
     *)
       die "cannot detect your system arch"
@@ -73,7 +73,8 @@ function find_toolchain()
       *clang*) continue
 	  ;;
       $CROSS_COMPILE-*) 
-	  NDK_TOOLCHAIN="${NDK}/toolchains/$name/prebuilt/linux-$host_arch/bin"
+	for arch in $host_arch; do
+	  NDK_TOOLCHAIN="${NDK}/toolchains/$name/prebuilt/linux-$arch/bin"
 	  tmp="${NDK_TOOLCHAIN}/${CROSS_COMPILE}-"
 	  for bin in gcc g++ ld ar ranlib strip; do
 	    if [ ! -f "$tmp$bin" ] ; then
@@ -81,6 +82,8 @@ function find_toolchain()
 	      break
 	    fi
 	  done
+	  test "x$NDK_TOOLCHAIN" != "x" && break
+	done
 	  ;;
       *) 	continue
 	  ;;
