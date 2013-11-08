@@ -1,4 +1,4 @@
-#!/bin/env ruby
+#!/usr/bin/env ruby
 
 #find all files in a directory ( recursively )
 def find_files(dir)
