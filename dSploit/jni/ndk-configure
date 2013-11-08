@@ -13,7 +13,27 @@ function die()
 function arg_parse()
 {
   if [ $# -lt 2 ] ; then
-    die -e "Usage ndk-configure <ndk_path> <api> [configure_script] [stl_provider] [update_files]\ne.g. ndk-configure /opt/android-ndk 9"
+    name=$(basename "$0")
+    die -e "Usage $name <ndk_path> <api_level> [configure_script] [stl_provider] [update_files]\n\
+\n\
+where:\n\
+\n\
+\tndk_path is the install directory of your ndk ( usually /opt/android-ndk )\n\
+\tapi_level is the target api level of your application\n\
+\tconfigure_script is the real configure script [default=./configure]\n\
+\tstl_provider is the c++ stl provider [default=system]\n\
+\tif update_files option is given will update machine detecting scripts\n\
+\n\
+stl_provider must be one of:\n\
+\n\
+\tgnustl_static:  GNU stl statically linked\n\
+\tgnustl_shared:  GNU stl shared library\n\
+\tstlport_static: android NDK stl port statically linked\n\
+\tstlport_shared: android NDK stl port shared library\n\
+\tsystem:         android NDK default stl\n\
+\n\
+read this answer for choose the right stl:\n\
+\thttp://stackoverflow.com/questions/9226513/linker-errors-in-android-ndk-undefined-reference-to-cxa-end-cleanup\n"
   fi
 
   if [ ! -d "$1" ] ; then
@@ -117,7 +137,7 @@ function find_cxxflags()
 		CXXFLAGS="${CXXFLAGS} -L$libdir -l$1 -I${includes/ / -I}"
 		echo "CXXFLAGS=$CXXFLAGS"
 		export CXXFLAGS
-		#TOFO: firebird
+		export LDFLAGS="-L$libdir -l$1 ${LDFLAGS}"
 	fi
 }
 
@@ -164,6 +184,7 @@ export SYSROOT=${NDK}/platforms/${PLATFORM}/arch-arm
 export CFLAGS="${CFLAGS} --sysroot=${SYSROOT}"
 export CPPFLAGS="${CPPFLAGS} --sysroot=${SYSROOT}"
 export CXXFLAGS="${CXXFLAGS} --sysroot=${SYSROOT}"
+export LDFLAGS="--sysroot=${SYSROOT} ${LDFLAGS}"
 argStr=""
 	
 while [ "$1" != "" ] ; do
