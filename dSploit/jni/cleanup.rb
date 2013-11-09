@@ -86,7 +86,7 @@ end
 #find headers used by file ( recursively )
 def find_headers(file)
 	in_comments = false
-	open(file).read.encode!('UTF-8', 'UTF-8', :invalid => :replace, :universal_newline => true).each_line do |line|
+	open(file).read.encode!('UTF-16', 'UTF-8', :invalid => :replace , :universal_newline => true).encode!('UTF-8', 'UTF-16').each_line do |line|
 		# remove newline
 		line.sub!(/\n$/,'')
 		# remove inline comments
