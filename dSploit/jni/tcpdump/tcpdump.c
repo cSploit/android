@@ -473,6 +473,9 @@ main(int argc, char **argv)
 	if(wsockinit() != 0) return 1;
 #endif /* WIN32 */
 
+	// unbuffered output
+	setbuf(stdout,NULL);
+
         gndo->ndo_Oflag=1;
 	gndo->ndo_Rflag=1;
 	gndo->ndo_dlt=-1;

@@ -177,6 +177,9 @@ int main(int argc, char *argv[]) {
   int ret;
   int i;
 
+  // unbuffered stdout
+  setbuf(stdout,NULL);
+
   set_program_name(argv[0]);
 
 #ifdef __amigaos__
