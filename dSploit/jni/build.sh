@@ -1,15 +1,9 @@
 #!/bin/sh
-ndk-build clean && \
-ndk-build && \
+ndk-build -j$(grep -E "^processor" /proc/cpuinfo | wc -l) && \
 unzip ../assets/tools.zip && \
-rm ./tools/arpspoof/arpspoof && \
-mv ../libs/armeabi/arpspoof ./tools/arpspoof/ && \
-rm ./tools/tcpdump/tcpdump && \
-mv ../libs/armeabi/tcpdump ./tools/tcpdump/ && \
-rm ./tools/ettercap/ettercap && \
-mv ../libs/armeabi/ettercap ./tools/ettercap/ && \
-rm ./tools/hydra/hydra && \
-mv ../libs/armeabi/hydra ./tools/hydra/ && \
+for tool in arpspoof tcpdump ettercap hydra nmap; do \
+	mv ../libs/armeabi/$tool ./tools/$tool/$tool; \
+done && \
 zip -r tools.zip tools && \
 rm -rf tools && \
 mv tools.zip ../assets/
