@@ -30,11 +30,12 @@ the solution it's quite ugly, we have to use signals to ask threads to cancel.
 +sigset_t waiting_mask;
 +if(sigpending (&waiting_mask, SIGUSR1))
 +  pthread_exit(0);
----
+```
+```diff
 -pthread_cancel(thread_id);
 +pthread_kill(thread_id,SIGUSR1);
 ```
-> **NOTE:** remember to #include <signals.h> if not already included.
+> **NOTE:** remember to `#include <signals.h>` if not already included.
 
 ### undefined reference to `crypt_r'
 
