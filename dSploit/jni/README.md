@@ -183,7 +183,7 @@ cd project
 ```
 
 
-  [bionic_workarounds]: bionic_workarounds
+  [bionic_workarounds]: bionic_workarounds.md
   [configure_hacks]: configure_hacks
   [ndk-configure]: ndk-configure
   [make2android]: make2android.rb
