@@ -32,7 +32,7 @@ import it.evilsocket.dsploit.R;
 public class SpinnerDialog extends AlertDialog{
   private int mSelected = 0;
 
-  public SpinnerDialog(String title, String message, String[] items, Activity activity, final SpinnerDialogListener listener){
+  public SpinnerDialog(String title, String message, String[] items, int default_index, Activity activity, final SpinnerDialogListener listener){
     super(activity);
 
     Spinner mSpinner = new Spinner(activity);
@@ -46,6 +46,8 @@ public class SpinnerDialog extends AlertDialog{
       public void onNothingSelected(AdapterView<?> arg0){
       }
     });
+
+    mSpinner.setSelection(default_index);
 
     this.setTitle(title);
     this.setMessage(message);
@@ -62,6 +64,10 @@ public class SpinnerDialog extends AlertDialog{
         dialog.dismiss();
       }
     });
+  }
+
+  public SpinnerDialog(String title, String message, String[] items, Activity activity, final SpinnerDialogListener listener) {
+    this(title,message,items,0,activity,listener);
   }
 
   public interface SpinnerDialogListener{

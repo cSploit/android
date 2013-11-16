@@ -116,13 +116,13 @@ public class RPCServer extends Thread
 
       @Override
       public void onEnd(int exitCode) {
-        Logger.debug("mExitCode="+exitCode);
+        Logger.debug("exitValue="+exitCode);
       }
     }
 
     try
     {
-      if(Shell.exec( "chroot \"" + msfChrootPath + "\" /start_msfrpcd.sh -P \"" + msfPassword + "\" -U \"" + msfUser + "\" -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg -f", new debug_receiver()) != 0) {
+      if(Shell.exec( "chroot '" + msfChrootPath + "' /start_msfrpcd.sh -P '" + msfPassword + "' -U '" + msfUser + "' -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg -f", new debug_receiver()) != 0) {
         Logger.error("chroot failed");
       }
     }
@@ -132,8 +132,30 @@ public class RPCServer extends Thread
     }
   }
 
-  private void start_daemon() throws RuntimeException, IOException, InterruptedException {
-    if(Shell.exec( "chroot \"" + msfChrootPath + "\" /start_msfrpcd.sh -P \"" + msfPassword + "\" -U \"" + msfUser + "\" -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg\n")!=0) {
+  private void start_daemon() throws RuntimeException, IOException, InterruptedException, TimeoutException {
+    Shell.StreamGobbler chroot;
+    long time = 0;
+
+    chroot = (Shell.StreamGobbler)Shell.async( "chroot '" + msfChrootPath + "' /start_msfrpcd.sh -P '" + msfPassword + "' -U '" + msfUser + "' -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg\n");
+    chroot.setName("chroot");
+    chroot.start();
+    try {
+    do {
+      Thread.sleep(100);
+      time=(new Date()).getTime();
+    } while(chroot.isAlive() && time < mTimeout);
+    } catch (InterruptedException e) {
+      //ensure to kill the chroot thread
+      chroot.interrupt();
+      throw e;
+    }
+    if(time >= mTimeout) {
+      chroot.interrupt();
+      throw new TimeoutException("chrooting timed out");
+    }
+    chroot.join();
+    if(chroot.exitValue !=0) {
+      Logger.error("chroot returned "+chroot.exitValue);
       throw new RuntimeException("chroot failed");
     }
   }

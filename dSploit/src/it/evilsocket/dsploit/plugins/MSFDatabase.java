@@ -51,9 +51,8 @@ public class MSFDatabase
       if(i<0)
         return null;
 
-      ex = new Exploit();
+      ex = new Exploit(new_location.substring(i+9),true);
       ex.url = new_location;
-      ex.msf_name = new_location.substring(i+9);
       ex.name = ex.msf_name.substring(ex.msf_name.lastIndexOf("/")+1);
     }
     catch( MalformedURLException mue )

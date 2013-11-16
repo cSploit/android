@@ -25,6 +25,8 @@ import org.msgpack.unpacker.Converter;
 
 import android.util.Log;
 
+import it.evilsocket.dsploit.net.Target;
+
 //TODO: add license and write down that we had taken part of this code from armitage
 /* NOTES
  * i have choosen to NOT use SSL for one reason: without SSL we don't need /dev/random in gentoo chroot,
@@ -94,6 +96,7 @@ public class RPCClient
     }
   }
 
+
   @SuppressWarnings("unchecked")
   protected Map exec (String methname, Object[] params) throws IOException, MsgpackException, MSFException
   {
@@ -143,7 +146,7 @@ public class RPCClient
   /** Caches certain calls and checks cache for re-executing them.
    * If not cached or not cacheable, calls exec. */
   @SuppressWarnings("unchecked")
-  private Object cacheExecute(String methodName, ArrayList params) throws IOException, MSFException, MsgpackException {
+  private Object cacheExecute(String methodName, Object[] params) throws IOException, MSFException, MsgpackException {
     if (methodName.equals("module.info") || methodName.equals("module.options") || methodName.equals("module.compatible_payloads") || methodName.equals("core.version")) {
       StringBuilder keysb = new StringBuilder(methodName);
 
@@ -156,19 +159,18 @@ public class RPCClient
       if(result != null)
         return result;
 
-      result = exec(methodName, params.toArray());
+      result = exec(methodName, params);
       callCache.put(key, result);
       return result;
     }
-    return exec(methodName, params.toArray());
+    return exec(methodName, params);
   }
 
   public Object execute(String method) throws IOException, MSFException
   {
     try
     {
-      ArrayList<String> tmp = new ArrayList<String>();
-      tmp.add(token);
+      Object[] tmp = new Object[] { token };
       return cacheExecute(method, tmp);
     }
     catch ( MsgpackException me)
@@ -178,14 +180,14 @@ public class RPCClient
   }
 
   @SuppressWarnings("unchecked")
-  public Object execute(String method, ArrayList args) throws IOException, MSFException
+  public Object execute(String method, Object...args) throws IOException, MSFException
   {
     try
     {
-      ArrayList local_array;
-
-      local_array = (ArrayList)args.clone();
-      local_array.add(0, token);
+      Object[] local_array = new Object[args.length+1];
+      local_array[0] = token;
+      for(int i=0;i<args.length;i++)
+        local_array[1+i] = args[i];
       return cacheExecute(method, local_array);
     }
     catch ( MsgpackException me)

@@ -18,13 +18,22 @@
  */
 package it.evilsocket.dsploit.net;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.os.StrictMode;
 
+import org.apache.http.conn.util.InetAddressUtils;
+
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Locale;
@@ -33,6 +42,7 @@ import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.net.Network.Protocol;
+import it.evilsocket.dsploit.net.metasploit.RPCClient;
 
 public class Target
 {
@@ -46,7 +56,7 @@ public class Target
 
     public static Type fromString(String type) throws Exception{
       if(type != null){
-        type = type = type.trim().toLowerCase(Locale.US);
+        type = type.trim().toLowerCase(Locale.US);
         if(type.equals("network"))
           return Type.NETWORK;
 
@@ -64,41 +74,34 @@ public class Target
   public static class Port{
     public Protocol protocol;
     public int number;
-    public String service;
-    public String	version;
+    public String service = "";
+    public String	version = "";
     private ArrayList<Vulnerability> vulns = new ArrayList<Target.Vulnerability>();
 
     public Port( int port, Protocol proto, String service, String version) {
+      Matcher matcher;
       this.number = port;
       this.protocol = proto;
       this.service = service;
-      this.version = version;
+      if(version != null && (matcher = VERSION_PATTERN.matcher(version)) != null && matcher.find())
+        this.version = matcher.group(1);
+      else
+        this.version = version;
     }
 
     public Port( int port, Protocol proto, String service ) {
-      this(port, proto, service, null);
+      this(port, proto, service, "");
     }
 
     public Port( int port, Protocol proto ) {
-      this( port, proto, null, null );
+      this( port, proto, "", "" );
     }
 
     public String getServiceQuery() {
-      String query = "";
-      Matcher matcher	  = null;
-
-      if( service != null )
-      {
-        query += service;
-
-        if(version!=null)
-          if((matcher = VERSION_PATTERN.matcher(version)) != null && matcher.find())
-            query += " " + matcher.group(1);
-          else
-            query += " " + version;
-      }
-
-      return query;
+      if(version!=null)
+        return service + " " + version;
+      else
+        return service;
     }
 
     // needed for vulnerabilities hashmap
@@ -126,6 +129,27 @@ public class Target
     public ArrayList<Vulnerability> getVulnerabilities()
     {
       return vulns;
+    }
+
+    public boolean equals(Object o) {
+      if(o == null || o.getClass() != this.getClass())
+        return false;
+      Port p = (Port)o;
+      if(p.number != this.number || p.protocol != this.protocol)
+        return false;
+      if(this.version!=null) {
+        if(!this.version.equals(p.version))
+          return false;
+      } else if (p.version != null) {
+        return false;
+      }
+      if(this.service!=null) {
+        if(!this.service.equals(p.service))
+          return false;
+      } else if (p.version!=null) {
+        return false;
+      }
+      return true;
     }
   }
 
@@ -227,20 +251,213 @@ public class Target
     }
   }
 
+  @SuppressWarnings("unchecked")
+  public static class ExploitOption {
+    private final static String[] requiredFields = new String[] {"type","required","advanced","evasion","desc"};
+    private final static HashMap<String,types> typesMap = new HashMap<String, types>() {
+      {
+        put("string", types.STRING);
+        put("bool", types.BOOLEAN);
+        put("address", types.ADDRESS);
+        put("integer", types.INTEGER);
+        put("port", types.PORT);
+        put("path", types.PATH);
+        put("enum", types.ENUM);
+      }
+    };
+
+    public static enum types {
+      STRING,
+      BOOLEAN,
+      PATH,
+      ADDRESS,
+      INTEGER,
+      PORT,
+      ENUM
+    }
+
+    private String mName,mDesc,mValue;
+    private HashMap<String,Object> mAttributes;
+    private types mType;
+    private boolean mAdvanced,mRequired,mEvasion;
+    private String[] enums;
+
+    public ExploitOption(String name, HashMap<String,Object> attrs) throws RuntimeException {
+      mName = name;
+      mAttributes = attrs;
+      // check for required data
+      for(String field : requiredFields)
+        if(!mAttributes.containsKey(field))
+          throw new RuntimeException("missing "+field+" field");
+      // get type
+      String type = (String) mAttributes.get("type");
+      if(!typesMap.containsKey(type))
+        throw new RuntimeException("unknown option type: "+type);
+      mType = typesMap.get(type);
+      if(mType == types.ENUM) {
+        if(!mAttributes.containsKey("enums"))
+          throw new RuntimeException("missing enums field");
+        //TODO: search if exists not string enums
+        enums = new String[((ArrayList<String>)mAttributes.get("enums")).size()];
+        enums = ((ArrayList<String>) mAttributes.get("enums")).toArray(enums);
+      }
+      // get all other data
+      mDesc = (String) mAttributes.get("desc");
+      mAdvanced = (Boolean) mAttributes.get("advanced");
+      mRequired = (Boolean) mAttributes.get("required");
+      mEvasion  = (Boolean) mAttributes.get("evasion");
+    }
+
+
+    public String getName() {
+      return mName;
+    }
+
+    public String getDescription() {
+      return mDesc;
+    }
+
+    public types getType() {
+      return mType;
+    }
+
+    public boolean isAdvanced() {
+      return mAdvanced;
+    }
+
+    public boolean isRequired() {
+      return mRequired;
+    }
+
+    public boolean isEvasion() {
+      return mEvasion;
+    }
+
+    public String[] getEnum() {
+      return enums;
+    }
+
+    public void setValue(String value) throws NumberFormatException {
+      switch (mType) {
+        case STRING:
+          mValue = value;
+          break;
+        case ADDRESS:
+          if(!InetAddressUtils.isIPv4Address(value))
+            throw new NumberFormatException("invalid IP address");
+          mValue = value;
+          break;
+        case PORT:
+          int i = Integer.parseInt(value);
+          if(i<0 || i > 65535)
+            throw new NumberFormatException("port must be between 0 and 65535");
+          break;
+        case BOOLEAN:
+          value=value.toLowerCase();
+          if(value.equals("true") || value.equals("false"))
+            mValue=value;
+          else
+            throw new NumberFormatException("boolean must be true or false");
+          break;
+        case ENUM:
+          //TODO: handle integer enums
+          ArrayList<String> valid = ((ArrayList<String>)mAttributes.get("enums"));
+          if(!valid.contains(value)) {
+            String valid_line = "";
+            for(String v : valid) {
+              valid_line+=" " + v;
+            }
+            Logger.warning("expected: (" + valid_line + ") got: " + value);
+            throw new NumberFormatException("invalid choice");
+          }
+          mValue = value;
+          break;
+        case PATH:
+          //TODO:
+          mValue = value;
+          break;
+      }
+    }
+
+    public String getValue() {
+      if(mValue!=null)
+        return mValue;
+      else if(mAttributes.containsKey("default"))
+        return mAttributes.get("default").toString();
+      else
+        return "";
+    }
+  }
+
   public static class Exploit
   {
     public String url;
     public String name;
     public String msf_name;
+    private String mDescription = null;
     public int payload_size;
     public boolean started = false;
     private Vulnerability mVuln = null;
+    private ArrayList<ExploitOption> options = null;
     //TODO: get payload_size
+    //TODO: refactoring
+
+    public Exploit(String name, boolean isMsfExploit) {
+      if(isMsfExploit) {
+        msf_name = name;
+        if(System.getMsfRpc()!=null) {
+          retrieveInfos();
+          retrieveOptions();
+        }
+      } else {
+        this.name = name;
+      }
+    }
+
+    public Exploit(String name) {
+      this(name,false);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void retrieveOptions() {
+      try
+      {
+        HashMap<String,Object>  map =  (HashMap<String,Object>) System.getMsfRpc().execute("module.options","exploit",msf_name);
+        Iterator it = map.entrySet().iterator();
+        options = new ArrayList<ExploitOption>();
+        while(it.hasNext()) {
+          Map.Entry<String,HashMap<String,Object>> item = (Map.Entry<String, HashMap<String, Object>>) it.next();
+          String name = item.getKey();
+          ExploitOption opt = new ExploitOption(name,item.getValue());
+          if(name.equals("RHOST"))
+            opt.setValue(System.getCurrentTarget().getAddress().getHostAddress());
+          options.add(opt);
+        }
+      } catch ( IOException e) {
+        Logger.error(e.getMessage());
+      } catch (RPCClient.MSFException e) {
+        Logger.error(e.getMessage());
+      }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void retrieveInfos() {
+      try
+      {
+        HashMap<String,Object> map = (HashMap<String,Object>) System.getMsfRpc().execute("module.info","exploit",msf_name);
+        mDescription=(String)map.get("name");
+        //TODO:get all other things
+      } catch ( IOException e) {
+        Logger.error(e.getMessage());
+      } catch (RPCClient.MSFException e) {
+        Logger.error(e.getMessage());
+      }
+    }
 
     public String toString()
     {
       if(msf_name!=null)
-        return msf_name;
+        return msf_name.substring(msf_name.lastIndexOf('/')+1);
       return name;
     }
 
@@ -251,7 +468,14 @@ public class Target
     }
 
     public String getDescription() {
-      return url;
+      if(mDescription!=null)
+        return mDescription;
+      else
+        return url;
+    }
+
+    public boolean isMsf() {
+      return this.msf_name != null;
     }
 
     public void setVulnerability(Vulnerability vuln)
@@ -261,11 +485,30 @@ public class Target
       if(mVuln!=null)
         mVuln.delExploit(this);
       mVuln=vuln;
+      if(mVuln!=null && this.msf_name != null && options!=null) {
+        for(ExploitOption opt : options)
+          if(opt.getName().equals("RPORT"))
+            opt.setValue(mVuln.getPort().number + "");
+      }
     }
 
     public Vulnerability getVulnerability()
     {
       return mVuln;
+    }
+
+    public ArrayList<ExploitOption> getOptions() {
+      if(options!=null)
+        return options;
+      else
+        return new ArrayList<ExploitOption>();
+    }
+
+    public boolean equals(Object o) {
+      if(o == null || o.getClass() != this.getClass())
+        return false;
+      Exploit e = (Exploit)o;
+      return ((Exploit)o).name.equals(this.name);
     }
   }
 
@@ -649,20 +892,8 @@ public class Target
   }
 
   public void addOpenPort(Port port){
-    for( int i = 0; i < mPorts.size(); i++ )
-    {
-      if( mPorts.get(i).number == port.number )
-      {
-        if( port.service != null )
-          mPorts.get(i).service = port.service;
-        if( port.version != null )
-          mPorts.get(i).version = port.version;
-
-        return;
-      }
-    }
-
-    mPorts.add( port );
+    if(!mPorts.contains(port))
+      mPorts.add( port );
   }
 
   public void addOpenPort(int port, Protocol protocol){

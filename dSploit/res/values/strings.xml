@@ -370,6 +370,7 @@
         <item>EXDB</item>
         <item>BOTH</item>
     </string-array>
+    <string name="pref_advanced">Advanced</string>
     <string name="pref_folder">Folder</string>
     <string name="pref_err_exists">does not exists.</string>
     <string name="pref_err_writable">is not writable.</string>

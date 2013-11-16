@@ -106,8 +106,7 @@ public class EXDatabase
       {
         while(matcher.find())
         {
-          exp = new Exploit();
-          exp.name = matcher.group(2);
+          exp = new Exploit(matcher.group(2));
           exp.url = matcher.group(1);
           upshots.add(exp);
         }

@@ -136,6 +136,7 @@ public class System
   private static Object mCustomData = null;
 
   private static RPCClient mMsfRpc      = null;
+  private static Exploit mExploit       = null;
 
   public static void init(Context context) throws Exception{
     mContext = context;
@@ -357,10 +358,6 @@ public class System
   public static String getLibraryPath(){
     //noinspection ConstantConditions
     return getToolsPath() + "libs/";
-  }
-
-  public static String getBinaryPath(){
-    return getToolsPath() + "bin/";
   }
 
   public static String getFifosPath() {
@@ -898,6 +895,14 @@ public class System
 
   public static Plugin getCurrentPlugin(){
     return mCurrentPlugin;
+  }
+
+  public static void setCurrentExploit(Exploit exploit) {
+    mExploit = exploit;
+  }
+
+  public static Exploit getCurrentExploit() {
+    return mExploit;
   }
 
   public static void addOpenPort( int port, Protocol protocol ) {

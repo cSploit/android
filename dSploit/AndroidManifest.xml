@@ -53,6 +53,10 @@
                 android:label="@string/title_activity_main">
         </activity>
         <activity
+                android:name=".gui.ExploitPreferences"
+                android:label="@string/title_activity_main">
+        </activity>
+        <activity
                 android:name=".ActionActivity"
                 android:label="@string/title_activity_main">
         </activity>
