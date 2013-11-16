@@ -275,11 +275,6 @@ public class MainActivity extends SherlockListActivity
           else if(installer.needed() && !installer.install())
             fatal = getString(R.string.install_error);
 
-            // check for LD_LIBRARY_PATH issue ( https://github.com/evilsocket/dsploit/issues/35 )
-          else if(!Shell.isLibraryPathOverridable(appContext))
-            fatal = getString(R.string.fatal_error_html) +
-              getString(R.string.fatal_error_html2);
-
           dialog.dismiss();
 
           if(fatal != null){
@@ -592,7 +587,7 @@ public class MainActivity extends SherlockListActivity
     }
     else if( itemId == R.id.ss_msfrpcd )
     {
-      if(System.getMsfRpc()!=null)
+      if(System.getMsfRpc()!=null || (mRPCServer!=null && mRPCServer.isRunning()))
       {
         StopRPCServer();
         item.setTitle("Start msfrpcd");
