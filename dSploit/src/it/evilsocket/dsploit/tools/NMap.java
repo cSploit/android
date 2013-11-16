@@ -18,6 +18,7 @@
  */
 package it.evilsocket.dsploit.tools;
 
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -75,7 +76,6 @@ public class NMap extends Tool
     }
 
     public void onNewLine( String line ) {
-      Logger.debug( "NMAP: " + line );
       Matcher matcher;
 
       if( ( matcher = PORT_PATTERN.matcher( line ) ) != null && matcher.find() )

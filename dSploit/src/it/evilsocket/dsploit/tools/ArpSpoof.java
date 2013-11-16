@@ -45,7 +45,7 @@ public class ArpSpoof extends Tool
       System.errorLogging(e);
     }
 
-    return super.asyncStatic(commandLine, receiver);
+    return super.async(commandLine, receiver);
   }
 
   public boolean kill(){

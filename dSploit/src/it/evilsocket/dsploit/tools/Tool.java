@@ -30,29 +30,30 @@ import it.evilsocket.dsploit.core.System;
 
 public class Tool
 {
-  protected File mFile = null;
-  protected String mName = null;
-  protected String mDirName = null;
-  protected String mFileName = null;
-  protected String mLibPath = null;
-  protected Context mAppContext = null;
+  protected String mPath = null;
+  protected String mBasename = null;
 
-  @SuppressWarnings("ConstantConditions")
   public Tool(String name, Context context){
-    mAppContext = context;
-    mLibPath = mAppContext.getFilesDir().getAbsolutePath() + "/tools/libs";
-    mFileName = mAppContext.getFilesDir().getAbsolutePath() + "/tools/" + name;
-    mFile = new File(mFileName);
-    mName = mFile.getName();
-    mDirName = mFile.getParent();
+    File stat;
+
+    mPath = context.getFilesDir().getAbsolutePath() + "/tools/" + name;
+    stat = new File(mPath);
+    if(!stat.exists()) {
+      Logger.error("cannot find tool: '"+name+"'");
+      Logger.error(mPath +": No such file or directory");
+      Logger.error("this tool will be disabled.");
+      mPath = "date";
+    } else {
+      mBasename = stat.getName();
+    }
   }
 
   public Tool(String name){
-    mName = name;
+    mPath = mBasename = name;
   }
 
   public void run(String args, OutputReceiver receiver) throws IOException, InterruptedException{
-    Shell.exec(mName + " " + args, receiver);
+    Shell.exec(mPath + " " + args, receiver);
   }
 
   public void run(String args) throws IOException, InterruptedException{
@@ -60,11 +61,7 @@ public class Tool
   }
 
   public Thread async(String args, OutputReceiver receiver){
-    return Shell.async(mName + " " + args, receiver);
-  }
-
-  public Thread asyncStatic(String args, OutputReceiver receiver){
-    return Shell.async(mName + " " + args, receiver, false);
+    return Shell.async(mPath + " " + args, receiver);
   }
 
   public boolean kill(){
@@ -73,7 +70,7 @@ public class Tool
 
   public boolean kill(String signal){
     try{
-      Shell.exec("killall -" + signal + " " + mName);
+      Shell.exec("killall -" + signal + " " + mBasename);
 
       return true;
     }

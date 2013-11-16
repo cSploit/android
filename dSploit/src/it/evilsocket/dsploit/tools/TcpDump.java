@@ -20,6 +20,8 @@ package it.evilsocket.dsploit.tools;
 
 import android.content.Context;
 
+import java.io.IOException;
+
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 
 public class TcpDump extends Tool{

@@ -207,13 +207,6 @@ public class Shell
     return exec(command, null);
   }
 
-  /**
-   * @deprecated
-   */
-  public static Thread async(String cmd, OutputReceiver receiver, boolean b) {
-    return async(cmd,receiver);
-  }
-
   public static Thread async(final String command, final OutputReceiver receiver) {
     int fifonum;
     String fifo_path;

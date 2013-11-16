@@ -20,6 +20,7 @@ package it.evilsocket.dsploit.tools;
 
 import android.content.Context;
 
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
