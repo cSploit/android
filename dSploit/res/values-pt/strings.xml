@@ -356,7 +356,6 @@
     <string name="menu_add">Adicionar</string>
     <string name="menu_scan">Escanearcan</string>
     <string name="menu_wifi_scan">Escanear WiFi</string>
-    <string name="menu_settings">Configurações</string>
     <string name="menu_stop_msfrpcd">Parar msfrpcd</string>
     
     <string name="pref_theme">Tema Escuro</string>

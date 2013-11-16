@@ -231,6 +231,5 @@
     <string name="menu_add">Ajouter</string>
     <string name="menu_scan">Scanner</string>
     <string name="menu_wifi_scan">Scan WiFi</string>
-    <string name="menu_settings">Paramètres</string>
     <string name="menu_stop_msfrpcd">Arrêter le msfrpcd</string>
 </resources>

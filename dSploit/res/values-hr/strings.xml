@@ -389,6 +389,5 @@
     <string name="menu_add">Dodaj</string>
     <string name="menu_scan">Pretraži</string>
     <string name="menu_wifi_scan">WiFi Pretraživanje</string>
-    <string name="menu_settings">Postavke</string>
     <string name="menu_stop_msfrpcd">Zaustavi msfrpcd</string>
 </resources>

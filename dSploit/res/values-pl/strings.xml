@@ -388,7 +388,6 @@
     <string name="menu_add">Add</string>
     <string name="menu_scan">Scan</string>
     <string name="menu_wifi_scan">WiFi Scan</string>
-    <string name="menu_settings">Settings</string>
     <string name="menu_stop_msfrpcd">Stop msfrpcd</string>
     
     <string name="pref_theme">Dark Theme</string>

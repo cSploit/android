@@ -381,7 +381,6 @@
     <string name="menu_add">Přidat</string>
     <string name="menu_scan">Skenovat</string>
     <string name="menu_wifi_scan">WiFi sken</string>
-    <string name="menu_settings">Nastavení</string>
     <string name="menu_stop_msfrpcd">Konec msfrpcd</string>
 
     <string name="pref_theme">Tmavé téma</string>
