@@ -124,8 +124,6 @@ public class NMap extends Tool
     }
 
     public void onNewLine( String line ) {
-      Logger.debug( "NMAP: " + line );
-
       Matcher matcher = null;
 
       if((matcher = PORT_PATTERN.matcher(line)) != null && matcher.find())

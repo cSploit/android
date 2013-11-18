@@ -64,11 +64,12 @@ public class Sessions extends Plugin
 
     i=nEx=0;
     nEx = System.getCurrentTarget().getExploits().size();
+    /*
     for(i=0;i<nEx;i++)
     {
       if(System.getCurrentExploits().get(i).started)
         break;
-    }
+    }*/
 
     if( System.getCurrentTarget().hasOpenPorts() == false )
       new FinishDialog( getString(R.string.warning), getString(R.string.no_open_ports), this ).show();

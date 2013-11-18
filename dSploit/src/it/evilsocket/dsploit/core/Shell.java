@@ -104,44 +104,12 @@ public class Shell
   }
 
   public static boolean isRootGranted() {
-    Process process = null;
-    DataOutputStream writer = null;
-    BufferedReader reader = null;
-    String line = null;
-    boolean granted = false;
-
     try{
-      process = spawnShell("su");
-      writer = new DataOutputStream(process.getOutputStream());
-      reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-      writer.writeBytes("id\n");
-      writer.flush();
-      writer.writeBytes("exit\n");
-      writer.flush();
-
-      while((line = reader.readLine()) != null && !granted){
-        if(line.toLowerCase().contains("uid=0"))
-          granted = true;
-      }
-
-      process.waitFor();
-
+      return exec("id | grep -q 'uid=0'") == 0;
     } catch(Exception e){
       System.errorLogging(e);
-    } finally{
-      try{
-        if(writer != null)
-          writer.close();
-
-        if(reader != null)
-          reader.close();
-      } catch(IOException e){
-        // ignore errors
-      }
     }
-
-    return granted;
+    return false;
   }
 
   public interface OutputReceiver {
@@ -154,24 +122,10 @@ public class Shell
 
   public static boolean isBinaryAvailable(String binary) {
     try{
-      Process process = spawnShell("sh");
-      DataOutputStream writer = new DataOutputStream(process.getOutputStream());
-      BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-      String line = null;
-
-      writer.writeBytes("which " + binary + "\n");
-      writer.flush();
-      writer.writeBytes("exit\n");
-      writer.flush();
-
-      while((line = reader.readLine()) != null){
-        if(line.isEmpty() == false && line.startsWith("/"))
-          return true;
-      }
+      return exec("which "+binary) == 0;
     } catch(Exception e){
       System.errorLogging(e);
     }
-
     return false;
   }
 
@@ -195,12 +149,12 @@ public class Shell
   }
 
   public static int exec(String command, OutputReceiver receiver) throws IOException, InterruptedException {
-    StreamGobbler g = (StreamGobbler)async(command, receiver);
+    Thread g = async(command, receiver);
     if(g==fakeThread)
       return -1;
     g.start();
     g.join();
-    return  g.exitValue;
+    return  ((StreamGobbler)g).exitValue;
   }
 
   public static int exec(String command) throws IOException, InterruptedException {
@@ -215,9 +169,8 @@ public class Shell
 
     try
     {
-      // first time spawn the shell
-      if( mRootShell == null )
-      {
+      // spawn shell for the first time
+      if(mRootShell==null) {
         mRootShell = spawnShell("su");
         mWriter = new DataOutputStream(mRootShell.getOutputStream());
         // this 2 reader are useful for debugging purposes
@@ -255,6 +208,8 @@ public class Shell
       fakeThread = new Thread(new Runnable() {
         @Override
         public void run() {
+          if(receiver!=null)
+            receiver.onEnd(-1);
           return;
         }
       });

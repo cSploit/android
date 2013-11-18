@@ -166,7 +166,7 @@ public class RPCClient
     return exec(methodName, params);
   }
 
-  public Object execute(String method) throws IOException, MSFException
+  public Object call(String method) throws IOException, MSFException
   {
     try
     {
@@ -180,7 +180,7 @@ public class RPCClient
   }
 
   @SuppressWarnings("unchecked")
-  public Object execute(String method, Object...args) throws IOException, MSFException
+  public Object call(String method, Object... args) throws IOException, MSFException
   {
     try
     {

@@ -53,7 +53,7 @@
                 android:label="@string/title_activity_main">
         </activity>
         <activity
-                android:name=".gui.ExploitPreferences"
+                android:name=".gui.MsfPreferences"
                 android:label="@string/title_activity_main">
         </activity>
         <activity

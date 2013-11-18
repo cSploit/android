@@ -384,6 +384,17 @@
 
     <string name="exploit_finder">Exploit Finder</string>
     <string name="exploit_finder_desc">Search for exploit that matches found vulnerabilities.</string>
+    <string name="exploit_launch_all">Launch all</string>
     <string name="sessions">Sessions</string>
     <string name="sessions_desc">Sessions on pwned target.</string>
+    <string name="exploit_launch">Launch</string>
+    <string name="exploit_edit_options">Edit options</string>
+    <string name="payload_edit_settings">Edit payload settings</string>
+    <string name="exploit_choose_payload">Choose payload</string>
+    <string name="exploit_choose_target">Choose target</string>
+    <string name="open_url">Open URL</string>
+    <string name="show_full_description">Show full description</string>
+    <string name="choose_an_option">choose an option</string>
+    <string name="required">Required</string>
+    <string name="evasion">Evasion</string>
 </resources>

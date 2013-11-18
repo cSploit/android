@@ -136,7 +136,7 @@ public class RPCServer extends Thread
     Shell.StreamGobbler chroot;
     long time = 0;
 
-    chroot = (Shell.StreamGobbler)Shell.async( "chroot '" + msfChrootPath + "' /start_msfrpcd.sh -P '" + msfPassword + "' -U '" + msfUser + "' -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg\n");
+    chroot = (Shell.StreamGobbler)Shell.async( "chroot '" + msfChrootPath + "' /start_msfrpcd.sh -P '" + msfPassword + "' -U '" + msfUser + "' -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg");
     chroot.setName("chroot");
     chroot.start();
     try {

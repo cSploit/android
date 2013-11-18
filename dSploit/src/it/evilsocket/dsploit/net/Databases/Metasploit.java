@@ -17,22 +17,23 @@
  * You should have received a copy of the GNU General Public License
  * along with dSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.evilsocket.dsploit.plugins;
+package it.evilsocket.dsploit.net.Databases;
 
 import it.evilsocket.dsploit.net.Target.Exploit;
+import it.evilsocket.dsploit.net.metasploit.MsfExploit;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
-public class MSFDatabase
+public class Metasploit
 {
-  private static Exploit search( String encoded_query )
+  private static MsfExploit search( String encoded_query )
   {
     String query = null;
     URLConnection  connection = null;
-    Exploit ex = null;
+    MsfExploit ex = null;
     String new_location = null;
 
     try
@@ -51,9 +52,7 @@ public class MSFDatabase
       if(i<0)
         return null;
 
-      ex = new Exploit(new_location.substring(i+9),true);
-      ex.url = new_location;
-      ex.name = ex.msf_name.substring(ex.msf_name.lastIndexOf("/")+1);
+      ex = new MsfExploit(new_location.substring(i+9),new_location);
     }
     catch( MalformedURLException mue )
     {
@@ -67,14 +66,14 @@ public class MSFDatabase
   }
 
   //Search by cve
-  public static Exploit search_by_cve( String query )
+  public static MsfExploit search_by_cve( String query )
   {
     return search(query);
   }
 
 
   //Search by osvdb
-  public static Exploit search_by_osvdb( int data )
+  public static MsfExploit search_by_osvdb( int data )
   {
     return search("" + data);
   }

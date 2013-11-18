@@ -60,7 +60,7 @@ public class ShellSession extends Thread {
       array_buffer.add(session);
       array_buffer.add(buffer.toString());
 			/* write our command to whateverz */
-      connection.execute("session.shell_write", array_buffer);
+      connection.call("session.shell_write", array_buffer);
 
 			/* read until we encounter AAAAAAAAAA */
       buffer.delete(0,buffer.length());
@@ -132,6 +132,8 @@ public class ShellSession extends Thread {
   }
 
   private Map readResponse() throws Exception {
-    return (Map)(connection.execute("session.shell_read", new ArrayList<String>() {{ add(session);}}));
+    return (Map)(connection.call("session.shell_read", new ArrayList<String>() {{
+      add(session);
+    }}));
   }
 }

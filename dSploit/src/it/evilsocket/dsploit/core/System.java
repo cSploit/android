@@ -77,6 +77,7 @@ import it.evilsocket.dsploit.net.Target.Port;
 import it.evilsocket.dsploit.net.Target.Type;
 import it.evilsocket.dsploit.net.Target.Vulnerability;
 import it.evilsocket.dsploit.net.Target.Exploit;
+import it.evilsocket.dsploit.net.metasploit.Payload;
 import it.evilsocket.dsploit.net.metasploit.RPCClient;
 import it.evilsocket.dsploit.net.http.proxy.HTTPSRedirector;
 import it.evilsocket.dsploit.net.http.proxy.Proxy;
@@ -137,6 +138,7 @@ public class System
 
   private static RPCClient mMsfRpc      = null;
   private static Exploit mExploit       = null;
+  private static Payload mPayload       = null;
 
   public static void init(Context context) throws Exception{
     mContext = context;
@@ -903,6 +905,14 @@ public class System
 
   public static Exploit getCurrentExploit() {
     return mExploit;
+  }
+
+  public static void setCurrentPayload(Payload payload) {
+    mPayload = payload;
+  }
+
+  public static Payload getCurrentPayload() {
+    return mPayload;
   }
 
   public static void addOpenPort( int port, Protocol protocol ) {

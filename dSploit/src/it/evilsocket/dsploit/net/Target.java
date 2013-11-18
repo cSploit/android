@@ -251,264 +251,57 @@ public class Target
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public static class ExploitOption {
-    private final static String[] requiredFields = new String[] {"type","required","advanced","evasion","desc"};
-    private final static HashMap<String,types> typesMap = new HashMap<String, types>() {
-      {
-        put("string", types.STRING);
-        put("bool", types.BOOLEAN);
-        put("address", types.ADDRESS);
-        put("integer", types.INTEGER);
-        put("port", types.PORT);
-        put("path", types.PATH);
-        put("enum", types.ENUM);
-      }
-    };
+  public static class Exploit {
+    protected String mName;
+    protected String mDescription;
+    protected String mUrl;
+    protected Vulnerability mVuln;
 
-    public static enum types {
-      STRING,
-      BOOLEAN,
-      PATH,
-      ADDRESS,
-      INTEGER,
-      PORT,
-      ENUM
+    public Exploit(String name, String url, String description) {
+      this.mName = name;
+      this.mUrl = url;
+      this.mDescription = description;
     }
 
-    private String mName,mDesc,mValue;
-    private HashMap<String,Object> mAttributes;
-    private types mType;
-    private boolean mAdvanced,mRequired,mEvasion;
-    private String[] enums;
-
-    public ExploitOption(String name, HashMap<String,Object> attrs) throws RuntimeException {
-      mName = name;
-      mAttributes = attrs;
-      // check for required data
-      for(String field : requiredFields)
-        if(!mAttributes.containsKey(field))
-          throw new RuntimeException("missing "+field+" field");
-      // get type
-      String type = (String) mAttributes.get("type");
-      if(!typesMap.containsKey(type))
-        throw new RuntimeException("unknown option type: "+type);
-      mType = typesMap.get(type);
-      if(mType == types.ENUM) {
-        if(!mAttributes.containsKey("enums"))
-          throw new RuntimeException("missing enums field");
-        //TODO: search if exists not string enums
-        enums = new String[((ArrayList<String>)mAttributes.get("enums")).size()];
-        enums = ((ArrayList<String>) mAttributes.get("enums")).toArray(enums);
-      }
-      // get all other data
-      mDesc = (String) mAttributes.get("desc");
-      mAdvanced = (Boolean) mAttributes.get("advanced");
-      mRequired = (Boolean) mAttributes.get("required");
-      mEvasion  = (Boolean) mAttributes.get("evasion");
+    public Exploit(String name, String url) {
+      this(name, url,"");
     }
-
 
     public String getName() {
-      return mName;
+      return this.mName;
     }
 
     public String getDescription() {
-      return mDesc;
-    }
-
-    public types getType() {
-      return mType;
-    }
-
-    public boolean isAdvanced() {
-      return mAdvanced;
-    }
-
-    public boolean isRequired() {
-      return mRequired;
-    }
-
-    public boolean isEvasion() {
-      return mEvasion;
-    }
-
-    public String[] getEnum() {
-      return enums;
-    }
-
-    public void setValue(String value) throws NumberFormatException {
-      switch (mType) {
-        case STRING:
-          mValue = value;
-          break;
-        case ADDRESS:
-          if(!InetAddressUtils.isIPv4Address(value))
-            throw new NumberFormatException("invalid IP address");
-          mValue = value;
-          break;
-        case PORT:
-          int i = Integer.parseInt(value);
-          if(i<0 || i > 65535)
-            throw new NumberFormatException("port must be between 0 and 65535");
-          break;
-        case BOOLEAN:
-          value=value.toLowerCase();
-          if(value.equals("true") || value.equals("false"))
-            mValue=value;
-          else
-            throw new NumberFormatException("boolean must be true or false");
-          break;
-        case ENUM:
-          //TODO: handle integer enums
-          ArrayList<String> valid = ((ArrayList<String>)mAttributes.get("enums"));
-          if(!valid.contains(value)) {
-            String valid_line = "";
-            for(String v : valid) {
-              valid_line+=" " + v;
-            }
-            Logger.warning("expected: (" + valid_line + ") got: " + value);
-            throw new NumberFormatException("invalid choice");
-          }
-          mValue = value;
-          break;
-        case PATH:
-          //TODO:
-          mValue = value;
-          break;
-      }
-    }
-
-    public String getValue() {
-      if(mValue!=null)
-        return mValue;
-      else if(mAttributes.containsKey("default"))
-        return mAttributes.get("default").toString();
+      if(this.mDescription!=null)
+        return this.mDescription;
       else
-        return "";
-    }
-  }
-
-  public static class Exploit
-  {
-    public String url;
-    public String name;
-    public String msf_name;
-    private String mDescription = null;
-    public int payload_size;
-    public boolean started = false;
-    private Vulnerability mVuln = null;
-    private ArrayList<ExploitOption> options = null;
-    //TODO: get payload_size
-    //TODO: refactoring
-
-    public Exploit(String name, boolean isMsfExploit) {
-      if(isMsfExploit) {
-        msf_name = name;
-        if(System.getMsfRpc()!=null) {
-          retrieveInfos();
-          retrieveOptions();
-        }
-      } else {
-        this.name = name;
-      }
+        return this.mUrl;
     }
 
-    public Exploit(String name) {
-      this(name,false);
+    public String getUrl() {
+      return this.mUrl;
     }
 
-    @SuppressWarnings("unchecked")
-    private void retrieveOptions() {
-      try
-      {
-        HashMap<String,Object>  map =  (HashMap<String,Object>) System.getMsfRpc().execute("module.options","exploit",msf_name);
-        Iterator it = map.entrySet().iterator();
-        options = new ArrayList<ExploitOption>();
-        while(it.hasNext()) {
-          Map.Entry<String,HashMap<String,Object>> item = (Map.Entry<String, HashMap<String, Object>>) it.next();
-          String name = item.getKey();
-          ExploitOption opt = new ExploitOption(name,item.getValue());
-          if(name.equals("RHOST"))
-            opt.setValue(System.getCurrentTarget().getAddress().getHostAddress());
-          options.add(opt);
-        }
-      } catch ( IOException e) {
-        Logger.error(e.getMessage());
-      } catch (RPCClient.MSFException e) {
-        Logger.error(e.getMessage());
-      }
+    public void setVulnerability(Vulnerability vulnerability) {
+      this.mVuln = vulnerability;
     }
 
-    @SuppressWarnings("unchecked")
-    private void retrieveInfos() {
-      try
-      {
-        HashMap<String,Object> map = (HashMap<String,Object>) System.getMsfRpc().execute("module.info","exploit",msf_name);
-        mDescription=(String)map.get("name");
-        //TODO:get all other things
-      } catch ( IOException e) {
-        Logger.error(e.getMessage());
-      } catch (RPCClient.MSFException e) {
-        Logger.error(e.getMessage());
-      }
-    }
-
-    public String toString()
-    {
-      if(msf_name!=null)
-        return msf_name.substring(msf_name.lastIndexOf('/')+1);
-      return name;
-    }
-
-    public int getDrawableResourceId() {
-      if(msf_name!=null)
-        return R.drawable.exploit_msf;
-      return R.drawable.exploit;
-    }
-
-    public String getDescription() {
-      if(mDescription!=null)
-        return mDescription;
-      else
-        return url;
-    }
-
-    public boolean isMsf() {
-      return this.msf_name != null;
-    }
-
-    public void setVulnerability(Vulnerability vuln)
-    {
-      if(mVuln==vuln)
-        return;
-      if(mVuln!=null)
-        mVuln.delExploit(this);
-      mVuln=vuln;
-      if(mVuln!=null && this.msf_name != null && options!=null) {
-        for(ExploitOption opt : options)
-          if(opt.getName().equals("RPORT"))
-            opt.setValue(mVuln.getPort().number + "");
-      }
-    }
-
-    public Vulnerability getVulnerability()
-    {
+    public Vulnerability getVulnerability() {
       return mVuln;
     }
 
-    public ArrayList<ExploitOption> getOptions() {
-      if(options!=null)
-        return options;
-      else
-        return new ArrayList<ExploitOption>();
+    public String toString() {
+      return mName;
+    }
+
+    public int getDrawableResourceId() {
+      return R.drawable.exploit;
     }
 
     public boolean equals(Object o) {
       if(o == null || o.getClass() != this.getClass())
         return false;
-      Exploit e = (Exploit)o;
-      return ((Exploit)o).name.equals(this.name);
+      return ((Exploit)o).getName().equals(this.mName);
     }
   }
 
@@ -964,9 +757,8 @@ public class Target
     return mVulnerabilities;
   }
 
-  public void addExploit(Vulnerability v, Exploit ex)
-  {
-    if(mExploits.contains(ex) || !mVulnerabilities.contains(v))
+  public void addExploit(Vulnerability v, Exploit ex) {
+    if (mExploits.contains(ex) || !mVulnerabilities.contains(v))
       return;
     mExploits.add(ex);
     v.addExploit(ex);
