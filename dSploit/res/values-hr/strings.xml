@@ -128,7 +128,7 @@
     </string>
     <string name="selected">Odabrano</string>
     <string name="nothing_found"><![CDATA[<small><i>Ništa Nije Pronađeno</i></small>]]></string>
-    <string name="no_open_ports">Nisu pronađeni otvoreni portovi na meti, prvo pokreni inspektora za servise.</string>
+    <string name="no_open_ports">Nisu pronađeni otvoreni portovi na meti, prvo pokreni Pretraživač Servisa.</string>
     <string name="no_exploits_found">Nisu pronađeni exploiti.</string>
     <string name="no_open_ports_focused_scan">Nisu pronađeni otvoreni portovi, pokreni pretraživač portova prije pokretanja fokusiranog pretraživanja.</string>
     <string name="no_open_ports_exploitfinder">Nema exploita na meti, prvo pokreni Pretraživač Exploita.</string>
@@ -176,7 +176,7 @@
     <string name="vulnerability_finder_desc">Pretraži poznate ranjivosti na National Vulnerability Database(Nacionalnoj Bazi Ranjivosti)
         na meti koja ima pokrenute servise.
     </string>
-    <string name="inspector">Pretraživač</string>
+    <string name="inspector">Pretraživač Servisa</string>
     <string name="inspector_desc">Pokreni otkrivanje Operativnog Sistema i duboko pretraživanje pokrenutih servisa
         (Sporije ali točnije od Pretraživača Portova).
     </string>
