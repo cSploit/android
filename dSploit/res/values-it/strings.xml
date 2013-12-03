@@ -212,8 +212,8 @@
     <string name="session_sniffer">Sniffer di Sessione</string>
 
     <string name="untraced_hops">hops non tracciati</string>
-    <string name="stopped_dots">Fermo ...</string>
-    <string name="starting_dots">In esecuzione ...</string>
+    <string name="stopped_dots">Fermo &#8230;</string>
+    <string name="starting_dots">In esecuzione &#8230;</string>
     <string name="add_username">Imposta l\'username</string>
     <string name="enter_username">Inserisci il nome utente che desideri utilizzare:</string>
     <string name="select_wordlist">Seleziona una Wordlist</string>
@@ -235,7 +235,7 @@
     <string name="error_rpc">errore RPC</string>
     <string name="error_rpcd_inval">impostazioni errate</string>
     <string name="error_rpcd_shell">impossibile eseguire shells</string>
-    <string name="rpcd_starting">Avvio MetaSploit RPCD...</string>
+    <string name="rpcd_starting">Avvio MetaSploit RPCD&#8230;</string>
     <string name="rpcd_started">MetaSploit RPCD avviato</string>
     <string name="rpcd_stopped">MetaSploit RPCD fermato</string>
     <string name="rpcd_running">MetaSploit RPCD in esecuzione</string>
@@ -306,10 +306,10 @@
 
     <string name="scanner_select_ports">Seleziona Porte Personalizzate</string>
 
-    <string name="wifi_initializing">Inizializzazione ...</string>
-    <string name="wifi_activating_iface">Attivo l\'interfaccia WiFi ...</string>
+    <string name="wifi_initializing">Inizializzazione &#8230;</string>
+    <string name="wifi_activating_iface">Attivo l\'interfaccia WiFi &#8230;</string>
     <string name="wifi_activated">WiFi attivato.</string>
-    <string name="wifi_scanning">Scansione ...</string>
+    <string name="wifi_scanning">Scansione &#8230;</string>
     <string name="wifi_attempting_to">Tento di connettermi a</string>
     <string name="wifi_with_key">con la chiave</string>
     <string name="wifi_connecting_to">In connessione a</string>
@@ -370,4 +370,9 @@
     <string name="pref_err_busy_port">Un altro processo è in ascolto su questa porta, per favore specificane un altra.</string>
     <string name="pref_err_buffer_size">La grandezza del buffer deve essere compresa tra 1024 e 104857600.</string>
 
+    <string name="menu_add">Add</string>
+    <string name="menu_scan">Scan</string>
+    <string name="menu_wifi_scan">WiFi Scan</string>
+    <string name="menu_stop_msfrpcd">Stop msfrpcd</string>
+    
 </resources>

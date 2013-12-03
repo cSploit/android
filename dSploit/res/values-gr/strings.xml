@@ -209,4 +209,8 @@
     <string name="set_session_filename">Δηλώστε το όνομα του αρχείου συνεδρίας:</string>
     <string name="session_sniffer">Session Sniffer</string>
 
+    <string name="menu_add">Add</string>
+    <string name="menu_scan">Scan</string>
+    <string name="menu_wifi_scan">WiFi Scan</string>
+    <string name="menu_stop_msfrpcd">Stop msfrpcd</string>
 </resources>

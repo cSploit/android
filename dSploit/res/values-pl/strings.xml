@@ -1,32 +1,32 @@
 <resources>
     <string name="app_name">dSploit</string>
-    <string name="menu_settings">Settings</string>
+    <string name="menu_settings">Ustawienia</string>
     <string name="title_activity_main">dSploit</string>
     <string name="crash_toast_text">Ooooops ! I crashed, but a report is going to be sent to my
         developer to help fix the issue :)
     </string>
     <string name="toggle_button">ToggleButton</string>
     <string name="enter_redirection_details">Enter redirection details below:</string>
-    <string name="address">Address</string>
+    <string name="address">Addres</string>
     <string name="port">Port</string>
-    <string name="target">Target</string>
-    <string name="unknown">unknown</string>
-    <string name="services">Services</string>
+    <string name="target">Cel</string>
+    <string name="unknown">nienznay</string>
+    <string name="services">Usługi</string>
     <string name="os">OS</string>
-    <string name="device_type">Device Type</string>
-    <string name="start_hijack">Tap on a session to start hijacking, long tap to save it to file.
+    <string name="device_type">Rodzaj urządzenia</string>
+    <string name="start_hijack">Kliknij na sesję by rozpocząć przechytywanie, przytrzymaj by zapisać do pliku.
     </string>
-    <string name="sort">Sort:</string>
-    <string name="select_module">Select a module to run</string>
-    <string name="choose">Choose</string>
-    <string name="response">Response</string>
-    <string name="request">Request</string>
-    <string name="wait_for_response">Wait for a response</string>
-    <string name="protocol">Protocol</string>
-    <string name="dsploit_catchphrase">dSploit - An Android network penetration suite.</string>
+    <string name="sort">Sortuj:</string>
+    <string name="select_module">Wybierz moduł do uruchomienia</string>
+    <string name="choose">Wybierz</string>
+    <string name="response">Odpowiedź</string>
+    <string name="request">Rządanie</string>
+    <string name="wait_for_response">Czekaj na odpowiedź</string>
+    <string name="protocol">Protokół</string>
+    <string name="dsploit_catchphrase">dSploit - Zestaw penetracyjny dla systemu Android.</string>
     <string name="dsploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
     <string name="dsploit_url">http://www.dsploit.net/</string>
-    <string name="disclaimer">Disclaimer</string>
+    <string name="disclaimer">Wyłączenie odpowiedzialności</string>
     <string name="dsploit_disclaimer">
         <![CDATA[This application is not to be used for any purposes other than to demonstrate its functions, and must only be used on networks for which you have permission to do so. Any other use is not the responsibility of the developer.In other words, don&apos;t be stupid, and don&apos;t direct angry people towards me.]]></string>
     <string name="license">License</string>
@@ -39,56 +39,55 @@
         You should have received a copy of the GNU General Public License along with this program.
         If not, see http://www.gnu.org/licenses/.
     </string>
-    <string name="service">Service</string>
-    <string name="stopped">Stopped&#8230;</string>
+    <string name="service">Usługa</string>
+    <string name="stopped">Zatrzymane&#8230;</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
-    <string name="stopped_dots">Stopped &#8230;</string>
-    <string name="starting_dots">Starting &#8230;</string>
-    <string name="max_length">Max Length</string>
-    <string name="min_length">Min Length</string>
-    <string name="username">Username</string>
-    <string name="Charset">Charset</string>
+    <string name="stopped_dots">Zatrzymane &#8230;</string>
+    <string name="starting_dots">Uruchamiane &#8230;</string>
+    <string name="max_length">Maksymalna Długość</string>
+    <string name="min_length">Minimalna Długość</string>
+    <string name="username">Login</string>
+    <string name="Charset">Zestaw znaków</string>
     <string name="filter_desc">Enter a custom replace filter, including simple string replacement or
         regular expressions.
     </string>
-    <string name="from">From</string>
-    <string name="to">To</string>
+    <string name="from">Od</string>
+    <string name="to">Do</string>
     <string name="wake_on_lan">Wake On Lan</string>
-    <string name="send">Send</string>
-    <string name="update_available">Update Available</string>
-    <string name="new_update_desc">A new update to version</string>
-    <string name="new_update_desc2">is available, do you want to download it ?</string>
-    <string name="checking">Checking&#8230;</string>
-    <string name="no_updates_available">No updates available.</string>
-    <string name="new_version">New version</string>
-    <string name="new_version2">found!</string>
-    <string name="downloading_update">Downloading update&#8230;</string>
-    <string name="connecting">Connecting&#8230;</string>
-    <string name="cancel">Cancel</string>
-    <string name="error">Error</string>
-    <string name="error_occured">An error occurred while downloading the update.</string>
-    <string name="invalid_target">Invalid target.</string>
-    <string name="add_custom_target">Add custom target</string>
-    <string name="enter_url">Enter an URL, host name or ip address below:</string>
-    <string name="net_discovery_stopped">Network discovery stopped.</string>
-    <string name="net_discovery_started">Network discovery started.</string>
-    <string name="start_monitor">Start Network Monitor</string>
-    <string name="stop_monitor">Stop Network Monitor</string>
-    <string name="start_msfrpcd">Start MetaSploit RPCD</string>
-    <string name="stop_msfrpcd">Stop MetaSploit RPCD</string>
+    <string name="send">Wyślij</string>
+    <string name="update_available">Aktualizacja jest dostępna</string>
+    <string name="new_update_desc">Nowa aktualizacja do wersji</string>
+    <string name="new_update_desc2">jest dostępna, chcesz ją pobrać ?</string>
+    <string name="checking">Sprawdzam&#8230;</string>
+    <string name="no_updates_available">Brak dostępnych aktualizacji.</string>
+    <string name="new_version">Nowa wersja</string>
+    <string name="new_version2">znaleziono!</string>
+    <string name="downloading_update">Pobieranie aktualizacji&#8230;</string>
+    <string name="connecting">Łączenie&#8230;</string>
+    <string name="cancel">Anuluj</string>
+    <string name="error">Bład</string>
+    <string name="error_occured">Wystąpił błąd podczas pobierania aktualizacji.</string>
+    <string name="invalid_target">Błędny cel.</string>
+    <string name="add_custom_target">Dodaj własny cel</string>
+    <string name="enter_url">Wpisz URL, nazwę hosta lub adres ip poniżej:</string>
+    <string name="net_discovery_stopped">Wyszukiwanie sieci zatrzymane.</string>
+    <string name="start_monitor">Rozpocznij Network Monitor</string>
+    <string name="stop_monitor">Zatrzymaj Network Monitor</string>
+    <string name="start_msfrpcd">Rozpocznij MetaSploit RPCD</string>
+    <string name="stop_msfrpcd">Zatrzymaj MetaSploit RPCD</string>
     <string name="exit">Exit</string>
-    <string name="close_confirm">This will close dSploit, are you sure you want to continue ?
+    <string name="close_confirm">To zamknie dSploit, jesteś pewien, że chcesz kontynuować ?
     </string>
-    <string name="press_back">Press back again to close this app.</string>
-    <string name="selected_">Selected&#160;</string>
+    <string name="press_back">Naciśnij wstecz jeszcze raz by opuścić aplikację.</string>
+    <string name="selected_">Wybrano&#160;</string>
     <string name="github_issues">https://github.com/evilsocket/dsploit/issues/new</string>
-    <string name="no_session_found">No session file found on sd card.</string>
-    <string name="select_session_file">Select a session file from the sd card :</string>
-    <string name="select_session">Select Session</string>
+    <string name="no_session_found">Nie znaleziono pliku sesji na karcie sd.</string>
+    <string name="select_session_file">Wybierz plik sesji ze swojej karty sd :</string>
+    <string name="select_session">Wybierz sesję</string>
     <string name="invalid_session">Invalid session name.</string>
-    <string name="session_saved_to">Session saved to &#160;</string>
-    <string name="save_session">Save Session</string>
+    <string name="session_saved_to">Sesja zapisana w &#160;</string>
+    <string name="save_session">Zapisz sesję</string>
     <string name="enter_session_name">Enter the name of the session file :</string>
     <string name="new_session_started">New session started</string>
     <string name="warning">Warning</string>
@@ -370,7 +369,6 @@
         <item>EXDB</item>
         <item>BOTH</item>
     </string-array>
-    <string name="pref_advanced">Advanced</string>
     <string name="pref_folder">Folder</string>
     <string name="pref_err_exists">does not exists.</string>
     <string name="pref_err_writable">is not writable.</string>
@@ -384,18 +382,8 @@
 
     <string name="exploit_finder">Exploit Finder</string>
     <string name="exploit_finder_desc">Search for exploit that matches found vulnerabilities.</string>
-    <string name="exploit_launch_all">Launch all</string>
     <string name="sessions">Sessions</string>
     <string name="sessions_desc">Sessions on pwned target.</string>
-    <string name="exploit_launch">Launch</string>
-    <string name="exploit_edit_options">Edit options</string>
-    <string name="payload_edit_settings">Edit payload settings</string>
-    <string name="exploit_choose_payload">Choose payload</string>
-    <string name="exploit_choose_target">Choose target</string>
-    <string name="open_url">Open URL</string>
-    <string name="show_full_description">Show full description</string>
-    <string name="choose_an_option">choose an option</string>
-    <string name="required">Required</string>
     
     <string name="menu_add">Add</string>
     <string name="menu_scan">Scan</string>
@@ -405,15 +393,4 @@
     <string name="pref_theme">Dark Theme</string>
     <string name="pref_choose_theme">Enable the dark theme, which is easier on the eyes</string>
     <string name="please_restart">The new theme will not be applied until you restart the app</string>
-    <string name="evasion">Evasion</string>
-    <string name="search_exact_version">Exact version matching</string>
-    <string name="sessions_title">Open a shell by clicking on a session, or see more options by long press on it.</string>
-    <string name="open_shell">Open shell</string>
-    <string name="clear_event_log">Clear event log</string>
-    <string name="run">Run</string>
-    <string name="command">Command</string>
-    <string name="clear">Clear</string>
-    <string name="msfrpc_disconnected">MSF RPC disconnected</string>
-    <string name="no_opened_sessions">there is no opened sessions for this target</string>
-    <string name="delete">Delete</string>
 </resources>

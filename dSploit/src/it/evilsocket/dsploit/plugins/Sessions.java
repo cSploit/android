@@ -44,31 +44,24 @@ import it.evilsocket.dsploit.net.metasploit.RPCClient;
 import it.evilsocket.dsploit.net.metasploit.Session;
 import it.evilsocket.dsploit.net.metasploit.ShellSession;
 
-public class Sessions extends Plugin
-{
-  private ListView 			mListView		   = null;
+public class Sessions extends Plugin {
+	private ListView mListView = null;
   private ArrayList<Session> mResults;
   private ArrayAdapter<Session> mAdapter = null;
   private Sessions              UIThread = null;
 
-  public Sessions() {
-    super
-    (
-      R.string.sessions,
-      R.string.sessions_desc,
+	public Sessions() {
+		super(R.string.sessions, R.string.sessions_desc,
 
-      new Target.Type[]{ Target.Type.ENDPOINT, Target.Type.REMOTE },
-      R.layout.plugin_sessions_layout,
-      R.drawable.action_session
-    );
-  }
+		new Target.Type[] { Target.Type.ENDPOINT, Target.Type.REMOTE },
+				R.layout.plugin_sessions_layout, R.drawable.action_session);
+	}
 
   private AdapterView.OnItemLongClickListener longClickListener = new AdapterView.OnItemLongClickListener() {
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
       final Session s = mAdapter.getItem(position);
       final ArrayList<Integer> availableChoices = new ArrayList<Integer>();
-
       availableChoices.add(R.string.show_full_description);
       if(s.haveShell())
         availableChoices.add(R.string.open_shell);
@@ -139,37 +132,47 @@ public class Sessions extends Plugin
     }
   };
 
-  @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+		Boolean isDark = themePrefs.getBoolean("isDark", false);
+		if (isDark)
+			setTheme(R.style.Sherlock___Theme);
+		else
+			setTheme(R.style.AppTheme);
+		super.onCreate(savedInstanceState);
 
     UIThread = this;
 
     if(System.getMsfRpc()==null) {
       new FinishDialog(getString(R.string.error),"MSF RPC not connected",Sessions.this).show();
       return;
-    }
+		}
 
     System.getMsfRpc().updateSessions();
+					getString(R.string.no_open_ports), this).show();
 
     mResults = System.getCurrentTarget().getSessions();
+					getString(R.string.no_open_ports_exploitfinder), this)
+					.show();
 
     if(mResults.isEmpty()) {
       new FinishDialog(getString(R.string.warning),getString(R.string.no_opened_sessions),Sessions.this).show();
       return;
     }
 
-    mListView = ( ListView )findViewById( android.R.id.list );
+		mListView = (ListView) findViewById(android.R.id.list);
     mAdapter  = new ArrayAdapter<Session>(this, android.R.layout.simple_list_item_1, mResults);
+				android.R.layout.simple_list_item_1, results);
 
-    mListView.setAdapter( mAdapter );
+		mListView.setAdapter(mAdapter);
 
     mListView.setOnItemClickListener(clickListener);
 
     mListView.setOnItemLongClickListener(longClickListener);
-  }
+	}
 
-  @Override
+	@Override
   public void onRpcChange(RPCClient currentValue) {
     if(UIThread==null)
       return;
@@ -177,5 +180,5 @@ public class Sessions extends Plugin
       UIThread.onRpcChange(currentValue);
     else if(currentValue == null)
       new FinishDialog(getString(R.string.error),getString(R.string.msfrpc_disconnected),Sessions.this).show();
-  }
+	}
 }

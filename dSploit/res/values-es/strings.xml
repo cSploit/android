@@ -344,4 +344,9 @@
     <string name="exploit_finder_desc">Busca exploits que coinciden con las vulnerabilidades encontradas.</string>
     <string name="sessions">Sesiones</string>
     <string name="sessions_desc">Sesiones en el objetivo seleccionado.</string>
+    
+    <string name="menu_add">Add</string>
+    <string name="menu_scan">Scan</string>
+    <string name="menu_wifi_scan">WiFi Scan</string>
+    <string name="menu_stop_msfrpcd">Stop msfrpcd</string>
 </resources>

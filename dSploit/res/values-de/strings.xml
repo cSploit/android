@@ -35,8 +35,8 @@
     <string name="stopped">Gestoppt&#8230;</string>
     <string name="start">Start</string>
     <string name="stop">Stopp</string>
-    <string name="stopped_dots">Gestoppt ...</string>
-    <string name="starting_dots">Starten ...</string>
+    <string name="stopped_dots">Gestoppt &#8230;</string>
+    <string name="starting_dots">Starten &#8230;</string>
     <string name="max_length">Max Länge</string>
     <string name="min_length">Min Länge</string>
     <string name="username">Benutzername</string>
@@ -229,4 +229,10 @@
     <string name="error_mitm_proxy">Kann den Proxy nicht erstellen. Bitte Verbindung und Portverfügbarkeit überprüfen.</string>
     <string name="error_mitm_https_redirector">Kann den HTTPS-Umleiter nicht erstellen. Bitte Verbindung und Portverfügbarkeit überprüfen.</string>
     <string name="error_mitm_resource_server">Kann den Ressourcenserver nicht erstellen. Bitte Verbindung und Portverfügbarkeit überprüfen.</string>
+
+    <string name="menu_add">Add</string>
+    <string name="menu_scan">Scan</string>
+    <string name="menu_wifi_scan">WiFi Scan</string>
+    <string name="menu_stop_msfrpcd">Stop msfrpcd</string>
+
 </resources>

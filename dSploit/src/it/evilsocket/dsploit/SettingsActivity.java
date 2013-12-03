@@ -18,22 +18,24 @@
  */
 package it.evilsocket.dsploit;
 
+import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.gui.DirectoryPicker;
+
+import java.io.File;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
-
-import java.io.File;
-
-import it.evilsocket.dsploit.core.System;
-import it.evilsocket.dsploit.gui.DirectoryPicker;
 
 @SuppressWarnings("deprecation")
 public class SettingsActivity extends SherlockPreferenceActivity implements OnSharedPreferenceChangeListener
@@ -46,6 +48,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
   private EditTextPreference mRedirectorPort = null;
   private EditTextPreference mHttpBufferSize = null;
   private EditTextPreference mPasswordFilename = null;
+  private CheckBoxPreference mThemeChooser = null;
 
   @SuppressWarnings("ConstantConditions")
   @Override
@@ -61,6 +64,18 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
     mRedirectorPort = (EditTextPreference) getPreferenceScreen().findPreference("PREF_HTTPS_REDIRECTOR_PORT");
     mHttpBufferSize = (EditTextPreference) getPreferenceScreen().findPreference("PREF_HTTP_MAX_BUFFER_SIZE");
     mPasswordFilename = (EditTextPreference) getPreferenceScreen().findPreference("PREF_PASSWORD_FILENAME");
+    mThemeChooser = (CheckBoxPreference) getPreferenceScreen().findPreference("PREF_DARK_THEME");
+    
+    mThemeChooser.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+		
+		@Override
+		public boolean onPreferenceChange(Preference preference, Object newValue) {
+			SharedPreferences themePrefs = getBaseContext().getSharedPreferences("THEME", 0);
+			themePrefs.edit().putBoolean("isDark", (Boolean) newValue).commit();
+			Toast.makeText(getBaseContext(), getString(R.string.please_restart), Toast.LENGTH_LONG).show();
+			return true;
+		}
+	});
 
     mSavePath.setOnPreferenceClickListener(new OnPreferenceClickListener(){
       @Override

@@ -18,6 +18,7 @@
  */
 package it.evilsocket.dsploit.plugins;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,114 +33,118 @@ import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.tools.NMap.TraceOutputReceiver;
 
-public class Traceroute extends Plugin
-{
-  private ToggleButton mTraceToggleButton = null;
-  private ProgressBar mTraceProgress = null;
-  private boolean mRunning = false;
-  private ArrayAdapter<String> mListAdapter = null;
-  private Receiver mTraceReceiver = null;
+public class Traceroute extends Plugin {
+	private ToggleButton mTraceToggleButton = null;
+	private ProgressBar mTraceProgress = null;
+	private boolean mRunning = false;
+	private ArrayAdapter<String> mListAdapter = null;
+	private Receiver mTraceReceiver = null;
 
-  public Traceroute(){
-    super(
-      R.string.trace,
-      R.string.trace_desc,
+	public Traceroute() {
+		super(R.string.trace, R.string.trace_desc,
 
-      new Target.Type[]{Target.Type.ENDPOINT, Target.Type.REMOTE},
-      R.layout.plugin_traceroute,
-      R.drawable.action_traceroute
-    );
+		new Target.Type[] { Target.Type.ENDPOINT, Target.Type.REMOTE },
+				R.layout.plugin_traceroute, R.drawable.action_traceroute);
 
-    mTraceReceiver = new Receiver();
-  }
+		mTraceReceiver = new Receiver();
+	}
 
-  private void setStoppedState(){
-    System.getNMap().kill();
-    mTraceProgress.setVisibility(View.INVISIBLE);
-    mRunning = false;
-    mTraceToggleButton.setChecked(false);
-  }
+	private void setStoppedState() {
+		System.getNMap().kill();
+		mTraceProgress.setVisibility(View.INVISIBLE);
+		mRunning = false;
+		mTraceToggleButton.setChecked(false);
+	}
 
-  private void setStartedState(){
-    mListAdapter.clear();
+	private void setStartedState() {
+		mListAdapter.clear();
 
-    System.getNMap().trace(System.getCurrentTarget(), mTraceReceiver).start();
+		System.getNMap().trace(System.getCurrentTarget(), mTraceReceiver)
+				.start();
 
-    mRunning = true;
-  }
+		mRunning = true;
+	}
 
-  @Override
-  public void onCreate(Bundle savedInstanceState){
-    super.onCreate(savedInstanceState);
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+		Boolean isDark = themePrefs.getBoolean("isDark", false);
+		if (isDark)
+			setTheme(R.style.Sherlock___Theme);
+		else
+			setTheme(R.style.AppTheme);
+		super.onCreate(savedInstanceState);
 
-    mTraceToggleButton = (ToggleButton) findViewById(R.id.traceToggleButton);
-    mTraceProgress = (ProgressBar) findViewById(R.id.traceActivity);
+		mTraceToggleButton = (ToggleButton) findViewById(R.id.traceToggleButton);
+		mTraceProgress = (ProgressBar) findViewById(R.id.traceActivity);
 
-    mTraceToggleButton.setOnClickListener(new OnClickListener(){
-      @Override
-      public void onClick(View v){
-        if(mRunning){
-          setStoppedState();
-        } else{
-          setStartedState();
-        }
-      }
-    }
-    );
+		mTraceToggleButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (mRunning) {
+					setStoppedState();
+				} else {
+					setStartedState();
+				}
+			}
+		});
 
-    ListView mTraceList = (ListView) findViewById(R.id.traceListView);
+		ListView mTraceList = (ListView) findViewById(R.id.traceListView);
 
-    mListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
-    mTraceList.setAdapter(mListAdapter);
-  }
+		mListAdapter = new ArrayAdapter<String>(this,
+				android.R.layout.simple_list_item_1);
+		mTraceList.setAdapter(mListAdapter);
+	}
 
-  @Override
-  public void onBackPressed(){
-    setStoppedState();
-    super.onBackPressed();
-  }
+	@Override
+	public void onBackPressed() {
+		setStoppedState();
+		super.onBackPressed();
+	}
 
-  private class Receiver extends TraceOutputReceiver{
-    @Override
-    public void onStart(String commandLine){
-      super.onStart(commandLine);
+	private class Receiver extends TraceOutputReceiver {
+		@Override
+		public void onStart(String commandLine) {
+			super.onStart(commandLine);
 
-      Traceroute.this.runOnUiThread(new Runnable(){
-        @Override
-        public void run(){
-          mRunning = true;
-          mTraceProgress.setVisibility(View.VISIBLE);
-        }
-      });
-    }
+			Traceroute.this.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					mRunning = true;
+					mTraceProgress.setVisibility(View.VISIBLE);
+				}
+			});
+		}
 
-    @Override
-    public void onEnd(int exitCode){
-      super.onEnd(exitCode);
+		@Override
+		public void onEnd(int exitCode) {
+			super.onEnd(exitCode);
 
-      Traceroute.this.runOnUiThread(new Runnable(){
-        @Override
-        public void run(){
-          setStoppedState();
-        }
-      });
-    }
+			Traceroute.this.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					setStoppedState();
+				}
+			});
+		}
 
-    @Override
-    public void onHop(final String hop, final String time, final String address){
+		@Override
+		public void onHop(final String hop, final String time,
+				final String address) {
 
-      Traceroute.this.runOnUiThread(new Runnable(){
-        @Override
-        public void run(){
-          if(!time.equals("..."))
-            mListAdapter.add(address + " ( " + time + " )");
+			Traceroute.this.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					if (!time.equals("..."))
+						mListAdapter.add(address + " ( " + time + " )");
 
-          else
-            mListAdapter.add(address + getString(R.string.untraced_hops));
+					else
+						mListAdapter.add(address
+								+ getString(R.string.untraced_hops));
 
-          mListAdapter.notifyDataSetChanged();
-        }
-      });
-    }
-  }
+					mListAdapter.notifyDataSetChanged();
+				}
+			});
+		}
+	}
 }

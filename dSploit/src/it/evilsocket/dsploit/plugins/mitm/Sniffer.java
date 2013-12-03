@@ -19,6 +19,7 @@
 package it.evilsocket.dsploit.plugins.mitm;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -281,6 +282,12 @@ public class Sniffer extends SherlockActivity
 
   public void onCreate(Bundle savedInstanceState){
     super.onCreate(savedInstanceState);
+    SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+	Boolean isDark = themePrefs.getBoolean("isDark", false);
+	if (isDark)
+		setTheme(R.style.Sherlock___Theme);
+	else
+		setTheme(R.style.AppTheme);
     setTitle(System.getCurrentTarget() + " > MITM > Sniffer");
     setContentView(R.layout.plugin_mitm_sniffer);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
