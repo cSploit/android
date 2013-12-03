@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -150,11 +151,8 @@ public class Sessions extends Plugin {
 		}
 
     System.getMsfRpc().updateSessions();
-					getString(R.string.no_open_ports), this).show();
 
     mResults = System.getCurrentTarget().getSessions();
-					getString(R.string.no_open_ports_exploitfinder), this)
-					.show();
 
     if(mResults.isEmpty()) {
       new FinishDialog(getString(R.string.warning),getString(R.string.no_opened_sessions),Sessions.this).show();
@@ -163,7 +161,6 @@ public class Sessions extends Plugin {
 
 		mListView = (ListView) findViewById(android.R.id.list);
     mAdapter  = new ArrayAdapter<Session>(this, android.R.layout.simple_list_item_1, mResults);
-				android.R.layout.simple_list_item_1, results);
 
 		mListView.setAdapter(mAdapter);
 
