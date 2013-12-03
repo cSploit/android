@@ -32,6 +32,9 @@ import it.evilsocket.dsploit.R;
 
 public class ListChoiceDialog extends AlertDialog{
 
+  /** create a list choice dialog from android resource ids
+   * @param items String ids
+   */
   public ListChoiceDialog(Integer title, Integer[] items, Activity activity, final ChoiceDialog.ChoiceDialogListener listener){
     super(activity);
 
@@ -53,7 +56,36 @@ public class ListChoiceDialog extends AlertDialog{
       }
     });
 
-    this.setTitle(activity.getString(title));
+    setTitle(activity.getString(title));
+    setView(mList);
+
+    setButton(activity.getString(R.string.cancel_dialog), new OnClickListener(){
+      public void onClick(DialogInterface dialog, int id){
+        dialog.dismiss();
+      }
+    });
+  }
+
+  /** create a list choice dialog from a String array
+   * @param items Strings to choose from
+   */
+
+  public ListChoiceDialog(String title, String[] items, Activity activity, final ChoiceDialog.ChoiceDialogListener listener){
+    super(activity);
+
+    ListView mList = new ListView(activity);
+
+    mList.setAdapter(new ArrayAdapter<String>(activity, android.R.layout.simple_list_item_1,items));
+
+    mList.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+      @Override
+      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        listener.onChoice(position);
+        ListChoiceDialog.this.dismiss();
+      }
+    });
+
+    this.setTitle(title);
     this.setView(mList);
 
     this.setButton(activity.getString(R.string.cancel_dialog), new OnClickListener(){
@@ -63,12 +95,20 @@ public class ListChoiceDialog extends AlertDialog{
     });
   }
 
-  public ListChoiceDialog(String title, String[] items, Activity activity, final ChoiceDialog.ChoiceDialogListener listener){
+  /** create a list choice dialog from generic objects array ( call toString on every object )
+   * @param items
+   */
+  public ListChoiceDialog(String title, Object[] items, Activity activity, final ChoiceDialog.ChoiceDialogListener listener) {
     super(activity);
 
     ListView mList = new ListView(activity);
 
-    mList.setAdapter(new ArrayAdapter<String>(activity, android.R.layout.simple_list_item_1,items));
+    String[] _items = new String[items.length];
+
+    for(int i = 0; i < _items.length;i++)
+      _items[i] = items[i].toString();
+
+    mList.setAdapter(new ArrayAdapter<String>(activity, android.R.layout.simple_list_item_1,_items));
 
     mList.setOnItemClickListener( new AdapterView.OnItemClickListener() {
       @Override

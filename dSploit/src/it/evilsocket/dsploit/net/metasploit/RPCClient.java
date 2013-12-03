@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,6 +26,7 @@ import org.msgpack.unpacker.Converter;
 
 import android.util.Log;
 
+import it.evilsocket.dsploit.core.*;
 import it.evilsocket.dsploit.net.Target;
 
 //TODO: add license and write down that we had taken part of this code from armitage
@@ -193,6 +195,39 @@ public class RPCClient
     catch ( MsgpackException me)
     {
       throw new IOException(me);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public void updateSessions() {
+    Map<Integer,Map<String,Object>> openSessions;
+    Integer[] ids;
+
+    try {
+      openSessions = (Map<Integer, Map<String, Object>>) call("session.list");
+      ids = openSessions.keySet().toArray(new Integer[openSessions.size()]);
+
+      for(Integer id : ids) {
+        try {
+          String type = (String)openSessions.get(id).get("type");
+          Session s;
+          if("shell".equals(type)) {
+            s = new ShellSession(id,openSessions.get(id));
+          } else if("meterpreter".equals(type)) {
+            //TODO
+            s = new Session(id,openSessions.get(id));
+          } else {
+            s = new Session(id,openSessions.get(id));
+          }
+          it.evilsocket.dsploit.core.System.getCurrentTarget().addSession(s);
+        } catch ( UnknownHostException e) {
+          Logger.info(e.getMessage());
+        }
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (MSFException e) {
+      e.printStackTrace();
     }
   }
 

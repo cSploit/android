@@ -416,8 +416,10 @@ public class MainActivity extends SherlockListActivity
     {
       if(mRPCServer !=null)
       {
-        mRPCServer.exit();
-        mRPCServer.join();
+        if(mRPCServer.isRunning()) {
+          mRPCServer.exit();
+          mRPCServer.join();
+        }
         mRPCServer = null;
       }
       System.setMsfRpc(null);

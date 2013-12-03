@@ -6,7 +6,7 @@
                 android:padding="10dp" >
 
     <ListView
-            android:id="@+id/android:list"
+            android:id="@android:id/list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -14,6 +14,14 @@
             android:layout_below="@+id/textView" >
 
     </ListView>
+
+    <View
+        android:id="@+id/separator"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        android:layout_alignBottom="@+id/textView"
+        android:layout_alignParentLeft="true"/>
 
     <TextView
             android:id="@+id/textView"
@@ -23,7 +31,7 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:padding="5dp"
-            android:text="Execute an exploit below by clicking on a row, or long click on it to enter it's options."
+            android:text="@string/sessions_title"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="#ccc" />
 

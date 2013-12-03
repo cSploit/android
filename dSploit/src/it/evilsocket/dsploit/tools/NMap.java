@@ -18,7 +18,7 @@
  */
 package it.evilsocket.dsploit.tools;
 
-import java.io.IOException;
+import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,6 +28,7 @@ import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Target.Port;
 import android.content.Context;
 //import android.net.wifi.WifiConfiguration.Protocol;
+import android.text.TextUtils;
 import android.util.Log;
 import it.evilsocket.dsploit.net.Network.Protocol;
 
@@ -109,14 +110,16 @@ public class NMap extends Tool
   {
     private static final Pattern PORT_PATTERN 		  = Pattern.compile( "<port protocol=\"([^\"]+)\" portid=\"([^\"]+)\"><state state=\"open\"[^>]+><service.+product=\"([^\"]+)\" version=\"([^\"]+)\"", Pattern.CASE_INSENSITIVE);
     private static final Pattern OS_PATTERN 		  = Pattern.compile( "<osclass type=\"([^\"]+)\".+osfamily=\"([^\"]+)\".+accuracy=\"([^\"]+)\"", Pattern.CASE_INSENSITIVE);
+    // remove "dev" "rc" and other extra version info
+    private final static Pattern VERSION_PATTERN = Pattern.compile( "(([0-9]+\\.)+[0-9]+)[a-zA-Z]+");
 
-    private static final int 	proto = 1,
-      number = 2,
-      name = 3,
-      version = 4,
-      device_type = 1,
-      osfamily = 2,
-      accuracy = 3;
+    private static final int PROTO = 1,
+      NUMBER = 2,
+      NAME = 3,
+      VERSION = 4,
+      DEVICE_TYPE = 1,
+      OSFAMILY = 2,
+      ACCURACY = 3;
     private static int last_accuracy;
 
     public void onStart( String commandLine ) {
@@ -128,24 +131,31 @@ public class NMap extends Tool
 
       if((matcher = PORT_PATTERN.matcher(line)) != null && matcher.find())
       {
-        int port_number = Integer.parseInt(matcher.group(number));
-        String protocol = matcher.group(proto);
+        int port_number = Integer.parseInt(matcher.group(NUMBER));
+        String protocol = matcher.group(PROTO);
+        String name     = matcher.group(NAME);
+        String version  = matcher.group(VERSION);
 
-        onOpenPortFound(port_number, protocol);
-        for( String _version : matcher.group(version).split("-"))
-        {
-          onServiceFound(port_number, protocol, matcher.group(name), _version);
-        }
+        if(version == null || version.trim().isEmpty())
+          onOpenPortFound(port_number, protocol);
+        else
+          for( String _version : version.split("-")) {
+            matcher = VERSION_PATTERN.matcher(_version);
+            if(matcher!=null && matcher.find())
+              onServiceFound(port_number,protocol,name,matcher.group(1));
+            else
+              onServiceFound(port_number, protocol, name, _version);
+          }
 
       }
       else if( ( matcher = OS_PATTERN.matcher(line) ) != null && matcher.find() )
       {
         int found_accuracy;
-        if((found_accuracy = Integer.parseInt(matcher.group(accuracy))) > last_accuracy)
+        if((found_accuracy = Integer.parseInt(matcher.group(ACCURACY))) > last_accuracy)
         {
           last_accuracy = found_accuracy;
-          onOsFound(matcher.group(osfamily));
-          onDeviceFound(matcher.group(device_type));
+          onOsFound(matcher.group(OSFAMILY));
+          onDeviceFound(matcher.group(DEVICE_TYPE));
         }
       }
     }
@@ -164,23 +174,32 @@ public class NMap extends Tool
   }
 
   public Thread inpsect( Target target, InspectionReceiver receiver, boolean advanced_scan ) {
-    String tcp_ports,udp_ports, cmd;
+    String cmd;
+    LinkedList<Integer> tcp,udp;
 
     if(advanced_scan)
     {
-      tcp_ports = "";
-      udp_ports = "";
-      for( Port p : target.getOpenPorts())
-        if(p.protocol.equals(Protocol.TCP))
-          tcp_ports += Integer.toString(p.number) + ",";
-        else if(p.protocol.equals(Protocol.UDP))
-          udp_ports += Integer.toString(p.number) + ",";
-      if(udp_ports.length()>0)
-        udp_ports = "U:" + udp_ports;
-      if(tcp_ports.length()>0)
-        tcp_ports = "T:" + tcp_ports;
-
-      cmd = "-T4 -sV -O --privileged --send-ip --system-dns -Pn -oX - -p " + tcp_ports + udp_ports + " " + target.getCommandLineRepresentation();
+      tcp = new LinkedList<Integer>();
+      udp = new LinkedList<Integer>();
+      for( Port p : target.getOpenPorts()) {
+        if(p.protocol.equals(Protocol.TCP)) {
+          if(!tcp.contains(p.number))
+            tcp.add(p.number);
+        } else if(p.protocol.equals(Protocol.UDP)) {
+          if(!udp.contains(p.number))
+            udp.add(p.number);
+        }
+      }
+      cmd = "-T4 -sV -O --privileged --send-ip --system-dns -Pn -oX - ";
+      if(tcp.size() + udp.size() > 0) {
+        cmd+= "-p ";
+        if(tcp.size()>0)
+          cmd+= "T:"+TextUtils.join(",",tcp);
+        if(udp.size()>0)
+          cmd+= "U:"+TextUtils.join(",",udp);
+        cmd+= " ";
+      }
+      cmd+= target.getCommandLineRepresentation();
     }
     else
       cmd = "-T4 -F -O -sV --privileged --send-ip --system-dns -oX - " + target.getCommandLineRepresentation();

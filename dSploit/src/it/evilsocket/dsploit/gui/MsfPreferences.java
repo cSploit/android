@@ -1,27 +1,23 @@
 package it.evilsocket.dsploit.gui;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
+import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.PreferenceCategory;
+import android.preference.PreferenceScreen;
+import android.text.InputType;
+import android.util.Patterns;
+import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.app.SherlockPreferenceActivity;
 
 import java.util.ArrayList;
 
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.*;
 import it.evilsocket.dsploit.core.System;
-import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
-import it.evilsocket.dsploit.gui.dialogs.InputDialog;
-import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog;
 import it.evilsocket.dsploit.net.metasploit.MsfExploit;
 import it.evilsocket.dsploit.net.metasploit.Option;
 import it.evilsocket.dsploit.net.metasploit.Payload;
@@ -30,176 +26,99 @@ import it.evilsocket.dsploit.net.metasploit.Payload;
  * activity fo setting exploit options.
  */
 
-public class MsfPreferences extends SherlockActivity {
+public class MsfPreferences extends SherlockPreferenceActivity {
 
-  private ListView 		          mListView     = null;
-  private OptionAdapter  mAdapter      = null;
-  private ArrayList<Object> objectsList = new ArrayList<Object>();
-  private static final int ITEM_VIEW_TYPE_OPTION = 0;
-  private static final int ITEM_VIEW_TYPE_SEPARATOR = 1;
-  private static final int ITEM_VIEW_TYPE_COUNT = 2;
+  private Option[] options;
+  private final Preference.OnPreferenceChangeListener listener = new Preference.OnPreferenceChangeListener() {
 
-  private final AdapterView.OnItemClickListener clickListener = new AdapterView.OnItemClickListener() {
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-      //we are sure that we are dealing with an option ( look at OptionAdapter.isEnabled )
-      final Option opt = (Option)mAdapter.getItem(position);
-      if(opt.getType() == Option.types.ENUM ){
-        final String[] enums = opt.getEnum();
-        String currentValue = opt.getValue();
-        if(currentValue.isEmpty()){
-          new SpinnerDialog(opt.getName(), opt.getDescription(), enums, MsfPreferences.this, new SpinnerDialog.SpinnerDialogListener() {
-            @Override
-            public void onItemSelected(int index) {
-              opt.setValue(enums[index]);
-            }
-          }).show();
-        } else {
-          int i;
-          for(i=0;i<enums.length && !(enums[i].equals(currentValue));i++);
-          if(i==enums.length && i > 0) {
-            StringBuilder debug = new StringBuilder();
-            debug.append(enums[0]);
-            for(i=1;i<enums.length;i++)
-              debug.append(", " + enums[i]);
-            Logger.error("cannot find " + currentValue + "in (" + debug + ")");
-            i=0;
-          } else {
-            Logger.error("empty enum! option name: "+opt.getName()+", option value: "+opt.getValue());
-            return;
-          }
-          new SpinnerDialog(opt.getName(), opt.getDescription(), enums, i, MsfPreferences.this, new SpinnerDialog.SpinnerDialogListener() {
-            @Override
-            public void onItemSelected(int index) {
-              opt.setValue(enums[index]);
-            }
-          }).show();
+    public boolean onPreferenceChange(Preference preference, Object newValue) {
+      Option opt = null;
+      String key;
+
+      key = preference.getKey();
+
+      for(Option o : options) {
+        if(o.getName().equals(key)) {
+          opt = o;
+          break;
         }
-      } else {
-        new InputDialog(opt.getName(),opt.getDescription(), opt.getValue(), true, false, MsfPreferences.this, new InputDialog.InputDialogListener() {
-          @Override
-          public void onInputEntered(String input) {
-            try {
-              opt.setValue(input);
-            } catch (Exception e) {
-              Logger.error(e.toString());
-              new ErrorDialog(getString(R.string.error),e.getLocalizedMessage(),MsfPreferences.this).show();
-            }
-          }
-        }).show();
       }
+      if(opt==null)
+        return false;
+      switch (opt.getType()) {
+        case STRING:
+        case PATH:
+        case ENUM:
+          opt.setValue((String)newValue);
+          return true;
+        case ADDRESS:
+          if(Patterns.IP_ADDRESS.matcher((String)newValue).matches()) {
+            opt.setValue((String)newValue);
+            return true;
+          } else
+            Toast.makeText(getApplicationContext(),getString(R.string.error_invalid_address_or_port),Toast.LENGTH_LONG).show();
+          break;
+        case INTEGER:
+          try {
+            int res = Integer.parseInt((String)newValue);
+            opt.setValue(""+res);
+            return true;
+          } catch ( NumberFormatException e) {
+            Toast.makeText(getApplicationContext(),getString(R.string.pref_err_invalid_number),Toast.LENGTH_SHORT).show();
+          }
+          break;
+        case BOOLEAN:
+          if((Boolean)newValue)
+            opt.setValue("true");
+          else
+            opt.setValue("false");
+          return true;
+        case PORT:
+          try {
+            int res = Integer.parseInt((String)newValue);
+            if(res <= 0 || res > 65535)
+              throw new RuntimeException();
+            opt.setValue(""+res);
+            return true;
+          } catch ( NumberFormatException e) {
+            Toast.makeText(getApplicationContext(),getString(R.string.pref_err_invalid_number),Toast.LENGTH_SHORT).show();
+          } catch (RuntimeException e) {
+            Toast.makeText(getApplicationContext(),getString(R.string.invalid_port),Toast.LENGTH_SHORT).show();
+          }
+          break;
+      }
+      return false;
     }
   };
 
-  private class OptionAdapter extends BaseAdapter
-  {
-    private class option_holder {
-      TextView    itemTitle;
-      TextView    itemDescription;
-    }
-
-    private class separator_holder {
-      ImageView itemIcon;
-      TextView  itemTitle;
-    }
-
-    @Override
-    public int getCount() {
-      return objectsList.size();
-    }
-
-    @Override
-    public Object getItem(int position) {
-      return objectsList.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-      return position;
-    }
-
-    @Override
-    public int getViewTypeCount() {
-      return ITEM_VIEW_TYPE_COUNT;
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-      return (objectsList.get(position) instanceof String) ? ITEM_VIEW_TYPE_SEPARATOR : ITEM_VIEW_TYPE_OPTION;
-    }
-
-    @Override
-    public boolean isEnabled(int position) {
-      // A separator cannot be clicked !
-      return getItemViewType(position) != ITEM_VIEW_TYPE_SEPARATOR;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-      Object holder;
-      final boolean isSeparator = getItemViewType(position) == ITEM_VIEW_TYPE_SEPARATOR;
-
-      // First, let's create a new convertView if needed. You can also
-      // create a ViewHolder to speed up changes if you want ;)
-      if (convertView == null) {
-        int layout;
-
-        if(isSeparator) {
-          layout = R.layout.exploit_preferences_separator;
-          holder = new separator_holder();
-        } else {
-          layout = R.layout.exploit_preferences_item;
-          holder = new option_holder();
-        }
-        LayoutInflater inflater = ( LayoutInflater )MsfPreferences.this.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
-        convertView = inflater.inflate( layout, parent, false);
-
-        if(isSeparator) {
-          ((separator_holder)holder).itemTitle = ( TextView )convertView.findViewById( R.id.itemTitle );
-          ((separator_holder)holder).itemIcon = ( ImageView )convertView.findViewById( R.id.itemIcon);
-        } else {
-          ((option_holder)holder).itemTitle = ( TextView )convertView.findViewById( R.id.itemTitle );
-          ((option_holder)holder).itemDescription = ( TextView )convertView.findViewById( R.id.itemDescription );
-        }
-
-        convertView.setTag(holder);
-      } else {
-        holder = convertView.getTag();
-      }
-
-      // We can now fill the list item view with the appropriate data.
-      if (isSeparator) {
-        ((separator_holder)holder).itemTitle.setText((String)getItem(position));
-        //TODO: separator icon
-      } else {
-        final Option opt = (Option) getItem(position);
-        ((option_holder)holder).itemTitle.setText(opt.getName());
-        ((option_holder)holder).itemDescription.setText(opt.getValue());
-      }
-
-      return convertView;
-    }
-
-  }
 
   @Override
-  public void onCreate(Bundle savedInstanceState){
+  protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.exploit_preferences);
+
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-    mListView= (ListView)findViewById( android.R.id.list);
-    mAdapter = new OptionAdapter();
+    setPreferenceScreen(createPreferenceHierarchy());
+  }
 
-    Option[] options = null;
+  private PreferenceScreen createPreferenceHierarchy() {
+    // Root
+    PreferenceScreen root = getPreferenceManager().createPreferenceScreen(this);
+
     String title;
-    ArrayList<Option> required = new ArrayList<Option>();
-    ArrayList<Option> general = new ArrayList<Option>();
-    ArrayList<Option> advanced = new ArrayList<Option>();
-    ArrayList<Option> evasion = new ArrayList<Option>();
+    PreferenceCategory cat_required = new PreferenceCategory(this);
+    PreferenceCategory cat_general = new PreferenceCategory(this);
+    PreferenceCategory cat_advanced = new PreferenceCategory(this);
+    PreferenceCategory cat_evasion = new PreferenceCategory(this);
+    ArrayList<Preference> required = new ArrayList<Preference>();
+    ArrayList<Preference> general = new ArrayList<Preference>();
+    ArrayList<Preference> advanced = new ArrayList<Preference>();
+    ArrayList<Preference> evasion = new ArrayList<Preference>();
 
     Payload payload = System.getCurrentPayload();
     MsfExploit exploit = (MsfExploit) System.getCurrentExploit();
+    System.setCurrentPayload(null);
+    System.setCurrentExploit(null);
 
     if(payload != null) {
       options = payload.getOptions();
@@ -213,67 +132,101 @@ public class MsfPreferences extends SherlockActivity {
       Logger.error("called without Payload or MsfExploit");
     }
 
-    for(Option opt : options) {
-      if(opt.isAdvanced())
-        advanced.add(opt);
-      else if(opt.isRequired())
-        required.add(opt);
-      else if(opt.isEvasion())
-        evasion.add(opt);
-      else
-        general.add(opt);
-    }
-
-    if(!required.isEmpty()) {
-      objectsList.add(getString(R.string.required));
-      objectsList.addAll(required);
-    }
-    if(!general.isEmpty()) {
-      objectsList.add(getString(R.string.pref_general));
-      objectsList.addAll(general);
-    }
-    if(!advanced.isEmpty()) {
-      objectsList.add(getString(R.string.pref_advanced));
-      objectsList.addAll(advanced);
-    }
-    if(!evasion.isEmpty()) {
-      objectsList.add(getString(R.string.evasion));
-      objectsList.addAll(evasion);
-    }
-
-    // force Garbage Collector to munmap(2)
-    required.clear();
-    general.clear();
-    advanced.clear();
-    evasion.clear();
-    required = general = advanced = evasion = null;
-
     setTitle(title + " > " + getString(R.string.menu_settings));
+    cat_required.setTitle(R.string.required);
+    cat_general.setTitle(R.string.pref_general);
+    cat_advanced.setTitle(R.string.pref_advanced);
+    cat_evasion.setTitle(R.string.evasion);
 
-    mListView.setAdapter( mAdapter );
+    for(Option opt : options) {
+      Preference item;
+      int inputType = 0;
 
-    mListView.setOnItemClickListener(clickListener);
-  }
+      switch (opt.getType()) {
+        case ADDRESS:
+        case STRING:
+        case PATH:
+        case INTEGER:
+        case PORT:
+          item = new EditTextPreference(this);
+          item.setTitle(opt.getName());
+          ((EditTextPreference)item).setDialogTitle(opt.getName());
+          ((EditTextPreference)item).setDialogMessage(opt.getDescription());
+          item.setSummary(opt.getDescription());
+          item.setKey(opt.getName());
+          item.setDefaultValue(opt.getValue());
+          break;
+        case BOOLEAN:
+          item = new CheckBoxPreference(this);
+          item.setTitle(opt.getName());
+          item.setKey(opt.getName());
+          item.setSummary(opt.getDescription());
+          ((CheckBoxPreference)item).setChecked(opt.getValue().equals("true"));
+          break;
+        case ENUM:
+          item = new ListPreference(this);
+          ((ListPreference)item).setEntries(opt.getEnum());
+          ((ListPreference)item).setEntryValues(opt.getEnum());
+          ((ListPreference)item).setDialogTitle(opt.getName());
+          ((ListPreference)item).setValue(opt.getValue());
+          item.setKey(opt.getName());
+          item.setTitle(opt.getName());
+          item.setSummary(opt.getDescription());
+          break;
+        default:
+          item = null;
+      }
 
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item){
-    switch(item.getItemId()){
-      case android.R.id.home:
+      switch (opt.getType()) {
+        case ADDRESS:
+          inputType=InputType.TYPE_CLASS_PHONE;
+          break;
+        case PATH:
+        case STRING:
+          inputType=InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
+          break;
+        case PORT:
+        case INTEGER:
+          inputType=InputType.TYPE_CLASS_NUMBER;
+          break;
+      }
 
-        onBackPressed();
+      if(inputType!=0)
+        ((EditTextPreference)item).getEditText().setInputType(inputType);
 
-        return true;
-
-      default:
-        return super.onOptionsItemSelected(item);
+      if(opt.isAdvanced())
+        advanced.add(item);
+      else if(opt.isRequired())
+        required.add(item);
+      else if(opt.isEvasion())
+        evasion.add(item);
+      else if (item != null)
+        general.add(item);
+      if(item!=null)
+        item.setOnPreferenceChangeListener(listener);
     }
-  }
 
-  @Override
-  public void onBackPressed(){
-    super.onBackPressed();
-    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-    System.setCurrentExploit(null);
-    System.setCurrentPayload(null);
+    if(required.size()>0) {
+      root.addPreference(cat_required);
+      for(Preference i : required)
+        cat_required.addPreference(i);
+    }
+    if(general.size()>0) {
+      root.addPreference(cat_general);
+      for(Preference i : general)
+        cat_general.addPreference(i);
+    }
+    if(advanced.size()>0) {
+      root.addPreference(cat_advanced);
+      for(Preference i : advanced)
+        cat_advanced.addPreference(i);
+    }
+    if(evasion.size()>0) {
+      root.addPreference(cat_evasion);
+      for(Preference i : evasion)
+        cat_evasion.addPreference(i);
+    }
+
+    return root;
   }
 }

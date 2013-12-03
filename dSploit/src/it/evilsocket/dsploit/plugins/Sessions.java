@@ -19,22 +19,37 @@
  */
 package it.evilsocket.dsploit.plugins;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.TimeoutException;
+
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
+
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.gui.Console;
+import it.evilsocket.dsploit.gui.dialogs.ChoiceDialog;
+import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
 import it.evilsocket.dsploit.gui.dialogs.FinishDialog;
+import it.evilsocket.dsploit.gui.dialogs.ListChoiceDialog;
 import it.evilsocket.dsploit.net.Target;
-import it.evilsocket.dsploit.net.Target.Exploit;
+import it.evilsocket.dsploit.net.metasploit.RPCClient;
+import it.evilsocket.dsploit.net.metasploit.Session;
+import it.evilsocket.dsploit.net.metasploit.ShellSession;
 
 public class Sessions extends Plugin
 {
   private ListView 			mListView		   = null;
-  private ArrayList<Exploit> results = new ArrayList<Target.Exploit>();
-  private ArrayAdapter<Exploit> mAdapter = null;
+  private ArrayList<Session> mResults;
+  private ArrayAdapter<Session> mAdapter = null;
+  private Sessions              UIThread = null;
 
   public Sessions() {
     super
@@ -48,79 +63,119 @@ public class Sessions extends Plugin
     );
   }
 
-
-  private Thread mThread = new Thread( new Runnable() {
+  private AdapterView.OnItemLongClickListener longClickListener = new AdapterView.OnItemLongClickListener() {
     @Override
-    public void run()
-    {
-      // TODO: find and add sessions to mAdapted
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+      final Session s = mAdapter.getItem(position);
+      final ArrayList<Integer> availableChoices = new ArrayList<Integer>();
+
+      availableChoices.add(R.string.show_full_description);
+      if(s.haveShell())
+        availableChoices.add(R.string.open_shell);
+      if(s.isMeterpreter()) {
+        if(System.getCurrentTarget().getDeviceOS().toLowerCase().contains("windows"))
+          availableChoices.add(R.string.clear_event_log);
+      }
+      availableChoices.add(R.string.delete);
+
+      new ListChoiceDialog(R.string.choose_an_option,availableChoices.toArray(new Integer[availableChoices.size()]),Sessions.this, new ChoiceDialog.ChoiceDialogListener() {
+        @Override
+        public void onChoice(int choice) {
+          switch (availableChoices.get(choice)) {
+            case R.string.open_shell:
+              System.setCurrentSession(s);
+              startActivity(new Intent(Sessions.this, Console.class));
+              overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+              break;
+            case R.string.show_full_description:
+              String message = s.getDescription();
+              if(s.getInfo().length()>0)
+                message+= "\n\nInfo:\n"+s.getInfo();
+              new ErrorDialog(s.getName(),message,Sessions.this).show();
+              break;
+            case R.string.clear_event_log:
+              boolean succeeded = false;
+              int exitCode = -1;
+              try {
+                exitCode = ((ShellSession)s).runCommand("clearev");
+                succeeded = true;
+              } catch (InterruptedException e) {
+                System.errorLogging(e);
+              } catch (IOException e) {
+                System.errorLogging(e);
+              } catch (TimeoutException e) {
+                System.errorLogging(e);
+              } catch (RPCClient.MSFException e) {
+                System.errorLogging(e);
+              }
+              if(!succeeded)
+                Toast.makeText(Sessions.this,"command failed",Toast.LENGTH_SHORT).show();
+              else if(exitCode != 0)
+                Toast.makeText(Sessions.this,"command returned "+exitCode,Toast.LENGTH_LONG).show();
+              break;
+            case R.string.delete:
+              s.stopSession();
+              System.getCurrentTarget().getSessions().remove(s);
+              mAdapter.notifyDataSetChanged();
+              break;
+          }
+        }
+      }).show();
+      return true;
     }
-  });
+  };
+
+  private AdapterView.OnItemClickListener clickListener = new AdapterView.OnItemClickListener() {
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+      Session s = mAdapter.getItem(position);
+      if(s.haveShell()) {
+        System.setCurrentSession(s);
+        startActivity(new Intent(Sessions.this,Console.class));
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+      } else {
+        longClickListener.onItemLongClick(parent, view, position, id);
+      }
+    }
+  };
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    int nEx,i;
 
-    i=nEx=0;
-    nEx = System.getCurrentTarget().getExploits().size();
-    /*
-    for(i=0;i<nEx;i++)
-    {
-      if(System.getCurrentExploits().get(i).started)
-        break;
-    }*/
+    UIThread = this;
 
-    if( System.getCurrentTarget().hasOpenPorts() == false )
-      new FinishDialog( getString(R.string.warning), getString(R.string.no_open_ports), this ).show();
+    if(System.getMsfRpc()==null) {
+      new FinishDialog(getString(R.string.error),"MSF RPC not connected",Sessions.this).show();
+      return;
+    }
 
-    else if( nEx == 0)
-      new FinishDialog( getString(R.string.warning), getString(R.string.no_open_ports_exploitfinder), this ).show();
+    System.getMsfRpc().updateSessions();
 
-    else if(i>=nEx)
-      new FinishDialog( getString(R.string.warning), getString(R.string.no_exploit_started), this ).show();
+    mResults = System.getCurrentTarget().getSessions();
+
+    if(mResults.isEmpty()) {
+      new FinishDialog(getString(R.string.warning),getString(R.string.no_opened_sessions),Sessions.this).show();
+      return;
+    }
 
     mListView = ( ListView )findViewById( android.R.id.list );
-    mAdapter  = new ArrayAdapter<Exploit>(this, android.R.layout.simple_list_item_1, results);
-
-    mAdapter.clear();
+    mAdapter  = new ArrayAdapter<Session>(this, android.R.layout.simple_list_item_1, mResults);
 
     mListView.setAdapter( mAdapter );
 
-    mThread.start();
+    mListView.setOnItemClickListener(clickListener);
 
-     /*TODO: open shell....how? maybe we can use android-terminal-emulator
-
-      mListView.setOnChildClickListener( new OnChildClickListener(){
-			@Override
-			public boolean onChildClick( ExpandableListView parent, View v, int groupPosition, int childPosition, long id ) {
-				Vulnerability cve = ( Vulnerability )mAdapter.getChild(groupPosition, childPosition);
-
-				if( cve != null )
-				{
-					String uri     = "http://web.nvd.nist.gov/view/vuln/detail?vulnId=" + cve.getIdentifier();
-					Intent browser = new Intent( Intent.ACTION_VIEW, Uri.parse( uri ) );
-
-					startActivity( browser );
-				}
-
-				return true;
-			}}
-        );
-
-		for( int i = 0; i < mAdapter.getGroupCount(); i++ )
-		{
-			mListView.expandGroup( i );
-		}
-
-		*/
+    mListView.setOnItemLongClickListener(longClickListener);
   }
 
   @Override
-  public void onBackPressed() {
-    super.onBackPressed();
-    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-    mThread.interrupt();
-    mThread.stop();
+  public void onRpcChange(RPCClient currentValue) {
+    if(UIThread==null)
+      return;
+    if(this!=UIThread)
+      UIThread.onRpcChange(currentValue);
+    else if(currentValue == null)
+      new FinishDialog(getString(R.string.error),getString(R.string.msfrpc_disconnected),Sessions.this).show();
   }
 }

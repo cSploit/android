@@ -29,6 +29,7 @@ import it.evilsocket.dsploit.core.Logger;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 
 import java.util.Date;
 import java.util.concurrent.TimeoutException;
@@ -192,6 +193,7 @@ public class RPCServer extends Thread
         throw new RuntimeException();
       }
     } while(new Date().getTime() < mTimeout);
+    Logger.debug("MSF RPC Server timed out");
     throw new TimeoutException();
   }
 
@@ -202,10 +204,12 @@ public class RPCServer extends Thread
 
     mRunning = true;
 
-    msfChrootPath = System.getSettings().getString("MSF_CHROOT_PATH", "/data/gentoo_msf");
-    msfUser = System.getSettings().getString("MSF_RPC_USER", "msf");
-    msfPassword = System.getSettings().getString("MSF_RPC_PSWD", "pswd");
-    msfPort = System.getSettings().getInt("MSF_RPC_PORT", 55553);
+    SharedPreferences prefs = System.getSettings();
+
+    msfChrootPath = prefs.getString("MSF_CHROOT_PATH", "/data/gentoo_msf");
+    msfUser = prefs.getString("MSF_RPC_USER", "msf");
+    msfPassword = prefs.getString("MSF_RPC_PSWD", "pswd");
+    msfPort = prefs.getInt("MSF_RPC_PORT", 55553);
 
     try
     {
@@ -214,9 +218,11 @@ public class RPCServer extends Thread
         start_daemon();
         wait_for_connection();
         sendDaemonNotification(TOAST,R.string.rpcd_started);
-      }
-      else
+        Logger.debug("connected to new MSF RPC Server");
+      } else {
         sendDaemonNotification(TOAST, R.string.rpcd_running);
+        Logger.debug("connected to running MSF RPC Server");
+      }
     } catch ( IOException ioe ) {
       Logger.error(ioe.getMessage());
       sendDaemonNotification(ERROR,R.string.error_rpcd_shell);

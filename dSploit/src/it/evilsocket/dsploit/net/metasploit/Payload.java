@@ -49,6 +49,10 @@ public class Payload {
     return mOptions;
   }
 
+  public String getName() {
+    return mName;
+  }
+
   public String toString() {
     return mName;
   }

@@ -77,11 +77,15 @@ import it.evilsocket.dsploit.net.Target.Port;
 import it.evilsocket.dsploit.net.Target.Type;
 import it.evilsocket.dsploit.net.Target.Vulnerability;
 import it.evilsocket.dsploit.net.Target.Exploit;
+import it.evilsocket.dsploit.net.metasploit.MsfExploit;
 import it.evilsocket.dsploit.net.metasploit.Payload;
 import it.evilsocket.dsploit.net.metasploit.RPCClient;
 import it.evilsocket.dsploit.net.http.proxy.HTTPSRedirector;
 import it.evilsocket.dsploit.net.http.proxy.Proxy;
 import it.evilsocket.dsploit.net.http.server.Server;
+import it.evilsocket.dsploit.net.metasploit.Session;
+import it.evilsocket.dsploit.net.metasploit.ShellSession;
+import it.evilsocket.dsploit.plugins.Sessions;
 import it.evilsocket.dsploit.tools.ArpSpoof;
 import it.evilsocket.dsploit.tools.Ettercap;
 import it.evilsocket.dsploit.tools.Hydra;
@@ -139,6 +143,7 @@ public class System
   private static RPCClient mMsfRpc      = null;
   private static Exploit mExploit       = null;
   private static Payload mPayload       = null;
+  private static Session mMsfSession    = null;
 
   public static void init(Context context) throws Exception{
     mContext = context;
@@ -677,6 +682,19 @@ public class System
 
   public static void setMsfRpc(RPCClient value){
     mMsfRpc = value;
+    // refresh all exploits
+    // NOTE: this method is usually called by the RPCServer Thread, which will not block the UI
+    for( Target t : getTargets()) {
+      for( Exploit e : t.getExploits()) {
+        if(e instanceof MsfExploit) {
+          ((MsfExploit)e).refresh();
+        }
+      }
+    }
+    for( Plugin plugin : getPluginsForTarget() ) {
+      plugin.onRpcChange(value);
+    }
+
   }
 
   public static Proxy getProxy(){
@@ -915,6 +933,14 @@ public class System
     return mPayload;
   }
 
+  public static void setCurrentSession(Session s) {
+    mMsfSession = s;
+  }
+
+  public static Session getCurrentSession() {
+    return mMsfSession;
+  }
+
   public static void addOpenPort( int port, Protocol protocol ) {
     addOpenPort( port, protocol, null, null );
   }
@@ -995,7 +1021,7 @@ public class System
     setForwarding(false);
 
     try{
-      String tools = "";
+      String tools = "msfrpcd ";
       for(String tool : ToolsInstaller.TOOLS)
         tools += tool + " ";
 
@@ -1011,6 +1037,10 @@ public class System
         if(mWakeLock != null && mWakeLock.isHeld())
           mWakeLock.release();
       }
+
+      for(Target t : mTargets)
+        for(Session s : t.getSessions())
+          s.stopSession();
     }
     catch(Exception e){
       errorLogging(e);

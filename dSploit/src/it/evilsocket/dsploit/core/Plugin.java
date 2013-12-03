@@ -29,6 +29,7 @@ import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Target.Exploit;
 import it.evilsocket.dsploit.net.Target.Port;
 import it.evilsocket.dsploit.net.Target.Vulnerability;
+import it.evilsocket.dsploit.net.metasploit.RPCClient;
 
 public abstract class Plugin extends SherlockActivity{
   public static final int NO_LAYOUT = -1;
@@ -127,4 +128,6 @@ public abstract class Plugin extends SherlockActivity{
   public void onTargetNewExploit( Target target, Exploit ex ) {
 
   }
+
+  public void onRpcChange(RPCClient currentValue) { }
 }

@@ -18,22 +18,13 @@
  */
 package it.evilsocket.dsploit.net;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.os.StrictMode;
 
-import org.apache.http.conn.util.InetAddressUtils;
-
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Locale;
@@ -42,12 +33,10 @@ import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.net.Network.Protocol;
-import it.evilsocket.dsploit.net.metasploit.RPCClient;
+import it.evilsocket.dsploit.net.metasploit.Session;
 
 public class Target
 {
-  // remove "dev" "rc" and other extra version infos
-  private final static Pattern VERSION_PATTERN = Pattern.compile( "(([0-9]+\\.)+[0-9]+)[a-zA-Z]+");
 
   public enum Type{
     NETWORK,
@@ -79,14 +68,10 @@ public class Target
     private ArrayList<Vulnerability> vulns = new ArrayList<Target.Vulnerability>();
 
     public Port( int port, Protocol proto, String service, String version) {
-      Matcher matcher;
       this.number = port;
       this.protocol = proto;
       this.service = service;
-      if(version != null && (matcher = VERSION_PATTERN.matcher(version)) != null && matcher.find())
-        this.version = matcher.group(1);
-      else
-        this.version = version;
+      this.version = version;
     }
 
     public Port( int port, Protocol proto, String service ) {
@@ -98,6 +83,10 @@ public class Target
     }
 
     public String getServiceQuery() {
+      return service;
+    }
+
+    public String getServiceQueryWithVersion() {
       if(version!=null)
         return service + " " + version;
       else
@@ -146,7 +135,7 @@ public class Target
       if(this.service!=null) {
         if(!this.service.equals(p.service))
           return false;
-      } else if (p.version!=null) {
+      } else if (p.service!=null) {
         return false;
       }
       return true;
@@ -249,6 +238,18 @@ public class Target
       if(mExploits.contains(ex))
         mExploits.remove(ex);
     }
+
+    public boolean equals(Object o) {
+      if(o == null || o.getClass() != this.getClass())
+        return false;
+      //TODO: split Vulnerability into 2 classes
+      if(this.cve_id!=null) {
+        if(this.cve_id.equals(((Vulnerability)o).cve_id))
+          return true;
+      } else if(this.osvdb_id > 0 && ((Vulnerability)o).osvdb_id == this.osvdb_id)
+        return true;
+      return false;
+    }
   }
 
   public static class Exploit {
@@ -317,6 +318,7 @@ public class Target
   private String mAlias = null;
   private ArrayList<Vulnerability> mVulnerabilities = new ArrayList<Vulnerability>();
   private ArrayList<Exploit> mExploits = new ArrayList<Target.Exploit>();
+  private ArrayList<Session> mSessions = new ArrayList<Session>();
 
   public static Target getFromString(String string){
     final Pattern PARSE_PATTERN = Pattern.compile("^(([a-z]+)://)?([0-9a-z\\-\\.]+)(:([\\d]+))?[0-9a-z\\-\\./]*$", Pattern.CASE_INSENSITIVE);
@@ -685,6 +687,15 @@ public class Target
   }
 
   public void addOpenPort(Port port){
+    if(port.service!=null) { // update service but preserve different versions
+      for(Port p : mPorts) {
+        if(p.number == port.number && p.service == null) {
+          p.service = port.service;
+          p.version = port.version;
+          return;
+        }
+      }
+    }
     if(!mPorts.contains(port))
       mPorts.add( port );
   }
@@ -768,5 +779,14 @@ public class Target
   public ArrayList<Exploit> getExploits()
   {
     return mExploits;
+  }
+
+  public ArrayList<Session> getSessions() {
+    return mSessions;
+  }
+
+  public void addSession(Session s) {
+    if(!mSessions.contains(s))
+      mSessions.add(s);
   }
 }
