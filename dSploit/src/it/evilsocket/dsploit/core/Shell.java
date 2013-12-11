@@ -196,7 +196,7 @@ public class Shell
 
       mWriter.writeBytes(String.format("mkfifo -m 666 '%s'\n", fifo_path));
       mWriter.flush();
-      mWriter.writeBytes(String.format("(%s ; echo -e \"\\n%s$?\") 2>&1 >%s &\n", command, token, fifo_path));
+      mWriter.writeBytes(String.format("(%s%s echo -e \"\\n%s$?\") 2>&1 >%s &\n", command,(command.trim().endsWith(";") ? "" : " ;"), token, fifo_path));
       mWriter.flush();
 
       gobbler = new StreamGobbler(fifo_path, receiver, token, fifonum);
@@ -210,7 +210,6 @@ public class Shell
         public void run() {
           if(receiver!=null)
             receiver.onEnd(-1);
-          return;
         }
       });
       return fakeThread;
