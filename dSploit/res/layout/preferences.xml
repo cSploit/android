@@ -112,11 +112,11 @@
 
     <PreferenceCategory android:title="@string/pref_msf" >
 
-        <EditTextPreference
-            android:defaultValue="/data/gentoo_msf"
-            android:key="MSF_CHROOT_PATH"
-            android:summary="@string/pref_chroot_desc"
-            android:title="@string/pref_chroot" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="MSF_ENABLED"
+            android:title="@string/pref_msf_enable"
+            android:summary="@string/pref_msf_enable_desc" />
 
         <EditTextPreference
             android:defaultValue="msf"
@@ -129,6 +129,11 @@
             android:key="MSF_RPC_PSWD"
             android:summary="@string/pref_rpc_pswd_desc"
             android:title="@string/pref_rpc_pswd" />
+
+        <Preference
+            android:key="PREF_MSF_WIPE"
+            android:title="@string/pref_msf_delete"
+            android:summary="@string/pref_msf_delete_desc"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

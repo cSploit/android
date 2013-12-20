@@ -20,12 +20,14 @@ package it.evilsocket.dsploit.core;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
+
+import it.evilsocket.dsploit.net.metasploit.RPCServer;
 
 public class UpdateChecker extends Thread
 {
   public static final String UPDATE_CHECKING = "UpdateChecker.action.CHECKING";
   public static final String UPDATE_AVAILABLE = "UpdateChecker.action.UPDATE_AVAILABLE";
+  public static final String GENTOO_AVAILABLE = "UpdateChecker.action.GENTOO_AVAILABLE";
   public static final String UPDATE_NOT_AVAILABLE = "UpdateChecker.action.UPDATE_NOT_AVAILABLE";
   public static final String AVAILABLE_VERSION = "UpdateChecker.data.AVAILABLE_VERSION";
 
@@ -54,7 +56,8 @@ public class UpdateChecker extends Thread
 
     if(System.getUpdateManager().isUpdateAvailable())
       send(UPDATE_AVAILABLE, AVAILABLE_VERSION, System.getUpdateManager().getRemoteVersion());
-
+    else if(System.getSettings().getBoolean("MSF_ENABLED",true) && !RPCServer.exists() && Shell.isBinaryAvailable("tar") && System.getUpdateManager().isGentooAvailable())
+      send(GENTOO_AVAILABLE, null, null);
     else
       send(UPDATE_NOT_AVAILABLE, null, null);
 

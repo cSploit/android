@@ -61,6 +61,7 @@
     <string name="wake_on_lan">Wake On Lan</string>
     <string name="send">Invia</string>
     <string name="update_available">Aggiornamento Disponibile</string>
+    <string name="new_msf_update_desc">Un aggiornamento del MetaSploit Framework</string>
     <string name="new_update_desc">Un nuovo aggiornamento alla versione</string>
     <string name="new_update_desc2">è disponibile, lo vuoi scaricare ?</string>
     <string name="checking">Controllo&#8230;</string>
@@ -342,7 +343,7 @@
     <string name="pref_https_redirector_port_desc">Porta sulla quale il redirezionatore HTTPS deve mettersi in ascolto.</string>
     <string name="pref_http_max_buffer_size_desc">Grandezza massima del buffer HTTP che il proxy trasparente può gestire.</string>
     <string name="pref_password_filename_desc">Nome del file da usare per loggare password e cookie.</string>
-    <string name="pref_rpc_user_desc">Username per connettersi MetaSploit.</string>
+    <string name="pref_rpc_user_desc">Username per connettersi a MetaSploit.</string>
     <string name="pref_rpc_pswd_desc">Password per connettersi a MetaSploit.</string>
     <string name="pref_rpc_port">porta RPC</string>
     <string name="pref_rpc_port_desc">Porta per connettersi a MetaSploit.</string>
@@ -359,6 +360,12 @@
         <item>da exploitdb</item>
         <item>sia da exploitdb che compatibili con MSF</item>
     </string-array>
+    <string name="pref_msf_enable">Abilita MSF</string>
+    <string name="pref_msf_enable_desc">Abilita il MetaSploit Framework</string>
+    <string name="pref_msf_delete">Cancella MSF</string>
+    <string name="pref_msf_delete_desc">Cancella MetaSploit Framework dal tuo dispositivo</string>
+    <string name="pref_msfwipe_message">Vuoi veramente cancellare il MetaSploit Framework ?</string>
+    <string name="pref_msfwipe_size">Saranno liberati circa %d MB.</string>
     <string name="pref_folder">La cartella</string>
     <string name="pref_err_exists">non esiste.</string>
     <string name="pref_err_writable">non è scrivibile.</string>
@@ -374,5 +381,10 @@
     <string name="menu_scan">Scan</string>
     <string name="menu_wifi_scan">WiFi Scan</string>
     <string name="menu_stop_msfrpcd">Stop msfrpcd</string>
-    
+
+    <string name="checksum_failed">Controllo fallito</string>
+    <string name="extraction_failed">Estrazione fallita</string>
+    <string name="extracting">Estrazione&#8230;</string>
+    <string name="click_here_to_upgrade">Clicca qui per aggiornare</string>
+
 </resources>

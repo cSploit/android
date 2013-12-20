@@ -18,12 +18,17 @@
  */
 package it.evilsocket.dsploit;
 
+import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.DirectoryPicker;
+import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
 
 import java.io.File;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -41,7 +46,12 @@ import com.actionbarsherlock.view.MenuItem;
 public class SettingsActivity extends SherlockPreferenceActivity implements OnSharedPreferenceChangeListener
 {
   public static final int SETTINGS_DONE = 101285;
+  public static final String SETTINGS_WIPE_START = "SettingsActivity.WIPE_START";
+  public static final String SETTINGS_WIPE_DONE = "SettingsActivity.WIPE_DONE";
+  public static final String SETTINGS_MSF_CHANGED = "SettingsActivity.MSF_CHANGED";
+
   private Preference mSavePath = null;
+  private Preference mWipeMSF  = null;
   private EditTextPreference mSnifferSampleTime = null;
   private EditTextPreference mProxyPort = null;
   private EditTextPreference mServerPort = null;
@@ -49,6 +59,8 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
   private EditTextPreference mHttpBufferSize = null;
   private EditTextPreference mPasswordFilename = null;
   private CheckBoxPreference mThemeChooser = null;
+  private static int mMsfSize = 0;
+  private BroadcastReceiver mReceiver = null;
 
   @SuppressWarnings("ConstantConditions")
   @Override
@@ -56,8 +68,10 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
     super.onCreate(savedInstanceState);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     addPreferencesFromResource(R.layout.preferences);
+    measureMsfSize();
 
     mSavePath = getPreferenceScreen().findPreference("PREF_SAVE_PATH");
+    mWipeMSF  = getPreferenceScreen().findPreference("PREF_MSF_WIPE");
     mSnifferSampleTime = (EditTextPreference) getPreferenceScreen().findPreference("PREF_SNIFFER_SAMPLE_TIME");
     mProxyPort = (EditTextPreference) getPreferenceScreen().findPreference("PREF_HTTP_PROXY_PORT");
     mServerPort = (EditTextPreference) getPreferenceScreen().findPreference("PREF_HTTP_SERVER_PORT");
@@ -84,6 +98,74 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
         return true;
       }
     });
+
+    mWipeMSF.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+      @Override
+      public boolean onPreferenceClick(Preference preference) {
+        String message = getString(R.string.pref_msfwipe_message);
+        if(mMsfSize>0) {
+          message += "\n" + String.format(getString(R.string.pref_msfwipe_size), mMsfSize);
+        }
+        new ConfirmDialog(getString(R.string.warning),message,SettingsActivity.this, new ConfirmDialog.ConfirmDialogListener() {
+          @Override
+          public void onConfirm() {
+            sendBroadcast(new Intent(SETTINGS_WIPE_START));
+          }
+
+          @Override
+          public void onCancel() {
+
+          }
+        }).show();
+        return true;
+      }
+    });
+
+    mWipeMSF.setEnabled(new File(System.getGentooPath()).isDirectory());
+
+    mReceiver = new BroadcastReceiver() {
+      @Override
+      public void onReceive(Context context, Intent intent) {
+        if(intent.getAction().equals(SETTINGS_WIPE_DONE)) {
+          mWipeMSF.setEnabled(new File(System.getGentooPath()).isDirectory());
+        }
+      }
+    };
+    registerReceiver(mReceiver, new IntentFilter(SETTINGS_WIPE_DONE));
+  }
+
+  private void measureMsfSize() {
+    Shell.async("du -xsm '"+System.getGentooPath()+"'",
+            new Shell.OutputReceiver() {
+              private int size;
+
+              @Override
+              public void onStart(String command) {
+
+              }
+
+              @SuppressWarnings("StatementWithEmptyBody")
+              @Override
+              public void onNewLine(String line) {
+                if(line.isEmpty())
+                  return;
+                try {
+                  int start,end;
+                  for(start=0;start<line.length()&&java.lang.Character.isSpaceChar(line.charAt(start));start++);
+                  for(end=start+1;end<line.length()&&java.lang.Character.isDigit(line.charAt(end));end++);
+                  size = Integer.parseInt(line.substring(start,end));
+                } catch ( Exception e ) {
+                  System.errorLogging(e);
+                }
+              }
+
+              @Override
+              public void onEnd(int exitCode) {
+                if(exitCode==0)
+                  mMsfSize = size;
+              }
+            }
+            ).start();
   }
 
   @Override
@@ -257,6 +339,8 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 
       mPasswordFilename.setText(passFileName);
     }
+    else if(key.equals("MSF_ENABLED") || key.equals("MSF_RPC_USER") || key.equals("MSF_RPC_PSWD"))
+      sendBroadcast(new Intent(SETTINGS_MSF_CHANGED));
   }
 
   @Override
@@ -269,5 +353,11 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
       default:
         return super.onOptionsItemSelected(item);
     }
+  }
+
+  @Override
+  protected void onDestroy() {
+    unregisterReceiver(mReceiver);
+    super.onDestroy();
   }
 }

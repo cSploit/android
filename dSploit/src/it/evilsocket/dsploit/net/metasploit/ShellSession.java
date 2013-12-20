@@ -21,7 +21,6 @@ public class ShellSession extends Session {
   // max time to wait for command execution
   private final static int TIMEOUT = 60000;
 
-  protected final RPCClient mRpcClient;
   protected Shell.OutputReceiver mReceiver;
   protected final Stack<String> mCommands  = new Stack<String>();
   protected boolean mSleep = true;
@@ -29,7 +28,6 @@ public class ShellSession extends Session {
 
   public ShellSession(Integer id, Map<String,Object> map) throws UnknownHostException {
     super(id,map);
-    mRpcClient = System.getMsfRpc();
     mReceiver = null;
     start();
   }
@@ -41,15 +39,21 @@ public class ShellSession extends Session {
     Boolean tokenFound = false;
     long start;
     int newline;
+    RPCClient client = System.getMsfRpc();
+
+    if(client==null) {
+      mReceiver.onEnd(126); // @see http://stackoverflow.com/questions/1101957/are-there-any-standard-exit-status-codes-in-linux
+      return;
+    }
 
     // send command
-    mRpcClient.call("session.shell_write", mJobId,command+"\necho\necho \"$?"+token+"\"\n");
+    client.call("session.shell_write", mJobId,command+"\necho\necho \"$?"+token+"\"\n");
 
     // read until token is found
     start = java.lang.System.currentTimeMillis();
     do
     {
-      String data = (((Map<String, String>)mRpcClient.call("session.shell_read",mJobId )).get("data") + "");
+      String data = (((Map<String, String>)client.call("session.shell_read",mJobId )).get("data") + "");
 
       newline = data.indexOf('\n');
       while(newline>=0) {
@@ -130,6 +134,7 @@ public class ShellSession extends Session {
   /* keep grabbing commands, acquiring locks, until everything is executed */
   public void run() {
     try {
+      //noinspection InfiniteLoopStatement
       while(true) {
         while(mSleep)
           Thread.sleep(200);

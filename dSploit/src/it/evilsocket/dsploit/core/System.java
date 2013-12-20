@@ -84,8 +84,6 @@ import it.evilsocket.dsploit.net.http.proxy.HTTPSRedirector;
 import it.evilsocket.dsploit.net.http.proxy.Proxy;
 import it.evilsocket.dsploit.net.http.server.Server;
 import it.evilsocket.dsploit.net.metasploit.Session;
-import it.evilsocket.dsploit.net.metasploit.ShellSession;
-import it.evilsocket.dsploit.plugins.Sessions;
 import it.evilsocket.dsploit.tools.ArpSpoof;
 import it.evilsocket.dsploit.tools.Ettercap;
 import it.evilsocket.dsploit.tools.Hydra;
@@ -108,7 +106,7 @@ public class System
   private static boolean mInitialized = false;
   private static String mLastError = "";
   private static String mSuPath = null;
-  private static UpdateManager mUpdateManager = null;
+  private static UpdateService mUpdateService = null;
   private static Context mContext = null;
   private static WifiLock mWifiLock = null;
   private static WakeLock mWakeLock = null;
@@ -150,7 +148,7 @@ public class System
     try{
       mStoragePath = getSettings().getString("PREF_SAVE_PATH", Environment.getExternalStorageDirectory().toString());
       mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
-      mUpdateManager = new UpdateManager();
+      mUpdateService = new UpdateService();
       mPlugins = new ArrayList<Plugin>();
       mOpenPorts = new SparseIntArray(3);
 
@@ -362,9 +360,8 @@ public class System
     return mContext.getResources().openRawResource(id);
   }
 
-  public static String getLibraryPath(){
-    //noinspection ConstantConditions
-    return getToolsPath() + "libs/";
+  public static String getGentooPath() {
+    return mContext.getFilesDir().getAbsolutePath() + "/gentoo/";
   }
 
   public static String getFifosPath() {
@@ -383,7 +380,7 @@ public class System
     try{
       Process process = Runtime.getRuntime().exec("which su");
       BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-      String line = null;
+      String line;
 
       while((line = reader.readLine()) != null){
         if(!line.isEmpty() && line.startsWith("/")){
@@ -465,8 +462,8 @@ public class System
     }
   }
 
-  public static UpdateManager getUpdateManager(){
-    return mUpdateManager;
+  public static UpdateService getUpdateManager(){
+    return mUpdateService;
   }
 
   public static String getSessionName(){
@@ -681,6 +678,8 @@ public class System
   }
 
   public static void setMsfRpc(RPCClient value){
+    if(value==mMsfRpc)
+      return;
     mMsfRpc = value;
     // refresh all exploits
     // NOTE: this method is usually called by the RPCServer Thread, which will not block the UI
@@ -794,7 +793,7 @@ public class System
     return mContext;
   }
 
-  public static Network getNetwork() throws NoRouteToHostException, SocketException{
+  public static Network getNetwork() {
     return mNetwork;
   }
 

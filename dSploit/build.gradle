@@ -8,9 +8,15 @@ buildscript {
 }
 apply plugin: 'android'
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
     compile project(':actionbarsherlock')
+    compile group: 'org.apache.commons', name: 'commons-compress', version: '1.6'
+    compile 'org.apache.commons:commons-compress:1.6:sources'
 }
 
 android {

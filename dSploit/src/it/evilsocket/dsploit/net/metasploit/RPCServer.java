@@ -45,8 +45,7 @@ public class RPCServer extends Thread
   private Context         mContext	 		  = null;
   private boolean         mRunning	 		  = false;
   private String          msfUser,
-                          msfPassword,
-                          msfChrootPath;
+                          msfPassword;
   private int             msfPort;
   private long            mTimeout = 0;
 
@@ -55,6 +54,9 @@ public class RPCServer extends Thread
     mContext   = context;
   }
 
+  public static boolean exists() {
+    return (new java.io.File(System.getGentooPath() + "start_msfrpcd.sh")).exists();
+  }
 
   private void sendDaemonNotification(String action, int message)
   {
@@ -123,7 +125,7 @@ public class RPCServer extends Thread
 
     try
     {
-      if(Shell.exec( "chroot '" + msfChrootPath + "' /start_msfrpcd.sh -P '" + msfPassword + "' -U '" + msfUser + "' -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg -f", new debug_receiver()) != 0) {
+      if(Shell.exec( "chroot '" + System.getGentooPath() + "' /start_msfrpcd.sh -P '" + msfPassword + "' -U '" + msfUser + "' -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg -f", new debug_receiver()) != 0) {
         Logger.error("chroot failed");
       }
     }
@@ -134,17 +136,21 @@ public class RPCServer extends Thread
   }
 
   private void start_daemon() throws RuntimeException, IOException, InterruptedException, TimeoutException {
+    Thread res;
     Shell.StreamGobbler chroot;
-    long time = 0;
+    long time;
 
-    chroot = (Shell.StreamGobbler)Shell.async( "chroot '" + msfChrootPath + "' /start_msfrpcd.sh -P '" + msfPassword + "' -U '" + msfUser + "' -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg");
+    res = Shell.async( "chroot '" + System.getGentooPath() + "' /start_msfrpcd.sh -P '" + msfPassword + "' -U '" + msfUser + "' -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg");
+    if(!(res instanceof Shell.StreamGobbler))
+      throw new IOException("cannot run shell commands");
+    chroot = (Shell.StreamGobbler) res;
     chroot.setName("chroot");
     chroot.start();
     try {
-    do {
-      Thread.sleep(100);
-      time=(new Date()).getTime();
-    } while(chroot.isAlive() && time < mTimeout);
+      do {
+        Thread.sleep(100);
+        time=(new Date()).getTime();
+      } while(chroot.isAlive() && time < mTimeout);
     } catch (InterruptedException e) {
       //ensure to kill the chroot thread
       chroot.interrupt();
@@ -206,7 +212,6 @@ public class RPCServer extends Thread
 
     SharedPreferences prefs = System.getSettings();
 
-    msfChrootPath = prefs.getString("MSF_CHROOT_PATH", "/data/gentoo_msf");
     msfUser = prefs.getString("MSF_RPC_USER", "msf");
     msfPassword = prefs.getString("MSF_RPC_PSWD", "pswd");
     msfPort = prefs.getInt("MSF_RPC_PORT", 55553);

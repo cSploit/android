@@ -300,9 +300,7 @@ public class Target
     }
 
     public boolean equals(Object o) {
-      if(o == null || o.getClass() != this.getClass())
-        return false;
-      return ((Exploit)o).getName().equals(this.mName);
+      return !(o == null || o.getClass() != this.getClass()) && ((Exploit) o).getName().equals(this.mName);
     }
   }
 
@@ -563,16 +561,11 @@ public class Target
 
       if(vendor != null) desc += " - " + vendor;
 
-      try{
-        if(mEndpoint.getAddress().equals(System.getNetwork().getGatewayAddress()))
-          desc += "\n" + System.getContext().getString(R.string.gateway_router);
+      if(mEndpoint.getAddress().equals(System.getNetwork().getGatewayAddress()))
+        desc += "\n" + System.getContext().getString(R.string.gateway_router);
 
-        else if(mEndpoint.getAddress().equals(System.getNetwork().getLocalAddress()))
-          desc += System.getContext().getString(R.string.this_device);
-      }
-      catch(SocketException e){
-        System.errorLogging(e);
-      }
+      else if(mEndpoint.getAddress().equals(System.getNetwork().getLocalAddress()))
+        desc += System.getContext().getString(R.string.this_device);
 
       return desc.trim();
     } else if(mType == Type.REMOTE)

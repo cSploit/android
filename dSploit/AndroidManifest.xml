@@ -39,6 +39,9 @@
         <service
                 android:name=".core.UpdateChecker"
                 android:enabled="true"/>
+        <service
+                android:name=".core.UpdateService"
+                android:enabled="true"/>
 
         <activity
                 android:name=".WifiScannerActivity"

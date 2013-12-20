@@ -24,10 +24,8 @@ import org.msgpack.type.*;
 import org.msgpack.unpacker.Unpacker;
 import org.msgpack.unpacker.Converter;
 
-import android.util.Log;
-
-import it.evilsocket.dsploit.core.*;
-import it.evilsocket.dsploit.net.Target;
+import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.core.Logger;
 
 //TODO: add license and write down that we had taken part of this code from armitage
 /* NOTES
@@ -43,12 +41,11 @@ public class RPCClient
   private URLConnection huc;
   private String token;
   private static MessagePack msgpack = null;
-  private Map callCache = new HashMap();
+  private final Map callCache = new HashMap();
   private final Lock lock = new ReentrantLock();
 
   private static final Pattern 	GET_FILENAME 	= Pattern.compile("[^/]+$");
   private static final Pattern 	GET_FUNC 		= Pattern.compile("`([^']+)");
-  private static final String		TAG				= "RPCClient";
 
   public RPCClient(final String host, final String username, final String password, final int port) throws MalformedURLException, IOException, MSFException
   {
@@ -71,8 +68,8 @@ public class RPCClient
     Packer pk = msgpack.createPacker(os);
     pk.writeArrayBegin(args.length+1);
     pk.write(methodName);
-    for(int i = 0; i < args.length;i++)
-      pk.write(args[i]);
+    for (Object arg : args)
+      pk.write(arg);
     pk.writeArrayEnd();
     pk.close();
     os.close();
@@ -188,8 +185,7 @@ public class RPCClient
     {
       Object[] local_array = new Object[args.length+1];
       local_array[0] = token;
-      for(int i=0;i<args.length;i++)
-        local_array[1+i] = args[i];
+      java.lang.System.arraycopy(args, 0, local_array, 1, args.length);
       return cacheExecute(method, local_array);
     }
     catch ( MsgpackException me)
@@ -285,7 +281,7 @@ public class RPCClient
             StackTraceElement[] trace_a;
             String file,filename,func;
             int line;
-            Matcher matcher = null;
+            Matcher matcher;
             for(String str : (ArrayList<String>)hout.get("error_backtrace"))
             {
               try
@@ -305,7 +301,8 @@ public class RPCClient
               }
               catch ( Exception e)
               {
-                Log.w(TAG,"cannot parse \""+str+"\" as stack trace",e);
+                Logger.warning("cannot parse \""+str+"\" as stack trace");
+                System.errorLogging(e);
               }
             }
             trace_a = new StackTraceElement[trace.size()];

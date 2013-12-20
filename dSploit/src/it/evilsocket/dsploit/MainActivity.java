@@ -19,6 +19,7 @@
 package it.evilsocket.dsploit;
 
 import static it.evilsocket.dsploit.core.UpdateChecker.AVAILABLE_VERSION;
+import static it.evilsocket.dsploit.core.UpdateChecker.GENTOO_AVAILABLE;
 import static it.evilsocket.dsploit.core.UpdateChecker.UPDATE_AVAILABLE;
 import static it.evilsocket.dsploit.core.UpdateChecker.UPDATE_CHECKING;
 import static it.evilsocket.dsploit.core.UpdateChecker.UPDATE_NOT_AVAILABLE;
@@ -27,12 +28,14 @@ import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_HARDWARE;
 import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_NAME;
 import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_UPDATE;
 import static it.evilsocket.dsploit.net.NetworkDiscovery.NEW_ENDPOINT;
-import it.evilsocket.dsploit.core.DownloadManager;
+
+import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.core.ManagedReceiver;
 import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.ToolsInstaller;
 import it.evilsocket.dsploit.core.UpdateChecker;
+import it.evilsocket.dsploit.core.UpdateService;
 import it.evilsocket.dsploit.gui.dialogs.AboutDialog;
 import it.evilsocket.dsploit.gui.dialogs.ChangelogDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
@@ -49,7 +52,6 @@ import it.evilsocket.dsploit.net.NetworkDiscovery;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.metasploit.RPCServer;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -369,11 +371,16 @@ public class MainActivity extends SherlockListActivity {
 
 		item = menu.findItem(R.id.ss_msfrpcd);
 
-		if (System.getMsfRpc() != null
-				|| (mRPCServer != null && mRPCServer.isRunning()))
-			item.setTitle(getString(R.string.stop_msfrpcd));
-		else
-			item.setTitle(getString(R.string.start_msfrpcd));
+    if(RPCServer.exists()) {
+      item.setEnabled(true);
+      if (System.getMsfRpc() != null
+          || (mRPCServer != null && mRPCServer.isRunning()))
+        item.setTitle(getString(R.string.stop_msfrpcd));
+      else
+        item.setTitle(getString(R.string.start_msfrpcd));
+    } else {
+      item.setEnabled(false);
+    }
 
 		mMenu = menu;
 
@@ -424,36 +431,62 @@ public class MainActivity extends SherlockListActivity {
 		stopNetworkDiscovery(silent, true);
 	}
 
+  /**
+   * start MSF RPC Daemon
+   */
 	public void StartRPCServer() {
-		try {
-			if (mRPCServer != null) {
-				mRPCServer.exit();
-				mRPCServer.join();
-				mRPCServer = null;
-			}
-		} catch (InterruptedException ie) {
-			// woop
-		}
-		mRPCServer = new RPCServer(this);
-		mRPCServer.start();
+    new Thread( new Runnable() {
+      @Override
+      public void run() {
+        Logger.debug("Starting RPC Server");
+
+        try {
+          if (mRPCServer != null) {
+            if(mRPCServer.isRunning()) {
+              mRPCServer.exit();
+              mRPCServer.join();
+            }
+            mRPCServer = null;
+          }
+          System.setMsfRpc(null);
+        } catch ( Exception e) {
+          // woop
+        }
+        if(RPCServer.exists() && System.getSettings().getBoolean("MSF_ENABLED",true)) {
+          mRPCServer = new RPCServer(MainActivity.this);
+          mRPCServer.start();
+        }
+      }
+    }).start();
 	}
 
-	public void StopRPCServer() {
-		try {
-			if (mRPCServer != null) {
-        if(mRPCServer.isRunning()) {
-          mRPCServer.exit();
-          mRPCServer.join();
+  /**
+   * stop MSF RPC Daemon
+   * @param silent show an information Toast if {@code false}
+   */
+	public void StopRPCServer(final boolean silent) {
+    new Thread( new Runnable() {
+      @Override
+      public void run() {
+        Logger.debug("Stopping RPC Server");
+
+        try {
+          if (mRPCServer != null) {
+            if(mRPCServer.isRunning()) {
+              mRPCServer.exit();
+              mRPCServer.join();
+            }
+            mRPCServer = null;
+          }
+          System.setMsfRpc(null);
+          Shell.exec("killall msfrpcd");
+          if(!silent)
+            Toast.makeText(MainActivity.this, getString(R.string.rpcd_stopped),Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+          // woop
         }
-				mRPCServer = null;
-			}
-			System.setMsfRpc(null);
-			Shell.exec("killall msfrpcd");
-			Toast.makeText(this, getString(R.string.rpcd_stopped),
-					Toast.LENGTH_SHORT).show();
-		} catch (Exception e) {
-			// woop
-		}
+      }
+    }).start();
 	}
 
 	@Override
@@ -629,13 +662,12 @@ public class MainActivity extends SherlockListActivity {
 			return true;
 
 		case R.id.ss_msfrpcd:
-			if (System.getMsfRpc() != null) {
-      if(System.getMsfRpc()!=null || (mRPCServer!=null && mRPCServer.isRunning()))
-				StopRPCServer();
-				item.setTitle("Start msfrpcd");
+      if(System.getMsfRpc()!=null || (mRPCServer!=null && mRPCServer.isRunning())) {
+				StopRPCServer(false);
+				item.setTitle(getString(R.string.start_msfrpcd));
 			} else {
 				StartRPCServer();
-				item.setTitle("Stop msfrpcd");
+				item.setTitle(getString(R.string.stop_msfrpcd));
 			}
 			return true;
 
@@ -714,7 +746,7 @@ public class MainActivity extends SherlockListActivity {
 	@Override
 	public void onDestroy() {
 		stopNetworkDiscovery(true);
-		StopRPCServer();
+		StopRPCServer(true);
 
 		if (mEndpointReceiver != null)
 			mEndpointReceiver.unregister();
@@ -731,9 +763,6 @@ public class MainActivity extends SherlockListActivity {
 		BugSenseHandler.closeSession(getApplicationContext());
 
 		super.onDestroy();
-
-		// remove the application from the cache
-		java.lang.System.exit(0);
 	}
 
 	public class TargetAdapter extends ArrayAdapter<Target> {
@@ -856,6 +885,8 @@ public class MainActivity extends SherlockListActivity {
 
 			mFilter.addAction(RPCServer.ERROR);
 			mFilter.addAction(RPCServer.TOAST);
+      mFilter.addAction(SettingsActivity.SETTINGS_WIPE_START);
+      mFilter.addAction(SettingsActivity.SETTINGS_MSF_CHANGED);
 		}
 
 		public IntentFilter getFilter() {
@@ -870,27 +901,38 @@ public class MainActivity extends SherlockListActivity {
 			 * extra, easy, fast and portable ;) we should use it for every
 			 * ManagedReceiver, IMHO -- tux_mind
 			 */
-			final int message_id = intent.getIntExtra(RPCServer.STRINGID,
-					R.string.error);
+			final int message_id = intent.getIntExtra(RPCServer.STRINGID, R.string.error);
 
 			if (intent.getAction().equals(RPCServer.ERROR)) {
 				MainActivity.this.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
 						new ErrorDialog(getString(R.string.error_rpc),
-								getString(message_id), MainActivity.this);
+								getString(message_id), MainActivity.this).show();
 					}
 				});
-			} else {
+			} else if(intent.getAction().equals(RPCServer.TOAST)){
 				MainActivity.this.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						Toast.makeText(MainActivity.this,
-								getString(message_id), Toast.LENGTH_SHORT)
-								.show();
-					}
-				});
-			}
+          @Override
+          public void run() {
+            Toast.makeText(MainActivity.this,
+                    getString(message_id), Toast.LENGTH_SHORT)
+                    .show();
+          }
+        });
+			} else if(intent.getAction().equals(SettingsActivity.SETTINGS_WIPE_START)) {
+        try {
+          StopRPCServer(true);
+          Shell.exec("rm -rf '" + System.getGentooPath() + "'");
+        } catch ( Exception e) {
+          System.errorLogging(e);
+        } finally {
+          MainActivity.this.sendBroadcast(new Intent(SettingsActivity.SETTINGS_WIPE_DONE));
+        }
+      } else if(intent.getAction().equals(SettingsActivity.SETTINGS_MSF_CHANGED)){
+        StopRPCServer(true);
+        StartRPCServer();
+      }
 		}
 	}
 
@@ -903,6 +945,9 @@ public class MainActivity extends SherlockListActivity {
 			mFilter.addAction(UPDATE_CHECKING);
 			mFilter.addAction(UPDATE_AVAILABLE);
 			mFilter.addAction(UPDATE_NOT_AVAILABLE);
+      mFilter.addAction(GENTOO_AVAILABLE);
+      mFilter.addAction(UpdateService.ERROR);
+      mFilter.addAction(UpdateService.DONE);
 		}
 
 		public IntentFilter getFilter() {
@@ -912,7 +957,7 @@ public class MainActivity extends SherlockListActivity {
 		@SuppressWarnings("ConstantConditions")
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (mUpdateStatus != null
+      if (mUpdateStatus != null
 					&& intent.getAction().equals(UPDATE_CHECKING)
 					&& mUpdateStatus != null) {
 				mUpdateStatus.setText(NO_WIFI_UPDATE_MESSAGE.replace(
@@ -922,6 +967,33 @@ public class MainActivity extends SherlockListActivity {
 					&& mUpdateStatus != null) {
 				mUpdateStatus.setText(NO_WIFI_UPDATE_MESSAGE.replace(
 						"#STATUS#", getString(R.string.no_updates_available)));
+      } else if (intent.getAction().equals(GENTOO_AVAILABLE)) {
+        if(mUpdateStatus != null)
+          mUpdateStatus.setText(NO_WIFI_UPDATE_MESSAGE.replace(
+            "#STATUS#", getString(R.string.new_msf_update_desc)));
+
+        MainActivity.this.runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            new ConfirmDialog(getString(R.string.update_available),
+                    getString(R.string.new_msf_update_desc) + " " + getString(R.string.new_update_desc2),
+                    MainActivity.this,
+                    new ConfirmDialogListener() {
+                      @Override
+                      public void onConfirm() {
+                        Intent i = new Intent(MainActivity.this,UpdateService.class);
+                        i.setAction(UpdateService.START);
+                        i.putExtra(UpdateService.ACTION, UpdateService.action.gentoo_update);
+                        startService(i);
+                      }
+
+                      @Override
+                      public void onCancel() {
+
+                      }
+                    }).show();
+          }
+        });
 			} else if (intent.getAction().equals(UPDATE_AVAILABLE)) {
 				final String remoteVersion = (String) intent.getExtras().get(
 						AVAILABLE_VERSION);
@@ -942,61 +1014,10 @@ public class MainActivity extends SherlockListActivity {
 								MainActivity.this, new ConfirmDialogListener() {
 									@Override
 									public void onConfirm() {
-										DownloadManager manager = new DownloadManager(
-												MainActivity.this,
-												R.string.downloading_update,
-												R.string.connecting);
-										String remote = System
-												.getUpdateManager()
-												.getRemoteVersionUrl(), local = System
-												.getStoragePath()
-												+ "/"
-												+ System.getUpdateManager()
-														.getRemoteVersionFileName();
-
-										manager.download(
-												remote,
-												local,
-												new DownloadManager.StatusReceiver() {
-													@Override
-													public void onStart() {
-													}
-
-													@Override
-													public void onCanceled() {
-													}
-
-													@Override
-													public void onError(
-															Exception e) {
-														MainActivity.this
-																.runOnUiThread(new Runnable() {
-																	@Override
-																	public void run() {
-																		new ErrorDialog(
-																				getString(R.string.error),
-																				getString(R.string.error_occured),
-																				MainActivity.this)
-																				.show();
-																	}
-																});
-													}
-
-													@Override
-													public void onFinished(
-															File file) {
-														Intent intent = new Intent(
-																Intent.ACTION_VIEW);
-														intent.setDataAndType(
-																Uri.fromFile(file),
-																"application/vnd.android.package-archive");
-														intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-														System.getContext()
-																.startActivity(
-																		intent);
-													}
-												});
+                    Intent i = new Intent(MainActivity.this,UpdateService.class);
+                    i.setAction(UpdateService.START);
+                    i.putExtra(UpdateService.ACTION, UpdateService.action.apk_update);
+                    startService(i);
 									}
 
 									@Override
@@ -1005,7 +1026,22 @@ public class MainActivity extends SherlockListActivity {
 								}).show();
 					}
 				});
-			}
+			} else if(intent.getAction().equals(UpdateService.ERROR)) {
+        final int messageId = intent.getIntExtra(UpdateService.MESSAGE, R.string.error_occured);
+        MainActivity.this.runOnUiThread( new Runnable() {
+          @Override
+          public void run() {
+            new ErrorDialog(
+                    getString(R.string.error),
+                    getString(messageId),
+                    MainActivity.this)
+                    .show();
+          }
+        });
+      } else if(intent.getAction().equals(UpdateService.DONE)) {
+        if(intent.getSerializableExtra(UpdateService.ACTION) == UpdateService.action.gentoo_update)
+          StartRPCServer();
+      }
 		}
 	}
 }
