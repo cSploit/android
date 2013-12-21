@@ -371,7 +371,7 @@ public class MainActivity extends SherlockListActivity {
 
 		item = menu.findItem(R.id.ss_msfrpcd);
 
-    if(RPCServer.exists()) {
+    if(RPCServer.exists() && System.getSettings().getBoolean("MSF_ENABLED",true) && !System.isServiceRunning("it.evilsocket.dsploit.core.UpdateService")) {
       item.setEnabled(true);
       if (System.getMsfRpc() != null
           || (mRPCServer != null && mRPCServer.isRunning()))
@@ -438,8 +438,6 @@ public class MainActivity extends SherlockListActivity {
     new Thread( new Runnable() {
       @Override
       public void run() {
-        Logger.debug("Starting RPC Server");
-
         try {
           if (mRPCServer != null) {
             if(mRPCServer.isRunning()) {
@@ -452,7 +450,8 @@ public class MainActivity extends SherlockListActivity {
         } catch ( Exception e) {
           // woop
         }
-        if(RPCServer.exists() && System.getSettings().getBoolean("MSF_ENABLED",true)) {
+        // start MSF RPC Daemon only if it exists, user want it and no updates are in progress
+        if(RPCServer.exists() && System.getSettings().getBoolean("MSF_ENABLED",true) && !System.isServiceRunning("it.evilsocket.dsploit.core.UpdateService")) {
           mRPCServer = new RPCServer(MainActivity.this);
           mRPCServer.start();
         }

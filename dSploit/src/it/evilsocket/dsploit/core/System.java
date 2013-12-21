@@ -462,7 +462,7 @@ public class System
     }
   }
 
-  public static UpdateService getUpdateManager(){
+  public static UpdateService getUpdateService(){
     return mUpdateService;
   }
 

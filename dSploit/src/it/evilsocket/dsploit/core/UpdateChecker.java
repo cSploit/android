@@ -54,9 +54,9 @@ public class UpdateChecker extends Thread
 
     Logger.debug("Service started.");
 
-    if(System.getUpdateManager().isUpdateAvailable())
-      send(UPDATE_AVAILABLE, AVAILABLE_VERSION, System.getUpdateManager().getRemoteVersion());
-    else if(System.getSettings().getBoolean("MSF_ENABLED",true) && !RPCServer.exists() && Shell.isBinaryAvailable("tar") && System.getUpdateManager().isGentooAvailable())
+    if(System.getUpdateService().isUpdateAvailable())
+      send(UPDATE_AVAILABLE, AVAILABLE_VERSION, System.getUpdateService().getRemoteVersion());
+    else if(System.getSettings().getBoolean("MSF_ENABLED",true) && !RPCServer.exists() && Shell.isBinaryAvailable("tar") && System.getUpdateService().isGentooAvailable())
       send(GENTOO_AVAILABLE, null, null);
     else
       send(UPDATE_NOT_AVAILABLE, null, null);

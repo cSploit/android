@@ -382,9 +382,10 @@
     <string name="menu_wifi_scan">WiFi Scan</string>
     <string name="menu_stop_msfrpcd">Stop msfrpcd</string>
 
-    <string name="checksum_failed">Controllo fallito</string>
+    <string name="checksum_failed">File corrotto</string>
     <string name="extraction_failed">Estrazione fallita</string>
     <string name="extracting">Estrazione&#8230;</string>
     <string name="click_here_to_upgrade">Clicca qui per aggiornare</string>
+    <string name="bad_permissions">Il file che hai messo sul dispositivo ha permessi errati, non riesco a leggerlo e/o scriverlo!</string>
 
 </resources>

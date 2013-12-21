@@ -81,9 +81,9 @@ public class UpdateService extends IntentService
                   sha1sum           = null,
                   mRemoteVersion    = null,
                   mInstalledVersion = null;
-  private boolean mRunning          = false,
-                  mHoldNotification = false;
+  private boolean mRunning          = false;
   compressionAlgorithm mAlgorithm = compressionAlgorithm.none;
+  private Intent  mContentIntent    = null;
 
   private NotificationManager mNotificationManager = null;
   private NotificationCompat.Builder mBuilder = null;
@@ -190,6 +190,11 @@ public class UpdateService extends IntentService
    */
   public boolean isGentooAvailable() {
     try {
+      File local = new File(System.getStoragePath() + "/" + REMOTE_IMAGE_NAME);
+      if(local.exists() && local.isFile())
+        return true;
+
+      HttpURLConnection.setFollowRedirects(true);
       URL url = new URL(REMOTE_IMAGE_URL);
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.connect();
@@ -292,41 +297,130 @@ public class UpdateService extends IntentService
     registerReceiver(mReceiver,new IntentFilter(NOTIFICATION_CANCELLED));
     // set common notification actions
     mBuilder.setDeleteIntent(PendingIntent.getBroadcast(this, CANCEL_CODE, new Intent(NOTIFICATION_CANCELLED), 0));
-    // will leave our notification on exit?
-    mHoldNotification=false;
   }
 
   /**
-   * delete our notification if mHoldNotification is false
+   * if mContentIntent is null delete our notification,
+   * else assign it to the notification onClick
    */
-  private void deleteNotification() {
-    if(mHoldNotification)
-      return;
-    Logger.debug("deleting notifications");
-    if(mNotificationManager!=null) {
-      mNotificationManager.cancel(NOTIFICATION_ID);
-      mNotificationManager = null;
+  private void finishNotification() {
+    if(mContentIntent==null){
+      Logger.debug("deleting notifications");
+      if(mNotificationManager!=null)
+        mNotificationManager.cancel(NOTIFICATION_ID);
+    } else {
+      Logger.debug("assign '"+mContentIntent.toString()+"'to notification");
+     if(mBuilder!=null&&mNotificationManager!=null) {
+       mBuilder.setContentIntent(PendingIntent.getActivity(this, DOWNLOAD_COMPLETE_CODE, mContentIntent, 0));
+       mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+     }
     }
-    if(mReceiver!=null) {
+    if(mReceiver!=null)
       unregisterReceiver(mReceiver);
-      mReceiver = null;
-    }
+    mReceiver             = null;
+    mBuilder              = null;
+    mNotificationManager  = null;
   }
 
-  private void setNotificationActions() {
-    if(mLocalFile.endsWith("apk")){
-      Intent intent = new Intent(Intent.ACTION_VIEW);
-      intent.setDataAndType(Uri.fromFile(new File(mLocalFile)),"application/vnd.android.package-archive");
-      intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+  /**
+   * check if mLocalFile exists.
+   *
+   * @return true if file exists and match md5sum and sha1sum.
+   * @throws java.util.concurrent.CancellationException when check is cancelled by user
+   * @throws SecurityException bad file permissions
+   * @throws IOException when IOException occurs
+   * @throws java.security.NoSuchAlgorithmException when digests cannot be created
+   * @throws java.security.KeyException when file checksum fails
+   */
+  private boolean haveLocalFile() throws CancellationException, SecurityException, IOException, NoSuchAlgorithmException, KeyException {
 
+    File file = null;
+    InputStream reader = null;
+    boolean exitForError = true;
+
+    try {
+      MessageDigest md5, sha1;
+      byte[] buffer;
+      int read;
+      String digest;
+      short percentage,previous_percentage;
+      long read_counter,total;
+
+      file = new File(mLocalFile);
+      buffer = new byte[4096];
+      total= file.length();
+      read_counter=0;
+      previous_percentage=-1;
+      mBuilder.setContentTitle(getString(R.string.checking))
+              .setSmallIcon(android.R.drawable.ic_popup_sync)
+              .setContentText("")
+              .setProgress(100, 0, false);
+      mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
+
+      if(!file.exists() || !file.isFile())
+        return false;
+
+      if(!file.canWrite() || !file.canRead()) {
+        read = -1;
+        try {
+          read = Shell.exec("chmod 777 '"+mLocalFile+"'");
+        } catch ( Exception e) {
+          System.errorLogging(e);
+        } finally {
+          if(read!=0)
+            //noinspection ThrowFromFinallyBlock
+            throw new SecurityException("bad file permissions for '"+mLocalFile+"', chmod returned: "+read);
+        }
+      }
+
+      if(md5sum==null || sha1sum==null) // cannot check file consistency
+        return false;
+
+      md5 = MessageDigest.getInstance("MD5");
+      sha1 = MessageDigest.getInstance("SHA-1");
+
+      reader = new FileInputStream(file);
+      while(mRunning && (read = reader.read(buffer))!=-1) {
+        md5.update(buffer,0,read);
+        sha1.update(buffer,0,read);
+
+        read_counter+=read;
+
+        percentage=(short)(((double)read_counter/total)*100);
+        if(percentage!=previous_percentage) {
+          mBuilder.setProgress(100,percentage,false)
+                  .setContentInfo(percentage + "%");
+          mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
+          previous_percentage=percentage;
+        }
+      }
+      reader.close();
+      reader=null;
+      if(!mRunning) {
+        exitForError=false;
+        throw new CancellationException("local file check cancelled");
+      }
+      if(!md5sum.equals(digest2string(md5.digest())))
+        throw new KeyException("wrong MD5");
+      if(!sha1sum.equals(digest2string(sha1.digest())))
+        throw new KeyException("wrong SHA-1");
+      Logger.info("file already exists: "+mLocalFile);
       mBuilder.setSmallIcon(android.R.drawable.stat_sys_download_done)
               .setContentTitle(getString(R.string.update_available))
               .setContentText(getString(R.string.click_here_to_upgrade))
               .setProgress(0, 0, false) // remove progress bar
-              .setAutoCancel(true)
-              .setContentIntent(PendingIntent.getActivity(this, DOWNLOAD_COMPLETE_CODE, intent, 0));
-      mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-      mHoldNotification=true;
+              .setAutoCancel(true);
+      exitForError=false;
+      return true;
+    } finally {
+      if(exitForError&&file!=null&&file.exists()&&!file.delete())
+        Logger.error("cannot delete local file '"+mLocalFile+"'");
+      try {
+        if(reader!=null)
+          reader.close();
+      } catch (IOException e) {
+        System.errorLogging(e);
+      }
     }
   }
 
@@ -339,12 +433,14 @@ public class UpdateService extends IntentService
    * @throws CancellationException when user cancelled the download via notification
    */
 
-  private void downloadFile() throws KeyException, IOException, NoSuchAlgorithmException, CancellationException {
+  private void downloadFile() throws SecurityException, KeyException, IOException, NoSuchAlgorithmException, CancellationException {
     if(mRemoteUrl==null||mLocalFile==null)
       return;
 
+    File file = null;
     FileOutputStream writer = null;
     InputStream reader = null;
+    boolean exitForError = true;
 
     try
     {
@@ -354,62 +450,23 @@ public class UpdateService extends IntentService
       byte[] buffer;
       int read;
       String digest;
-      File file;
       short percentage,previous_percentage;
       long downloaded,total;
 
       mBuilder.setContentTitle(getString(R.string.downloading_update))
+              .setContentText(getString(R.string.connecting))
               .setSmallIcon(android.R.drawable.stat_sys_download)
-              .setProgress(100, 0, false);
-
+              .setProgress(100, 0, true);
+      mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
 
       md5 = (md5sum!=null  ? MessageDigest.getInstance("MD5") : null);
       sha1= (sha1sum!=null ? MessageDigest.getInstance("SHA-1") : null);
-
-      // checks if file already exists
-      // only if we have md5sum and sha1sum
-      //noinspection ResultOfMethodCallIgnored
-      file = new File(mLocalFile);
       buffer = new byte[4096];
-      total= file.length();
-      downloaded=0;
-      previous_percentage=-1;
-      mBuilder.setContentText(getString(R.string.checking));
+      file = new File(mLocalFile);
 
-      if(file.exists()) {
-        if(md5!=null && sha1!=null && file.isFile()) {
-          reader = new FileInputStream(file);
-          while(mRunning && (read = reader.read(buffer))!=-1) {
-            md5.update(buffer,0,read);
-            sha1.update(buffer,0,read);
-
-            downloaded+=read;
-
-            percentage=(short)(((double)downloaded/total)*100);
-            if(percentage!=previous_percentage) {
-              mBuilder.setProgress(100,percentage,false)
-                      .setContentInfo(percentage+"%");
-              mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
-              previous_percentage=percentage;
-            }
-          }
-          reader.close();
-          reader=null;
-          if(!mRunning)
-            throw new CancellationException("download cancelled while checking local file");
-          if(md5sum.equals(digest2string(md5.digest())) && sha1sum.equals(digest2string(sha1.digest()))) {
-            Logger.warning("file already exists: "+mLocalFile);
-            setNotificationActions();
-            return;
-          }
-        }
+      if(file.exists()&&file.isFile())
         //noinspection ResultOfMethodCallIgnored
         file.delete();
-      }
-
-      mBuilder.setContentText(getString(R.string.connecting))
-              .setProgress(100,0,true);
-      mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
 
       HttpURLConnection.setFollowRedirects(true);
       url = new URL(mRemoteUrl);
@@ -455,24 +512,21 @@ public class UpdateService extends IntentService
       reader=null;
 
       if(!mRunning) {
-        file.delete();
         throw new CancellationException("download cancelled");
       } else
         Logger.debug("download finished successfully");
 
       if(md5sum!=null && md5 != null && !md5sum.equals((digest = digest2string(md5.digest())))) {
-        Logger.warning(String.format("expected md5: %s, got %s",md5sum,digest));
-        file.delete();
         throw new KeyException("wrong MD5");
       } else if(sha1sum!=null && sha1 != null && !sha1sum.equals((digest = digest2string(sha1.digest())))){
-        Logger.warning(String.format("expected sha1: %s, got %s",sha1sum,digest));
-        file.delete();
         throw new KeyException("wrong SHA-1");
       }
 
-      setNotificationActions();
+      exitForError=false;
 
     } finally {
+      if(exitForError&&file!=null&&file.exists()&&!file.delete())
+          Logger.error("cannot delete file '"+mLocalFile+"'");
       try {
         if(writer!=null)
           writer.close();
@@ -487,7 +541,7 @@ public class UpdateService extends IntentService
 
   /**
    * extract mLocalFile tarball to mDestinationDir
-   * we cannot untar from Java:
+   * we cannot extract tar files from Java:
    *   -  cannot make symlinks
    *   -  cannot change file owner
    *   -  cannot fully change file mode
@@ -558,7 +612,8 @@ public class UpdateService extends IntentService
       if(!mRunning)
         throw new CancellationException("tar extraction cancelled while decompressing");
 
-      inFile.delete();
+      if(!inFile.delete())
+        Logger.error("cannot delete tarball '"+mLocalFile+"'");
 
       mBuilder.setContentInfo("")
               .setProgress(100,100,true);
@@ -589,6 +644,7 @@ public class UpdateService extends IntentService
   @Override
   protected void onHandleIntent(Intent intent) {
     action what_to_do = (action)intent.getSerializableExtra(ACTION);
+    Intent everythingGoesOk = null;
 
     if(what_to_do==null) {
       Logger.error("received null action");
@@ -601,6 +657,9 @@ public class UpdateService extends IntentService
       case apk_update:
         mRemoteUrl = REMOTE_APK_URL;
         mLocalFile =System.getStoragePath() + "/dSploit-" + mRemoteVersion + ".apk";
+        everythingGoesOk = new Intent(Intent.ACTION_VIEW);
+        everythingGoesOk.setDataAndType(Uri.fromFile(new File(mLocalFile)),"application/vnd.android.package-archive");
+        everythingGoesOk.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         break;
       case gentoo_update:
         mRemoteUrl =REMOTE_IMAGE_URL;
@@ -614,23 +673,28 @@ public class UpdateService extends IntentService
 
     try {
       setupNotification();
-      downloadFile();
+      if(!haveLocalFile())
+        downloadFile();
       tarballExtract();
+      mContentIntent=everythingGoesOk;
       sendDone(what_to_do);
+    } catch ( SecurityException e) {
+      sendError(R.string.bad_permissions);
+      Logger.warning(e.getClass().getName() + ": " + e.getMessage());
     } catch (KeyException e) {
       sendError(R.string.checksum_failed);
-      Logger.warning(e.getMessage());
+      Logger.warning(e.getClass().getName() + ": " + e.getMessage());
     } catch (NoSuchAlgorithmException e) {
       sendError(R.string.error_occured);
       System.errorLogging(e);
     } catch (CancellationException e) {
-      Logger.warning(e.getMessage());
+      Logger.warning(e.getClass().getName() + ": " + e.getMessage());
     } catch (IOException e) {
       sendError(R.string.error_occured);
       System.errorLogging(e);
     } catch ( RuntimeException e) {
       sendError(R.string.error_occured);
-      Logger.error(e.getMessage());
+      Logger.error(e.getClass().getName() + ": " + e.getMessage());
     } catch (InterruptedException e) {
       sendError(R.string.error_occured);
       System.errorLogging(e);
@@ -642,7 +706,7 @@ public class UpdateService extends IntentService
 
   @Override
   public void onDestroy() {
-    deleteNotification();
+    finishNotification();
     super.onDestroy();
   }
 }
