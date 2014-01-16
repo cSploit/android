@@ -297,6 +297,7 @@ public class UpdateService extends IntentService
     registerReceiver(mReceiver,new IntentFilter(NOTIFICATION_CANCELLED));
     // set common notification actions
     mBuilder.setDeleteIntent(PendingIntent.getBroadcast(this, CANCEL_CODE, new Intent(NOTIFICATION_CANCELLED), 0));
+    mBuilder.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(), 0));
   }
 
   /**
