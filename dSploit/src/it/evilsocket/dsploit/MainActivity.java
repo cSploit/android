@@ -287,7 +287,7 @@ public class MainActivity extends SherlockListActivity {
 					if (!Shell.isRootGranted())
 						fatal = getString(R.string.only_4_root);
 
-					else if (!Shell.isBinaryAvailable("killall"))
+					else if (!Shell.isBinaryAvailable("killall", true))
 						fatal = getString(R.string.busybox_required);
 
 					else if (!System.isARM())
