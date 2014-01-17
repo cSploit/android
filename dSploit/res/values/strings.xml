@@ -428,4 +428,7 @@
     <string name="extracting">Extracting&#8230;</string>
     <string name="click_here_to_upgrade">Click here to upgrade</string>
     <string name="bad_permissions">The local file that you put on your storage have bad permissions, i can not read and/or write it!</string>
+    <string name="restore_default_path">restore default path</string>
+    <string name="choose_a_custom_path">choose a custom path</string>
+    <string name="error_symlink">destination device does not support symlinks, please select a decent filesystem.</string>
 </resources>

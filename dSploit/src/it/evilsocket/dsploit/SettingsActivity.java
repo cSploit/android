@@ -18,12 +18,16 @@
  */
 package it.evilsocket.dsploit;
 
+import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.DirectoryPicker;
+import it.evilsocket.dsploit.gui.dialogs.ChoiceDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -52,6 +56,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 
   private Preference mSavePath = null;
   private Preference mWipeMSF  = null;
+  private Preference mGentooRoot = null;
   private EditTextPreference mSnifferSampleTime = null;
   private EditTextPreference mProxyPort = null;
   private EditTextPreference mServerPort = null;
@@ -72,6 +77,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 
     mSavePath = getPreferenceScreen().findPreference("PREF_SAVE_PATH");
     mWipeMSF  = getPreferenceScreen().findPreference("PREF_MSF_WIPE");
+    mGentooRoot = getPreferenceScreen().findPreference("GENTOO_ROOT");
     mSnifferSampleTime = (EditTextPreference) getPreferenceScreen().findPreference("PREF_SNIFFER_SAMPLE_TIME");
     mProxyPort = (EditTextPreference) getPreferenceScreen().findPreference("PREF_HTTP_PROXY_PORT");
     mServerPort = (EditTextPreference) getPreferenceScreen().findPreference("PREF_HTTP_SERVER_PORT");
@@ -79,7 +85,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
     mHttpBufferSize = (EditTextPreference) getPreferenceScreen().findPreference("PREF_HTTP_MAX_BUFFER_SIZE");
     mPasswordFilename = (EditTextPreference) getPreferenceScreen().findPreference("PREF_PASSWORD_FILENAME");
     mThemeChooser = (CheckBoxPreference) getPreferenceScreen().findPreference("PREF_DARK_THEME");
-    
+
     mThemeChooser.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 		
 		@Override
@@ -93,30 +99,46 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 
     mSavePath.setOnPreferenceClickListener(new OnPreferenceClickListener(){
       @Override
-      public boolean onPreferenceClick(Preference preference){
-        startActivityForResult(new Intent(SettingsActivity.this, DirectoryPicker.class), DirectoryPicker.PICK_DIRECTORY);
+      public boolean onPreferenceClick(Preference preference) {
+        startDirectoryPicker(preference);
         return true;
       }
     });
+    mGentooRoot.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+      @Override
+      public boolean onPreferenceClick(Preference preference) {
+        if(!System.getGentooPath().equals(System.getDefaultGentooPath())) {
+          final Preference fPref = preference;
+          (new ChoiceDialog(
+                  SettingsActivity.this,
+                  getString(R.string.choose_an_option),
+                  new String[] {getString(R.string.restore_default_path), getString(R.string.choose_a_custom_path)},
+                  new ChoiceDialog.ChoiceDialogListener() {
+                    @Override
+                    public void onChoice(int choice) {
+                      if(choice==0) {
+                        // simulate directory picker
+                        Intent i = new Intent();
+                        i.putExtra(DirectoryPicker.AFFECTED_PREF, fPref.getKey());
+                        i.putExtra(DirectoryPicker.CHOSEN_DIRECTORY, System.getDefaultGentooPath());
+                        onActivityResult(DirectoryPicker.PICK_DIRECTORY, RESULT_OK, i);
+                      } else {
+                        startDirectoryPicker(fPref);
+                      }
+                    }
+          })).show();
+        } else {
+          startDirectoryPicker(preference);
+        }
+        return true;
+      }
+    });
+    mGentooRoot.setDefaultValue(System.getDefaultGentooPath());
 
     mWipeMSF.setOnPreferenceClickListener(new OnPreferenceClickListener() {
       @Override
       public boolean onPreferenceClick(Preference preference) {
-        String message = getString(R.string.pref_msfwipe_message);
-        if(mMsfSize>0) {
-          message += "\n" + String.format(getString(R.string.pref_msfwipe_size), mMsfSize);
-        }
-        new ConfirmDialog(getString(R.string.warning),message,SettingsActivity.this, new ConfirmDialog.ConfirmDialogListener() {
-          @Override
-          public void onConfirm() {
-            sendBroadcast(new Intent(SETTINGS_WIPE_START));
-          }
-
-          @Override
-          public void onCancel() {
-
-          }
-        }).show();
+        wipe_prompt();
         return true;
       }
     });
@@ -134,8 +156,26 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
     registerReceiver(mReceiver, new IntentFilter(SETTINGS_WIPE_DONE));
   }
 
+  private void wipe_prompt() {
+    String message = getString(R.string.pref_msfwipe_message);
+    if(mMsfSize>0) {
+      message += "\n" + String.format(getString(R.string.pref_msfwipe_size), mMsfSize);
+    }
+    new ConfirmDialog(getString(R.string.warning),message,SettingsActivity.this, new ConfirmDialog.ConfirmDialogListener() {
+      @Override
+      public void onConfirm() {
+        sendBroadcast(new Intent(SETTINGS_WIPE_START));
+      }
+
+      @Override
+      public void onCancel() {
+
+      }
+    }).show();
+  }
+
   private void measureMsfSize() {
-    Shell.async("du -xsm '"+System.getGentooPath()+"'",
+    Shell.async("du -xsm '"+ System.getGentooPath()+"'",
             new Shell.OutputReceiver() {
               private int size;
 
@@ -172,19 +212,62 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
   protected void onActivityResult(int requestCode, int resultCode, Intent intent){
     if(requestCode == DirectoryPicker.PICK_DIRECTORY && resultCode != RESULT_CANCELED){
       Bundle extras = intent.getExtras();
-      String path = (String) (extras != null ? extras.get(DirectoryPicker.CHOSEN_DIRECTORY) : null);
-      File folder = new File(path);
+      String path;
+      String key;
+      File folder;
+
+      if(extras==null) {
+        Logger.debug("null extra: " + intent);
+        return;
+      }
+
+      path = (String) extras.get(DirectoryPicker.CHOSEN_DIRECTORY);
+      key = (String) extras.get(DirectoryPicker.AFFECTED_PREF);
+
+      if(path == null || key == null) {
+        Logger.debug("null path or key: "+intent);
+        return;
+      }
+
+      folder = new File(path);
 
       if(!folder.exists())
         Toast.makeText(SettingsActivity.this, getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_exists), Toast.LENGTH_SHORT).show();
+
+      else if(key.equals("GENTOO_ROOT")) {
+        File current = new File(System.getGentooPath());
+
+        try {
+          if(Shell.exec("ln -fs '/system' '"+path + "/test' && rm '"+path+"/test'") != 0) {
+            Toast.makeText(SettingsActivity.this, R.string.error_symlink, Toast.LENGTH_LONG).show();
+            return;
+          }
+        } catch ( Exception e) {
+          System.errorLogging(e);
+          Toast.makeText(SettingsActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+          return;
+        }
+
+        if(current.exists() && current.isDirectory() && current.listFiles().length > 2) {
+          wipe_prompt(); // erase the contents of the gentoo root before changing it's location
+        }
+        //noinspection ConstantConditions
+        getPreferenceManager().getSharedPreferences().edit().putString(key, path).commit();
+      }
 
       else if(!folder.canWrite())
         Toast.makeText(SettingsActivity.this, getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_writable), Toast.LENGTH_SHORT).show();
 
       else
         //noinspection ConstantConditions
-        getPreferenceManager().getSharedPreferences().edit().putString("PREF_SAVE_PATH", path).commit();
+        getPreferenceManager().getSharedPreferences().edit().putString(key, path).commit();
     }
+  }
+
+  private void startDirectoryPicker(Preference preference) {
+    Intent i = new Intent(SettingsActivity.this, DirectoryPicker.class);
+    i.putExtra(DirectoryPicker.AFFECTED_PREF, preference.getKey());
+    startActivityForResult(i, DirectoryPicker.PICK_DIRECTORY);
   }
 
   @SuppressWarnings("ConstantConditions")
@@ -339,7 +422,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 
       mPasswordFilename.setText(passFileName);
     }
-    else if(key.equals("MSF_ENABLED") || key.equals("MSF_RPC_USER") || key.equals("MSF_RPC_PSWD"))
+    else if(key.equals("MSF_ENABLED") || key.equals("MSF_RPC_USER") || key.equals("MSF_RPC_PSWD") || key.equals("GENTOO_ROOT"))
       sendBroadcast(new Intent(SETTINGS_MSF_CHANGED));
   }
 

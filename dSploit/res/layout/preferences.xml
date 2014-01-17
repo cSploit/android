@@ -118,6 +118,11 @@
             android:title="@string/pref_msf_enable"
             android:summary="@string/pref_msf_enable_desc" />
 
+        <Preference
+            android:key="GENTOO_ROOT"
+            android:summary="@string/pref_chroot_desc"
+            android:title="@string/pref_chroot" />
+
         <EditTextPreference
             android:defaultValue="msf"
             android:key="MSF_RPC_USER"

@@ -45,7 +45,8 @@ public class RPCServer extends Thread
   private Context         mContext	 		  = null;
   private boolean         mRunning	 		  = false;
   private String          msfUser,
-                          msfPassword;
+                          msfPassword,
+                          msfRoot;
   private int             msfPort;
   private long            mTimeout = 0;
 
@@ -125,7 +126,7 @@ public class RPCServer extends Thread
 
     try
     {
-      if(Shell.exec( "chroot '" + System.getGentooPath() + "' /start_msfrpcd.sh -P '" + msfPassword + "' -U '" + msfUser + "' -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg -f", new debug_receiver()) != 0) {
+      if(Shell.exec( "chroot '" + msfRoot + "' /start_msfrpcd.sh -P '" + msfPassword + "' -U '" + msfUser + "' -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg -f", new debug_receiver()) != 0) {
         Logger.error("chroot failed");
       }
     }
@@ -140,7 +141,7 @@ public class RPCServer extends Thread
     Shell.StreamGobbler chroot;
     long time;
 
-    res = Shell.async( "chroot '" + System.getGentooPath() + "' /start_msfrpcd.sh -P '" + msfPassword + "' -U '" + msfUser + "' -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg");
+    res = Shell.async( "chroot '" + msfRoot + "' /start_msfrpcd.sh -P '" + msfPassword + "' -U '" + msfUser + "' -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg");
     if(!(res instanceof Shell.StreamGobbler))
       throw new IOException("cannot run shell commands");
     chroot = (Shell.StreamGobbler) res;
@@ -214,6 +215,7 @@ public class RPCServer extends Thread
 
     msfUser = prefs.getString("MSF_RPC_USER", "msf");
     msfPassword = prefs.getString("MSF_RPC_PSWD", "pswd");
+    msfRoot = prefs.getString("GENTOO_ROOT", System.getDefaultGentooPath());
     msfPort = prefs.getInt("MSF_RPC_PORT", 55553);
 
     try

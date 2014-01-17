@@ -360,8 +360,12 @@ public class System
     return mContext.getResources().openRawResource(id);
   }
 
-  public static String getGentooPath() {
+  public static String getDefaultGentooPath() {
     return mContext.getFilesDir().getAbsolutePath() + "/gentoo/";
+  }
+
+  public static String getGentooPath() {
+    return getSettings().getString("GENTOO_ROOT", getDefaultGentooPath());
   }
 
   public static String getFifosPath() {

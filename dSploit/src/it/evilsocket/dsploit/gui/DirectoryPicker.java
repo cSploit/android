@@ -44,10 +44,12 @@ public class DirectoryPicker extends ListActivity{
   public static final String ONLY_DIRS = "onlyDirs";
   public static final String SHOW_HIDDEN = "showHidden";
   public static final String CHOSEN_DIRECTORY = "chosenDir";
+  public static final String AFFECTED_PREF = "prefKey";
   public static final int PICK_DIRECTORY = 43522432;
   private File dir;
   private boolean showHidden = false;
   private boolean onlyDirs = true;
+  private String  mAffectedPref = null;
 
   @Override
   public void onCreate(Bundle savedInstanceState){
@@ -62,6 +64,7 @@ public class DirectoryPicker extends ListActivity{
       preferredStartDir = extras.getString(START_DIR);
       showHidden = extras.getBoolean(SHOW_HIDDEN, false);
       onlyDirs = extras.getBoolean(ONLY_DIRS, true);
+      mAffectedPref = extras.getString(AFFECTED_PREF);
 
       if(preferredStartDir != null){
         File startDir = new File(preferredStartDir);
@@ -110,6 +113,7 @@ public class DirectoryPicker extends ListActivity{
         intent.putExtra(DirectoryPicker.START_DIR, path);
         intent.putExtra(DirectoryPicker.SHOW_HIDDEN, showHidden);
         intent.putExtra(DirectoryPicker.ONLY_DIRS, onlyDirs);
+        intent.putExtra(DirectoryPicker.AFFECTED_PREF, mAffectedPref);
         startActivityForResult(intent, PICK_DIRECTORY);
       }
     });
@@ -127,6 +131,7 @@ public class DirectoryPicker extends ListActivity{
   private void returnDir(String path){
     Intent result = new Intent();
     result.putExtra(CHOSEN_DIRECTORY, path);
+    result.putExtra(AFFECTED_PREF, mAffectedPref);
     setResult(RESULT_OK, result);
     finish();
   }
