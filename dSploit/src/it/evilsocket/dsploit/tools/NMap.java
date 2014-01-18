@@ -108,15 +108,15 @@ public class NMap extends Tool
 
   public static abstract class InspectionReceiver implements OutputReceiver
   {
-    private static final Pattern PORT_PATTERN 		  = Pattern.compile( "<port protocol=\"([^\"]+)\" portid=\"([^\"]+)\"><state state=\"open\"[^>]+><service.+product=\"([^\"]+)\" version=\"([^\"]+)\"", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PORT_PATTERN 		  = Pattern.compile( "<port protocol=\"([^\"]+)\" portid=\"([^\"]+)\"><state state=\"open\"[^>]+><service(.+product=\"([^\"]+)\")?(.+version=\"([^\"]+)\")?", Pattern.CASE_INSENSITIVE);
     private static final Pattern OS_PATTERN 		  = Pattern.compile( "<osclass type=\"([^\"]+)\".+osfamily=\"([^\"]+)\".+accuracy=\"([^\"]+)\"", Pattern.CASE_INSENSITIVE);
     // remove "dev" "rc" and other extra version info
     private final static Pattern VERSION_PATTERN = Pattern.compile( "(([0-9]+\\.)+[0-9]+)[a-zA-Z]+");
 
     private static final int PROTO = 1,
       NUMBER = 2,
-      NAME = 3,
-      VERSION = 4,
+      NAME = 4,
+      VERSION = 6,
       DEVICE_TYPE = 1,
       OSFAMILY = 2,
       ACCURACY = 3;
@@ -136,7 +136,7 @@ public class NMap extends Tool
         String name     = matcher.group(NAME);
         String version  = matcher.group(VERSION);
 
-        if(version == null || version.trim().isEmpty())
+        if(version == null || version.trim().isEmpty() || name == null || name.trim().isEmpty())
           onOpenPortFound(port_number, protocol);
         else
           for( String _version : version.split("-")) {
