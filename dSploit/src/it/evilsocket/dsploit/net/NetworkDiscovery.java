@@ -20,8 +20,10 @@ package it.evilsocket.dsploit.net;
 
 import android.content.Context;
 import android.content.Intent;
+import android.gesture.GestureLibrary;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -38,6 +40,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Logger;
 
@@ -180,6 +183,24 @@ public class NetworkDiscovery extends Thread
         }
         catch(Exception e){
           System.errorLogging(e);
+          if(e.getMessage().contains("EMFILE")) {
+            try {
+              Shell.exec("lsof | grep "+android.os.Process.myPid(),new Shell.OutputReceiver() {
+                @Override
+                public void onStart(String command) { }
+
+                @Override
+                public void onNewLine(String line) {
+                  Logger.debug(line);
+                }
+
+                @Override
+                public void onEnd(int exitCode) { }
+              });
+            } catch ( Exception e1) {
+              System.errorLogging(e1);
+            }
+          }
         }
       }
     }
