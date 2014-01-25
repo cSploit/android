@@ -45,82 +45,102 @@
 
         <activity
                 android:name=".WifiScannerActivity"
+                android:configChanges="orientation|screenSize"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".SettingsActivity"
+                android:configChanges="orientation|screenSize"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".gui.DirectoryPicker"
+                android:configChanges="orientation|screenSize"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".gui.MsfPreferences"
+                android:configChanges="orientation|screenSize"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
             android:name=".gui.Console"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".ActionActivity"
+                android:configChanges="orientation|screenSize"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.RouterPwn"
+                android:configChanges="orientation|screenSize"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.Traceroute"
+                android:configChanges="orientation|screenSize"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.PortScanner"
+                android:configChanges="orientation|screenSize"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.Inspector"
+                android:configChanges="orientation|screenSize"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.VulnerabilityFinder"
+                android:configChanges="orientation|screenSize"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.Sessions"
+                android:configChanges="orientation|screenSize"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.ExploitFinder"
+                android:configChanges="orientation|screenSize"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.mitm.MITM"
+                android:configChanges="orientation|screenSize"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.mitm.Sniffer"
+                android:configChanges="orientation|screenSize"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.mitm.PasswordSniffer"
+                android:configChanges="orientation|screenSize"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.mitm.hijacker.Hijacker"
+                android:configChanges="orientation|screenSize"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.mitm.hijacker.HijackerWebView"
+                android:configChanges="orientation|screenSize"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.LoginCracker"
+                android:configChanges="orientation|screenSize"
                 android:label="@string/title_activity_main">
         </activity>
         <activity
                 android:name=".plugins.PacketForger"
+                android:configChanges="orientation|screenSize"
                 android:label="@string/title_activity_main">
         </activity>
     </application>
