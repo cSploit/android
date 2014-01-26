@@ -486,7 +486,7 @@ public class Hijacker extends SherlockActivity {
 							}).show();
 				}
 
-				return false;
+				return true;
 			}
 		});
 
