@@ -184,7 +184,7 @@ public class MainActivity extends SherlockListActivity {
 							}
 						}).show();
 
-				return false;
+				return true;
 			}
 		});
 
