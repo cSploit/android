@@ -314,6 +314,7 @@ public class Target
   private String mDeviceType = null;
   private String mDeviceOS = null;
   private String mAlias = null;
+  private boolean mConnected = true;
   private ArrayList<Vulnerability> mVulnerabilities = new ArrayList<Vulnerability>();
   private ArrayList<Exploit> mExploits = new ArrayList<Target.Exploit>();
   private ArrayList<Session> mSessions = new ArrayList<Session>();
@@ -653,6 +654,14 @@ public class Target
     } catch(Exception e){
       Logger.debug(e.toString());
     }
+  }
+
+  public void setConneced(boolean conneced) {
+    mConnected = conneced;
+  }
+
+  public boolean isConnected() {
+    return mConnected;
   }
 
   public Type getType(){

@@ -808,6 +808,11 @@ public class MainActivity extends SherlockListActivity {
 			else
 				holder.itemTitle.setText(target.toString());
 
+      if(target.isConnected())
+        holder.itemTitle.setTextColor(getResources().getColor(R.color.app_color));
+      else
+        holder.itemTitle.setTextColor(getResources().getColor(R.color.gray_text));
+
 			holder.itemTitle.setTypeface(null, Typeface.NORMAL);
 			holder.itemImage.setImageResource(target.getDrawableResourceId());
 			holder.itemDescription.setText(target.getDescription());
