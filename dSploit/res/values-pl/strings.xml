@@ -2,15 +2,15 @@
     <string name="app_name">dSploit</string>
     <string name="menu_settings">Ustawienia</string>
     <string name="title_activity_main">dSploit</string>
-    <string name="crash_toast_text">Ooooops ! I crashed, but a report is going to be sent to my
-        developer to help fix the issue :)
+    <string name="crash_toast_text">Ooooops ! Wywaliłem się, ale zamierzam wysłać raport do mojego twórcy
+        żeby pomóc naprawić problem :)
     </string>
     <string name="toggle_button">ToggleButton</string>
-    <string name="enter_redirection_details">Enter redirection details below:</string>
-    <string name="address">Addres</string>
+    <string name="enter_redirection_details">Wprowadź poniżej szczegóły przekierowania:</string>
+    <string name="address">Adres</string>
     <string name="port">Port</string>
     <string name="target">Cel</string>
-    <string name="unknown">nienznay</string>
+    <string name="unknown">Nieznany</string>
     <string name="services">Usługi</string>
     <string name="os">OS</string>
     <string name="device_type">Rodzaj urządzenia</string>
@@ -20,7 +20,7 @@
     <string name="select_module">Wybierz moduł do uruchomienia</string>
     <string name="choose">Wybierz</string>
     <string name="response">Odpowiedź</string>
-    <string name="request">Rządanie</string>
+    <string name="request">Żądanie</string>
     <string name="wait_for_response">Czekaj na odpowiedź</string>
     <string name="protocol">Protokół</string>
     <string name="dsploit_catchphrase">dSploit - Zestaw penetracyjny dla systemu Android.</string>
@@ -28,8 +28,8 @@
     <string name="dsploit_url">http://www.dsploit.net/</string>
     <string name="disclaimer">Wyłączenie odpowiedzialności</string>
     <string name="dsploit_disclaimer">
-        <![CDATA[This application is not to be used for any purposes other than to demonstrate its functions, and must only be used on networks for which you have permission to do so. Any other use is not the responsibility of the developer.In other words, don&apos;t be stupid, and don&apos;t direct angry people towards me.]]></string>
-    <string name="license">License</string>
+        <![CDATA[Ta aplikacja nie powinna być używana w innym celu niż prezentacja jej funkcji. Może być tylko używana w sieciach, w kótrych masz pozwolenie na takie zabawy. Za żaden inny przypadek użycia, twórca nie ponosi odpowiedzialności. Innymi słowy, nie bądź głupi, nie napuszczać wkurzonych ludzi na mnie.]]></string>
+    <string name="license">Licencja</string>
     <string name="gpl_license">This program is free software: you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by the Free Software
         Foundation, either version 3 of the License, or (at your option) any later version.
@@ -49,8 +49,7 @@
     <string name="min_length">Minimalna Długość</string>
     <string name="username">Login</string>
     <string name="Charset">Zestaw znaków</string>
-    <string name="filter_desc">Enter a custom replace filter, including simple string replacement or
-        regular expressions.
+    <string name="filter_desc">Wprowadź własny filtr podmiany, zawierający proste podmiany znaków, jak i wyrażenia regularne.
     </string>
     <string name="from">Od</string>
     <string name="to">Do</string>
@@ -76,7 +75,7 @@
     <string name="stop_monitor">Zatrzymaj Network Monitor</string>
     <string name="start_msfrpcd">Rozpocznij MetaSploit RPCD</string>
     <string name="stop_msfrpcd">Zatrzymaj MetaSploit RPCD</string>
-    <string name="exit">Exit</string>
+    <string name="exit">Wyjdź</string>
     <string name="close_confirm">To zamknie dSploit, jesteś pewien, że chcesz kontynuować ?
     </string>
     <string name="press_back">Naciśnij wstecz jeszcze raz by opuścić aplikację.</string>
@@ -85,20 +84,19 @@
     <string name="no_session_found">Nie znaleziono pliku sesji na karcie sd.</string>
     <string name="select_session_file">Wybierz plik sesji ze swojej karty sd :</string>
     <string name="select_session">Wybierz sesję</string>
-    <string name="invalid_session">Invalid session name.</string>
+    <string name="invalid_session">Błędna nazwa sesji.</string>
     <string name="session_saved_to">Sesja zapisana w &#160;</string>
     <string name="save_session">Zapisz sesję</string>
-    <string name="enter_session_name">Enter the name of the session file :</string>
-    <string name="new_session_started">New session started</string>
-    <string name="warning">Warning</string>
-    <string name="warning_new_session">Starting a new session would delete the current one,
-        continue?
+    <string name="enter_session_name">Wprowadź nazwę pliku sesji:</string>
+    <string name="new_session_started">Nowa sesja rozpoczęta</string>
+    <string name="warning">Ostrzeżenie</string>
+    <string name="warning_new_session">Rozpoczęcie nowej sesji usunie obecną. Chcesz kontynuować?
     </string>
     <string name="fatal_error_html">
         <![CDATA[<p>It seems like your ROM has the <b>LD_LIBRARY_PATH bug</b>, i\'m sorry but it\'s not compatible with dSploit.</p>]]></string>
     <string name="fatal_error_html2">
         <![CDATA[<p>For more info read the <a href=\"http://dsploit.net/#faq\">FAQ</a>.</p>]]></string>
-    <string name="install_error">Error during files installation!</string>
+    <string name="install_error">Błąd podczas instalacji plików!</string>
     <string name="arm_error">
         <![CDATA[<p>It seems like your device processor is not an ARM, i\'m sorry but it\'s not compatible with dSploit.</p>]]></string>
     <string name="arm_error2">
