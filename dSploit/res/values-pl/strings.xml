@@ -93,148 +93,141 @@
     <string name="warning_new_session">Rozpoczęcie nowej sesji usunie obecną. Chcesz kontynuować?
     </string>
     <string name="fatal_error_html">
-        <![CDATA[<p>It seems like your ROM has the <b>LD_LIBRARY_PATH bug</b>, i\'m sorry but it\'s not compatible with dSploit.</p>]]></string>
+        <![CDATA[<p>Wygląda na to, że Twój ROM ma błąd <b>LD_LIBRARY_PATH</b>. Przykro mi, ale to znaczy, że nie jest kompatybilny z dSploit.</p>]]></string>
     <string name="fatal_error_html2">
-        <![CDATA[<p>For more info read the <a href=\"http://dsploit.net/#faq\">FAQ</a>.</p>]]></string>
+        <![CDATA[<p>Tu znajdziesz więcej informacji: <a href=\"http://dsploit.net/#faq\">FAQ</a>.</p>]]></string>
     <string name="install_error">Błąd podczas instalacji plików!</string>
     <string name="arm_error">
-        <![CDATA[<p>It seems like your device processor is not an ARM, i\'m sorry but it\'s not compatible with dSploit.</p>]]></string>
+        <![CDATA[<p>Wygląda na to, że Twoje urządzenie ma inny procesor niż ARM. Przykro mi, ale to znaczy, że nie jest kompatybilne z dSploit.</p>]]></string>
     <string name="arm_error2">
-        <![CDATA[<p>For more info read the <a href=\"http://dsploit.net/#requirements\">requirements</a> section.</p>]]></string>
-    <string name="busybox_required">Full BusyBox installation required, killall binary not
-        found(maybe you have an old busybox version).
+        <![CDATA[<p>Tu znajdziesz więcej informacji: <a href=\"http://dsploit.net/#requirements\">Wymagania</a>.</p>]]></string>
+    <string name="busybox_required">Pełna instalacja BusyBox jest wymagana.
+                                    Nie mogę znaleźć binarnej wersji killall (może masz starą wersję busyboxa).
     </string>
-    <string name="only_4_root">This application can run only on rooted devices.</string>
-    <string name="initializing">Initializing&#8230;</string>
-    <string name="initialization_error">Initialization Error</string>
-    <string name="target_alias">Target Alias</string>
-    <string name="set_alias">Set an alias for this target:</string>
-    <string name="no_connectivity">No connectivity available.</string>
-    <string name="wifi_key_copied">WiFi key copied to clipboard.</string>
-    <string name="connected_to"><![CDATA[Connected to <b>]]></string>
-    <string name="connected_to2"><![CDATA[</b> with key <b><font color=\"green\">]]></string>
+    <string name="only_4_root">Ta aplikacja działa tylko na zrootowanych urządzeniach.</string>
+    <string name="initializing">Inicjowanie&#8230;</string>
+    <string name="initialization_error">Błąd Inicjalizacji</string>
+    <string name="target_alias">Alias celu</string>
+    <string name="set_alias">Ustaw alias dla tego celu:</string>
+    <string name="no_connectivity">Połączenie nie dostępne.</string>
+    <string name="wifi_key_copied">Klucz WiFi skopiowany do schowka.</string>
+    <string name="connected_to"><![CDATA[Połączony z <b>]]></string>
+    <string name="connected_to2"><![CDATA[</b> kluczem <b><font color=\"green\">]]></string>
     <string name="connected_to3"><![CDATA[</font></b> !]]></string>
-    <string name="connection_to"><![CDATA[Connection to <b>]]></string>
+    <string name="connection_to"><![CDATA[Połączenie z <b>]]></string>
     <string name="connection_to2">
-        <![CDATA[</b> <b><font color=\"red\">FAILED</font></b>.]]></string>
-    <string name="enter_key_or_crack">Enter WiFi Key or attempt cracking:</string>
-    <string name="enter_wifi_key">Enter WiFi Key:</string>
-    <string name="scanning">Scanning&#8230;</string>
-    <string name="invalid_filename">Invalid file name.</string>
-    <string name="something_went_wrong">Something went wrong, please select again a valid target.
+        <![CDATA[</b> <b><font color=\"red\">NIEUDANE</font></b>.]]></string>
+    <string name="enter_key_or_crack">Wprowadź klucz WiFi lub spróbuj crackowania:</string>
+    <string name="enter_wifi_key">Wprowadź klucz WiFi:</string>
+    <string name="scanning">Skanowanie&#8230;</string>
+    <string name="invalid_filename">Błędna nazwa pliku.</string>
+    <string name="something_went_wrong">Coś poszło źle, spróbuj wskazać ponownie poprawny cel.</string>
+    <string name="selected">Wskazany</string>
+    <string name="nothing_found"><![CDATA[<small><i>Nic nie znaleziono</i></small>]]></string>
+    <string name="no_open_ports">Nie znaleziono otwartych portów w obecnym celu. Uruchom najpierw inspektora usług.</string>
+    <string name="no_exploits_found">Nie znaleziono exploitów.</string>
+    <string name="no_open_ports_focused_scan">Nie znaleziono otwartych portów. Uruchom skaner portów zanim wybierzesz celowane skanowanie.</string>
+    <string name="no_open_ports_exploitfinder">Nie znaleziono exploitów w tym celu. Uruchom najpierw ExploitFindera.</string>
+    <string name="no_exploit_started">Nie uruchomiono żadnego exploita.</string>
+    <string name="no_vulnerabilities_found">Nie znaleziono żadnych podatności w obecnym celu. Uruchom najpierw Vulnerability Finder.</string>
+    <string name="no_infos_on_target">Nie ma konkretnych informacji o usługach uruchomionych na maszynie celu.
+                                      Uruchom najpierw inspektora usług.
     </string>
-    <string name="selected">Selected</string>
-    <string name="nothing_found"><![CDATA[<small><i>Nothing Found</i></small>]]></string>
-    <string name="no_open_ports">No open ports detected on current target, run the service inspector first.</string>
-    <string name="no_exploits_found">No exploits found.</string>
-    <string name="no_open_ports_focused_scan">No open ports found, run the port scanner before selecting a focused scan.</string>
-    <string name="no_open_ports_exploitfinder">No exploits found on this target, run the ExploitFinder first.</string>
-    <string name="no_exploit_started">No exploit has been started.</string>
-    <string name="no_vulnerabilities_found">No vulnerabilities found about this target. run the Vulnerability Finder first.</string>
-    <string name="no_infos_on_target">No specific informations about services running on target
-        machine, run the service inspector first.
+    <string name="custom_charset">Własny zestaw znaków</string>
+    <string name="enter_chars_wanted">Wprowadź znaki, których chcesz użyć we własnym zestawie znaków:
     </string>
-    <string name="custom_charset">Custom Charset</string>
-    <string name="enter_chars_wanted">Enter the chars you want to use in the custom charset:
+    <string name="invalid_port">Wskazano błędny port.</string>
+    <string name="request_empty">Żądanie nie może być puste.</string>
+    <string name="request_sent">Żądanie wysłane.</string>
+    <string name="customize_wol_port">Dostosuj port WOL i wciśnij Wyślij.</string>
+    <string name="couldnt_send_wol_packet">Nie mogłem wysłać pakietu WOL do celu nie znając jego adresu MAC.
     </string>
-    <string name="invalid_port">Invalid port specified.</string>
-    <string name="request_empty">The request can not be empty.</string>
-    <string name="request_sent">Request sent.</string>
-    <string name="customize_wol_port">Customize WOL port and press Send.</string>
-    <string name="couldnt_send_wol_packet">Could not send a WOL packet to a target without a known
-        MAC address.
+    <string name="no_activities_for_url">Nie ma aktywności mogących obsłużyć ten typ urla.</string>
+    <string name="select_ports">Wybierz porty</string>
+    <string name="enter_ports_list">Wprowadź listę portów rozdzielonych przecinkami:</string>
+    <string name="invalid_port_">Błędny port \'</string>
+    <string name="port_must_be_greater">Port musi być większy od 0 i mniejszy niż 65535.</string>
+    <string name="invalid_ports">Wprowadzono błędne porty.</string>
+    <string name="empty_port_list">Lista portów jest pusta.</string>
+    <string name="about_dsploit_v_">O dSploit v</string>
+    <string name="select_target">Wskaż cel poniżej klikając na wiersz albo wprowadź alias przytrzymując wiersz dłużej.
     </string>
-    <string name="no_activities_for_url">No activities to handle this type of url.</string>
-    <string name="select_ports">Select Ports</string>
-    <string name="enter_ports_list">Enter a comma separated list of ports:</string>
-    <string name="invalid_port_">Invalid port \'</string>
-    <string name="port_must_be_greater">Port must be greater than 0 and smaller than 65535.</string>
-    <string name="invalid_ports">Invalid ports specified.</string>
-    <string name="empty_port_list">Empty port list.</string>
-    <string name="about_dsploit_v_">About dSploit v</string>
-    <string name="select_target">Select a target below by clicking on a row, or long click on it to
-        enter an alias.
+    <string name="generating_keys">Generowanie kluczy&#8230;</string>
+    <string name="no_wifi_available">Nie dostępne połączenie WiFi, aplikacja sprawdzi tylko aktualizacje. #STATUS#
     </string>
-    <string name="generating_keys">Generating keys&#8230;</string>
-    <string name="no_wifi_available">No WiFi connection available, the application will just check
-        for updates. #STATUS#
-    </string>
-    <string name="loading_changelog">Loading changelog&#8230;</string>
+    <string name="loading_changelog">Ładuję listę zmian&#8230;</string>
     <string name="something_went_wrong_changelog">
-        <![CDATA[<html><body><p><b>Something went wrong while retrieving the changelog:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
-    <string name="cancel_dialog">Cancel</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
-    <string name="connect">Connect</string>
-    <string name="crack">Crack</string>
-    <string name="could_not_read_folder">Could not read folder contents.</string>
-    <string name="choose_dir">Choose&#160;</string>
+        <![CDATA[<html><body><p><b>Coś poszło źle w trakcie wczytywania listy zmian:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
+    <string name="cancel_dialog">Anuluj</string>
+    <string name="yes">Tak</string>
+    <string name="no">Nie</string>
+    <string name="connect">Połącz</string>
+    <string name="crack">Crackuj</string>
+    <string name="could_not_read_folder">Nie mogę przeczytać zawartości folderu.</string>
+    <string name="choose_dir">Wybierz&#160;</string>
     <string name="vulnerability_finder">Vulnerability Finder</string>
-    <string name="vulnerability_finder_desc">Search for known vulnerabilities for target running
-        services upon National Vulnerability Database.
+    <string name="vulnerability_finder_desc">Szukaj znanych podatności dla usług uruchomionych na celu w Międzynarodowej Bazie Podatności.
     </string>
-    <string name="inspector">Inspector</string>
-    <string name="inspector_desc">Perform target operating system and services deep detection
-        (slower than port scanner, but more accurate).
+    <string name="inspector">Inspektor</string>
+    <string name="inspector_desc">Wykryj system operacyjny celu i szczegóły o usługach
+        (wolniejsze niż skaner portów ale dokładniejsze).
     </string>
     <string name="login_cracker">Login Cracker</string>
-    <string name="login_cracker_desc">A very fast network logon cracker which support many different
-        services.
+    <string name="login_cracker_desc">Bardzo szybki cracker logowania, obsługujący wiele usług.
     </string>
     <string name="packet_forger">Packet Forger</string>
-    <string name="packet_forger_desc">Craft and send a custom TCP or UDP packet to the target.
+    <string name="packet_forger_desc">Stwórz i wyślij własne pakiety TCP i UDP do celu.
     </string>
     <string name="port_scanner">Port Scanner</string>
-    <string name="port_scanner_desc">Perform a SYN port scanning on target.</string>
+    <string name="port_scanner_desc">Przeprowadź skanowanie SYN na celu.</string>
     <string name="router_pwn">Router PWN</string>
-    <string name="router_pwn_desc">Launch the http://routerpwn.com/ service to pwn your router.
+    <string name="router_pwn_desc">Uruchom usługę http://routerpwn.com/ żeby przejąć kontrolę nad Twoim routerem.
     </string>
     <string name="trace">Trace</string>
-    <string name="trace_desc">Perform a traceroute on target.</string>
+    <string name="trace_desc">Przeprowadź operację traceroute na celu.</string>
     <string name="mitm">MITM</string>
-    <string name="mitm_desc">Perform various man-in-the-middle attacks, such as network sniffing,
-        traffic manipulation, etc&#8230;
+    <string name="mitm_desc">Przeprowadź różne ataki man-in-the-middle, takie jak sniffing,
+        manipulowanie ruchem, itp&#8230;
     </string>
-    <string name="network_subnet_mask">This is your network subnet mask</string>
-    <string name="gateway_router">(Your network gateway / router)</string>
-    <string name="this_device">&#160;(This device)</string>
-    <string name="wifi_went_down">WiFi connectivity went down.</string>
+    <string name="network_subnet_mask">To jest maska Twojej podsieci</string>
+    <string name="gateway_router">(Bramka Twojej sieci / router)</string>
+    <string name="this_device">&#160;(To urządzenie)</string>
+    <string name="wifi_went_down">Łączność WiFi nie działa.</string>
     <string name="hijack_session">Hijack Session</string>
-    <string name="start_hijacking">Stop sniffing and start session hijacking?</string>
-    <string name="start_hijacking2">Start session hijacking?</string>
-    <string name="set_session_filename">Set the session file name:</string>
+    <string name="start_hijacking">Skończyć sniffing i rozpocząć przechwytywanie sesji?</string>
+    <string name="start_hijacking2">Rozpocząć przechwytywanie sesji?</string>
+    <string name="set_session_filename">Wprowadź nazwę pliku sesji:</string>
     <string name="session_sniffer">Session Sniffer</string>
 
     <string name="untraced_hops">untraced hops</string>
-    <string name="add_username">Add username</string>
-    <string name="enter_username">Enter the username you want to use:</string>
-    <string name="select_wordlist">Select Wordlist</string>
-    <string name="error_filepath">Could not determine file path, please use a different file
-        manager.
+    <string name="add_username">Dodaj nazwę użytkownika</string>
+    <string name="enter_username">Wprowadź nazwę użytkownika, której chcesz użyć:</string>
+    <string name="select_wordlist">Wybierz słownik</string>
+    <string name="error_filepath">Nie mogę określić ścieżki pliku. Użyj innego menadżera plików.
     </string>
-    <string name="trying">Trying</string>
+    <string name="trying">Próbuję</string>
     <string name="left">left</string>
-    <string name="error_filepath2">Could not determine file path.</string>
-    <string name="tap_again">Tap again to stop.</string>
-    <string name="unexpected_file_error">Unexpected error while reading the file : </string>
-    <string name="the_port">The port</string>
-    <string name="error_proxy_port"> which is needed by the transparent proxy is taken from another process, open application settings ?</string>
-    <string name="error_mitm_port"> which is needed by the mitm server is taken from another process, open application settings ?</string>
-    <string name="error_https_port"> which is needed by the mitm https redirector is taken from another process, open application settings ?</string>
-    <string name="error_mitm_ports">MITM modules need all ports available.</string>
+    <string name="error_filepath2">Nie mogę określić ścieżki pliku.</string>
+    <string name="tap_again">Stuknij ponownie żeby zatrzymać.</string>
+    <string name="unexpected_file_error">Nieoczekiwany błąd w trakcie wczytywania pliku: </string>
+    <string name="the_port">Port</string>
+    <string name="error_proxy_port"> potrzebny dla transparentnego proxy jest używany przez inny proces, otworzyć ustawienia aplikacji?</string>
+    <string name="error_mitm_port"> potrzebny dla serwera mitm jest używany przez inny proces, otworzyć ustawienia aplikacji?</string>
+    <string name="error_https_port"> potrzebny do przekierowania mitm https jest używany przez inny proces, otworzyć ustawienia aplikacji?</string>
+    <string name="error_mitm_ports">moduły MITM potrzebują dostępności wszystkich portów.</string>
 
     <!-- rpc stuff -->
-    <string name="error_rpc">RPC error</string>
-    <string name="error_rpcd_inval">bad settings</string>
-    <string name="error_rpcd_shell">cannot execute shell</string>
-    <string name="rpcd_starting">Starting MetaSploit RPCD&#8230;</string>
-    <string name="rpcd_started">MetaSploit RPCD started</string>
-    <string name="rpcd_stopped">MetaSploit RPCD stopped</string>
-    <string name="rpcd_running">MetaSploit RPCD is already running</string>
-    <string name="rpcd_timedout">MetaSploit RPCD does not respond</string>
-    <string name="error_rcpd_fatal">fatal error occurred, i\'m searching that bug for send it to my developers.
-        if i won\'t exit please close me from preferences->applications,
-        and ALERT MY DEVELOPERS.
+    <string name="error_rpc">błąd RPC</string>
+    <string name="error_rpcd_inval">złe ustawienia</string>
+    <string name="error_rpcd_shell">nie mogę uruchomić shella</string>
+    <string name="rpcd_starting">Uruchamianie MetaSploit RPCD&#8230;</string>
+    <string name="rpcd_started">MetaSploit RPCD uruchomiony</string>
+    <string name="rpcd_stopped">MetaSploit RPCD zatrzymany</string>
+    <string name="rpcd_running">MetaSploit RPCD już działa</string>
+    <string name="rpcd_timedout">MetaSploit RPCD nie odpowiada</string>
+    <string name="error_rcpd_fatal">wystąpił fatalny błąd, szukam tego buga, żeby wysłać go do moich twórców.
+        jeśli nie wyjdę, proszę zamknij mnie przez ustawienia->aplikacje
+        i POWIADOM MOICH TWÓRCÓW.
     </string>
 
     <!-- mitm modules -->
