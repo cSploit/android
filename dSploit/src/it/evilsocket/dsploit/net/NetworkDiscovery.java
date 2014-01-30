@@ -186,8 +186,9 @@ public class NetworkDiscovery extends Thread
           boolean update = false;
           boolean found;
           int i;
+          Target[] currentTargets = System.getTargets().toArray(new Target[System.getTargets().size()]);
 
-          for(Target t : System.getTargets()) {
+          for(Target t : currentTargets) {
 
             endpoint = t.getEndpoint();
 
