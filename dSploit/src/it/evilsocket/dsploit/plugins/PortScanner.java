@@ -84,7 +84,7 @@ public class PortScanner extends Plugin {
 	}
 
 	private void setStartedState() {
-		mPortList.clear();
+		createPortList();
 
 		System.getNMap()
 				.synScan(System.getCurrentTarget(), mScanReceiver, mCustomPorts)
@@ -92,6 +92,24 @@ public class PortScanner extends Plugin {
 
 		mRunning = true;
 	}
+
+  private void createPortList() {
+    mPortList.clear();
+
+    for(Port p : System.getCurrentTarget().getOpenPorts()) {
+      String resolvedProtocol = System.getProtocolByPort(""+p.number);
+      String str;
+
+      if (resolvedProtocol != null)
+        str = p.number + " ( " + resolvedProtocol + " )";
+      else
+        str = p.protocol.toString().toLowerCase() + " : " + p.number;
+
+      if(!mPortList.contains(str))
+        mPortList.add(str);
+    }
+
+  }
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -119,10 +137,7 @@ public class PortScanner extends Plugin {
 
 		ListView mScanList = (ListView) findViewById(R.id.scanListView);
 
-		for (Port port : System.getCurrentTarget().getOpenPorts()) {
-			mPortList.add(port.number + " ( "
-					+ port.protocol.toString().toLowerCase() + " )");
-		}
+		createPortList();
 
 		mListAdapter = new ArrayAdapter<String>(this,
 				android.R.layout.simple_list_item_1, mPortList);
@@ -297,27 +312,29 @@ public class PortScanner extends Plugin {
 
 		@Override
 		public void onPortFound(String port, String protocol) {
-			final String openPort = port;
-			final String portProto = protocol;
+			final int    portNumber = Integer.parseInt(port);
+			final String portProtocol = protocol;
+      final String resolvedProtocol = System.getProtocolByPort(port);
+
+      System.addOpenPort(portNumber, Network.Protocol.fromString(protocol));
 
 			PortScanner.this.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					String proto = System.getProtocolByPort(openPort), entry = openPort;
+          String entry;
 
-					if (proto != null)
-						entry = openPort + " ( " + proto + " )";
+					if (resolvedProtocol != null)
+						entry = portNumber + " ( " + resolvedProtocol + " )";
 
 					else
-						entry = portProto + " : " + openPort;
+						entry = portProtocol + " : " + portNumber;
 
 					// add open port to the listview and notify the environment
 					// about the event
-					mPortList.add(entry);
-					mListAdapter.notifyDataSetChanged();
-
-					System.addOpenPort(Integer.parseInt(openPort),
-							Network.Protocol.fromString(portProto));
+          if(!mPortList.contains(entry)) {
+					  mPortList.add(entry);
+					  mListAdapter.notifyDataSetChanged();
+          }
 				}
 			});
 		}
