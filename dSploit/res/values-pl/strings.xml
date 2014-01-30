@@ -378,7 +378,7 @@
     
     <string name="menu_add">Dodaj</string>
     <string name="menu_scan">Skanuj</string>
-    <string name="menu_wifi_scan">Skanuj WiFi/string>
+    <string name="menu_wifi_scan">Skanuj WiFi</string>
     <string name="menu_stop_msfrpcd">Zatrzymaj msfrpcd</string>
     
     <string name="pref_theme">Dark Theme</string>
