@@ -31,6 +31,8 @@ import static it.evilsocket.dsploit.net.NetworkDiscovery.NEW_ENDPOINT;
 
 import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.core.ManagedReceiver;
+import it.evilsocket.dsploit.core.MultiAttackService;
+import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.ToolsInstaller;
@@ -44,6 +46,7 @@ import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
 import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog;
 import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
+import it.evilsocket.dsploit.gui.dialogs.MultipleChoiceDialog;
 import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog;
 import it.evilsocket.dsploit.gui.dialogs.SpinnerDialog.SpinnerDialogListener;
 import it.evilsocket.dsploit.net.Endpoint;
@@ -83,6 +86,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListActivity;
+import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -103,6 +107,7 @@ public class MainActivity extends SherlockListActivity {
 	private TextView mUpdateStatus = null;
 	private Toast mToast = null;
 	private long mLastBackPressTime = 0;
+  private ActionMode mActionMode = null;
 
 	private void createUpdateLayout() {
 
@@ -169,22 +174,19 @@ public class MainActivity extends SherlockListActivity {
 
 		getListView().setOnItemLongClickListener(new OnItemLongClickListener() {
 			@Override
-			public boolean onItemLongClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				final Target target = System.getTarget(position);
-
-				new InputDialog(getString(R.string.target_alias),
-						getString(R.string.set_alias),
-						target.hasAlias() ? target.getAlias() : "", true,
-						false, MainActivity.this, new InputDialogListener() {
-							@Override
-							public void onInputEntered(String input) {
-								target.setAlias(input);
-								mTargetAdapter.notifyDataSetChanged();
-							}
-						}).show();
-
-				return true;
+			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        Target t = System.getTarget(position);
+        if(t.getType() == Target.Type.NETWORK) {
+          if(mActionMode==null)
+            targetAliasPrompt(t);
+          return true;
+        }
+        if(mActionMode==null) {
+          mTargetAdapter.clearSelection();
+          mActionMode = startActionMode(mActionModeCallback);
+        }
+        mTargetAdapter.toggleSelection(position);
+        return true;
 			}
 		});
 
@@ -386,6 +388,97 @@ public class MainActivity extends SherlockListActivity {
 
 		return super.onPrepareOptionsMenu(menu);
 	}
+
+  private void targetAliasPrompt(final Target target) {
+
+    new InputDialog(getString(R.string.target_alias),
+            getString(R.string.set_alias),
+            target.hasAlias() ? target.getAlias() : "", true,
+            false, MainActivity.this, new InputDialogListener() {
+              @Override
+              public void onInputEntered(String input) {
+                target.setAlias(input);
+                mTargetAdapter.notifyDataSetChanged();
+              }
+    }).show();
+  }
+
+  private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+      MenuInflater inflater = mode.getMenuInflater();
+      inflater.inflate(R.menu.main_multi, menu);
+      return true;
+    }
+
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+      int i = mTargetAdapter.getSelectedCount();
+      mode.setTitle(i + " " + getString((i>1 ? R.string.targets_selected : R.string.target_selected)));
+      MenuItem item = menu.findItem(R.id.multi_action);
+      if(item!=null)
+        item.setIcon((i>1 ? android.R.drawable.ic_dialog_dialer : android.R.drawable.ic_menu_edit));
+      return false;
+    }
+
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+      ArrayList<Plugin> commonPlugins = null;
+
+      switch (item.getItemId()) {
+        case R.id.multi_action:
+          final int[] selected = mTargetAdapter.getSelectedPositions();
+          if(selected.length>1) {
+             commonPlugins = System.getPluginsForTarget(System.getTarget(selected[0]));
+            for(int i =1; i <selected.length;i++) {
+              ArrayList<Plugin> targetPlugins = System.getPluginsForTarget(System.getTarget(selected[i]));
+              ArrayList<Plugin> removeThem = new ArrayList<Plugin>();
+              for(Plugin p : commonPlugins) {
+                if(!targetPlugins.contains(p))
+                  removeThem.add(p);
+              }
+              for(Plugin p : removeThem) {
+                commonPlugins.remove(p);
+              }
+            }
+            if(commonPlugins.size()>0) {
+              final int[] actions = new int[commonPlugins.size()];
+              for(int i=0; i<actions.length; i++)
+                actions[i] = commonPlugins.get(i).getName();
+
+              (new MultipleChoiceDialog(R.string.choose_method,actions, MainActivity.this, new MultipleChoiceDialog.MultipleChoiceDialogListener() {
+                @Override
+                public void onChoice(int[] choices) {
+                  Intent intent = new Intent(MainActivity.this,MultiAttackService.class);
+                  int[] selectedActions = new int[choices.length];
+                  int j=0;
+
+                  for(int i =0; i< selectedActions.length;i++)
+                    selectedActions[i] = actions[choices[i]];
+
+                  intent.putExtra(MultiAttackService.MULTI_TARGETS, selected);
+                  intent.putExtra(MultiAttackService.MULTI_ACTIONS, selectedActions);
+
+                  startService(intent);
+                }
+              })).show();
+            } else {
+              (new ErrorDialog(getString(R.string.error),"no common actions found", MainActivity.this)).show();
+            }
+          } else {
+            targetAliasPrompt(System.getTarget(selected[0]));
+          }
+          mode.finish(); // Action picked, so close the CAB
+          return true;
+        default:
+          return false;
+      }
+    }
+
+    // called when the user exits the action mode
+    public void onDestroyActionMode(ActionMode mode) {
+      mActionMode = null;
+      mTargetAdapter.clearSelection();
+    }
+  };
 
 	public void startUpdateChecker() {
 		if (System.getSettings().getBoolean("PREF_CHECK_UPDATES", true)) {
@@ -691,6 +784,11 @@ public class MainActivity extends SherlockListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 
+    if(mActionMode!=null) {
+      ((TargetAdapter)getListAdapter()).toggleSelection(position);
+      return;
+    }
+
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -808,10 +906,10 @@ public class MainActivity extends SherlockListActivity {
 			else
 				holder.itemTitle.setText(target.toString());
 
-      if(target.isConnected())
-        holder.itemTitle.setTextColor(getResources().getColor(R.color.app_color));
-      else
-        holder.itemTitle.setTextColor(getResources().getColor(R.color.gray_text));
+      holder.itemTitle.setTextColor(getResources().getColor((target.isConnected() ? R.color.app_color : R.color.gray_text)));
+
+      if(row!=null)
+        row.setBackgroundColor(getResources().getColor((target.isSelected() ? R.color.abs__background_holo_dark : android.R.color.transparent)));
 
 			holder.itemTitle.setTypeface(null, Typeface.NORMAL);
 			holder.itemImage.setImageResource(target.getDrawableResourceId());
@@ -819,6 +917,52 @@ public class MainActivity extends SherlockListActivity {
 
 			return row;
 		}
+
+    public void clearSelection() {
+      for(Target t : System.getTargets())
+        t.setSelected(false);
+      notifyDataSetChanged();
+      if(mActionMode!=null)
+        mActionMode.finish();
+    }
+
+    public void toggleSelection(int position) {
+      Target t = System.getTarget(position);
+      t.setSelected(!t.isSelected());
+      notifyDataSetChanged();
+      if(mActionMode!=null) {
+        if(getSelectedCount() > 0)
+          mActionMode.invalidate();
+        else
+          mActionMode.finish();
+      }
+    }
+
+    public int getSelectedCount() {
+      int i = 0;
+      for(Target t : System.getTargets())
+        if(t.isSelected())
+          i++;
+      return i;
+    }
+
+    public ArrayList<Target> getSelected() {
+      ArrayList<Target> result = new ArrayList<Target>();
+      for(Target t : System.getTargets())
+        if(t.isSelected())
+          result.add(t);
+      return result;
+    }
+
+    public int[] getSelectedPositions() {
+      int[] res = new int[getSelectedCount()];
+      int j=0;
+
+      for(int i = 0; i < System.getTargets().size(); i++)
+        if(System.getTarget(i).isSelected())
+          res[j++]=i;
+      return res;
+    }
 
 		class TargetHolder {
 			ImageView itemImage;

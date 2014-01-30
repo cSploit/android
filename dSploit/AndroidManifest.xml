@@ -25,7 +25,8 @@
         <activity
                 android:name=".MainActivity"
                 android:configChanges="orientation|screenSize"
-                android:label="@string/title_activity_main">
+                android:label="@string/title_activity_main"
+                android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -42,6 +43,9 @@
                 android:enabled="true"/>
         <service
                 android:name=".core.UpdateService"
+                android:enabled="true"/>
+        <service
+                android:name=".core.MultiAttackService"
                 android:enabled="true"/>
 
         <activity

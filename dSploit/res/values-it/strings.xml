@@ -162,7 +162,7 @@
     <string name="empty_port_list">Lista di porte vuota.</string>
     <string name="about_dsploit_v_">About dSploit v</string>
     <string name="select_target">Seleziona un obiettivo qui sotto cliccando su una riga, o tieni
-        premuto su di essa per inserire un alias.
+        premuto su di essa per inserire un alias o iniziare un attacco multiplo.
     </string>
     <string name="generating_keys">Generazione chiavi&#8230;</string>
     <string name="no_wifi_available">Nessuna connessione WiFi disponibile, l\'applicazione si
@@ -388,4 +388,7 @@
     <string name="click_here_to_upgrade">Clicca qui per aggiornare</string>
     <string name="bad_permissions">Il file che hai messo sul dispositivo ha permessi errati, non riesco a leggerlo e/o scriverlo!</string>
 
+    <string name="target_selected">obiettivo selezionato</string>
+    <string name="targets_selected">obiettivi selezionati</string>
+    <string name="multiple_attack">attacco multiplo</string>
 </resources>

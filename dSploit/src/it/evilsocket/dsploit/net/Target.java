@@ -33,6 +33,7 @@ import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.net.Network.Protocol;
+import it.evilsocket.dsploit.net.metasploit.MsfExploit;
 import it.evilsocket.dsploit.net.metasploit.Session;
 
 public class Target
@@ -63,8 +64,8 @@ public class Target
   public static class Port{
     public Protocol protocol;
     public int number;
-    public String service = "";
-    public String	version = "";
+    public String service = null;
+    public String	version = null;
     private ArrayList<Vulnerability> vulns = new ArrayList<Target.Vulnerability>();
 
     public Port( int port, Protocol proto, String service, String version) {
@@ -83,14 +84,14 @@ public class Target
     }
 
     public String getServiceQuery() {
-      return service;
+      return ""+service;
     }
 
     public String getServiceQueryWithVersion() {
       if(version!=null)
         return service + " " + version;
       else
-        return service;
+        return ""+service;
     }
 
     // needed for vulnerabilities hashmap
@@ -315,6 +316,7 @@ public class Target
   private String mDeviceOS = null;
   private String mAlias = null;
   private boolean mConnected = true;
+  private boolean mSelected = false;
   private ArrayList<Vulnerability> mVulnerabilities = new ArrayList<Vulnerability>();
   private ArrayList<Exploit> mExploits = new ArrayList<Target.Exploit>();
   private ArrayList<Session> mSessions = new ArrayList<Session>();
@@ -664,6 +666,14 @@ public class Target
     return mConnected;
   }
 
+  public void setSelected(boolean value) {
+    mSelected = value;
+  }
+
+  public boolean isSelected() {
+    return mSelected;
+  }
+
   public Type getType(){
     return mType;
   }
@@ -691,7 +701,7 @@ public class Target
   public void addOpenPort(Port port){
     if(port.service!=null) { // update service but preserve different versions
       for(Port p : mPorts) {
-        if(p.number == port.number && p.service == null) {
+        if(p.number == port.number && (p.service == null || p.service.isEmpty())) {
           p.service = port.service;
           p.version = port.version;
           return;
@@ -759,11 +769,11 @@ public class Target
   }
 
   public void addVulnerability( Port port, Vulnerability v ) {
+    port.addVulnerability(v);
+    v.setPort(port);
     if(mVulnerabilities.contains(v))
       return;
     mVulnerabilities.add(v);
-    port.addVulnerability(v);
-    v.setPort(port);
   }
 
   public ArrayList< Vulnerability > getVulnerabilities() {
@@ -781,6 +791,27 @@ public class Target
   public ArrayList<Exploit> getExploits()
   {
     return mExploits;
+  }
+
+  public ArrayList<MsfExploit> getMsfExploits() {
+    ArrayList<MsfExploit> ret = new ArrayList<MsfExploit>();
+
+    for(Exploit e : mExploits)
+      if(e instanceof MsfExploit)
+        ret.add((MsfExploit)e);
+    return ret;
+  }
+
+  public boolean hasExploits() {
+    return mExploits.size()>0;
+  }
+
+  public boolean hasMsfExploits() {
+    boolean ret = false;
+    for(int i = 0; i < mExploits.size() && !ret; i++)
+      if(mExploits.get(i) instanceof MsfExploit)
+        ret = true;
+    return ret;
   }
 
   public ArrayList<Session> getSessions() {
