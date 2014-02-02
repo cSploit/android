@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<view
-        class="com.actionbarsherlock.internal.widget.ScrollingTabContainerView$TabView"
-        style="?attr/actionBarTabStyle"
-        />
