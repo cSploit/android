@@ -35,7 +35,8 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:enabled="true"
-        android:clickable="true"/>
+        android:clickable="true"
+        android:fontFamily="sans-serif-condensed"/>
 
     <!-- <TextView
         android:layout_width="fill_parent"

@@ -1,40 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/card_background"
+    android:showDividers="none"
+    android:layout_marginBottom="8dp">
+
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:paddingRight="8dip"
+        android:background="@drawable/selectable_background_cardbank"
+        android:weightSum="100"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="10"
+            android:layout_marginRight="8dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/actionIcon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp">
+                android:layout_gravity="center"
+                android:contentDescription="@string/image"
+                android:src="@drawable/action_plugin" />
+        </LinearLayout>
 
-    <ImageView
-            android:id="@+id/actionIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="16dp"
-            android:gravity="center_vertical"
-            android:src="@drawable/action_plugin"
-            android:contentDescription="@string/app_name"/>
-
-    <TextView
-            android:id="@+id/actionName"
-            android:layout_width="fill_parent"
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="90"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/actionIcon"
-            android:fontFamily="sans-serif-light"
-            android:textColor="@color/app_color"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="8dp"
+            android:orientation="vertical">
 
-    <TextView
-            android:id="@+id/actionDescription"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/actionName"
-            android:layout_below="@id/actionName"
-            android:paddingBottom="8dip"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/gray_text"
-            android:textSize="14sp"/>
+            <TextView
+                android:id="@+id/actionName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
+                android:text="@string/app_name"
+                android:textColor="@color/holo_blue"
+                android:textSize="16sp" />
 
-</RelativeLayout>
+            <TextView
+                android:id="@+id/actionDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:ellipsize="end"
+                android:maxLines="50"
+                android:fontFamily="sans-serif-light"
+                android:textSize="14sp"
+                android:autoLink="all"
+                android:text="lorem ipsum dolor sit amet" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
