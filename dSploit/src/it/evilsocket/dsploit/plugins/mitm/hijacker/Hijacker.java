@@ -338,10 +338,10 @@ public class Hijacker extends SherlockActivity {
 			if (holder.favicon != null)
 				holder.favicon.setImageBitmap(picture);
 
-			if (session.mUserName != null)
+			if (session.mUserName != null) {
 				if (holder.address != null)
 					holder.address.setText(session.mUserName);
-				else if (holder.address != null)
+      } else if (holder.address != null)
 					holder.address.setText(session.mAddress);
 
 			if (holder.domain != null)
