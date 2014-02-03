@@ -23,6 +23,11 @@ dependencies {
 android {
     compileSdkVersion 18
     buildToolsVersion "18.0.1"
+    
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
 
     signingConfigs {
         release {
