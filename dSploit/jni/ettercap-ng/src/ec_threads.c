@@ -227,7 +227,14 @@ void ec_thread_init(void)
     * allow a thread to be cancelled as soon as the
     * cancellation  request  is received
     */
-#ifndef ANDROID
+#ifdef ANDROID
+	 sigset_t set;
+	 
+	 sigemptyset(&set);
+   sigaddset(&set, SIGUSR1);
+   if(pthread_sigmask(SIG_BLOCK, &set, NULL))
+		 DEBUG_MSG("ec_thread_init -- (%ul) pthread_sigmask: %s", PTHREAD_ID(id), strerror(errno));
+#else
    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 #endif

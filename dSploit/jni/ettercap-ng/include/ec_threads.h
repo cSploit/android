@@ -37,7 +37,7 @@ EC_API_EXTERN void ec_thread_exit(void);
 	sigset_t waiting_mask;\
 	sigpending (&waiting_mask);\
 	if (sigismember (&waiting_mask, SIGUSR1))\
-		pthread_exit(0);\
+		ec_thread_exit();\
 }while(0);
 #else
 #define CANCELLATION_POINT()  pthread_testcancel()
