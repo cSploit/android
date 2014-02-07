@@ -32,11 +32,13 @@ public class Tool
 {
   protected String mPath = null;
   protected String mBasename = null;
+  protected String mDirectory = null;
 
   public Tool(String name, Context context){
     File stat;
 
     mPath = context.getFilesDir().getAbsolutePath() + "/tools/" + name;
+    mDirectory = mPath.substring(0, mPath.lastIndexOf('/'));
     stat = new File(mPath);
     if(!stat.exists()) {
       Logger.error("cannot find tool: '"+name+"'");
@@ -62,6 +64,13 @@ public class Tool
 
   public Thread async(String args, OutputReceiver receiver){
     return Shell.async(mPath + " " + args, receiver);
+  }
+
+  public Thread async(String args, OutputReceiver receiver, boolean chdir) {
+    if(chdir)
+      return Shell.async("cd '" + mDirectory + "' && " + mPath + " " + args, receiver);
+    else
+      return Shell.async(mPath + " " + args, receiver);
   }
 
   public boolean kill(){

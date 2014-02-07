@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.core.Shell.OutputReceiver;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.Target;
@@ -87,7 +88,7 @@ public class Ettercap extends Tool
       System.errorLogging(e);
     }
 
-    return super.async(commandLine, listener);
+    return super.async(commandLine, listener, true);
   }
 
   public boolean kill(){
