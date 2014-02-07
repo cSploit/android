@@ -6,6 +6,9 @@
 
 #include <ec_stdint.h>
 #include <pthread.h>
+#ifdef ANDROID
+# include <bthread.h>
+#endif
 
 struct ec_thread {
    char *name;
@@ -32,16 +35,8 @@ EC_API_EXTERN void ec_thread_kill_all(void);
 EC_API_EXTERN void ec_thread_exit(void);
 
 #define RETURN_IF_NOT_MAIN() do{ if (strcmp(ec_thread_getname(EC_PTHREAD_SELF), GBL_PROGRAM)) return; }while(0)
-#ifdef ANDROID
-#define CANCELLATION_POINT()  do { \
-	sigset_t waiting_mask;\
-	sigpending (&waiting_mask);\
-	if (sigismember (&waiting_mask, SIGUSR1))\
-		ec_thread_exit();\
-}while(0);
-#else
+
 #define CANCELLATION_POINT()  pthread_testcancel()
-#endif
 #endif
 
 /* EOF */

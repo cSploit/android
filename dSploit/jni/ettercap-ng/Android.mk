@@ -14,7 +14,8 @@ LOCAL_C_INCLUDES := \
 	libnet/include \
 	include \
 	openssl \
-	openssl/include
+	openssl/include\
+	libbthread
 
 LOCAL_SRC_FILES:= \
         src/ec_send.c \
@@ -137,7 +138,8 @@ LOCAL_STATIC_LIBRARIES:= \
 	libnet \
 	libssl \
 	libcrypto\
-	libexpat
+	libexpat\
+	libbthread
 
 LOCAL_MODULE:= ettercap
 
