@@ -29,3 +29,4 @@ include $(MY_LOCAL_PATH)/libtommath/Android.mk
 include $(MY_LOCAL_PATH)/firebird/Android.mk
 include $(MY_LOCAL_PATH)/hydra/Android.mk
 include $(MY_LOCAL_PATH)/nmap/Android.mk
+include $(MY_LOCAL_PATH)/libbthread/Android.mk
