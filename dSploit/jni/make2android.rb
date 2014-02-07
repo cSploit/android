@@ -192,7 +192,12 @@ def parse_inputs(t,inputs)
 			if f.size > 1
 				abort("#{t.name}: more targets for `#{input}' => #{f}")
 			elsif f.size == 0
-				abort("#{t.name}: cannot find `#{input}' in #{$list}")
+				if !(input =~ pwd_re) then # this library stands outside the PWD, probably another project.
+					f << Library.new
+					f[0].name = input
+				else
+					abort("#{t.name}: cannot find `#{input}' in #{$list}")
+				end
 			end
 			i=f[0]
 			if i.is_a?(Library)
@@ -204,7 +209,9 @@ def parse_inputs(t,inputs)
 			fullname=$~[0]
 			name=$1.sub(/^lib/,'')
 			next if system_libs.include? name
-			f=$list.find_all{|item| item.class != Executable and item.name == fullname}
+			f=$list.find_all{|item| item.class != Executable and (
+																item.name == fullname || (
+																	item.is_a?(Library) and item.shared and item.libname == "lib#{name}"))}
 			if f.size > 1
 				abort("#{t.name}: more targets for `#{input}' => #{f}")
 			elsif f.size == 0
