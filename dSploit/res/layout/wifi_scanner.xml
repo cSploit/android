@@ -11,7 +11,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:layout_below="@+id/scanStatusText"></ListView>
+            android:layout_below="@+id/scanStatusText"/>
 
     <TextView
             android:id="@+id/scanStatusText"
@@ -20,9 +20,9 @@
             android:layout_alignLeft="@+id/android:list"
             android:layout_alignParentTop="true"
             android:layout_alignRight="@+id/android:list"
-            android:padding="6dp"
+            android:padding="8dp"
             android:text="Status"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="#ccc"/>
+            android:fontFamily="sans-serif-condensed" />
 
 </RelativeLayout>

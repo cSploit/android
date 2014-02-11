@@ -81,7 +81,17 @@ public abstract class Plugin extends SherlockActivity{
     return mLayoutId != -1;
   }
 
-  public void onActionClick(Context context){
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    public void onActionClick(Context context){
 
   }
 

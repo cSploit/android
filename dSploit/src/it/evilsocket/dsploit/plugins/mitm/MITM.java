@@ -18,6 +18,7 @@
  */
 package it.evilsocket.dsploit.plugins.mitm;
 
+import android.annotation.TargetApi;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +26,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore.MediaColumns;
 import android.view.LayoutInflater;
@@ -119,6 +121,7 @@ public class MITM extends Plugin
       mActions = actions;
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
       View row = convertView;
@@ -127,7 +130,8 @@ public class MITM extends Plugin
       if(row == null){
         LayoutInflater inflater = (LayoutInflater) MITM.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         row = inflater.inflate(mLayoutId, parent, false);
-
+        if (getSharedPreferences("THEME", 0).getBoolean("isDark", false))
+            row.setBackground(getResources().getDrawable(R.drawable.card_background_dark));
         holder = new ActionHolder();
         holder.icon = (ImageView) (row != null ? row.findViewById(R.id.actionIcon) : null);
         holder.name = (TextView) (row != null ? row.findViewById(R.id.itemName) : null);

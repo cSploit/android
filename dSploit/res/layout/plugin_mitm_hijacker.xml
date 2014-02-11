@@ -42,6 +42,7 @@
             android:layout_alignRight="@+id/separator"
             android:layout_below="@+id/separator"
             android:padding="8dp"
+            android:gravity="center_horizontal"
             android:text="@string/start_hijack"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/gray_text"/>
@@ -55,6 +56,6 @@
             android:layout_below="@+id/textView"
             android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
             android:paddingLeft="8dp"
-            android:paddingRight="8dp"></ListView>
+            android:paddingRight="8dp"/>
 
 </RelativeLayout>
