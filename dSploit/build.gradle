@@ -23,10 +23,10 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("keystore.keystore")
-            storePassword "YOUR_KEY_PASSWORD"
-            keyAlias "YOUR_KEY_ALIAS"
-            keyPassword "YOUR_KEY_PASSWORD"
+            storeFile = file(System.getenv("KEYSTORE_PATH"))
+            storePassword = System.getenv("KEYSTORE_PWD")
+            keyAlias = System.getenv("KEYSTORE_ALIAS")
+            keyPassword = System.getenv("KEYSTORE_ALIAS_PWD")
         }
     }
 
