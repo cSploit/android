@@ -15,8 +15,8 @@ YELLOW="\\E[33;44m"
 RED="\\033[1;31m"
 RESET="\\e[0m"
 DATE=`date +%Y-%m-%d`
-LOG_DIR="${DIR}/logs/"
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOG_DIR="${DIR}/logs/"
 
 if [ ! -d "${LOG_DIR}" ]; then
     mkdir -p $LOG_DIR
