@@ -183,12 +183,7 @@ public class System
         HTTPS_REDIR_PORT = 8082;
       }
 
-      mNmap = new NMap(mContext);
-      mArpSpoof = new ArpSpoof(mContext);
-      mEttercap = new Ettercap(mContext);
-      mIptables = new IPTables();
-      mHydra = new Hydra(mContext);
-      mTcpdump = new TcpDump(mContext);
+      reloadTools();
 
       // initialize network data at the end
       mNetwork = new Network(mContext);
@@ -211,6 +206,15 @@ public class System
 
       throw e;
     }
+  }
+
+  public static void reloadTools() {
+    mNmap = new NMap(mContext);
+    mArpSpoof = new ArpSpoof(mContext);
+    mEttercap = new Ettercap(mContext);
+    mIptables = new IPTables();
+    mHydra = new Hydra(mContext);
+    mTcpdump = new TcpDump(mContext);
   }
 
   public static void reloadNetworkMapping(){

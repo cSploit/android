@@ -145,6 +145,8 @@ public class ToolsInstaller{
 
       Shell.exec("echo '" + mAppVersion + "' > '" + mVersionFile + "' && chmod 777 '" + mVersionFile + "'");
 
+      System.reloadTools();
+
       return true;
     }
     catch(Exception e){
