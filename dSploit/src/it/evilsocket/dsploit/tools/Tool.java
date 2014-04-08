@@ -44,7 +44,7 @@ public class Tool
       Logger.error("cannot find tool: '"+name+"'");
       Logger.error(mPath +": No such file or directory");
       Logger.error("this tool will be disabled.");
-      mPath = "date";
+      mPath = "false";
     } else {
       mBasename = stat.getName();
     }
