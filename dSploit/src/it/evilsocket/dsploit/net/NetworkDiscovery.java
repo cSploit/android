@@ -24,6 +24,7 @@ import android.content.Intent;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -100,43 +101,66 @@ public class NetworkDiscovery extends Thread
 
       mNetBiosMap.clear();
       mStopped = false;
-      String iface = "";
+      InetAddress localAddress,gatewayAddress;
       ArrayList<Target> foundTargets = new ArrayList<Target>();
+      RandomAccessFile fileReader;
+      Network network = System.getNetwork();
+      String line;
+      String iface = "";
+      String name;
+      Matcher matcher;
+      Endpoint endpoint;
+      Target target;
+      StringBuilder sb;
+      int c;
 
       try{
-        iface = System.getNetwork().getInterface().getDisplayName();
+        iface = network.getInterface().getDisplayName();
       }
       catch(Exception e){
         System.errorLogging(e);
       }
 
+      localAddress = network.getLocalAddress();
+      gatewayAddress = network.getGatewayAddress();
+      sb = new StringBuilder();
+
+      // open ARP_TABLE_FILE once ( #430 )
+      try {
+        fileReader = new RandomAccessFile(ARP_TABLE_FILE, "r");
+      } catch (Exception e) {
+        System.errorLogging(e);
+        return;
+      }
+
       while(!mStopped){
         try{
-          BufferedReader reader = new BufferedReader(new FileReader(ARP_TABLE_FILE));
-          String line = null,
-            name = null;
-          Matcher matcher = null;
-          Endpoint endpoint = null;
-          Target target = null;
-          Network network = System.getNetwork();
-
           foundTargets.clear();
+          fileReader.seek(0);
+          sb.setLength(0);
 
-          while((line = reader.readLine()) != null){
+          while((c=fileReader.read()) >= 0) {
+            sb.append((char)c);
+            if(c!='\n')
+              continue;
+
+            line = sb.toString();
+            sb.setLength(0); // clear buffer
+
             if((matcher = ARP_TABLE_PARSER.matcher(line)) != null && matcher.find()){
               String address = matcher.group(1),
-                // hwtype  = matcher.group( 2 ),
-                flags = matcher.group(3),
-                hwaddr = matcher.group(4),
-                // mask	   = matcher.group( 5 ),
-                device = matcher.group(6);
+                      // hwtype  = matcher.group( 2 ),
+                      flags = matcher.group(3),
+                      hwaddr = matcher.group(4),
+                      // mask	   = matcher.group( 5 ),
+                      device = matcher.group(6);
 
               if(device.equals(iface) && !hwaddr.equals("00:00:00:00:00:00") && flags.contains("2")){
                 endpoint = new Endpoint(address, hwaddr);
                 target = new Target(endpoint);
                 foundTargets.add(target);
                 // rescanning the gateway could cause an issue when the gateway itself has multiple interfaces ( LAN, WAN ... )
-                if(!endpoint.getAddress().equals(network.getGatewayAddress()) && !endpoint.getAddress().equals(network.getLocalAddress())){
+                if(!endpoint.getAddress().equals(gatewayAddress) && !endpoint.getAddress().equals(localAddress)){
                   synchronized(mNetBiosMap){
                     name = mNetBiosMap.get(address);
                   }
@@ -181,8 +205,6 @@ public class NetworkDiscovery extends Thread
             }
           }
 
-          reader.close();
-
           boolean update = false;
           boolean found;
           int i;
@@ -199,7 +221,7 @@ public class NetworkDiscovery extends Thread
                 found = true;
             }
 
-            if(t.isConnected() != found && !t.isRouter() && !t.getAddress().equals(network.getLocalAddress())) {
+            if(t.isConnected() != found && !t.isRouter() && !t.getAddress().equals(localAddress)) {
               t.setConneced(found);
               update = true;
             }
@@ -208,8 +230,7 @@ public class NetworkDiscovery extends Thread
           if(update)
             sendEndpointUpdateNotification();
           Thread.sleep(500);
-        }
-        catch(Exception e){
+        } catch(Exception e){
           System.errorLogging(e);
           String msg = e.getMessage();
           if(msg != null && msg.contains("EMFILE")) {
@@ -231,6 +252,12 @@ public class NetworkDiscovery extends Thread
             }
           }
         }
+      }
+
+      try {
+        fileReader.close();
+      } catch (IOException e) {
+        System.errorLogging(e);
       }
     }
 
