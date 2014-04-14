@@ -25,6 +25,8 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
+import org.apache.commons.net.util.SubnetUtils;
+
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.NoRouteToHostException;
@@ -91,14 +93,23 @@ public class Network
   private IP4Address mLocal = null;
   private IP4Address mBase = null;
 
+  /** see http://en.wikipedia.org/wiki/Reserved_IP_addresses
+   */
+  private static final String[] PRIVATE_NETWORKS = {
+          "10.0.0.0/8",
+          "100.64.0.0/10",
+          "172.16.0.0/12",
+          "192.168.0.0/16"
+  };
+
   public Network(Context context) throws NoRouteToHostException, SocketException, UnknownHostException{
     mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
     mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     mInfo = mWifiManager.getDhcpInfo();
     mWifiInfo = mWifiManager.getConnectionInfo();
-    mGateway = new IP4Address(mInfo.gateway);
-    mNetmask = new IP4Address(mInfo.netmask);
     mLocal = new IP4Address(mInfo.ipAddress);
+    mGateway = new IP4Address(mInfo.gateway);
+    mNetmask = getNetmask();
     mBase = new IP4Address(mInfo.netmask & mInfo.gateway);
 
     if(isConnected() == false)
@@ -126,6 +137,25 @@ public class Network
           throw e;
       }
     }
+  }
+
+  private IP4Address getNetmask() throws UnknownHostException {
+    IP4Address result = new IP4Address(mInfo.netmask);
+
+    if(System.getSettings().getBoolean("WIDE_SCAN", false)) {
+      SubnetUtils privateNetwork;
+
+      for(String cidr_notation : PRIVATE_NETWORKS) {
+        privateNetwork = new SubnetUtils(cidr_notation);
+
+        if(privateNetwork.getInfo().isInRange(mLocal.toString())) {
+          result = new IP4Address(privateNetwork.getInfo().getNetmask());
+          break;
+        }
+      }
+    }
+
+    return result;
   }
 
   public boolean equals(Network network){

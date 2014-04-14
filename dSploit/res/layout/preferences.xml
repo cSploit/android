@@ -108,6 +108,13 @@
             android:key="SEARCH_EXDB"
             android:summary="@string/choose_method"
             android:title="@string/pref_performance_exploit_desc" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="WIDE_SCAN"
+            android:summary="@string/pref_performance_widescan_desc"
+            android:title="@string/pref_performance_widescan"
+            />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_msf" >

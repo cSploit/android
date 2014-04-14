@@ -360,6 +360,8 @@
         <item>da exploitdb</item>
         <item>sia da exploitdb che compatibili con MSF</item>
     </string-array>
+    <string name="pref_performance_widescan">scansione host estesa</string>
+    <string name="pref_performance_widescan_desc">cerca gli host fuori dalla netmask</string>
     <string name="pref_msf_enable">Abilita MSF</string>
     <string name="pref_msf_enable_desc">Abilita il MetaSploit Framework</string>
     <string name="pref_msf_delete">Cancella MSF</string>

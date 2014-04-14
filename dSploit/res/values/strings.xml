@@ -371,6 +371,8 @@
         <item>EXDB</item>
         <item>BOTH</item>
     </string-array>
+    <string name="pref_performance_widescan">wide host scan</string>
+    <string name="pref_performance_widescan_desc">scan for hosts outside the network mask</string>
     <string name="pref_advanced">Advanced</string>
     <string name="pref_folder">Folder</string>
     <string name="pref_msf_enable">Enable MSF</string>
