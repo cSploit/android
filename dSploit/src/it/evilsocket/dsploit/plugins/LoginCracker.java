@@ -50,6 +50,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
@@ -545,6 +546,8 @@ public class LoginCracker extends Plugin {
 			reset();
 
 			mStarted = java.lang.System.currentTimeMillis();
+
+      super.onStart(command);
 		}
 
 		@Override
@@ -637,6 +640,7 @@ public class LoginCracker extends Plugin {
 					}
 				});
 			}
+      super.onEnd(code);
 		}
 	}
 }
