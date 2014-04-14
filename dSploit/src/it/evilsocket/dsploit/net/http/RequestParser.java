@@ -18,6 +18,8 @@
  */
 package it.evilsocket.dsploit.net.http;
 
+import android.util.Patterns;
+
 import org.apache.http.impl.cookie.BasicClientCookie;
 
 import java.sql.Date;
@@ -288,6 +290,10 @@ public class RequestParser
 
   public static String getBaseDomain(String hostname){
     String domain = "";
+
+    // if hostname is an IP address return that address
+    if(Patterns.IP_ADDRESS.matcher(hostname).matches())
+      return hostname;
 
     for(String tld : TLD){
       if(hostname.endsWith(tld)){
