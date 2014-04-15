@@ -345,8 +345,12 @@
     <string name="pref_password_filename_desc">Nome del file da usare per loggare password e cookie.</string>
     <string name="pref_rpc_user_desc">Username per connettersi a MetaSploit.</string>
     <string name="pref_rpc_pswd_desc">Password per connettersi a MetaSploit.</string>
+    <string name="pref_rpc_host">host RPC</string>
+    <string name="pref_rpc_host_desc">host sul quale il servizio MetaSploit è in ascolto</string>
     <string name="pref_rpc_port">porta RPC</string>
     <string name="pref_rpc_port_desc">Porta per connettersi a MetaSploit.</string>
+    <string name="pref_rpc_ssl">RPC usa SSL</string>
+    <string name="pref_rpc_ssl_desc">specifica se MetaSploit RPC utilizza SSL.</string>
     <string name="pref_chroot_desc">La directory contenete il sistema gentoo.</string>
     <string name="pref_performance_vuln_title">Tipologie di vulnerabilità ricercate</string>
     <string-array name="pref_performance_vuln" >
@@ -393,4 +397,9 @@
     <string name="target_selected">obiettivo selezionato</string>
     <string name="targets_selected">obiettivi selezionati</string>
     <string name="multiple_attack">attacco multiplo</string>
+
+    <string name="connect_msf">connetti a MetaSploit</string>
+    <string name="disconnect_msf">disconnetti da MetaSploit</string>
+    <string name="connected_msf">connecsso a MetaSploit</string>
+    <string name="connection_failed">connessione FALLITA!</string>
 </resources>

@@ -345,8 +345,12 @@
     <string name="pref_rpc_user_desc">Username for connect to MetaSploit RPCD.</string>
     <string name="pref_rpc_pswd">RPC password</string>
     <string name="pref_rpc_pswd_desc">Password for connect to MetaSploit RPCD.</string>
+    <string name="pref_rpc_host">RPC host</string>
+    <string name="pref_rpc_host_desc">host where the MetaSploit RPC server is on</string>
     <string name="pref_rpc_port">RPC port</string>
     <string name="pref_rpc_port_desc">Port for connect to MetaSploit RPCD.</string>
+    <string name="pref_rpc_ssl">RPC use SSL</string>
+    <string name="pref_rpc_ssl_desc">Specify if MetaSploit RPC use SSL</string>
     <string name="pref_chroot">gentoo root</string>
     <string name="pref_chroot_desc">Directory containing gentoo system.</string>
     <string name="pref_performance_vuln_desc">Search for vulnerability using</string>
@@ -438,4 +442,8 @@
     <string name="target_selected">target selected</string>
     <string name="targets_selected">targets selected</string>
     <string name="multiple_attack">multiple attack</string>
+    <string name="connect_msf">connect to MetaSploit</string>
+    <string name="disconnect_msf">disconnect from MetaSploit</string>
+    <string name="connected_msf">connected to MetaSploit</string>
+    <string name="connection_failed">connection FAILED!</string>
 </resources>

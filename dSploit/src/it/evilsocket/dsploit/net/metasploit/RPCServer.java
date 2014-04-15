@@ -34,6 +34,12 @@ import android.content.SharedPreferences;
 import java.util.Date;
 import java.util.concurrent.TimeoutException;
 
+/* NOTES
+ * i have choosen to NOT use SSL for one reason: without SSL we don't need /dev/random in gentoo chroot,
+ * so we don't have to "if mountpoint /data/gentoo/dev; mount -o bind /dev /data/gentoo/dev; fi".
+ * security flaws: a local sniffer can grep the msfrpcd username/password.
+*/
+
 public class RPCServer extends Thread
 {
   public static final String 	TOAST 			= "RPCServer.action.TOAST";
@@ -44,7 +50,10 @@ public class RPCServer extends Thread
 
   private Context         mContext	 		  = null;
   private boolean         mRunning	 		  = false;
-  private String          msfUser,
+  private boolean         mRemote 	 		  = false;
+  private boolean         msfSsl    	 		= false;
+  private String          msfHost,
+                          msfUser,
                           msfPassword,
                           msfRoot;
   private int             msfPort;
@@ -57,6 +66,14 @@ public class RPCServer extends Thread
 
   public static boolean exists() {
     return (new java.io.File(System.getGentooPath() + "start_msfrpcd.sh")).exists();
+  }
+
+  public static boolean isInternal() {
+    return System.getNetwork().isInternal(System.getSettings().getString("MSF_RPC_HOST", "127.0.0.1"));
+  }
+
+  public static boolean isLocal() {
+    return System.getSettings().getString("MSF_RPC_HOST", "127.0.0.1").equals("127.0.0.1");
   }
 
   private void sendDaemonNotification(String action, int message)
@@ -73,11 +90,11 @@ public class RPCServer extends Thread
   private boolean connect_to_running_server() throws RuntimeException, IOException, InterruptedException {
     boolean ret = false;
 
-    if(Shell.exec("pidof msfrpcd")==0)
+    if(mRemote || Shell.exec("pidof msfrpcd")==0)
     {
       try
       {
-        System.setMsfRpc(new RPCClient("127.0.0.1",msfUser,msfPassword,msfPort));
+        System.setMsfRpc(new RPCClient(msfHost,msfUser,msfPassword,msfPort,msfSsl));
         ret = true;
       }
       catch ( MalformedURLException mue)
@@ -88,6 +105,8 @@ public class RPCServer extends Thread
       catch ( IOException ioe)
       {
         Logger.debug(ioe.getMessage());
+        if(mRemote)
+          throw new RuntimeException();
       }
       catch ( RPCClient.MSFException me)
       {
@@ -95,7 +114,7 @@ public class RPCServer extends Thread
         throw new RuntimeException();
       }
       finally {
-        if(!ret)
+        if(!ret && !mRemote)
           Shell.exec("killall msfrpcd");
       }
     }
@@ -182,7 +201,7 @@ public class RPCServer extends Thread
       try
       {
         Thread.sleep(DELAY);
-        System.setMsfRpc(new RPCClient("127.0.0.1",msfUser,msfPassword,msfPort));
+        System.setMsfRpc(new RPCClient(msfHost,msfUser,msfPassword,msfPort,msfSsl));
         return;
       }
       catch ( MalformedURLException mue)
@@ -213,10 +232,14 @@ public class RPCServer extends Thread
 
     SharedPreferences prefs = System.getSettings();
 
-    msfUser = prefs.getString("MSF_RPC_USER", "msf");
+    msfHost     = prefs.getString("MSF_RPC_HOST", "127.0.0.1");
+    msfUser     = prefs.getString("MSF_RPC_USER", "msf");
     msfPassword = prefs.getString("MSF_RPC_PSWD", "pswd");
-    msfRoot = prefs.getString("GENTOO_ROOT", System.getDefaultGentooPath());
-    msfPort = prefs.getInt("MSF_RPC_PORT", 55553);
+    msfRoot     = prefs.getString("GENTOO_ROOT", System.getDefaultGentooPath());
+    msfPort     = prefs.getInt("MSF_RPC_PORT", 55553);
+    msfSsl      = prefs.getBoolean("MSF_RPC_SSL", false);
+
+    mRemote     = !msfHost.equals("127.0.0.1");
 
     try
     {
@@ -227,7 +250,7 @@ public class RPCServer extends Thread
         sendDaemonNotification(TOAST,R.string.rpcd_started);
         Logger.debug("connected to new MSF RPC Server");
       } else {
-        sendDaemonNotification(TOAST, R.string.rpcd_running);
+        sendDaemonNotification(TOAST, R.string.connected_msf);
         Logger.debug("connected to running MSF RPC Server");
       }
     } catch ( IOException ioe ) {

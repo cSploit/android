@@ -28,11 +28,6 @@ import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Logger;
 
 //TODO: add license and write down that we had taken part of this code from armitage
-/* NOTES
- * i have choosen to NOT use SSL for one reason: without SSL we don't need /dev/random in gentoo chroot,
- * so we don't have to "if mountpoint /data/gentoo/dev; mount -o bind /dev /data/gentoo/dev; fi".
- * security flaws: a local sniffer can grep the msfrpcd username/password.
-*/
 
 @SuppressWarnings("rawtypes")
 public class RPCClient
@@ -43,18 +38,21 @@ public class RPCClient
   private static MessagePack msgpack = null;
   private final Map callCache = new HashMap();
   private final Lock lock = new ReentrantLock();
+  private final boolean mRemote;
 
   private static final Pattern 	GET_FILENAME 	= Pattern.compile("[^/]+$");
   private static final Pattern 	GET_FUNC 		= Pattern.compile("`([^']+)");
 
-  public RPCClient(final String host, final String username, final String password, final int port) throws MalformedURLException, IOException, MSFException
+  public RPCClient(final String host, final String username, final String password, final int port, final boolean ssl) throws MalformedURLException, IOException, MSFException
   {
-    u = new URL("http", host, port, "/api/");
+    u = new URL("http" + (ssl ? "s" : ""), host, port, "/api/");
 
     if(msgpack==null)
       msgpack = new MessagePack();
 
     login(username, password);
+
+    mRemote = !(host.equals("127.0.0.1") || System.getNetwork().isInternal(host));
   }
 
   protected void writeCall(String methodName, Object[] args) throws IOException {
@@ -225,6 +223,10 @@ public class RPCClient
     } catch (MSFException e) {
       e.printStackTrace();
     }
+  }
+
+  public boolean isRemote() {
+    return mRemote;
   }
 
   // Errors from server

@@ -373,7 +373,16 @@ public class MainActivity extends SherlockListActivity {
 
 		item = menu.findItem(R.id.ss_msfrpcd);
 
-    if(RPCServer.exists() && System.getSettings().getBoolean("MSF_ENABLED",true) && !System.isServiceRunning("it.evilsocket.dsploit.core.UpdateService")) {
+    if(!System.getSettings().getBoolean("MSF_ENABLED",true)) {
+      item.setEnabled(false);
+    } else if(!RPCServer.isLocal()) {
+      item.setEnabled(true);
+      if(System.getMsfRpc()==null)
+        item.setTitle(getString(R.string.connect_msf));
+      else
+        item.setTitle(getString(R.string.disconnect_msf));
+    } else if(RPCServer.exists() &&
+            !System.isServiceRunning("it.evilsocket.dsploit.core.UpdateService")) {
       item.setEnabled(true);
       if (System.getMsfRpc() != null
           || (mRPCServer != null && mRPCServer.isRunning()))
@@ -544,7 +553,7 @@ public class MainActivity extends SherlockListActivity {
           // woop
         }
         // start MSF RPC Daemon only if it exists, user want it and no updates are in progress
-        if(RPCServer.exists() && System.getSettings().getBoolean("MSF_ENABLED",true) && !System.isServiceRunning("it.evilsocket.dsploit.core.UpdateService")) {
+        if((RPCServer.isInternal() || (RPCServer.isLocal() && RPCServer.exists())) && System.getSettings().getBoolean("MSF_ENABLED",true) && !System.isServiceRunning("it.evilsocket.dsploit.core.UpdateService")) {
           mRPCServer = new RPCServer(MainActivity.this);
           mRPCServer.start();
         }
@@ -756,10 +765,16 @@ public class MainActivity extends SherlockListActivity {
 		case R.id.ss_msfrpcd:
       if(System.getMsfRpc()!=null || (mRPCServer!=null && mRPCServer.isRunning())) {
 				StopRPCServer(false);
-				item.setTitle(getString(R.string.start_msfrpcd));
+        if(RPCServer.isLocal())
+				  item.setTitle(R.string.start_msfrpcd);
+        else
+          item.setTitle(R.string.connect_msf);
 			} else {
 				StartRPCServer();
-				item.setTitle(getString(R.string.stop_msfrpcd));
+        if(RPCServer.isLocal())
+				  item.setTitle(R.string.stop_msfrpcd);
+        else
+          item.setTitle(R.string.disconnect_msf);
 			}
 			return true;
 
