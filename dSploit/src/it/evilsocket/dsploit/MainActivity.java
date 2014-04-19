@@ -756,9 +756,13 @@ public class MainActivity extends SherlockListActivity {
 
 				item.setTitle(getString(R.string.start_monitor));
 			} else {
-				startNetworkDiscovery(false);
+        try {
+          startNetworkDiscovery(false);
 
-				item.setTitle(getString(R.string.stop_monitor));
+          item.setTitle(getString(R.string.stop_monitor));
+        } catch (Exception e) {
+          new ErrorDialog(getString(R.string.error), e.getMessage(), MainActivity.this).show();
+        }
 			}
 			return true;
 
