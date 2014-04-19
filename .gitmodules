@@ -1,3 +1,6 @@
 [submodule "dSploit/jni/libnet"]
 	path = dSploit/jni/libnet
 	url = git@github.com:tux-mind/libnet.git
+[submodule "dSploit/jni/libexpat"]
+	path = dSploit/jni/libexpat
+	url = git@github.com:tux-mind/libexpat.git
