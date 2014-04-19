@@ -4,3 +4,6 @@
 [submodule "dSploit/jni/libexpat"]
 	path = dSploit/jni/libexpat
 	url = git@github.com:tux-mind/libexpat.git
+[submodule "dSploit/jni/libbthread"]
+	path = dSploit/jni/libbthread
+	url = git@github.com:tux-mind/libbthread.git
