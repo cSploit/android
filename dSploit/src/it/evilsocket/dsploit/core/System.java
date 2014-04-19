@@ -100,6 +100,7 @@ public class System
   public static int HTTP_PROXY_PORT = 8080;
   public static int HTTP_SERVER_PORT = 8081;
   public static int HTTPS_REDIR_PORT = 8082;
+  public static int MSF_RPC_PORT = 55553;
 
   public static final String IPV4_FORWARD_FILEPATH = "/proc/sys/net/ipv4/ip_forward";
 
@@ -174,9 +175,10 @@ public class System
 
       // set ports
       try{
-        HTTP_PROXY_PORT = Integer.parseInt(getSettings().getString("PREF_HTTP_PROXY_PORT", "8080"));
+        HTTP_PROXY_PORT  = Integer.parseInt(getSettings().getString("PREF_HTTP_PROXY_PORT", "8080"));
         HTTP_SERVER_PORT = Integer.parseInt(getSettings().getString("PREF_HTTP_SERVER_PORT", "8081"));
         HTTPS_REDIR_PORT = Integer.parseInt(getSettings().getString("PREF_HTTPS_REDIRECTOR_PORT", "8082"));
+        MSF_RPC_PORT     = Integer.parseInt(getSettings().getString("MSF_RPC_PORT", "5553"));
       } catch(NumberFormatException e){
         HTTP_PROXY_PORT = 8080;
         HTTP_SERVER_PORT = 8081;
