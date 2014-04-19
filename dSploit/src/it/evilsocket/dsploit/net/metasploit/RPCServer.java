@@ -234,9 +234,9 @@ public class RPCServer extends Thread
 
     msfHost     = prefs.getString("MSF_RPC_HOST", "127.0.0.1");
     msfUser     = prefs.getString("MSF_RPC_USER", "msf");
-    msfPassword = prefs.getString("MSF_RPC_PSWD", "pswd");
+    msfPassword = prefs.getString("MSF_RPC_PSWD", "msf");
     msfRoot     = prefs.getString("GENTOO_ROOT", System.getDefaultGentooPath());
-    msfPort     = prefs.getInt("MSF_RPC_PORT", 55553);
+    msfPort     = System.MSF_RPC_PORT;
     msfSsl      = prefs.getBoolean("MSF_RPC_SSL", false);
 
     mRemote     = !msfHost.equals("127.0.0.1");

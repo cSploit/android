@@ -157,6 +157,7 @@
         <EditTextPreference
             android:defaultValue="55553"
             android:key="MSF_RPC_PORT"
+            android:inputType="number"
             android:summary="@string/pref_rpc_port_desc"
             android:title="@string/pref_rpc_port" />
 

@@ -365,9 +365,7 @@
     <string name="pref_err_writable">nie ma praw zapisu.</string>
     <string name="pref_err_sample_time">przykładowy czas musi być pomiędzy 0.4 a 1.0.</string>
     <string name="pref_err_invalid_number">Błędny numer.</string>
-    <string name="pref_err_proxy_port">Port proxy musi być pomiędzy 1024 a 65535.</string>
-    <string name="pref_err_server_port">Port serwera musi być pomiędzy 1024 a 65535.</string>
-    <string name="pref_err_redirector_port">Port serwera musi być pomiędzy 1024 a 65535.</string>
+    <string name="pref_err_port_range">Port musi być pomiędzy 1024 a 65535.</string>
     <string name="pref_err_busy_port">Inny proces nasłuchuje na tym porcie. Wybierz inny port.</string>
     <string name="pref_err_buffer_size">Rozmiar bufora musi być pomiędzy 1024 a 104857600.</string>
 

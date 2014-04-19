@@ -353,9 +353,7 @@ If not, see http://www.gnu.org/licenses/.
 <string name="pref_err_writable">不可写.</string>
 <string name="pref_err_sample_time">样本时间必须在 0.4 和 1.0 之间.</string>
 <string name="pref_err_invalid_number">无效的数字.</string>
-<string name="pref_err_proxy_port">代理端口必须在1024 和 65535 之间.</string>
-<string name="pref_err_server_port">服务器端口必须在1024 和 65535 之间Server port must be between 1024 and 65535.</string>
-<string name="pref_err_redirector_port">重定向工具端口必须在1024 和 65535 之间.</string>
+<string name="pref_err_port_range">端口必须在1024 和 65535 之间.</string>
 <string name="pref_err_busy_port">另一个程序已经在这个端口上监听，请换另一个.</string>
 <string name="pref_err_buffer_size">缓冲区大小必须在 1024 和 104857600 之间.</string>
 

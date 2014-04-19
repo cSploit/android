@@ -375,9 +375,7 @@
     <string name="pref_err_writable">ne dopušta zapisivanje.</string>
     <string name="pref_err_sample_time">Vrijeme uzorkovanja mora biti između 0.4 i 1.0.</string>
     <string name="pref_err_invalid_number">Nevaljan broj.</string>
-    <string name="pref_err_proxy_port">Proxy port mora biti između 1024 i 65535.</string>
-    <string name="pref_err_server_port">Server port mora biti između 1024 i 65535.</string>
-    <string name="pref_err_redirector_port">Server port mora biti između 1024 i 65535.</string>
+    <string name="pref_err_port_range">Port mora biti između 1024 i 65535.</string>
     <string name="pref_err_busy_port">Drugi proces koristi ovaj port za osluškivanje, molimo koristite drugi port.</string>
     <string name="pref_err_buffer_size">Veličina međuspremnika mora biti između 1024 i 104857600.</string>
 

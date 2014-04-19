@@ -334,9 +334,8 @@
     <string name="pref_err_writable">no tiene permiso de escritura.</string>
     <string name="pref_err_sample_time">El tiempo de muestreo debe ser entre 0,4 y 1.</string>
     <string name="pref_err_invalid_number">Número no válido.</string>
-    <string name="pref_err_proxy_port">El puerto del proxy debe ser entre 1024 y 65535.</string>
-    <string name="pref_err_server_port">El puerto del servidor debe ser entre 1024 y 65535.</string>
-    <string name="pref_err_redirector_port">El puerto del servidor debe ser entre 1024 y 65535.</string>
+    
+    <string name="pref_err_port_range">El puerto debe ser entre 1024 y 65535.</string>
     <string name="pref_err_busy_port">Otro proceso está escuchando en este puerto, seleccione otro por favor.</string>
     <string name="pref_err_buffer_size">El tamaño del búfer debe ser entre 1024 y 104857600.</string>
 

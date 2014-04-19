@@ -368,9 +368,7 @@
     <string name="pref_err_writable">ei ole kirjoitettava.</string>
     <string name="pref_err_sample_time">Näytteenottoajan täytyy olla väliltä 0.4 ja 1.0.</string>
     <string name="pref_err_invalid_number">Epäkelpo numero.</string>
-    <string name="pref_err_proxy_port">Välityspalvelimen portin täytyy olla väliltä 1024 - 65535.</string>
-    <string name="pref_err_server_port">Palvelimen portin täytyy olla väliltä 1024 - 65535.</string>
-    <string name="pref_err_redirector_port">Palvelimen portin täytyy olla väliltä 1024 - 65535.</string>
+    <string name="pref_err_port_range">Portin täytyy olla väliltä 1024 - 65535.</string>
     <string name="pref_err_busy_port">Toinen palvelu käyttää tätä porttia. Ole hyvä ja valitse eri portti.</string>
     <string name="pref_err_buffer_size">Välimuistin maksimi koon täytyy olla väliltä 1024 - 104857600.</string>
 

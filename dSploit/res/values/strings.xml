@@ -389,9 +389,7 @@
     <string name="pref_err_writable">is not writable.</string>
     <string name="pref_err_sample_time">Sample time must be between 0.4 and 1.0.</string>
     <string name="pref_err_invalid_number">Invalid number.</string>
-    <string name="pref_err_proxy_port">Proxy port must be between 1024 and 65535.</string>
-    <string name="pref_err_server_port">Server port must be between 1024 and 65535.</string>
-    <string name="pref_err_redirector_port">Server port must be between 1024 and 65535.</string>
+    <string name="pref_err_port_range">Port must be between 1024 and 65535.</string>
     <string name="pref_err_busy_port">Another process is listening on this port, please use another one.</string>
     <string name="pref_err_buffer_size">Buffer size must be between 1024 and 104857600.</string>
     <string name="pref_persistent_network_monitor">persistent network monitor</string>

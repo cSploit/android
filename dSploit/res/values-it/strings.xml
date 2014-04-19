@@ -377,9 +377,7 @@
     <string name="pref_err_writable">non è scrivibile.</string>
     <string name="pref_err_sample_time">Il tempo di campionamento deve essere compreso tra 0.4 e 1.0.</string>
     <string name="pref_err_invalid_number">Numero non valido.</string>
-    <string name="pref_err_proxy_port">La porta del proxy deve essere compresa tra 1024 e 65535.</string>
-    <string name="pref_err_server_port">La porta del server deve essere compresa tra 1024 e 65535.</string>
-    <string name="pref_err_redirector_port">La porta del redirector deve essere compresa tra 1024 e 65535.</string>
+    <string name="pref_err_port_range">La porta deve essere compresa tra 1024 e 65535.</string>
     <string name="pref_err_busy_port">Un altro processo è in ascolto su questa porta, per favore specificane un altra.</string>
     <string name="pref_err_buffer_size">La grandezza del buffer deve essere compresa tra 1024 e 104857600.</string>
 

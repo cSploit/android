@@ -61,6 +61,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
   private EditTextPreference mProxyPort = null;
   private EditTextPreference mServerPort = null;
   private EditTextPreference mRedirectorPort = null;
+  private EditTextPreference mMsfPort = null;
   private EditTextPreference mHttpBufferSize = null;
   private EditTextPreference mPasswordFilename = null;
   private CheckBoxPreference mThemeChooser = null;
@@ -78,6 +79,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
     mSavePath = getPreferenceScreen().findPreference("PREF_SAVE_PATH");
     mWipeMSF  = getPreferenceScreen().findPreference("PREF_MSF_WIPE");
     mGentooRoot = getPreferenceScreen().findPreference("GENTOO_ROOT");
+    mMsfPort = (EditTextPreference) getPreferenceScreen().findPreference("MSF_RPC_PORT");
     mSnifferSampleTime = (EditTextPreference) getPreferenceScreen().findPreference("PREF_SNIFFER_SAMPLE_TIME");
     mProxyPort = (EditTextPreference) getPreferenceScreen().findPreference("PREF_HTTP_PROXY_PORT");
     mServerPort = (EditTextPreference) getPreferenceScreen().findPreference("PREF_HTTP_SERVER_PORT");
@@ -307,80 +309,49 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 
       mSnifferSampleTime.setText(Double.toString(sampleTime));
     }
-    else if(key.equals("PREF_HTTP_PROXY_PORT")){
-      int proxyPort;
+    else if(key.endsWith("_PORT")) {
+      int port;
 
       try{
-        proxyPort = Integer.parseInt(mProxyPort.getText());
-        if(proxyPort < 1024 || proxyPort > 65536){
-          message = getString(R.string.pref_err_proxy_port);
-          proxyPort = 8080;
+        port = Integer.parseInt(mProxyPort.getText());
+        if(port < 1024 || port > 65536){
+          message = getString(R.string.pref_err_port_range);
+          port = 0;
         }
-        else if(!System.isPortAvailable(proxyPort)){
+        else if(!System.isPortAvailable(port)){
           message = getString(R.string.pref_err_busy_port);
-          proxyPort = 8080;
+          port = 0;
         }
       }
       catch(Throwable t){
         message = getString(R.string.pref_err_invalid_number);
-        proxyPort = 8080;
+        port = 0;
       }
 
-      if(message != null)
+      if(message!=null)
         Toast.makeText(SettingsActivity.this, message, Toast.LENGTH_SHORT).show();
 
-      mProxyPort.setText(Integer.toString(proxyPort));
-      System.HTTP_PROXY_PORT = proxyPort;
-    }
-    else if(key.equals("PREF_HTTP_SERVER_PORT")){
-      int serverPort;
-
-      try{
-        serverPort = Integer.parseInt(mServerPort.getText());
-        if(serverPort < 1024 || serverPort > 65535){
-          message = getString(R.string.pref_err_server_port);
-          serverPort = 8081;
-        }
-        else if(!System.isPortAvailable(serverPort)){
-          message = getString(R.string.pref_err_busy_port);
-          serverPort = 8081;
-        }
+      if(key.equals("PREF_HTTP_PROXY_PORT")) {
+        if(port==0)
+          port=8080;
+        mProxyPort.setText(Integer.toString(port));
+        System.HTTP_PROXY_PORT = port;
+      } else if(key.equals("PREF_HTTP_SERVER_PORT")) {
+        if(port==0)
+          port = 8081;
+        mServerPort.setText(Integer.toString(port));
+        System.HTTP_SERVER_PORT = port;
+      } else if(key.equals("PREF_HTTPS_REDIRECTOR_PORT")) {
+        if(port==0)
+          port = 8082;
+        mRedirectorPort.setText(Integer.toString(port));
+        System.HTTPS_REDIR_PORT = port;
+      } else if(key.equals("MSF_RPC_PORT")) {
+        if(port==0)
+          port = 55553;
+        mMsfPort.setText(Integer.toString(port));
+        System.MSF_RPC_PORT = port;
       }
-      catch(Throwable t){
-        message = getString(R.string.pref_err_invalid_number);
-        serverPort = 8081;
-      }
-
-      if(message != null)
-        Toast.makeText(SettingsActivity.this, message, Toast.LENGTH_SHORT).show();
-
-      mServerPort.setText(Integer.toString(serverPort));
-      System.HTTP_SERVER_PORT = serverPort;
-    }
-    else if(key.equals("PREF_HTTPS_REDIRECTOR_PORT")){
-      int redirPort;
-
-      try{
-        redirPort = Integer.parseInt(mRedirectorPort.getText());
-        if(redirPort < 1024 || redirPort > 65535){
-          message = getString(R.string.pref_err_redirector_port);
-          redirPort = 8082;
-        }
-        else if(!System.isPortAvailable(redirPort)){
-          message = getString(R.string.pref_err_busy_port);
-          redirPort = 8082;
-        }
-      }
-      catch(Throwable t){
-        message = getString(R.string.pref_err_invalid_number);
-        redirPort = 8082;
-      }
-
-      if(message != null)
-        Toast.makeText(SettingsActivity.this, message, Toast.LENGTH_SHORT).show();
-
-      mRedirectorPort.setText(Integer.toString(redirPort));
-      System.HTTPS_REDIR_PORT = redirPort;
     }
     else if(key.equals("PREF_HTTP_MAX_BUFFER_SIZE")){
       int maxBufferSize;

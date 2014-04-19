@@ -342,9 +342,7 @@
     <string name="pref_err_writable">Não é gravável.</string>
     <string name="pref_err_sample_time">Tempo da amostra deve estar entre 0.4 e 1.0.</string>
     <string name="pref_err_invalid_number">Número Inválido.</string>
-    <string name="pref_err_proxy_port">Porta de proxy deve estar entre 1024 e 65535.</string>
-    <string name="pref_err_server_port">Porta do servidor deve estar entre 1024 e 65535.</string>
-    <string name="pref_err_redirector_port">Porta do servidor deve estar entre 1024 e 65535.</string>
+    <string name="pref_err_port_range">Porta deve estar entre 1024 e 65535.</string>
     <string name="pref_err_busy_port">Outro processo está Executando nessa porta, utilize o outro.</string>
     <string name="pref_err_buffer_size">Tamanho do buffer deve estar entre 1024 e 104857600.</string>
 

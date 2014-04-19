@@ -367,9 +367,7 @@
     <string name="pref_err_writable">nelze zapisovat</string>
     <string name="pref_err_sample_time">Vzorkovací čas musí být mezi 0.4 a 1.0.</string>
     <string name="pref_err_invalid_number">Neplatné číslo.</string>
-    <string name="pref_err_proxy_port">Proxy port musí být mezi 1024 a 65535.</string>
-    <string name="pref_err_server_port">Server port musí být mezi 1024 a 65535.</string>
-    <string name="pref_err_redirector_port">Server port musí být mezi 1024 a 65535.</string>
+    <string name="pref_err_port_range">Port musí být mezi 1024 a 65535.</string>
     <string name="pref_err_busy_port">Jiný proces naslouchá na tomto portu, prosím zvolte jiný.</string>
     <string name="pref_err_buffer_size">Velikost Bufferu musí být mezi 1024 a 104857600.</string>
 
