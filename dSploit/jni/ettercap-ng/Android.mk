@@ -11,7 +11,7 @@ LOCAL_C_INCLUDES := \
 	ettercap-ng/include \
 	ettercap-ng/src/interfaces/text \
 	libpcap \
-	libnet/include \
+	libnet/libnet/include \
 	include \
 	openssl \
 	openssl/include\
