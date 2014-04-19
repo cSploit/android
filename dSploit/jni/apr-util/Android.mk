@@ -15,7 +15,7 @@ LOCAL_C_INCLUDES:= \
 	sqlite3/include\
 	apr/include\
 	bdb/include\
-	expat/lib\
+	libexpat/lib\
 	libiconv/include\
 	unixODBC/include
 LOCAL_SRC_FILES:= \

@@ -7,7 +7,7 @@ LOCAL_CFLAGS:= -DHAVE_CONFIG_H -DNE_PRIVATE=extern -ffunction-sections -fdata-se
 
 LOCAL_C_INCLUDES:= \
 	openssl/include\
-	expat/lib\
+	libexpat/lib\
 	neon
 LOCAL_SRC_FILES:= \
 	src/ne_request.c\

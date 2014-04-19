@@ -10,7 +10,7 @@ LOCAL_C_INCLUDES:= \
 	subversion/subversion\
 	apr/include\
 	apr-util/include\
-	expat/lib\
+	libexpat/lib\
 	libiconv/include\
 	neon/src\
 	sqlite3

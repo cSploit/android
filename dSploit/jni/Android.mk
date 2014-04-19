@@ -19,7 +19,7 @@ include $(MY_LOCAL_PATH)/unixODBC/Android.mk
 include $(MY_LOCAL_PATH)/libiconv/Android.mk
 include $(MY_LOCAL_PATH)/neon/Android.mk
 include $(MY_LOCAL_PATH)/bdb/Android.mk
-include $(MY_LOCAL_PATH)/expat/Android.mk
+include $(MY_LOCAL_PATH)/libexpat/Android.mk
 include $(MY_LOCAL_PATH)/libssh/Android.mk
 include $(MY_LOCAL_PATH)/icu/Android.mk
 include $(MY_LOCAL_PATH)/pcre/Android.mk
