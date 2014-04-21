@@ -61,6 +61,7 @@
     <string name="new_update_desc2">je dostupno, želite li ga preuzeti ?</string>
     <string name="checking">Provjera&#8230;</string>
     <string name="no_updates_available">Nema dostupnih ažuriranja.</string>
+    <string name="new_msf_update_desc">MetasploitFramework nadogradnja</string>
     <string name="new_version">Nova verzija</string>
     <string name="new_version2">je pronađena!</string>
     <string name="downloading_update">Skidanje ažuriranja&#8230;</string>
@@ -70,7 +71,7 @@
     <string name="error_occured">Greška se pojavila pri skidanju ažuriranja.</string>
     <string name="invalid_target">Nevažeća meta.</string>
     <string name="add_custom_target">Dodaj posebnu metu</string>
-    <string name="enter_url">Napiši URL, ime hosta (uređaja) ili IP adresu ispod:</string>
+    <string name="enter_url">Napiši URL, ime izvora (uređaja) ili IP adresu ispod:</string>
     <string name="net_discovery_stopped">Pretraga mreže zaustavljena.</string>
     <string name="net_discovery_started">Pretraga mreže pokrenuta.</string>
     <string name="start_monitor">Pokreni Pretragu Mreže</string>
@@ -344,8 +345,12 @@
     <string name="pref_rpc_user_desc">Korisničko ime za spajanje na MetaSploit RPCD.</string>
     <string name="pref_rpc_pswd">RPC lozinka</string>
     <string name="pref_rpc_pswd_desc">Lozinka za spajanje na MetaSploit RPCD.</string>
+    <string name="pref_rpc_host">RPC izvor</string>
+    <string name="pref_rpc_host_desc">izvor na kojemu se MetaSploit RPC server nalazi</string>
     <string name="pref_rpc_port">RPC port</string>
     <string name="pref_rpc_port_desc">Port za spajanje na MetaSploit RPCD.</string>
+    <string name="pref_rpc_ssl">RPC koristi SSL</string>
+    <string name="pref_rpc_ssl_desc">Opcija da MetaSploit RPC koristi SSL</string>
     <string name="pref_chroot">gentoo korijenska mapa</string>
     <string name="pref_chroot_desc">Mapa koja sadržava gentoo sustav.</string>
     <string name="pref_performance_vuln_desc">Traži ranjivosti koristeći</string>
@@ -370,7 +375,16 @@
         <item>EXDB</item>
         <item>MSF i EXDB</item>
     </string-array>
+    <string name="pref_performance_widescan">Opsežna potraga za izvorima</string>
+    <string name="pref_performance_widescan_desc">Potraga za izvorima izvan mrežne maske</string>
+    <string name="pref_advanced">Napredno</string>
     <string name="pref_folder">Mapa</string>
+    <string name="pref_msf_enable">Omogući MSF</string>
+    <string name="pref_msf_enable_desc">Uključuje MetaSploit Framework</string>
+    <string name="pref_msf_delete">Izbriši MSF</string>
+    <string name="pref_msf_delete_desc">Izbriši MetaSploit Framework sa uređaja</string>
+    <string name="pref_msfwipe_message">Jeste li sigurni da hoćete izbrisata MetaSploit Framework ?</string>
+    <string name="pref_msfwipe_size">Oko %d MB će biti oslobođeno.</string>
     <string name="pref_err_exists">ne postoji.</string>
     <string name="pref_err_writable">ne dopušta zapisivanje.</string>
     <string name="pref_err_sample_time">Vrijeme uzorkovanja mora biti između 0.4 i 1.0.</string>
@@ -378,14 +392,55 @@
     <string name="pref_err_port_range">Port mora biti između 1024 i 65535.</string>
     <string name="pref_err_busy_port">Drugi proces koristi ovaj port za osluškivanje, molimo koristite drugi port.</string>
     <string name="pref_err_buffer_size">Veličina međuspremnika mora biti između 1024 i 104857600.</string>
+    <string name="pref_persistent_network_monitor">Ustrajno mrežno nadgledanje</string>
+    <string name="pref_persistent_network_monitor_desc">Mrežno nadgledanje će stalno pretraživati mrežne izvore</string>
 
     <string name="exploit_finder">Traženje Exploita</string>
     <string name="exploit_finder_desc">Traži exploite koji koriste pronađene ranjivosti.</string>
     <string name="sessions">Sesije</string>
     <string name="sessions_desc">Sesije na zaposjednutoj meti.</string>
+    <string name="exploit_launch">Pokreni</string>
+    <string name="exploit_edit_options">Uredi postavke</string>
+    <string name="payload_edit_settings">Uredi postavke nositelja</string>
+    <string name="exploit_choose_payload">Odaberi nostitelja</string>
+    <string name="exploit_choose_target">Odaberi metu</string>
+    <string name="open_url">Otvori URL</string>
+    <string name="show_full_description">Prikaži potpuni opis</string>
+    <string name="choose_an_option">Odaberi opciju</string>
+    <string name="required">Neophodno</string>
     
     <string name="menu_add">Dodaj</string>
     <string name="menu_scan">Pretraži</string>
     <string name="menu_wifi_scan">WiFi Pretraživanje</string>
     <string name="menu_stop_msfrpcd">Zaustavi msfrpcd</string>
+    
+    <string name="pref_theme">Tamna tema</string>
+    <string name="pref_choose_theme">Omogući tamnu temu, koja je lakša za oći</string>
+    <string name="please_restart">Nova tema neće se primjeniti​sve dok ponovno ne pokrenete aplikaciju</string>
+    <string name="evasion">Izbjegavanje</string>
+    <string name="search_exact_version">Podudaranje točne verzije</string>
+    <string name="sessions_title">Otvori ljusku pritiskom na sesiju, ili pogledaj više opcija dužim pritiskom.</string>
+    <string name="open_shell">Otvori ljusku</string>
+    <string name="clear_event_log">Očisti dnevnik događaja</string>
+    <string name="run">Pokreni</string>
+    <string name="command">Naredba</string>
+    <string name="clear">Očisti</string>
+    <string name="msfrpc_disconnected">MSF RPC odspojen</string>
+    <string name="no_opened_sessions">nema otvorene sesije na ovoj meti</string>
+    <string name="delete">Izbriši</string>
+    <string name="checksum_failed">Datoteka je oštećena</string>
+    <string name="extraction_failed">Izvlačenje nije uspjelo</string>
+    <string name="extracting">Izvlačenje&#8230;</string>
+    <string name="click_here_to_upgrade">Kliknite ovdje za nadogradnju</string>
+    <string name="bad_permissions">Lokalna datoteka koju ste stavili na svoj prostor za pohranu ima loša dopuštenja, ne mogu ga čitati i/ili pisati!</string>
+    <string name="restore_default_path">vratiti zadanu putanju</string>
+    <string name="choose_a_custom_path">odaberi prilagođenu putanju</string>
+    <string name="error_symlink">odredišni uređaj ne podržava simboličke veze, molim odaberite pristojan datotečni sustav.</string>
+    <string name="target_selected">meta odabrana</string>
+    <string name="targets_selected">mete odabrane</string>
+    <string name="multiple_attack">višestruki napad</string>
+    <string name="connect_msf">spoji se na MetaSploit</string>
+    <string name="disconnect_msf">odspoji se sa MetaSploita</string>
+    <string name="connected_msf">spojen na MetaSploit</string>
+    <string name="connection_failed">veza NIJE USPJELA!</string>
 </resources>
