@@ -415,7 +415,7 @@
     <string name="menu_stop_msfrpcd">Zaustavi msfrpcd</string>
     
     <string name="pref_theme">Tamna tema</string>
-    <string name="pref_choose_theme">Omogući tamnu temu, koja je lakša za oći</string>
+    <string name="pref_choose_theme">Omogući tamnu temu, koja je lakša za oči</string>
     <string name="please_restart">Nova tema neće se primjeniti​sve dok ponovno ne pokrenete aplikaciju</string>
     <string name="evasion">Izbjegavanje</string>
     <string name="search_exact_version">Podudaranje točne verzije</string>
