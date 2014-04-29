@@ -94,6 +94,9 @@ end
 def system_includes
 	/sources\/cxx-stl\//
 end
+def system_cflags
+	["-fpie","-fpic","-fPIE","-fPIC"]
+end
 def extra_cflags
     ["-static","-ffunction-sections", "-fdata-sections"]
 end
@@ -138,7 +141,7 @@ def get_params(line,t)
 		dst = t.cflags
 	end
 	line.scan(cflags_re).each do |flag|
-		dst << flag[0] if !(dst.include? flag[0])
+		dst << flag[0] if !(dst.include? flag[0] or system_cflags.include? flag[0])
 	end
 	line.scan(include_re).each do |inc|
 		next if inc[0] =~ system_includes
