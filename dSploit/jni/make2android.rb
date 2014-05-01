@@ -21,7 +21,7 @@
 # makefiles standard.
 
 class ObjectTarget
-	attr_accessor :name,:objs,:srcs,:libs,:cflags,:cxxflags,:includes
+	attr_accessor :name,:objs,:srcs,:libs,:cflags,:cxxflags,:ldflags,:includes
 	
 	def initialize()
 		@objs=[]
@@ -29,6 +29,7 @@ class ObjectTarget
 		@libs=[]
 		@cflags=[]
 		@cxxflags=[]
+		@ldflags=[]
 		@includes=[]
 	end
 	
@@ -73,6 +74,12 @@ end
 def cflags_re
 	/ (-[Df] ?[^ ]+)/
 end
+def ldflags_re
+	/ (-(rdynamic|s|static|static-libgcc|static-libstdc\+\+|shared|shared-libgcc|symbolic) )/
+end
+def ldflags_opt_re
+	/ (-(Wl,|Xlinker|u) ?[^ ]+)/
+end
 def include_re
 	/ -I([^ ]+)/
 end
@@ -96,6 +103,9 @@ def system_includes
 end
 def system_cflags
 	["-fpie","-fpic","-fPIE","-fPIC"]
+end
+def system_ldflags
+	[]
 end
 def extra_cflags
     ["-static","-ffunction-sections", "-fdata-sections"]
@@ -141,7 +151,9 @@ def get_params(line,t)
 		dst = t.cflags
 	end
 	line.scan(cflags_re).each do |flag|
-		dst << flag[0] if !(dst.include? flag[0] or system_cflags.include? flag[0])
+		dst << flag[0] if !(
+			dst.include? flag[0] or
+		  system_cflags.include? flag[0])
 	end
 	line.scan(include_re).each do |inc|
 		next if inc[0] =~ system_includes
@@ -152,6 +164,14 @@ def get_params(line,t)
 		next if !(File.exists? dir)
 		rel=dir.sub(topwd_re,'')
 		t.includes << rel if !(t.includes.include? rel)
+	end
+	ldflags=line.scan(ldflags_re)
+	ldflags.concat(line.scan(ldflags_opt_re))
+	ldflags.each do |flag|
+		t.ldflags << flag[0] if !(
+			t.ldflags.include? flag[0] or
+		  system_ldflags.include? flag[0] or
+		  extra_ldflags.include? flag[0])
 	end
 	line.scan(libs_re).each do |lib|
 		next if system_libs.include? lib[0]
@@ -439,10 +459,7 @@ $list.find_all{|item| item.is_a?(Library) or item.is_a?(Executable)}.each do |li
 		i+=flag.size+3
 		print "#{flag} "
 	end
-    # fixed stuff ( you can change it from the head of this script )
-	print "\n# fixed flags\nLOCAL_CFLAGS+= #{extra_cflags.join(" ")}" if extra_cflags.size > 0
-
-	# the whole world call it CXXFLAGS, but google decided that in their makefiles
+		# the whole world call it CXXFLAGS, but google decided that in their makefiles
 	# CXXFLAGS is CPPFLAGS ( that is usually the C/C++ preprocessor flags )
 	# /me FACEPALM
 	print "\n\nLOCAL_CPPFLAGS:= " if cxxflags.size > 0
@@ -455,7 +472,19 @@ $list.find_all{|item| item.is_a?(Library) or item.is_a?(Executable)}.each do |li
 		i+=flag.size+3
 		print "#{flag} "
 	end
-	print "\n\nLOCAL_LDFLAGS:= #{extra_ldflags.join(" ")}" if lib.is_a?(Executable) and extra_ldflags.size > 0
+	print "\n\nLOCAL_LDFLAGS:= " if lib.ldflags.size > 0
+	i=16
+	lib.ldflags.each do |flag|
+		if (i+flag.size) > 80 && i > 0 then
+			print "\\\n"
+			i=0
+		end
+		i+=flag.size+3
+		print "#{flag} "
+	end
+    # fixed stuff ( you can change it from the head of this script )
+	print "\n\n# fixed flags\nLOCAL_CFLAGS+= #{extra_cflags.join(" ")}" if extra_cflags.size > 0
+	print "\nLOCAL_LDFLAGS+= #{extra_ldflags.join(" ")}" if lib.is_a?(Executable) and extra_ldflags.size > 0
 	print "\n\n"
 	print "LOCAL_C_INCLUDES:= " if includes.size > 0
 	includes.each do |inc|
