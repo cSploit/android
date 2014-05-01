@@ -343,7 +343,7 @@ text.each_line do |line|
 			parse_inputs(t,inputs)
 			$list << t
 		# probably we are building a library if no sources in input 
-		elsif (res=(inputs.grep /\.(l?a|so(\.[0-9]+)*)$/)).size > 0 then
+		elsif (res=(inputs.grep /\.(l?a|so(\.[0-9]+)*)$/)).size > 0 or generic_check_executable =~ line then
 			# try to find the target library
 			if prog=="ar" then # if using ar, the target is the first one
 				name=res[0]
@@ -371,7 +371,7 @@ text.each_line do |line|
 			parse_inputs(t,inputs)
 			$list << t
 		else
-			warn "unknown command: `#{line}'" if !(generic_check_executable =~ line)
+			warn "unknown command: `#{line}'"
 		end
   end
 end
