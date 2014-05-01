@@ -105,13 +105,13 @@ def system_cflags
 	["-fpie","-fpic","-fPIE","-fPIC"]
 end
 def system_ldflags
-	[]
+	["-static","-shared"]
 end
 def extra_cflags
-    ["-static","-ffunction-sections", "-fdata-sections"]
+    ["-ffunction-sections", "-fdata-sections"]
 end
 def extra_ldflags
-    [" -Wl,--gc-sections"]
+    [" -Wl,--gc-sections","-static"]
 end
 def cd_re
 	/^cd\s+(?<dir>[^; ]+)/
