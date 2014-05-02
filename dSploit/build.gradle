@@ -12,31 +12,34 @@ dependencies {
 android {
     compileSdkVersion 19
     buildToolsVersion "19.0.3"
-    
+
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
     }
-    
+
     lintOptions {
         abortOnError false
     }
 
     signingConfigs {
         release {
-            storeFile = file(System.getenv("KEYSTORE_FILE"))
-            storePassword = System.getenv("KEYSTORE_PWD")
-            keyAlias = System.getenv("KEYSTORE_ALIAS")
-            keyPassword = System.getenv("KEYSTORE_ALIAS_PWD")
+            if (System.getenv("KEYSTORE_FILE") != null) {
+                storeFile = file(System.getenv("KEYSTORE_FILE"))
+                storePassword = System.getenv("KEYSTORE_PWD")
+                keyAlias = System.getenv("KEYSTORE_ALIAS")
+                keyPassword = System.getenv("KEYSTORE_ALIAS_PWD")
+            }
         }
     }
 
     buildTypes {
-        release {
-            signingConfig signingConfigs.release
-        }
         debug {
             packageNameSuffix ".debug"
+        }
+
+        release {
+            signingConfig signingConfigs.release
         }
     }
 
