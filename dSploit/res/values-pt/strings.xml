@@ -409,7 +409,7 @@
     <string name="extracting">Extraindo&#8230;</string>
     <string name="click_here_to_upgrade">Clique aqui para atualizar</string>
     <string name="bad_permissions">O arquivo local que você colocou no seu armazenamento tem permissões ruins, eu não posso ler e / ou escrever isso!</string>
-    <string name="pref_performance_vuln_title" tools:ignore="ExtraTranslation">preferências perf_vuln</string>
+    <string name="pref_performance_vuln_title">preferências perf_vuln</string>
     <string name="restore_default_path">restaurar caminho padrão</string>
     <string name="choose_a_custom_path">Escolher caminho personalizado</string>
     <string name="error_symlink">Dispositivo de destino Não suporta symlinks, Por favor selecione um sistema de arquivos decente.</string>
