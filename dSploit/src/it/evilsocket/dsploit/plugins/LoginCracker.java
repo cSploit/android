@@ -553,7 +553,7 @@ public class LoginCracker extends Plugin {
 		@Override
 		public void onNewAttempt(String login, String password,
 				final int progress, final int total) {
-			String status = getString(R.string.trying) + login + ":" + password;
+			String status = getString(R.string.trying) + " " + login + ":" + password;
 
 			mNow = java.lang.System.currentTimeMillis();
 
