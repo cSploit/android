@@ -106,7 +106,7 @@ public class Hydra extends Tool
     else
       command += " -x \"" + minlength + ":" + maxlength + ":" + charset + "\" ";
 
-    command += "-s " + port + " -V -t 10 " + target.getCommandLineRepresentation() + " " + service;
+    command += " -s " + port + " -V -t 10 " + target.getCommandLineRepresentation() + " " + service;
 
     if(service.equalsIgnoreCase("http-head"))
       command += " /";
