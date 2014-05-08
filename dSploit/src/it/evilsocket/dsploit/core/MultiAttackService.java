@@ -239,7 +239,7 @@ public class MultiAttackService extends IntentService {
 
       if(System.getMsfRpc() != null && target.hasMsfExploits()) {
         for(MsfExploit e : target.getMsfExploits())
-          e.launch();
+          e.tryLaunch();
       }
     }
 
