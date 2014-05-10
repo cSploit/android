@@ -10,3 +10,6 @@
 [submodule "dSploit/jni/ncurses"]
 	path = dSploit/jni/ncurses
 	url = git@github.com:tux-mind/platform_external_ncurses.git
+[submodule "dSploit/jni/icu4c"]
+	path = dSploit/jni/icu4c
+	url = git@github.com:tux-mind/platform_external_icu4c.git
