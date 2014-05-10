@@ -17,3 +17,6 @@
 	path = dSploit/jni/openssl
 	url = https://github.com/android/platform_external_openssl.git
 	branch = gingerbread-release
+[submodule "dSploit/jni/libyaml"]
+	path = dSploit/jni/libyaml
+	url = git@github.com:tux-mind/libyaml.git
