@@ -13,3 +13,7 @@
 [submodule "dSploit/jni/icu4c"]
 	path = dSploit/jni/icu4c
 	url = git@github.com:tux-mind/platform_external_icu4c.git
+[submodule "dSploit/jni/openssl"]
+	path = dSploit/jni/openssl
+	url = https://github.com/android/platform_external_openssl.git
+	branch = gingerbread-release
