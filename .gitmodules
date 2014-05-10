@@ -7,3 +7,6 @@
 [submodule "dSploit/jni/libbthread"]
 	path = dSploit/jni/libbthread
 	url = git@github.com:tux-mind/libbthread.git
+[submodule "dSploit/jni/ncurses"]
+	path = dSploit/jni/ncurses
+	url = git@github.com:tux-mind/platform_external_ncurses.git
