@@ -33,3 +33,6 @@
 [submodule "dSploit/jni/libxslt"]
 	path = dSploit/jni/libxslt
 	url = git@github.com:tux-mind/platform_external_libxslt.git
+[submodule "dSploit/jni/libreadline"]
+	path = dSploit/jni/libreadline
+	url = git@github.com:tux-mind/platform_external_libreadline.git
