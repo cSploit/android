@@ -23,3 +23,7 @@
 [submodule "dSploit/jni/zlib"]
 	path = dSploit/jni/zlib
 	url = git@github.com:tux-mind/platform_external_zlib.git
+[submodule "dSploit/jni/libpcap"]
+	path = dSploit/jni/libpcap
+	url = https://github.com/android/platform_external_libpcap.git
+	branch = origin/gingerbread-release
