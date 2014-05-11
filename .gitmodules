@@ -36,3 +36,6 @@
 [submodule "dSploit/jni/libreadline"]
 	path = dSploit/jni/libreadline
 	url = git@github.com:tux-mind/platform_external_libreadline.git
+[submodule "dSploit/jni/libtommath"]
+	path = dSploit/jni/libtommath
+	url = git@github.com:tux-mind/libtommath.git
