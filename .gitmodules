@@ -20,3 +20,6 @@
 [submodule "dSploit/jni/libyaml"]
 	path = dSploit/jni/libyaml
 	url = git@github.com:tux-mind/libyaml.git
+[submodule "dSploit/jni/zlib"]
+	path = dSploit/jni/zlib
+	url = git@github.com:tux-mind/platform_external_zlib.git
