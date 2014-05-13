@@ -48,3 +48,6 @@
 [submodule "dSploit/jni/libmysqlclient"]
 	path = dSploit/jni/libmysqlclient
 	url = git@github.com:tux-mind/platform_external_libmysqlclient.git
+[submodule "dSploit/jni/apr"]
+	path = dSploit/jni/apr
+	url = git@github.com:tux-mind/platform_external_apache-apr.git
