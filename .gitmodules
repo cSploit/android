@@ -42,3 +42,6 @@
 [submodule "dSploit/jni/libedit"]
 	path = dSploit/jni/libedit
 	url = git@github.com:tux-mind/platform_external_libedit.git
+[submodule "dSploit/jni/firebird"]
+	path = dSploit/jni/firebird
+	url = git@github.com:tux-mind/platform_external_firebird.git
