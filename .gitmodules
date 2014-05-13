@@ -39,3 +39,6 @@
 [submodule "dSploit/jni/libtommath"]
 	path = dSploit/jni/libtommath
 	url = git@github.com:tux-mind/libtommath.git
+[submodule "dSploit/jni/libedit"]
+	path = dSploit/jni/libedit
+	url = git@github.com:tux-mind/platform_external_libedit.git
