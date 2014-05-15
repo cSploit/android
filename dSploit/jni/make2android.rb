@@ -162,7 +162,11 @@ def get_params(line,t)
 			dir=File.expand_path(File.readlink(dir),File.dirname(dir))
 		end
 		next if !(File.exists? dir)
-		rel=dir.sub(topwd_re,'')
+		if dir =~ pwd_re then
+			rel=dir.sub(pwd_re,'$(LOCAL_PATH)/')
+		else
+			rel=dir.sub(topwd_re,'')
+		end
 		t.includes << rel if !(t.includes.include? rel)
 	end
 	ldflags=line.scan(ldflags_re)
