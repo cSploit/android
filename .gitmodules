@@ -51,3 +51,6 @@
 [submodule "dSploit/jni/apr"]
 	path = dSploit/jni/apr
 	url = git@github.com:tux-mind/platform_external_apache-apr.git
+[submodule "dSploit/jni/freetds"]
+	path = dSploit/jni/freetds
+	url = git@github.com:tux-mind/platform_external_freetds.git
