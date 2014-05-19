@@ -54,3 +54,6 @@
 [submodule "dSploit/jni/freetds"]
 	path = dSploit/jni/freetds
 	url = git@github.com:tux-mind/platform_external_freetds.git
+[submodule "dSploit/jni/unixODBC"]
+	path = dSploit/jni/unixODBC
+	url = git@github.com:tux-mind/platform_external_unixODBC.git
