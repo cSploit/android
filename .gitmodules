@@ -66,3 +66,6 @@
 [submodule "dSploit/jni/libiconv"]
 	path = dSploit/jni/libiconv
 	url = git@github.com:tux-mind/platform_external_libiconv.git
+[submodule "dSploit/jni/bdb"]
+	path = dSploit/jni/bdb
+	url = git@github.com:tux-mind/platform_external_bdb.git
