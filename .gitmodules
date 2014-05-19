@@ -63,3 +63,6 @@
 [submodule "dSploit/jni/postgresql"]
 	path = dSploit/jni/postgresql
 	url = git@github.com:tux-mind/platform_external_postgresql.git
+[submodule "dSploit/jni/libiconv"]
+	path = dSploit/jni/libiconv
+	url = git@github.com:tux-mind/platform_external_libiconv.git
