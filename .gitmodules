@@ -60,3 +60,6 @@
 [submodule "dSploit/jni/openldap"]
 	path = dSploit/jni/openldap
 	url = git@github.com:tux-mind/platform_external_openldap.git
+[submodule "dSploit/jni/postgresql"]
+	path = dSploit/jni/postgresql
+	url = git@github.com:tux-mind/platform_external_postgresql.git
