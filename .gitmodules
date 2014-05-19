@@ -57,3 +57,6 @@
 [submodule "dSploit/jni/unixODBC"]
 	path = dSploit/jni/unixODBC
 	url = git@github.com:tux-mind/platform_external_unixODBC.git
+[submodule "dSploit/jni/openldap"]
+	path = dSploit/jni/openldap
+	url = git@github.com:tux-mind/platform_external_openldap.git
