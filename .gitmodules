@@ -72,3 +72,6 @@
 [submodule "dSploit/jni/sqlite"]
 	path = dSploit/jni/sqlite
 	url = https://github.com/android/platform_external_sqlite.git
+[submodule "dSploit/jni/apr-util"]
+	path = dSploit/jni/apr-util
+	url = https://github.com/android/platform_external_apr-util.git
