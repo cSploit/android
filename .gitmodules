@@ -75,3 +75,6 @@
 [submodule "dSploit/jni/apr-util"]
 	path = dSploit/jni/apr-util
 	url = https://github.com/android/platform_external_apr-util.git
+[submodule "dSploit/jni/libneon"]
+	path = dSploit/jni/libneon
+	url = https://github.com/android/platform_external_libneon.git
