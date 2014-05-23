@@ -81,3 +81,6 @@
 [submodule "dSploit/jni/subversion"]
 	path = dSploit/jni/subversion
 	url = https://github.com/android/platform_external_subversion.git
+[submodule "dSploit/jni/libpcre"]
+	path = dSploit/jni/libpcre
+	url = https://github.com/android/platform_external_libpcre.git
