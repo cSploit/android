@@ -78,3 +78,6 @@
 [submodule "dSploit/jni/libneon"]
 	path = dSploit/jni/libneon
 	url = https://github.com/android/platform_external_libneon.git
+[submodule "dSploit/jni/subversion"]
+	path = dSploit/jni/subversion
+	url = https://github.com/android/platform_external_subversion.git
