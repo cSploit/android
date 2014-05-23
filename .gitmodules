@@ -69,3 +69,6 @@
 [submodule "dSploit/jni/bdb"]
 	path = dSploit/jni/bdb
 	url = git@github.com:tux-mind/platform_external_bdb.git
+[submodule "dSploit/jni/sqlite"]
+	path = dSploit/jni/sqlite
+	url = https://github.com/android/platform_external_sqlite.git
