@@ -86,7 +86,7 @@
 	url = https://github.com/android/platform_external_libpcre.git
 [submodule "dSploit/jni/libidn"]
 	path = dSploit/jni/libidn
-	url = https://github.com/android/platform_external_libidn.git
+	url = https://github.com/tux-mind/platform_external_libidn.git
 [submodule "dSploit/jni/libncp"]
 	path = dSploit/jni/libncp
 	url = https://github.com/android/platform_external_libncp.git
