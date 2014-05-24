@@ -1,74 +1,74 @@
 [submodule "dSploit/jni/libnet"]
 	path = dSploit/jni/libnet
-	url = git@github.com:tux-mind/libnet.git
+	url = https://github.com/tux-mind/libnet.git
 [submodule "dSploit/jni/libexpat"]
 	path = dSploit/jni/libexpat
-	url = git@github.com:tux-mind/libexpat.git
+	url = https://github.com/tux-mind/libexpat.git
 [submodule "dSploit/jni/libbthread"]
 	path = dSploit/jni/libbthread
-	url = git@github.com:tux-mind/libbthread.git
+	url = https://github.com/tux-mind/libbthread.git
 [submodule "dSploit/jni/ncurses"]
 	path = dSploit/jni/ncurses
-	url = git@github.com:tux-mind/platform_external_ncurses.git
+	url = https://github.com/tux-mind/platform_external_ncurses.git
 [submodule "dSploit/jni/icu4c"]
 	path = dSploit/jni/icu4c
-	url = git@github.com:tux-mind/platform_external_icu4c.git
+	url = https://github.com/tux-mind/platform_external_icu4c.git
 [submodule "dSploit/jni/openssl"]
 	path = dSploit/jni/openssl
 	url = https://github.com/android/platform_external_openssl.git
 	branch = gingerbread-release
 [submodule "dSploit/jni/libyaml"]
 	path = dSploit/jni/libyaml
-	url = git@github.com:tux-mind/libyaml.git
+	url = https://github.com/tux-mind/libyaml.git
 [submodule "dSploit/jni/zlib"]
 	path = dSploit/jni/zlib
-	url = git@github.com:tux-mind/platform_external_zlib.git
+	url = https://github.com/tux-mind/platform_external_zlib.git
 [submodule "dSploit/jni/libpcap"]
 	path = dSploit/jni/libpcap
 	url = https://github.com/android/platform_external_libpcap.git
 	branch = origin/gingerbread-release
 [submodule "dSploit/jni/libxml2"]
 	path = dSploit/jni/libxml2
-	url = git@github.com:tux-mind/platform_external_libxml2.git
+	url = https://github.com/tux-mind/platform_external_libxml2.git
 [submodule "dSploit/jni/libxslt"]
 	path = dSploit/jni/libxslt
-	url = git@github.com:tux-mind/platform_external_libxslt.git
+	url = https://github.com/tux-mind/platform_external_libxslt.git
 [submodule "dSploit/jni/libreadline"]
 	path = dSploit/jni/libreadline
-	url = git@github.com:tux-mind/platform_external_libreadline.git
+	url = https://github.com/tux-mind/platform_external_libreadline.git
 [submodule "dSploit/jni/libtommath"]
 	path = dSploit/jni/libtommath
-	url = git@github.com:tux-mind/libtommath.git
+	url = https://github.com/tux-mind/libtommath.git
 [submodule "dSploit/jni/libedit"]
 	path = dSploit/jni/libedit
-	url = git@github.com:tux-mind/platform_external_libedit.git
+	url = https://github.com/tux-mind/platform_external_libedit.git
 [submodule "dSploit/jni/firebird"]
 	path = dSploit/jni/firebird
-	url = git@github.com:tux-mind/platform_external_firebird.git
+	url = https://github.com/tux-mind/platform_external_firebird.git
 [submodule "dSploit/jni/libmysqlclient"]
 	path = dSploit/jni/libmysqlclient
-	url = git@github.com:tux-mind/platform_external_libmysqlclient.git
+	url = https://github.com/tux-mind/platform_external_libmysqlclient.git
 [submodule "dSploit/jni/apr"]
 	path = dSploit/jni/apr
-	url = git@github.com:tux-mind/platform_external_apr.git
+	url = https://github.com/tux-mind/platform_external_apr.git
 [submodule "dSploit/jni/freetds"]
 	path = dSploit/jni/freetds
-	url = git@github.com:tux-mind/platform_external_freetds.git
+	url = https://github.com/tux-mind/platform_external_freetds.git
 [submodule "dSploit/jni/unixODBC"]
 	path = dSploit/jni/unixODBC
-	url = git@github.com:tux-mind/platform_external_unixODBC.git
+	url = https://github.com/tux-mind/platform_external_unixODBC.git
 [submodule "dSploit/jni/openldap"]
 	path = dSploit/jni/openldap
-	url = git@github.com:tux-mind/platform_external_openldap.git
+	url = https://github.com/tux-mind/platform_external_openldap.git
 [submodule "dSploit/jni/postgresql"]
 	path = dSploit/jni/postgresql
-	url = git@github.com:tux-mind/platform_external_postgresql.git
+	url = https://github.com/tux-mind/platform_external_postgresql.git
 [submodule "dSploit/jni/libiconv"]
 	path = dSploit/jni/libiconv
-	url = git@github.com:tux-mind/platform_external_libiconv.git
+	url = https://github.com/tux-mind/platform_external_libiconv.git
 [submodule "dSploit/jni/bdb"]
 	path = dSploit/jni/bdb
-	url = git@github.com:tux-mind/platform_external_bdb.git
+	url = https://github.com/tux-mind/platform_external_bdb.git
 [submodule "dSploit/jni/sqlite"]
 	path = dSploit/jni/sqlite
 	url = https://github.com/android/platform_external_sqlite.git
@@ -95,13 +95,13 @@
 	url = https://github.com/android/platform_external_tcpdump.git
 [submodule "dSploit/jni/libssh"]
 	path = dSploit/jni/libssh
-	url = git@github.com:tux-mind/platform_external_libssh.git
+	url = https://github.com/tux-mind/platform_external_libssh.git
 [submodule "dSploit/jni/arpspoof"]
 	path = dSploit/jni/arpspoof
-	url = git@github.com:evilsocket/dsploit-arpspoof.git
+	url = https://github.com/evilsocket/dsploit-arpspoof.git
 [submodule "dSploit/jni/thomson"]
 	path = dSploit/jni/thomson
-	url = git@github.com:evilsocket/dsploit-thomson.git
+	url = https://github.com/evilsocket/dsploit-thomson.git
 
 
 
