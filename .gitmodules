@@ -99,3 +99,9 @@
 
 
 
+[submodule "dSploit/jni/arpspoof"]
+	path = dSploit/jni/arpspoof
+	url = https://github.com/evilsocket/dsploit-arpspoof.git
+[submodule "dSploit/jni/thomson"]
+	path = dSploit/jni/thomson
+	url = https://github.com/evilsocket/dsploit-thomson.git
