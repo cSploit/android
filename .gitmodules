@@ -93,3 +93,6 @@
 [submodule "dSploit/jni/tcpdump"]
 	path = dSploit/jni/tcpdump
 	url = https://github.com/android/platform_external_tcpdump.git
+[submodule "dSploit/jni/libssh"]
+	path = dSploit/jni/libssh
+	url = git@github.com:tux-mind/platform_external_libssh.git
