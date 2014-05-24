@@ -77,13 +77,13 @@
 	url = https://github.com/tux-mind/platform_external_apr-util.git
 [submodule "dSploit/jni/libneon"]
 	path = dSploit/jni/libneon
-	url = https://github.com/android/platform_external_libneon.git
+	url = https://github.com/tux-mind/platform_external_libneon.git
 [submodule "dSploit/jni/subversion"]
 	path = dSploit/jni/subversion
-	url = https://github.com/android/platform_external_subversion.git
+	url = https://github.com/tux-mind/platform_external_subversion.git
 [submodule "dSploit/jni/libpcre"]
 	path = dSploit/jni/libpcre
-	url = https://github.com/android/platform_external_libpcre.git
+	url = https://github.com/tux-mind/platform_external_libpcre.git
 [submodule "dSploit/jni/libidn"]
 	path = dSploit/jni/libidn
 	url = https://github.com/tux-mind/platform_external_libidn.git
