@@ -90,3 +90,6 @@
 [submodule "dSploit/jni/libncp"]
 	path = dSploit/jni/libncp
 	url = https://github.com/android/platform_external_libncp.git
+[submodule "dSploit/jni/tcpdump"]
+	path = dSploit/jni/tcpdump
+	url = https://github.com/android/platform_external_tcpdump.git
