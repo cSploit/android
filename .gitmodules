@@ -108,3 +108,6 @@
 [submodule "dSploit/jni/ettercap-ng"]
 	path = dSploit/jni/ettercap-ng
 	url = https://github.com/tux-mind/platform_external_ettercap.git
+[submodule "dSploit/jni/nmap"]
+	path = dSploit/jni/nmap
+	url = https://github.com/tux-mind/platform_external_nmap.git
