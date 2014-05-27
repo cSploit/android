@@ -114,3 +114,6 @@
 [submodule "dSploit/jni/hydra"]
 	path = dSploit/jni/hydra
 	url = https://github.com/tux-mind/platform_external_hydra.git
+[submodule "dSploit/jni/libifaddrs"]
+	path = dSploit/jni/libifaddrs
+	url = https://github.com/tux-mind/platform_external_libifaddrs.git
