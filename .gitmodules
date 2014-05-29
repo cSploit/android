@@ -96,9 +96,6 @@
 [submodule "dSploit/jni/libssh"]
 	path = dSploit/jni/libssh
 	url = https://github.com/tux-mind/platform_external_libssh.git
-
-
-
 [submodule "dSploit/jni/arpspoof"]
 	path = dSploit/jni/arpspoof
 	url = https://github.com/evilsocket/dsploit-arpspoof.git
@@ -111,12 +108,12 @@
 [submodule "dSploit/jni/nmap"]
 	path = dSploit/jni/nmap
 	url = https://github.com/tux-mind/platform_external_nmap.git
-[submodule "dSploit/jni/hydra"]
-	path = dSploit/jni/hydra
-	url = https://github.com/tux-mind/platform_external_hydra.git
 [submodule "dSploit/jni/libifaddrs"]
 	path = dSploit/jni/libifaddrs
 	url = https://github.com/tux-mind/platform_external_libifaddrs.git
 [submodule "dSploit/jni/libcurl"]
 	path = dSploit/jni/libcurl
 	url = https://github.com/tux-mind/platform_external_curl.git
+[submodule "dSploit/jni/hydra"]
+	path = dSploit/jni/hydra
+	url = https://github.com/vanhauser-thc/thc-hydra.git
