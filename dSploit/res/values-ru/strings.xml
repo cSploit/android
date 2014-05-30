@@ -150,7 +150,7 @@
     </string>
     <string name="loading_changelog">Загрузка списка изменений&#8230;</string>
     <string name="something_went_wrong_changelog">
-        <![CDATA[<html><body><p><b>Что-то пршло не так при загрузке списка изменений:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
+        <![CDATA[<html><body><p><b>Что-то пошло не так при загрузке списка изменений:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
     <string name="cancel_dialog">Отмена</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
