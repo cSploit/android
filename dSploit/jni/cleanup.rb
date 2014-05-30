@@ -149,6 +149,7 @@ srcs.map! do |s|
 	File.absolute_path(s.sub(/^/,topdir + subdir + '/'))
 end
 inc.map! do |i|
+	i.sub!('$(LOCAL_PATH)',$subdir)
 	File.absolute_path(i.sub(/^/,topdir))
 end
 
@@ -222,8 +223,11 @@ if probably_unused_files.size > 0 then
 	print "probably unused but kept files:\n"
 	probably_unused_files.each{|f| print "#{f.sub(topdir + subdir,'')}\n"}
 	print "\ndo you want to delete them? [y/N] "
-	c=STDIN.gets.split[0][0]
-	probably_unused_files.each{|f| File.delete f} if (c == 'Y' or c == 'y')
+	input=STDIN.gets.strip
+	if input.size > 0 then
+		c=input[0]
+		probably_unused_files.each{|f| File.delete f} if (c == 'Y' or c == 'y')
+	end
 end
 
 #remove empty dirs
