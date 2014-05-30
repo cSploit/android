@@ -93,7 +93,7 @@ def libsearch_re
 	/ -L([^\s]+)/
 end
 def abslib_re
-	/\/[^\s]+\.(l?a|so(\.[0-9]+)*)/
+	/\/[^\s]+\.(a|so(\.[0-9]+)*)/
 end
 def system_libs
 	["m","z","c","dl","stc++","gcc","gnustl_static","stlport_static","gnustl_shared","stlport_shared"]
@@ -119,8 +119,8 @@ end
 def pwd_re
 	/#{Dir.pwd}\//
 end
-def cmake_cd_re
-	/^cd\s+[^\s]+\s+&&\s+[^ ]+cmake\s/
+def temp_cd_re
+	/^cd\s+[^\s]+\s+&&\s+[^ ]+\s/
 end
 
 # directory object
@@ -186,7 +186,7 @@ def get_params(line,t)
 end
 
 def bash_globbing(t,inputs)
-	globbed=inputs.find_all{|i| i =~ /\*.*\.[a-z]?[oa]/}
+	globbed=inputs.find_all{|i| i =~ /\*.*\.[oa]/}
 	# cannot use -=, must work on the same object
 	inputs.delete_if{|i| globbed.include? i}
 	globbed.each do |g|
@@ -214,7 +214,7 @@ def parse_inputs(t,inputs)
 			# not simple printf("hello world!\n");
 			abort("making executable `#{t.name}' from source `#{input}'") if t.is_a?(Executable)
 			t.srcs << input
-		when /\.[la]?[oa]$/
+		when /\.[oa]$/
 			f=$list.find_all{|item| !(item.is_a?(Executable)) and item.name == input}
 			if f.size > 1
 				abort("#{t.name}: more targets for `#{input}' => #{f}")
@@ -266,27 +266,26 @@ def check_cd(line)
 	if cd_re =~ line then
 		$dir_stack.push Directory.new get_absolute_path($~[:dir])
 		# cd /path && /usr/bin/cmake ... => we will remain in that directory
-        if !(cmake_cd_re =~ line) then
+        if !(temp_cd_re =~ line) then
             res=true
         end
 	end
 	res
 end
+
+$env_debug=ENV["DEBUG"] != nil
 	
+def debug(s)
+	warn s if $env_debug
+end
+
 
 $list=[]
 $dir_stack=[]
 dir_re=/(?<action>(Entering|Leaving)) directory `(?<path>[^']+)'/
-lt_check=/(--mode=(?<mode>(link|compile))).*?-o (?<target>[^ ]+(\.([al]?o|l?a))?)/
-lt_get_inputs=/^[^-].*\.(c|cpp|cc|S|s|[la]?o|l?a|so(\.[0-9]+)*)$/
-# libtool compile some extra objects when making static libs
-# end it change object/source order upon libtool version...
-lt_extra_check=/libtool: compile:.*?-o (?<target>[^ ]+\.o)/
-lt_extra_get_inputs=/(?<inputs>( +([^ ]+\.c))+)/
-# generic compilation logs ( i use it for cmake )
-generic_check=/(^| )(\/[^ ]+)?(?<prog>(gcc|ld|ar|g\+\+)) .*?[^ ]+\.(c|cpp|cc|S|s|[al]?o|l?a)( |$)/
-generic_get_inputs=lt_get_inputs
-generic_get_target=/-o (?<target>[^ ]+\.([al]?o|l?a))( |$)/
+generic_get_inputs=/^[^-].*\.(c|cpp|cc|S|s|o|a|so(\.[0-9]+)*)$/
+generic_check=/(^| )(\/[^ ]+)?(?<prog>(gcc|ld|ar|g\+\+)) .*?[^ ]+\.(c|cpp|cc|S|s|o|a)( |$)/
+generic_get_target=/-o (?<target>[^ ]+\.(o|a))( |$)/
 generic_check_executable=/-o [^ ]+($| )/
 
 in_temporary_dir=false
@@ -312,45 +311,13 @@ text.each_line do |line|
   elsif check_cd(line) then
       in_temporary_dir=true
   end
-#  if false and lt_check =~ line then
-#      re_result=$~
-#	  name=$dir_stack[-1].relative_path+re_result[:target]
-#	  next if $list.find_all{|item| item.name == name}.size > 0
-#	  inputs=(line.split.grep lt_get_inputs).delete_if{|item| item == re_result[:target]}
-#	  case name
-#		when /\.[a-z]?o$/
-#			t=ObjectTarget.new
-#		when /\.[a-z]?a$/
-#			t=Library.new
-#		else
-#			t=Executable.new
-#		end
-#	  t.name = name
-#		#check for bash globbing
-#		bash_globbing(t,inputs) if t.is_a?(Library) or t.is_a?(Executable)
-#	  get_params(line,t)
-#		parse_inputs(t,inputs)
-#	  $list << t
-#  elsif false and lt_extra_check =~ line then
-#		lt_found=true
-#	  t = ObjectTarget.new
-#	  t.name = $dir_stack[-1].relative_path+($~[:target].sub(".o",".lo"))
-#	  #remove .libs
-#	  t.name.sub!('.libs/','')
-#	  next if $list.find_all{|item| item.name == t.name}.size > 0
-#	  (lt_extra_get_inputs.match line)[:inputs].split.each do |s|
-#		  t.srcs << get_absolute_path(s).sub(pwd_re,'')
-#	  end
-#	  get_params(line, t)
-#	  $list << t
-#	els
 	if generic_check =~ line then
 		prog=$~[:prog]
 		inputs=(line.split.grep generic_get_inputs)
 		res=[]
 		# probably we are building an object if we have sources in input
 		if (res=(inputs.grep /\.(c|cpp|cc|S|s)$/).uniq).size > 0 then
-			objs=(inputs.grep /\.[al]?o$/)
+			objs=(inputs.grep /\.o$/)
 			abort("more sources in input: #{res}") if res.size > 1
 			if objs.size == 0 then #guess object name ( source basename in CWD with .o extension)
 				objs=[res[0].sub(/\.[a-zS]+$/,'.o').sub(/^.*\//,'')]
@@ -367,12 +334,12 @@ text.each_line do |line|
 			parse_inputs(t,inputs)
 			$list << t
 		# probably we are building a library if no sources in input 
-		elsif (res=(inputs.grep /\.(l?a|so(\.[0-9]+)*)$/)).size > 0 or generic_check_executable =~ line then
+		elsif (res=(inputs.grep /\.(a|so(\.[0-9]+)*)$/)).size > 0 or generic_check_executable =~ line then
 			# try to find the target library
 			if prog=="ar" then # if using ar, the target is the first one
 				name=res[0]
 				t=Library.new
-			elsif line =~ /-o (?<target>[^ ]+\.l?a)/ then
+			elsif line =~ /-o (?<target>[^ ]+\.a)/ then
 				name=$~[:target]
 				t=Library.new
 			elsif line =~ /-o (?<target>[^ ]+\.so(\.[0-9]+)*)/ then
@@ -387,7 +354,6 @@ text.each_line do |line|
 			end
 			t.name = get_absolute_path(name).sub(pwd_re,'')
 			next if ($list.include? t)
-			#next if (t.is_a?(Library) and $list.select{|item| item.is_a?(Library) and item.libname == t.libname}.size > 0)
 			inputs.delete_if{|item| item == name}
 			#check for bash globbing
 			bash_globbing(t,inputs)
