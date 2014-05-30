@@ -117,3 +117,6 @@
 [submodule "dSploit/jni/hydra"]
 	path = dSploit/jni/hydra
 	url = https://github.com/vanhauser-thc/thc-hydra.git
+[submodule "dSploit/jni/ruby"]
+	path = dSploit/jni/ruby
+	url = https://github.com/tux-mind/ruby.git
