@@ -2,14 +2,14 @@
     <string name="app_name">dSploit</string>
     <string name="menu_settings">Настройки</string>
     <string name="title_activity_main">dSploit</string>
-    <string name="crash_toast_text">Ой! Я упал, но отправка отчета об ошибке моему разработчику поможет исправить проблему :)
+    <string name="crash_toast_text">Ой! Я вынужден завершить работу, но отправка отчета об ошибке моему разработчику поможет исправить проблему :)
     </string>
     <string name="toggle_button">Выключатель</string>
     <string name="enter_redirection_details">Введите параметры переадресации ниже:</string>
     <string name="address">Адрес</string>
     <string name="port">Порт</string>
     <string name="target">Цель</string>
-    <string name="unknown">неизв.</string>
+    <string name="unknown">неизвестно</string>
     <string name="services">Сервисы</string>
     <string name="os">ОС</string>
     <string name="device_type">Тип устройства</string>
@@ -53,7 +53,7 @@
     <string name="new_update_desc2">. Выполнить обновление сейчас?</string>
     <string name="checking">Проверка&#8230;</string>
     <string name="no_updates_available">Обновления не найдены.</string>
-    <string name="new_msf_update_desc">Обновление MetasploitFramework</string>
+    <string name="new_msf_update_desc">Обновление Metasploit Framework</string>
     <string name="new_version">Доступна новая версия</string>
     <string name="new_version2">!</string>
     <string name="downloading_update">Загрузка обновления&#8230;</string>
@@ -103,18 +103,18 @@
     <string name="target_alias">Псевдоним цели</string>
     <string name="set_alias">Задайте псевдоним для цели:</string>
     <string name="no_connectivity">Нет доступа к сети.</string>
-    <string name="wifi_key_copied">WiFi ключ скопирован в буфер обмена.</string>
+    <string name="wifi_key_copied">Ключ от WiFi скопирован в буфер обмена.</string>
     <string name="connected_to"><![CDATA[Подключен к <b>]]></string>
     <string name="connected_to2"><![CDATA[</b> с ключом<b><font color=\"green\">]]></string>
     <string name="connected_to3"><![CDATA[</font></b> !]]></string>
     <string name="connection_to"><![CDATA[Подключение к <b>]]></string>
     <string name="connection_to2">
         <![CDATA[</b> завершилось <b><font color=\"red\">НЕУДАЧНО</font></b>.]]></string>
-    <string name="enter_key_or_crack">Введите WiFi ключ (или попытаться взломать):</string>
+    <string name="enter_key_or_crack">Ввести ключ от WiFi (или попытаться взломать):</string>
     <string name="enter_wifi_key">Введите WiFi ключ:</string>
     <string name="scanning">Сканирование&#8230;</string>
     <string name="invalid_filename">Неправильное имя файла.</string>
-    <string name="something_went_wrong">Что-то произошло неправильно, пожалуйста, выберите правильную цель снова.
+    <string name="something_went_wrong">Что-то пошло не так, пожалуйста, выберите правильную цель снова.
     </string>
     <string name="selected">Выбрано</string>
     <string name="nothing_found"><![CDATA[<small><i>Ничего не найдено</i></small>]]></string>
@@ -150,7 +150,7 @@
     </string>
     <string name="loading_changelog">Загрузка списка изменений&#8230;</string>
     <string name="something_went_wrong_changelog">
-        <![CDATA[<html><body><p><b>Что-то произошло не так при загрузке списка изменений:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
+        <![CDATA[<html><body><p><b>Что-то пршло не так при загрузке списка изменений:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
     <string name="cancel_dialog">Отмена</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
@@ -176,7 +176,7 @@
     <string name="router_pwn_desc">Запустите сервис http://routerpwn.com/, чтобы получить полный доступ к роутеру.
     </string>
     <string name="trace">Трассировка</string>
-    <string name="trace_desc">Выполнить traceroute до цели.</string>
+    <string name="trace_desc">Выполнить трассировку до цели.</string>
     <string name="mitm">MITM</string>
     <string name="mitm_desc">Выполнить различные атаки man-in-the-middle, например, анализ сети, манипуляция над трафиком и т.д.&#8230;
     </string>
@@ -185,7 +185,7 @@
     <string name="this_device">&#160;(Данное устройство)</string>
     <string name="wifi_went_down">WiFi подключение разорвано.</string>
     <string name="hijack_session">Похитить сессию</string>
-    <string name="start_hijacking">Остановить анализ сети и запустить хищение сессии?</string>
+    <string name="start_hijacking">Остановить перехват сессий и запустить хищение сессии?</string>
     <string name="start_hijacking2">Выполнить хищение сессии?</string>
     <string name="set_session_filename">Укажите название файла сессии:</string>
     <string name="session_sniffer">Сниффер сессий</string>
@@ -209,9 +209,9 @@
 
     <!-- rpc stuff -->
     <string name="error_rpc">Ошибка RPC</string>
-    <string name="error_rpcd_inval">неправильный настройки</string>
+    <string name="error_rpcd_inval">неправильные настройки</string>
     <string name="error_rpcd_shell">невозможно запустить shell</string>
-    <string name="rpcd_starting">Запуска MetaSploit RPCD&#8230;</string>
+    <string name="rpcd_starting">Запуск MetaSploit RPCD&#8230;</string>
     <string name="rpcd_started">MetaSploit RPCD запущен</string>
     <string name="rpcd_stopped">MetaSploit RPCD остановлен</string>
     <string name="rpcd_running">MetaSploit RPCD уже запущен</string>
@@ -223,12 +223,12 @@
     <string name="mitm_simple_sniff">Простой сниффинг</string>
     <string name="mitm_simple_sniff_desc">Перенапралвние трафика через данное устройство и сохранение данных в pcap файл с показом статистики.</string>
     <string name="mitm_password_sniff">Сниффер паролей</string>
-    <string name="mitm_password_sniff_desc">Сниффер паролей для большого количество протоколов, таких как  http, ftp, imap, imaps, irc, msn и т.д.</string>
+    <string name="mitm_password_sniff_desc">Сниффер паролей для большого количество протоколов, таких как http, ftp, imap, imaps, irc, msn и т.д.</string>
     <string name="mitm_session_hijack">Сниффер сессий</string>
     <string name="mitm_session_hijack_desc">Анализ трафика сети на предмет cookie и подмена сессий на данном устройстве.</string>
     <string name="mitm_connection_kill">Разорвать подключения</string>
     <string name="mitm_connection_kill_desc">Разорвать подключения, чтобы предотвратить доступ цели к любым веб-сайтам или серверам.</string>
-    <string name="mitm_connection_kill_error">Разрыв подключение может быть использован только для одиночной конечной цели.</string>
+    <string name="mitm_connection_kill_error">Разрыв подключения может быть использован только для одиночной конечной цели.</string>
     <string name="mitm_redirect">Перенаправление</string>
     <string name="mitm_redirect_desc">Перенаправить весь HTTP трафик на другой адрес.</string>
     <string name="mitm_redirection">Перенаправление</string>
@@ -346,7 +346,7 @@
     <string-array name="pref_performance_exploit" >
         <item>Только совместимые с MSF</item>
         <item>Толко на exploitdb</item>
-        <item>Использовать и exploitdb, и MSF</item>
+        <item>Использовать exploitdb и MSF</item>
     </string-array>
     <string-array name="pref_performance_exploit_values">
         <item>MSF</item>
