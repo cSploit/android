@@ -60,17 +60,19 @@
     <string name="new_update_desc2">jest dostępna, chcesz ją pobrać ?</string>
     <string name="checking">Sprawdzam&#8230;</string>
     <string name="no_updates_available">Brak dostępnych aktualizacji.</string>
+	<string name="new_msf_update_desc">Aktualizacja MetasploitFramework</string>
     <string name="new_version">Nowa wersja</string>
     <string name="new_version2">znaleziono!</string>
     <string name="downloading_update">Pobieranie aktualizacji&#8230;</string>
     <string name="connecting">Łączenie&#8230;</string>
     <string name="cancel">Anuluj</string>
-    <string name="error">Bład</string>
+    <string name="error">Błąd</string>
     <string name="error_occured">Wystąpił błąd podczas pobierania aktualizacji.</string>
     <string name="invalid_target">Błędny cel.</string>
     <string name="add_custom_target">Dodaj własny cel</string>
     <string name="enter_url">Wpisz URL, nazwę hosta lub adres ip poniżej:</string>
     <string name="net_discovery_stopped">Wyszukiwanie sieci zatrzymane.</string>
+	<string name="net_discovery_started">Wyszukiwanie sieci rozpoczęte.</string>
     <string name="start_monitor">Rozpocznij Network Monitor</string>
     <string name="stop_monitor">Zatrzymaj Network Monitor</string>
     <string name="start_msfrpcd">Rozpocznij MetaSploit RPCD</string>
@@ -109,7 +111,7 @@
     <string name="initialization_error">Błąd Inicjalizacji</string>
     <string name="target_alias">Alias celu</string>
     <string name="set_alias">Ustaw alias dla tego celu:</string>
-    <string name="no_connectivity">Połączenie nie dostępne.</string>
+    <string name="no_connectivity">Połączenie niedostępne.</string>
     <string name="wifi_key_copied">Klucz WiFi skopiowany do schowka.</string>
     <string name="connected_to"><![CDATA[Połączony z <b>]]></string>
     <string name="connected_to2"><![CDATA[</b> kluczem <b><font color=\"green\">]]></string>
@@ -178,7 +180,7 @@
     <string name="packet_forger">Packet Forger</string>
     <string name="packet_forger_desc">Stwórz i wyślij własne pakiety TCP i UDP do celu.
     </string>
-    <string name="port_scanner">Port Scanner</string>
+    <string name="port_scanner">Skaner Portów</string>
     <string name="port_scanner_desc">Przeprowadź skanowanie SYN na celu.</string>
     <string name="router_pwn">Router PWN</string>
     <string name="router_pwn_desc">Uruchom usługę http://routerpwn.com/ żeby przejąć kontrolę nad Twoim routerem.
@@ -198,7 +200,6 @@
     <string name="start_hijacking2">Rozpocząć przechwytywanie sesji?</string>
     <string name="set_session_filename">Wprowadź nazwę pliku sesji:</string>
     <string name="session_sniffer">Session Sniffer</string>
-
     <string name="untraced_hops">untraced hops</string>
     <string name="add_username">Dodaj nazwę użytkownika</string>
     <string name="enter_username">Wprowadź nazwę użytkownika, której chcesz użyć:</string>
@@ -215,7 +216,6 @@
     <string name="error_mitm_port"> potrzebny dla serwera mitm jest używany przez inny proces, otworzyć ustawienia aplikacji?</string>
     <string name="error_https_port"> potrzebny do przekierowania mitm https jest używany przez inny proces, otworzyć ustawienia aplikacji?</string>
     <string name="error_mitm_ports">moduły MITM potrzebują dostępności wszystkich portów.</string>
-
     <!-- rpc stuff -->
     <string name="error_rpc">błąd RPC</string>
     <string name="error_rpcd_inval">złe ustawienia</string>
@@ -229,7 +229,6 @@
         jeśli nie wyjdę, proszę zamknij mnie przez ustawienia->aplikacje
         i POWIADOM MOICH TWÓRCÓW.
     </string>
-
     <!-- mitm modules -->
     <string name="mitm_simple_sniff">Simple Sniff</string>
     <string name="mitm_simple_sniff_desc">Przekieruj ruch celu przez to urządzenie i pokaż pewne statystyki podczas zrzucania do pliku pcap.</string>
@@ -240,12 +239,12 @@
     <string name="mitm_connection_kill">Kill Connections</string>
     <string name="mitm_connection_kill_desc">Zabijaj połączenia uniemożliwiając celowi otwarcie jakiejkolwiek strony web lub osiągnięcie serwera.</string>
     <string name="mitm_connection_kill_error">Zabijanie połączeń działa tylko przeciwko pojedynczemy punktowi końcowemu.</string>
-    <string name="mitm_redirect">Redirect</string>
+    <string name="mitm_redirect">Przekieruj</string>
     <string name="mitm_redirect_desc">Przekiruj cały ruch http na inny adres.</string>
     <string name="mitm_redirection">Przekierowanie</string>
     <string name="error_port_outofrange">Port poza zakresem.</string>
     <string name="error_invalid_address_or_port">Błędny adres i/lub port.</string>
-    <string name="mitm_image_replace">Replace Images</string>
+    <string name="mitm_image_replace">Podmień Obrazy</string>
     <string name="mitm_image_replace_desc">Zamień wszystkie obrazki na stronach na jeden wskazany.</string>
     <string name="choose_source">Wybierz źródło:</string>
     <string name="local_images">Obrazki lokalne</string>
@@ -253,7 +252,7 @@
     <string name="image">Obrazek</string>
     <string name="enter_image_url">Wprowadź url obrazka:</string>
     <string name="error_image_url">Błędny url obrazka.</string>
-    <string name="mitm_video_replace">Replace Videos</string>
+    <string name="mitm_video_replace">Podmień Filmiki</string>
     <string name="mitm_video_replace_desc">Zamień wszystkie filmy youtube na stronach na jeden wskazany.</string>
     <string name="video">Film</string>
     <string name="enter_video_url">Wprowadź url filmu:</string>
@@ -266,31 +265,26 @@
     <string name="error_file_intent">Wygląda na to, że nie masz menadżera plików zdolnego przeglądać pliki. Zainstaluj jakiś.</string>
     <string name="enter_js_code">Wprowadź kod js do wstrzyknięcia:</string>
     <string name="error_js_code"><![CDATA[Błędny kod javascript, pamiętaj żeby użyć <script></script> znaczników zamykających.]]></string>
-    <string name="mitm_custom">Custom Filter</string>
+    <string name="mitm_custom">Własny filtr</string>
     <string name="mitm_custom_desc">Zamień wybrany tekst na stronach na jeden wskazany.</string>
     <string name="custom_filter">Własny filtr</string>
     <string name="error_filter">Błędne wyrażenie regularne</string>
-    <string name="file_output">File Output</string>
+    <string name="file_output">Plik wyjściowy</string>
     <string name="question_save_to_pcap">Chcesz zapisać podsłuchany ruch do pliku pcap?</string>
     <string name="dumping_traffic_to">Zrzucanie ruchu do </string>
-
     <string name="error_mitm_proxy">Nie mogę stworzyć proxy. Sprawdź swoje połączenie i dostępność portu.</string>
     <string name="error_mitm_https_redirector">Nie mogę stworzyć przekierowania HTTPS. Sprawdź swoje połączenie i dostępność portu.</string>
     <string name="error_mitm_resource_server">Nie mogę stworzyć serwera zasobów. Sprawdź swoje połączenie i dostępność portu.</string>
-
     <string name="hijacker_load_from_file">Wczytaj z pliku</string>
     <string name="login_user_wordlist">Słownik nazw użytkownika</string>
     <string name="login_pass_wordlist">Słownik haseł</string>
-
     <string name="menu_new_session">Nowa sesja</string>
     <string name="menu_save_session">Zapisz sesję</string>
     <string name="menu_restore_session">Odtwórz sesję</string>
     <string name="menu_stop_monitor">Zatrzymaj Network Monitor</string>
     <string name="menu_submit_issue">Submit Issue</string>
-    <string name="menu_about">O</string>
-
+    <string name="menu_about">O dSploit</string>
     <string name="scanner_select_ports">Wybierz własne porty</string>
-
     <string name="wifi_initializing">Inicjalizuję &#8230;</string>
     <string name="wifi_activating_iface">Aktywuję interfejs WiFi &#8230;</string>
     <string name="wifi_activated">WiFi aktywne.</string>
@@ -300,7 +294,6 @@
     <string name="wifi_connecting_to">Łączę się z</string>
     <string name="wifi_error_keys">Nie mogłem wygenerować kluczy.</string>
     <string name="wifi_scan_finished">Skanowanie zakończone.</string>
-
     <!-- preferences -->
     <string name="pref_general">Ogólne</string>
     <string name="pref_modules">Moduły</string>
@@ -326,16 +319,20 @@
     <string name="pref_sniffer_sample_time_desc">Sample time in seconds of the sniffer module network statistics.</string>
     <string name="pref_http_proxy_port_desc">MITM transparent proxy port to listen on, change this if you have problems starting the proxy.</string>
     <string name="pref_http_server_port_desc">MITM http server port to listen on, change this if you have problems starting the server.</string>
-    <string name="pref_https_redirect_desc">Redirect traffic from HTTPS to HTTP.</string>
+    <string name="pref_https_redirect_desc">Przekieruj ruch z HTTPS na HTTP.</string>
     <string name="pref_https_redirector_port_desc">MITM https redirection server port to listen on.</string>
     <string name="pref_http_max_buffer_size_desc">Max buffer size of HTTP requests handled by the transparent proxy.</string>
     <string name="pref_password_filename_desc">Name of the file to use to log passwords and cookies.</string>
-    <string name="pref_rpc_user">RPC username</string>
-    <string name="pref_rpc_user_desc">Username for connect to MetaSploit RPCD.</string>
-    <string name="pref_rpc_pswd">RPC password</string>
-    <string name="pref_rpc_pswd_desc">Password for connect to MetaSploit RPCD.</string>
-    <string name="pref_rpc_port">RPC port</string>
-    <string name="pref_rpc_port_desc">Port for connect to MetaSploit RPCD.</string>
+    <string name="pref_rpc_user">Login RPC</string>
+    <string name="pref_rpc_user_desc">Login do połączenia MetaSploit RPCD.</string>
+    <string name="pref_rpc_pswd">Hasło RPC</string>
+    <string name="pref_rpc_pswd_desc">Hasło do połączenia z MetaSploit RPCD.</string>
+	<string name="pref_rpc_host">RPC host</string>
+    <string name="pref_rpc_host_desc">host where the MetaSploit RPC server is on.</string>
+    <string name="pref_rpc_port">Port RPC</string>
+    <string name="pref_rpc_port_desc">Port połączenia dla z MetaSploit RPCD.</string>
+	<string name="pref_rpc_ssl">RPC SSL</string>
+    <string name="pref_rpc_ssl_desc">Zaznacz, jeżeli MFS ma używać SSL.</string>
     <string name="pref_chroot">gentoo root</string>
     <string name="pref_chroot_desc">Directory containing gentoo system.</string>
     <string name="pref_performance_vuln_desc">Search for vulnerability using</string>
@@ -349,18 +346,27 @@
         <item>CVE</item>
         <item>BOTH</item>
     </string-array>
-    <string name="pref_performance_exploit_desc">Search exploits</string>
+    <string name="pref_performance_exploit_desc">Wyszukiwanie exploitów</string>
     <string-array name="pref_performance_exploit" >
-        <item>MSF compatible only</item>
-        <item>on exploitdb only</item>
-        <item>from both exploitdb and MSF</item>
+        <item>Tylko z MSF</item>
+        <item>Tylko z exploit-db</item>
+        <item>Z exploit-db i MSF</item>
     </string-array>
     <string-array name="pref_performance_exploit_values">
         <item>MSF</item>
         <item>EXDB</item>
         <item>BOTH</item>
     </string-array>
+	<string name="pref_performance_widescan">wide host scan</string>
+    <string name="pref_performance_widescan_desc">scan for hosts outside the network mask.</string>
+    <string name="pref_advanced">Advanced</string>
     <string name="pref_folder">Folder</string>
+	<string name="pref_msf_enable">Włącz MSF</string>
+    <string name="pref_msf_enable_desc">Aktywuje MetaSploit Framework.</string>
+    <string name="pref_msf_delete">Usuń MSF</string>
+    <string name="pref_msf_delete_desc">Usuwa MetaSploit Framework z urządzenia.</string>
+    <string name="pref_msfwipe_message">Do you really want to delete the MetaSploit Framework ?</string>
+    <string name="pref_msfwipe_size">About %d MB will be freed.</string>
     <string name="pref_err_exists">nie istnieje.</string>
     <string name="pref_err_writable">nie ma praw zapisu.</string>
     <string name="pref_err_sample_time">przykładowy czas musi być pomiędzy 0.4 a 1.0.</string>
@@ -368,18 +374,53 @@
     <string name="pref_err_port_range">Port musi być pomiędzy 1024 a 65535.</string>
     <string name="pref_err_busy_port">Inny proces nasłuchuje na tym porcie. Wybierz inny port.</string>
     <string name="pref_err_buffer_size">Rozmiar bufora musi być pomiędzy 1024 a 104857600.</string>
-
+	<string name="pref_persistent_network_monitor">persistent network monitor</string>
+    <string name="pref_persistent_network_monitor_desc">keep network monitor watching the network</string>
     <string name="exploit_finder">Exploit Finder</string>
     <string name="exploit_finder_desc">Szukaj exploitów pasujących do wykrytych podatności.</string>
+	<string name="exploit_launch_all">Launch all</string>
     <string name="sessions">Sessions</string>
     <string name="sessions_desc">Sesje na przejętym celu.</string>
-    
+	<string name="exploit_launch">Launch</string>
+    <string name="exploit_edit_options">Edytuj opcje</string>
+    <string name="payload_edit_settings">Edit payload settings</string>
+    <string name="exploit_choose_payload">Choose payload</string>
+    <string name="exploit_choose_target">Wybierz cel</string>
+    <string name="open_url">Otwórz URL</string>
+    <string name="show_full_description">Pokaż pełny opis</string>
+    <string name="choose_an_option">choose an option</string>
+    <string name="required">Required</string>    
     <string name="menu_add">Dodaj</string>
     <string name="menu_scan">Skanuj</string>
     <string name="menu_wifi_scan">Skanuj WiFi</string>
-    <string name="menu_stop_msfrpcd">Zatrzymaj msfrpcd</string>
-    
+    <string name="menu_stop_msfrpcd">Zatrzymaj msfrpcd</string>    
     <string name="pref_theme">Dark Theme</string>
-    <string name="pref_choose_theme">Włącz ciemny motyw, który jest przyjaźniejszy dla oczu</string>
+    <string name="pref_choose_theme">Włącz ciemny motyw, który jest korzystniejszy dla oczu.</string>
+    <string name="evasion">Evasion</string>
+    <string name="search_exact_version">Exact version matching</string>
+    <string name="sessions_title">Open a shell by clicking on a session, or see more options by long press on it.</string>
+    <string name="open_shell">Open shell</string>
+    <string name="clear_event_log">Clear event log</string>
+    <string name="run">Run</string>
+    <string name="command">Command</string>
+    <string name="clear">Clear</string>
+    <string name="msfrpc_disconnected">MSF RPC disconnected</string>
+    <string name="no_opened_sessions">there is no opened sessions for this target</string>
+    <string name="delete">Usuń</string>
+    <string name="checksum_failed">Plik jest uszkodzony</string>
+    <string name="extraction_failed">Wypakowywanie nieudane</string>
+    <string name="extracting">Wypakowywanie&#8230;</string>
+    <string name="click_here_to_upgrade">Click here to upgrade</string>
+    <string name="bad_permissions">The local file that you put on your storage have bad permissions, i can not read and/or write it!</string>
+    <string name="restore_default_path">restore default path</string>
+    <string name="choose_a_custom_path">choose a custom path</string>
+    <string name="error_symlink">destination device does not support symlinks, please select a decent filesystem.</string>
+    <string name="target_selected">cel wybrany</string>
+    <string name="targets_selected">cele wybrane</string>
+    <string name="multiple_attack">multiple attack</string>
+    <string name="connect_msf">connect to MetaSploit</string>
+    <string name="disconnect_msf">disconnect from MetaSploit</string>
+    <string name="connected_msf">connected to MetaSploit</string>
+    <string name="connection_failed">connection FAILED!</string>
     <string name="please_restart">Nowy motyw zostanie zatwierdzony po ponownym uruchomieniu aplikacji</string>
 </resources>
