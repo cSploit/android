@@ -21,13 +21,13 @@ package it.evilsocket.dsploit.core;
 import android.content.Context;
 import android.content.Intent;
 
-import it.evilsocket.dsploit.net.metasploit.RPCServer;
-
 public class UpdateChecker extends Thread
 {
   public static final String UPDATE_CHECKING = "UpdateChecker.action.CHECKING";
   public static final String UPDATE_AVAILABLE = "UpdateChecker.action.UPDATE_AVAILABLE";
-  public static final String GENTOO_AVAILABLE = "UpdateChecker.action.GENTOO_AVAILABLE";
+  public static final String RUBY_AVAILABLE = "UpdateChecker.action.RUBY_AVAILABLE";
+  public static final String GEMS_AVAILABLE = "UpdateChecker.action.GEMS_AVAILABLE";
+  public static final String MSF_AVAILABLE = "UpdateChecker.action.MSF_AVAILABLE";
   public static final String UPDATE_NOT_AVAILABLE = "UpdateChecker.action.UPDATE_NOT_AVAILABLE";
   public static final String AVAILABLE_VERSION = "UpdateChecker.data.AVAILABLE_VERSION";
 
@@ -54,11 +54,19 @@ public class UpdateChecker extends Thread
 
     Logger.debug("Service started.");
 
-    if(System.getUpdateService().isUpdateAvailable())
-      send(UPDATE_AVAILABLE, AVAILABLE_VERSION, System.getUpdateService().getRemoteVersion());
-    else if(System.getSettings().getBoolean("MSF_ENABLED",true) && !RPCServer.exists() && Shell.isBinaryAvailable("tar", true) && System.getUpdateService().isGentooAvailable())
-      send(GENTOO_AVAILABLE, null, null);
-    else
+    boolean checkMsfUpdates = System.getSettings().getBoolean("MSF_ENABLED", true) &&
+            System.getSettings().getBoolean("MSF_CHECK_UPDATES", true) &&
+            Shell.isRootGranted();
+
+    if(UpdateService.isUpdateAvailable())
+      send(UPDATE_AVAILABLE, AVAILABLE_VERSION, UpdateService.getRemoteVersion());
+    else if(checkMsfUpdates && UpdateService.isRubyUpdateAvailable())
+      send(RUBY_AVAILABLE, null, null);
+    else if(checkMsfUpdates && UpdateService.isMsfUpdateAvailable()) {
+      send(MSF_AVAILABLE, null, null);
+    } else if(checkMsfUpdates && UpdateService.isGemUpdateAvailable()){
+      send(GEMS_AVAILABLE, null, null);
+    } else
       send(UPDATE_NOT_AVAILABLE, null, null);
 
     Logger.debug("Service stopped.");

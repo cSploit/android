@@ -52,7 +52,6 @@ public class Inspector extends Plugin{
   private boolean mRunning = false;
   private boolean mFocusedScan = false;
   private Receiver mReceiver = null;
-  private ArrayAdapter<Port> mAdapter = null;
   private String empty = null;
 
   public Inspector(){
@@ -75,18 +74,28 @@ public class Inspector extends Plugin{
 
   private void write_services()
   {
-    mDeviceServices.setText("");
-    if(System.getCurrentTarget().hasOpenPortsWithService()) {
-      for(Port port : System.getCurrentTarget().getOpenPorts()) {
-        if( port.service!=null && !port.service.isEmpty() )
-          if( port.version!=null && !port.version.isEmpty() )
-            mDeviceServices.append( port.number + " ( " + port.protocol.toString() + " ) : " + port.service + " - " + port.version +  "\n" );
-          else
-            mDeviceServices.append( port.number + " ( " + port.protocol.toString() + " ) : " + port.service + "\n" );
+    synchronized (mDeviceServices) {
+      StringBuilder sb = new StringBuilder();
+      for (Port port : System.getCurrentTarget().getOpenPorts()) {
+        if (port.service != null && !port.service.isEmpty()) {
+          sb.append(port.number);
+          sb.append(" ( ");
+          sb.append(port.protocol.toString());
+          sb.append(" ) : ");
+          sb.append(port.service);
+
+          if (port.version != null && !port.version.isEmpty()) {
+            sb.append(" - ");
+            sb.append(port.version);
+          }
+          sb.append("\n");
+        }
       }
+      if (sb.length() > 0)
+        mDeviceServices.setText(sb.toString());
+      else
+        mDeviceServices.setText(empty);
     }
-    else
-      mDeviceServices.setText(empty);
   }
 
   private void setStartedState(){
@@ -191,29 +200,6 @@ public class Inspector extends Plugin{
     public void onServiceFound( final int port, final String protocol, final String service, final String version ){
       boolean hasServiceDescription = !service.trim().isEmpty();
       final boolean hasVersion = (version != null && !version.isEmpty());
-      final TextView finalDevicesServices = mDeviceServices;
-
-      if(hasServiceDescription) {
-        Inspector.this.runOnUiThread(new Runnable(){
-
-          @Override
-          public void run(){
-            String value;
-
-            if(hasVersion)
-              value = port + " ( " + protocol + " ) : " + service + " - " + version +  "\n";
-            else
-              value = port + " ( " + protocol + " ) : " + service + "\n" ;
-
-            synchronized (finalDevicesServices) {
-              if(finalDevicesServices.getText().equals(empty))
-                finalDevicesServices.setText(value);
-              else if(!finalDevicesServices.getText().toString().contains(value))
-                finalDevicesServices.append(value);
-            }
-          }
-        });
-      }
 
       if(hasServiceDescription){
         if(hasVersion) {
@@ -224,6 +210,14 @@ public class Inspector extends Plugin{
       }
       else
         System.addOpenPort(port, Network.Protocol.fromString(protocol));
+
+      Inspector.this.runOnUiThread(new Runnable(){
+
+        @Override
+        public void run(){
+          write_services();
+        }
+      });
     }
 
     @Override

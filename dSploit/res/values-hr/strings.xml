@@ -351,8 +351,6 @@
     <string name="pref_rpc_port_desc">Port za spajanje na MetaSploit RPCD.</string>
     <string name="pref_rpc_ssl">RPC koristi SSL</string>
     <string name="pref_rpc_ssl_desc">Opcija da MetaSploit RPC koristi SSL</string>
-    <string name="pref_chroot">gentoo korijenska mapa</string>
-    <string name="pref_chroot_desc">Mapa koja sadržava gentoo sustav.</string>
     <string name="pref_performance_vuln_desc">Traži ranjivosti koristeći</string>
     <string-array name="pref_performance_vuln" >
         <item>OSVDB</item>

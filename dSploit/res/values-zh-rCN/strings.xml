@@ -324,8 +324,6 @@ If not, see http://www.gnu.org/licenses/.
 <string name="pref_rpc_pswd_desc">在MetaSploit远程过程调用守护程序中使用的密码.</string>
 <string name="pref_rpc_port">远程过程调用端口</string>
 <string name="pref_rpc_port_desc">在MetaSploit远程过程调用守护程序中使用的端口.</string>
-<string name="pref_chroot">gentoo根文件系统</string>
-<string name="pref_chroot_desc">文件夹包含gentoo系统.</string>
 <string name="pref_performance_vuln_desc">搜索漏洞的方式</string>
 <string-array name="pref_performance_vuln" >
 <item>OSVDB</item>

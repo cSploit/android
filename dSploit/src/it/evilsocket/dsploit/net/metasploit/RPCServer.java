@@ -31,14 +31,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
-import java.util.Date;
 import java.util.concurrent.TimeoutException;
-
-/* NOTES
- * i have choosen to NOT use SSL for one reason: without SSL we don't need /dev/random in gentoo chroot,
- * so we don't have to "if mountpoint /data/gentoo/dev; mount -o bind /dev /data/gentoo/dev; fi".
- * security flaws: a local sniffer can grep the msfrpcd username/password.
-*/
 
 public class RPCServer extends Thread
 {
@@ -55,7 +48,7 @@ public class RPCServer extends Thread
   private String          msfHost,
                           msfUser,
                           msfPassword,
-                          msfRoot;
+                          msfDir;
   private int             msfPort;
   private long            mTimeout = 0;
 
@@ -65,7 +58,7 @@ public class RPCServer extends Thread
   }
 
   public static boolean exists() {
-    return (new java.io.File(System.getGentooPath() + "start_msfrpcd.sh")).exists();
+    return (new java.io.File(System.getMsfPath() + "/msfrpcd")).exists();
   }
 
   public static boolean isInternal() {
@@ -87,7 +80,7 @@ public class RPCServer extends Thread
     return mRunning;
   }
 
-  private boolean connect_to_running_server() throws RuntimeException, IOException, InterruptedException {
+  private boolean connect_to_running_server() throws RuntimeException, IOException, InterruptedException, TimeoutException {
     boolean ret = false;
 
     if(mRemote || Shell.exec("pidof msfrpcd")==0)
@@ -118,6 +111,8 @@ public class RPCServer extends Thread
           Shell.exec("killall msfrpcd");
       }
     }
+    if(mRemote && !ret)
+      throw new TimeoutException("remote rcpd does not respond");
     return ret;
   }
 
@@ -126,7 +121,7 @@ public class RPCServer extends Thread
    * NOTE: it can be useful if we decide to own the msfrpcd process
   */
   private void start_daemon_fg() {
-    class debug_receiver implements Shell.OutputReceiver {
+    Shell.OutputReceiver debug_receiver = new Shell.OutputReceiver() {
       @Override
       public void onStart(String command) {
         Logger.debug("running \""+command+"\"");
@@ -141,12 +136,15 @@ public class RPCServer extends Thread
       public void onEnd(int exitCode) {
         Logger.debug("exitValue="+exitCode);
       }
-    }
+    };
 
     try
     {
-      if(Shell.exec( "chroot '" + msfRoot + "' /start_msfrpcd.sh -P '" + msfPassword + "' -U '" + msfUser + "' -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg -f", new debug_receiver()) != 0) {
-        Logger.error("chroot failed");
+      Shell.setupRubyEnviron();
+      String command = String.format("%s/msfrpcd -P '%s' -U '%s' -p '%d' -a 127.0.0.1 -n %s -t Msg -f",
+              msfDir,msfPassword,msfUser,msfPort,(msfSsl ? "" : "-S"));
+      if(Shell.exec( command, debug_receiver) != 0) {
+        Logger.error("msfrpcd failed");
       }
     }
     catch ( Exception e)
@@ -157,33 +155,39 @@ public class RPCServer extends Thread
 
   private void start_daemon() throws RuntimeException, IOException, InterruptedException, TimeoutException {
     Thread res;
-    Shell.StreamGobbler chroot;
+    Shell.StreamGobbler msfrpcd;
     long time;
+    boolean daemonJoined = false;
 
-    res = Shell.async( "chroot '" + msfRoot + "' /start_msfrpcd.sh -P '" + msfPassword + "' -U '" + msfUser + "' -p " + msfPort + " -a 127.0.0.1 -n -S -t Msg");
+    Shell.setupRubyEnviron();
+
+    res = Shell.async(String.format(
+            "%s/msfrpcd -P '%s' -U '%s' -p '%d' -a 127.0.0.1 -n %s -t Msg",
+            msfDir,msfPassword,msfUser,msfPort,(msfSsl ? "" : "-S")
+    ));
     if(!(res instanceof Shell.StreamGobbler))
       throw new IOException("cannot run shell commands");
-    chroot = (Shell.StreamGobbler) res;
-    chroot.setName("chroot");
-    chroot.start();
+
+    msfrpcd = (Shell.StreamGobbler) res;
+    msfrpcd.setName("msfrpcd");
+    msfrpcd.start();
+
     try {
-      do {
+      while ((time = java.lang.System.currentTimeMillis()) < mTimeout &&
+              msfrpcd.getState() != State.TERMINATED)
         Thread.sleep(100);
-        time=(new Date()).getTime();
-      } while(chroot.isAlive() && time < mTimeout);
-    } catch (InterruptedException e) {
-      //ensure to kill the chroot thread
-      chroot.interrupt();
-      throw e;
-    }
-    if(time >= mTimeout) {
-      chroot.interrupt();
-      throw new TimeoutException("chrooting timed out");
-    }
-    chroot.join();
-    if(chroot.exitValue !=0) {
-      Logger.error("chroot returned "+chroot.exitValue);
-      throw new RuntimeException("chroot failed");
+      if (time >= mTimeout)
+        throw new TimeoutException("msfrpcd timed out");
+      msfrpcd.join();
+      daemonJoined = true;
+      if (msfrpcd.exitValue != 0) {
+        Logger.error("msfrpcd returned " + msfrpcd.exitValue);
+        throw new RuntimeException("msfrpcd failed");
+      }
+    } finally {
+      if(!daemonJoined) {
+        msfrpcd.interrupt();
+      }
     }
   }
 
@@ -218,15 +222,15 @@ public class RPCServer extends Thread
         System.errorLogging(me);
         throw new RuntimeException();
       }
-    } while(new Date().getTime() < mTimeout);
+    } while(java.lang.System.currentTimeMillis() < mTimeout);
     Logger.debug("MSF RPC Server timed out");
     throw new TimeoutException();
   }
 
   @Override
   public void run( ) {
-    mTimeout = new Date().getTime() + TIMEOUT;
-    Logger.debug("RPCServer started");
+    mTimeout = java.lang.System.currentTimeMillis() + TIMEOUT;
+    Logger.debug("RPCD Service started");
 
     mRunning = true;
 
@@ -235,7 +239,7 @@ public class RPCServer extends Thread
     msfHost     = prefs.getString("MSF_RPC_HOST", "127.0.0.1");
     msfUser     = prefs.getString("MSF_RPC_USER", "msf");
     msfPassword = prefs.getString("MSF_RPC_PSWD", "msf");
-    msfRoot     = prefs.getString("GENTOO_ROOT", System.getDefaultGentooPath());
+    msfDir      = prefs.getString("MSF_DIR", System.getDefaultMsfPath());
     msfPort     = System.MSF_RPC_PORT;
     msfSsl      = prefs.getBoolean("MSF_RPC_SSL", false);
 
@@ -244,10 +248,10 @@ public class RPCServer extends Thread
     try
     {
       if(!connect_to_running_server()) {
-        sendDaemonNotification(TOAST,R.string.rpcd_starting);
+        sendDaemonNotification(TOAST, R.string.rpcd_starting);
         start_daemon();
         wait_for_connection();
-        sendDaemonNotification(TOAST,R.string.rpcd_started);
+        sendDaemonNotification(TOAST, R.string.rpcd_started);
         Logger.debug("connected to new MSF RPC Server");
       } else {
         sendDaemonNotification(TOAST, R.string.connected_msf);
@@ -255,17 +259,19 @@ public class RPCServer extends Thread
       }
     } catch ( IOException ioe ) {
       Logger.error(ioe.getMessage());
-      sendDaemonNotification(ERROR,R.string.error_rpcd_shell);
+      sendDaemonNotification(ERROR, R.string.error_rpcd_shell);
     } catch ( InterruptedException e ) {
       if(e.getMessage()!=null)
         Logger.debug(e.getMessage());
       else
         System.errorLogging(e);
     } catch ( RuntimeException e ) {
-      sendDaemonNotification(ERROR,R.string.error_rpcd_inval);
+      sendDaemonNotification(ERROR, R.string.error_rpcd_inval);
     } catch (TimeoutException e) {
-      sendDaemonNotification(TOAST,R.string.rpcd_timedout);
+      sendDaemonNotification(TOAST, R.string.rpcd_timedout);
     }
+
+    Logger.debug("RPCD Service stopped");
     mRunning = false;
   }
 

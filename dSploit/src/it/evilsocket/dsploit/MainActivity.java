@@ -19,7 +19,9 @@
 package it.evilsocket.dsploit;
 
 import static it.evilsocket.dsploit.core.UpdateChecker.AVAILABLE_VERSION;
-import static it.evilsocket.dsploit.core.UpdateChecker.GENTOO_AVAILABLE;
+import static it.evilsocket.dsploit.core.UpdateChecker.GEMS_AVAILABLE;
+import static it.evilsocket.dsploit.core.UpdateChecker.MSF_AVAILABLE;
+import static it.evilsocket.dsploit.core.UpdateChecker.RUBY_AVAILABLE;
 import static it.evilsocket.dsploit.core.UpdateChecker.UPDATE_AVAILABLE;
 import static it.evilsocket.dsploit.core.UpdateChecker.UPDATE_CHECKING;
 import static it.evilsocket.dsploit.core.UpdateChecker.UPDATE_NOT_AVAILABLE;
@@ -29,7 +31,6 @@ import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_NAME;
 import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_UPDATE;
 import static it.evilsocket.dsploit.net.NetworkDiscovery.NEW_ENDPOINT;
 
-import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.core.ManagedReceiver;
 import it.evilsocket.dsploit.core.MultiAttackService;
 import it.evilsocket.dsploit.core.Plugin;
@@ -569,8 +570,6 @@ public class MainActivity extends SherlockListActivity {
     new Thread( new Runnable() {
       @Override
       public void run() {
-        Logger.debug("Stopping RPC Server");
-
         try {
           if (mRPCServer != null) {
             if(mRPCServer.isRunning()) {
@@ -1089,12 +1088,33 @@ public class MainActivity extends SherlockListActivity {
         });
 			} else if(intent.getAction().equals(SettingsActivity.SETTINGS_WIPE_START)) {
         try {
+          String path;
+
+          if(intent.hasExtra(SettingsActivity.SETTINGS_WIPE_DIR)) {
+            path = intent.getStringExtra(SettingsActivity.SETTINGS_WIPE_DIR);
+          } else {
+            path = System.getRubyPath() + "' '" + System.getMsfPath();
+          }
+
           StopRPCServer(true);
-          Shell.exec("rm -rf '" + System.getGentooPath() + "'");
+          Shell.async("rm -rf '" + path + "'", new Shell.OutputReceiver() {
+            @Override
+            public void onStart(String command) {
+
+            }
+
+            @Override
+            public void onNewLine(String line) {
+
+            }
+
+            @Override
+            public void onEnd(int exitCode) {
+              MainActivity.this.sendBroadcast(new Intent(SettingsActivity.SETTINGS_WIPE_DONE));
+            }
+          }).start();
         } catch ( Exception e) {
           System.errorLogging(e);
-        } finally {
-          MainActivity.this.sendBroadcast(new Intent(SettingsActivity.SETTINGS_WIPE_DONE));
         }
       } else if(intent.getAction().equals(SettingsActivity.SETTINGS_MSF_CHANGED)){
         StopRPCServer(true);
@@ -1112,7 +1132,9 @@ public class MainActivity extends SherlockListActivity {
 			mFilter.addAction(UPDATE_CHECKING);
 			mFilter.addAction(UPDATE_AVAILABLE);
 			mFilter.addAction(UPDATE_NOT_AVAILABLE);
-      mFilter.addAction(GENTOO_AVAILABLE);
+      mFilter.addAction(RUBY_AVAILABLE);
+      mFilter.addAction(GEMS_AVAILABLE);
+      mFilter.addAction(MSF_AVAILABLE);
       mFilter.addAction(UpdateService.ERROR);
       mFilter.addAction(UpdateService.DONE);
 		}
@@ -1134,23 +1156,77 @@ public class MainActivity extends SherlockListActivity {
 					&& mUpdateStatus != null) {
 				mUpdateStatus.setText(NO_WIFI_UPDATE_MESSAGE.replace(
 						"#STATUS#", getString(R.string.no_updates_available)));
-      } else if (intent.getAction().equals(GENTOO_AVAILABLE)) {
-        if(mUpdateStatus != null)
+      } else if (intent.getAction().equals(RUBY_AVAILABLE)) {
+        MainActivity.this.runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            new ConfirmDialog(getString(R.string.update_available),
+                    getString(R.string.new_ruby_update_desc) + " " +  getString(R.string.new_update_desc2),
+                    MainActivity.this,
+                    new ConfirmDialogListener() {
+                      @Override
+                      public void onConfirm() {
+                        StopRPCServer(true);
+                        Intent i = new Intent(MainActivity.this,UpdateService.class);
+                        i.setAction(UpdateService.START);
+                        i.putExtra(UpdateService.ACTION, UpdateService.action.ruby_update);
+                        startService(i);
+                      }
+
+                      @Override
+                      public void onCancel() {
+
+                      }
+                    }).show();
+          }
+        });
+      } else if (intent.getAction().equals(MSF_AVAILABLE)) {
+        if (mUpdateStatus != null)
           mUpdateStatus.setText(NO_WIFI_UPDATE_MESSAGE.replace(
-            "#STATUS#", getString(R.string.new_msf_update_desc)));
+                  "#STATUS#",
+                  getString(R.string.new_version) + " " +
+                  getString(R.string.new_version2)
+          ));
 
         MainActivity.this.runOnUiThread(new Runnable() {
           @Override
           public void run() {
+
             new ConfirmDialog(getString(R.string.update_available),
                     getString(R.string.new_msf_update_desc) + " " + getString(R.string.new_update_desc2),
                     MainActivity.this,
                     new ConfirmDialogListener() {
                       @Override
                       public void onConfirm() {
+                        StopRPCServer(true);
+                        Intent i = new Intent(MainActivity.this, UpdateService.class);
+                        i.setAction(UpdateService.START);
+                        i.putExtra(UpdateService.ACTION, UpdateService.action.msf_update);
+                        startService(i);
+                      }
+
+                      @Override
+                      public void onCancel() {
+
+                      }
+                    }
+            ).show();
+          }
+        });
+      } else if ( intent.getAction().equals(GEMS_AVAILABLE)) {
+        MainActivity.this.runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            new ConfirmDialog(getString(R.string.update_available),
+                    getString(R.string.new_gems_update_desc) + " " +  getString(R.string.new_update_desc2),
+                    MainActivity.this,
+                    new ConfirmDialogListener() {
+                      @Override
+                      public void onConfirm() {
+                        StopRPCServer(true);
                         Intent i = new Intent(MainActivity.this,UpdateService.class);
                         i.setAction(UpdateService.START);
-                        i.putExtra(UpdateService.ACTION, UpdateService.action.gentoo_update);
+                        i.putExtra(UpdateService.ACTION, UpdateService.action.gems_update);
                         startService(i);
                       }
 
@@ -1206,8 +1282,10 @@ public class MainActivity extends SherlockListActivity {
           }
         });
       } else if(intent.getAction().equals(UpdateService.DONE)) {
-        if(intent.getSerializableExtra(UpdateService.ACTION) == UpdateService.action.gentoo_update)
+        UpdateService.action a = (UpdateService.action)intent.getSerializableExtra(UpdateService.ACTION);
+        if(a == UpdateService.action.msf_update || a == UpdateService.action.gems_update || a == UpdateService.action.ruby_update)
           StartRPCServer();
+        startUpdateChecker(); // restart update checker after a successful update
       }
 		}
 	}

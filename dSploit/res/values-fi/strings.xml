@@ -349,8 +349,6 @@
     <string name="pref_rpc_pswd_desc">Salasana jota käytetään MetaSploit RPCD:hen yhdistäessä.</string>
     <string name="pref_rpc_port">RPC Portti</string>
     <string name="pref_rpc_port_desc">Portti jota käytetään MetaSploit RPCD:hen yhdistäessä.</string>
-    <string name="pref_chroot">Gentoo:n kansio</string>
-    <string name="pref_chroot_desc">Kansio jossa Gentoo:n järjestelmä on.</string>
     <string name="pref_performance_vuln_desc">Etsi heikkouksia kohteesta</string>
     <string-array name="pref_performance_vuln" >
         <item>OSVDB</item>

@@ -125,10 +125,27 @@
             android:title="@string/pref_msf_enable"
             android:summary="@string/pref_msf_enable_desc" />
 
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="MSF_CHECK_UPDATES"
+            android:summary="@string/pref_msf_check_updates_desc"
+            android:title="@string/pref_msf_check_updates" />
+
+        <ListPreference
+            android:key="MSF_BRANCH"
+            android:summary="@string/pref_msf_branch_desc"
+            android:dialogTitle="@string/choose_branch"
+            android:title="@string/pref_msf_branch_title" />
+
         <Preference
-            android:key="GENTOO_ROOT"
-            android:summary="@string/pref_chroot_desc"
-            android:title="@string/pref_chroot" />
+            android:key="MSF_DIR"
+            android:summary="@string/pref_msfdir_desc"
+            android:title="@string/pref_msfdir" />
+
+        <Preference
+            android:key="RUBY_DIR"
+            android:summary="@string/pref_rubydir_desc"
+            android:title="@string/pref_rubydir" />
 
         <EditTextPreference
             android:defaultValue="msf"

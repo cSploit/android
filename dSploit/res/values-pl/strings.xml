@@ -333,8 +333,6 @@
     <string name="pref_rpc_port_desc">Port połączenia dla z MetaSploit RPCD.</string>
 	<string name="pref_rpc_ssl">RPC SSL</string>
     <string name="pref_rpc_ssl_desc">Zaznacz, jeżeli MFS ma używać SSL.</string>
-    <string name="pref_chroot">gentoo root</string>
-    <string name="pref_chroot_desc">Directory containing gentoo system.</string>
     <string name="pref_performance_vuln_desc">Search for vulnerability using</string>
     <string-array name="pref_performance_vuln" >
         <item>OSVDB</item>

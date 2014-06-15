@@ -21,13 +21,12 @@ package it.evilsocket.dsploit;
 import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.core.UpdateService;
 import it.evilsocket.dsploit.gui.DirectoryPicker;
 import it.evilsocket.dsploit.gui.dialogs.ChoiceDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -38,6 +37,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -51,12 +51,14 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 {
   public static final int SETTINGS_DONE = 101285;
   public static final String SETTINGS_WIPE_START = "SettingsActivity.WIPE_START";
+  public static final String SETTINGS_WIPE_DIR = "SettingsActivity.data.WIPE_DIR";
   public static final String SETTINGS_WIPE_DONE = "SettingsActivity.WIPE_DONE";
   public static final String SETTINGS_MSF_CHANGED = "SettingsActivity.MSF_CHANGED";
 
   private Preference mSavePath = null;
   private Preference mWipeMSF  = null;
-  private Preference mGentooRoot = null;
+  private Preference mRubyDir = null;
+  private Preference mMsfDir = null;
   private EditTextPreference mSnifferSampleTime = null;
   private EditTextPreference mProxyPort = null;
   private EditTextPreference mServerPort = null;
@@ -65,6 +67,8 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
   private EditTextPreference mHttpBufferSize = null;
   private EditTextPreference mPasswordFilename = null;
   private CheckBoxPreference mThemeChooser = null;
+  private CheckBoxPreference mMsfEnabled  = null;
+  private ListPreference mMsfBranch = null;
   private static int mMsfSize = 0;
   private BroadcastReceiver mReceiver = null;
 
@@ -74,11 +78,11 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
     super.onCreate(savedInstanceState);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     addPreferencesFromResource(R.layout.preferences);
-    measureMsfSize();
 
     mSavePath = getPreferenceScreen().findPreference("PREF_SAVE_PATH");
     mWipeMSF  = getPreferenceScreen().findPreference("PREF_MSF_WIPE");
-    mGentooRoot = getPreferenceScreen().findPreference("GENTOO_ROOT");
+    mRubyDir = getPreferenceScreen().findPreference("RUBY_DIR");
+    mMsfDir = getPreferenceScreen().findPreference("MSF_DIR");
     mMsfPort = (EditTextPreference) getPreferenceScreen().findPreference("MSF_RPC_PORT");
     mSnifferSampleTime = (EditTextPreference) getPreferenceScreen().findPreference("PREF_SNIFFER_SAMPLE_TIME");
     mProxyPort = (EditTextPreference) getPreferenceScreen().findPreference("PREF_HTTP_PROXY_PORT");
@@ -87,17 +91,19 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
     mHttpBufferSize = (EditTextPreference) getPreferenceScreen().findPreference("PREF_HTTP_MAX_BUFFER_SIZE");
     mPasswordFilename = (EditTextPreference) getPreferenceScreen().findPreference("PREF_PASSWORD_FILENAME");
     mThemeChooser = (CheckBoxPreference) getPreferenceScreen().findPreference("PREF_DARK_THEME");
+    mMsfBranch = (ListPreference) getPreferenceScreen().findPreference("MSF_BRANCH");
+    mMsfEnabled = (CheckBoxPreference) getPreferenceScreen().findPreference("MSF_ENABLED");
 
     mThemeChooser.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-		
-		@Override
-		public boolean onPreferenceChange(Preference preference, Object newValue) {
-			SharedPreferences themePrefs = getBaseContext().getSharedPreferences("THEME", 0);
-			themePrefs.edit().putBoolean("isDark", (Boolean) newValue).commit();
-			Toast.makeText(getBaseContext(), getString(R.string.please_restart), Toast.LENGTH_LONG).show();
-			return true;
-		}
-	});
+
+      @Override
+      public boolean onPreferenceChange(Preference preference, Object newValue) {
+        SharedPreferences themePrefs = getBaseContext().getSharedPreferences("THEME", 0);
+        themePrefs.edit().putBoolean("isDark", (Boolean) newValue).commit();
+        Toast.makeText(getBaseContext(), getString(R.string.please_restart), Toast.LENGTH_LONG).show();
+        return true;
+      }
+    });
 
     mSavePath.setOnPreferenceClickListener(new OnPreferenceClickListener(){
       @Override
@@ -106,56 +112,9 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
         return true;
       }
     });
-    mGentooRoot.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-      @Override
-      public boolean onPreferenceClick(Preference preference) {
-        if(!System.getGentooPath().equals(System.getDefaultGentooPath())) {
-          final Preference fPref = preference;
-          (new ChoiceDialog(
-                  SettingsActivity.this,
-                  getString(R.string.choose_an_option),
-                  new String[] {getString(R.string.restore_default_path), getString(R.string.choose_a_custom_path)},
-                  new ChoiceDialog.ChoiceDialogListener() {
-                    @Override
-                    public void onChoice(int choice) {
-                      if(choice==0) {
-                        // simulate directory picker
-                        Intent i = new Intent();
-                        i.putExtra(DirectoryPicker.AFFECTED_PREF, fPref.getKey());
-                        i.putExtra(DirectoryPicker.CHOSEN_DIRECTORY, System.getDefaultGentooPath());
-                        onActivityResult(DirectoryPicker.PICK_DIRECTORY, RESULT_OK, i);
-                      } else {
-                        startDirectoryPicker(fPref);
-                      }
-                    }
-          })).show();
-        } else {
-          startDirectoryPicker(preference);
-        }
-        return true;
-      }
-    });
-    mGentooRoot.setDefaultValue(System.getDefaultGentooPath());
 
-    mWipeMSF.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-      @Override
-      public boolean onPreferenceClick(Preference preference) {
-        wipe_prompt();
-        return true;
-      }
-    });
-
-    mWipeMSF.setEnabled(new File(System.getGentooPath()).isDirectory());
-
-    mReceiver = new BroadcastReceiver() {
-      @Override
-      public void onReceive(Context context, Intent intent) {
-        if(intent.getAction().equals(SETTINGS_WIPE_DONE)) {
-          mWipeMSF.setEnabled(new File(System.getGentooPath()).isDirectory());
-        }
-      }
-    };
-    registerReceiver(mReceiver, new IntentFilter(SETTINGS_WIPE_DONE));
+    if(mMsfEnabled.isEnabled())
+      onMsfEnabled();
   }
 
   private void wipe_prompt() {
@@ -176,10 +135,26 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
     }).show();
   }
 
+  private void wipe_prompt_older(final File oldDir) {
+    new ConfirmDialog(getString(R.string.warning),getString(R.string.delete_previous_location),SettingsActivity.this, new ConfirmDialog.ConfirmDialogListener() {
+      @Override
+      public void onConfirm() {
+        Intent i = new Intent(SETTINGS_WIPE_START);
+        i.putExtra(SETTINGS_WIPE_DIR, oldDir.getAbsolutePath());
+        sendBroadcast(i);
+      }
+
+      @Override
+      public void onCancel() {
+
+      }
+    }).show();
+  }
+
   private void measureMsfSize() {
-    Shell.async("du -xsm '"+ System.getGentooPath()+"'",
+    Shell.async(String.format("du -xsm '%s' '%s'",System.getRubyPath(), System.getMsfPath()),
             new Shell.OutputReceiver() {
-              private int size;
+              private int size = 0;
 
               @Override
               public void onStart(String command) {
@@ -195,7 +170,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
                   int start,end;
                   for(start=0;start<line.length()&&java.lang.Character.isSpaceChar(line.charAt(start));start++);
                   for(end=start+1;end<line.length()&&java.lang.Character.isDigit(line.charAt(end));end++);
-                  size = Integer.parseInt(line.substring(start,end));
+                  size += Integer.parseInt(line.substring(start,end));
                 } catch ( Exception e ) {
                   System.errorLogging(e);
                 }
@@ -217,6 +192,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
       String path;
       String key;
       File folder;
+      String oldPath = null;
 
       if(extras==null) {
         Logger.debug("null extra: " + intent);
@@ -231,38 +207,33 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
         return;
       }
 
+      if(!path.endsWith("/"))
+        path+="/";
+
       folder = new File(path);
+
+
+      if(key.equals("RUBY_DIR") || key.equals("MSF_DIR")) {
+        oldPath = (key.equals("RUBY_DIR") ? System.getRubyPath() : System.getMsfPath());
+      }
 
       if(!folder.exists())
         Toast.makeText(SettingsActivity.this, getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_exists), Toast.LENGTH_SHORT).show();
 
-      else if(key.equals("GENTOO_ROOT")) {
-        File current = new File(System.getGentooPath());
-
-        try {
-          if(Shell.exec("ln -fs '/system' '"+path + "/test' && rm '"+path+"/test'") != 0) {
-            Toast.makeText(SettingsActivity.this, R.string.error_symlink, Toast.LENGTH_LONG).show();
-            return;
-          }
-        } catch ( Exception e) {
-          System.errorLogging(e);
-          Toast.makeText(SettingsActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
-          return;
-        }
-
-        if(current.exists() && current.isDirectory() && current.listFiles().length > 2) {
-          wipe_prompt(); // erase the contents of the gentoo root before changing it's location
-        }
-        //noinspection ConstantConditions
-        getPreferenceManager().getSharedPreferences().edit().putString(key, path).commit();
-      }
-
       else if(!folder.canWrite())
         Toast.makeText(SettingsActivity.this, getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_writable), Toast.LENGTH_SHORT).show();
 
-      else
+      else {
         //noinspection ConstantConditions
         getPreferenceManager().getSharedPreferences().edit().putString(key, path).commit();
+        if(oldPath!=null) {
+          File current = new File(oldPath);
+
+          if (current.exists() && current.isDirectory() && current.listFiles().length > 2) {
+            wipe_prompt_older(current);
+          }
+        }
+      }
     }
   }
 
@@ -392,9 +363,115 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
         Toast.makeText(SettingsActivity.this, message, Toast.LENGTH_SHORT).show();
 
       mPasswordFilename.setText(passFileName);
-    }
-    else if(key.equals("MSF_ENABLED") || key.equals("MSF_RPC_USER") || key.equals("MSF_RPC_PSWD") || key.equals("GENTOO_ROOT"))
+    } else if (key.equals("MSF_ENABLED")) {
+      if (mMsfEnabled.isChecked())
+        onMsfEnabled();
       sendBroadcast(new Intent(SETTINGS_MSF_CHANGED));
+    } else if (key.equals("MSF_BRANCH")) {
+      // don't send SETTINGS_MSF_CHANGED, this change will affect he app on next restart
+    } else if (key.contains("MSF")) {
+      sendBroadcast(new Intent(SETTINGS_MSF_CHANGED));
+    } else if (key.contains("RUBY")) {
+      sendBroadcast(new Intent(SETTINGS_MSF_CHANGED));
+      Shell.rubySettingsChanged();
+    }
+  }
+
+  private void onMsfEnabled() {
+    // use mReceiver as "already did that"
+    if(mReceiver!=null)
+      return;
+
+    // start measureMsfSize ASAP
+    onMsfPathChanged();
+
+    OnPreferenceClickListener directoryPickerWithDefaultPath = new OnPreferenceClickListener() {
+      @Override
+      public boolean onPreferenceClick(Preference preference) {
+
+        final String currentValue;
+        final String defaultValue;
+        final String key = preference.getKey();
+
+        if(key.equals("RUBY_DIR")) {
+          currentValue = System.getRubyPath();
+          defaultValue = System.getDefaultRubyPath();
+        } else if(key.equals("MSF_DIR")) {
+          currentValue = System.getMsfPath();
+          defaultValue = System.getDefaultMsfPath();
+        } else
+          return true;
+
+        if (!currentValue.equals(defaultValue)) {
+          final Preference fPref = preference;
+          (new ChoiceDialog(
+                  SettingsActivity.this,
+                  getString(R.string.choose_an_option),
+                  new String[]{getString(R.string.restore_default_path), getString(R.string.choose_a_custom_path)},
+                  new ChoiceDialog.ChoiceDialogListener() {
+                    @Override
+                    public void onChoice(int choice) {
+                      if (choice == 0) {
+                        // create default directory if it does not exists
+                        File f = new File(defaultValue);
+                        if(!f.exists())
+                          f.mkdirs();
+                        // simulate directory picker
+                        Intent i = new Intent();
+                        i.putExtra(DirectoryPicker.AFFECTED_PREF, key);
+                        i.putExtra(DirectoryPicker.CHOSEN_DIRECTORY, defaultValue);
+                        onActivityResult(DirectoryPicker.PICK_DIRECTORY, RESULT_OK, i);
+                      } else {
+                        startDirectoryPicker(fPref);
+                      }
+                    }
+                  }
+          )).show();
+        } else {
+          startDirectoryPicker(preference);
+        }
+        return true;
+      }
+    };
+
+    mRubyDir.setDefaultValue(System.getDefaultRubyPath());
+    mRubyDir.setOnPreferenceClickListener(directoryPickerWithDefaultPath);
+
+    mMsfDir.setDefaultValue(System.getDefaultMsfPath());
+    mMsfDir.setOnPreferenceClickListener(directoryPickerWithDefaultPath);
+
+    mWipeMSF.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+      @Override
+      public boolean onPreferenceClick(Preference preference) {
+        wipe_prompt();
+        return true;
+      }
+    });
+
+    String [] branches = UpdateService.getMsfBranches();
+    boolean hasRelease = false;
+    mMsfBranch.setEntryValues(branches);
+    mMsfBranch.setEntries(branches);
+    for(int i = 0;!hasRelease&&i<branches.length; i++) {
+      hasRelease = branches[i].equals("release");
+    }
+    mMsfBranch.setDefaultValue((hasRelease ? "release" : "master"));
+
+    mReceiver = new BroadcastReceiver() {
+      @Override
+      public void onReceive(Context context, Intent intent) {
+        if(intent.getAction().equals(SETTINGS_WIPE_DONE)) {
+          mWipeMSF.setEnabled(new File(System.getRubyPath()).isDirectory());
+        }
+      }
+    };
+    registerReceiver(mReceiver, new IntentFilter(SETTINGS_WIPE_DONE));
+  }
+
+  private void onMsfPathChanged() {
+    measureMsfSize();
+    mWipeMSF.setEnabled(new File(System.getRubyPath()).isDirectory() ||
+            new File(System.getMsfPath()).isDirectory());
   }
 
   @Override
@@ -411,7 +488,10 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 
   @Override
   protected void onDestroy() {
-    unregisterReceiver(mReceiver);
+    if(mReceiver!=null) {
+      unregisterReceiver(mReceiver);
+      mReceiver = null;
+    }
     super.onDestroy();
   }
 }

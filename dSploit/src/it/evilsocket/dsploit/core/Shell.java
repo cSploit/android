@@ -25,17 +25,23 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.Process;
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.concurrent.Semaphore;
 
 public class Shell
 {
   private final static int MAX_FIFO = 1024;
+  private final static String rubyLib = "%1$s/site_ruby/1.9.1:%1$s/site_ruby/1.9.1/arm-linux-androideabi:%1$s/site_ruby:%1$s/vendor_ruby/1.9.1:%1$s/vendor_ruby/1.9.1/arm-linux-androideabi:%1$s/vendor_ruby:%1$s/1.9.1:%1$s/1.9.1/arm-linux-androideabi";
+
+  private static Semaphore mRootShellLock = new Semaphore(1);
   private static Process mRootShell = null;
   private static DataOutputStream mWriter = null;
   //private static BufferedReader reader = null, error = null;
   private final static ArrayList<Integer> mFIFOS = new ArrayList<Integer>();
-  private static Thread fakeThread;
+  private static boolean rubyEnvironExported = false;
+  private static boolean gotR00t = false;
 
   /**
    * "gobblers" seem to be the recommended way to ensure the streams
@@ -125,6 +131,9 @@ public class Shell
   }
 
   public static boolean isRootGranted() {
+    if(gotR00t)
+      return true;
+
     try{
       final StringBuilder output = new StringBuilder();
       OutputReceiver receiver = new OutputReceiver() {
@@ -145,11 +154,11 @@ public class Shell
       };
 
       if(exec("id", receiver) == 0)
-        return output.toString().contains("uid=0");
+        gotR00t = output.toString().contains("uid=0");
     } catch(Exception e){
       System.errorLogging(e);
     }
-    return false;
+    return gotR00t;
   }
 
   public interface OutputReceiver {
@@ -179,20 +188,23 @@ public class Shell
   private static void clearFifos() throws IOException {
     File d = new File(System.getFifosPath());
     File[] files;
-    if(!d.exists())
-      d.mkdir();
-
-    else if(!d.isDirectory()) {
-      d.delete();
-      d.mkdir();
+    if(!d.exists()) {
+      if (!d.mkdir())
+        throw new IOException("cannot create fifo directory");
+    } else if(!d.isDirectory()) {
+      if(!d.delete())
+        throw new IOException(String.format("cannot delete a file named fifo under %s", d.getAbsolutePath()));
+      if(!d.mkdir())
+        throw new IOException("cannot create fifo directory");
     }
     if(d.isDirectory() && (files = d.listFiles())!=null) {
       for(File f : files) {
-        f.delete();
+        if(!f.delete())
+          throw new IOException(String.format("cannot delete fifo `%s'", f.getAbsolutePath()));
       }
     }
     else {
-      throw new IOException("cannot create fifos directory");
+      throw new IOException("cannot create fifo directory");
     }
   }
 
@@ -207,7 +219,7 @@ public class Shell
    */
   public static int exec(String command, OutputReceiver receiver, boolean withInput) throws IOException, InterruptedException {
     Thread g = async(command, receiver, withInput);
-    if(g==fakeThread)
+    if(!(g instanceof StreamGobbler))
       throw new IOException("cannot execute shell commands");
     g.start();
     g.join();
@@ -240,24 +252,76 @@ public class Shell
   @SuppressWarnings("StatementWithEmptyBody")
   public static Thread async(final String command, final OutputReceiver receiver, boolean withInput) {
     int fifonum,inputFifoNum;
-    String fifo_path,input_fifo_path;
+    String fifo_path,input_fifo_path,fifo_dir;
     String token = UUID.randomUUID().toString().toUpperCase();
     StreamGobbler gobbler = null;
 
     try
     {
       // spawn shell for the first time
-      if(mRootShell==null) {
-        mRootShell = spawnSuShell();
-        mWriter = new DataOutputStream(mRootShell.getOutputStream());
-        // this 2 reader are useful for debugging purposes
-        //reader = new BufferedReader(new InputStreamReader(mRootShell.getInputStream()));
-        //error = new BufferedReader(new InputStreamReader(mRootShell.getErrorStream()));
-        clearFifos();
+      mRootShellLock.acquire();
+      try {
+        if (mRootShell == null) {
+          Logger.info("initializing root shell");
+          mRootShell = spawnSuShell();
+          mWriter = new DataOutputStream(mRootShell.getOutputStream());
+          int ret = -1;
+          try {
+            mWriter.write("exit 0\n".getBytes());
+            mWriter.flush();
+            ret = mRootShell.waitFor();
+          } catch (Exception e) {
+            System.errorLogging(e);
+          }
+
+          if(ret!=0) {
+            mRootShell=null;
+            throw new IOException(String.format("cannot execute `su`: exitValue=%d", ret));
+          }
+          Logger.debug("I have superpowers!");
+          mWriter.close();
+          mRootShell = spawnSuShell();
+          mWriter = new DataOutputStream(mRootShell.getOutputStream());
+          // this 2 reader are useful for debugging purposes
+          //reader = new BufferedReader(new InputStreamReader(mRootShell.getInputStream()));
+          //error = new BufferedReader(new InputStreamReader(mRootShell.getErrorStream()));
+          clearFifos();
+
+          Logger.debug("checking fifo...");
+
+          fifo_path = String.format("%s0",System.getFifosPath());
+          mWriter.write(String.format("mkfifo -m 666 '%s'\n", fifo_path).getBytes());
+          mWriter.flush();
+          long start,elapsed;
+
+          start = java.lang.System.currentTimeMillis();
+          while((elapsed=(java.lang.System.currentTimeMillis() - start)) < 1000 && !(new File(fifo_path)).exists())
+            Thread.sleep(10);
+
+          if(elapsed>1000) {
+            mRootShell=null;
+            mWriter.close();
+            throw new IOException("cannot create fifo");
+          }
+
+          Logger.debug(String.format("fifo created after %d ms",elapsed));
+
+          // change umask to give read and execution permission to java,
+          // thus to check file existence from java. ( default is 077 )
+          mWriter.write("umask 022\n".getBytes());
+          mWriter.flush();
+
+          Logger.info("root shell initialized");
+          rubyEnvironExported=false;
+        }
+      } finally {
+        mRootShellLock.release();
       }
 
       if(receiver != null)
         receiver.onStart(command);
+
+      fifo_dir = System.getFifosPath();
 
       synchronized (mFIFOS)
       {
@@ -277,38 +341,38 @@ public class Shell
           inputFifoNum=-1;
       }
 
-      fifo_path = String.format("%s%d",System.getFifosPath(),fifonum);
+      fifo_path = String.format("%s%d",fifo_dir,fifonum);
 
       mWriter.writeBytes(String.format("mkfifo -m 666 '%s'\n", fifo_path));
       if(inputFifoNum>=0) {
-        input_fifo_path = String.format("%s%d",System.getFifosPath(), inputFifoNum);
+        input_fifo_path = String.format("%s%d",fifo_dir, inputFifoNum);
         mWriter.writeBytes(String.format("mkfifo -m 666 '%s'\n", input_fifo_path));
       } else
         input_fifo_path = null;
       mWriter.writeBytes(String.format("(%s%s echo -e \"\\n%s$?\") 2>&1 >%s %s &\n",
-                          command,
-                          (command.trim().endsWith(";") ? "" : " ;"),
-                          token,
-                          fifo_path,
-                          (inputFifoNum>=0 ? "<"+input_fifo_path : "")));
+              command,
+              (command.trim().endsWith(";") ? "" : " ;"),
+              token,
+              fifo_path,
+              (inputFifoNum>=0 ? "<"+input_fifo_path : "")));
       mWriter.flush();
 
       gobbler = new StreamGobbler(fifo_path, receiver, token, fifonum);
       if(inputFifoNum>=0)
         gobbler.setOutputFifo(input_fifo_path, inputFifoNum);
-    }
-    catch ( IOException e) {
+    } catch ( InterruptedException e) {
+      Logger.error("interrupted while acquiring mRootShellLock");
+    } catch ( IOException e) {
       System.errorLogging(e);
     }
     if(gobbler==null) {
-      fakeThread = new Thread(new Runnable() {
+      return new Thread(new Runnable() {
         @Override
         public void run() {
           if(receiver!=null)
             receiver.onEnd(-1);
         }
       });
-      return fakeThread;
     }
     else
       return gobbler;
@@ -329,5 +393,21 @@ public class Shell
    */
   public static Thread async(String command) {
     return async(command, null);
+  }
+
+  public static void setupRubyEnviron() throws IOException {
+    if(rubyEnvironExported)
+      return;
+    synchronized (mFIFOS) { // must be sure that no one else write on our main shell
+      mWriter.writeBytes(String.format("export RUBYLIB=\"" + rubyLib + "\"\n", System.getRubyPath() + "/lib/ruby"));
+      mWriter.writeBytes(String.format("export PATH=\"$PATH:%s:%s\"\n", System.getRubyPath() + "/bin", System.getMsfPath()));
+      mWriter.writeBytes(String.format("export HOME=\"%s\"\n", System.getRubyPath() + "/home/ruby"));
+      mWriter.flush();
+    }
+    rubyEnvironExported=true;
+  }
+
+  public static void rubySettingsChanged() {
+    rubyEnvironExported=false;
   }
 }

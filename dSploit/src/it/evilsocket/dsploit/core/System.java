@@ -53,6 +53,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NoRouteToHostException;
@@ -136,6 +137,10 @@ public class System
 
   private static String mStoragePath = null;
   private static String mSessionName = null;
+
+  private static String mLocalApkVersion = null;
+  private static Double mLocalRubyVersion = null;
+  private static Double mLocalMsfVersion = null;
 
   private static Object mCustomData = null;
 
@@ -297,6 +302,9 @@ public class System
       else if(e.toString() != null)
         message = e.toString();
 
+      if(message.equals(mLastError))
+        return;
+
       Writer sWriter = new StringWriter();
       PrintWriter pWriter = new PrintWriter(sWriter);
 
@@ -366,12 +374,20 @@ public class System
     return mContext.getResources().openRawResource(id);
   }
 
-  public static String getDefaultGentooPath() {
-    return mContext.getFilesDir().getAbsolutePath() + "/gentoo/";
+  public static String getDefaultRubyPath() {
+    return mContext.getFilesDir().getAbsolutePath() + "/ruby";
   }
 
-  public static String getGentooPath() {
-    return getSettings().getString("GENTOO_ROOT", getDefaultGentooPath());
+  public static String getRubyPath() {
+    return getSettings().getString("RUBY_DIR", getDefaultRubyPath());
+  }
+
+  public static String getDefaultMsfPath() {
+    return mContext.getFilesDir().getAbsolutePath() + "/msf";
+  }
+
+  public static String getMsfPath() {
+    return getSettings().getString("MSF_DIR", getDefaultMsfPath());
   }
 
   public static String getFifosPath() {
@@ -489,17 +505,94 @@ public class System
   }
 
   public static String getAppVersionName(){
+    if(mLocalApkVersion!=null)
+      return mLocalApkVersion;
     try{
       PackageManager manager = mContext.getPackageManager();
       PackageInfo info = manager != null ? manager.getPackageInfo(mContext.getPackageName(), 0) : null;
 
-      return info.versionName;
+      return (mLocalApkVersion = info.versionName);
     }
     catch(NameNotFoundException e){
       errorLogging(e);
     }
 
     return "?";
+  }
+
+  /**
+   * reade the first line of a file
+   * @param filePath path of the file to read from
+   * @return the first line of the file or {@code null} if an error occurs
+   */
+  private static String readFirstLine(String filePath) {
+    BufferedReader reader = null;
+
+    if(filePath==null)
+      return null;
+
+    try {
+      reader = new BufferedReader(new FileReader(filePath));
+      return reader.readLine().trim();
+    } catch (IOException e) {
+      Logger.debug(e.getMessage());
+    } finally {
+      try {
+        if(reader!=null)
+          reader.close();
+      } catch (IOException e) {
+        //ignored
+      }
+    }
+    return null;
+  }
+
+  /**
+   * get version of installed ruby
+   * @return the installed version of ruby
+   */
+  public static Double getLocalRubyVersion() {
+    if(mLocalRubyVersion!=null)
+      return mLocalRubyVersion;
+    String line = readFirstLine(getRubyPath() + "/VERSION");
+    if(line!=null)
+      return (mLocalRubyVersion = Double.valueOf(line));
+    return null;
+  }
+
+  public static void updateLocalRubyVersion() {
+    mLocalRubyVersion=null;
+    getLocalRubyVersion();
+  }
+
+  /**
+   * get version of installed MetaSploit Framework
+   * @return the version of installed MetaSploit Framework
+   */
+  public static Double getLocalMsfVersion() {
+    /**
+     * short SHA it's the first 7 chars of the commit SHA.
+     * it's max value is 0xFFFFFFF = 268435455 < 3*(10^8)
+     * Double maximum value is about 1.7*(10^308)
+     * thus no overflow is possible.
+     */
+    if(mLocalMsfVersion!=null)
+      return mLocalMsfVersion;
+
+    String line = readFirstLine(getMsfPath() + "/VERSION");
+    if(line==null)
+      return null;
+    if(line.length()<7) {
+      Logger.error("msf version is shorter then 7 characters");
+      return null;
+    }
+
+    return (mLocalMsfVersion = (new BigInteger(line.substring(0,7), 16)).doubleValue());
+  }
+
+  public static void updateLocalMsfVersion() {
+    mLocalMsfVersion = null;
+    getLocalMsfVersion();
   }
 
   public static boolean isServiceRunning(String name){

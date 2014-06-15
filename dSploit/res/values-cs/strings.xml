@@ -338,8 +338,6 @@
     <string name="pref_rpc_pswd_desc">Password for connect to MetaSploit RPCD.</string>
     <string name="pref_rpc_port">RPC port</string>
     <string name="pref_rpc_port_desc">Port for connect to MetaSploit RPCD.</string>
-    <string name="pref_chroot">gentoo root</string>
-    <string name="pref_chroot_desc">Directory containing gentoo system.</string>
     <string name="pref_performance_vuln_desc">Search for vulnerability using</string>
     <string-array name="pref_performance_vuln" >
         <item>OSVDB</item>

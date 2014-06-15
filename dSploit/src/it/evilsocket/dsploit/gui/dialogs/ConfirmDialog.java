@@ -31,7 +31,7 @@ public class ConfirmDialog extends AlertDialog{
     public void onCancel();
   }
 
-  public ConfirmDialog(String title, String message, Activity activity, ConfirmDialogListener confirmDialogListener){
+  public ConfirmDialog(String title, CharSequence message, Activity activity, ConfirmDialogListener confirmDialogListener){
     super(activity);
 
     this.setTitle(title);

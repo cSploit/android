@@ -28,27 +28,45 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveInputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 import org.apache.commons.compress.utils.CountingInputStream;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.KeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CancellationException;
+import java.util.regex.Pattern;
 
 import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.net.GemParser;
+import it.evilsocket.dsploit.net.GitHubParser;
+import it.evilsocket.dsploit.core.ArchiveMetadata.archiveAlgorithm;
+import it.evilsocket.dsploit.core.ArchiveMetadata.compressionAlgorithm;
 
 public class UpdateService extends IntentService
 {
@@ -56,10 +74,12 @@ public class UpdateService extends IntentService
   private static final String REMOTE_VERSION_URL = "http://update.dsploit.net/version";
   private static final String REMOTE_APK_URL = "http://update.dsploit.net/apk";
   private static final String VERSION_CHAR_MAP = "zyxwvutsrqponmlkjihgfedcba";
-  private static final String REMOTE_IMAGE_URL = "http://update.dsploit.net/gentoo_msf.tar.xz";
-  private static final String REMOTE_IMAGE_NAME = "gentoo_msf.tar.xz";
-  private static final String REMOTE_IMAGE_MD5 = "4e8158c974650970b8add11624a7d68b";
-  private static final String REMOTE_IMAGE_SHA1 = "250170ccc11debfd382077b283849d6e80b0ff1a";
+  private static final String REMOTE_RUBY_VERSION_URL = "https://gist.githubusercontent.com/tux-mind/e594b1cf923183cfcdfe/raw/ruby.json";
+  private static final String REMOTE_GEMS_VERSION_URL = "https://gist.githubusercontent.com/tux-mind/9c85eced88fd88367fa9/raw/gems.json";
+  private static final String REMOTE_MSF_URL = "https://github.com/rapid7/metasploit-framework/archive/%s.zip";
+  private static final String LOCAL_MSF_NAME = "%s.zip";
+  private static final String REMOTE_GEM_SERVER = "http://gems.dsploit.net/";
+  private static final Pattern VERSION_CHECK = Pattern.compile("^[0-9]+\\.[0-9]+\\.[0-9]+[a-z]?$");
 
   // Intent defines
   public static final String START    = "UpdateService.action.START";
@@ -74,16 +94,21 @@ public class UpdateService extends IntentService
   private static final int CANCEL_CODE = 2;
   private static final String NOTIFICATION_CANCELLED = "it.evilsocket.dSploit.core.UpdateService.CANCELLED";
 
-  private String  mRemoteUrl        = null,
-                  mLocalFile        = null,
-                  mDestinationDir   = null,
-                  md5sum            = null,
-                  sha1sum           = null,
-                  mRemoteVersion    = null,
-                  mInstalledVersion = null;
-  private boolean mRunning          = false;
-  compressionAlgorithm mAlgorithm = compressionAlgorithm.none;
-  private Intent  mContentIntent    = null;
+  // remote data
+  private static final ArchiveMetadata  mApkInfo          = new ArchiveMetadata();
+  private static final ArchiveMetadata  mMsfInfo          = new ArchiveMetadata();
+  private static final ArchiveMetadata  mRubyInfo         = new ArchiveMetadata();
+  private static final GitHubParser     mMsfRepoParser    = new GitHubParser("rapid7", "metasploit-framework");
+  private static final GemParser        mGemUploadParser  = new GemParser(REMOTE_GEMS_VERSION_URL);
+
+  private boolean
+          mRunning                    = false;
+  private ArchiveMetadata
+          mCurrentTask                = null;
+  final private StringBuffer
+          mErrorOutput                = new StringBuffer();
+  private Shell.OutputReceiver
+          mErrorReceiver              = null;
 
   private NotificationManager mNotificationManager = null;
   private NotificationCompat.Builder mBuilder = null;
@@ -91,21 +116,59 @@ public class UpdateService extends IntentService
 
   public enum action {
     apk_update,
-    gentoo_update
-  }
-
-  private enum compressionAlgorithm {
-    none,
-    gzip,
-    bzip,
-    xz
+    ruby_update,
+    gems_update,
+    msf_update
   }
 
   public UpdateService(){
     super("UpdateService");
-    mInstalledVersion = System.getAppVersionName();
+    // prepare error receiver
+    mErrorReceiver = new Shell.OutputReceiver() {
+      @Override
+      public void onStart(String command) {
+        mErrorOutput.delete(0, mErrorOutput.length());
+        mErrorOutput.append("running: ");
+        mErrorOutput.append(command);
+        mErrorOutput.append("\n");
+      }
+
+      @Override
+      public void onNewLine(String line) {
+        mErrorOutput.append(line);
+        mErrorOutput.append("\n");
+      }
+
+      @Override
+      public void onEnd(int exitCode) {
+        mErrorOutput.append("exitValue: ");
+        mErrorOutput.append(exitCode);
+      }
+    };
   }
 
+  /**
+   * <p>
+   * parse a string containing the version of the apk
+   * into a double for easily compare them.
+   * </p>
+   * <p>
+   * the algorithm works as follows:
+   * </p>
+   * <p>
+   * {@code version = "1.2.3d"}
+   * <br/>
+   * {@code output = (((1+1) * 1000) + ((2+1) * 100) + ((3+1) * 1)) - ((charOffset+1) / 100.0)}
+   * <br/>
+   * {@code output = 2304.77}
+   * </p>
+   * <p>
+   * where {@code charOffset} is the distance of the letter from the 'z'
+   * in the ASCII table.
+   * </p>
+   * @param version the apk version
+   * @return the input version represented as double
+   */
   private static double getVersionCode(String version){
     double code = 0,
            multipliers[] = { 1000, 100, 1 };
@@ -142,72 +205,237 @@ public class UpdateService extends IntentService
     return code;
   }
 
-  public boolean isUpdateAvailable(){
+  public static boolean isUpdateAvailable(){
+    boolean exitForError = true;
+    String localVersion = System.getAppVersionName();
 
-    try{
-      if(mInstalledVersion != null){
+    // cannot retrieve installed apk version
+    if(localVersion==null)
+      return false;
+
+    try {
+      synchronized (mApkInfo) {
         // Read remote version
-        if(mRemoteVersion == null){
+        if (mApkInfo.version == null) {
           URL url = new URL(REMOTE_VERSION_URL);
           HttpURLConnection connection = (HttpURLConnection) url.openConnection();
           BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
           String line,
-            buffer = "";
+                  buffer = "";
 
-          while((line = reader.readLine()) != null){
+          while ((line = reader.readLine()) != null) {
             buffer += line + "\n";
           }
 
           reader.close();
-
-          mRemoteVersion = buffer.trim();
+          mApkInfo.url = REMOTE_APK_URL;
+          mApkInfo.versionString = buffer.split("\n")[0].trim();
+          if (!VERSION_CHECK.matcher(mApkInfo.versionString).matches())
+            throw new org.apache.http.ParseException(
+                    String.format("remote version parse failed: '%s'", mApkInfo.versionString));
+          mApkInfo.version = getVersionCode(mApkInfo.versionString);
+          mApkInfo.name = String.format("dSploit-%s.apk", mApkInfo.versionString);
+          mApkInfo.path = String.format("%s/%s", System.getStoragePath(), mApkInfo.name);
+          mApkInfo.contentIntent = new Intent(Intent.ACTION_VIEW);
+          mApkInfo.contentIntent.setDataAndType(Uri.fromFile(new File(mApkInfo.path)), "application/vnd.android.package-archive");
+          mApkInfo.contentIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
 
         // Compare versions
-        double installedVersionCode = getVersionCode(mInstalledVersion),
-          remoteVersionCode = getVersionCode(mRemoteVersion);
+        double installedVersionCode = getVersionCode(localVersion);
 
-        Logger.debug( "mInstalledVersion = " + mInstalledVersion + " ( " + getVersionCode(mInstalledVersion)+ " ) " );
-        Logger.debug( "mRemoteVersion    = " + mRemoteVersion + " ( " + getVersionCode(mRemoteVersion)+ " ) " );
+        Logger.debug(String.format("mApkInstalledVersion = %s ( %s ) ", localVersion, installedVersionCode));
+        Logger.debug(String.format("mRemoteVersion       = %s ( %s ) ", mApkInfo.versionString, mApkInfo.version));
 
-        if(remoteVersionCode > installedVersionCode)
+        exitForError = false;
+
+        if (mApkInfo.version > installedVersionCode)
+          return true;
+      }
+    } catch (org.apache.http.ParseException e) {
+      Logger.error(e.getMessage());
+    } catch(Exception e){
+      System.errorLogging(e);
+    } finally {
+      if(exitForError)
+        mApkInfo.reset();
+    }
+
+    return false;
+  }
+
+  public static String getRemoteVersion(){
+    return mApkInfo.versionString;
+  }
+
+  /**
+   * is ruby update available?
+   * @return true if ruby can be updated, false otherwise
+   */
+  public static boolean isRubyUpdateAvailable() {
+    HttpURLConnection connection = null;
+    BufferedReader reader = null;
+    String line;
+    boolean exitForError = true;
+    Double localVersion = System.getLocalRubyVersion();
+
+    try {
+      synchronized (mRubyInfo) {
+        if (mRubyInfo.version == null) {
+
+          HttpURLConnection.setFollowRedirects(true);
+          URL url = new URL(REMOTE_RUBY_VERSION_URL);
+          connection = (HttpURLConnection) url.openConnection();
+          connection.connect();
+
+          if (connection.getResponseCode() != 200)
+            return false;
+
+          reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+          StringBuilder sb = new StringBuilder();
+
+          while ((line = reader.readLine()) != null) {
+            sb.append(line);
+          }
+
+          JSONObject info = new JSONObject(sb.toString());
+          mRubyInfo.url = info.getString("url");
+          mRubyInfo.version = info.getDouble("version");
+          mRubyInfo.versionString = String.format("%d", mRubyInfo.version.intValue());
+          mRubyInfo.path = String.format("%s/%s", System.getStoragePath(), info.getString("name"));
+          mRubyInfo.archiver = archiveAlgorithm.valueOf(info.getString("archiver"));
+          mRubyInfo.compression = compressionAlgorithm.valueOf(info.getString("compression"));
+          mRubyInfo.md5 = info.getString("md5");
+          mRubyInfo.sha1 = info.getString("sha1");
+          mRubyInfo.outputDir = System.getRubyPath();
+        }
+        exitForError = false;
+        if (localVersion == null || localVersion < mRubyInfo.version)
           return true;
       }
     } catch(Exception e){
       System.errorLogging(e);
+    } finally {
+      try {
+        if (reader != null)
+          reader.close();
+      } catch (Exception e) {
+        //ignored
+      }
+      if(connection!=null)
+        connection.disconnect();
+      if(exitForError)
+        mRubyInfo.reset();
     }
-
     return false;
   }
 
-  public String getRemoteVersion(){
-    return mRemoteVersion;
-  }
+  public static boolean isGemUpdateAvailable() {
 
-  /**
-   * is gentoo image available?
-   * @return true if the image can be downloaded, false otherwise
-   */
-  public boolean isGentooAvailable() {
     try {
-      File local = new File(System.getStoragePath() + "/" + REMOTE_IMAGE_NAME);
-      if(local.exists() && local.isFile())
+      synchronized (mGemUploadParser) {
+        GemParser.RemoteGemInfo[] gemInfoArray = mGemUploadParser.parse();
+        ArrayList<GemParser.RemoteGemInfo> gemsToUpdate = new ArrayList<GemParser.RemoteGemInfo>();
+
+        if (gemInfoArray.length == 0)
+          return false;
+
+        String format = String.format("%s/lib/ruby/gems/1.9.1/specifications/%%s-%%s-arm-linux.gemspec", System.getRubyPath());
+
+        for (GemParser.RemoteGemInfo gemInfo : gemInfoArray) {
+          File f = new File(String.format(format, gemInfo.name, gemInfo.version));
+          if (!f.exists() || f.lastModified() < gemInfo.uploaded.getTime()) {
+            Logger.debug(String.format("'%s' %s", f.getAbsolutePath(), (f.exists() ? "is old" : "does not exists")));
+            gemsToUpdate.add(gemInfo);
+          }
+        }
+
+        if(gemsToUpdate.size() == 0)
+          return false;
+
+        mGemUploadParser.setOldGems(gemsToUpdate.toArray(new GemParser.RemoteGemInfo[gemsToUpdate.size()]));
         return true;
-
-      HttpURLConnection.setFollowRedirects(true);
-      URL url = new URL(REMOTE_IMAGE_URL);
-      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-      connection.connect();
-
-      int retCode = connection.getResponseCode();
-
-      connection.disconnect();
-
-      return retCode == 200;
-    } catch(Exception e){
+      }
+    } catch (IOException e) {
+      Logger.warning(e.getClass() + ": " + e.getMessage());
+    } catch (JSONException e) {
       System.errorLogging(e);
     }
     return false;
+  }
+
+  /**
+   * is a MetaSploitFramework update available?
+   * @return true if the framework can be updated, false otherwise
+   */
+  public static boolean isMsfUpdateAvailable() {
+    boolean exitForError = true;
+    String branch = System.getSettings().getString("MSF_BRANCH", "release");
+    Double localVersion = System.getLocalMsfVersion();
+    HashMap<Integer, String> msfModeMap = new HashMap<Integer, String>() {
+      {
+        put(0755, "msfrpcd msfconsole msfcli $(find . -name '*.rb')");
+      }
+    };
+
+    try {
+      String name = String.format(LOCAL_MSF_NAME, branch);
+      String path = String.format("%s/%s", System.getStoragePath(), name);
+      File local = new File(path);
+
+      synchronized (mMsfInfo) {
+
+        if (local.exists() && local.isFile() && local.canRead()) {
+          mMsfInfo.name = name;
+          mMsfInfo.path = path;
+          mMsfInfo.archiver = archiveAlgorithm.zip;
+          mMsfInfo.version = (localVersion != null ? localVersion + 1 : 0);
+          mMsfInfo.outputDir = System.getMsfPath();
+          mMsfInfo.dirToExtract = "metasploit-framework-" + branch + "/";
+          mMsfInfo.modeMap = msfModeMap;
+        } else if (mMsfInfo.version == null) {
+          synchronized (mMsfRepoParser) {
+            if (!branch.equals(mMsfRepoParser.getBranch()))
+              mMsfRepoParser.setBranch(branch);
+            mMsfInfo.versionString = mMsfRepoParser.getLastCommitSha();
+          }
+
+          mMsfInfo.url = String.format(REMOTE_MSF_URL, branch);
+          mMsfInfo.name = name;
+          mMsfInfo.path = path;
+          mMsfInfo.outputDir = System.getMsfPath();
+          mMsfInfo.archiver = archiveAlgorithm.zip;
+          mMsfInfo.dirToExtract = "metasploit-framework-" + branch + "/";
+          mMsfInfo.modeMap = msfModeMap;
+          // see System.getLocalMsfVersion for more info about this line of code
+          mMsfInfo.version = (new BigInteger(mMsfInfo.versionString.substring(0, 7), 16)).doubleValue();
+        }
+
+        exitForError = false;
+
+        if (!mMsfInfo.version.equals(localVersion))
+          return true;
+      }
+    } catch (Exception e) {
+      System.errorLogging(e);
+    } finally {
+      if(exitForError)
+        mMsfInfo.reset();
+    }
+    return false;
+  }
+
+  public static String[] getMsfBranches() {
+    synchronized (mMsfRepoParser) {
+      try {
+        return mMsfRepoParser.getBranches();
+      } catch (JSONException e) {
+        System.errorLogging(e);
+      } catch (IOException e) {
+        Logger.warning("getMsfBranches: " + e.getMessage());
+      }
+    }
+    return new String[] {"master"};
   }
 
   /**
@@ -230,6 +458,11 @@ public class UpdateService extends IntentService
     sendBroadcast(i);
   }
 
+  /**
+   * convert a byte array to it's hexadecimal string representation
+   * @param digest the byte array to convert
+   * @return the hexadecimal string that represent the given array
+   */
   private String digest2string(byte[] digest) {
     StringBuilder sb = new StringBuilder();
     for (byte b : digest) {
@@ -242,10 +475,12 @@ public class UpdateService extends IntentService
    * open a compressed InputStream
    * @param in the InputStream to decompress
    * @return the InputStream to read from
-   * @throws IOException
+   * @throws IOException if an I/O error occurs
    */
   private InputStream openCompressedStream(InputStream in) throws IOException {
-    switch(mAlgorithm) {
+    if(mCurrentTask.compression==null)
+      return in;
+    switch(mCurrentTask.compression) {
       default:
       case none:
         return in;
@@ -259,12 +494,56 @@ public class UpdateService extends IntentService
   }
 
   /**
-   * wipe the mDestinationDir ( rm -rf )
+   * open an Archive InputStream
+   * @param in the InputStream to the archive
+   * @return the ArchiveInputStream to read from
+   * @throws IOException if an I/O error occurs
+   * @throws java.lang.IllegalStateException if no archive method has been choose
+   */
+  private ArchiveInputStream openArchiveStream(InputStream in) throws IOException, IllegalStateException {
+    switch (mCurrentTask.archiver) {
+      case tar:
+        return new TarArchiveInputStream(new BufferedInputStream(openCompressedStream(in)));
+      case zip:
+        return new ZipArchiveInputStream(new BufferedInputStream(openCompressedStream(in)));
+      default:
+        throw new IllegalStateException("trying to open an archive, but no archive algorithm selected.");
+    }
+  }
+
+  /**
+   * delete a directory recursively
+   * @param f the file/directory to delete
+   * @throws IOException if cannot delete something
+   */
+  private void deleteRecursively(File f) throws IOException {
+    if (f.isDirectory()) {
+      for (File c : f.listFiles())
+        deleteRecursively(c);
+    }
+    if (!f.delete())
+      throw new IOException("Failed to delete file: " + f);
+  }
+
+  /**
+   * wipe the destination dir ( rm -rf )
    */
   private void wipe() {
+    File outputFile;
+    if(mCurrentTask==null||mCurrentTask.outputDir==null||mCurrentTask.outputDir.isEmpty()||
+            !(outputFile = new File(mCurrentTask.outputDir)).exists())
+      return;
+
     try {
-      Shell.exec("rm -rf '"+mDestinationDir+"'");
+      Shell.exec("rm -rf '"+mCurrentTask.outputDir+"'");
+      return;
     } catch (Exception e) {
+      System.errorLogging(e);
+    }
+
+    try {
+      deleteRecursively(outputFile);
+    } catch (IOException e) {
       System.errorLogging(e);
     }
   }
@@ -305,14 +584,14 @@ public class UpdateService extends IntentService
    * else assign it to the notification onClick
    */
   private void finishNotification() {
-    if(mContentIntent==null){
+    if(mCurrentTask.contentIntent==null){
       Logger.debug("deleting notifications");
       if(mNotificationManager!=null)
         mNotificationManager.cancel(NOTIFICATION_ID);
     } else {
-      Logger.debug("assign '"+mContentIntent.toString()+"'to notification");
+      Logger.debug("assign '"+mCurrentTask.contentIntent.toString()+"' to notification");
      if(mBuilder!=null&&mNotificationManager!=null) {
-       mBuilder.setContentIntent(PendingIntent.getActivity(this, DOWNLOAD_COMPLETE_CODE, mContentIntent, 0));
+       mBuilder.setContentIntent(PendingIntent.getActivity(this, DOWNLOAD_COMPLETE_CODE, mCurrentTask.contentIntent, 0));
        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
      }
     }
@@ -321,6 +600,97 @@ public class UpdateService extends IntentService
     mReceiver             = null;
     mBuilder              = null;
     mNotificationManager  = null;
+  }
+
+  /**
+   * wait that a shell terminate or user cancel the notification.
+   * @param shell the Thread returned by {@link it.evilsocket.dsploit.core.Shell#async(String, it.evilsocket.dsploit.core.Shell.OutputReceiver, boolean)}
+   * @param cancellationMessage the message of the CancellationException
+   * @throws java.io.IOException when cannot execute shell
+   * @throws java.util.concurrent.CancellationException when user cancelled the notification
+   */
+  private int execShell(Thread shell, String cancellationMessage) throws IOException, CancellationException, InterruptedException {
+    if(!(shell instanceof Shell.StreamGobbler))
+      throw new IOException("cannot execute shell commands");
+    shell.start();
+    while(mRunning && shell.getState()!= Thread.State.TERMINATED)
+      Thread.sleep(10);
+    if(!mRunning) {
+      shell.interrupt();
+      throw new CancellationException(cancellationMessage);
+    } else
+      shell.join();
+
+    int ret = ((Shell.StreamGobbler)shell).exitValue;
+
+    if(ret!=0 && mErrorOutput.length() > 0)
+      for(String line : mErrorOutput.toString().split("\n"))
+        Logger.error(line);
+
+    return ret;
+  }
+
+  /**
+   * check if an archive is valid by reading it.
+   * @throws RuntimeException if trying to run this with no archive
+   */
+  private void verifyArchiveIntegrity() throws RuntimeException, KeyException {
+    File f;
+    long total;
+    short old_percentage,percentage;
+    CountingInputStream counter;
+    ArchiveInputStream is;
+    byte[] buffer;
+    boolean dirToExtractFound;
+
+    Logger.info("verifying archive integrity");
+
+    if(mCurrentTask==null||mCurrentTask.path==null)
+      throw new RuntimeException("no archive to test");
+
+    mBuilder.setContentTitle(getString(R.string.checking))
+            .setSmallIcon(android.R.drawable.ic_popup_sync)
+            .setContentText("")
+            .setProgress(100, 0, false);
+    mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
+
+    f = new File(mCurrentTask.path);
+    try {
+      counter = new CountingInputStream(new FileInputStream(f));
+    } catch (FileNotFoundException e) {
+      throw new RuntimeException(String.format("archive '%s' does not exists", mCurrentTask.path));
+    }
+
+    dirToExtractFound = mCurrentTask.dirToExtract == null;
+
+    try {
+      is = openArchiveStream(counter);
+      ArchiveEntry entry;
+      buffer = new byte[2048];
+      total = f.length();
+      old_percentage = -1;
+      // consume the archive
+      while (mRunning && (entry = is.getNextEntry()) != null)
+        if(!dirToExtractFound && entry.getName().startsWith(mCurrentTask.dirToExtract))
+          dirToExtractFound=true;
+        while (mRunning && is.read(buffer) > 0) {
+          percentage = (short) (((double) counter.getBytesRead() / total) * 100);
+          if (percentage != old_percentage) {
+            mBuilder.setProgress(100, percentage, false)
+                    .setContentInfo(percentage + "%");
+            mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+            old_percentage = percentage;
+          }
+        }
+    } catch (IOException e) {
+      throw new KeyException("corrupted archive: "+e.getMessage());
+    }
+
+    if(!mRunning)
+      throw new CancellationException("archive integrity check cancelled");
+
+    if(!dirToExtractFound)
+      throw new KeyException(String.format("archive '%s' does not contains required '%s' directory", mCurrentTask.path, mCurrentTask.dirToExtract));
   }
 
   /**
@@ -339,24 +709,21 @@ public class UpdateService extends IntentService
     InputStream reader = null;
     boolean exitForError = true;
 
+    if(mCurrentTask.path==null)
+      return false;
+
     try {
       MessageDigest md5, sha1;
       byte[] buffer;
       int read;
-      String digest;
       short percentage,previous_percentage;
       long read_counter,total;
 
-      file = new File(mLocalFile);
+      file = new File(mCurrentTask.path);
       buffer = new byte[4096];
       total= file.length();
       read_counter=0;
       previous_percentage=-1;
-      mBuilder.setContentTitle(getString(R.string.checking))
-              .setSmallIcon(android.R.drawable.ic_popup_sync)
-              .setContentText("")
-              .setProgress(100, 0, false);
-      mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
 
       if(!file.exists() || !file.isFile())
         return false;
@@ -364,48 +731,56 @@ public class UpdateService extends IntentService
       if(!file.canWrite() || !file.canRead()) {
         read = -1;
         try {
-          read = Shell.exec("chmod 777 '"+mLocalFile+"'");
+          read = Shell.exec(String.format("chmod 777 '%s'", mCurrentTask.path));
         } catch ( Exception e) {
           System.errorLogging(e);
-        } finally {
-          if(read!=0)
-            //noinspection ThrowFromFinallyBlock
-            throw new SecurityException("bad file permissions for '"+mLocalFile+"', chmod returned: "+read);
         }
+        if(read!=0)
+          throw new SecurityException(String.format("bad file permissions for '%s', chmod returned: %d", mCurrentTask.path, read));
       }
 
-      if(md5sum==null || sha1sum==null) // cannot check file consistency
-        return false;
+      if(mCurrentTask.md5!=null || mCurrentTask.sha1!=null) {
+        mBuilder.setContentTitle(getString(R.string.checking))
+                .setSmallIcon(android.R.drawable.ic_popup_sync)
+                .setContentText("")
+                .setProgress(100, 0, false);
+        mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
 
-      md5 = MessageDigest.getInstance("MD5");
-      sha1 = MessageDigest.getInstance("SHA-1");
+        md5 = (mCurrentTask.md5!=null ? MessageDigest.getInstance("MD5") : null);
+        sha1 = (mCurrentTask.sha1!=null ? MessageDigest.getInstance("SHA-1") : null);
 
-      reader = new FileInputStream(file);
-      while(mRunning && (read = reader.read(buffer))!=-1) {
-        md5.update(buffer,0,read);
-        sha1.update(buffer,0,read);
+        reader = new FileInputStream(file);
+        while (mRunning && (read = reader.read(buffer)) != -1) {
+          if(md5!=null)
+            md5.update(buffer, 0, read);
+          if(sha1!=null)
+            sha1.update(buffer, 0, read);
 
-        read_counter+=read;
+          read_counter += read;
 
-        percentage=(short)(((double)read_counter/total)*100);
-        if(percentage!=previous_percentage) {
-          mBuilder.setProgress(100,percentage,false)
-                  .setContentInfo(percentage + "%");
-          mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
-          previous_percentage=percentage;
+          percentage = (short) (((double) read_counter / total) * 100);
+          if (percentage != previous_percentage) {
+            mBuilder.setProgress(100, percentage, false)
+                    .setContentInfo(percentage + "%");
+            mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+            previous_percentage = percentage;
+          }
         }
+        reader.close();
+        reader = null;
+        if (!mRunning) {
+          exitForError = false;
+          throw new CancellationException("local file check cancelled");
+        }
+        if (md5!=null && !mCurrentTask.md5.equals(digest2string(md5.digest())))
+          throw new KeyException("wrong MD5");
+        if (sha1!=null && !mCurrentTask.sha1.equals(digest2string(sha1.digest())))
+          throw new KeyException("wrong SHA-1");
+        Logger.info(String.format("checksum ok: '%s'", mCurrentTask.path));
+      } else if (mCurrentTask.archiver != null) {
+        verifyArchiveIntegrity();
       }
-      reader.close();
-      reader=null;
-      if(!mRunning) {
-        exitForError=false;
-        throw new CancellationException("local file check cancelled");
-      }
-      if(!md5sum.equals(digest2string(md5.digest())))
-        throw new KeyException("wrong MD5");
-      if(!sha1sum.equals(digest2string(sha1.digest())))
-        throw new KeyException("wrong SHA-1");
-      Logger.info("file already exists: "+mLocalFile);
+      Logger.info(String.format("file already exists: '%s'", mCurrentTask.path));
       mBuilder.setSmallIcon(android.R.drawable.stat_sys_download_done)
               .setContentTitle(getString(R.string.update_available))
               .setContentText(getString(R.string.click_here_to_upgrade))
@@ -415,7 +790,7 @@ public class UpdateService extends IntentService
       return true;
     } finally {
       if(exitForError&&file!=null&&file.exists()&&!file.delete())
-        Logger.error("cannot delete local file '"+mLocalFile+"'");
+        Logger.error(String.format("cannot delete local file '%s'", mCurrentTask.path));
       try {
         if(reader!=null)
           reader.close();
@@ -426,16 +801,15 @@ public class UpdateService extends IntentService
   }
 
   /**
-   * download mRemoteUrl to mLocalFile.
+   * download mCurrentTask.url to mCurrentTask.path
    *
    * @throws KeyException when MD5 or SHA1 sum fails
    * @throws IOException when IOError occurs
    * @throws NoSuchAlgorithmException when required digest algorithm is not available
    * @throws CancellationException when user cancelled the download via notification
    */
-
   private void downloadFile() throws SecurityException, KeyException, IOException, NoSuchAlgorithmException, CancellationException {
-    if(mRemoteUrl==null||mLocalFile==null)
+    if(mCurrentTask.url==null||mCurrentTask.path==null)
       return;
 
     File file = null;
@@ -450,7 +824,6 @@ public class UpdateService extends IntentService
       HttpURLConnection connection;
       byte[] buffer;
       int read;
-      String digest;
       short percentage,previous_percentage;
       long downloaded,total;
 
@@ -460,17 +833,17 @@ public class UpdateService extends IntentService
               .setProgress(100, 0, true);
       mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
 
-      md5 = (md5sum!=null  ? MessageDigest.getInstance("MD5") : null);
-      sha1= (sha1sum!=null ? MessageDigest.getInstance("SHA-1") : null);
+      md5 = (mCurrentTask.md5!=null  ? MessageDigest.getInstance("MD5") : null);
+      sha1= (mCurrentTask.sha1!=null ? MessageDigest.getInstance("SHA-1") : null);
       buffer = new byte[4096];
-      file = new File(mLocalFile);
+      file = new File(mCurrentTask.path);
 
       if(file.exists()&&file.isFile())
         //noinspection ResultOfMethodCallIgnored
         file.delete();
 
       HttpURLConnection.setFollowRedirects(true);
-      url = new URL(mRemoteUrl);
+      url = new URL(mCurrentTask.url);
       connection = (HttpURLConnection) url.openConnection();
 
       connection.connect();
@@ -483,9 +856,10 @@ public class UpdateService extends IntentService
       downloaded=0;
       previous_percentage=-1;
 
-      mBuilder.setContentText("");
+      mBuilder.setContentText(file.getName());
+      mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
 
-      Logger.debug(String.format("downloading '%s' to '%s'",mRemoteUrl,mLocalFile));
+      Logger.info(String.format("downloading '%s' to '%s'", mCurrentTask.url, mCurrentTask.path));
 
       while( mRunning && (read = reader.read(buffer)) != -1 ) {
         writer.write(buffer, 0, read);
@@ -494,40 +868,40 @@ public class UpdateService extends IntentService
         if(sha1!=null)
           sha1.update(buffer, 0, read);
 
-        downloaded+=read;
+        if(total>=0) {
+          downloaded += read;
 
-        percentage = (short)(((double)downloaded/ total) * 100);
+          percentage = (short) (((double) downloaded / total) * 100);
 
-        if(percentage!=previous_percentage) {
-          mBuilder.setProgress(100,percentage,false)
-                  .setContentInfo(percentage + "%");
-          mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-          previous_percentage=percentage;
+          if (percentage != previous_percentage) {
+            mBuilder.setProgress(100, percentage, false)
+                    .setContentInfo(percentage + "%");
+            mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+            previous_percentage = percentage;
+          }
         }
       }
 
-      writer.close();
-      reader.close();
-
-      writer=null;
-      reader=null;
-
-      if(!mRunning) {
+      if(!mRunning)
         throw new CancellationException("download cancelled");
-      } else
-        Logger.debug("download finished successfully");
 
-      if(md5sum!=null && md5 != null && !md5sum.equals((digest = digest2string(md5.digest())))) {
-        throw new KeyException("wrong MD5");
-      } else if(sha1sum!=null && sha1 != null && !sha1sum.equals((digest = digest2string(sha1.digest())))){
-        throw new KeyException("wrong SHA-1");
+      Logger.info("download finished successfully");
+
+      if( md5 != null || sha1 != null ) {
+        if (md5 != null && !mCurrentTask.md5.equals(digest2string(md5.digest()))) {
+          throw new KeyException("wrong MD5");
+        } else if (sha1 != null && !mCurrentTask.sha1.equals(digest2string(sha1.digest()))) {
+          throw new KeyException("wrong SHA-1");
+        }
+      } else if(mCurrentTask.archiver != null) {
+        verifyArchiveIntegrity();
       }
 
       exitForError=false;
 
     } finally {
       if(exitForError&&file!=null&&file.exists()&&!file.delete())
-          Logger.error("cannot delete file '"+mLocalFile+"'");
+          Logger.error(String.format("cannot delete file '%s'", mCurrentTask.path));
       try {
         if(writer!=null)
           writer.close();
@@ -541,111 +915,341 @@ public class UpdateService extends IntentService
 
 
   /**
-   * extract mLocalFile tarball to mDestinationDir
-   * we cannot extract tar files from Java:
-   *   -  cannot make symlinks
-   *   -  cannot change file owner
-   *   -  cannot fully change file mode
-   * decompress it using mAlgorithm
+   * extract an archive into a directory
+   *
+   * @throws IOException if some I/O error occurs
+   * @throws java.util.concurrent.CancellationException if task is cancelled by user
+   * @throws java.lang.InterruptedException when the the running thread get cancelled.
    */
+  private void extract() throws CancellationException, RuntimeException, IOException, InterruptedException {
+    ArchiveInputStream is = null;
+    ArchiveEntry entry;
+    CountingInputStream counter;
+    File f,inFile;
+    File[] list;
+    String name;
+    FileOutputStream fos = null;
+    byte data[] = new byte[2048];
+    int mode;
+    int count;
+    long total;
+    short percentage,old_percentage;
 
-  private void tarballExtract() throws CancellationException, RuntimeException, IOException, InterruptedException {
-    if(mLocalFile==null||mDestinationDir==null)
+    if(mCurrentTask.path==null||mCurrentTask.outputDir==null)
       return;
 
-    OutputStream writer = null;
-    InputStream reader = null;
-    boolean exitForError = true;
+    mBuilder.setContentTitle(getString(R.string.extracting))
+            .setContentText("")
+            .setContentInfo("")
+            .setSmallIcon(android.R.drawable.ic_popup_sync)
+            .setProgress(100, 0, false);
+    mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
+
+    Logger.info(String.format("extracting '%s' to '%s'",mCurrentTask.path, mCurrentTask.outputDir));
 
     try {
-      Thread result;
-      Shell.StreamGobbler gobbler;
-      File inFile;
-      CountingInputStream counter;
-      long total;
-      short percentage,old_percentage;
-      int read;
-      byte[] buffer = new byte[4096];
-      long time = java.lang.System.currentTimeMillis();
-
-      mBuilder.setContentTitle(getString(R.string.extracting))
-              .setContentText("")
-              .setContentInfo("")
-              .setSmallIcon(android.R.drawable.ic_popup_sync)
-              .setProgress(100, 0, true);
-      mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
-
-      result = Shell.async(String.format("mkdir -p '%s' && cd '%s' && tar -x",mDestinationDir,mDestinationDir), null, true );
-      if(!(result instanceof Shell.StreamGobbler))
-        throw new IOException("cannot execute shell commands");
-      gobbler = (Shell.StreamGobbler) result;
-      gobbler.start();
-      // wait that stdin get connected to OutputStream
-      while(mRunning && (writer = gobbler.getOutputStream()) == null)
-        Thread.sleep(50);
-
-      if(writer == null) // check writer instead of mRunning to shut up NullPointer inspection
-        throw new CancellationException("tar extraction cancelled while connecting to stdin");
-
-      inFile = new File(mLocalFile);
+      inFile = new File(mCurrentTask.path);
+      total = inFile.length();
       counter = new CountingInputStream(new FileInputStream(inFile));
-      reader = openCompressedStream(counter);
-
+      is = openArchiveStream(counter);
       old_percentage=-1;
-      total=inFile.length();
 
-      while(mRunning && (read = reader.read(buffer))!=-1) {
-        writer.write(buffer,0,read);
-        percentage=(short)(((double)counter.getBytesRead()/total)*100);
-        if(percentage!=old_percentage) {
-          mBuilder.setProgress(100,percentage,false)
-                  .setContentInfo(percentage+"%");
-          mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
-          old_percentage=percentage;
+      f = new File(mCurrentTask.outputDir);
+      if(f.exists() && f.isDirectory() && (list = f.listFiles()) != null &&  list.length > 2)
+        Logger.warning(String.format("output directory '%s' is not empty", mCurrentTask.outputDir));
+
+      if(is instanceof TarArchiveInputStream && mCurrentTask.modeMap==null)
+        mCurrentTask.modeMap = new HashMap<Integer, String>();
+
+      while (mRunning && (entry = is.getNextEntry()) != null) {
+        name = entry.getName().replaceFirst("^\\./?", "");
+
+        if(mCurrentTask.dirToExtract!=null) {
+          if (!name.startsWith(mCurrentTask.dirToExtract))
+            continue;
+          else
+            name = name.substring(mCurrentTask.dirToExtract.length());
+        }
+
+        f = new File(mCurrentTask.outputDir, name);
+
+        if (entry.isDirectory()) {
+          if (!f.exists()) {
+            if (!f.mkdirs()) {
+              throw new IOException(String.format("Couldn't create directory '%s'.", f.getAbsolutePath()));
+            }
+          }
+        } else {
+          BufferedOutputStream bof = new BufferedOutputStream(new FileOutputStream(f));
+
+          while(mRunning && (count = is.read(data)) != -1) {
+            bof.write(data, 0, count);
+            percentage=(short)(((double)counter.getBytesRead()/total)*100);
+            if(percentage!=old_percentage) {
+              mBuilder.setProgress(100,percentage,false)
+                      .setContentInfo(percentage+"%");
+              mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
+              old_percentage=percentage;
+            }
+          }
+          bof.flush();
+          bof.close();
+        }
+        // Zip does not store file permissions.
+        if(entry instanceof TarArchiveEntry) {
+          mode=((TarArchiveEntry)entry).getMode();
+
+          if(!mCurrentTask.modeMap.containsKey(mode))
+            mCurrentTask.modeMap.put(mode, entry.getName() + " ");
+          else
+            mCurrentTask.modeMap.put(mode,
+                    mCurrentTask.modeMap.get(mode).concat(entry.getName() + " "));
         }
       }
 
-      writer.close();
-      writer = null;
-      reader.close();
-      reader = null;
-
       if(!mRunning)
-        throw new CancellationException("tar extraction cancelled while decompressing");
+        throw new CancellationException("extraction cancelled.");
 
-      if(!inFile.delete())
-        Logger.error("cannot delete tarball '"+mLocalFile+"'");
+      Logger.info("extraction completed");
+
+      if(mCurrentTask.versionString!=null&&!mCurrentTask.versionString.isEmpty()) {
+        f = new File(mCurrentTask.outputDir, "VERSION");
+        fos = new FileOutputStream(f);
+        fos.write(mCurrentTask.versionString.getBytes());
+      } else
+        Logger.warning("version string not found");
 
       mBuilder.setContentInfo("")
               .setProgress(100,100,true);
       mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
-      try {
-        gobbler.join();
-      } catch (InterruptedException e) {
-        throw new CancellationException("tar extraction cancelled while extracting");
-      }
-
-      if(gobbler.exitValue!=0) {
-        throw new RuntimeException("tar failed with code: "+gobbler.exitValue);
-      }
-
-      Logger.debug("extraction took "+((java.lang.System.currentTimeMillis() - time)/1000)+" s");
-
-      exitForError=false;
     } finally {
-      if(reader!=null)
-        reader.close();
-      if(writer!=null)
-        writer.close();
-      if(exitForError)
-        wipe();
+      if(is != null)
+        is.close();
+      if(fos!=null)
+        fos.close();
     }
+  }
+
+  /**
+   * correct file modes on extracted files
+   * @throws CancellationException if task get cancelled by user
+   */
+  private void correctModes() throws CancellationException, IOException, RuntimeException, InterruptedException {
+    /*
+     * NOTE:  this horrible solution to chmod is only
+     *        a temporary way to changing mode to files.
+     *        we have to run chmod as root, our android App
+     *        does not usually have write permissions
+     *        outside of it's data dir.
+     *        we will make a better way to achieve that shortly
+     *        by executing native code as root.
+     */
+    if(mCurrentTask.modeMap==null||mCurrentTask.modeMap.size()==0)
+      return;
+
+    mBuilder.setContentTitle(getString(R.string.setting_file_modes))
+            .setContentText("")
+            .setContentInfo("")
+            .setSmallIcon(android.R.drawable.ic_popup_sync)
+            .setProgress(100, 0, true);
+    mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+
+    StringBuilder sb = new StringBuilder();
+    sb.append("cd '");
+    sb.append(mCurrentTask.outputDir);
+    sb.append("' ");
+    for (Map.Entry<Integer, String> e : mCurrentTask.modeMap.entrySet()) {
+      sb.append(" && ");
+      sb.append(String.format("chmod %o %s", e.getKey(), e.getValue()));
+    }
+
+    if (execShell(Shell.async(sb.toString(),mErrorReceiver), "chmod cancelled") != 0) {
+      Logger.debug("chmod command: "+sb.toString());
+      throw new IOException("cannot chmod extracted files.");
+    }
+  }
+
+  /**
+   * patch shebang on extracted files.
+   * simply replace standard '/usr/bin/env' with busybox one
+   * @throws IOException if cannot execute shell commands
+   * @throws InterruptedException if current thread get interrupted
+   * @throws RuntimeException if something goes wrong
+   * @throws java.util.concurrent.CancellationException if user cancelled this task
+   */
+  private void patchShebang() throws IOException, InterruptedException, RuntimeException, CancellationException {
+
+    if(mCurrentTask.outputDir==null)
+      return;
+
+    final StringBuilder envPath = new StringBuilder();
+
+    mBuilder.setContentTitle(getString(R.string.patching_shebang))
+            .setContentText("")
+            .setContentInfo("")
+            .setSmallIcon(android.R.drawable.ic_popup_sync)
+            .setProgress(100, 0, true);
+    mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+
+    if (Shell.exec("which env", new Shell.OutputReceiver() {
+      @Override
+      public void onStart(String command) {
+      }
+
+      @Override
+      public void onNewLine(String line) {
+        if(line.length()>0) {
+          envPath.delete(0, envPath.length());
+          envPath.append(line);
+        }
+      }
+
+      @Override
+      public void onEnd(int exitCode) {
+      }
+    }) != 0)
+      throw new RuntimeException("cannot find 'env' executable");
+
+    Logger.debug("envPath: " + envPath);
+
+    Thread shell = Shell.async(
+            String.format("sed -i '1s,^#!/usr/bin/env,#!%s,' $(find '%s' -type f -perm +111 )",
+                    envPath.toString(), mCurrentTask.outputDir), mErrorReceiver);
+
+    if (execShell(shell, "cannot change shebang") != 0)
+      throw new RuntimeException("cannot change shebang");
+  }
+
+  /**
+   * install gems required by the MSF
+   */
+  private void installGems() throws CancellationException, RuntimeException, IOException, InterruptedException {
+    String msfPath = System.getMsfPath();
+
+    mBuilder.setContentTitle(getString(R.string.installing_gems))
+            .setContentText(getString(R.string.installing_bundle))
+            .setContentInfo("")
+            .setSmallIcon(android.R.drawable.stat_sys_download)
+            .setProgress(100, 0, true);
+    mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+    Shell.setupRubyEnviron();
+    Thread shell;
+
+    shell = Shell.async("gem install bundle", mErrorReceiver);
+
+    // install bundle gem, required for install msf
+    if(execShell(shell,"cancelled while install bundle")!=0)
+      throw new RuntimeException("cannot install bundle");
+
+    mBuilder.setContentText(getString(R.string.installing_msf_gems));
+    mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+
+    // append our REMOTE_GEM_SERVER to msf Gemfile sources.
+    // we use an our gem server to provide cross compiled gems,
+    // because android does not comes with a compiler.
+
+    shell = Shell.async( String.format(
+            "sed -i \"/source 'https:\\/\\/rubygems.org'/a\\\nsource '%s'\" '%s/Gemfile'",
+            REMOTE_GEM_SERVER, msfPath), mErrorReceiver);
+
+    if(execShell(shell, "cancelled while adding our gem server")!=0)
+      throw new RuntimeException("cannot add our gem server");
+
+    // i was able to cross compile pcaprub 0.10.0,
+    // newer version use pcap version that are not used by android.
+
+    shell = Shell.async(String.format(
+            "sed -i \"s/'pcaprub'\\$/'pcaprub', '0.10.0'/\" '%s/Gemfile'",
+            msfPath
+    ), mErrorReceiver);
+
+    if(execShell(shell, "cancelled while patching pcaprub version")!=0)
+      throw new RuntimeException("cannot specify pcaprub version");
+
+    shell = Shell.async(
+            String.format("cd '%s' && bundle install --without development test", msfPath),
+            mErrorReceiver);
+
+    // install gem required by msf using bundle
+    if(execShell(shell, "cancelled on bundle install")!=0)
+      throw new RuntimeException("cannot install msf gems");
+  }
+
+  /**
+   * update rubygems thus to correct an SSL certificate mismatch error.
+   */
+  private void updateRubyGems() throws CancellationException, IOException, InterruptedException {
+    mBuilder.setContentTitle(getString(R.string.installing_gems))
+            .setContentText(getString(R.string.updating_rubygem))
+            .setContentInfo("")
+            .setSmallIcon(android.R.drawable.stat_sys_download)
+            .setProgress(100, 0, true);
+    mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+    Shell.setupRubyEnviron();
+    Thread shell;
+
+    shell = Shell.async("gem update --system --source 'http://rubygems.org/'", mErrorReceiver);
+
+    if (execShell(shell, "cancelled on gem system update") != 0)
+      throw new IOException("cannot update RubyGems");
+  }
+
+  private void updateGems() throws IOException, InterruptedException, CancellationException, RuntimeException, KeyException, NoSuchAlgorithmException {
+    GemParser.RemoteGemInfo[] gemsToUpdate = mGemUploadParser.getGemsToUpdate();
+
+    if(gemsToUpdate==null||gemsToUpdate.length==0)
+      return;
+
+    Shell.setupRubyEnviron();
+    String localFormat = String.format("%s/%%s",System.getStoragePath());
+    String remoteFormat = String.format("%s/gems/%%s", REMOTE_GEM_SERVER);
+    mCurrentTask.archiver = archiveAlgorithm.tar;
+
+    Thread shell;
+
+    for(GemParser.RemoteGemInfo gemInfo : gemsToUpdate) {
+
+      String gemFilename = String.format("%s-%s-arm-linux.gem", gemInfo.name, gemInfo.version);
+
+      mCurrentTask.url = String.format(remoteFormat, gemFilename);
+      mCurrentTask.path = String.format(localFormat, gemFilename);
+      if(!haveLocalFile())
+        downloadFile();
+
+      mBuilder.setContentTitle(getString(R.string.installing_gems))
+              .setContentText(gemInfo.name)
+              .setContentInfo("")
+              .setSmallIcon(android.R.drawable.ic_popup_sync)
+              .setProgress(100, 0, true);
+      mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+
+      shell = Shell.async(String.format(
+              "gem uninstall --force -x -v '%s' '%s' && gem install -l '%s'",
+              gemInfo.version, gemInfo.name, mCurrentTask.path), mErrorReceiver);
+
+      String cancelMessage = String.format("cancelled while updating '%s-%s'",
+              gemInfo.name, gemInfo.version);
+
+      if(execShell(shell,cancelMessage)!=0)
+        throw new RuntimeException(String.format("cannot update '%s-%s'", gemInfo.name, gemInfo.version));
+
+      if(!(new File(mCurrentTask.path).delete()))
+        Logger.warning(String.format("cannot delete downloaded gem '%s'", mCurrentTask.path));
+      mCurrentTask.path = null;
+    }
+  }
+
+  private void deleteTemporaryFiles() {
+    if(mCurrentTask.path==null||mCurrentTask.path.isEmpty())
+      return;
+    if(!(new File(mCurrentTask.path)).delete())
+      Logger.error(String.format("cannot delete temporary file '%s'", mCurrentTask.path));
   }
 
   @Override
   protected void onHandleIntent(Intent intent) {
     action what_to_do = (action)intent.getSerializableExtra(ACTION);
-    Intent everythingGoesOk = null;
+    boolean exitForError=true;
 
     if(what_to_do==null) {
       Logger.error("received null action");
@@ -656,19 +1260,16 @@ public class UpdateService extends IntentService
 
     switch (what_to_do) {
       case apk_update:
-        mRemoteUrl = REMOTE_APK_URL;
-        mLocalFile =System.getStoragePath() + "/dSploit-" + mRemoteVersion + ".apk";
-        everythingGoesOk = new Intent(Intent.ACTION_VIEW);
-        everythingGoesOk.setDataAndType(Uri.fromFile(new File(mLocalFile)),"application/vnd.android.package-archive");
-        everythingGoesOk.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mCurrentTask = mApkInfo;
         break;
-      case gentoo_update:
-        mRemoteUrl =REMOTE_IMAGE_URL;
-        md5sum=REMOTE_IMAGE_MD5;
-        sha1sum=REMOTE_IMAGE_SHA1;
-        mLocalFile=System.getStoragePath() + "/" + REMOTE_IMAGE_NAME;
-        mDestinationDir=System.getGentooPath();
-        mAlgorithm=compressionAlgorithm.xz;
+      case ruby_update:
+        mCurrentTask = mRubyInfo;
+        break;
+      case msf_update:
+        mCurrentTask = mMsfInfo;
+        break;
+      case gems_update:
+        mCurrentTask = new ArchiveMetadata();
         break;
     }
 
@@ -676,8 +1277,24 @@ public class UpdateService extends IntentService
       setupNotification();
       if(!haveLocalFile())
         downloadFile();
-      tarballExtract();
-      mContentIntent=everythingGoesOk;
+      extract();
+      correctModes();
+      patchShebang();
+
+      if(what_to_do==action.ruby_update)
+        updateRubyGems();
+      else if(what_to_do==action.msf_update)
+        installGems();
+      else if(what_to_do==action.gems_update)
+        updateGems();
+
+      if(what_to_do!=action.apk_update)
+        deleteTemporaryFiles();
+      exitForError=false;
+      if(what_to_do==action.msf_update)
+        System.updateLocalMsfVersion();
+      if(what_to_do==action.ruby_update)
+        System.updateLocalRubyVersion();
       sendDone(what_to_do);
     } catch ( SecurityException e) {
       sendError(R.string.bad_permissions);
@@ -695,11 +1312,16 @@ public class UpdateService extends IntentService
       System.errorLogging(e);
     } catch ( RuntimeException e) {
       sendError(R.string.error_occured);
-      Logger.error(e.getClass().getName() + ": " + e.getMessage());
+      if(e.getClass() == NullPointerException.class)
+        System.errorLogging(e);
+      else
+        Logger.error(e.getClass().getName() + ": " + e.getMessage());
     } catch (InterruptedException e) {
       sendError(R.string.error_occured);
       System.errorLogging(e);
     } finally {
+      if(exitForError)
+        wipe();
       stopSelf();
       mRunning = false;
     }

@@ -272,6 +272,7 @@
     <string name="mitm_script_injection">Script Injection</string>
     <string name="mitm_script_injection_desc">Inject a javascript in every visited webpage.</string>
     <string name="choose_method">Choose a method:</string>
+    <string name="choose_branch">Choose a branch:</string>
     <string name="local_files">Local files</string>
     <string name="custom_code">Custom Code</string>
     <string name="error_file_intent">Seems like you have no file manager capable of browsing files, please install one.</string>
@@ -341,6 +342,8 @@
     <string name="pref_https_redirector_port_desc">MITM https redirection server port to listen on.</string>
     <string name="pref_http_max_buffer_size_desc">Max buffer size of HTTP requests handled by the transparent proxy.</string>
     <string name="pref_password_filename_desc">Name of the file to use to log passwords and cookies.</string>
+    <string name="pref_msf_check_updates">Check for MSF updates</string>
+    <string name="pref_msf_check_updates_desc">Check for MSF updates every time the application is started.</string>
     <string name="pref_rpc_user">RPC username</string>
     <string name="pref_rpc_user_desc">Username for connect to MetaSploit RPCD.</string>
     <string name="pref_rpc_pswd">RPC password</string>
@@ -351,8 +354,13 @@
     <string name="pref_rpc_port_desc">Port for connect to MetaSploit RPCD.</string>
     <string name="pref_rpc_ssl">RPC use SSL</string>
     <string name="pref_rpc_ssl_desc">Specify if MetaSploit RPC use SSL</string>
-    <string name="pref_chroot">gentoo root</string>
-    <string name="pref_chroot_desc">Directory containing gentoo system.</string>
+    <string name="pref_msfdir">MSF directory</string>
+    <string name="pref_msfdir_desc">Directory containing the MetaSploit Framework.</string>
+    <string name="pref_rubydir">Ruby directory</string>
+    <string name="pref_rubydir_desc">Directory containing the Ruby interpreter.</string>
+    <string name="pref_msf_branch_desc">The MetaSploit Framework branch to use</string>
+    <string name="pref_msf_branch_title">MSF branch</string>
+    <string name="pref_performance_vuln_title">Search preferences</string>
     <string name="pref_performance_vuln_desc">Search for vulnerability using</string>
     <string-array name="pref_performance_vuln" >
         <item>OSVDB</item>
@@ -444,4 +452,13 @@
     <string name="disconnect_msf">disconnect from MetaSploit</string>
     <string name="connected_msf">connected to MetaSploit</string>
     <string name="connection_failed">connection FAILED!</string>
+    <string name="new_ruby_update_desc">An update for ruby is available</string>
+    <string name="delete_previous_location">Delete previous location ?</string>
+    <string name="setting_file_modes">setting file permissions…</string>
+    <string name="updating_rubygem">updating RubyGems</string>
+    <string name="installing_gems">installing gems…</string>
+    <string name="patching_shebang">patching shebang</string>
+    <string name="installing_msf_gems">installing gems for MSF</string>
+    <string name="installing_bundle">installing bundle</string>
+    <string name="new_gems_update_desc">An update for ruby gems</string>
 </resources>

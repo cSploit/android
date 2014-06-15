@@ -48,7 +48,6 @@ public class FatalDialog extends AlertDialog{
     this.setButton("Ok", new DialogInterface.OnClickListener(){
       public void onClick(DialogInterface dialog, int id){
         activity.finish();
-        System.exit(0xFF);
       }
     });
   }

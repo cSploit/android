@@ -63,6 +63,7 @@
     <string name="update_available">Aggiornamento Disponibile</string>
     <string name="new_msf_update_desc">Un aggiornamento del MetaSploit Framework</string>
     <string name="new_update_desc">Un nuovo aggiornamento alla versione</string>
+    <string name="new_ruby_update_desc">Un aggiornamento di ruby</string>
     <string name="new_update_desc2">è disponibile, lo vuoi scaricare ?</string>
     <string name="checking">Controllo&#8230;</string>
     <string name="no_updates_available">Nessun aggiornamento disponibile.</string>
@@ -277,6 +278,7 @@
     <string name="mitm_script_injection">Iniezione di Script</string>
     <string name="mitm_script_injection_desc">Inietta un javascript in ogni pagina visitata.</string>
     <string name="choose_method">Seleziona un Metodo:</string>
+    <string name="choose_branch">Seleziona un branch:</string>
     <string name="local_files">File Locali</string>
     <string name="custom_code">Codice Personalizzato</string>
     <string name="error_file_intent">Sembrerebbe che non hai un file manager in grado di sfogliare i file, per favore installane uno.</string>
@@ -343,6 +345,8 @@
     <string name="pref_https_redirector_port_desc">Porta sulla quale il redirezionatore HTTPS deve mettersi in ascolto.</string>
     <string name="pref_http_max_buffer_size_desc">Grandezza massima del buffer HTTP che il proxy trasparente può gestire.</string>
     <string name="pref_password_filename_desc">Nome del file da usare per loggare password e cookie.</string>
+    <string name="pref_msf_check_updates">Controllo Aggiornamenti per MSF</string>
+    <string name="pref_msf_check_updates_desc">Controlla gli aggiornamenti per MSF ogni volta che l\'applicazione viene avviata.</string>
     <string name="pref_rpc_user_desc">Username per connettersi a MetaSploit.</string>
     <string name="pref_rpc_pswd_desc">Password per connettersi a MetaSploit.</string>
     <string name="pref_rpc_host">host RPC</string>
@@ -351,8 +355,11 @@
     <string name="pref_rpc_port_desc">Porta per connettersi a MetaSploit.</string>
     <string name="pref_rpc_ssl">RPC usa SSL</string>
     <string name="pref_rpc_ssl_desc">specifica se MetaSploit RPC utilizza SSL.</string>
-    <string name="pref_chroot_desc">La directory contenete il sistema gentoo.</string>
-    <string name="pref_performance_vuln_title">Tipologie di vulnerabilità ricercate</string>
+    <string name="pref_msfdir_desc">Directory contenente il MetaSploit Framework.</string>
+    <string name="pref_rubydir_desc">Directory contenente l\'interprete Ruby.</string>
+    <string name="pref_msf_branch_desc">Il branch del MetaSploit Framework da usare.</string>
+    <string name="pref_performance_vuln_desc">Tipologie di vulnerabilità ricercate</string>
+    <string name="pref_performance_vuln_title">Preferenze di ricerca</string>
     <string-array name="pref_performance_vuln" >
         <item>OSVDB</item>
         <item>CVE</item>
@@ -372,6 +379,7 @@
     <string name="pref_msf_delete_desc">Cancella MetaSploit Framework dal tuo dispositivo</string>
     <string name="pref_msfwipe_message">Vuoi veramente cancellare il MetaSploit Framework ?</string>
     <string name="pref_msfwipe_size">Saranno liberati circa %d MB.</string>
+    <string name="delete_previous_location">Cancellare la vecchia posizione?</string>
     <string name="pref_folder">La cartella</string>
     <string name="pref_err_exists">non esiste.</string>
     <string name="pref_err_writable">non è scrivibile.</string>
@@ -400,4 +408,14 @@
     <string name="disconnect_msf">disconnetti da MetaSploit</string>
     <string name="connected_msf">connecsso a MetaSploit</string>
     <string name="connection_failed">connessione FALLITA!</string>
+
+    <string name="please_restart">Il nuovo tema sarà applicato al prossimo riavvio dell\'applicazione</string>
+
+    <string name="setting_file_modes">settaggio dei permessi…</string>
+    <string name="updating_rubygem">aggiorno RubyGems</string>
+    <string name="installing_gems">installo le gemme…</string>
+    <string name="patching_shebang">correggo le shebang</string>
+    <string name="installing_msf_gems">installo le gemme per MSF</string>
+    <string name="installing_bundle">installo bundle</string>
+    <string name="new_gems_update_desc">Un aggiornamento per le gemme di ruby</string>
 </resources>
