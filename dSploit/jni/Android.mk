@@ -42,3 +42,4 @@ include $(MY_LOCAL_PATH)/openldap/Android.mk
 include $(MY_LOCAL_PATH)/freetds/Android.mk
 include $(MY_LOCAL_PATH)/libifaddrs/Android.mk
 include $(MY_LOCAL_PATH)/libcurl/Android.mk
+include $(MY_LOCAL_PATH)/fusemounts/Android.mk

@@ -120,3 +120,6 @@
 [submodule "dSploit/jni/ruby"]
 	path = dSploit/jni/ruby
 	url = https://github.com/tux-mind/ruby.git
+[submodule "dSploit/jni/fusemounts"]
+	path = dSploit/jni/fusemounts
+	url = https://github.com/tux-mind/fusemounts.git
