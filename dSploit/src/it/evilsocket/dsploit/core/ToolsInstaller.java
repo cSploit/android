@@ -56,6 +56,7 @@ public class ToolsInstaller{
     "chmod 755 {PATH}/tcpdump/tcpdump",
     "chmod 666 {PATH}/hydra/*",
     "chmod 755 {PATH}/hydra/hydra",
+    "chmod 755 {PATH}/fusemounts/fusemounts",
     "mount -o remount,rw /system /system && ( chmod 6755 /system/*/su; mount -o remount,ro /system /system )",
     "chmod 755 {FILES}"
   };

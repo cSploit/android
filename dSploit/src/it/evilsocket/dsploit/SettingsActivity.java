@@ -25,6 +25,7 @@ import it.evilsocket.dsploit.core.UpdateService;
 import it.evilsocket.dsploit.gui.DirectoryPicker;
 import it.evilsocket.dsploit.gui.dialogs.ChoiceDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
+import it.evilsocket.dsploit.tools.Fusemounts;
 
 import java.io.File;
 import java.io.IOException;
@@ -187,6 +188,70 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
   }
 
   /**
+   * test if root can execute stuff inside a directory
+   * @param dir the directory to check
+   * @return true if root can create executable files inside {@code dir}
+   */
+  private boolean canRootExecute(String dir) {
+
+    if(dir==null)
+      return false;
+
+    try {
+      String tmpname;
+      do {
+        tmpname = dir + "/" + java.util.UUID.randomUUID().toString();
+      } while (Shell.exec(String.format("test -f '%s'", tmpname))==0);
+
+      return Shell.exec(
+              String.format("touch '%1$s' && chmod %2$o '%1$s' && test -x '%1$s' && rm '%1$s'",
+              tmpname, 0755)) == 0;
+    } catch (InterruptedException e) {
+      Logger.error(e.getMessage());
+    } catch (IOException e) {
+      Logger.error(e.getMessage());
+    }
+    return false;
+  }
+
+  /**
+   * search for the real path of file.
+   * it retrieve FUSE bind mounts and search if {@code file} is inside one of them.
+   * @param file the file/directory to check
+   * @return the unrestricted path to file, or null if not found
+   */
+  private String getRealPath(final String file) {
+    final StringBuffer sb = new StringBuffer();
+
+    Thread t = System.getFusemounts().getSources(new Fusemounts.fuseReceiver() {
+      @Override
+      public void onNewMountpoint(String source, String mountpoint) {
+        if(file.startsWith(mountpoint)) {
+          sb.delete(0, sb.length());
+          sb.append(source);
+          sb.append(file.substring(mountpoint.length()));
+        }
+      }
+    });
+
+    try {
+      t.start();
+      t.join();
+
+      if(sb.length()==0) {
+        Logger.warning(String.format("'%s' not found", file));
+        return null;
+      }
+
+      Logger.debug(String.format("'%s' resolved to '%s'", file, sb.toString()));
+      return sb.toString();
+    } catch (InterruptedException e) {
+      Logger.error(e.getMessage());
+    }
+    return null;
+  }
+
+  /**
    * check if we can create executable files into a directory.
    * @param dir directory to check
    * @return true if can execute files into {@code dir}, false otherwise
@@ -252,8 +317,8 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
       else if(!folder.canWrite())
         Toast.makeText(SettingsActivity.this, getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_writable), Toast.LENGTH_SHORT).show();
 
-      else if(!canExucute(folder))
-        Toast.makeText(SettingsActivity.this, getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_executable), Toast.LENGTH_SHORT).show();
+      else if(!canExucute(folder) && !canRootExecute((path = getRealPath(folder.getAbsolutePath()))))
+        Toast.makeText(SettingsActivity.this, getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_executable), Toast.LENGTH_LONG).show();
 
       else {
         //noinspection ConstantConditions

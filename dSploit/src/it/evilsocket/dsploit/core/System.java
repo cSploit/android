@@ -87,6 +87,7 @@ import it.evilsocket.dsploit.net.http.server.Server;
 import it.evilsocket.dsploit.net.metasploit.Session;
 import it.evilsocket.dsploit.tools.ArpSpoof;
 import it.evilsocket.dsploit.tools.Ettercap;
+import it.evilsocket.dsploit.tools.Fusemounts;
 import it.evilsocket.dsploit.tools.Hydra;
 import it.evilsocket.dsploit.tools.IPTables;
 import it.evilsocket.dsploit.tools.NMap;
@@ -130,6 +131,7 @@ public class System
   private static IPTables mIptables = null;
   private static Hydra mHydra = null;
   private static TcpDump mTcpdump = null;
+  private static Fusemounts mFusemounts = null;
 
   private static HTTPSRedirector mRedirector = null;
   private static Proxy mProxy = null;
@@ -222,6 +224,7 @@ public class System
     mIptables = new IPTables();
     mHydra = new Hydra(mContext);
     mTcpdump = new TcpDump(mContext);
+    mFusemounts = new Fusemounts(mContext);
   }
 
   public static void reloadNetworkMapping(){
@@ -774,6 +777,10 @@ public class System
 
   public static TcpDump getTcpDump(){
     return mTcpdump;
+  }
+
+  public static Fusemounts getFusemounts() {
+    return mFusemounts;
   }
 
   public static RPCClient getMsfRpc() {
