@@ -47,7 +47,7 @@ echo "*** creating tools package ***"
 echo -n "building native executables..."
 ndk-build -j$(grep -E "^processor" /proc/cpuinfo | wc -l) >&3 2>&1 || die
 echo -ne "ok\ncopying programs..."
-for tool in arpspoof tcpdump ettercap hydra nmap; do
+for tool in arpspoof tcpdump ettercap hydra nmap fusemounts; do
 	mkdir -p ./tools/$tool >&3 2>&1
 	cp ../libs/armeabi/$tool ./tools/$tool/$tool >&3 2>&1 || die
 done
