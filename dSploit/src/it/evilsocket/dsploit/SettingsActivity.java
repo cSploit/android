@@ -27,6 +27,7 @@ import it.evilsocket.dsploit.gui.dialogs.ChoiceDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
 
 import java.io.File;
+import java.io.IOException;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -185,6 +186,33 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
             ).start();
   }
 
+  /**
+   * check if we can create executable files into a directory.
+   * @param dir directory to check
+   * @return true if can execute files into {@code dir}, false otherwise
+   */
+  private boolean canExucute(File dir) {
+    String tmpname;
+    File tmpfile = null;
+
+    try {
+      do {
+        tmpname = java.util.UUID.randomUUID().toString();
+      } while((tmpfile = new File(dir, tmpname)).exists());
+
+      tmpfile.createNewFile();
+
+      return (tmpfile.canExecute() || tmpfile.setExecutable(true, false));
+
+    } catch (IOException e) {
+      Logger.warning(e.getMessage());
+    } finally {
+      if(tmpfile!=null && tmpfile.exists())
+        tmpfile.delete();
+    }
+    return false;
+  }
+
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent intent){
     if(requestCode == DirectoryPicker.PICK_DIRECTORY && resultCode != RESULT_CANCELED){
@@ -213,15 +241,19 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
       folder = new File(path);
 
 
-      if(key.equals("RUBY_DIR") || key.equals("MSF_DIR")) {
-        oldPath = (key.equals("RUBY_DIR") ? System.getRubyPath() : System.getMsfPath());
-      }
+      if(key.equals("RUBY_DIR"))
+        oldPath = System.getRubyPath();
+      else if (key.equals("MSF_DIR"))
+        oldPath = System.getMsfPath();
 
       if(!folder.exists())
         Toast.makeText(SettingsActivity.this, getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_exists), Toast.LENGTH_SHORT).show();
 
       else if(!folder.canWrite())
         Toast.makeText(SettingsActivity.this, getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_writable), Toast.LENGTH_SHORT).show();
+
+      else if(!canExucute(folder))
+        Toast.makeText(SettingsActivity.this, getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_executable), Toast.LENGTH_SHORT).show();
 
       else {
         //noinspection ConstantConditions

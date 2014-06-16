@@ -383,6 +383,7 @@
     <string name="pref_folder">La cartella</string>
     <string name="pref_err_exists">non esiste.</string>
     <string name="pref_err_writable">non è scrivibile.</string>
+    <string name="pref_err_executable">non consente la creazione di contenuti eseguibili.</string>
     <string name="pref_err_sample_time">Il tempo di campionamento deve essere compreso tra 0.4 e 1.0.</string>
     <string name="pref_err_invalid_number">Numero non valido.</string>
     <string name="pref_err_port_range">La porta deve essere compresa tra 1024 e 65535.</string>
