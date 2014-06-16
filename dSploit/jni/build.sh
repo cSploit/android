@@ -18,6 +18,29 @@ test -d "${oldpwd}" || die
 exec 3> build.log
 
 pkg="tools"
+nmap_data="nmap-mac-prefixes
+nmap-payloads
+nmap-rpc
+nmap-os-db
+nmap-protocols
+nmap-services
+nmap-service-probes"
+ettercap_share="etter.mime
+etter.filter.kill
+etter.services
+etterfilter.cnt
+etter.fields
+etter.conf
+etter.ssl.crt
+etter.filter.ssh
+etter.filter
+etter.dns
+etterfilter.tbl
+etter.finger.os
+etterlog.dtd
+etter.filter.examples
+etter.filter.pcre
+etter.finger.mac"
 
 echo "*** creating tools package ***"
 
@@ -25,9 +48,7 @@ echo -n "building native executables..."
 ndk-build -j$(grep -E "^processor" /proc/cpuinfo | wc -l) >&3 2>&1 || die
 echo -ne "ok\ncopying programs..."
 for tool in arpspoof tcpdump ettercap hydra nmap; do
-	if [ ! -d ./tools/$tool ]; then
-		mkdir -p ./tools/$tool >&3 2>&1 || die
-	fi
+	mkdir -p ./tools/$tool >&3 2>&1
 	cp ../libs/armeabi/$tool ./tools/$tool/$tool >&3 2>&1 || die
 done
 echo -ne "ok\ncopying libraries..."
@@ -38,6 +59,18 @@ done
 echo -ne "ok\ncopying scripts..."
 find ./nmap -name "*.lua" -print0 | rsync -aq --files-from=- --from0 ./ ./tools/ >&3 2>&1 || die
 rsync -aq ./nmap/scripts/ ./tools/nmap/scripts/ >&3 2>&1 || die
+
+echo -ne "ok\ncopying configuration/database files..."
+for f in $nmap_data; do
+	cp ./nmap/$f ./tools/nmap/ >&3 2>&1 || die
+done
+
+mkdir -p ./tools/ettercap/share || die
+
+for f in $ettercap_share; do
+	cp ./ettercap*/share/$f ./tools/ettercap/share/ >&3 2>&1 || die
+done
+
 echo -ne "ok\ncreating archive..."
 zip -qr tools.zip tools >&3 2>&1 || die
 echo "ok"
