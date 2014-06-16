@@ -161,6 +161,9 @@ public class RPCServer extends Thread
 
     Shell.setupRubyEnviron();
 
+    if(!Shell.canExecuteInDir(msfDir) && !Shell.canRootExecuteInDir((msfDir = Shell.getRealPath(msfDir))))
+      throw new IOException("cannot execute msf binaries");
+
     res = Shell.async(String.format(
             "%s/msfrpcd -P '%s' -U '%s' -p '%d' -a 127.0.0.1 -n %s -t Msg",
             msfDir,msfPassword,msfUser,msfPort,(msfSsl ? "" : "-S")

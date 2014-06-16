@@ -310,6 +310,20 @@ public class UpdateService extends IntentService
           mRubyInfo.outputDir = System.getRubyPath();
         }
         exitForError = false;
+
+        if (Shell.canExecuteInDir(mRubyInfo.outputDir)) {
+          mRubyInfo.executableOutputDir = mRubyInfo.outputDir;
+        } else {
+          String realPath = Shell.getRealPath(mRubyInfo.outputDir);
+          if(Shell.canRootExecuteInDir(realPath))
+            mRubyInfo.executableOutputDir = realPath;
+          else {
+            Logger.error(String.format("cannot create executable files in '%s' or '%s'",
+                    mRubyInfo.outputDir, realPath));
+            return false;
+          }
+        }
+
         if (localVersion == null || localVersion < mRubyInfo.version)
           return true;
       }
@@ -412,6 +426,19 @@ public class UpdateService extends IntentService
         }
 
         exitForError = false;
+
+        if (Shell.canExecuteInDir(mMsfInfo.outputDir)) {
+          mMsfInfo.executableOutputDir = mMsfInfo.outputDir;
+        } else {
+          String realPath = Shell.getRealPath(mMsfInfo.outputDir);
+          if (Shell.canRootExecuteInDir(realPath)) {
+            mMsfInfo.executableOutputDir = realPath;
+          } else {
+            Logger.error(String.format("cannot create executable files in '%s' or '%s'",
+                    mMsfInfo.outputDir, realPath));
+            return false;
+          }
+        }
 
         if (!mMsfInfo.version.equals(localVersion))
           return true;
@@ -625,7 +652,8 @@ public class UpdateService extends IntentService
 
     if(ret!=0 && mErrorOutput.length() > 0)
       for(String line : mErrorOutput.toString().split("\n"))
-        Logger.error(line);
+        if(line.length()>0)
+          Logger.error(line);
 
     return ret;
   }
@@ -1047,6 +1075,9 @@ public class UpdateService extends IntentService
     if(mCurrentTask.modeMap==null||mCurrentTask.modeMap.size()==0)
       return;
 
+    if(mCurrentTask.executableOutputDir==null)
+      throw new IOException("output directory does not allow executable contents.");
+
     mBuilder.setContentTitle(getString(R.string.setting_file_modes))
             .setContentText("")
             .setContentInfo("")
@@ -1056,7 +1087,7 @@ public class UpdateService extends IntentService
 
     StringBuilder sb = new StringBuilder();
     sb.append("cd '");
-    sb.append(mCurrentTask.outputDir);
+    sb.append(mCurrentTask.executableOutputDir);
     sb.append("' ");
     for (Map.Entry<Integer, String> e : mCurrentTask.modeMap.entrySet()) {
       sb.append(" && ");
@@ -1081,6 +1112,9 @@ public class UpdateService extends IntentService
 
     if(mCurrentTask.outputDir==null)
       return;
+
+    if(mCurrentTask.executableOutputDir==null)
+      throw new IOException("output directory does not allow executable contents.");
 
     final StringBuilder envPath = new StringBuilder();
 
@@ -1114,7 +1148,7 @@ public class UpdateService extends IntentService
 
     Thread shell = Shell.async(
             String.format("sed -i '1s,^#!/usr/bin/env,#!%s,' $(find '%s' -type f -perm +111 )",
-                    envPath.toString(), mCurrentTask.outputDir), mErrorReceiver);
+                    envPath.toString(), mCurrentTask.executableOutputDir), mErrorReceiver);
 
     if (execShell(shell, "cannot change shebang") != 0)
       throw new RuntimeException("cannot change shebang");
@@ -1192,6 +1226,9 @@ public class UpdateService extends IntentService
 
     if (execShell(shell, "cancelled on gem system update") != 0)
       throw new IOException("cannot update RubyGems");
+
+    // rubygems update rewrite the shebang
+    patchShebang();
   }
 
   private void updateGems() throws IOException, InterruptedException, CancellationException, RuntimeException, KeyException, NoSuchAlgorithmException {

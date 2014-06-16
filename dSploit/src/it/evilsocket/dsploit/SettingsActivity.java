@@ -187,97 +187,6 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
             ).start();
   }
 
-  /**
-   * test if root can execute stuff inside a directory
-   * @param dir the directory to check
-   * @return true if root can create executable files inside {@code dir}
-   */
-  private boolean canRootExecute(String dir) {
-
-    if(dir==null)
-      return false;
-
-    try {
-      String tmpname;
-      do {
-        tmpname = dir + "/" + java.util.UUID.randomUUID().toString();
-      } while (Shell.exec(String.format("test -f '%s'", tmpname))==0);
-
-      return Shell.exec(
-              String.format("touch '%1$s' && chmod %2$o '%1$s' && test -x '%1$s' && rm '%1$s'",
-              tmpname, 0755)) == 0;
-    } catch (InterruptedException e) {
-      Logger.error(e.getMessage());
-    } catch (IOException e) {
-      Logger.error(e.getMessage());
-    }
-    return false;
-  }
-
-  /**
-   * search for the real path of file.
-   * it retrieve FUSE bind mounts and search if {@code file} is inside one of them.
-   * @param file the file/directory to check
-   * @return the unrestricted path to file, or null if not found
-   */
-  private String getRealPath(final String file) {
-    final StringBuffer sb = new StringBuffer();
-
-    Thread t = System.getFusemounts().getSources(new Fusemounts.fuseReceiver() {
-      @Override
-      public void onNewMountpoint(String source, String mountpoint) {
-        if(file.startsWith(mountpoint)) {
-          sb.delete(0, sb.length());
-          sb.append(source);
-          sb.append(file.substring(mountpoint.length()));
-        }
-      }
-    });
-
-    try {
-      t.start();
-      t.join();
-
-      if(sb.length()==0) {
-        Logger.warning(String.format("'%s' not found", file));
-        return null;
-      }
-
-      Logger.debug(String.format("'%s' resolved to '%s'", file, sb.toString()));
-      return sb.toString();
-    } catch (InterruptedException e) {
-      Logger.error(e.getMessage());
-    }
-    return null;
-  }
-
-  /**
-   * check if we can create executable files into a directory.
-   * @param dir directory to check
-   * @return true if can execute files into {@code dir}, false otherwise
-   */
-  private boolean canExucute(File dir) {
-    String tmpname;
-    File tmpfile = null;
-
-    try {
-      do {
-        tmpname = java.util.UUID.randomUUID().toString();
-      } while((tmpfile = new File(dir, tmpname)).exists());
-
-      tmpfile.createNewFile();
-
-      return (tmpfile.canExecute() || tmpfile.setExecutable(true, false));
-
-    } catch (IOException e) {
-      Logger.warning(e.getMessage());
-    } finally {
-      if(tmpfile!=null && tmpfile.exists())
-        tmpfile.delete();
-    }
-    return false;
-  }
-
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent intent){
     if(requestCode == DirectoryPicker.PICK_DIRECTORY && resultCode != RESULT_CANCELED){
@@ -300,9 +209,6 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
         return;
       }
 
-      if(!path.endsWith("/"))
-        path+="/";
-
       folder = new File(path);
 
 
@@ -317,13 +223,13 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
       else if(!folder.canWrite())
         Toast.makeText(SettingsActivity.this, getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_writable), Toast.LENGTH_SHORT).show();
 
-      else if(!canExucute(folder) && !canRootExecute((path = getRealPath(folder.getAbsolutePath()))))
+      else if(!Shell.canExecuteInDir(folder.getAbsolutePath()) && !Shell.canRootExecuteInDir(Shell.getRealPath(folder.getAbsolutePath())))
         Toast.makeText(SettingsActivity.this, getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_executable), Toast.LENGTH_LONG).show();
 
       else {
         //noinspection ConstantConditions
         getPreferenceManager().getSharedPreferences().edit().putString(key, path).commit();
-        if(oldPath!=null) {
+        if(oldPath!=null && !oldPath.equals(path)) {
           File current = new File(oldPath);
 
           if (current.exists() && current.isDirectory() && current.listFiles().length > 2) {
@@ -558,6 +464,8 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
       @Override
       public void onReceive(Context context, Intent intent) {
         if(intent.getAction().equals(SETTINGS_WIPE_DONE)) {
+          System.updateLocalRubyVersion();
+          System.updateLocalMsfVersion();
           mWipeMSF.setEnabled(new File(System.getRubyPath()).isDirectory());
         }
       }

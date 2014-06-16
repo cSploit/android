@@ -14,6 +14,7 @@ public class ArchiveMetadata {
           path,
           versionString,
           outputDir,
+          executableOutputDir,
           dirToExtract,
           md5,
           sha1;
@@ -33,7 +34,8 @@ public class ArchiveMetadata {
   }
 
   synchronized public void reset() {
-    url = name = md5 = sha1 = versionString = path = outputDir = dirToExtract = null;
+    url = name = md5 = sha1 = versionString = path =
+    outputDir = dirToExtract = executableOutputDir = null;
     version = null;
     compression = null;
     archiver = null;
