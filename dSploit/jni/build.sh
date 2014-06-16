@@ -1,31 +1,11 @@
 #!/bin/sh
-ndk-build -j$(grep -E "^processor" /proc/cpuinfo | wc -l) && \
-unzip -q ../assets/tools.zip && \
-for tool in arpspoof tcpdump ettercap hydra nmap; do \
-	mv ../libs/armeabi/$tool ./tools/$tool/$tool; \
-done && \
-find ./nmap -name "*.lua" -print0 | rsync -aq --files-from=- --from0 ./ ./tools/ && \
-rsync -aq ./nmap/scripts/ ./tools/nmap/scripts/ &&
-zip -qr tools.zip tools && \
-rm -rf tools && \
-mv tools.zip ../assets/
-
-directories="/enc/trans/
-/enc/
-/io/
-/digest/
-/dl/
-/json/ext/
-/mathn/
-/racc/
-/"
 
 oldpwd=$(pwd)
 
 function die {
 	echo "FAILED"
 	echo "--------------------------------------------------"
-	echo "an error occurred while creating the ruby package."
+	echo "an error occurred while creating the $pkg package."
 	echo "see build.log for more info"
 	echo "--------------------------------------------------"
 	
@@ -36,6 +16,49 @@ function die {
 test -d "${oldpwd}" || die
 
 exec 3> build.log
+
+pkg="tools"
+
+echo "*** creating tools package ***"
+
+echo -n "building native executables..."
+ndk-build -j$(grep -E "^processor" /proc/cpuinfo | wc -l) >&3 2>&1 || die
+echo -ne "ok\ncopying programs..."
+for tool in arpspoof tcpdump ettercap hydra nmap; do
+	if [ ! -d ./tools/$tool ]; then
+		mkdir -p ./tools/$tool >&3 2>&1 || die
+	fi
+	cp ../libs/armeabi/$tool ./tools/$tool/$tool >&3 2>&1 || die
+done
+echo -ne "ok\ncopying libraries..."
+for ec_lib in ../libs/armeabi/libec_*.so; do
+	ec_lib=$(basename "$ec_lib")
+	cp ../libs/armeabi/$ec_lib ./tools/ettercap/${ec_lib:3} >&3 2>&1 || die
+done
+echo -ne "ok\ncopying scripts..."
+find ./nmap -name "*.lua" -print0 | rsync -aq --files-from=- --from0 ./ ./tools/ >&3 2>&1 || die
+rsync -aq ./nmap/scripts/ ./tools/nmap/scripts/ >&3 2>&1 || die
+echo -ne "ok\ncreating archive..."
+zip -qr tools.zip tools >&3 2>&1 || die
+echo "ok"
+rm -rf tools >&3 2>&1 || die
+if [ ! -d ../assets ]; then
+	mkdir ../assets >&3 2>&1 || die
+fi
+mv tools.zip ../assets/ >&3 2>&1 || die
+
+directories="/enc/trans/
+/enc/
+/io/
+/digest/
+/dl/
+/json/ext/
+/mathn/
+/racc/
+/"
+pkg="ruby"
+
+echo -e "\n*** creating ruby package ***"
 
 echo -n "creating rubyroot..."
 rm -rf rubyroot >&3 2>&1 || die
