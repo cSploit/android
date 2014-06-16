@@ -47,7 +47,7 @@ if [ -n "${PREVIOUS_COMMIT}" -a "${PREVIOUS_COMMIT}" == "${LAST_COMMIT}" ]; then
 fi
 
 echo -n -e "${CYAN}Building dSploit...${RESET}\n" | tee $LOG_DIR/$DATE.log
-rm -f dSploit/build/apk/dSploit-release.apk
+rm -f $(find . -name "dSploit-release.apk" -type f)
 oldpwd=$(pwd)
 cd dSploit/jni && ./build.sh  | tee $LOG_DIR/$DATE.log
 cd "$oldpwd"
@@ -55,7 +55,7 @@ cd "$oldpwd"
 ./gradlew assembleRelease | tee $LOG_DIR/$DATE.log
 
 echo -n -e "${GREEN}Copying signed apk to output directory${RESET}\n" | tee $LOG_DIR/$DATE.log
-cp dSploit/build/apk/dSploit-release.apk $NIGHTLIES_OUT_DIR/dSploit-$LAST_COMMIT.apk &&
+cp $(find . -name "dSploit-release.apk" -type f) $NIGHTLIES_OUT_DIR/dSploit-$LAST_COMMIT.apk &&
 ln -sf "dSploit-${LAST_COMMIT}.apk" $NIGHTLIES_OUT_DIR/dSploit-lastest.apk &&
 echo "${LAST_COMMIT}" > "${LOG_DIR}last_commit" | tee $LOG_DIR/$DATE.log
 
