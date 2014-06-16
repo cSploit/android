@@ -113,7 +113,7 @@
 	url = https://github.com/tux-mind/platform_external_libifaddrs.git
 [submodule "dSploit/jni/libcurl"]
 	path = dSploit/jni/libcurl
-	url = https://github.com/tux-mind/platform_external_curl.git
+	url = https://github.com/tux-mind/platform_external_libcurl.git
 [submodule "dSploit/jni/hydra"]
 	path = dSploit/jni/hydra
 	url = https://github.com/vanhauser-thc/thc-hydra.git
