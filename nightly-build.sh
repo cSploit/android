@@ -36,7 +36,7 @@ find $NIGHTLIES_OUT_DIR -type f -a -mtime +${MAX_DAYS} -a ! -name "${LAST_APK}" 
 find $LOG_DIR -type f -a -mtime +${MAX_DAYS} -exec rm -f "{}" \; | tee $LOG_DIR/$DATE.log
 
 echo -n -e "${CYAN}Syncing git repo...${RESET}\n" | tee $LOG_DIR/$DATE.log
-git fetch --all && git reset --hard origin/master && git submodule update | tee $LOG_DIR/$DATE.log
+git fetch --all && git reset --hard origin/master && git submodule update --init | tee $LOG_DIR/$DATE.log
 
 LAST_COMMIT=$(git rev-parse HEAD)
 
@@ -48,6 +48,9 @@ fi
 
 echo -n -e "${CYAN}Building dSploit...${RESET}\n" | tee $LOG_DIR/$DATE.log
 rm -f dSploit/build/apk/dSploit-release.apk
+oldpwd=$(pwd)
+cd dSploit/jni && ./build.sh  | tee $LOG_DIR/$DATE.log
+cd "$oldpwd"
 ./gradlew clean | tee $LOG_DIR/$DATE.log
 ./gradlew assembleRelease | tee $LOG_DIR/$DATE.log
 
