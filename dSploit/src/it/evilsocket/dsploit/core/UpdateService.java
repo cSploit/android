@@ -1312,21 +1312,24 @@ public class UpdateService extends IntentService
 
     try {
       setupNotification();
-      if(!haveLocalFile())
-        downloadFile();
-      extract();
-      correctModes();
-      patchShebang();
 
-      if(what_to_do==action.ruby_update)
-        updateRubyGems();
-      else if(what_to_do==action.msf_update)
-        installGems();
-      else if(what_to_do==action.gems_update)
-        updateGems();
+      synchronized (mCurrentTask) {
+        if (!haveLocalFile())
+          downloadFile();
+        extract();
+        correctModes();
+        patchShebang();
 
-      if(what_to_do!=action.apk_update)
-        deleteTemporaryFiles();
+        if (what_to_do == action.ruby_update)
+          updateRubyGems();
+        else if (what_to_do == action.msf_update)
+          installGems();
+        else if (what_to_do == action.gems_update)
+          updateGems();
+
+        if (what_to_do != action.apk_update)
+          deleteTemporaryFiles();
+      }
       exitForError=false;
       if(what_to_do==action.msf_update)
         System.updateLocalMsfVersion();
