@@ -1150,7 +1150,7 @@ public class UpdateService extends IntentService
             String.format("sed -i '1s,^#!/usr/bin/env,#!%s,' $(find '%s' -type f -perm +111 )",
                     envPath.toString(), mCurrentTask.executableOutputDir), mErrorReceiver);
 
-    if (execShell(shell, "cannot change shebang") != 0)
+    if (execShell(shell, "cancelled while changing shebangs") != 0)
       throw new RuntimeException("cannot change shebang");
   }
 
