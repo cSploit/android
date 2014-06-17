@@ -984,7 +984,7 @@ public class UpdateService extends IntentService
 
       f = new File(mCurrentTask.outputDir);
       if(f.exists() && f.isDirectory() && (list = f.listFiles()) != null &&  list.length > 2)
-        Logger.warning(String.format("output directory '%s' is not empty", mCurrentTask.outputDir));
+        wipe();
 
       if(is instanceof TarArchiveInputStream && mCurrentTask.modeMap==null)
         mCurrentTask.modeMap = new HashMap<Integer, String>();
