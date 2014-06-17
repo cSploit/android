@@ -25,10 +25,8 @@ import it.evilsocket.dsploit.core.UpdateService;
 import it.evilsocket.dsploit.gui.DirectoryPicker;
 import it.evilsocket.dsploit.gui.dialogs.ChoiceDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
-import it.evilsocket.dsploit.tools.Fusemounts;
 
 import java.io.File;
-import java.io.IOException;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -56,6 +54,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
   public static final String SETTINGS_WIPE_DIR = "SettingsActivity.data.WIPE_DIR";
   public static final String SETTINGS_WIPE_DONE = "SettingsActivity.WIPE_DONE";
   public static final String SETTINGS_MSF_CHANGED = "SettingsActivity.MSF_CHANGED";
+  public static final String SETTINGS_MSF_BRANCHES_AVAILABLE = "SettingsActivity.MSF_MSF_BRANCHES_AVAILABLE";
 
   private Preference mSavePath = null;
   private Preference mWipeMSF  = null;
@@ -458,9 +457,9 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
       @Override
       public void onReceive(Context context, Intent intent) {
         if(intent.getAction().equals(SETTINGS_WIPE_DONE)) {
-          System.updateLocalRubyVersion();
-          System.updateLocalMsfVersion();
-          mWipeMSF.setEnabled(new File(System.getRubyPath()).isDirectory());
+          onMsfPathChanged();
+        } else if(intent.getAction().equals(SETTINGS_MSF_BRANCHES_AVAILABLE)) {
+          onMsfBranchesAvailable();
         }
       }
     };
@@ -483,15 +482,8 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
     mBranchesWaiter = new Thread(new Runnable() {
       @Override
       public void run() {
-        String [] branches = UpdateService.getMsfBranches();
-        boolean hasRelease = false;
-        pref.setEntryValues(branches);
-        pref.setEntries(branches);
-        for(int i = 0;!hasRelease&&i<branches.length; i++) {
-          hasRelease = branches[i].equals("release");
-        }
-        pref.setDefaultValue((hasRelease ? "release" : "master"));
-        pref.setEnabled(true);
+        UpdateService.getMsfBranches();
+        sendBroadcast(new Intent(SETTINGS_MSF_BRANCHES_AVAILABLE));
       }
     });
     mBranchesWaiter.start();
@@ -499,8 +491,31 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 
   private void onMsfPathChanged() {
     measureMsfSize();
-    mWipeMSF.setEnabled(new File(System.getRubyPath()).isDirectory() ||
-            new File(System.getMsfPath()).isDirectory());
+    System.updateLocalRubyVersion();
+    System.updateLocalMsfVersion();
+    boolean haveMsf = false;
+    File dir;
+    File [] content;
+
+    if((dir=new File(System.getRubyPath())).isDirectory() ||
+            (dir=new File(System.getMsfPath())).isDirectory()) {
+      content = dir.listFiles();
+      haveMsf = content!=null && content.length > 2;
+    }
+
+    mWipeMSF.setEnabled(haveMsf);
+  }
+
+  private void onMsfBranchesAvailable() {
+    String [] branches = UpdateService.getMsfBranches();
+    boolean hasRelease = false;
+    mMsfBranch.setEntryValues(branches);
+    mMsfBranch.setEntries(branches);
+    for(int i = 0;!hasRelease&&i<branches.length; i++) {
+      hasRelease = branches[i].equals("release");
+    }
+    mMsfBranch.setDefaultValue((hasRelease ? "release" : "master"));
+    mMsfBranch.setEnabled(true);
   }
 
   @Override
