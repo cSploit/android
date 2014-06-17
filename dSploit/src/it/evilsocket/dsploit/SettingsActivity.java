@@ -73,6 +73,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
   private ListPreference mMsfBranch = null;
   private static int mMsfSize = 0;
   private BroadcastReceiver mReceiver = null;
+  private Thread mBranchesWaiter = null;
 
   @SuppressWarnings("ConstantConditions")
   @Override
@@ -451,14 +452,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
       }
     });
 
-    String [] branches = UpdateService.getMsfBranches();
-    boolean hasRelease = false;
-    mMsfBranch.setEntryValues(branches);
-    mMsfBranch.setEntries(branches);
-    for(int i = 0;!hasRelease&&i<branches.length; i++) {
-      hasRelease = branches[i].equals("release");
-    }
-    mMsfBranch.setDefaultValue((hasRelease ? "release" : "master"));
+    getMsfBranches();
 
     mReceiver = new BroadcastReceiver() {
       @Override
@@ -471,6 +465,36 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
       }
     };
     registerReceiver(mReceiver, new IntentFilter(SETTINGS_WIPE_DONE));
+  }
+
+  private void getMsfBranches() {
+    if(mBranchesWaiter!=null) { // run it once per settings activity
+      if(mBranchesWaiter.getState() == Thread.State.TERMINATED)
+        try {
+          mBranchesWaiter.join();
+        } catch (InterruptedException e) {
+          Logger.error(e.getMessage());
+        }
+      return;
+    }
+
+    final ListPreference pref = mMsfBranch;
+    mMsfBranch.setEnabled(false);
+    mBranchesWaiter = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        String [] branches = UpdateService.getMsfBranches();
+        boolean hasRelease = false;
+        pref.setEntryValues(branches);
+        pref.setEntries(branches);
+        for(int i = 0;!hasRelease&&i<branches.length; i++) {
+          hasRelease = branches[i].equals("release");
+        }
+        pref.setDefaultValue((hasRelease ? "release" : "master"));
+        pref.setEnabled(true);
+      }
+    });
+    mBranchesWaiter.start();
   }
 
   private void onMsfPathChanged() {
