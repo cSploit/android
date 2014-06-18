@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.*;
 import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.metasploit.MsfExploit;
 import it.evilsocket.dsploit.net.metasploit.Option;
 import it.evilsocket.dsploit.net.metasploit.Payload;
@@ -105,7 +106,7 @@ public class MsfPreferences extends SherlockPreferenceActivity {
     // Root
     PreferenceScreen root = getPreferenceManager().createPreferenceScreen(this);
 
-    String title;
+    String title = null;
     PreferenceCategory cat_required = new PreferenceCategory(this);
     PreferenceCategory cat_general = new PreferenceCategory(this);
     PreferenceCategory cat_advanced = new PreferenceCategory(this);
@@ -126,10 +127,21 @@ public class MsfPreferences extends SherlockPreferenceActivity {
     } else if(exploit!=null) {
       options = exploit.getOptions();
       title = exploit.toString();
-    } else {
+    }
+
+    if(options==null) {
       options = new Option[0];
       title = getString(R.string.error);
-      Logger.error("called without Payload or MsfExploit");
+      String error_message;
+
+      if(exploit!=null)
+        error_message = String.format("cannot retrieve options for '%s'", exploit.getName());
+      else if(payload!=null)
+        error_message = String.format("cannot retrieve options for '%s'", payload.getName());
+      else
+        error_message = "called without Payload or MsfExploit";
+
+      Logger.error(error_message);
     }
 
     setTitle(title + " > " + getString(R.string.menu_settings));
