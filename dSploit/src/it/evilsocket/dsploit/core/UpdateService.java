@@ -843,13 +843,13 @@ public class UpdateService extends IntentService
     File file = null;
     FileOutputStream writer = null;
     InputStream reader = null;
+    HttpURLConnection connection = null;
     boolean exitForError = true;
 
     try
     {
       MessageDigest md5, sha1;
       URL url;
-      HttpURLConnection connection;
       byte[] buffer;
       int read;
       short percentage,previous_percentage;
@@ -880,6 +880,11 @@ public class UpdateService extends IntentService
       reader = connection.getInputStream();
 
       total = connection.getContentLength();
+      read = connection.getResponseCode();
+
+      if(read!=200)
+        throw new IOException(String.format("cannot download '%s': responseCode: %d",
+                mCurrentTask.url, read));
 
       downloaded=0;
       previous_percentage=-1;
@@ -935,6 +940,8 @@ public class UpdateService extends IntentService
           writer.close();
         if(reader!=null)
           reader.close();
+        if(connection!=null)
+          connection.disconnect();
       } catch (IOException e) {
         System.errorLogging(e);
       }
