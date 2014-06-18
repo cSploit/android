@@ -3,3 +3,5 @@ libs/armeabi
 libs/x86
 libs/mips
 assets
+*.keystore
+*.jks
