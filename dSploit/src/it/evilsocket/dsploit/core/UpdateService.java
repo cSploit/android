@@ -400,30 +400,25 @@ public class UpdateService extends IntentService
       synchronized (mMsfInfo) {
 
         if (local.exists() && local.isFile() && local.canRead()) {
-          mMsfInfo.name = name;
-          mMsfInfo.path = path;
-          mMsfInfo.archiver = archiveAlgorithm.zip;
+          mMsfInfo.url = null;
           mMsfInfo.version = (localVersion != null ? localVersion + 1 : 0);
-          mMsfInfo.outputDir = System.getMsfPath();
-          mMsfInfo.dirToExtract = "metasploit-framework-" + branch + "/";
-          mMsfInfo.modeMap = msfModeMap;
-        } else if (mMsfInfo.version == null) {
+        } else if (mMsfInfo.url == null) {
           synchronized (mMsfRepoParser) {
             if (!branch.equals(mMsfRepoParser.getBranch()))
               mMsfRepoParser.setBranch(branch);
             mMsfInfo.versionString = mMsfRepoParser.getLastCommitSha();
           }
-
           mMsfInfo.url = String.format(REMOTE_MSF_URL, branch);
-          mMsfInfo.name = name;
-          mMsfInfo.path = path;
-          mMsfInfo.outputDir = System.getMsfPath();
-          mMsfInfo.archiver = archiveAlgorithm.zip;
-          mMsfInfo.dirToExtract = "metasploit-framework-" + branch + "/";
-          mMsfInfo.modeMap = msfModeMap;
           // see System.getLocalMsfVersion for more info about this line of code
           mMsfInfo.version = (new BigInteger(mMsfInfo.versionString.substring(0, 7), 16)).doubleValue();
         }
+
+        mMsfInfo.name = name;
+        mMsfInfo.path = path;
+        mMsfInfo.outputDir = System.getMsfPath();
+        mMsfInfo.archiver = archiveAlgorithm.zip;
+        mMsfInfo.dirToExtract = "metasploit-framework-" + branch + "/";
+        mMsfInfo.modeMap = msfModeMap;
 
         exitForError = false;
 
