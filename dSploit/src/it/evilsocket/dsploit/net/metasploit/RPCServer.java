@@ -26,6 +26,7 @@ import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Logger;
+import it.evilsocket.dsploit.net.Network;
 
 import android.content.Context;
 import android.content.Intent;
@@ -62,7 +63,8 @@ public class RPCServer extends Thread
   }
 
   public static boolean isInternal() {
-    return System.getNetwork().isInternal(System.getSettings().getString("MSF_RPC_HOST", "127.0.0.1"));
+    Network network = System.getNetwork();
+    return network != null && network.isInternal(System.getSettings().getString("MSF_RPC_HOST", "127.0.0.1"));
   }
 
   public static boolean isLocal() {
