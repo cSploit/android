@@ -136,7 +136,7 @@ echo -ne "ok\ncreating archive..."
 
 cd "${oldpwd}"
 cd rubyroot
-tar -cJf ../../assets/ruby.tar.xz . || die
+tar -cJf ../../assets/ruby.tar.xz . >&3 2>&1 || die
 cd "${oldpwd}"
 rm -rf rubyroot
 
