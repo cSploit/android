@@ -2,6 +2,10 @@
 
 oldpwd=$(pwd)
 
+UPDATE_SERVER="http://update.dsploit.net/"
+RUBY_VERSION=1
+TOOLS_VERSION=1
+
 function die {
 	echo "FAILED"
 	echo "--------------------------------------------------"
@@ -11,6 +15,27 @@ function die {
 	
 	cd "${oldpwd}"
 	exit 1
+}
+
+function create_archive_metadata {
+  echo -n "creating metadata file..."
+  md5=$(md5sum "$1" 2>&3 | grep -oE "[0-9a-f]{32}")
+  test -n "${md5}" || die
+  sha1=$(sha1sum "$1" 2>&3 | grep -oE "[0-9a-f]{40}")
+  test -n "${sha1}" || die
+  filename=$(basename "$1")
+  cat > "$2" 2>&3 <<EOF
+{
+  "url" : "${UPDATE_SERVER}${filename}",
+  "name" : "${filename}",
+  "version" : $3,
+  "archiver" : "$4",
+  "compression" : "$5",
+  "md5" : "${md5}",
+  "sha1" : "${sha1}"
+}
+EOF
+  echo -ne "ok\n"
 }
 
 test -d "${oldpwd}" || die
@@ -80,6 +105,8 @@ if [ ! -d ../assets ]; then
 fi
 mv tools.zip ../assets/ >&3 2>&1 || die
 
+create_archive_metadata ../assets/tools.zip ../assets/tools.json $TOOLS_VERSION zip none
+
 directories="/enc/trans/
 /enc/
 /io/
@@ -142,5 +169,4 @@ rm -rf rubyroot
 
 echo -ne "ok\n"
 
-echo "ruby package successfuly created"
-
+create_archive_metadata ../assets/ruby.tar.xz ../assets/ruby.json $RUBY_VERSION tar xz
