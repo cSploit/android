@@ -5,3 +5,5 @@ libs/mips
 assets
 *.keystore
 *.jks
+*.tar.*
+*.zip
