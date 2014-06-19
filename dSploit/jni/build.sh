@@ -65,8 +65,27 @@ etterlog.dtd
 etter.filter.examples
 etter.filter.pcre
 etter.finger.mac"
+ndk_empty_scripts="build-host-executable.mk
+build-host-shared-library.mk
+build-host-static-library.mk"
 
 echo "*** creating tools package ***"
+
+ndk_build=$(which ndk-build) || \
+(echo "android NDK not found, please ensure that it's directory is in your PATH"; die)
+
+ndk_dir=$(dirname "${ndk_build}")
+ndk_dir+="/build/core/"
+
+sudo=""
+
+test -w "${ndk_dir}" || sudo="sudo"
+
+for s in $ndk_empty_scripts; do
+  if [ ! -f "${ndk_dir}${s}" ]; then
+    $sudo touch "${ndk_dir}${s}" >&3 2>&1 || die
+  fi
+done
 
 echo -n "building native executables..."
 ndk-build -j$(grep -E "^processor" /proc/cpuinfo | wc -l) >&3 2>&1 || die
