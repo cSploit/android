@@ -4,7 +4,6 @@ oldpwd=$(pwd)
 
 UPDATE_SERVER="http://update.dsploit.net/"
 RUBY_VERSION=1
-TOOLS_VERSION=1
 
 function die {
 	echo "FAILED"
@@ -105,8 +104,6 @@ if [ ! -d ../assets ]; then
 fi
 mv tools.zip ../assets/ >&3 2>&1 || die
 
-create_archive_metadata ../assets/tools.zip ../assets/tools.json $TOOLS_VERSION zip none
-
 directories="/enc/trans/
 /enc/
 /io/
@@ -162,11 +159,14 @@ cp "${oldpwd}/ruby/rbconfig.rb" "${rubyroot}/lib/ruby/1.9.1/arm-linux-androideab
 echo -ne "ok\ncreating archive..."
 
 cd "${oldpwd}"
+
+mkdir -p ../dist >&3 2>&1 || die
+
 cd rubyroot
-tar -cJf ../../assets/ruby.tar.xz . >&3 2>&1 || die
+tar -cJf ../../dist/ruby.tar.xz . >&3 2>&1 || die
 cd "${oldpwd}"
 rm -rf rubyroot
 
 echo -ne "ok\n"
 
-create_archive_metadata ../assets/ruby.tar.xz ../assets/ruby.json $RUBY_VERSION tar xz
+create_archive_metadata ../dist/ruby.tar.xz ../dist/ruby.json $RUBY_VERSION tar xz
