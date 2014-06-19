@@ -420,4 +420,13 @@
     <string name="disconnect_msf">отключится от MetaSploit</string>
     <string name="connected_msf">подключено к MetaSploit</string>
     <string name="connection_failed">СБОЙ при подключении!</string>
+    <string name="new_ruby_update_desc">Доступно обновление для ruby</string>
+    <string name="delete_previous_location">Удалить предыдущее расположение ?</string>
+    <string name="setting_file_modes">установка прав файлам…</string>
+    <string name="updating_rubygem">Обнавление RubyGems</string>
+    <string name="installing_gems">Установка gems…</string>
+    <string name="patching_shebang">Применение патча к shebang</string>
+    <string name="installing_msf_gems">установка gems для MSF</string>
+    <string name="installing_bundle">Установка бандла</string>
+    <string name="new_gems_update_desc">Обновление для ruby gems</string>
 </resources>
