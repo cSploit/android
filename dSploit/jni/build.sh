@@ -5,7 +5,7 @@ oldpwd=$(pwd)
 UPDATE_SERVER="http://update.dsploit.net/"
 RUBY_VERSION=1
 
-function die {
+die() {
 	echo "FAILED"
 	echo "--------------------------------------------------"
 	echo "an error occurred while creating the $pkg package."
@@ -16,7 +16,7 @@ function die {
 	exit 1
 }
 
-function create_archive_metadata {
+create_archive_metadata() {
   echo -n "creating metadata file..."
   md5=$(md5sum "$1" 2>&3 | grep -oE "[0-9a-f]{32}")
   test -n "${md5}" || die
