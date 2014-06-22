@@ -87,11 +87,6 @@ for s in $ndk_empty_scripts; do
   fi
 done
 
-if [ ! -e $(pwd)/firebird/src/include/gen/autoconfig.h ] ; then
-  rm $(pwd)/firebird/src/include/gen/autoconfig.h
-  ln -s $(pwd)/firebird/src/include/gen/autoconfig.auto $(pwd)/firebird/src/include/gen/autoconfig.h
-fi
-
 echo -n "building native executables..."
 ndk-build -j$(grep -E "^processor" /proc/cpuinfo | wc -l) >&3 2>&1 || die
 echo -ne "ok\ncopying programs..."
@@ -142,11 +137,6 @@ pkg="ruby"
 echo -e "\n*** creating ruby package ***"
 
 echo -n "creating rubyroot..."
-
-realpath . >/dev/null 2>&1
-if [ $? -ne 0 ]; then
-  source realpath.sh >&3 2>&1 || die
-fi
 
 rm -rf rubyroot >&3 2>&1 || die
 rubyroot=$(readlink -f rubyroot) || die
