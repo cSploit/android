@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 oldpwd=$(pwd)
 
@@ -137,8 +137,11 @@ pkg="ruby"
 echo -e "\n*** creating ruby package ***"
 
 echo -n "creating rubyroot..."
+
+which realpath || source realpath.sh >&3 2>&1 || die
+
 rm -rf rubyroot >&3 2>&1 || die
-rubyroot=$(realpath rubyroot)
+rubyroot=$(realpath rubyroot) || die
 for d in $directories; do
 	echo "making \`${rubyroot}/lib/ruby/1.9.1/arm-linux-androideabi$d'" >&3
 	mkdir -p "${rubyroot}/lib/ruby/1.9.1/arm-linux-androideabi$d" >&3 2>&1 || die
