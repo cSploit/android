@@ -87,6 +87,11 @@ for s in $ndk_empty_scripts; do
   fi
 done
 
+if [ ! -e $(pwd)/firebird/src/include/gen/autoconfig.h ] ; then
+  rm $(pwd)/firebird/src/include/gen/autoconfig.h
+  ln -s $(pwd)/firebird/src/include/gen/autoconfig.auto $(pwd)/firebird/src/include/gen/autoconfig.h
+fi
+
 echo -n "building native executables..."
 ndk-build -j$(grep -E "^processor" /proc/cpuinfo | wc -l) >&3 2>&1 || die
 echo -ne "ok\ncopying programs..."
@@ -144,7 +149,7 @@ if [ $? -ne 0 ]; then
 fi
 
 rm -rf rubyroot >&3 2>&1 || die
-rubyroot=$(realpath rubyroot) || die
+rubyroot=$(readlink -f rubyroot) || die
 for d in $directories; do
 	echo "making \`${rubyroot}/lib/ruby/1.9.1/arm-linux-androideabi$d'" >&3
 	mkdir -p "${rubyroot}/lib/ruby/1.9.1/arm-linux-androideabi$d" >&3 2>&1 || die
