@@ -1042,6 +1042,10 @@ public class UpdateService extends IntentService
 
       Logger.info("extraction completed");
 
+      f = new File(mCurrentTask.outputDir, ".nomedia");
+      if(f.createNewFile())
+        Logger.info(".nomedia created");
+
       if(mCurrentTask.versionString!=null&&!mCurrentTask.versionString.isEmpty()) {
         f = new File(mCurrentTask.outputDir, "VERSION");
         fos = new FileOutputStream(f);
