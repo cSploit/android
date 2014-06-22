@@ -75,7 +75,7 @@ ndk_build=$(which ndk-build) || \
 (echo "android NDK not found, please ensure that it's directory is in your PATH"; die)
 
 ndk_dir=$(dirname "${ndk_build}")
-ndk_dir+="/build/core/"
+ndk_dir="${ndk_dir}/build/core/"
 
 sudo=""
 
