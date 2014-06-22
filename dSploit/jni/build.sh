@@ -140,6 +140,8 @@ echo -n "creating rubyroot..."
 
 rm -rf rubyroot >&3 2>&1 || die
 rubyroot=$(readlink -f rubyroot) || die
+echo "rubyroot='${rubyroot}'" >&3
+test -n "${rubyroot}" || die
 for d in $directories; do
 	echo "making \`${rubyroot}/lib/ruby/1.9.1/arm-linux-androideabi$d'" >&3
 	mkdir -p "${rubyroot}/lib/ruby/1.9.1/arm-linux-androideabi$d" >&3 2>&1 || die
