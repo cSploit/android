@@ -138,7 +138,10 @@ echo -e "\n*** creating ruby package ***"
 
 echo -n "creating rubyroot..."
 
-which realpath || source realpath.sh >&3 2>&1 || die
+realpath . >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  source realpath.sh >&3 2>&1 || die
+fi
 
 rm -rf rubyroot >&3 2>&1 || die
 rubyroot=$(realpath rubyroot) || die

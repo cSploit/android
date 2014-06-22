@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 # Copyleft (C) 2014 The dSploit Project
 #
@@ -20,43 +20,58 @@ LOG_DIR="${DIR}/logs/"
 MAX_DAYS="15"
 PREVIOUS_COMMIT=$(cat "${LOG_DIR}last_commit")
 
+
+die() {
+ echo -n -e "${RED}An error occured while building the nightly apk${RESET}\n"
+ echo -n -e "${RED}See $LOG_DIR/$DATE.log for more info\n${RESET}\n"
+ exec 3>&-
+ exit 1
+}
+
 if [ ! -d "${LOG_DIR}" ]; then
     mkdir -p $LOG_DIR
+fi
+
+if [ -z "${NIGHTLIES_OUT_DIR}" ]; then
+  NIGHTLIES_OUT_DIR="${DIR}/dSploit/build"
 fi
 
 if [ ! -d "${NIGHTLIES_OUT_DIR}" ]; then
     mkdir -p $NIGHTLIES_OUT_DIR
 fi
 
-cd "${DIR}" || exit 1 | tee $LOG_DIR/$DATE.log
+exec 3> $LOG_DIR/$DATE.log
 
-echo -n -e "${YELLOW}Cleaning old files${RESET}\n" | tee $LOG_DIR/$DATE.log
-LAST_APK=$(readlink -f "${NIGHTLIES_OUT_DIR}/dSploit-lastest.apk")
-find $NIGHTLIES_OUT_DIR -type f -a -mtime +${MAX_DAYS} -a ! -name "${LAST_APK}" -exec rm -f "{}" \; | tee $LOG_DIR/$DATE.log
-find $LOG_DIR -type f -a -mtime +${MAX_DAYS} -exec rm -f "{}" \; | tee $LOG_DIR/$DATE.log
+cd "${DIR}" >&3 2>&1 || die
 
-echo -n -e "${CYAN}Syncing git repo...${RESET}\n" | tee $LOG_DIR/$DATE.log
-git fetch --all && git reset --hard origin/master && git submodule update --init | tee $LOG_DIR/$DATE.log
+echo -n -e "${YELLOW}Cleaning old files${RESET}\n" | tee >(cat - >&3)
+LAST_APK=$(readlink "${NIGHTLIES_OUT_DIR}/dSploit-lastest.apk")
+find $NIGHTLIES_OUT_DIR -type f -a -mtime +${MAX_DAYS} -a ! -name "${LAST_APK}" -exec rm -f "{}" \; >&3 2>&1
+find $LOG_DIR -type f -a -mtime +${MAX_DAYS} -exec rm -f "{}" \; >&3 2>&1
+
+echo -n -e "${CYAN}Syncing git repo...${RESET}\n" | tee >(cat - >&3)
+#git fetch --all && git reset --hard origin/master && git submodule update --init >&3 2>&1 || die
 
 LAST_COMMIT=$(git rev-parse HEAD)
 
 if [ -n "${PREVIOUS_COMMIT}" -a "${PREVIOUS_COMMIT}" == "${LAST_COMMIT}" ]; then
-    echo -n -e "${YELLOW}Nothing changed${RESET}" | tee $LOG_DIR/$DATE.log
-    echo -n -e "${GREEN}Done" | tee $LOG_DIR/$DATE.log
+    echo -n -e "${YELLOW}Nothing changed${RESET}" | tee >(cat - >&3)
+    echo -n -e "${GREEN}Done" | tee >(cat - >&3)
     exit 0
 fi
 
-echo -n -e "${CYAN}Building dSploit...${RESET}\n" | tee $LOG_DIR/$DATE.log
+echo -n -e "${CYAN}Building dSploit...${RESET}\n" | tee >(cat - >&3)
 rm -f $(find . -name "dSploit-release.apk" -type f)
 oldpwd=$(pwd)
-cd dSploit/jni && ./build.sh  | tee $LOG_DIR/$DATE.log
-cd "$oldpwd"
-./gradlew clean | tee $LOG_DIR/$DATE.log
-./gradlew assembleRelease | tee $LOG_DIR/$DATE.log
+cd dSploit/jni >&3 2>&1 || die
+./build.sh  >&3 2>&1 || cat ./build.log >&3 && die
+cd "$oldpwd" >&3 2>&1 || die
+./gradlew clean >&3 2>&1 || die
+./gradlew assembleRelease >&3 2>&1 || die
 
-echo -n -e "${GREEN}Copying signed apk to output directory${RESET}\n" | tee $LOG_DIR/$DATE.log
+echo -n -e "${GREEN}Copying signed apk to output directory${RESET}\n" | tee >(cat - >&3)
 cp $(find . -name "dSploit-release.apk" -type f) $NIGHTLIES_OUT_DIR/dSploit-$LAST_COMMIT.apk &&
 ln -sf "dSploit-${LAST_COMMIT}.apk" $NIGHTLIES_OUT_DIR/dSploit-lastest.apk &&
-echo "${LAST_COMMIT}" > "${LOG_DIR}last_commit" | tee $LOG_DIR/$DATE.log
+echo "${LAST_COMMIT}" > "${LOG_DIR}last_commit" 2>&3 || die
 
-echo -n -e "${GREEN}Done.${RESET}\n\n" | tee $LOG_DIR/$DATE.log
+echo -n -e "${GREEN}Done.${RESET}\n\n" | tee >(cat - >&3)
