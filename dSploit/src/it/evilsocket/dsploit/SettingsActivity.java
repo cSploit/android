@@ -463,7 +463,10 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
         }
       }
     };
-    registerReceiver(mReceiver, new IntentFilter(SETTINGS_WIPE_DONE));
+    IntentFilter filter = new IntentFilter();
+    filter.addAction(SETTINGS_WIPE_DONE);
+    filter.addAction(SETTINGS_MSF_BRANCHES_AVAILABLE);
+    registerReceiver(mReceiver, filter);
   }
 
   private void getMsfBranches() {
