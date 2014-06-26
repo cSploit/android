@@ -28,6 +28,11 @@ die() {
  exit 1
 }
 
+jni_die() {
+ cat "${DIR}/dSploit/jni/build.log" >&3
+ die
+}
+
 if [ ! -d "${LOG_DIR}" ]; then
     mkdir -p $LOG_DIR
 fi
@@ -64,7 +69,7 @@ echo -n -e "${CYAN}Building dSploit...${RESET}\n" | tee >(cat - >&3)
 rm -f $(find . -name "dSploit-release.apk" -type f)
 oldpwd=$(pwd)
 cd dSploit/jni >&3 2>&1 || die
-./build.sh  >&3 2>&1 || cat ./build.log >&3 && die
+./build.sh  >&3 2>&1 || jni_die
 cd "$oldpwd" >&3 2>&1 || die
 ./gradlew clean >&3 2>&1 || die
 ./gradlew assembleRelease >&3 2>&1 || die
