@@ -47,7 +47,7 @@ public class Metasploit
       if (new_location.equals(query)) {
         return null;
       }
-      int i = new_location.indexOf("/modules/");
+      int i = new_location.indexOf("/modules/exploit/");
 
       if(i<0)
         return null;
