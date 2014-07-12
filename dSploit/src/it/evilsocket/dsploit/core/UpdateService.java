@@ -943,7 +943,6 @@ public class UpdateService extends IntentService
     }
   }
 
-
   /**
    * extract an archive into a directory
    *
@@ -1282,6 +1281,18 @@ public class UpdateService extends IntentService
     }
   }
 
+  private void clearGemsCache() {
+
+    if(!System.getSettings().getBoolean("MSF_ENABLED", true))
+      return;
+
+    try {
+      Shell.exec(String.format("rm -rf '%s/lib/ruby/gems/1.9.1/cache/'", System.getRubyPath()));
+    } catch (Exception e) {
+      System.errorLogging(e);
+    }
+  }
+
   private void deleteTemporaryFiles() {
     if(mCurrentTask.path==null||mCurrentTask.path.isEmpty())
       return;
@@ -1366,8 +1377,10 @@ public class UpdateService extends IntentService
       sendError(R.string.error_occured);
       System.errorLogging(e);
     } finally {
-      if(exitForError)
+      if(exitForError) {
+        clearGemsCache();
         wipe();
+      }
       stopSelf();
       mRunning = false;
     }
