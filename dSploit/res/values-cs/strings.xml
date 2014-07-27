@@ -2,7 +2,7 @@
     <string name="app_name">dSploit</string>
     <string name="menu_settings">Nastavení</string>
     <string name="title_activity_main">dSploit</string>
-    <string name="crash_toast_text">Ooooops ! Něco špatně, ale zpráva bude odeslána vývojáři pro opravu chyby:)
+    <string name="crash_toast_text">Ops! Něco je špatně, ale zpráva bude odeslána vývojáři pro opravu chyby:)
     </string>
     <string name="toggle_button">Přepínač</string>
     <string name="enter_redirection_details">Vyplňte přesměrovací údaje:</string>
@@ -13,7 +13,7 @@
     <string name="services">Služby</string>
     <string name="os">OS</string>
     <string name="device_type">Typ zařízení</string>
-    <string name="start_hijack">Dotykem startujete hijackingu, dlouhým dotykem uložíte do souboru.
+    <string name="start_hijack">Dotykem startujete hijacking, dlouhým dotykem uložíte do souboru.
     </string>
     <string name="sort">Sort:</string>
     <string name="select_module">Vyberte modul</string>
@@ -27,25 +27,25 @@
     <string name="dsploit_url">http://www.dsploit.net/</string>
     <string name="disclaimer">Záruka</string>
     <string name="dsploit_disclaimer">
-        <![CDATA[This application is not to be used for any purposes other than to demonstrate its functions, and must only be used on networks for which you have permission to do so. Any other use is not the responsibility of the developer.In other words, don&apos;t be stupid, and don&apos;t direct angry people towards me.]]></string>
+        <![CDATA[Tato aplikace byla vytvořena pouze za účelem demonstrace jejích funkcí a může být použita pouze na sítích do kterých máte právo zasahovat. Za jiné použití vývojář nezodpovídá. Jinými slovy, nebuďte hloupí a neštvěte zlé lidi proti mě.]]></string>
     <string name="license">License</string>
-    <string name="gpl_license">This program is free software: you can redistribute it and/or modify
-        it under the terms of the GNU General Public License as published by the Free Software
-        Foundation, either version 3 of the License, or (at your option) any later version.
-        This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    <string name="gpl_license">Tento program je svobodný software: můžete ho distribuovat a/nebo upravovat
+        pod podmínkami GNU General Public License vydanými Free Software Foundation,
+        buď pod licencí verze 3, nebo (podle vaší volby) některou z pozdějších verzí.
+        Tento program je šířen v naději, že bude užitečný. Ale je BEZ JAKÉKOLIV ZÁRUKY;
         without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-        See the GNU General Public License for more details.
-        You should have received a copy of the GNU General Public License along with this program.
-        If not, see http://www.gnu.org/licenses/.
+        Pro více informací se podívejte na GNU General Public License.
+        Měli byste obdržet kopii GNU General Public License spolu s tímto programem.
+        Pokud ne, najdete ji na: http://www.gnu.org/licenses/.
     </string>
     <string name="service">Služba</string>
     <string name="stopped">Zastaveno&#8230;</string>
     <string name="start">Spustit</string>
     <string name="stop">Stop</string>
-    <string name="stopped_dots">Stopped &#8230;</string>
+    <string name="stopped_dots">Zastaveno &#8230;</string>
     <string name="starting_dots">Spouštím &#8230;</string>
-    <string name="max_length">Max. Délka</string>
-    <string name="min_length">Min. Délka</string>
+    <string name="max_length">Max. délka</string>
+    <string name="min_length">Min. délka</string>
     <string name="username">Uživatelské jméno</string>
     <string name="Charset">Znaky</string>
     <string name="filter_desc">Enter a custom replace filter, including simple string replacement or
@@ -55,14 +55,14 @@
     <string name="to">Do</string>
     <string name="wake_on_lan">Wake On Lan</string>
     <string name="send">Odeslat</string>
-    <string name="update_available">Nová Aktualizace</string>
-    <string name="new_update_desc">Nová aktualizace na verzi</string>
+    <string name="update_available">Nová aktualizace</string>
+    <string name="new_update_desc">Nová aktualizace verze</string>
     <string name="new_update_desc2">je venku chcete stáhnout?</string>
-    <string name="checking">Čekuju&#8230;</string>
+    <string name="checking">Kontroluji&#8230;</string>
     <string name="no_updates_available">Nic.</string>
     <string name="new_version">Nová verze</string>
     <string name="new_version2">venku!</string>
-    <string name="downloading_update">Stahuju aktualizacj&#8230;</string>
+    <string name="downloading_update">Stahuji aktualizaci&#8230;</string>
     <string name="connecting">Připojuji&#8230;</string>
     <string name="cancel">Zrušit</string>
     <string name="error">Error</string>
@@ -79,7 +79,7 @@
     <string name="exit">Exit</string>
     <string name="close_confirm">Opravdu zavřít?
     </string>
-    <string name="press_back">Stisknout znovu ZPĚT pro ukončení aplikace</string>
+    <string name="press_back">Pro ukončení aplikace stiskněte znovu ZPĚT</string>
     <string name="selected_">Vybráno&#160;</string>
     <string name="github_issues">https://github.com/evilsocket/dsploit/issues/new</string>
     <string name="no_session_found">Na SD kartě nebyl nalezen žádný spoubor ze sezení</string>
@@ -88,7 +88,7 @@
     <string name="invalid_session">Neplatné jméno sezení</string>
     <string name="session_saved_to">Sezení uloženo do &#160;</string>
     <string name="save_session">Uložit sezení</string>
-    <string name="enter_session_name">Napište jméno souboru se sezením :</string>
+    <string name="enter_session_name">Napište jméno souboru se sezením:</string>
     <string name="new_session_started">Nové sezení začalo</string>
     <string name="warning">Varování</string>
     <string name="warning_new_session">Zahájení nového sezení smaže aktuální, pokračovat?
@@ -103,7 +103,7 @@
     <string name="arm_error2">
         <![CDATA[<p>Pro více informací <a href=\"http://dsploit.net/#requirements\">requirements</a> section.</p>]]></string>
     <string name="busybox_required">Je nutná plná BusyBox instalace, killall binary nenalezeno
-        (že by stará verze BusyBoxy?).
+        (že by stará verze BusyBoxu?).
     </string>
     <string name="only_4_root">Jen pro ROOTlá zařízení</string>
     <string name="initializing">Připravuji&#8230;</string>
@@ -119,7 +119,7 @@
     <string name="connection_to2">
         <![CDATA[</b> <b><font color=\"red\">SELHÁNÍ</font></b>.]]></string>
     <string name="enter_key_or_crack">Vložte WiFi klíč nebo zkuste cracking</string>
-    <string name="enter_wifi_key">Vložte WiFi Klíč:</string>
+    <string name="enter_wifi_key">Vložte WiFi klíč:</string>
     <string name="scanning">Skenování&#8230;</string>
     <string name="invalid_filename">Neplatný název souboru.</string>
     <string name="something_went_wrong">Něco bylo špatně, prosím zvolte znovu cíl.
@@ -127,39 +127,39 @@
     <string name="selected">Vybráno </string>
     <string name="nothing_found"><![CDATA[<small><i>Nic nenalezeno</i></small>]]></string>
     <string name="no_open_ports">Na aktuálním cíly nebyly nalezeny žádné otevřené porty (zkuste hledat znovu)</string>
-    <string name="no_exploits_found">Nebyli nalezeny žádné exploity.</string>
+    <string name="no_exploits_found">Nebyly nalezeny žádné exploity.</string>
     <string name="no_open_ports_focused_scan">Jsou potřeba otevřené porty, nejdříve spusťte Hledač Portů před podrobným skenem</string>
     <string name="no_open_ports_exploitfinder">Žádné otevřené porty nenalezeny, nejdříve spusťe Inspektor Služeb</string>
     <string name="no_exploit_started">Žádný exploit nebyl spuštěn.</string>
     <string name="no_vulnerabilities_found">Žádné slabiny nebyly na cíly nalezeny, Spusťte nejdříve Hledač Slabin</string>
-    <string name="no_infos_on_target">Žádné specifické informaca o službách běžících na tomto cíly
-        , nejdříve spusťte inspektor služeb.
+    <string name="no_infos_on_target">Žádné specifické informaca o službách běžících na tomto cíly,
+        nejdříve spusťte inspektor služeb.
     </string>
     <string name="custom_charset">Vlastní znaky</string>
     <string name="enter_chars_wanted">Vložte vlastní znaky které chcete pužít:
     </string>
     <string name="invalid_port">Neplatný port.</string>
     <string name="request_empty">Výzva nemůže být prázdná</string>
-    <string name="request_sent">Výzva odelslána.</string>
+    <string name="request_sent">Výzva odeslána.</string>
     <string name="customize_wol_port">Upravte WOL port a stiskněte Odeslat.</string>
     <string name="couldnt_send_wol_packet">Nelze odeslat WOL packet bez MAC adresy.
     </string>
     <string name="no_activities_for_url">Žádné aktivity pro tento typ URL.</string>
     <string name="select_ports">Vyberte Porty</string>
-    <string name="enter_ports_list">Vložte jména portů oddělených čárkou:</string>
+    <string name="enter_ports_list">Vložte čísla portů oddělených čárkou:</string>
     <string name="invalid_port_">Neplatný port \'</string>
     <string name="port_must_be_greater">Port musí být větší než 0 a menší než 65535.</string>
-    <string name="invalid_ports">Neplatný port specifikiván.</string>
+    <string name="invalid_ports">Neplatný port.</string>
     <string name="empty_port_list">Prázdný list portů.</string>
     <string name="about_dsploit_v_">O dSploitu v</string>
-    <string name="select_target">Vyberte cíl kliknutím na něj nebo k němu podržením přiřaďte Alias.
+    <string name="select_target">Vyberte cíl, podržením k němu přiřaďte Alias.
     </string>
     <string name="generating_keys">Generuji klíče&#8230;</string>
     <string name="no_wifi_available">Bez Wifi připojení, aplikace bude jen kontrolovat stav. #STATUS#
     </string>
     <string name="loading_changelog">Načítám změny&#8230;</string>
     <string name="something_went_wrong_changelog">
-        <![CDATA[<html><body><p><b>Něco bylo špatn3 při získavání seznamu změn:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
+        <![CDATA[<html><body><p><b>Něco bylo špatně při získavání seznamu změn:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
     <string name="cancel_dialog">Zrušit</string>
     <string name="yes">Ano</string>
     <string name="no">Ne</string>
@@ -172,18 +172,18 @@
     </string>
     <string name="inspector">Inspektor Služeb</string>
     <string name="inspector_desc">Spustit hlubší detekci OS a služeb cíle
-        (pomalejší než Hledač Portů ale víc ůčiný).
+        (pomalejší než Hledač Portů ale více účinné).
     </string>
     <string name="login_cracker">Cracker Přihlášení</string>
-    <string name="login_cracker_desc">Velmi rychlí síťový cracker přihlášení podporující mnoho služeb.
+    <string name="login_cracker_desc">Velmi rychlý síťový cracker přihlášení podporující mnoho služeb.
     </string>
     <string name="packet_forger">Padělatel Paketů</string>
-    <string name="packet_forger_desc">Vytvořit a poslat TCP nebo UDP paket cíly
+    <string name="packet_forger_desc">Vytvořit a poslat TCP nebo UDP paket cíli
     </string>
     <string name="port_scanner">Hledač Portů</string>
     <string name="port_scanner_desc">Vyhledat SYN porty cíle.</string>
     <string name="router_pwn">Router PWN</string>
-    <string name="router_pwn_desc">Jdi na http://routerpwn.com/ pro PWNuti Vašeho routeru.
+    <string name="router_pwn_desc">Jděte na http://routerpwn.com/ pro PWNuti Vašeho routeru.
     </string>
     <string name="trace">Trace</string>
     <string name="trace_desc">Použít traceroute na cíl</string>
@@ -191,13 +191,13 @@
     <string name="mitm_desc">Použít různé man-in-the-middle útoky, jako síťové šmírování,
         manipulace s daty, atd&#8230;
     </string>
-    <string name="network_subnet_mask">Tohe je Vaše síťová subnet maska</string>
+    <string name="network_subnet_mask">Toto je Vaše síťová subnet maska</string>
     <string name="gateway_router">(Vaše  síťová gateway / router)</string>
     <string name="this_device">&#160;(Toto zařízení)</string>
-    <string name="wifi_went_down">WiFi připojeňí šlo do...</string>
-    <string name="hijack_session">Hijacknout sezeňí</string>
+    <string name="wifi_went_down">WiFi připojení šlo do...</string>
+    <string name="hijack_session">Hijacknout sezení</string>
     <string name="start_hijacking">Přestat šmírovat a začit hijackovat sezení?</string>
-    <string name="start_hijacking2">Start session hijacking?</string>
+    <string name="start_hijacking2">Začít relaci hijackingu?</string>
     <string name="set_session_filename">Nastavte název souboru se sezením:</string>
     <string name="session_sniffer">Šmírování sezení</string>
 
@@ -205,18 +205,17 @@
     <string name="add_username">Přidat uživatelské jméno</string>
     <string name="enter_username">Vložte uživatelské jméno které chcete používat:</string>
     <string name="select_wordlist">Vybrat slovník</string>
-    <string name="error_filepath">Zkuste jiný zprávce souborů.
-    </string>
+    <string name="error_filepath">Zkuste jiný správce souborů.</string>
     <string name="trying">Zkouším</string>
     <string name="left">zbývá</string>
     <string name="error_filepath2">Soubor nelze najít</string>
     <string name="tap_again">Dotkněte se znovu pro konec</string>
-    <string name="unexpected_file_error">Nečekaná chyba při čtení souboru : </string>
+    <string name="unexpected_file_error">Nečekaná chyba při čtení souboru: </string>
     <string name="the_port">Port</string>
     <string name="error_proxy_port"> který je třeba pro transparentní proxy je používán jiným procesem, otevřít nastavení ?</string>
-    <string name="error_mitm_port"> který ke třeba pro MITM je využíván jiným procesem, otevřít nastavení</string>
+    <string name="error_mitm_port"> který ke třeba pro MITM je využíván jiným procesem, otevřít nastavení ?</string>
     <string name="error_https_port"> kzerý ke potřebný pro MITM přesměrování je používán jiným procesem, otevřít nastavení ?</string>
-    <string name="error_mitm_ports">Pro MITM moduly jsou nutné všechný porty dostupné</string>
+    <string name="error_mitm_ports">Pro MITM moduly jsou nutné všechny porty dostupné</string>
 
     <!-- rpc stuff -->
     <string name="error_rpc">Chyba RPC</string>
@@ -227,27 +226,27 @@
     <string name="rpcd_stopped">MetaSploit RPCD vypnut</string>
     <string name="rpcd_running">MetaSploit RPCD již běží</string>
     <string name="rpcd_timedout">MetaSploit RPCD neodpovídá</string>
-    <string name="error_rcpd_fatal">fatalní chyba, hledám chybu pro poslání logu vývojářovi
+    <string name="error_rcpd_fatal">fatální chyba, hledám chybu pro poslání logu vývojářovi
         pokud se nevypnu, vypněte mě z Nastavení->Aplikace,
         a DEJTE VĚDĚT MÉMU VÝVOJÁŘI.
     </string>
 
     <!-- mitm modules -->
     <string name="mitm_simple_sniff">Jednoduché šmírování</string>
-    <string name="mitm_simple_sniff_desc">Přesměruje provoz z cíle do tohot zařízení a ukáže některé informace při zpracovávání do a sounoru pcap.</string>
+    <string name="mitm_simple_sniff_desc">Přesměruje provoz z cíle do tohoto zařízení a ukáže některé informace při zpracovávání a uloží do souboru pcap.</string>
     <string name="mitm_password_sniff">Šmírování Hesel</string>
     <string name="mitm_password_sniff_desc">Šmírování hesel protokolů jako http, ftp, imap, imaps, irc, msn, atd. cíle.</string>
     <string name="mitm_session_hijack">Hijacker sezení</string>
     <string name="mitm_session_hijack_desc">Naslouchá pro cookie na sítí and hijacklých sezeních.</string>
     <string name="mitm_connection_kill">Zabiják připojení</string>
-    <string name="mitm_connection_kill_desc">Zabít připojení pro předcházení načtení stránky nebp serveru cílem.</string>
+    <string name="mitm_connection_kill_desc">Zabít připojení pro předcházení načtení stránky nebo serveru cílem.</string>
     <string name="mitm_connection_kill_error">Zabiják připojení lze použít jen na jeden cíl</string>
     <string name="mitm_redirect">Přesměrování</string>
     <string name="mitm_redirect_desc">Přesměruje všechen http provoz na jinou adresu</string>
     <string name="mitm_redirection">Přesměrování</string>
     <string name="error_port_outofrange">Port nelze dosáhnout</string>
     <string name="error_invalid_address_or_port">Neplatná adresa a/nebo špatný port</string>
-    <string name="mitm_image_replace">Nahradit Obrázly</string>
+    <string name="mitm_image_replace">Nahradit obrázky</string>
     <string name="mitm_image_replace_desc">Nahradit obrázky na stránkách vlastním</string>
     <string name="choose_source">Vyberte zdroj:</string>
     <string name="local_images">Místní obrázky</string>
@@ -256,31 +255,31 @@
     <string name="enter_image_url">Vložte URL obrázku :</string>
     <string name="error_image_url">Neplatné URL obrázku.</string>
     <string name="mitm_video_replace">Nahradit videa</string>
-    <string name="mitm_video_replace_desc">Nahradit všechna youtube videa na stránkách zvoleným.</string>
+    <string name="mitm_video_replace_desc">Nahradit všechna YouTube videa na stránkách zvoleným.</string>
     <string name="video">Video</string>
-    <string name="enter_video_url">Vložte url videa :</string>
-    <string name="error_video_url">Neplatné youtube video.</string>
+    <string name="enter_video_url">Vložte URL videa :</string>
+    <string name="error_video_url">Neplatné YouTube video.</string>
     <string name="mitm_script_injection">Injekce Skriptu</string>
-    <string name="mitm_script_injection_desc">Vložit a javascript na všech navštívených stránkách.</string>
+    <string name="mitm_script_injection_desc">Vložit javascript na všech navštívených stránkách.</string>
     <string name="choose_method">Vybrat metodu:</string>
     <string name="local_files">Místní soubory</string>
-    <string name="custom_code">Vlaatní kód</string>
+    <string name="custom_code">Vlastní kód</string>
     <string name="error_file_intent">Nejspíše nemáte kompatibilní prohlížeč souborů.</string>
-    <string name="enter_js_code">Kód pro vložení :</string>
-    <string name="error_js_code"><![CDATA[Invalid javascript code, remember to use <script></script> enclosing tags.]]></string>
+    <string name="enter_js_code">Kód pro vložení:</string>
+    <string name="error_js_code"><![CDATA[Neplatný javascriptový kód, nezapomeňte použít <script></script> ohraničující znaky.]]></string>
     <string name="mitm_custom">Vlastní Filter</string>
     <string name="mitm_custom_desc">Nahradit text na stránkách vlastním textem</string>
     <string name="custom_filter">Vlastní Filter</string>
     <string name="error_filter">Neplatná exprese</string>
     <string name="file_output">Výstupní soubor</string>
-    <string name="question_save_to_pcap">Chcete uložit odśmírovaný provoz do pcap souboru ?</string>
+    <string name="question_save_to_pcap">Chcete uložit odšmírovaný provoz do pcap souboru ?</string>
     <string name="dumping_traffic_to">Ukládám provoz do </string>
 
     <string name="error_mitm_proxy">Nelze vytvořit proxy, prosím zkontrolujte připojení a dostupnost portů.</string>
     <string name="error_mitm_https_redirector">Nelze vytvořit HTTPS přesměrovač, prosím zkontrolujte připojení a dostupnost portů.</string>
     <string name="error_mitm_resource_server">Nelze vytvořit zdrojový server, prosím zkontrolujte připojení a dostupnost portů.</string>
 
-    <string name="hijacker_load_from_file">Načíst ze soiboru</string>
+    <string name="hijacker_load_from_file">Načíst ze souboru</string>
     <string name="login_user_wordlist">Použít slovník</string>
     <string name="login_pass_wordlist">Slovník hesel</string>
 
@@ -288,7 +287,7 @@
     <string name="menu_save_session">Uložit sezení</string>
     <string name="menu_restore_session">Obnovit sezení</string>
     <string name="menu_stop_monitor">Ukončit průzkum sítě</string>
-    <string name="menu_submit_issue">Odeslat zprávu chybě</string>
+    <string name="menu_submit_issue">Odeslat zprávu o chybě</string>
     <string name="menu_about">O aplikaci</string>
 
     <string name="scanner_select_ports">Vyberte vlastní porty</string>
@@ -304,16 +303,16 @@
     <string name="wifi_scan_finished">Konec hledání.</string>
 
     <!-- preferences -->
-    <string name="pref_general">Halvní</string>
+    <string name="pref_general">Hlavní</string>
     <string name="pref_modules">Moduly</string>
     <string name="pref_msf">MetaSploitFramework</string>
     <string name="pref_performance">Výkon</string>
     <string name="pref_check_updates">Zkontrolovat aktualizace</string>
-    <string name="pref_wake_lock">Wake Lock</string>
+    <string name="pref_wake_lock">Zabránit uspání</string>
     <string name="pref_save_path">Místo ukládání</string>
     <string name="pref_debug_error_logging">Ladící chyba záznamu</string>
     <string name="pref_enable_profiler">Kódový Profil</string>
-    <string name="pref_sniffer_sample_time">Vzorlovací čas šmírování</string>
+    <string name="pref_sniffer_sample_time">Vzorkovací čas šmírování</string>
     <string name="pref_http_proxy_port">HTTP Proxy Port</string>
     <string name="pref_http_server_port">HTTP Server Port</string>
     <string name="pref_https_redirect">SSL Stripping</string>
@@ -321,7 +320,7 @@
     <string name="pref_http_max_buffer_size">HTTP Max Buffer Size</string>
     <string name="pref_password_filename">Password Sniffer File</string>
     <string name="pref_check_updates_desc">Kontrolovat aktualiuace při startu</string>
-    <string name="pref_wake_lock_desc">Zařízení nejde do sleep modu při používání aplikace</string>
+    <string name="pref_wake_lock_desc">Zařízení nejde do režimu spánku při používání aplikace</string>
     <string name="pref_save_path_desc">Globalní umístění pro každý zaznamenaný log</string>
     <string name="pref_debug_error_logging_desc">Zapnout/vypnout logování do ladícího souboru.</string>
     <string name="pref_enable_profiler_desc">Zapnout/vypnout záznam síťového kódu profilu do ladícího souboru</string>
@@ -331,25 +330,25 @@
     <string name="pref_https_redirect_desc">Přesměrovat provoz z HTTPS do HTTP.</string>
     <string name="pref_https_redirector_port_desc">MITM https přesměrovací server port pro naslouchání.</string>
     <string name="pref_http_max_buffer_size_desc">Max buffer size of HTTP requests handled by the transparent proxy.</string>
-    <string name="pref_password_filename_desc">Name of the file to use to log passwords and cookies.</string>
-    <string name="pref_rpc_user">RPC username</string>
-    <string name="pref_rpc_user_desc">Username for connect to MetaSploit RPCD.</string>
-    <string name="pref_rpc_pswd">RPC password</string>
-    <string name="pref_rpc_pswd_desc">Password for connect to MetaSploit RPCD.</string>
+    <string name="pref_password_filename_desc">Jméno souboru pro záznam hesel a cookies.</string>
+    <string name="pref_rpc_user">RPC uživatelské jméno</string>
+    <string name="pref_rpc_user_desc">Uživatelské jméno pro připojení k MetaSploit RPCD.</string>
+    <string name="pref_rpc_pswd">RPC heslo</string>
+    <string name="pref_rpc_pswd_desc">Heslo pro připojení k MetaSploit RPCD.</string>
     <string name="pref_rpc_port">RPC port</string>
-    <string name="pref_rpc_port_desc">Port for connect to MetaSploit RPCD.</string>
-    <string name="pref_performance_vuln_desc">Search for vulnerability using</string>
+    <string name="pref_rpc_port_desc">Port pro připojení k MetaSploit RPCD.</string>
+    <string name="pref_performance_vuln_desc">Hledání využití zranitelnosti</string>
     <string-array name="pref_performance_vuln" >
         <item>OSVDB</item>
         <item>CVE</item>
-        <item>both CVE and OSVDB</item>
+        <item>oboje - CVE i OSVDB</item>
     </string-array>
     <string-array name="pref_performance_vuln_values">
         <item>OSVDB</item>
         <item>CVE</item>
-        <item>BOTH</item>
+        <item>oboje</item>
     </string-array>
-    <string name="pref_performance_exploit_desc">Search exploits</string>
+    <string name="pref_performance_exploit_desc">Hledání exploitů</string>
     <string-array name="pref_performance_exploit" >
         <item>MSF jenom kompatibilní </item>
         <item>jen na exploitdb </item>
@@ -358,7 +357,7 @@
     <string-array name="pref_performance_exploit_values">
         <item>MSF</item>
         <item>EXDB</item>
-        <item>BOTH</item>
+        <item>oboje</item>
     </string-array>
     <string name="pref_folder">Složka</string>
     <string name="pref_err_exists">neexistuje.</string>
@@ -380,6 +379,6 @@
     <string name="menu_stop_msfrpcd">Konec msfrpcd</string>
 
     <string name="pref_theme">Tmavé téma</string>
-    <string name="pref_choose_theme">Tmavé téma lepśí pro tmavé prostředí</string>
+    <string name="pref_choose_theme">Tmavé téma je lepší pro tmavé prostředí</string>
     <string name="please_restart">Bude aplikováno po restartu</string>
 </resources>
