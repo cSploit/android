@@ -307,8 +307,10 @@ public class UpdateService extends IntentService
           mRubyInfo.compression = compressionAlgorithm.valueOf(info.getString("compression"));
           mRubyInfo.md5 = info.getString("md5");
           mRubyInfo.sha1 = info.getString("sha1");
-          mRubyInfo.outputDir = System.getRubyPath();
         }
+
+        mRubyInfo.outputDir = System.getRubyPath();
+
         exitForError = false;
 
         if (Shell.canExecuteInDir(mRubyInfo.outputDir)) {
