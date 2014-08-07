@@ -1092,17 +1092,9 @@ public class UpdateService extends IntentService
             .setProgress(100, 0, true);
     mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
 
-    StringBuilder sb = new StringBuilder();
-    sb.append("cd '");
-    sb.append(mCurrentTask.executableOutputDir);
-    sb.append("' ");
-    for (Map.Entry<Integer, String> e : mCurrentTask.modeMap.entrySet()) {
-      sb.append(" && ");
-      sb.append(String.format("chmod %o %s", e.getKey(), e.getValue()));
-    }
-
-    if (execShell(Shell.async(sb.toString(),mErrorReceiver), "chmod cancelled") != 0) {
-      Logger.debug("chmod command: "+sb.toString());
+    if (execShell(Shell.async(
+            "chmod -R 755 '" + mCurrentTask.executableOutputDir + "'",
+            mErrorReceiver), "chmod cancelled") != 0) {
       throw new IOException("cannot chmod extracted files.");
     }
   }
