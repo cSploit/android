@@ -18,6 +18,7 @@
  */
 package it.evilsocket.dsploit;
 
+import it.evilsocket.dsploit.core.ExecChecker;
 import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.System;
@@ -223,7 +224,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
       else if(!folder.canWrite())
         Toast.makeText(SettingsActivity.this, getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_writable), Toast.LENGTH_SHORT).show();
 
-      else if(!Shell.canExecuteInDir(folder.getAbsolutePath()) && !Shell.canRootExecuteInDir(Shell.getRealPath(folder.getAbsolutePath())))
+      else if(!ExecChecker.user(folder.getAbsolutePath()) && !ExecChecker.remount(folder.getAbsolutePath(), true) && !ExecChecker.root(ExecChecker.getRealPath(folder.getAbsolutePath())))
         Toast.makeText(SettingsActivity.this, getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_executable), Toast.LENGTH_LONG).show();
 
       else {

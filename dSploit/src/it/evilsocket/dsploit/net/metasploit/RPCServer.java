@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 
 import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.core.ExecChecker;
 import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Logger;
@@ -163,7 +164,8 @@ public class RPCServer extends Thread
 
     Shell.setupRubyEnviron();
 
-    if(!Shell.canExecuteInDir(msfDir) && !Shell.canRootExecuteInDir((msfDir = Shell.getRealPath(msfDir))))
+    if(!ExecChecker.user(msfDir) && !ExecChecker.remount(msfDir, false) &&
+            !ExecChecker.root((msfDir = ExecChecker.getRealPath(msfDir))))
       throw new IOException("cannot execute msf binaries");
 
     res = Shell.async(String.format(

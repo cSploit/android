@@ -313,11 +313,11 @@ public class UpdateService extends IntentService
 
         exitForError = false;
 
-        if (Shell.canExecuteInDir(mRubyInfo.outputDir)) {
+        if (ExecChecker.user(mRubyInfo.outputDir) || ExecChecker.remount(mRubyInfo.outputDir, true)) {
           mRubyInfo.executableOutputDir = mRubyInfo.outputDir;
         } else {
-          String realPath = Shell.getRealPath(mRubyInfo.outputDir);
-          if(Shell.canRootExecuteInDir(realPath))
+          String realPath = ExecChecker.getRealPath(mRubyInfo.outputDir);
+          if(ExecChecker.root(realPath))
             mRubyInfo.executableOutputDir = realPath;
           else {
             Logger.error(String.format("cannot create executable files in '%s' or '%s'",
@@ -424,11 +424,11 @@ public class UpdateService extends IntentService
 
         exitForError = false;
 
-        if (Shell.canExecuteInDir(mMsfInfo.outputDir)) {
+        if (ExecChecker.user(mMsfInfo.outputDir) || ExecChecker.remount(mMsfInfo.outputDir, true)) {
           mMsfInfo.executableOutputDir = mMsfInfo.outputDir;
         } else {
-          String realPath = Shell.getRealPath(mMsfInfo.outputDir);
-          if (Shell.canRootExecuteInDir(realPath)) {
+          String realPath = ExecChecker.getRealPath(mMsfInfo.outputDir);
+          if (ExecChecker.root(realPath)) {
             mMsfInfo.executableOutputDir = realPath;
           } else {
             Logger.error(String.format("cannot create executable files in '%s' or '%s'",

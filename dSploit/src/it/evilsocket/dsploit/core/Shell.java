@@ -30,8 +30,6 @@ import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
-import it.evilsocket.dsploit.tools.Fusemounts;
-
 public class Shell
 {
   private final static int MAX_FIFO = 1024;
@@ -44,33 +42,6 @@ public class Shell
   private final static ArrayList<Integer> mFIFOS = new ArrayList<Integer>();
   private static boolean rubyEnvironExported = false;
   private static boolean gotR00t = false;
-  private static final ArrayList<fuseBind> mFuseBinds = new ArrayList<fuseBind>();
-
-  private static class fuseBind {
-    public String source,mountpoint;
-
-    @Override
-    public boolean equals(Object o) {
-      if(o.getClass() != fuseBind.class)
-        return false;
-
-      fuseBind b = (fuseBind)o;
-
-      if(b.source != null) {
-        if(!b.source.equals(this.source))
-          return false;
-      } else if(this.source != null)
-        return false;
-
-      if(b.mountpoint != null) {
-        if(!b.mountpoint.equals(this.mountpoint))
-          return false;
-      } else if(this.mountpoint != null)
-        return false;
-
-      return true;
-    }
-  }
 
   /**
    * "gobblers" seem to be the recommended way to ensure the streams
@@ -431,9 +402,13 @@ public class Shell
     String rubyPath = System.getRubyPath();
     String msfPath = System.getMsfPath();
 
-    if(!canExecuteInDir(rubyPath) && !canRootExecuteInDir(rubyPath = getRealPath(rubyPath)))
+    if( !ExecChecker.user(rubyPath) &&
+        !ExecChecker.remount(rubyPath, false) &&
+        !ExecChecker.root(rubyPath = ExecChecker.getRealPath(rubyPath)))
       throw new IOException("cannot execute content of ruby directory");
-    if(!canExecuteInDir(msfPath) && !canRootExecuteInDir(msfPath = getRealPath(msfPath)))
+    if( !ExecChecker.user(msfPath) &&
+        !ExecChecker.remount(msfPath, false) &&
+        !ExecChecker.root(msfPath = ExecChecker.getRealPath(msfPath)))
       throw new IOException("cannot execute content of msf directory");
 
     synchronized (mFIFOS) { // must be sure that no one else write on our main shell
@@ -447,119 +422,5 @@ public class Shell
 
   public static void rubySettingsChanged() {
     rubyEnvironExported=false;
-  }
-
-  /**
-   * test if root can execute stuff inside a directory
-   * @param dir the directory to check
-   * @return true if root can create executable files inside {@code dir}
-   */
-  public static boolean canRootExecuteInDir(String dir) {
-
-    if(dir==null)
-      return false;
-
-    try {
-      String tmpname;
-      do {
-        tmpname = dir + "/" + UUID.randomUUID().toString();
-      } while (Shell.exec(String.format("test -f '%s'", tmpname))==0);
-
-      return Shell.exec(
-              String.format("touch '%1$s' && chmod %2$o '%1$s' && test -x '%1$s' && rm '%1$s'",
-                      tmpname, 0755)) == 0;
-    } catch (InterruptedException e) {
-      Logger.error(e.getMessage());
-    } catch (IOException e) {
-      Logger.error(e.getMessage());
-    }
-    return false;
-  }
-
-  private static void updateFuseBinds() {
-    final StringBuilder sb = new StringBuilder();
-
-    System.getFusemounts().getSources(new Fusemounts.fuseReceiver() {
-      @Override
-      public void onNewMountpoint(String source, String mountpoint) {
-        sb.append(source);
-        sb.append("\t");
-        sb.append(mountpoint);
-        sb.append("\n");
-      }
-    }).run();
-
-    if (sb.length() == 0) {
-      Logger.warning("no fuse mounts found.");
-      return;
-    }
-
-    for (String line : sb.toString().split("\n")) {
-      fuseBind b = new fuseBind();
-      String[] parts = line.split("\t");
-      b.source = parts[0];
-      b.mountpoint = parts[1];
-      mFuseBinds.add(b);
-    }
-  }
-
-  /**
-   * search for the real path of file.
-   * it retrieve FUSE bind mounts and search if {@code file} is inside one of them.
-   * @param file the file/directory to check
-   * @return the unrestricted path to file, or null if not found
-   */
-  public static String getRealPath(final String file) {
-
-    if(file==null)
-      return null;
-
-    synchronized (mFuseBinds) {
-      if (mFuseBinds.size() == 0)
-        updateFuseBinds();
-      if(mFuseBinds.size()>0) {
-        for(fuseBind b : mFuseBinds) {
-          if(file.startsWith(b.mountpoint)) {
-            return b.source + file.substring(b.mountpoint.length());
-          }
-        }
-      }
-      return null;
-    }
-  }
-
-  /**
-   * check if we can create executable files inside a directory.
-   * @param dir directory to check
-   * @return true if can execute files into {@code dir}, false otherwise
-   */
-  public static boolean canExecuteInDir(String dir) {
-    String tmpname;
-    File tmpfile = null;
-
-    if(dir==null)
-      return false;
-
-    tmpfile = new File(dir);
-
-    try {
-      if(!tmpfile.exists())
-        tmpfile.mkdirs();
-
-      do {
-        tmpname = UUID.randomUUID().toString();
-      } while((tmpfile = new File(dir, tmpname)).exists());
-
-      tmpfile.createNewFile();
-
-      return (tmpfile.canExecute() || tmpfile.setExecutable(true, false));
-
-    } catch (IOException e) {
-      Logger.warning(String.format("cannot create files over '%s'",dir));
-    } finally {
-      if(tmpfile!=null && tmpfile.exists())
-        tmpfile.delete();
-    }
-    return false;
   }
 }
