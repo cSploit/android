@@ -1221,7 +1221,7 @@ public class UpdateService extends IntentService
     Shell.setupRubyEnviron();
     Thread shell;
 
-    shell = Shell.async("gem update --system --source 'http://rubygems.org/'", mErrorReceiver);
+    shell = Shell.async("gem update --system --no-ri --no-rdoc --source 'http://rubygems.org/'", mErrorReceiver);
 
     if (execShell(shell, "cancelled on gem system update") != 0)
       throw new IOException("cannot update RubyGems");
