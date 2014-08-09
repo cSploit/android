@@ -2,9 +2,7 @@ obj
 libs/armeabi
 libs/x86
 libs/mips
-assets
 dist
-*.keystore
 *.jks
 *.tar.*
 *.zip
