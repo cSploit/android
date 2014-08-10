@@ -959,7 +959,6 @@ public class UpdateService extends IntentService
     File f,inFile;
     File[] list;
     String name;
-    FileOutputStream fos = null;
     byte data[] = new byte[2048];
     int mode;
     int count;
@@ -1047,21 +1046,12 @@ public class UpdateService extends IntentService
       if(f.createNewFile())
         Logger.info(".nomedia created");
 
-      if(mCurrentTask.versionString!=null&&!mCurrentTask.versionString.isEmpty()) {
-        f = new File(mCurrentTask.outputDir, "VERSION");
-        fos = new FileOutputStream(f);
-        fos.write(mCurrentTask.versionString.getBytes());
-      } else
-        Logger.warning("version string not found");
-
       mBuilder.setContentInfo("")
               .setProgress(100,100,true);
       mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
     } finally {
       if(is != null)
         is.close();
-      if(fos!=null)
-        fos.close();
     }
   }
 
@@ -1294,6 +1284,35 @@ public class UpdateService extends IntentService
       Logger.error(String.format("cannot delete temporary file '%s'", mCurrentTask.path));
   }
 
+  private void createVersionFile() throws IOException {
+    File f;
+    FileOutputStream fos = null;
+
+    if(mCurrentTask.outputDir==null)
+      return;
+
+    if(mCurrentTask.versionString == null || mCurrentTask.versionString.isEmpty()) {
+      Logger.warning("version string not found");
+      return;
+    }
+
+    try {
+        f = new File(mCurrentTask.outputDir, "VERSION");
+        fos = new FileOutputStream(f);
+        fos.write(mCurrentTask.versionString.getBytes());
+    } catch (Exception e) {
+      System.errorLogging(e);
+      throw new IOException("cannot create VERSION file");
+    } finally {
+      if(fos!=null) {
+        try { fos.close(); }
+        catch (Exception e) {
+          // ignored
+        }
+      }
+    }
+  }
+
   @Override
   protected void onHandleIntent(Intent intent) {
     action what_to_do = (action)intent.getSerializableExtra(ACTION);
@@ -1340,6 +1359,7 @@ public class UpdateService extends IntentService
 
         if (what_to_do != action.apk_update)
           deleteTemporaryFiles();
+        createVersionFile();
       }
       exitForError=false;
       if(what_to_do==action.msf_update)
