@@ -1278,7 +1278,7 @@ public class UpdateService extends IntentService
   }
 
   private void deleteTemporaryFiles() {
-    if(mCurrentTask.path==null||mCurrentTask.path.isEmpty())
+    if(mCurrentTask.outputDir==null||mCurrentTask.path==null||mCurrentTask.path.isEmpty())
       return;
     if(!(new File(mCurrentTask.path)).delete())
       Logger.error(String.format("cannot delete temporary file '%s'", mCurrentTask.path));
@@ -1357,8 +1357,7 @@ public class UpdateService extends IntentService
         else if (what_to_do == action.gems_update)
           updateGems();
 
-        if (what_to_do != action.apk_update)
-          deleteTemporaryFiles();
+        deleteTemporaryFiles();
         createVersionFile();
       }
       exitForError=false;
