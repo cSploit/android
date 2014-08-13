@@ -1198,28 +1198,6 @@ public class UpdateService extends IntentService
       throw new RuntimeException("cannot install msf gems");
   }
 
-  /**
-   * update rubygems thus to correct an SSL certificate mismatch error.
-   */
-  private void updateRubyGems() throws CancellationException, IOException, InterruptedException {
-    mBuilder.setContentTitle(getString(R.string.installing_gems))
-            .setContentText(getString(R.string.updating_rubygem))
-            .setContentInfo("")
-            .setSmallIcon(android.R.drawable.stat_sys_download)
-            .setProgress(100, 0, true);
-    mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-    Shell.setupRubyEnviron();
-    Thread shell;
-
-    shell = Shell.async("gem update --backtrace --debug --system --no-ri --no-rdoc --source 'http://rubygems.org/' 2>&1", mErrorReceiver);
-
-    if (execShell(shell, "cancelled on gem system update") != 0)
-      throw new IOException("cannot update RubyGems");
-
-    // rubygems update rewrite the shebang
-    patchShebang();
-  }
-
   private void updateGems() throws IOException, InterruptedException, CancellationException, RuntimeException, KeyException, NoSuchAlgorithmException {
     GemParser.RemoteGemInfo[] gemsToUpdate = mGemUploadParser.getGemsToUpdate();
 
@@ -1350,9 +1328,7 @@ public class UpdateService extends IntentService
         correctModes();
         patchShebang();
 
-        if (what_to_do == action.ruby_update)
-          updateRubyGems();
-        else if (what_to_do == action.msf_update)
+        if (what_to_do == action.msf_update)
           installGems();
         else if (what_to_do == action.gems_update)
           updateGems();
