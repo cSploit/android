@@ -243,7 +243,7 @@
 
     <!-- mitm modules -->
     <string name="mitm_simple_sniff">Enkel Sniff</string>
-    <string name="mitm_simple_sniff_desc">Omdirigere målet 's trafikk gjennom denne enheten og viser noen statistikk mens dumping den til en pcap fil.</string>
+    <string name="mitm_simple_sniff_desc">Omdirigere målet \'s trafikk gjennom denne enheten og viser noen statistikk mens dumping den til en pcap fil.</string>
     <string name="mitm_password_sniff">Passord Sniffer</string>
     <string name="mitm_password_sniff_desc">Sniff passord av mange protokoller som http, ftp, imap, imaps, irc, msn, etc fra målet.</string>
     <string name="mitm_session_hijack">Økt Kapring</string>
