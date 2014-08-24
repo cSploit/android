@@ -99,7 +99,7 @@
     <string name="wifi_key_copied">WLAN-Schlüssel in die Zwischenablage kopiert.</string>
     <string name="connected_to"><![CDATA[Verbunden zu <b>]]></string>
     <string name="connected_to2"><![CDATA[</b> mit Schlüssel <b><font color=\"green\">]]></string>
-    <string name="connected_to3"><![CDATA[</font></b> !]]></string>
+    <string name="connected_to3"><![CDATA[</font></b>!]]></string>
     <string name="connection_to"><![CDATA[Verbindung zu <b>]]></string>
     <string name="connection_to2">
         <![CDATA[</b> <b><font color=\"red\">FEHLGESCHLAGEN</font></b>.]]></string>

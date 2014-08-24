@@ -101,7 +101,7 @@
     <string name="wifi_key_copied">Clave WiFi copiada al portapapeles.</string>
     <string name="connected_to"><![CDATA[Conectado a <b>]]></string>
     <string name="connected_to2"><![CDATA[</b> con la clave <b><font color=\"green\">]]></string>
-    <string name="connected_to3"><![CDATA[</font></b> !]]></string>
+    <string name="connected_to3"><![CDATA[</font></b>!]]></string>
     <string name="connection_to"><![CDATA[Conexión a <b>]]></string>
     <string name="connection_to2"><![CDATA[</b> <b><font color=\"red\">FALLIDA</font></b>.]]></string>
     <string name="enter_key_or_crack">Introducir clave WiFi o intentar averiguarla:</string>

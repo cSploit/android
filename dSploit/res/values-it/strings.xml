@@ -2,7 +2,7 @@
     <string name="app_name">dSploit</string>
     <string name="menu_settings">Impostazioni</string>
     <string name="title_activity_main">dSploit</string>
-    <string name="crash_toast_text">Ooooops ! Sono crashato, ma un report verrà inviato al mio
+    <string name="crash_toast_text">Ooooops! Sono crashato, ma un report verrà inviato al mio
         sviluppatore in modo tale che il problema venga risolto.
     </string>
     <string name="toggle_button">ToggleButton</string>
@@ -64,7 +64,7 @@
     <string name="new_msf_update_desc">Un aggiornamento del MetaSploit Framework</string>
     <string name="new_update_desc">Un nuovo aggiornamento alla versione</string>
     <string name="new_ruby_update_desc">Un aggiornamento di ruby</string>
-    <string name="new_update_desc2">è disponibile, lo vuoi scaricare ?</string>
+    <string name="new_update_desc2">è disponibile, lo vuoi scaricare?</string>
     <string name="checking">Controllo&#8230;</string>
     <string name="no_updates_available">Nessun aggiornamento disponibile.</string>
     <string name="new_version">Nuova versione</string>
@@ -84,7 +84,7 @@
     <string name="start_monitor">Avvia Monitor di Rete</string>
     <string name="stop_monitor">Ferma Monitor di Rete</string>
     <string name="exit">Esci</string>
-    <string name="close_confirm">Questa azione chiuderà dSploit, sei sicuro di voler continuare ?
+    <string name="close_confirm">Questa azione chiuderà dSploit, sei sicuro di voler continuare?
     </string>
     <string name="press_back">Premi nuovamente il tasto indietro per chiudere l\'app.</string>
     <string name="selected_">Selezionato&#160;</string>
@@ -124,7 +124,7 @@
     <string name="wifi_key_copied">Chiave WiFi copiata sulla clipboard.</string>
     <string name="connected_to"><![CDATA[Connesso a <b>]]></string>
     <string name="connected_to2"><![CDATA[</b> con la chiave <b><font color=\"green\">]]></string>
-    <string name="connected_to3"><![CDATA[</font></b> !]]></string>
+    <string name="connected_to3"><![CDATA[</font></b>!]]></string>
     <string name="connection_to"><![CDATA[Connessione a <b>]]></string>
     <string name="connection_to2">
         <![CDATA[</b> <b><font color=\"red\">FALLITA</font></b>.]]></string>
@@ -228,9 +228,9 @@
     <string name="tap_again">Premi di nuovo per fermare.</string>
     <string name="unexpected_file_error">Errore inatteso durante la lettura del file : </string>
     <string name="the_port">La porta</string>
-    <string name="error_proxy_port"> della quale ha bisogno il transparent proxy è occupata da un altro processo, aprire le impostazioni ?</string>
-    <string name="error_mitm_port"> della quale ha bisogno il server mitm è occupata da un altro processo, aprire le impostazioni ?</string>
-    <string name="error_https_port"> della quale ha bisogno il redirezionatore https è occupata da un altro processo, aprire le impostazioni ?</string>
+    <string name="error_proxy_port"> della quale ha bisogno il transparent proxy è occupata da un altro processo, aprire le impostazioni?</string>
+    <string name="error_mitm_port"> della quale ha bisogno il server mitm è occupata da un altro processo, aprire le impostazioni?</string>
+    <string name="error_https_port"> della quale ha bisogno il redirezionatore https è occupata da un altro processo, aprire le impostazioni?</string>
     <string name="error_mitm_ports">Le porte devono essere disponibili per poter utilizzare i moduli MITM.</string>
 
     <!-- rpc stuff -->
@@ -283,13 +283,13 @@
     <string name="custom_code">Codice Personalizzato</string>
     <string name="error_file_intent">Sembrerebbe che non hai un file manager in grado di sfogliare i file, per favore installane uno.</string>
     <string name="enter_js_code">Inserisci il codice js da iniettare :</string>
-    <string name="error_js_code"><![CDATA[Codice javascript non valido, ricordati di usare i tag <script></script> .]]></string>
+    <string name="error_js_code"><![CDATA[Codice javascript non valido, ricordati di usare i tag <script></script>.]]></string>
     <string name="mitm_custom">Filtro Personalizzato</string>
     <string name="mitm_custom_desc">Sostituisce del testo arbitrario con quello personalizzato.</string>
     <string name="custom_filter">Filtro Personalizzato</string>
     <string name="error_filter">Espressione regolare non valida</string>
     <string name="file_output">Output su File</string>
-    <string name="question_save_to_pcap">Vuoi che il traffico intercettato venga salvato in un file pcap ?</string>
+    <string name="question_save_to_pcap">Vuoi che il traffico intercettato venga salvato in un file pcap?</string>
     <string name="dumping_traffic_to">Traffico dumpato su </string>
 
     <string name="error_mitm_proxy">Impossibile avviare il proxy, controlla la connessione e la disponibilità delle porte.</string>
@@ -377,7 +377,7 @@
     <string name="pref_msf_enable_desc">Abilita il MetaSploit Framework</string>
     <string name="pref_msf_delete">Cancella MSF</string>
     <string name="pref_msf_delete_desc">Cancella MetaSploit Framework dal tuo dispositivo</string>
-    <string name="pref_msfwipe_message">Vuoi veramente cancellare il MetaSploit Framework ?</string>
+    <string name="pref_msfwipe_message">Vuoi veramente cancellare il MetaSploit Framework?</string>
     <string name="pref_msfwipe_size">Saranno liberati circa %d MB.</string>
     <string name="delete_previous_location">Cancellare la vecchia posizione?</string>
     <string name="pref_folder">La cartella</string>

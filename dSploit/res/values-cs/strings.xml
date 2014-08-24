@@ -114,7 +114,7 @@
     <string name="wifi_key_copied">WiFi klíč uložen v mezipaměti.</string>
     <string name="connected_to"><![CDATA[Připojeno k <b>]]></string>
     <string name="connected_to2"><![CDATA[</b> S klíčen <b><font color=\"green\">]]></string>
-    <string name="connected_to3"><![CDATA[</font></b> !]]></string>
+    <string name="connected_to3"><![CDATA[</font></b>!]]></string>
     <string name="connection_to"><![CDATA[Připojeno k <b>]]></string>
     <string name="connection_to2">
         <![CDATA[</b> <b><font color=\"red\">SELHÁNÍ</font></b>.]]></string>
@@ -212,9 +212,9 @@
     <string name="tap_again">Dotkněte se znovu pro konec</string>
     <string name="unexpected_file_error">Nečekaná chyba při čtení souboru: </string>
     <string name="the_port">Port</string>
-    <string name="error_proxy_port"> který je třeba pro transparentní proxy je používán jiným procesem, otevřít nastavení ?</string>
-    <string name="error_mitm_port"> který ke třeba pro MITM je využíván jiným procesem, otevřít nastavení ?</string>
-    <string name="error_https_port"> kzerý ke potřebný pro MITM přesměrování je používán jiným procesem, otevřít nastavení ?</string>
+    <string name="error_proxy_port"> který je třeba pro transparentní proxy je používán jiným procesem, otevřít nastavení?</string>
+    <string name="error_mitm_port"> který ke třeba pro MITM je využíván jiným procesem, otevřít nastavení?</string>
+    <string name="error_https_port"> kzerý ke potřebný pro MITM přesměrování je používán jiným procesem, otevřít nastavení?</string>
     <string name="error_mitm_ports">Pro MITM moduly jsou nutné všechny porty dostupné</string>
 
     <!-- rpc stuff -->
@@ -272,7 +272,7 @@
     <string name="custom_filter">Vlastní Filter</string>
     <string name="error_filter">Neplatná exprese</string>
     <string name="file_output">Výstupní soubor</string>
-    <string name="question_save_to_pcap">Chcete uložit odšmírovaný provoz do pcap souboru ?</string>
+    <string name="question_save_to_pcap">Chcete uložit odšmírovaný provoz do pcap souboru?</string>
     <string name="dumping_traffic_to">Ukládám provoz do </string>
 
     <string name="error_mitm_proxy">Nelze vytvořit proxy, prosím zkontrolujte připojení a dostupnost portů.</string>

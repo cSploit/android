@@ -106,7 +106,7 @@ If not, see http://www.gnu.org/licenses/.
 <string name="wifi_key_copied">WiFi 密码已经复制到剪贴板.</string>
 <string name="connected_to"><![CDATA[已经连接道 <b>]]></string>
 <string name="connected_to2"><![CDATA[</b> 使用密钥 <b><font color=\"green\">]]></string>
-<string name="connected_to3"><![CDATA[</font></b> !]]></string>
+<string name="connected_to3"><![CDATA[</font></b>!]]></string>
 <string name="connection_to"><![CDATA[到<b>]]></string>
 <string name="connection_to2">
 <![CDATA[的连接</b> <b><font color=\"red\">已经失败</font></b>.]]></string>
@@ -259,7 +259,7 @@ If not, see http://www.gnu.org/licenses/.
 <string name="custom_filter">自定义过滤器</string>
 <string name="error_filter">无效的正则表达式</string>
 <string name="file_output">文件输出</string>
-<string name="question_save_to_pcap">你想保存已经嗅探的流量到pcap文件么 ?</string>
+<string name="question_save_to_pcap">你想保存已经嗅探的流量到pcap文件么?</string>
 <string name="dumping_traffic_to">正在将流量转储 </string>
 
 <string name="error_mitm_proxy">无法建立代理，请检查网络连接和端口可用性.</string>

@@ -2,7 +2,7 @@
     <string name="app_name">dSploit</string>
     <string name="menu_settings">Ustawienia</string>
     <string name="title_activity_main">dSploit</string>
-    <string name="crash_toast_text">Ooooops ! Wywaliłem się, ale zamierzam wysłać raport do mojego twórcy
+    <string name="crash_toast_text">Ooooops! Wywaliłem się, ale zamierzam wysłać raport do mojego twórcy
         żeby pomóc naprawić problem :)
     </string>
     <string name="toggle_button">ToggleButton</string>
@@ -57,7 +57,7 @@
     <string name="send">Wyślij</string>
     <string name="update_available">Aktualizacja jest dostępna</string>
     <string name="new_update_desc">Nowa aktualizacja do wersji</string>
-    <string name="new_update_desc2">jest dostępna, chcesz ją pobrać ?</string>
+    <string name="new_update_desc2">jest dostępna, chcesz ją pobrać?</string>
     <string name="checking">Sprawdzam&#8230;</string>
     <string name="no_updates_available">Brak dostępnych aktualizacji.</string>
 	<string name="new_msf_update_desc">Aktualizacja MetasploitFramework</string>
@@ -78,7 +78,7 @@
     <string name="start_msfrpcd">Rozpocznij MetaSploit RPCD</string>
     <string name="stop_msfrpcd">Zatrzymaj MetaSploit RPCD</string>
     <string name="exit">Wyjdź</string>
-    <string name="close_confirm">To zamknie dSploit, jesteś pewien, że chcesz kontynuować ?
+    <string name="close_confirm">To zamknie dSploit, jesteś pewien, że chcesz kontynuować?
     </string>
     <string name="press_back">Naciśnij wstecz jeszcze raz by opuścić aplikację.</string>
     <string name="selected_">Wybrano&#160;</string>
@@ -115,7 +115,7 @@
     <string name="wifi_key_copied">Klucz WiFi skopiowany do schowka.</string>
     <string name="connected_to"><![CDATA[Połączony z <b>]]></string>
     <string name="connected_to2"><![CDATA[</b> kluczem <b><font color=\"green\">]]></string>
-    <string name="connected_to3"><![CDATA[</font></b> !]]></string>
+    <string name="connected_to3"><![CDATA[</font></b>!]]></string>
     <string name="connection_to"><![CDATA[Połączenie z <b>]]></string>
     <string name="connection_to2">
         <![CDATA[</b> <b><font color=\"red\">NIEUDANE</font></b>.]]></string>
@@ -363,7 +363,7 @@
     <string name="pref_msf_enable_desc">Aktywuje MetaSploit Framework.</string>
     <string name="pref_msf_delete">Usuń MSF</string>
     <string name="pref_msf_delete_desc">Usuwa MetaSploit Framework z urządzenia.</string>
-    <string name="pref_msfwipe_message">Do you really want to delete the MetaSploit Framework ?</string>
+    <string name="pref_msfwipe_message">Do you really want to delete the MetaSploit Framework?</string>
     <string name="pref_msfwipe_size">About %d MB will be freed.</string>
     <string name="pref_err_exists">nie istnieje.</string>
     <string name="pref_err_writable">nie ma praw zapisu.</string>
