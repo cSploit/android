@@ -116,7 +116,7 @@
     <string name="wifi_key_copied">WiFi avain kopioitu leikepöydälle.</string>
     <string name="connected_to"><![CDATA[Yhdistetty verkkoon <b>]]></string>
     <string name="connected_to2"><![CDATA[</b> avaimella <b><font color=\"green\">]]></string>
-    <string name="connected_to3"><![CDATA[</font></b> !]]></string>
+    <string name="connected_to3"><![CDATA[</font></b>!]]></string>
     <string name="connection_to"><![CDATA[Yhdistäminen kohteeseen <b>]]></string>
     <string name="connection_to2">
         <![CDATA[</b> <b><font color=\"red\">EPÄONNISTUI</font></b>.]]></string>
@@ -225,9 +225,9 @@
     <string name="tap_again">Näpäytä uudelleen pysäyttääksesi.</string>
     <string name="unexpected_file_error">Odottamaton virhe lukiessa tiedstoa : </string>
     <string name="the_port">Portti</string>
-    <string name="error_proxy_port"> jonka läpinäkyvä välityspalvelin tarvitsee on toisen prosessin käytössä, avaa sovelluksen asetukset ?</string>
-    <string name="error_mitm_port"> jonka mies välissä -palvelin tarvitsee on toisen prosessin käytössä, avaa sovelluksen asetukset? ?</string>
-    <string name="error_https_port"> jonka mies välissä HTTPS uudelleenohjaus tarvitsee on toisen prosessin käytössä, avaa sovelluksen asetukset ?</string>
+    <string name="error_proxy_port"> jonka läpinäkyvä välityspalvelin tarvitsee on toisen prosessin käytössä, avaa sovelluksen asetukset?</string>
+    <string name="error_mitm_port"> jonka mies välissä -palvelin tarvitsee on toisen prosessin käytössä, avaa sovelluksen asetukset?</string>
+    <string name="error_https_port"> jonka mies välissä HTTPS uudelleenohjaus tarvitsee on toisen prosessin käytössä, avaa sovelluksen asetukset?</string>
     <string name="error_mitm_ports">Mies Välissä -moduulit vaativat kaikki portit käytettäviksi.</string>
 
     <!--RPC tavaraa -->
@@ -285,7 +285,7 @@
     <string name="custom_filter">Oma suodatin</string>
     <string name="error_filter">Virheellinen säännöllinen lauseke.</string>
     <string name="file_output">Tiedoston vieminen</string>
-    <string name="question_save_to_pcap">Haluatko tallentaa nuuhkitun datan .pcap tiedostoon ?</string>
+    <string name="question_save_to_pcap">Haluatko tallentaa nuuhkitun datan .pcap tiedostoon?</string>
     <string name="dumping_traffic_to">Viedään likkennettä </string>
 
     <string name="error_mitm_proxy">Ei voida luoda välityspalvelinta, ole hyvä ja tarkista verkkoyhteytesi ja portin käytettävyys.</string>

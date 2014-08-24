@@ -58,7 +58,7 @@
     <string name="send">Send</string>
     <string name="update_available">Oppdatering tilgjengelig</string>
     <string name="new_update_desc">En ny oppdatering til versjon</string>
-    <string name="new_update_desc2">er tilgjengelig laste ned ?</string>
+    <string name="new_update_desc2">er tilgjengelig laste ned?</string>
     <string name="checking">Sjekker&#8230;</string>
     <string name="no_updates_available">Ingen oppdateringer tilgjengelig.</string>
     <string name="new_msf_update_desc">En MetasploitFramework oppdatering</string>
@@ -79,7 +79,7 @@
     <string name="start_msfrpcd">Start MetaSploit RPCD</string>
     <string name="stop_msfrpcd">Stopp MetaSploit RPCD</string>
     <string name="exit">Avslutt</string>
-    <string name="close_confirm">Dette vil lukke dSpolit, fortsette ?
+    <string name="close_confirm">Dette vil lukke dSpolit, fortsette?
     </string>
     <string name="press_back">trykk igjen for å avslutte.</string>
     <string name="selected_">Valgt&#160;</string>
@@ -117,7 +117,7 @@
     <string name="wifi_key_copied">WiFi nøkkel koblet til utklippstavle.</string>
     <string name="connected_to"><![CDATA[Connected to <b>]]></string>
     <string name="connected_to2"><![CDATA[</b> with key <b><font color=\"green\">]]></string>
-    <string name="connected_to3"><![CDATA[</font></b> !]]></string>
+    <string name="connected_to3"><![CDATA[</font></b>!]]></string>
     <string name="connection_to"><![CDATA[Connection to <b>]]></string>
     <string name="connection_to2">
         <![CDATA[</b> <b><font color=\"red\">FAILED</font></b>.]]></string>
@@ -223,7 +223,7 @@
     <string name="unexpected_file_error">Uventet feil under lesing av filen : </string>
     <string name="the_port">Porten</string>
     <string name="error_proxy_port"> som er nødvendig av transparent proxy er tatt fra en annen prosess, åpne program instillinger?</string>
-    <string name="error_mitm_port"> som er nødvendig av MITM serveren er tatt fra en annen prosess, åpne program innstillinger ?</string>
+    <string name="error_mitm_port"> som er nødvendig av MITM serveren er tatt fra en annen prosess, åpne program innstillinger?</string>
     <string name="error_https_port"> som er nødvendig av MITM https redirector er tatt fra en annen prosess, åpne program innstillinger?</string>
     <string name="error_mitm_ports">MITM moduler trenger alle porter tilgjengelig.</string>
 
@@ -283,7 +283,7 @@
     <string name="custom_filter">Tilpasset filter</string>
     <string name="error_filter">Ugyldig uttrykk</string>
     <string name="file_output">File Output</string>
-    <string name="question_save_to_pcap">Vil du lagre sniffet trafikk til en pcap fil ?</string>
+    <string name="question_save_to_pcap">Vil du lagre sniffet trafikk til en pcap fil?</string>
     <string name="dumping_traffic_to">Dumper trafikk til </string>
 
     <string name="error_mitm_proxy">Unable to create the proxy, please check your connection and port availability.</string>
@@ -391,7 +391,7 @@
     <string name="pref_msf_enable_desc">Aktiver MetaSploit Framework</string>
     <string name="pref_msf_delete">Slett MSF</string>
     <string name="pref_msf_delete_desc">Sletter MetaSploit Framework fra enheten din</string>
-    <string name="pref_msfwipe_message">Vil du slette MetaSploit Framework ?</string>
+    <string name="pref_msfwipe_message">Vil du slette MetaSploit Framework?</string>
     <string name="pref_msfwipe_size">Rundt %d MB vil be frigjort.</string>
     <string name="pref_err_exists">eksisterer ikke.</string>
     <string name="pref_err_writable">er ikke skrivbar.</string>
@@ -454,7 +454,7 @@
     <string name="connected_msf">Koblet til MetaSploit</string>
     <string name="connection_failed">tilkobling feilet!</string>
     <string name="new_ruby_update_desc">En oppdatering for ruby er tilgjengelig</string>
-    <string name="delete_previous_location">Slett forrige destionasjon ?</string>
+    <string name="delete_previous_location">Slett forrige destionasjon?</string>
     <string name="setting_file_modes">sette filrettigheter…</string>
     <string name="updating_rubygem">Oppdaterer RubyGems</string>
     <string name="installing_gems">innstallerer gems…</string>

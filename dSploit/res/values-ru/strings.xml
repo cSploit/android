@@ -106,7 +106,7 @@
     <string name="wifi_key_copied">Ключ от WiFi скопирован в буфер обмена.</string>
     <string name="connected_to"><![CDATA[Подключен к <b>]]></string>
     <string name="connected_to2"><![CDATA[</b> с ключом<b><font color=\"green\">]]></string>
-    <string name="connected_to3"><![CDATA[</font></b> !]]></string>
+    <string name="connected_to3"><![CDATA[</font></b>!]]></string>
     <string name="connection_to"><![CDATA[Подключение к <b>]]></string>
     <string name="connection_to2">
         <![CDATA[</b> завершилось <b><font color=\"red\">НЕУДАЧНО</font></b>.]]></string>
@@ -429,7 +429,7 @@
     <string name="connected_msf">Подключено к MetaSploit</string>
     <string name="connection_failed">СБОЙ при подключении!</string>
     <string name="new_ruby_update_desc">Доступно обновление для ruby</string>
-    <string name="delete_previous_location">Удалить предыдущее расположение ?</string>
+    <string name="delete_previous_location">Удалить предыдущее расположение?</string>
     <string name="setting_file_modes">Установка прав файлам…</string>
     <string name="updating_rubygem">Обновление RubyGems</string>
     <string name="installing_gems">Установка gems…</string>

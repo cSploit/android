@@ -113,7 +113,7 @@
     <string name="wifi_key_copied">Το κλέιδί του WiFi αντιγράφηκε.</string>
     <string name="connected_to"><![CDATA[Συνδεση στο <b>]]></string>
     <string name="connected_to2"><![CDATA[</b> με κλειδί <b><font color=\"green\">]]></string>
-    <string name="connected_to3"><![CDATA[</font></b> !]]></string>
+    <string name="connected_to3"><![CDATA[</font></b>!]]></string>
     <string name="connection_to"><![CDATA[Σύνδεση στο <b>]]></string>
     <string name="connection_to2">
         <![CDATA[</b> <b><font color=\"red\">ΑΠEΤΥΧΕ</font></b>.]]></string>

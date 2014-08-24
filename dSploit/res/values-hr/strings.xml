@@ -2,7 +2,7 @@
     <string name="app_name">dSploit</string>
     <string name="menu_settings">Postavke</string>
     <string name="title_activity_main">dSploit</string>
-    <string name="crash_toast_text">Ooooops ! Srušio sam se, ali izvješće će se poslati mojem
+    <string name="crash_toast_text">Ooooops! Srušio sam se, ali izvješće će se poslati mojem
         razvijaču da pokuša riješiti problem :)
     </string>
     <string name="toggle_button">PreklopniGumb</string>
@@ -58,7 +58,7 @@
     <string name="send">Pošalji</string>
     <string name="update_available">Ažuriranje Dostupno</string>
     <string name="new_update_desc">Novo ažuriranje na verziju</string>
-    <string name="new_update_desc2">je dostupno, želite li ga preuzeti ?</string>
+    <string name="new_update_desc2">je dostupno, želite li ga preuzeti?</string>
     <string name="checking">Provjera&#8230;</string>
     <string name="no_updates_available">Nema dostupnih ažuriranja.</string>
     <string name="new_msf_update_desc">MetasploitFramework nadogradnja</string>
@@ -79,7 +79,7 @@
     <string name="start_msfrpcd">Pokreni MetaSploit RPCD</string>
     <string name="stop_msfrpcd">Zaustavi MetaSploit RPCD</string>
     <string name="exit">Zaustavi</string>
-    <string name="close_confirm">Ovo će zatvoriti dSploit, jeste li sigurni da želite nastaviti ?
+    <string name="close_confirm">Ovo će zatvoriti dSploit, jeste li sigurni da želite nastaviti?
     </string>
     <string name="press_back">Pritisnite opet tipku nazad za izlaz.</string>
     <string name="selected_">Izabrano&#160;</string>
@@ -117,7 +117,7 @@
     <string name="wifi_key_copied">WiFi ključ kopiran u međuspremnik.</string>
     <string name="connected_to"><![CDATA[Povezan sa <b>]]></string>
     <string name="connected_to2"><![CDATA[</b> sa ključem <b><font color=\"green\">]]></string>
-    <string name="connected_to3"><![CDATA[</font></b> !]]></string>
+    <string name="connected_to3"><![CDATA[</font></b>!]]></string>
     <string name="connection_to"><![CDATA[Povezan na <b>]]></string>
     <string name="connection_to2">
         <![CDATA[</b> <b><font color=\"red\">NEUSPJEŠNO</font></b>.]]></string>
@@ -222,9 +222,9 @@
     <string name="tap_again">Dodirni opet za zaustavljanje.</string>
     <string name="unexpected_file_error">Neočekivana greška pri čitanju datoteke : </string>
     <string name="the_port">Port</string>
-    <string name="error_proxy_port"> koji je potreban prozirnom proxyju je zauzeo drugi proces, otvori postavke ?</string>
-    <string name="error_mitm_port"> koji je potreban MITM serveru je zauzeo drugi proces, otvori postavke ?</string>
-    <string name="error_https_port"> koji je potreban MITM HTTPS preusmjerivaču je zauzeo drugi proces, otvori postavke ?</string>
+    <string name="error_proxy_port"> koji je potreban prozirnom proxyju je zauzeo drugi proces, otvori postavke?</string>
+    <string name="error_mitm_port"> koji je potreban MITM serveru je zauzeo drugi proces, otvori postavke?</string>
+    <string name="error_https_port"> koji je potreban MITM HTTPS preusmjerivaču je zauzeo drugi proces, otvori postavke?</string>
     <string name="error_mitm_ports">MITM modulima je potrebno da su svi portovi otvoreni.</string>
 
     <!-- rpc stuff -->
@@ -282,7 +282,7 @@
     <string name="custom_filter">Prilagođeni Filter</string>
     <string name="error_filter">Normalan izraz nije valjan</string>
     <string name="file_output">Sadržaj Datoteke</string>
-    <string name="question_save_to_pcap">Želite li spasiti osluškivani promet u pcap datoteku ?</string>
+    <string name="question_save_to_pcap">Želite li spasiti osluškivani promet u pcap datoteku?</string>
     <string name="dumping_traffic_to">Zapisujem promet u </string>
 
     <string name="error_mitm_proxy">Nemoguće stvoriti proxy, molimo provjerite svoju vezu i dostupnost portova.</string>
@@ -381,7 +381,7 @@
     <string name="pref_msf_enable_desc">Uključuje MetaSploit Framework</string>
     <string name="pref_msf_delete">Izbriši MSF</string>
     <string name="pref_msf_delete_desc">Izbriši MetaSploit Framework sa uređaja</string>
-    <string name="pref_msfwipe_message">Jeste li sigurni da hoćete izbrisata MetaSploit Framework ?</string>
+    <string name="pref_msfwipe_message">Jeste li sigurni da hoćete izbrisata MetaSploit Framework?</string>
     <string name="pref_msfwipe_size">Oko %d MB će biti oslobođeno.</string>
     <string name="pref_err_exists">ne postoji.</string>
     <string name="pref_err_writable">ne dopušta zapisivanje.</string>

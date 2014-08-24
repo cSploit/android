@@ -45,7 +45,7 @@
     <string name="send">Enviar</string>
     <string name="update_available">Atualização Disponível</string>
     <string name="new_update_desc">Uma nova atualização para a versão</string>
-    <string name="new_update_desc2">está disponível, você quer fazer o download ?</string>
+    <string name="new_update_desc2">está disponível, você quer fazer o download?</string>
     <string name="checking">checagem&#8230;</string>
     <string name="no_updates_available">Não há atualizações disponíveis.</string>
     <string name="new_msf_update_desc">Uma atualização do Metasploit Framework</string>
@@ -66,7 +66,7 @@
     <string name="start_msfrpcd">Iniciar MetaSploit RPCD</string>
     <string name="stop_msfrpcd">Parar MetaSploit RPCD</string>
     <string name="exit">Sair</string>
-    <string name="close_confirm">Isto irá fechar o dSploit, você tem certeza que deseja continuar ?
+    <string name="close_confirm">Isto irá fechar o dSploit, você tem certeza que deseja continuar?
     </string>
     <string name="press_back">Pressione voltar novamente para fechar este aplicativo.</string>
     <string name="selected_">Selecionado&#160;</string>
@@ -80,7 +80,7 @@
     <string name="enter_session_name">Digite o nome do arquivo de sessão :</string>
     <string name="new_session_started">Nova sessão iniciada</string>
     <string name="warning">Aviso</string>
-    <string name="warning_new_session">Iniciando uma nova sessão irá apagar a atual, continuar ?</string>
+    <string name="warning_new_session">Iniciando uma nova sessão irá apagar a atual, continuar?</string>
     <string name="fatal_error_html">
         <![CDATA[<p>Parece que sua ROM tem o <b>LD_LIBRARY_PATH bug</b>, desculpe mas não é compatível com dSploit.</p>]]></string>
     <string name="fatal_error_html2">
@@ -101,7 +101,7 @@
     <string name="wifi_key_copied">Chave WiFi copiada para a área de Transferência.</string>
     <string name="connected_to"><![CDATA[Conectado a <b>]]></string>
     <string name="connected_to2"><![CDATA[</b> com chave <b><font color=\"green\">]]></string>
-    <string name="connected_to3"><![CDATA[</font></b> !]]></string>
+    <string name="connected_to3"><![CDATA[</font></b>!]]></string>
     <string name="connection_to"><![CDATA[Conectado para <b>]]></string>
     <string name="connection_to2">
         <![CDATA[</b> <b><font color=\"red\">FAILED</font></b>.]]></string>
@@ -180,8 +180,8 @@
     <string name="this_device">&#160;(Este Dispositivo)</string>
     <string name="wifi_went_down">conectividade WiFi Caiu.</string>
     <string name="hijack_session">Hijack de Sessão</string>
-    <string name="start_hijacking">Parar sniff e iniciar sessão de Sequestro ?</string>
-    <string name="start_hijacking2">Começar sequestro de sessão ?</string>
+    <string name="start_hijacking">Parar sniff e iniciar sessão de Sequestro?</string>
+    <string name="start_hijacking2">Começar sequestro de sessão?</string>
     <string name="set_session_filename">Defina o nome do arquivo de sessão:</string>
     <string name="session_sniffer">Sniffer de sessão</string>
 
@@ -197,9 +197,9 @@
     <string name="tap_again">Toque novamente para parar.</string>
     <string name="unexpected_file_error">Erro inesperado ao ler o arquivo : </string>
     <string name="the_port">A Porta</string>
-    <string name="error_proxy_port"> o que é necessário para o proxy transparente é tomada a partir de um outro processo, abrir as configurações do aplicativo ?</string>
-    <string name="error_mitm_port"> O que é necessário para o servidor MITM é tomado de outro processo, abrir as configurações do aplicativo ?</string>
-    <string name="error_https_port"> o que é necessário para o MITM https redirecionador é tirado de outro processo, abrir as configurações do aplicativo ?</string>
+    <string name="error_proxy_port"> o que é necessário para o proxy transparente é tomada a partir de um outro processo, abrir as configurações do aplicativo?</string>
+    <string name="error_mitm_port"> O que é necessário para o servidor MITM é tomado de outro processo, abrir as configurações do aplicativo?</string>
+    <string name="error_https_port"> o que é necessário para o MITM https redirecionador é tirado de outro processo, abrir as configurações do aplicativo?</string>
     <string name="error_mitm_ports">Módulos MITM precisa de todas as portas disponíveis.</string>
 
     <!-- rpc stuff -->
@@ -258,7 +258,7 @@
     <string name="custom_filter">Filtro Personalizado</string>
     <string name="error_filter">Expressão regular inválida</string>
     <string name="file_output">Arquivo de Saída</string>
-    <string name="question_save_to_pcap">Você quer salvar o tráfego sniffed para um arquivo pcap ?</string>
+    <string name="question_save_to_pcap">Você quer salvar o tráfego sniffed para um arquivo pcap?</string>
     <string name="dumping_traffic_to">Despejar tráfego para </string>
 
     <string name="error_mitm_proxy">Não é possível criar o proxy, por favor, verifique sua conexão e disponibilidade da porta.</string>
@@ -364,7 +364,7 @@
     <string name="pref_msf_enable_desc">Habilitar o MetaSploit Framework</string>
     <string name="pref_msf_delete">Deletar MSF</string>
     <string name="pref_msf_delete_desc">Excluir o Metasploit Framework do seu dispositivo</string>
-    <string name="pref_msfwipe_message">Você realmente quer deletar o Metasploit Framework ?</string>
+    <string name="pref_msfwipe_message">Você realmente quer deletar o Metasploit Framework?</string>
     <string name="pref_msfwipe_size">Sobre %d MB will be freed.</string>
     <string name="pref_err_exists">Não Existe.</string>
     <string name="pref_err_writable">Não é gravável.</string>
@@ -429,7 +429,7 @@
     <string name="pref_msf_check_updates">Verificar atualizações de MSF</string>
     <string name="pref_msf_check_updates_desc">Verificar por atualizações MSF toda vez que o aplicativo é iniciado.</string>
     <string name="new_ruby_update_desc">Uma atualização para ruby está disponível</string>
-    <string name="delete_previous_location">Excluir local anterior ?</string>
+    <string name="delete_previous_location">Excluir local anterior?</string>
     <string name="setting_file_modes">Definição de permissões de arquivo…</string>
     <string name="updating_rubygem">Atualizar o RubyGems</string>
     <string name="installing_gems">instalaçao de gems…</string>

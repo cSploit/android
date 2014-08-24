@@ -2,7 +2,7 @@
     <string name="app_name">dSploit</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">dSploit</string>
-    <string name="crash_toast_text">Ooooops ! I crashed, but a report is going to be sent to my
+    <string name="crash_toast_text">Ooooops! I crashed, but a report is going to be sent to my
         developer to help fix the issue :)
     </string>
     <string name="toggle_button">ToggleButton</string>
@@ -58,7 +58,7 @@
     <string name="send">Send</string>
     <string name="update_available">Update Available</string>
     <string name="new_update_desc">A new update to version</string>
-    <string name="new_update_desc2">is available, do you want to download it ?</string>
+    <string name="new_update_desc2">is available, do you want to download it?</string>
     <string name="checking">Checking&#8230;</string>
     <string name="no_updates_available">No updates available.</string>
     <string name="new_msf_update_desc">A MetasploitFramework update</string>
@@ -79,7 +79,7 @@
     <string name="start_msfrpcd">Start MetaSploit RPCD</string>
     <string name="stop_msfrpcd">Stop MetaSploit RPCD</string>
     <string name="exit">Exit</string>
-    <string name="close_confirm">This will close dSploit, are you sure you want to continue ?
+    <string name="close_confirm">This will close dSploit, are you sure you want to continue?
     </string>
     <string name="press_back">Press back again to close this app.</string>
     <string name="selected_">Selected&#160;</string>
@@ -117,7 +117,7 @@
     <string name="wifi_key_copied">WiFi key copied to clipboard.</string>
     <string name="connected_to"><![CDATA[Connected to <b>]]></string>
     <string name="connected_to2"><![CDATA[</b> with key <b><font color=\"green\">]]></string>
-    <string name="connected_to3"><![CDATA[</font></b> !]]></string>
+    <string name="connected_to3"><![CDATA[</font></b>!]]></string>
     <string name="connection_to"><![CDATA[Connection to <b>]]></string>
     <string name="connection_to2">
         <![CDATA[</b> <b><font color=\"red\">FAILED</font></b>.]]></string>
@@ -222,9 +222,9 @@
     <string name="tap_again">Tap again to stop.</string>
     <string name="unexpected_file_error">Unexpected error while reading the file : </string>
     <string name="the_port">The port</string>
-    <string name="error_proxy_port"> which is needed by the transparent proxy is taken from another process, open application settings ?</string>
-    <string name="error_mitm_port"> which is needed by the mitm server is taken from another process, open application settings ?</string>
-    <string name="error_https_port"> which is needed by the mitm https redirector is taken from another process, open application settings ?</string>
+    <string name="error_proxy_port"> which is needed by the transparent proxy is taken from another process, open application settings?</string>
+    <string name="error_mitm_port"> which is needed by the mitm server is taken from another process, open application settings?</string>
+    <string name="error_https_port"> which is needed by the mitm https redirector is taken from another process, open application settings?</string>
     <string name="error_mitm_ports">MITM modules need all ports available.</string>
 
     <!-- rpc stuff -->
@@ -283,7 +283,7 @@
     <string name="custom_filter">Custom Filter</string>
     <string name="error_filter">Invalid regular expression</string>
     <string name="file_output">File Output</string>
-    <string name="question_save_to_pcap">Do you want to save sniffed traffic to a pcap file ?</string>
+    <string name="question_save_to_pcap">Do you want to save sniffed traffic to a pcap file?</string>
     <string name="dumping_traffic_to">Dumping traffic to </string>
 
     <string name="error_mitm_proxy">Unable to create the proxy, please check your connection and port availability.</string>
@@ -391,7 +391,7 @@
     <string name="pref_msf_enable_desc">Enable the MetaSploit Framework</string>
     <string name="pref_msf_delete">Delete MSF</string>
     <string name="pref_msf_delete_desc">Delete the MetaSploit Framework from your device</string>
-    <string name="pref_msfwipe_message">Do you really want to delete the MetaSploit Framework ?</string>
+    <string name="pref_msfwipe_message">Do you really want to delete the MetaSploit Framework?</string>
     <string name="pref_msfwipe_size">About %d MB will be freed.</string>
     <string name="pref_err_exists">does not exists.</string>
     <string name="pref_err_writable">is not writable.</string>
@@ -454,7 +454,7 @@
     <string name="connected_msf">connected to MetaSploit</string>
     <string name="connection_failed">connection FAILED!</string>
     <string name="new_ruby_update_desc">An update for ruby is available</string>
-    <string name="delete_previous_location">Delete previous location ?</string>
+    <string name="delete_previous_location">Delete previous location?</string>
     <string name="setting_file_modes">setting file permissions…</string>
     <string name="updating_rubygem">updating RubyGems</string>
     <string name="installing_gems">installing gems…</string>
