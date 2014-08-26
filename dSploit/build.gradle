@@ -41,7 +41,9 @@ android {
         }
 
         release {
-            signingConfig signingConfigs.release
+            if (System.getenv("KEYSTORE_FILE") != null) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 
