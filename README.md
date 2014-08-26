@@ -28,11 +28,6 @@ Requirements
 - The device **must be rooted**.
 - The device must have a BusyBox **full install**, this means with **every** utility installed ( not the partial installation ).
 
-Note
--------------
-
-The app is made to work only in landscape mode and will stay landscape even if you rotate your device, if you have an application such as Rotation Control to force every app to rotate, probably you are going to see dSploit crash.
-This is something i want to be like this, every interface is designed to work in landscape, so do not submit issues related to rotation.
 
 Disclaimer
 -------------
