@@ -280,7 +280,7 @@
 
     <string name="wifi_initializing">Inicializar … &#8230;</string>
     <string name="wifi_activating_iface">Ativação da interface WiFi … &#8230;</string>
-    <string name="wifi_activated">WiFi ativado.</string>
+    <string name="wifi_activated">WiFi ativo.</string>
     <string name="wifi_scanning">Escaneando … &#8230;</string>
     <string name="wifi_attempting_to">Preparando Conexão Para</string>
     <string name="wifi_with_key">Com a Chave</string>
@@ -289,14 +289,14 @@
     <string name="wifi_scan_finished">Escaneamento Terminado.</string>
 
     <string name="pref_general">Geral</string>
-    <string name="pref_modules">Modulos</string>
+    <string name="pref_modules">Módulos</string>
     <string name="pref_msf">Framework MetaSploit</string>
     <string name="pref_performance">Performance</string>
     <string name="pref_check_updates">Checar por Atualizações</string>
     <string name="pref_wake_lock">Wake Lock</string>
     <string name="pref_save_path">Salvar Caminho</string>
     <string name="pref_debug_error_logging">Erro Debug Logging</string>
-    <string name="pref_enable_profiler">Perfil Código</string>
+    <string name="pref_enable_profiler">Perfil de Código</string>
     <string name="pref_sniffer_sample_time">Sniffer Amostra Tempo</string>
     <string name="pref_http_proxy_port">Porta do Proxy HTTP</string>
     <string name="pref_http_server_port">Porta do Servidor HTTP</string>
@@ -365,7 +365,7 @@
     <string name="pref_msf_delete">Deletar MSF</string>
     <string name="pref_msf_delete_desc">Excluir o Metasploit Framework do seu dispositivo</string>
     <string name="pref_msfwipe_message">Você realmente quer deletar o Metasploit Framework?</string>
-    <string name="pref_msfwipe_size">Sobre %d MB will be freed.</string>
+    <string name="pref_msfwipe_size">Sobre %d MB serão libertados.</string>
     <string name="pref_err_exists">Não Existe.</string>
     <string name="pref_err_writable">Não é gravável.</string>
     <string name="pref_err_executable">Não permitir a criação de conteúdos executáveis.</string>
