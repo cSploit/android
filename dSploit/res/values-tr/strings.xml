@@ -248,7 +248,7 @@
     <string name="mitm_image_replace_desc">Seçtiğiniz bir resimle web sayfalarındaki tüm resimleri değiştirin.</string>
     <string name="choose_source">Kaynak seç:</string>
     <string name="local_images">Yerel Resimler</string>
-    <string name="error_image_intent">This is weird, seems like you have no application to handle image browsing.</string>
+    <string name="error_image_intent">Resim görüntülemek için bir uygulama bulunamadı.</string>
     <string name="image">Resim</string>
     <string name="enter_image_url">Resim url i girin :</string>
     <string name="error_image_url">Geçersiz resim url i.</string>
@@ -412,8 +412,8 @@
     <string name="menu_wifi_scan">WiFi Tara</string>
     <string name="menu_stop_msfrpcd">msfrpcd durdur</string>
     
-    <string name="pref_theme">Karanlık Tema</string>
-    <string name="pref_choose_theme">Karanlık Temayı kullan.</string>
+    <string name="pref_theme">Siyah Tema</string>
+    <string name="pref_choose_theme">Siyah Temayı kullan.</string>
     <string name="please_restart">Temanın aktif olması için uygulamayı yeniden başlatın.</string>
     <string name="evasion">Kaçırma</string>
     <string name="search_exact_version">Tam sürüm eşleme</string>
@@ -448,6 +448,6 @@
     <string name="installing_gems">gemler yükleniyor…</string>
     <string name="patching_shebang">shebang düzeltiliyor</string>
     <string name="installing_msf_gems">MSF için gemler yükleniyor</string>
-    <string name="installing_bundle">dal yükleniyor</string>
+    <string name="installing_bundle">brunch yükleniyor</string>
     <string name="new_gems_update_desc">Ruby Gemleri için güncelleme mevcut</string>
 </resources>
