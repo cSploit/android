@@ -79,7 +79,7 @@ int notify_child_done(child_node *c, int status) {
 }
 
 /**
- * @brief read @p argv from @p data , args are separed with ::CMD_ARGV_SEPARATOR .
+ * @brief read @p argv from @p data , args are separed with ::STRING_SEPARATOR .
  * @param data the data to parse
  * @param length size of data
  * @param skip_argv0 will start build argv from argv[1] if != '\0'
@@ -93,7 +93,7 @@ char **parse_argv(char *data, unsigned int length, char skip_argv0) {
   num_sep=0;
   
   for(pos=data;pos<end;pos++)
-    if(*pos==CMD_ARGV_SEPARATOR)
+    if(*pos==STRING_SEPARATOR)
       num_sep++;
     
   if(skip_argv0) {
@@ -114,7 +114,7 @@ char **parse_argv(char *data, unsigned int length, char skip_argv0) {
   memset(argv, 0, length);
   
   for(start=pos=data;pos<end;pos++) {
-    if(*pos==CMD_ARGV_SEPARATOR) {
+    if(*pos==STRING_SEPARATOR) {
       if(pos>start) {
         argv[i] = strndup(start, (pos - start));
         if(!argv[i])
@@ -339,7 +339,8 @@ int handle_cmd_start(message *msg) {
   reply_info->id = c->id;
   
   if(enqueue_message(&(outcoming_messages), msg)) {
-    fprintf(stderr, "%s: cannot enqueue CMD_STARTED message\n", __func__);
+    fprintf(stderr, "%s: cannot enqueue message\n", __func__);
+    dump_message(msg);
     free_message(msg);
     return -1;
   }
@@ -379,7 +380,8 @@ int handle_cmd_start(message *msg) {
   
   ((struct cmd_fail_info *)msg->data)->cmd_action = CMD_FAIL;
   if(enqueue_message(&(outcoming_messages), msg)) {
-    fprintf(stderr, "%s: cannot enqueue CMD_FAIL message\n", __func__);
+    fprintf(stderr, "%s: cannot enqueue message\n", __func__);
+    dump_message(msg);
     free_message(msg);
     return -1;
   }

@@ -19,9 +19,6 @@ enum cmd_action {
   CMD_DIED,     ///< command died
 };
 
-/// byte to separate command argv
-#define CMD_ARGV_SEPARATOR  '\0'
-
 /// id of the command receiver
 #define COMMAND_RECEIVER_ID 0x00
 
@@ -32,7 +29,7 @@ enum cmd_action {
 struct cmd_start_info {
   char cmd_action;  ///< must be set to @CMD_START
   char hid;         ///< id of the @handler for this command
-  char argv[];      ///< command argv, separed with ::CMD_ARGV_SEPARATOR
+  char argv[];      ///< command argv, separed with ::STRING_SEPARATOR
 };
 
 /// command has been successfully started

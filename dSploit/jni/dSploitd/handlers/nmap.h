@@ -39,15 +39,23 @@ struct nmap_service_info {
   char            nmap_action;    ///< must be set to ::SERVICE
   char            proto;          ///< ::nmap_proto used by this port
   uint16_t        port;           ///< the port number
-  uint16_t        version_offset; ///< offset of the version string in ::nmap_service_info.name
-  char            name[];         ///< string containing service name ( and version if ::nmap_service_info.version_offset != 0 )
+  /**
+   * @brief array of strings ( separaed by ::STRING_SEPARATOR )
+   * service[0] is the service name
+   * service[1] is the verison ( if found )
+   */
+  char            service[];
 };
 
 struct nmap_os_info {
   char            nmap_action;    ///< must be set to ::OS
   uint8_t         accuracy;       ///< accuracy of this result
-  uint16_t        type_offset;    ///< offset of the device type string in ::nmap_os_info.os
-  char            os[];           ///< string containing discovered OS and device type
+  /**
+   * @brief array of strings ( separaed by ::STRING_SEPARATOR )
+   * os[0] is the OS
+   * os[1] is the device type
+   */
+  char            os[];
 };
 
 message *nmap_output_parser(char *);

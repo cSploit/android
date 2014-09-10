@@ -125,8 +125,6 @@ message *parse_nmap_port(char *line) {
   *(line + pmatch[1].rm_eo) = '\0';
   *(line + pmatch[2].rm_eo) = '\0';
   
-  printf("%s: port='%s' proto='%s'\n", __func__, line + pmatch[1].rm_so, line + pmatch[2].rm_so);
-  
   port_info = (struct nmap_port_info *)m->data;
   port_info->nmap_action = PORT;
   port_info->port = strtoul(line + pmatch[1].rm_so, NULL, 10);
@@ -163,10 +161,12 @@ message *parse_nmap_xml_port(char *line) {
   service_len = ( pmatch[4].rm_eo - pmatch[4].rm_so );
   version_len = ( pmatch[6].rm_eo - pmatch[6].rm_so );
   
-  if(!service_len) {
+  if(!service_len) { // no service found, only an open port.
     m = create_message(0, sizeof(struct nmap_port_info), 0);
-  } else {
-    m = create_message(0, sizeof(struct nmap_service_info) + (service_len + version_len), 0);
+  } else if(version_len) { // service and version found.
+    m = create_message(0, sizeof(struct nmap_service_info) + (service_len + 1 + version_len), 0);
+  } else { // only service found, no version.
+    m = create_message(0, sizeof(struct nmap_service_info) + service_len, 0);
   }
   
   if(!m) {
@@ -200,10 +200,10 @@ message *parse_nmap_xml_port(char *line) {
   
   if(service_len) {
     service_info->nmap_action = SERVICE;
-    memcpy(service_info->name, line + pmatch[4].rm_so, service_len);
+    memcpy(service_info->service, line + pmatch[4].rm_so, service_len);
     if(version_len) {
-      service_info->version_offset = service_len;
-      memcpy(service_info->name + service_len, line + pmatch[6].rm_so, version_len);
+      *(service_info->service + service_len) = STRING_SEPARATOR;
+      memcpy(service_info->service + service_len + 1, line + pmatch[6].rm_so, version_len);
     }
   } else {
     service_info->nmap_action = PORT;
@@ -229,7 +229,7 @@ message *parse_nmap_xml_os(char *line) {
   type_len = (pmatch[1].rm_eo - pmatch[1].rm_so);
   os_len   = (pmatch[2].rm_eo - pmatch[2].rm_so);
   
-  m = create_message(0, sizeof(struct nmap_os_info) + type_len + os_len, 0);
+  m = create_message(0, sizeof(struct nmap_os_info) + type_len + os_len + 1, 0);
   
   if(!m) {
     fprintf(stderr, "%s: cannot create messages\n", __func__);
@@ -242,9 +242,9 @@ message *parse_nmap_xml_os(char *line) {
   
   os_info->nmap_action = OS;
   os_info->accuracy = strtoul(line + pmatch[3].rm_so, NULL, 10);
-  os_info->type_offset = os_len;
   memcpy(os_info->os, line + pmatch[2].rm_so, os_len);
-  memcpy(os_info->os + os_len, line + pmatch[1].rm_so, type_len);
+  *(os_info->os + os_len) = STRING_SEPARATOR;
+  memcpy(os_info->os + os_len + 1, line + pmatch[1].rm_so, type_len);
   
   return m;
 }

@@ -8,8 +8,6 @@
 
 #include <stdint.h>
 
-#include "list.h"
-
 /// the head of a message
 struct msg_header {
   uint16_t seq;   ///< the message sequence number
@@ -23,11 +21,14 @@ typedef struct message {
   char * data;            ///< the message body
 } message;
 
+/// byte to separate strings inside message->data
+#define STRING_SEPARATOR '\0'
+
 message *create_message(uint16_t , uint16_t , uint16_t );
 message *read_message(int);
 void free_message(message *);
 void dump_message(message *);
-message *msgdup(struct message *);
-int send_message(int, struct message *);
+message *msgdup(message *);
+int send_message(int, message *);
 
 #endif
