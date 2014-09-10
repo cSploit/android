@@ -2,7 +2,7 @@
 ##
 ##
 CC := gcc
-CFLAGS  := -g -O0 -shared -I.. -fPIC
+CFLAGS  := -g -O0 -shared -I.. -fPIC -Wall -Wno-trigraphs -Werror
 LDFLAGS := -Wl,--as-needed -lpthread
 
 SRCS:= $(wildcard *.c)
