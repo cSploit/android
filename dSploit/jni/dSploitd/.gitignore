@@ -1,0 +1,6 @@
+*.h.gch
+doc
+tools
+*.o
+*.so
+dSploitd
