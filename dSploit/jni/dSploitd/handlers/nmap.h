@@ -45,7 +45,7 @@ struct nmap_service_info {
 
 struct nmap_os_info {
   char            nmap_action;    ///< must be set to ::OS
-  uint16_t        accuracy;       ///< accuracy of this result
+  uint8_t         accuracy;       ///< accuracy of this result
   uint16_t        type_offset;    ///< offset of the device type string in ::nmap_os_info.os
   char            os[];           ///< string containing discovered OS and device type
 };
