@@ -68,6 +68,12 @@ void *connection_handler(void *arg) {
     }
   }
   
+  pthread_mutex_lock(&(connections.control.mutex));
+  list_del(&(connections.list), (node *)c);
+  pthread_mutex_unlock(&(connections.control.mutex));
+  
+  pthread_cond_broadcast(&(connections.control.cond));
+  
   close(c->fd);
 
 #ifndef NDEBUG
@@ -84,12 +90,6 @@ void *connection_handler(void *arg) {
   }
   _send_to_graveyard(c->tid, name);
 #endif
-  
-  pthread_mutex_lock(&(connections.control.mutex));
-  list_del(&(connections.list), (node *)c);
-  pthread_mutex_unlock(&(connections.control.mutex));
-  
-  pthread_cond_broadcast(&(connections.control.cond));
   
   free(c);
   
