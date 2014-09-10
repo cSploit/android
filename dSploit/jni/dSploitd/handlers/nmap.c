@@ -262,7 +262,7 @@ message *nmap_output_parser(char *line) {
     &parse_nmap_xml_os
   };
   message *m;
-  int i;
+  register int i;
     
   if(!strlen(line)) {
     return NULL;
