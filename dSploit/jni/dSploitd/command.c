@@ -296,13 +296,21 @@ int handle_cmd_start(message *msg) {
     close(pexec[1]);
     close(pin[0]);
     close(pout[1]);
+    
+    if(free_argv0)
+      free(argv[0]);
+    for(i=1;argv[i];i++)
+      free(argv[i]);
+    free(argv);
+    argv=NULL;
+    
     if(read(pexec[0],&exec_errno, sizeof(int))) {
       fprintf(stderr, "%s: execv: %s\n", __func__, strerror(exec_errno));
       waitpid(pid, NULL, 0);
       goto start_fail;
     }
 #ifndef NDEBUG
-    printf("%s: successfully started command '%s' (pid=%d)\n", __func__, argv[0], pid);
+    printf("%s: successfully started a child for '%s' (pid=%d)\n", __func__, h->name, pid);
 #endif
     close(pexec[0]);
   }

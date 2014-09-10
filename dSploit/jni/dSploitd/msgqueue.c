@@ -59,27 +59,6 @@ int enqueue_message(struct msgqueue *queue, message *msg) {
   }
 }
 
-/*
- * @brief check if a message is pending on output queue
- * @param msg message to search for
- * @returns 1 if message is enqueued, 0 if not.
- */
-/*
-int message_enqueued(message *msg) {
-  msg_node *m;
-  
-  pthread_mutex_lock(&(outcoming_messages.control.mutex));
-  
-  for(m=(msg_node *) outcoming_messages.list.head;m && m->msg != msg;m=(msg_node *) m->next);
-  
-  pthread_mutex_unlock(&(outcoming_messages.control.mutex));
-  
-  if(m)
-    return 1;
-  return 0;
-  
-} */
-
 /**
  * @brief the thread that will dispatch incoming maessages
  * 
@@ -126,6 +105,9 @@ void *dispatcher(void *arg) {
         
       pthread_mutex_unlock(&(children.control.mutex));
     }
+    
+    free_message(m->msg);
+    free(m);
     
     pthread_mutex_lock(&(incoming_messages.control.mutex));
   }
@@ -174,10 +156,6 @@ void *sender(void *arg) {
         dump_message(m->msg);
       }
     }
-
-#ifndef NDEBUG
-    dump_message(m->msg);
-#endif
     
     free_message(m->msg);
     free(m);

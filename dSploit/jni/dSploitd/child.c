@@ -54,17 +54,19 @@ child_node *create_child() {
  */
 char *get_line_from_output_buff(child_node *c) {
   char *end, *line, *newbuff;
+  register char *newline;
   size_t line_len;
   
   if(!c->output_buff)
     return NULL;
   
-  end = strchr(c->output_buff, '\n');
+  end = c->output_buff + c->buff_len;
+  for(newline=c->output_buff;newline<end && *newline != '\n';newline++);
   
-  if(!end)
+  if(newline == end)
     return NULL;
   
-  line_len = (end - c->output_buff);
+  line_len = (newline - c->output_buff);
   c->buff_len -= line_len + 1;
   
   if(c->buff_len) {
@@ -150,27 +152,26 @@ int read_stdout(child_node *c) {
       }
     }
   } else if(c->handler->output_parser) { // parse lines
-    while((count=read(c->stdout, buff, STDOUT_BUFF_SIZE)) > 0) {
+    while((count=read(c->stdout, buff, STDOUT_BUFF_SIZE)) > 0 && !ret) {
       if(append_to_output_buff(c, buff, count)) {
         ret = -1;
-        break;
       }
-      while((line = get_line_from_output_buff(c))) {
+      while((line = get_line_from_output_buff(c)) && !ret) {
         m = c->handler->output_parser(line);
-        if(!m)
-          continue;
-        m->head.id = c->id;
-        m->head.seq = c->seq + 1;
-        
-        if(enqueue_message(&(outcoming_messages), m)) {
-          fprintf(stderr, "%s [%s]: cannot enqueue the following message.\n", __func__, c->handler->name);
-          dump_message(m);
-          free_message(m);
-          ret = -1;
-          break;
-        } else {
-          c->seq++;
+        if(m) {
+          m->head.id = c->id;
+          m->head.seq = c->seq + 1;
+          
+          if(enqueue_message(&(outcoming_messages), m)) {
+            fprintf(stderr, "%s [%s]: cannot enqueue the following message.\n", __func__, c->handler->name);
+            dump_message(m);
+            free_message(m);
+            ret = -1;
+          } else {
+            c->seq++;
+          }
         }
+        free(line);
       }
     }
   } else { // send raw bytes

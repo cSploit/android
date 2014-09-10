@@ -21,7 +21,6 @@ extern struct msgqueue {
   incoming_messages;  ///< input message queue
 
   
-//int message_enqueued(message *);
 int enqueue_message(struct msgqueue *, message *);
 
 int start_sender(void);

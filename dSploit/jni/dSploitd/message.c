@@ -162,7 +162,7 @@ int send_message(int fd, message *msg) {
   if(write_wrapper(fd, msg->data, msg->head.size))
     return -1;
 
-#ifdef DEBUG
+#ifndef NDEBUG
   printf("%s: message sent (fd=%d)\n", __func__, fd);
   dump_message(msg);
 #endif
