@@ -31,16 +31,16 @@ __attribute__((constructor))
 void nmap_init() {
   int ret;
   
-  if(ret = regcomp(&hop_pattern, "^([0-9]+) +(\\.\\.\\.|[0-9\\.]+ m?s) +([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}|[0-9]+)", REG_EXTENDED | REG_ICASE)) {
+  if((ret = regcomp(&hop_pattern, "^([0-9]+) +(\\.\\.\\.|[0-9\\.]+ m?s) +([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}|[0-9]+)", REG_EXTENDED | REG_ICASE))) {
     fprintf(stderr, "%s: regcomp(hop_pattern): %d\n", __func__, ret);
   }
-  if(ret = regcomp(&port_pattern, "^Discovered open port ([0-9]+)/([a-z]+)", REG_EXTENDED | REG_ICASE)) {
+  if((ret = regcomp(&port_pattern, "^Discovered open port ([0-9]+)/([a-z]+)", REG_EXTENDED | REG_ICASE))) {
     fprintf(stderr, "%s: regcomp(port_pattern): %d\n", __func__, ret);
   }
-  if(ret = regcomp(&xml_port_pattern, "<port protocol=\"([^\"]+)\" portid=\"([^\"]+)\"><state state=\"open\"[^>]+><service(.+product=\"([^\"]+)\")?(.+version=\"([^\"]+)\")?", REG_EXTENDED | REG_ICASE)) {
+  if((ret = regcomp(&xml_port_pattern, "<port protocol=\"([^\"]+)\" portid=\"([^\"]+)\"><state state=\"open\"[^>]+><service(.+product=\"([^\"]+)\")?(.+version=\"([^\"]+)\")?", REG_EXTENDED | REG_ICASE))) {
     fprintf(stderr, "%s: regcomp(xml_port_pattern): %d\n", __func__, ret);
   }
-  if(ret = regcomp(&xml_os_pattern, "<osclass type=\"([^\"]+)\".+osfamily=\"([^\"]+)\".+accuracy=\"([^\"]+)\"", REG_EXTENDED | REG_ICASE)) {
+  if((ret = regcomp(&xml_os_pattern, "<osclass type=\"([^\"]+)\".+osfamily=\"([^\"]+)\".+accuracy=\"([^\"]+)\"", REG_EXTENDED | REG_ICASE))) {
     fprintf(stderr, "%s: regcomp(xml_os_pattern): %d\n", __func__, ret);
   }
 }
@@ -109,7 +109,6 @@ message *parse_nmap_port(char *line) {
   regmatch_t pmatch[3];
   struct nmap_port_info *port_info;
   message *m;
-  size_t name_len;
   
   if(regexec(&port_pattern, line, 3, pmatch, 0))
     return NULL;

@@ -21,7 +21,7 @@ handler handler_info = {
   &ettercap_output_parser,    // output_parser
   NULL,                       // input_parser
   "tools/ettercap/ettercap",  // argv[0]
-  NULL,                       // workdir
+  "tools/ettercap",           // workdir
   "ettercap"                  // handler name
 };
 
@@ -116,7 +116,7 @@ message *parse_ettercap_account(char *line) {
 }
 
 /**
- * @brief function that call all nmap output parsers on @p line
+ * @brief function that call all ettercap output parsers on @p line
  * @param line the line to parse
  * @returns a message to send or NULL
  */
