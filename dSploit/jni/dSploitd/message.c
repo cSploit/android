@@ -100,7 +100,7 @@ void dump_message(message *msg) {
   end=pos+msg->head.size;
   for(;pos<end;pos++) {
     if(isprint(*pos))
-      write(STDERR_FILENO, pos, 1);
+      fprintf(stderr, "%c", *pos);
     else
       fprintf(stderr, "\\x%02hhX", *pos);
   }
