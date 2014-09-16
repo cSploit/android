@@ -10,9 +10,13 @@
 
 #include "control.h"
 
+/* part of this code has been taken from:
+ * Gentoo Linux Documentation - POSIX threads explained
+ */
+
 /**
- * @brief initialize a @data_control
- * @param mycontrol the @data_control to initilize
+ * @brief initialize a ::data_control
+ * @param mycontrol the ::data_control to initilize
  * @returns 0 on success, -1 on error
  */
 int control_init(data_control *mycontrol) {
@@ -29,8 +33,8 @@ int control_init(data_control *mycontrol) {
 }
 
 /**
- * @brief destroy a @data_control
- * @param mycontrol the @data_control to destroy
+ * @brief destroy a ::data_control
+ * @param mycontrol the ::data_control to destroy
  * @returns 0 on success, -1 on error
  */
 int control_destroy(data_control *mycontrol) {
@@ -47,8 +51,8 @@ int control_destroy(data_control *mycontrol) {
 }
 
 /**
- * @brief set @data_control.active to 1
- * @param mycontrol the @data_control to activate
+ * @brief set ::data_control.active to 1
+ * @param mycontrol the ::data_control to activate
  * @returns 0 on success, -1 on error
  */
 int control_activate(data_control *mycontrol) {
@@ -63,8 +67,8 @@ int control_activate(data_control *mycontrol) {
 }
 
 /**
- * @brief set @data_control.active to 0
- * @param mycontrol the @data_control to deactivate
+ * @brief set ::data_control.active to 0
+ * @param mycontrol the ::data_control to deactivate
  * @returns 0 on success, -1 on error.
  */
 int control_deactivate(data_control *mycontrol) {

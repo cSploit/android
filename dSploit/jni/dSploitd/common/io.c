@@ -1,20 +1,14 @@
-/*
- * LICENSE
- * 
+/* LICENSE
  * 
  */
 
 #include <stdio.h>
-#include <dirent.h>
 #include <unistd.h>
-#include <linux/limits.h>
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
-#include <sys/time.h>
-#include <pthread.h>
 
-#include "common.h"
+#include "io.h"
 
 /**
  * @brief ensure to read @p size bytes from @p fd into @p buff
@@ -96,45 +90,4 @@ char *read_chunk(int fd, unsigned int size) {
   }
   
   return data;
-}
-
-/**
- * @brief join @p tid or cancel it timed out.
- * @param tid the thread id to join
- * @param milliseconds amount of milliseconds for the timeout.
- * @returns the value returned by the joined thread ( PTHREAD_CANCELLED if timed out ).
- */
-void *pthread_join_w_timeout(pthread_t tid, unsigned int milliseconds) {
-  struct timeval timeout, cur;
-  void *ret;
-  
-  
-  if(IS_ALIVE(tid)) {
-    if(gettimeofday(&timeout, NULL)) {
-      fprintf(stderr, "%s: gettimeofday: %s\n", __func__, strerror(errno));
-    } else {
-      cur.tv_sec = 0;
-      cur.tv_usec = (1000 * milliseconds);
-      timeradd(&timeout, &cur, &timeout);
-      while(IS_ALIVE(tid)) {
-        if(gettimeofday(&cur, NULL)) {
-          fprintf(stderr, "%s: second gettimeofday: %s\n", __func__, strerror(errno));
-        } else if(!timercmp(&timeout, &cur, <)) { // bug workaround, see man timercmp
-          fprintf(stderr, "%s: thread #%lu timed out\n", __func__, tid);
-        } else {
-          usleep(1000);
-          continue;
-        }
-        pthread_cancel(tid);
-        break;
-      }
-    }
-  }
-  
-  if(pthread_join(tid, &ret)) {
-    fprintf(stderr, "%s: pthread_join: %s\n", __func__, strerror(errno));
-    ret = (void *) -1;
-  }
-  
-  return ret;
 }

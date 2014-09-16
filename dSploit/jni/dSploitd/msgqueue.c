@@ -17,7 +17,7 @@
 #include "command.h"
 #include "child.h"
 #include "handler.h"
-#include "common.h"
+#include "io.h"
 
 struct msgqueue incoming_messages;
 

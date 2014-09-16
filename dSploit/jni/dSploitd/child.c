@@ -19,6 +19,7 @@
 #include "msgqueue.h"
 #include "reaper.h"
 #include "command.h"
+#include "buffer.h"
 
 struct child_list children;
 
@@ -44,83 +45,6 @@ child_node *create_child() {
   if(c->id == COMMAND_RECEIVER_ID)
     c->id = uid++;
   return c;
-}
-
-
-/**
- * @brief get a line from child output buffer.
- * @param c the child you are dealing with
- * @returns a string containing the newline or NULL if not found.
- */
-char *get_line_from_output_buff(child_node *c) {
-  char *end, *line, *newbuff;
-  register char *newline;
-  size_t line_len;
-  
-  if(!c->output_buff)
-    return NULL;
-  
-  end = c->output_buff + c->buff_len;
-  for(newline=c->output_buff;newline<end && *newline != '\n';newline++);
-  
-  if(newline == end)
-    return NULL;
-  
-  line_len = (newline - c->output_buff);
-  c->buff_len -= line_len + 1;
-  
-  if(c->buff_len) {
-    newbuff = malloc(c->buff_len);
-    
-    if(!newbuff) {
-      fprintf(stderr, "%s: malloc: %s\n", __func__, strerror(errno));
-      c->buff_len += line_len + 1;
-      return NULL;
-    }
-    
-    memcpy(newbuff, c->output_buff + line_len + 1, c->buff_len);
-  } else {
-    newbuff = NULL;
-  }
-  
-  line = realloc(c->output_buff, line_len + 1);
-  if(!line) { 
-    // this should be impossible, new size is lesser then the current one.
-    // manage it anyway, just in case.
-    fprintf(stderr, "%s: realloc: %s\n", __func__, strerror(errno));
-    free(newbuff);
-    c->buff_len += line_len + 1;
-    return NULL;
-  }
-  
-  c->output_buff = newbuff; 
-  *(line + line_len) = '\0';
-  
-  return line;
-}
-
-/**
- * @brief append @p count bytes from @p buff to @p c->output_buff.
- * @param c the child you are dealing with
- * @param buff the buff to append
- * @param count bytes to process
- * @returns 0 on success, -1 on error.
- */
-int append_to_output_buff(child_node *c, char *buff, int count) {
-  
-  c->buff_len += count;
-  
-  c->output_buff = realloc(c->output_buff, c->buff_len);
-  
-  if (!c->output_buff) {
-    fprintf(stderr, "%s: realloc: %s\n", __func__, strerror(errno));
-    c->buff_len = 0;
-    return -1;
-  }
-  
-  memcpy(c->output_buff + ( c->buff_len - count ), buff, count);
-  
-  return 0;
 }
 
 /**
@@ -153,10 +77,10 @@ int read_stdout(child_node *c) {
     }
   } else if(c->handler->output_parser) { // parse lines
     while((count=read(c->stdout, buff, STDOUT_BUFF_SIZE)) > 0 && !ret) {
-      if(append_to_output_buff(c, buff, count)) {
+      if(append_to_buffer(&(c->output_buff), buff, count)) {
         ret = -1;
       }
-      while((line = get_line_from_output_buff(c)) && !ret) {
+      while((line = get_line_from_buffer(&(c->output_buff))) && !ret) {
         m = c->handler->output_parser(line);
         if(m) {
           m->head.id = c->id;
@@ -198,8 +122,8 @@ int read_stdout(child_node *c) {
   
   free(buff);
   
-  if(c->output_buff)
-    free(c->output_buff);
+  if(c->output_buff.buffer)
+    free(c->output_buff.buffer);
   
   if(count<0) {
     fprintf(stderr, "%s [%s]: read: %s\n", __func__, c->handler->name, strerror(errno));

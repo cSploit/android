@@ -8,6 +8,7 @@
 
 #include "list.h"
 #include "control.h"
+#include "buffer.h"
 
 struct handler;
 
@@ -23,8 +24,7 @@ typedef struct child_node {
   int stdout;                   ///< stdout file descritor of the process
   
   uint16_t seq;                 ///< sent messages sequence number
-  char *output_buff;            ///< buffer for ::handler.raw_output_parser
-  size_t buff_len;              ///< size of ::child_node.output_buff
+  buffer output_buff;           ///< ::buffer for ::handler.raw_output_parser
 } child_node;
 
 child_node *create_child(void);

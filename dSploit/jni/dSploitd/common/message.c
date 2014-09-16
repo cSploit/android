@@ -12,8 +12,7 @@
 #include <ctype.h>
 
 #include "message.h"
-#include "common.h"
-#include "msgqueue.h"
+#include "io.h"
 
 /// mutex to dump messages
 pthread_mutex_t dump_lock = PTHREAD_MUTEX_INITIALIZER;

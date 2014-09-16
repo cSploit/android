@@ -20,7 +20,6 @@
 #include "handler.h"
 #include "message.h"
 #include "command.h"
-#include "common.h"
 #include "msgqueue.h"
 #include "FS.h"
 
