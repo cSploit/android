@@ -7,6 +7,8 @@
 
 #include <arpa/inet.h>
 
+#define NMAP_HANDLER_ID 2
+
 enum nmap_action {
   HOP,
   PORT,

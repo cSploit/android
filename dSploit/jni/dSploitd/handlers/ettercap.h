@@ -7,6 +7,8 @@
 
 #include <arpa/inet.h>
 
+#define ETTERCAP_HANDLER_ID 3
+
 enum ettercap_action {
   READY,
   ACCOUNT

@@ -7,6 +7,8 @@
 
 #include <arpa/inet.h>
 
+#define HYDRA_HANDLER_ID 4
+
 enum hydra_action {
   STATUS,
   WARNING,

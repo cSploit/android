@@ -13,7 +13,7 @@
 
 handler handler_info = {
   NULL,                   // next
-  4,                      // handler id
+  HYDRA_HANDLER_ID,       // handler id
   0,                      // have_stdin
   1,                      // have_stdout
   1,                      // enabled
