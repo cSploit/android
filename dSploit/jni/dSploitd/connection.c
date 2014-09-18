@@ -1,7 +1,5 @@
-/*
- * the usual list handling in C
+/* LICENSE
  * 
- * LICENSE
  */
 #define _GNU_SOURCE
 #include <stdlib.h>
@@ -13,7 +11,7 @@
 
 #include "message.h"
 #include "connection.h"
-#include "msgqueue.h"
+#include "receiver.h"
 #include "reaper.h"
 
 struct connection_list connections;

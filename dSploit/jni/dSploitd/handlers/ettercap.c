@@ -9,7 +9,6 @@
 #include "handler.h"
 #include "ettercap.h"
 #include "message.h"
-#include "msgqueue.h"
 
 handler handler_info = {
   NULL,                       // next

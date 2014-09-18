@@ -18,7 +18,8 @@
 #include "message.h"
 #include "connection.h"
 #include "cleanup.h"
-#include "msgqueue.h"
+#include "sender.h"
+#include "receiver.h"
 #include "handler.h"
 #include "reaper.h"
 #include "child.h"
@@ -121,8 +122,8 @@ int main(int argc, char **argv) {
     return EXIT_FAILURE;
   }
   
-  if(start_dispatcher() || start_sender() || start_reaper()) {
-    stop_dispatcher();
+  if(start_receiver() || start_sender() || start_reaper()) {
+    stop_receiver();
     stop_sender();
     close(sockfd);
     unlink(SOCKET_PATH);
@@ -158,7 +159,7 @@ int main(int argc, char **argv) {
     close_connections();
   }
   
-  stop_dispatcher();
+  stop_receiver();
   stop_children();
   stop_sender();
   

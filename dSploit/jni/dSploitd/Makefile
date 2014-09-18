@@ -21,5 +21,5 @@ dSploitd: $(OBJS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 	
 clean:
-	rm -f $(OBJS)
+	rm -f dSploitd $(OBJS)
 	make -C handlers clean

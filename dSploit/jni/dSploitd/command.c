@@ -20,7 +20,7 @@
 #include "handler.h"
 #include "message.h"
 #include "command.h"
-#include "msgqueue.h"
+#include "sender.h"
 #include "FS.h"
 
 uint16_t cmd_seq = 0;
@@ -428,7 +428,7 @@ int handle_cmd_signal(struct message *msg) {
  * @param msg the request message.
  * @returns 0 on success, -1 on error.
  */
-int handle_command(struct message *msg) {
+int handle_command(message *msg) {
   
   switch(msg->data[0]) {
     case CMD_START:

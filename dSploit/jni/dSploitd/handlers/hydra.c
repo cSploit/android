@@ -9,7 +9,6 @@
 #include "handler.h"
 #include "hydra.h"
 #include "message.h"
-#include "msgqueue.h"
 
 handler handler_info = {
   NULL,                   // next

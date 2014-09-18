@@ -16,7 +16,7 @@
 #include "child.h"
 #include "handler.h"
 #include "message.h"
-#include "msgqueue.h"
+#include "sender.h"
 #include "reaper.h"
 #include "command.h"
 #include "buffer.h"
