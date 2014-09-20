@@ -3,12 +3,14 @@
  * 
  */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
@@ -82,7 +84,52 @@ void stop_daemon() {
 
 int main(int argc, char **argv) {
   struct sockaddr_un addr;
+  pid_t pid, sid;
+  int pipefd[2];
   int clfd;
+  
+  if(pipe2(pipefd, O_CLOEXEC)) {
+    fprintf(stderr, "%s: pipe2: %s\n", __func__, strerror(errno));
+    return EXIT_FAILURE;
+  }
+  
+  pid = fork();
+  
+  if(pid<0) {
+    fprintf(stderr, "%s: fork: %s\n", __func__, strerror(errno));
+    return EXIT_FAILURE;
+  } else if(pid) {
+    close(pipefd[1]);
+    if(!read(pipefd[0], &clfd, 1))
+      return EXIT_FAILURE;
+    return EXIT_SUCCESS;
+  }
+  close(pipefd[0]);
+  
+  umask(0);
+  
+  
+  close(STDIN_FILENO);
+  close(STDOUT_FILENO);
+  close(STDERR_FILENO);
+  
+  if(!freopen(LOG_PATH, "w", stderr)) {
+    fprintf(stderr, "%s: freopen(\"%s\", \"w\", stderr): %s\n", __func__, LOG_PATH, strerror(errno));
+    return EXIT_FAILURE;
+  }
+  
+#ifndef NDEBUG
+  if(!freopen(DEBUG_LOG_PATH, "w", stdout)) {
+    fprintf(stderr, "%s: freopen(\"%s\", \"w\", stdout): %s\n", __func__, DEBUG_LOG_PATH, strerror(errno));
+    return EXIT_FAILURE;
+  }
+#endif
+
+  sid = setsid();
+  if(sid<0) {
+    fprintf(stderr, "%s: setsid: %s\n", __func__, strerror(errno));
+    return EXIT_FAILURE;
+  }
   
   if(init_structs())
     return EXIT_FAILURE;
@@ -133,6 +180,12 @@ int main(int argc, char **argv) {
 #ifndef NDEBUG
   chmod(SOCKET_PATH, 0666);
 #endif
+  
+  if(write(pipefd[1], "!", 1) != 1) {
+    fprintf(stderr, "%s: cannot notify that daemon started", __func__);
+    return EXIT_FAILURE;
+  }
+  close(pipefd[1]);
   
   while(1) {
     if((clfd=accept(sockfd, NULL, NULL)) < 0) {
