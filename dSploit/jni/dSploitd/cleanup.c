@@ -12,9 +12,9 @@
 #include "dSploitd.h"
 
 /**
- * @brief SIGINT handler
+ * @brief SIGINT, SIGTERM handler
  */
-void interrupt_handler(int sig) {
+void stop_handler(int sig) {
   // close the main socket
   stop_daemon();
 }
@@ -26,12 +26,15 @@ void interrupt_handler(int sig) {
 int register_signal_handlers() {
   struct sigaction action;
   
-  action.sa_handler = interrupt_handler;
+  action.sa_handler = stop_handler;
   sigemptyset(&(action.sa_mask));
   action.sa_flags = 0;
   
   if(sigaction(SIGINT, &action, NULL)) {
-    fprintf(stderr, "%s: sigaction: %s\n", __func__, strerror(errno));
+    fprintf(stderr, "%s: sigaction(SIGINT): %s\n", __func__, strerror(errno));
+    return -1;
+  } else if(sigaction(SIGTERM, &action, NULL)) {
+    fprintf(stderr, "%s: sigaction(SIGTERM): %s\n", __func__, strerror(errno));
     return -1;
   }
   
