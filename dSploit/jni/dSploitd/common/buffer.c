@@ -93,3 +93,15 @@ int append_to_buffer(buffer *b, char *buff, int count) {
   
   return 0;
 }
+
+/**
+ * @brief free resources used by a ::buffer
+ * @param buff the buffer to free
+ */
+void release_buffer(buffer *buff) {
+  if(buff && buff->buffer) {
+    free(buff->buffer);
+    buff->buffer = NULL;
+    buff->size = 0;
+  }
+}

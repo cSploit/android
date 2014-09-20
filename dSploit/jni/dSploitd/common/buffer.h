@@ -14,5 +14,6 @@ typedef struct {
 
 char *get_line_from_buffer(buffer *);
 int append_to_buffer(buffer *, char *, int);
+void release_buffer(buffer *);
 
 #endif
