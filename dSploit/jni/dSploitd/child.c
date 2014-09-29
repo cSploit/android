@@ -16,12 +16,13 @@
 #include "child.h"
 #include "handler.h"
 #include "message.h"
-#include "sender.h"
 #include "reaper.h"
 #include "command.h"
 #include "buffer.h"
-
-struct child_list children;
+#include "connection.h"
+#include "sequence.h"
+#include "handler.h"
+#include "io.h"
 
 #define MIN(a, b) (a < b ? a : b)
 
@@ -29,8 +30,7 @@ struct child_list children;
  * @brief create a new unique child
  * @returns a pointer to the new child or NULL on error.
  */
-child_node *create_child() {
-  static unsigned short uid = 1;
+child_node *create_child(conn_node *conn) {
   register child_node *c;
   
   c = malloc(sizeof(child_node));
@@ -38,12 +38,13 @@ child_node *create_child() {
     fprintf(stderr, "%s: malloc: %s\n", __func__, strerror(errno));
     return NULL;
   }
-  memset(c, 0, sizeof(child_node));
-  c->stdout = c->stdin = -1;
   
-  c->id = uid++;
-  if(c->id == COMMAND_RECEIVER_ID)
-    c->id = uid++;
+  memset(c, 0, sizeof(child_node));
+  
+  c->stdout_fd = c->stdin_fd = -1;
+  c->id = get_id(&(conn->child_id), &(conn->control.mutex));
+  c->conn = conn;
+  
   return c;
 }
 
@@ -69,28 +70,36 @@ int read_stdout(child_node *c) {
   ret = 0;
   
   if(c->handler->raw_output_parser) { // parse raw bytes
-    while((count=read(c->stdout, buff, STDOUT_BUFF_SIZE)) > 0) {
+    while((count=read(c->stdout_fd, buff, STDOUT_BUFF_SIZE)) > 0) {
       if(c->handler->raw_output_parser(c, buff, count)) {
         ret = -1;
         break;
       }
     }
   } else if(c->handler->output_parser) { // parse lines
-    while((count=read(c->stdout, buff, STDOUT_BUFF_SIZE)) > 0 && !ret) {
+    while(!ret && (count=read(c->stdout_fd, buff, STDOUT_BUFF_SIZE)) > 0) {
       if(append_to_buffer(&(c->output_buff), buff, count)) {
         ret = -1;
       }
-      while((line = get_line_from_buffer(&(c->output_buff))) && !ret) {
+      while(!ret && (line = get_line_from_buffer(&(c->output_buff)))) {
         m = c->handler->output_parser(line);
         if(m) {
           m->head.id = c->id;
           m->head.seq = c->seq + 1;
           
-          if(enqueue_message(&(outcoming_messages), m)) {
+#ifdef BROADCAST_EVENTS
+          if(broadcast_message(m)) {
+            fprintf(stderr, "%s [%s]: cannot broadcast message.\n", __func__, c->handler->name);
+#else
+          if(enqueue_message(&(c->conn->outcoming), m)) {
             fprintf(stderr, "%s [%s]: cannot enqueue the following message.\n", __func__, c->handler->name);
+#endif
             dump_message(m);
             free_message(m);
             ret = -1;
+            // events not sent are not fatal, just a missed event.
+            // while in raw connection a missed message will de-align the output/input.
+            // this is why a "break;" is missing here
           } else {
             c->seq++;
           }
@@ -99,7 +108,7 @@ int read_stdout(child_node *c) {
       }
     }
   } else { // send raw bytes
-    while((count=read(c->stdout, buff, STDOUT_BUFF_SIZE)) > 0) {
+    while((count=read(c->stdout_fd, buff, STDOUT_BUFF_SIZE)) > 0) {
       m = create_message(c->seq + 1, count, c->id);
       if(!m) {
         buff[MIN(count, STDOUT_BUFF_SIZE -1)] = '\0';
@@ -108,7 +117,7 @@ int read_stdout(child_node *c) {
         break;
       }
       memcpy(m->data, buff, count);
-      if(enqueue_message(&(outcoming_messages), m)) {
+      if(enqueue_message(&(c->conn->outcoming), m)) {
         fprintf(stderr, "%s [%s]: cannot enqueue the following message.\n", __func__, c->handler->name);
         dump_message(m);
         free_message(m);
@@ -122,8 +131,7 @@ int read_stdout(child_node *c) {
   
   free(buff);
   
-  if(c->output_buff.buffer)
-    free(c->output_buff.buffer);
+  release_buffer(&(c->output_buff));
   
   if(count<0) {
     fprintf(stderr, "%s [%s]: read: %s\n", __func__, c->handler->name, strerror(errno));
@@ -162,9 +170,9 @@ void *handle_child(void *arg) {
     }
   }
   
-  if(waitpid(c->pid, &status, 0) < 0) {
+  if((wait_res = waitpid(c->pid, &status, 0)) != c->pid) {
     fprintf(stderr, "%s [%s]: waitpid: %s\n", __func__, c->handler->name, strerror(errno));
-  } else if(notify_child_done(c, status)) {
+  } else if(on_child_done(c, status)) {
     fprintf(stderr, "%s [%s]: cannot notify child termination.\n", __func__, c->handler->name);
   } else if(!stdout_error)
     ret = 0;
@@ -180,19 +188,19 @@ void *handle_child(void *arg) {
   _send_to_graveyard(c->tid, name);
 #endif
   
-  pthread_mutex_lock(&(children.control.mutex));
-  list_del(&(children.list), (node *)c);
-  pthread_mutex_unlock(&(children.control.mutex));
+  pthread_mutex_lock(&(c->conn->children.control.mutex));
+  list_del(&(c->conn->children.list), (node *)c);
+  pthread_mutex_unlock(&(c->conn->children.control.mutex));
   
-  pthread_cond_broadcast(&(children.control.cond));
+  pthread_cond_broadcast(&(c->conn->children.control.cond));
   
   if(c->handler->have_stdout)
-    close(c->stdout);
+    close(c->stdout_fd);
   if(c->handler->have_stdin)
-    close(c->stdin);
+    close(c->stdin_fd);
   
   if(wait_res!=c->pid)
-    kill(c->pid, 9);
+    kill(c->pid, 9); // SIGKILL, process didn't returned as expected
   
   free(c);
   
@@ -200,22 +208,67 @@ void *handle_child(void *arg) {
 }
 
 /**
- * @brief kill all forked processes and wait childs to exit gracefully.
+ * @brief kill all connection's forked processes and wait childs to exit gracefully.
+ * @param conn the owner of the children to stop
  */
-void stop_children() {
+void stop_children(conn_node *conn) {
   child_node *c;
   
-  pthread_mutex_lock(&(children.control.mutex));
+  pthread_mutex_lock(&(conn->children.control.mutex));
   
-  for(c=(child_node *)children.list.head;c;c=(child_node *) c->next) {
+  for(c=(child_node *)conn->children.list.head;c;c=(child_node *) c->next) {
+    if(c->handler->have_stdin)
+      close(c->stdin_fd);
     if(c->handler->have_stdout)
-      close(c->stdout);
-    kill(c->pid, 9);
+      close(c->stdout_fd);
+    kill(c->pid, CHILD_STOP_SIGNAL);
   }
   
-  while(children.list.head) {
-    pthread_cond_wait(&(children.control.cond), &(children.control.mutex));
+  while(conn->children.list.head) {
+    pthread_cond_wait(&(conn->children.control.cond), &(conn->children.control.mutex));
   }
   
-  pthread_mutex_unlock(&(children.control.mutex));
+  pthread_mutex_unlock(&(conn->children.control.mutex));
+}
+
+
+/**
+ * @brief handle a received message for a child
+ * @param conn the connection that sent @p m
+ * @param m the received ::message
+ * @returns 0 on success, -1 on error.
+ */
+int on_child_message(conn_node *conn, message *m) {
+  child_node *c;
+  int write_error, blind_error;
+  
+  write_error = blind_error = 0;
+  
+  pthread_mutex_lock(&(conn->children.control.mutex));
+  
+  for(c=(child_node *) conn->children.list.head;c && c->id != m->head.id; c=(child_node *) c->next);
+  
+  if(c) {
+    if(c->handler->input_parser) {
+      c->handler->input_parser(c, m);
+    } else if(c->handler->have_stdin) {
+      write_error = write_wrapper(c->stdin_fd, m->data, m->head.size);
+    } else {
+      blind_error = 1;
+    }
+  }
+  
+  pthread_mutex_unlock(&(conn->children.control.mutex));
+  
+  if(!c) {
+    fprintf(stderr, "%s: child #%u not found\n", __func__, m->head.id);
+  } else if(write_error) {
+    fprintf(stderr, "%s: cannot send message to child #%u\n", __func__, m->head.id);
+  } else if(blind_error) {
+    fprintf(stderr, "%s: received message for blind child #%u\n", __func__, m->head.id);
+  } else {
+    return 0;
+  }
+  
+  return -1;
 }

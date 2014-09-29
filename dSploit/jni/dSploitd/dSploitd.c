@@ -20,11 +20,9 @@
 #include "message.h"
 #include "connection.h"
 #include "cleanup.h"
-#include "sender.h"
-#include "receiver.h"
 #include "handler.h"
 #include "reaper.h"
-#include "child.h"
+#include "authenticator.h"
 
 int sockfd;
 
@@ -56,9 +54,7 @@ int remove_old_socket() {
  * @returns 0 on success, -1 on error.
  */
 int init_structs() {
-  if( control_init(&(incoming_messages.control)) ||
-      control_init(&(outcoming_messages.control)) ||
-      control_init(&(connections.control)) ||
+  if( control_init(&(connections.control)) ||
       control_init(&(graveyard.control)) )
     return -1;
   return 0;
@@ -68,8 +64,6 @@ int init_structs() {
  * @brief destroy lists controls
  */
 void destroy_structs() {
-  control_destroy(&(incoming_messages.control));
-  control_destroy(&(outcoming_messages.control));
   control_destroy(&(connections.control));
   control_destroy(&(graveyard.control));
 }
@@ -87,54 +81,72 @@ int main(int argc, char **argv) {
   pid_t pid, sid;
   int pipefd[2];
   int clfd;
+  char deamonize;
   
-  if(pipe2(pipefd, O_CLOEXEC)) {
-    fprintf(stderr, "%s: pipe2: %s\n", __func__, strerror(errno));
-    return EXIT_FAILURE;
+  if(argc==2 && !strncmp(argv[1], "-f", 3)) {
+    deamonize=0;
+  } else {
+    deamonize=1;
   }
   
-  pid = fork();
-  
-  if(pid<0) {
-    fprintf(stderr, "%s: fork: %s\n", __func__, strerror(errno));
-    return EXIT_FAILURE;
-  } else if(pid) {
-    close(pipefd[1]);
-    if(!read(pipefd[0], &clfd, 1))
+  if(deamonize) {
+    if(pipe2(pipefd, O_CLOEXEC)) {
+      fprintf(stderr, "%s: pipe2: %s\n", __func__, strerror(errno));
       return EXIT_FAILURE;
-    return EXIT_SUCCESS;
+    }
+    
+    pid = fork();
+    
+    if(pid<0) {
+      fprintf(stderr, "%s: fork: %s\n", __func__, strerror(errno));
+      return EXIT_FAILURE;
+    } else if(pid) {
+      close(pipefd[1]);
+      if(!read(pipefd[0], &clfd, 1))
+        return EXIT_FAILURE;
+      return EXIT_SUCCESS;
+    }
+    close(pipefd[0]);
   }
-  close(pipefd[0]);
   
   umask(0);
-  
   
   close(STDIN_FILENO);
   close(STDOUT_FILENO);
   close(STDERR_FILENO);
-  
-  if(!freopen(LOG_PATH, "w", stderr)) {
-    fprintf(stderr, "%s: freopen(\"%s\", \"w\", stderr): %s\n", __func__, LOG_PATH, strerror(errno));
-    return EXIT_FAILURE;
-  }
-  
-#ifndef NDEBUG
-  if(!freopen(DEBUG_LOG_PATH, "w", stdout)) {
-    fprintf(stderr, "%s: freopen(\"%s\", \"w\", stdout): %s\n", __func__, DEBUG_LOG_PATH, strerror(errno));
-    return EXIT_FAILURE;
-  }
-#endif
 
-  sid = setsid();
-  if(sid<0) {
-    fprintf(stderr, "%s: setsid: %s\n", __func__, strerror(errno));
+  clfd = open(LOG_PATH, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+  
+  if(clfd==-1) {
+    fprintf(stderr, "%s: open: %s\n", __func__, strerror(errno));
     return EXIT_FAILURE;
+  }
+  
+  setvbuf(stderr, NULL, _IOLBF, 1024);
+  setvbuf(stdout, NULL, _IOLBF, 1024);
+
+  if (dup2(clfd, fileno(stderr)) != fileno(stderr) ||
+      dup2(clfd, fileno(stdout)) != fileno(stdout))
+  {
+    fprintf(stderr, "%s: dup2: %s\n", __func__, strerror(errno));
+    return EXIT_FAILURE;
+  }
+
+  if(deamonize) {
+    sid = setsid();
+    if(sid<0) {
+      fprintf(stderr, "%s: setsid: %s\n", __func__, strerror(errno));
+      return EXIT_FAILURE;
+    }
   }
   
   if(init_structs())
     return EXIT_FAILURE;
   
   if(load_handlers())
+    return EXIT_FAILURE;
+  
+  if(load_users())
     return EXIT_FAILURE;
   
   if(remove_old_socket())
@@ -169,9 +181,7 @@ int main(int argc, char **argv) {
     return EXIT_FAILURE;
   }
   
-  if(start_receiver() || start_sender() || start_reaper()) {
-    stop_receiver();
-    stop_sender();
+  if(start_reaper()) {
     close(sockfd);
     unlink(SOCKET_PATH);
     return EXIT_FAILURE;
@@ -181,11 +191,13 @@ int main(int argc, char **argv) {
   chmod(SOCKET_PATH, 0666);
 #endif
   
-  if(write(pipefd[1], "!", 1) != 1) {
-    fprintf(stderr, "%s: cannot notify that daemon started", __func__);
-    return EXIT_FAILURE;
+  if(deamonize) {
+    if(write(pipefd[1], "!", 1) != 1) {
+      fprintf(stderr, "%s: cannot notify that daemon started", __func__);
+      return EXIT_FAILURE;
+    }
+    close(pipefd[1]);
   }
-  close(pipefd[1]);
   
   while(1) {
     if((clfd=accept(sockfd, NULL, NULL)) < 0) {
@@ -207,21 +219,13 @@ int main(int argc, char **argv) {
   
   unlink(SOCKET_PATH);
   
-  if(control_deactivate(&(connections.control))) {
-    fprintf(stderr, "%s: cannot deactivate new connections\n", __func__);
-    close_connections();
-  }
-  
-  stop_receiver();
-  stop_children();
-  stop_sender();
-  
   close_connections();
   
   stop_reaper();
   
   destroy_structs();
   
+  unload_users();
   unload_handlers();
   
   return EXIT_SUCCESS;

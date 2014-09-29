@@ -19,27 +19,32 @@
 #include "dSploitd.h"
 #include "handler.h"
 #include "message.h"
+#include "child.h"
+#include "connection.h"
 #include "command.h"
-#include "sender.h"
 #include "FS.h"
-
-uint16_t cmd_seq = 0;
+#include "sequence.h"
+#include "control_messages.h"
+#include "str_array.h"
 
 /**
  * @brief notify the command received that a child has exited
- * @param c the handler for that child
+ * @param c the terminated child
  * @param status the child status returned by waitpid()
  * @returns 0 on success, -1 on error.
  */
-int notify_child_done(child_node *c, int status) {
+int on_child_done(child_node *c, int status) {
   struct message *msg;
   struct cmd_end_info *end_info;
   struct cmd_died_info *died_info;
+  uint16_t seq;
+  
+  seq = get_sequence(&(c->conn->ctrl_seq), &(c->conn->control.mutex));
   
   if(WIFEXITED(status)) {
-    msg = create_message(0, sizeof(struct cmd_end_info), COMMAND_RECEIVER_ID);
+    msg = create_message(seq, sizeof(struct cmd_end_info), CTRL_ID);
   } else {
-    msg = create_message(0, sizeof(struct cmd_died_info), COMMAND_RECEIVER_ID);
+    msg = create_message(seq, sizeof(struct cmd_died_info), CTRL_ID);
   }
   
   if(!msg) {
@@ -60,86 +65,83 @@ int notify_child_done(child_node *c, int status) {
     if(WIFSIGNALED(status)) {
       died_info->signal = WTERMSIG(status);
     } else {
-      fprintf(stderr, "%s: child exited unexpectly. status=%0*x\n",
+      fprintf(stderr, "%s: child exited unexpectly. status=%0*X\n",
             __func__, (int) sizeof(int), status);
       died_info->signal = 0;
     }
   }
   
-  msg->head.seq = cmd_seq + 1;
-  if(enqueue_message(&(outcoming_messages), msg)) {
+  if(enqueue_message(&(c->conn->outcoming), msg)) {
     fprintf(stderr, "%s: cannot enqueue messages\n", __func__);
+    dump_message(msg);
     free_message(msg);
     return -1;
   }
-  cmd_seq++;
   
   return 0;
 }
 
 /**
- * @brief read @p argv from @p data , args are separed with ::STRING_SEPARATOR .
- * @param data the data to parse
- * @param length size of data
- * @param skip_argv0 will start build argv from argv[1] if != '\0'
+ * @brief read @p argv from @p m
+ * @param m the message to parse
+ * @param skip_argv0 start building from argv[1]
  * @returns the parsed argv on success, NULL on error.
  */
-char **parse_argv(char *data, unsigned int length, char skip_argv0) {
-  char **argv,*start,*pos,*end;
-  int num_sep,i;
+char **parse_argv(message *m, char skip_argv0) {
+  char **argv, *arg, *end;
+  int i,n;
+  size_t size;
+  struct cmd_start_info *start_info;
   
-  end = data + length;
-  num_sep=0;
+  start_info = (struct cmd_start_info *) m->data;
   
-  for(pos=data;pos<end;pos++)
-    if(*pos==STRING_SEPARATOR)
-      num_sep++;
-    
+  n = string_array_size(m, start_info->argv);
+  
+  if(!n) {
+    fprintf(stderr, "%s: empty argv", __func__);
+    dump_message(m);
+    return NULL;
+  }
+  
   if(skip_argv0) {
     i=1;
+    n++;
   } else {
     i=0;
   }
   
-  // HACK: use length
-  length = sizeof(char *) * (2 + i + num_sep);
-  argv = malloc(length);
+  size = (sizeof(char *) * (n+1));
+  argv = malloc(size);
   
   if(!argv) {
-    fprintf(stderr, "%s: malloc: %s\n", __func__, strerror(errno));
+    fprintf(stderr, "%s: malloc: %s", __func__, strerror(errno));
     return NULL;
   }
   
-  memset(argv, 0, length);
+  memset(argv, 0, size);
   
-  for(start=pos=data;pos<end;pos++) {
-    if(*pos==STRING_SEPARATOR) {
-      if(pos>start) {
-        argv[i] = strndup(start, (pos - start));
-        if(!argv[i])
-          goto error;
-        i++;
-      }
-      start = pos +1;
-    }
-  }
+  end = m->data + m->head.size;
+  arg=NULL;
   
-  if(end>start) {
-    argv[i] = strndup(start, (end - start));
-    if(!argv[i])
-      goto error;
+  while((i<n && (arg=string_array_next(m, start_info->argv, arg)))) {
+    
+    argv[i] = strndup(arg, (end-arg));
+    
+    if(!argv[i]) goto strndup_error;
+    
     i++;
   }
   
-  argv[i] = NULL;
-  
   return argv;
-  error:
+
+  strndup_error:
+  
   fprintf(stderr, "%s: strndup: %s\n", __func__, strerror(errno));
-  for(i=0;i<num_sep;i++)
+  for(i=0;i<n;i++)
     if(argv[i])
       free(argv[i]);
   free(argv);
+  
   return NULL;
 }
 
@@ -171,11 +173,11 @@ char *parse_cmd(char *cmd) {
 
 /**
  * @brief handle a start command request.
- * @param fd the file descriptor to which respond.
- * @param msg the request message.
- * @returns 0 on success, -1 on error.
+ * @param msg the request ::message.
+ * @param conn the connection that send the @p message
+ * @returns a reply message on success, NULL on error.
  */
-int handle_cmd_start(message *msg) {
+message *on_cmd_start(conn_node *conn, message *msg) {
   char **argv;
   char *cmd;
   int  exec_errno;
@@ -191,7 +193,7 @@ int handle_cmd_start(message *msg) {
   
   c = NULL;
   cmd = NULL;
-  // ensure to set piped fd to unused one,
+  // ensure to set piped fd to invalid one,
   // or close(2) will close unexpected fd. ( like our stdin if 0 )
   pin[0] = pin[1] = pout[0] = pout[1] = pexec[0] = pexec[1] = -1;
   request_info = (struct cmd_start_info *)msg->data;
@@ -200,7 +202,7 @@ int handle_cmd_start(message *msg) {
   pid = 0;
   seq = msg->head.seq;
   
-  c = create_child();
+  c = create_child(conn);
   if(!c) {
     fprintf(stderr, "%s: cannot craete a new child\n", __func__);
     goto start_fail;
@@ -217,7 +219,7 @@ int handle_cmd_start(message *msg) {
   cmd = (char *)c->handler->argv0;
   
   i = offsetof(struct cmd_start_info, argv);
-  argv = parse_argv(request_info->argv, msg->head.size - i, (cmd ? 1 : 0));
+  argv = parse_argv(msg, (cmd ? 1 : 0));
   if(!argv) {
     fprintf(stderr, "%s: cannot parse argv\n", __func__);
     goto start_fail;
@@ -287,7 +289,8 @@ int handle_cmd_start(message *msg) {
     close(pout[1]);
     
     execv(argv[0], argv);
-    write(pexec[1], &errno, sizeof(int));
+    i=errno;
+    write(pexec[1], &i, sizeof(int));
     close(pexec[1]);
     exit(-1);
   } else {
@@ -317,24 +320,24 @@ int handle_cmd_start(message *msg) {
   c->pid = pid;
   
   if(h->have_stdin)
-    c->stdin = pin[1];
+    c->stdin_fd = pin[1];
   
   if(h->have_stdout)
-    c->stdout = pout[0];
+    c->stdout_fd = pout[0];
   
-  pthread_mutex_lock(&(children.control.mutex));
+  pthread_mutex_lock(&(conn->children.control.mutex));
   if(pthread_create(&(c->tid), NULL, &handle_child, c)) {
     i=errno;
-    pthread_mutex_unlock(&(children.control.mutex));
+    pthread_mutex_unlock(&(conn->children.control.mutex));
     fprintf(stderr, "%s: pthread_craete: %s\n", __func__, strerror(i));
     goto start_fail;
   }
-  list_add(&(children.list), (node *)c);
-  pthread_mutex_unlock(&(children.control.mutex));
+  list_add(&(conn->children.list), (node *)c);
+  pthread_mutex_unlock(&(conn->children.control.mutex));
   
-  pthread_cond_broadcast(&(children.control.cond));
+  pthread_cond_broadcast(&(conn->children.control.cond));
   
-  msg = create_message(seq, sizeof(struct cmd_started_info), COMMAND_RECEIVER_ID);
+  msg = create_message(seq, sizeof(struct cmd_started_info), CTRL_ID);
   
   if(!msg) {
     fprintf(stderr, "%s: cannot create messages\n", __func__);
@@ -345,14 +348,7 @@ int handle_cmd_start(message *msg) {
   reply_info->cmd_action = CMD_STARTED;
   reply_info->id = c->id;
   
-  if(enqueue_message(&(outcoming_messages), msg)) {
-    fprintf(stderr, "%s: cannot enqueue message\n", __func__);
-    dump_message(msg);
-    free_message(msg);
-    return -1;
-  }
-  
-  return 0;
+  return msg;
   
   start_fail:
   if(c)
@@ -378,30 +374,23 @@ int handle_cmd_start(message *msg) {
   if(pid)
     kill(pid, 9);
   
-  msg = create_message(seq, sizeof(struct cmd_fail_info), COMMAND_RECEIVER_ID);
+  msg = create_message(seq, sizeof(struct cmd_fail_info), CTRL_ID);
   
   if(!msg) {
     fprintf(stderr, "%s: cannot create messages\n", __func__);
-    return -1;
+    return NULL;
   }
   
   ((struct cmd_fail_info *)msg->data)->cmd_action = CMD_FAIL;
-  if(enqueue_message(&(outcoming_messages), msg)) {
-    fprintf(stderr, "%s: cannot enqueue message\n", __func__);
-    dump_message(msg);
-    free_message(msg);
-    return -1;
-  }
-  return 0;
+  return msg;
 }
 
 /**
  * @brief handle a command signal request.
- * @param fd the file descriptor to which respond.
  * @param msg the request message.
- * @returns 0 on success, -1 on error.
+ * @returns NULL, does not respond to this request.
  */
-int handle_cmd_signal(struct message *msg) {
+message *on_cmd_signal(conn_node *conn, message *msg) {
   child_node *c;
   pid_t pid;
   struct cmd_signal_info *info;
@@ -410,33 +399,49 @@ int handle_cmd_signal(struct message *msg) {
   
   pid = 0;
   
-  pthread_mutex_lock(&(children.control.mutex));
-  for(c=(child_node *)children.list.head;c && c->id != info->id;c=(child_node *) c->next);
+  pthread_mutex_lock(&(conn->children.control.mutex));
+  for(c=(child_node *)conn->children.list.head;c && c->id != info->id;c=(child_node *) c->next);
   if(c)
     pid = c->pid;
-  pthread_mutex_unlock(&(children.control.mutex));
+  pthread_mutex_unlock(&(conn->children.control.mutex));
   
   if(pid && kill(pid, info->signal)) {
     fprintf(stderr, "%s: kill(%du, %d): %s\n", __func__, pid, info->signal, strerror(errno));
   }
   
-  return 0;
+  return NULL;
 }
 
 /**
  * @brief handle a command request.
- * @param msg the request message.
+ * @param c the connection that send @p msg
+ * @param msg the request ::message
  * @returns 0 on success, -1 on error.
  */
-int handle_command(message *msg) {
+int on_command_request(conn_node *c, message *msg) {
+  message *reply;
   
   switch(msg->data[0]) {
     case CMD_START:
-      return handle_cmd_start(msg);
+      reply = on_cmd_start(c, msg);
+      break;
     case CMD_SIGNAL:
-      return handle_cmd_signal(msg);
+      reply = on_cmd_signal(c, msg);
+      break;
     default:
-      fprintf(stderr, "%s: unknown command '%x'\n", __func__, msg->data[0]);
-      return 0; // drop invalid packets.
+      fprintf(stderr, "%s: unknown command '%02hhX'\n", __func__, msg->data[0]);
+      reply = NULL;
+      break;
   }
+  
+  if(!reply)
+    return 0;
+  
+  if(enqueue_message(&(c->outcoming), reply)) {
+    fprintf(stderr, "%s: cannot enqueue message", __func__);
+    dump_message(reply);
+    free_message(reply);
+    return -1;
+  }
+  return 0;
 }

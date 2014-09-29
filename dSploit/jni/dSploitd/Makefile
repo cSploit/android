@@ -7,19 +7,22 @@
 CC := gcc
 LD := gcc
 
-LDFLAGS := -Wl,-export-dynamic -rdynamic 
-LIBS := -lpthread -ldl
-CFLAGS := -g -O0 -Werror -Wall -I. -Icommon -fPIC 
+LDFLAGS := -Wl,-export-dynamic -rdynamic
+LIBS := -lpthread -ldl -L../dSploitCommon -ldSploitCommon
+CFLAGS := -g -O0 -Werror -Wall -I. -I../dSploitCommon -fPIC 
 #CFLAGS += -DNDEBUG
-SRCS:=$(wildcard *.c common/*.c)
+SRCS:=$(wildcard *.c )
 OBJS := $(SRCS:.c=.o)
 
-dSploitd: $(OBJS)
-	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
+dSploitd: $(OBJS) libdSploitCommon.so
+	$(LD) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
+
+	
+libdSploitCommon.so:
+	$(MAKE) -C ../dSploitCommon
 	
 .c.o:
 	$(CC) $(CFLAGS) -c -o $@ $<
 	
 clean:
 	rm -f dSploitd $(OBJS)
-	make -C handlers clean

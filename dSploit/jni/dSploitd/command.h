@@ -6,11 +6,11 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-#include "message.h"
-#include "child.h"
-#include "cmd.h"
+struct message;
+struct conn_node;
+struct child_node;
 
-int handle_command(message *);
-int notify_child_done(child_node *, int );
+int on_command_request(struct conn_node *, struct message *);
+int on_child_done(struct child_node *, int );
 
 #endif

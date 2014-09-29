@@ -9,23 +9,56 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "list.h"
+#include "control.h"
 #include "message.h"
 #include "connection.h"
-#include "receiver.h"
 #include "reaper.h"
+#include "child.h"
+#include "control_messages.h"
+#include "controller.h"
 
 struct connection_list connections;
 
 /**
- * @brief close all connections from ::cl
+ * @brief stop a connection
+ * @param c the connection to stop
+ */
+void stop_connection(conn_node *c) {
+  stop_children(c); // stop children and wait them to gracefully exits.
+  close(c->fd); // stop the reader
+  control_deactivate(&(c->control));
+  control_deactivate(&(c->incoming.control));   // stop the worker
+  control_deactivate(&(c->outcoming.control));  // stop the writer
+}
+
+/**
+ * @brief free resources used by a connection
+ * @param c the connection to free
+ * 
+ * all connection threads and owned childs must be ended before this call,
+ * otherwise they will access to free'd memory.
+ */
+void free_connection(conn_node *c) {
+  control_destroy(&(c->control));
+  control_destroy(&(c->incoming.control));
+  control_destroy(&(c->outcoming.control));
+  free(c);
+}
+
+/**
+ * @brief close all connections from ::connections
  */
 void close_connections() {
   register conn_node *c;
   
   pthread_mutex_lock(&(connections.control.mutex));
   
+  // equivalent to control_deactivate
+  connections.control.active = 0;
+  
   for(c=(conn_node *) connections.list.head;c;c=(conn_node *) c->next) {
-    close(c->fd); // associated thread will stop soon
+    stop_connection(c);
   }
   
   // wait that all connection threads ends
@@ -36,35 +69,162 @@ void close_connections() {
   pthread_mutex_unlock(&(connections.control.mutex));
 }
 
-/**
- * @brief handle a connection
- */
-void *connection_handler(void *arg) {
-  
-  struct message *msg;
+void *connection_writer(void *arg) {
+  msg_node *mn;
+  message *msg;
   conn_node *c;
-#ifndef NDEBUG
-  char *name;
-#endif
   
   c=(conn_node *) arg;
   
 #ifndef NDEBUG
-  printf("%s: connection opened (fd=%d)\n", __func__, c->fd);
+  printf("%s: started (fd=%d, tid=%lu)\n", __func__, c->fd, pthread_self());
 #endif
   
-  while(1) {
-    if(!(msg = read_message(c->fd))) {
-      // connection closed or broken
-      break;
+  pthread_mutex_lock(&(c->outcoming.control.mutex));
+  
+  while(c->outcoming.control.active || c->outcoming.list.head) {
+    
+    while(!(c->outcoming.list.head) && c->outcoming.control.active) {
+      pthread_cond_wait(&(c->outcoming.control.cond), &(c->outcoming.control.mutex));
     }
     
-    if(enqueue_message(&(incoming_messages), msg)) {
+    mn = (msg_node *) queue_get(&(c->outcoming.list));
+    
+    if(!mn)
+      continue;
+    
+    pthread_mutex_unlock(&(c->outcoming.control.mutex));
+    
+    pthread_mutex_lock(&(c->control.mutex));
+    
+    while(c->freeze) {
+      pthread_cond_wait(&(c->control.cond), &(c->control.mutex));
+    }
+    
+    pthread_mutex_unlock(&(c->control.mutex));
+    
+    msg = mn->msg;
+    
+    if(send_message(c->fd, msg)) {
+      fprintf(stderr, "%s: cannot send the following message\n", __func__);
+      dump_message(msg);
+    }
+    
+    free_message(msg);
+    free(mn);
+    
+    pthread_mutex_lock(&(c->outcoming.control.mutex));
+  }
+  
+  pthread_mutex_unlock(&(c->outcoming.control.mutex));
+  
+  pthread_mutex_lock(&(c->control.mutex));
+  c->writer_done=1;
+  pthread_mutex_unlock(&(c->control.mutex));
+  
+  pthread_cond_broadcast(&(c->control.cond));
+  
+  send_me_to_graveyard();
+  
+  return 0;
+}
+
+void *connection_worker(void *arg) {
+  msg_node *mn;
+  message *msg;
+  conn_node *c;
+  
+  c=(conn_node *) arg;
+  
+#ifndef NDEBUG
+  printf("%s: started (fd=%d, tid=%lu)\n", __func__, c->fd, pthread_self());
+#endif
+  
+  pthread_mutex_lock(&(c->incoming.control.mutex));
+  
+  while(c->incoming.control.active || c->incoming.list.head) {
+    
+    while(!(c->incoming.list.head) && c->incoming.control.active) {
+      pthread_cond_wait(&(c->incoming.control.cond), &(c->incoming.control.mutex));
+    }
+    
+    mn = (msg_node *) queue_get(&(c->incoming.list));
+    
+    if(!mn)
+      continue;
+    
+    pthread_mutex_unlock(&(c->incoming.control.mutex));
+    
+    msg = mn->msg;
+    
+    if(IS_CTRL(msg)) {
+      if(on_control_request(c, msg)) {
+        fprintf(stderr, "%s: cannot handle the following control message\n", __func__);
+        dump_message(msg);
+      }
+    } else {
+      if(on_child_message(c, msg)) {
+        fprintf(stderr, "%s: cannot handle the following message\n", __func__);
+        dump_message(msg);
+      }
+    }
+    
+    free_message(msg);
+    free(mn);
+    
+    pthread_mutex_lock(&(c->incoming.control.mutex));
+  }
+  
+  pthread_mutex_unlock(&(c->incoming.control.mutex));
+  
+  pthread_mutex_lock(&(c->control.mutex));
+  c->worker_done=1;
+  pthread_mutex_unlock(&(c->control.mutex));
+  
+  pthread_cond_broadcast(&(c->control.cond));
+  
+  send_me_to_graveyard();
+  
+  return 0;
+}
+
+/**
+ * @brief read from a connection
+ */
+void *connection_reader(void *arg) {
+  
+  struct message *msg;
+  conn_node *c;
+  
+  c=(conn_node *) arg;
+  
+#ifndef NDEBUG
+  printf("%s: started (fd=%d, tid=%lu)\n", __func__, c->fd, pthread_self());
+#endif
+  
+  while((msg = read_message(c->fd))) {
+    pthread_mutex_lock(&(c->control.mutex));
+    
+    while(c->freeze) {
+      pthread_cond_wait(&(c->control.cond), &(c->control.mutex));
+    }
+    
+    pthread_mutex_unlock(&(c->control.mutex));
+    
+    if(enqueue_message(&(c->incoming), msg)) {
       fprintf(stderr, "%s: cannot enqueue received message\n", __func__);
       dump_message(msg);
       free_message(msg);
     }
   }
+  
+  stop_connection(c);
+  
+  pthread_mutex_lock(&(c->control.mutex));
+  while(!c->writer_done || !c->worker_done) {
+    pthread_cond_wait(&(c->control.cond), &(c->control.mutex));
+  }
+  pthread_mutex_unlock(&(c->control.mutex));
   
   pthread_mutex_lock(&(connections.control.mutex));
   list_del(&(connections.list), (node *)c);
@@ -79,17 +239,9 @@ void *connection_handler(void *arg) {
 #endif
   
   // add me to the death list
-#ifdef NDEBUG
-  send_to_graveyard(c->tid);
-#else
-  if(asprintf(&name, "%s(fd=%d)", __func__, c->fd)<0) {
-    fprintf(stderr, "%s: asprintf: %s\n", __func__, strerror(errno));
-    name = NULL;
-  }
-  _send_to_graveyard(c->tid, name);
-#endif
+  send_me_to_graveyard();
   
-  free(c);
+  free_connection(c);
   
   return 0;
 }
@@ -101,32 +253,49 @@ void *connection_handler(void *arg) {
  */
 int serve_new_client(int fd) {
   conn_node *c;
+  pthread_t dummy;
+  int writer_created, worker_created;
+  
   
   pthread_mutex_lock(&(connections.control.mutex));
+  writer_created = connections.control.active; // OPTIMIZATION
+  pthread_mutex_unlock(&(connections.control.mutex));
   
-  if(!connections.control.active) {
-    pthread_mutex_unlock(&(connections.control.mutex));
+  if(!writer_created) {
     fprintf(stderr, "%s: connections disabled\n", __func__);
     return -1;
   }
+  
+  writer_created = worker_created = 0;
   
   c = malloc(sizeof(conn_node));
   
   if(!c) {
     fprintf(stderr, "%s: malloc: %s\n", __func__, strerror(errno));
-    pthread_mutex_unlock(&(connections.control.mutex));
     return -1;
   }
 
   memset(c, 0, sizeof(conn_node));
+  
+  if(control_init(&(c->control)) || control_init(&(c->incoming.control)) ||
+    control_init(&(c->outcoming.control))) {
+    fprintf(stderr, "%s: cannot init cotnrols\n", __func__);
+    free_connection(c);
+    return -1;
+  }
 
   c->fd = fd;
   
-  if(pthread_create(&(c->tid), NULL, &connection_handler, (void *)c)) {
+  pthread_mutex_lock(&(connections.control.mutex));
+  
+  if( (writer_created = pthread_create(&dummy, NULL, &connection_writer, (void *)c)) ||
+      (worker_created = pthread_create(&dummy, NULL, &connection_worker, (void *)c)) ||
+      pthread_create(&dummy, NULL, &connection_reader, (void *)c)) {
     pthread_mutex_unlock(&(connections.control.mutex));
     fprintf(stderr, "%s: pthread_create: %s\n", __func__, strerror(errno));
-    return -1;
+    goto create_error;
   }
+  
   list_add(&(connections.list), (node *) c);
   
   pthread_mutex_unlock(&(connections.control.mutex));
@@ -134,4 +303,19 @@ int serve_new_client(int fd) {
   pthread_cond_broadcast(&(connections.control.cond));
   
   return 0;
+  
+  create_error:
+  
+  if(writer_created || worker_created) {
+    stop_connection(c);
+    pthread_mutex_lock(&(c->control.mutex));
+    while((writer_created && !c->writer_done) || (worker_created && !c->worker_done)) {
+      pthread_cond_wait(&(c->control.cond), &(c->control.mutex));
+    }
+    pthread_mutex_unlock(&(c->control.mutex));
+  }
+  
+  free_connection(c);
+  
+  return -1;
 }

@@ -9,15 +9,17 @@
 #include "control.h"
 #include "message.h"
 
+struct conn_node;
 struct child_node;
+struct msg_node;
 
 typedef struct handler {
   node *next;
   uint8_t id;                   ///< handler id
   
-  char have_stdin:1;            ///< does it have stdin?
-  char have_stdout:1;           ///< does it have stdout?
-  char enabled:1;               ///< is this handler enabled?
+  char    have_stdin:1;         ///< does it have stdin ?
+  char    have_stdout:1;        ///< does it have stdout ?
+  char    enabled:1;            ///< is it enabled ?
   
   /**
    * @brief function that parse child binary output
@@ -48,14 +50,16 @@ typedef struct handler {
   /// an human readable identifier of the handler
   const char *name;
   
-  /// handler returned by dlopen
+  /// handle returned by dlopen
   void *dl_handle;
 } handler;
 
+/// list containing loaded handlers
 extern list handlers;
 
 int load_handlers(void);
 void unload_handlers(void);
+int on_handler_request(struct conn_node *, message *);
   
 #define HANDLERS_DIR "handlers"
 

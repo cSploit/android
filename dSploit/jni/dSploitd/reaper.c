@@ -44,7 +44,7 @@ void *reaper(void *arg) {
         fprintf(stderr, "%s: thread joined. (exit_val=%p)\n", __func__, exit_val);
 #else
       else {
-        printf("%s: thread \"%s\" joined. (exit_val=%p)\n", __func__, zombie->name, exit_val);
+        printf("%s: thread \"%s\" joined. (exit_val=%p, tid=%lu)\n", __func__, zombie->name, exit_val, zombie->tid);
         free(zombie->name);
       }
 #endif

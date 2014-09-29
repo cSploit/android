@@ -1,0 +1,17 @@
+/* LICENSE
+ * 
+ */
+#ifndef CONNECTION_H
+#define CONNECTION_H
+
+#include <jni.h>
+#include <pthread.h>
+
+extern int sockfd;
+extern pthread_mutex_t write_lock;
+
+jboolean connect_unix(JNIEnv *, jclass, jstring );
+void disconnect_unix(JNIEnv *, jclass);
+void on_disconnect(void);
+
+#endif
