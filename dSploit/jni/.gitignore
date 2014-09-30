@@ -3,5 +3,6 @@ libs
 *.l[oa]
 *.ao
 *.so[^.]*
+*.so
 build.log
 !.gitignore
