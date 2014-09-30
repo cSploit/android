@@ -8,10 +8,10 @@
 #include <arpa/inet.h>
 
 enum hydra_action {
-  STATUS,
-  WARNING,
-  ERROR,
-  LOGIN
+  HYDRA_STATUS,
+  HYDRA_WARNING,
+  HYDRA_ERROR,
+  HYDRA_LOGIN
 };
 
 /// hydra status info

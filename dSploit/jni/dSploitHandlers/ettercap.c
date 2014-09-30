@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 #include "handler.h"
+#include "logger.h"
 #include "ettercap.h"
 #include "message.h"
 
@@ -31,11 +32,11 @@ void ettercap_init() {
   int ret;
   
   if((ret = regcomp(&ready_pattern, "for inline help", REG_ICASE))) {
-    fprintf(stderr, "%s: regcomp(ready_pattern): %d\n", __func__, ret);
+    print(ERROR, "regcomp(ready_pattern): %d", ret);
   }
   //TODO: search for dissectors that does not match this line and create a specific regex ( or change thier sources )
   if((ret = regcomp(&account_pattern, "^([^ ]+).*[^0-9](([0-9]{1,3}\\.){3}[0-9]{1,3}).* -> USER: (.*)  PASS: ((.*)  [^ ]|(.*)$)", REG_EXTENDED | REG_ICASE))) {
-    fprintf(stderr, "%s: regcomp(account_pattern): %d\n", __func__, ret);
+    print(ERROR, "regcomp(account_pattern): %d", ret);
   }
 }
 
@@ -59,7 +60,7 @@ message *parse_ettercap_ready(char *line) {
   m = create_message(0, 1, 0);
   
   if(!m) {
-    fprintf(stderr, "%s: cannot create messages\n", __func__);
+    print(ERROR, "cannot create messages");
     return NULL;
   }
   
@@ -91,7 +92,7 @@ message *parse_ettercap_account(char *line) {
         0);
   
   if(!m) {
-    fprintf(stderr, "%s: cannot create messages\n", __func__);
+    print(ERROR, "cannot create messages");
     return NULL;
   }
   

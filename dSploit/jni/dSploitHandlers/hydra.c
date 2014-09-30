@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 #include "handler.h"
+#include "logger.h"
 #include "hydra.h"
 #include "message.h"
 
@@ -31,13 +32,13 @@ void hydra_init() {
   int ret;
   
   if((ret = regcomp(&status_pattern, "^\\[STATUS\\] .*, ([0-9]+) tries in [^,]+, ([0-9]+) todo", REG_EXTENDED))) {
-    fprintf(stderr, "%s: regcomp(status_pattern): %d\n", __func__, ret);
+    print( ERROR, "regcomp(status_pattern): %d", ret);
   }
   if((ret = regcomp(&alert_pattern, "^\\[(ERROR|WARNING)\\] ", REG_EXTENDED | REG_ICASE))) {
-    fprintf(stderr, "%s: regcomp(alert_pattern): %d\n", __func__, ret);
+    print( ERROR, "regcomp(alert_pattern): %d", ret);
   }
   if((ret = regcomp(&login_pattern, "^\\[([0-9]+)\\]\\[[^]]+\\] (host: ([^ ]+)( +|$))?(login: ([^ ]+)( +|$))?(password: ([^ ]+)( +|$))?", REG_EXTENDED))) {
-    fprintf(stderr, "%s: regcomp(login_pattern): %d\n", __func__, ret);
+    print( ERROR, "regcomp(login_pattern): %d", ret);
   }
 }
 
@@ -62,7 +63,7 @@ message *parse_hydra_status(char *line) {
   
   m = create_message(0, sizeof(struct hydra_status_info), 0);
   if(!m) {
-    fprintf(stderr, "%s: cannot create messages\n", __func__);
+    print( ERROR, "cannot create messages");
     return NULL;
   }
   
@@ -72,7 +73,7 @@ message *parse_hydra_status(char *line) {
   
   
   status_info = (struct hydra_status_info *) m->data;
-  status_info->hydra_action = STATUS;
+  status_info->hydra_action = HYDRA_STATUS;
   status_info->sent = strtoul(line + pmatch[1].rm_so, NULL, 10);
   status_info->left = strtoul(line + pmatch[2].rm_so, NULL, 10);
   
@@ -98,16 +99,16 @@ message *parse_hydra_alert(char *line) {
   m = create_message(0, sizeof(struct hydra_warning_info) + len + 1, 0);
   
   if(!m) {
-    fprintf(stderr, "%s: cannot craete messages\n", __func__);
+    print( ERROR, "cannot craete messages");
     return NULL;
   }
   
   alert_info = (struct hydra_warning_info *) m->data;
   
   if(line[1] == 'E') // ERROR
-    alert_info->hydra_action = ERROR;
+    alert_info->hydra_action = HYDRA_ERROR;
   else
-    alert_info->hydra_action = WARNING;
+    alert_info->hydra_action = HYDRA_WARNING;
   
   memcpy(alert_info->text, line + pmatch[0].rm_eo, len);
   *(alert_info->text + len) = '\0';
@@ -149,7 +150,7 @@ message *parse_hydra_login(char *line) {
         , 0);
   
   if(!m) {
-    fprintf(stderr, "%s: cannot create messages\n", __func__);
+    print( ERROR, "cannot create messages");
     return NULL;
   }
   
@@ -158,7 +159,7 @@ message *parse_hydra_login(char *line) {
   *(line + pmatch[3].rm_eo) = '\0';
   
   login_info = (struct hydra_login_info *)m->data;
-  login_info->hydra_action = LOGIN;
+  login_info->hydra_action = HYDRA_LOGIN;
   login_info->port = strtoul(line + pmatch[1].rm_so, NULL, 10);
   login_info->contents = 0;
   

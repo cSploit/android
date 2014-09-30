@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 #include "handler.h"
+#include "logger.h"
 #include "nmap.h"
 #include "message.h"
 
@@ -31,16 +32,16 @@ void nmap_init() {
   int ret;
   
   if((ret = regcomp(&hop_pattern, "^([0-9]+) +(\\.\\.\\.|[0-9\\.]+ m?s) +([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}|[0-9]+)", REG_EXTENDED | REG_ICASE))) {
-    fprintf(stderr, "%s: regcomp(hop_pattern): %d\n", __func__, ret);
+    print( ERROR, "%s: regcomp(hop_pattern): %d", ret);
   }
   if((ret = regcomp(&port_pattern, "^Discovered open port ([0-9]+)/([a-z]+)", REG_EXTENDED | REG_ICASE))) {
-    fprintf(stderr, "%s: regcomp(port_pattern): %d\n", __func__, ret);
+    print( ERROR, "%s: regcomp(port_pattern): %d", ret);
   }
   if((ret = regcomp(&xml_port_pattern, "<port protocol=\"([^\"]+)\" portid=\"([^\"]+)\"><state state=\"open\"[^>]+><service(.+product=\"([^\"]+)\")?(.+version=\"([^\"]+)\")?", REG_EXTENDED | REG_ICASE))) {
-    fprintf(stderr, "%s: regcomp(xml_port_pattern): %d\n", __func__, ret);
+    print( ERROR, "%s: regcomp(xml_port_pattern): %d", ret);
   }
   if((ret = regcomp(&xml_os_pattern, "<osclass type=\"([^\"]+)\".+osfamily=\"([^\"]+)\".+accuracy=\"([^\"]+)\"", REG_EXTENDED | REG_ICASE))) {
-    fprintf(stderr, "%s: regcomp(xml_os_pattern): %d\n", __func__, ret);
+    print( ERROR, "%s: regcomp(xml_os_pattern): %d", ret);
   }
 }
 
@@ -68,7 +69,7 @@ message *parse_nmap_hop(char *line) {
   
   m = create_message(0, sizeof(struct nmap_hop_info), 0);
   if(!m) {
-    fprintf(stderr, "%s: cannot create messages\n", __func__);
+    print( ERROR, "cannot create messages" );
     return NULL;
   }
   
@@ -115,7 +116,7 @@ message *parse_nmap_port(char *line) {
   m = create_message(0, sizeof(struct nmap_port_info), 0);
   
   if(!m) {
-    fprintf(stderr, "%s: cannot create messages\n", __func__);
+    print( ERROR, "cannot create messages" );
     return NULL;
   }
   
@@ -168,7 +169,7 @@ message *parse_nmap_xml_port(char *line) {
   }
   
   if(!m) {
-    fprintf(stderr, "%s: cannot create messages\n", __func__);
+    print( ERROR, "%s: cannot create messages" );
     return NULL;
   }
   
@@ -231,7 +232,7 @@ message *parse_nmap_xml_os(char *line) {
   m = create_message(0, sizeof(struct nmap_os_info) + type_len + os_len + 2, 0);
   
   if(!m) {
-    fprintf(stderr, "%s: cannot create messages\n", __func__);
+    print( ERROR, "cannot create messages" );
     return NULL;
   }
   
