@@ -56,7 +56,3 @@ void default_logger(int level, char *fmt, ...) {
   
   pthread_mutex_unlock(&print_lock);
 }
-
-void register_logger(void (*logger)(int, char *, ...)) {
-  _print = logger;
-}

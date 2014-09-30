@@ -15,11 +15,10 @@ enum loglevel {
   FATAL,
 };
 
-void register_logger(void (*)(int, char *, ...));
-
 extern pthread_mutex_t print_lock;
 extern void (*_print)(int, char *, ...);
 
 #define print( level, fmt, args...) _print( level, "%s: " fmt, __func__, ##args)
+#define register_logger(func) _print = func
 
 #endif
