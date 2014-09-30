@@ -10,6 +10,7 @@
 
 #include "list.h"
 #include "control.h"
+#include "logger.h"
 #include "reaper.h"
 
 struct graveyard graveyard;
@@ -37,14 +38,14 @@ void *reaper(void *arg) {
       pthread_mutex_unlock(&(graveyard.control.mutex));
       
       if(pthread_join(zombie->tid, &exit_val)) {
-        fprintf(stderr, "%s: pthread_join: %s\n", __func__, strerror(errno));
+        print( ERROR, "pthread_join: %s", strerror(errno) );
       }
 #ifdef NDEBUG
       else if(exit_val)
-        fprintf(stderr, "%s: thread joined. (exit_val=%p)\n", __func__, exit_val);
+        print( WARNING, "thread joined. (exit_val=%p)", exit_val );
 #else
       else {
-        printf("%s: thread \"%s\" joined. (exit_val=%p, tid=%lu)\n", __func__, zombie->name, exit_val, zombie->tid);
+        print( DEBUG, "thread \"%s\" joined. (exit_val=%p, tid=%lu)", zombie->name, exit_val, zombie->tid );
         free(zombie->name);
       }
 #endif
@@ -67,12 +68,12 @@ int start_reaper() {
     return 0;
   
   if(control_activate(&(graveyard.control))) {
-    fprintf(stderr, "%s: cannot activate the graveyard\n", __func__);
+    print( ERROR, "cannot activate the graveyard" );
     return -1;
   }
   
   if(pthread_create(&(reaper_tid), NULL, &reaper, NULL)) {
-    fprintf(stderr, "%s: pthread_create: %s\n", __func__, strerror(errno));
+    print( ERROR, "pthread_create: %s", strerror(errno) );
     reaper_tid=0;
     return -1;
   }
@@ -92,20 +93,20 @@ int stop_reaper() {
     return 0;
   
   if(control_deactivate(&(graveyard.control))) {
-    fprintf(stderr, "%s: cannot deactivate the graveyard\n", __func__);
+    print( ERROR, "cannot deactivate the graveyard" );
     return -1;
   }
   
   if(pthread_join(reaper_tid, &exit_val)) {
-    fprintf(stderr, "%s: pthread_join: %s\n", __func__, strerror(errno));
+    print( ERROR, "pthread_join: %s", strerror(errno) );
     return -1;
   }
 #ifdef NDEBUG
   else if(exit_val)
-    fprintf(stderr, "%s: reaper joined. (exit_val=%p)\n", __func__, exit_val);
+    print( WARNING, "reaper joined. (exit_val=%p)", exit_val );
 #else
   else
-    printf("%s: reaper joined. (exit_val=%p)\n", __func__, exit_val);
+    print( DEBUG, "reaper joined. (exit_val=%p)", exit_val );
 #endif
   
   return 0;
@@ -127,7 +128,7 @@ void _send_to_graveyard(pthread_t tid, char *name) {
   d=malloc(sizeof(dead_node));
   
   if(!d) {
-    fprintf(stderr, "%s: malloc: %s\n", __func__, strerror(errno));
+    print( ERROR, "malloc: %s", strerror(errno) );
     return;
   }
   memset(d, 0, sizeof(dead_node));

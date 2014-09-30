@@ -11,6 +11,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "logger.h"
 #include "list.h"
 #include "control.h"
 #include "connection.h"
@@ -46,14 +47,14 @@ int load_user(char *line) {
   colon = strchr(line, ':');
   
   if(!colon) {
-    fprintf(stderr, "%s: colon (':') not found\n", __func__);
+    print( ERROR, "colon (':') not found" );
     return -1;
   }
   
   l = malloc(sizeof(login));
   
   if(!l) {
-    fprintf(stderr, "%s: malloc: %s\n", __func__, strerror(errno));
+    print( ERROR, "malloc: %s", strerror(errno) );
     return -1;
   }  
     
@@ -61,7 +62,7 @@ int load_user(char *line) {
   colon++;
   
   if(!(l->user = strdup(line)) || !(l->pswd_hash = strdup(colon))) {
-    fprintf(stderr, "%s: strdup: %s\n", __func__, strerror(errno));
+    print( ERROR, "strdup: %s", strerror(errno) );
   } else {
     l->user_len = strlen(l->user);
     l->hash_len = strlen(l->pswd_hash);
@@ -88,25 +89,25 @@ int load_users() {
   fd = open(USERS_FILE, O_RDONLY);
   
   if(fd == -1) {
-    fprintf(stderr, "%s: cannot open \"" USERS_FILE "\": %s\n", __func__, strerror(errno));
+    print( ERROR, "cannot open \"" USERS_FILE "\": %s", strerror(errno) );
     return -1;
   }
   
   while((count = read(fd, buff, 255)) > 0) {
     if(append_to_buffer(&b, buff, count)) {
-      fprintf(stderr, "%s: cannot append to buffer\n", __func__);
+      print( ERROR, "cannot append to buffer" );
       goto exit;
     }
     while((line = get_line_from_buffer(&b))) {
       if(load_user(line)) {
-        fprintf(stderr, "%s: cannot load user from \"%s\"\n", __func__, line);
+        print( ERROR, "cannot load user from \"%s\"", line );
       }
       free(line);
     }
   }
   
   if(count == -1) {
-    fprintf(stderr, "%s: read: %s\n", __func__, strerror(errno));
+    print( ERROR, "read: %s", strerror(errno) );
   } else {
     ret = 0;
   }
@@ -131,13 +132,13 @@ int on_unathorized_request(conn_node *c, message *m __attribute__((unused))) {
   struct auth_status_info *fail_info;
   message *reply;
   
-  fprintf(stderr, "%s: received a control message fron an unauthorized client\n", __func__);
+  print( ERROR, "received a control message fron an unauthorized client" );
   
   reply = create_message(get_sequence(&(c->ctrl_seq), &(c->control.mutex)),
                          sizeof(struct auth_status_info),
                          CTRL_ID);
   if(!reply) {
-    fprintf(stderr, "%s: cannot create messages\n", __func__);
+    print( ERROR, "cannot create messages" );
     return -1;
   }
   
@@ -146,7 +147,7 @@ int on_unathorized_request(conn_node *c, message *m __attribute__((unused))) {
   fail_info->auth_code = AUTH_FAIL;
   
   if(enqueue_message(&(c->outcoming), reply)) {
-    fprintf(stderr, "%s: cannot enqueue messages", __func__);
+    print( ERROR, "cannot enqueue messages" );
     dump_message(reply);
     free_message(reply);
     return -1;
@@ -177,7 +178,7 @@ int on_auth_request(conn_node *c, message *m) {
   pswd_hash = string_array_next(m, auth_info->data, user);
   
   if(!user || !pswd_hash) {
-    fprintf(stderr, "%s: missing authentication credentials\n", __func__);
+    print( ERROR, "missing authentication credentials" );
     dump_message(m);
     goto send_response;
   }
@@ -185,16 +186,16 @@ int on_auth_request(conn_node *c, message *m) {
   for(l=(login *) users.head;l && strncmp(l->user, user, l->user_len + 1);l=(login *) l->next);
   
   if(!l) {
-    fprintf(stderr, "%s: unkown username: \"%s\"\n", __func__, user);
+    print( ERROR, "unkown username: \"%s\"", user );
   } else if(strncmp(l->pswd_hash, pswd_hash, l->hash_len + 1)) {
-    fprintf(stderr, "%s: wrong password hash\n", __func__);
+    print( ERROR, "wrong password hash" );
   } else {
     reply_code = AUTH_OK;
     pthread_mutex_lock(&(c->control.mutex));
     c->logged = 1;
     pthread_mutex_unlock(&(c->control.mutex));
 #ifndef NDEBUG
-    printf("%s: user \"%s\" logged in\n", __func__, user);
+    print( DEBUG, "user \"%s\" logged in", user );
 #endif
   }
   
@@ -204,7 +205,7 @@ int on_auth_request(conn_node *c, message *m) {
                          sizeof(struct auth_status_info), CTRL_ID);
   
   if(!reply) {
-    fprintf(stderr, "%s: cannot create messages\n", __func__);
+    print( ERROR, "cannot create messages" );
     ret = -1;
     goto exit;
   }
@@ -214,7 +215,7 @@ int on_auth_request(conn_node *c, message *m) {
   auth_info->auth_code = reply_code;
   
   if(enqueue_message(&(c->outcoming), reply)) {
-    fprintf(stderr, "%s: cannot enqueue message\n", __func__);
+    print( ERROR, "cannot enqueue message" );
     dump_message(reply);
     free_message(reply);
     ret = -1;

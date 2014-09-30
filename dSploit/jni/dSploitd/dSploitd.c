@@ -22,6 +22,7 @@
 #include "cleanup.h"
 #include "handler.h"
 #include "reaper.h"
+#include "logger.h"
 #include "authenticator.h"
 
 int sockfd;
@@ -37,11 +38,11 @@ int remove_old_socket() {
     // socket already exists
     if(S_ISSOCK(s.st_mode)) {
       if(unlink(SOCKET_PATH)) {
-        fprintf(stderr, "%s: unlink: %s\n", __func__, strerror(errno));
+        print( FATAL, "unlink: %s", strerror(errno) );
         return -1;
       }
     } else {
-      fprintf(stderr, "%s: '%s' is not a socket, remove it manually\n", __func__, SOCKET_PATH);
+      print( FATAL, "'%s' is not a socket, remove it manually", SOCKET_PATH );
       return -1;
     }
   }
@@ -91,14 +92,14 @@ int main(int argc, char **argv) {
   
   if(deamonize) {
     if(pipe2(pipefd, O_CLOEXEC)) {
-      fprintf(stderr, "%s: pipe2: %s\n", __func__, strerror(errno));
+      print( FATAL, "pipe2: %s", strerror(errno) );
       return EXIT_FAILURE;
     }
     
     pid = fork();
     
     if(pid<0) {
-      fprintf(stderr, "%s: fork: %s\n", __func__, strerror(errno));
+      print( FATAL, "fork: %s", strerror(errno) );
       return EXIT_FAILURE;
     } else if(pid) {
       close(pipefd[1]);
@@ -118,7 +119,7 @@ int main(int argc, char **argv) {
   clfd = open(LOG_PATH, O_WRONLY | O_CREAT | O_TRUNC, 0644);
   
   if(clfd==-1) {
-    fprintf(stderr, "%s: open: %s\n", __func__, strerror(errno));
+    print( FATAL, "open: %s", strerror(errno) );
     return EXIT_FAILURE;
   }
   
@@ -128,14 +129,14 @@ int main(int argc, char **argv) {
   if (dup2(clfd, fileno(stderr)) != fileno(stderr) ||
       dup2(clfd, fileno(stdout)) != fileno(stdout))
   {
-    fprintf(stderr, "%s: dup2: %s\n", __func__, strerror(errno));
+    print( FATAL, "dup2: %s", strerror(errno) );
     return EXIT_FAILURE;
   }
 
   if(deamonize) {
     sid = setsid();
     if(sid<0) {
-      fprintf(stderr, "%s: setsid: %s\n", __func__, strerror(errno));
+      print( FATAL, "setsid: %s", strerror(errno) );
       return EXIT_FAILURE;
     }
   }
@@ -155,7 +156,7 @@ int main(int argc, char **argv) {
   sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
   
   if(sockfd < 0) {
-    fprintf(stderr, "%s: socket: %s\n", __func__, strerror(errno));
+    print( FATAL, "socket: %s", strerror(errno) );
     return EXIT_FAILURE;
   }
   
@@ -168,14 +169,14 @@ int main(int argc, char **argv) {
   addr.sun_family = AF_UNIX;
   strncpy(addr.sun_path, SOCKET_PATH, sizeof(addr.sun_path)-1);
   if(bind(sockfd, (struct sockaddr*)&addr, sizeof(addr))) {
-    fprintf(stderr, "%s: bind: %s\n", __func__, strerror(errno));
+    print( FATAL, "bind: %s", strerror(errno) );
     close(sockfd);
     unlink(SOCKET_PATH);
     return EXIT_FAILURE;
   }
   
   if(listen(sockfd, 5)) {
-    fprintf(stderr, "%s: listen: %s\n", __func__, strerror(errno));
+    print( FATAL, "listen: %s", strerror(errno) );
     close(sockfd);
     unlink(SOCKET_PATH);
     return EXIT_FAILURE;
@@ -193,7 +194,7 @@ int main(int argc, char **argv) {
   
   if(deamonize) {
     if(write(pipefd[1], "!", 1) != 1) {
-      fprintf(stderr, "%s: cannot notify that daemon started", __func__);
+      print( FATAL, "cannot notify that daemon started" );
       return EXIT_FAILURE;
     }
     close(pipefd[1]);
@@ -203,16 +204,16 @@ int main(int argc, char **argv) {
     if((clfd=accept(sockfd, NULL, NULL)) < 0) {
       if(errno == EBADF) {
 #ifndef NDEBUG
-        printf("%s: socket closed\n", __func__);
+        print( DEBUG, "socket closed" );
 #endif
         break;
       }
-      fprintf(stderr, "%s: accept: %s\n", __func__, strerror(errno));
+      print( ERROR, "accept: %s", strerror(errno) );
       continue;
     }
     
     if(serve_new_client(clfd)) {
-      fprintf(stderr, "%s: cannot serve new connection\n", __func__);
+      print( WARNING, "cannot serve new connection" );
       close(clfd);
     }
   }

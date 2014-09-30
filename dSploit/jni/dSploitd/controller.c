@@ -10,6 +10,7 @@
 #include "authenticator.h"
 #include "command.h"
 #include "handler.h"
+#include "logger.h"
 
 #include "control_messages.h"
 
@@ -43,7 +44,7 @@ int on_control_request(conn_node *c, message *m) {
     case MOD_END:
       return on_module_request(c, m);
     default:
-      fprintf(stderr, "%s: unkown control code: %02hhX\n", __func__, m->data[0]);
+      print( ERROR, "unkown control code: %02hhX", m->data[0] );
       return -1;
   }
 }

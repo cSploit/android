@@ -10,8 +10,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "export.h"
 #include "buffer.h"
+#include "logger.h"
 
 /**
  * @brief get a line from a buffer.
@@ -39,7 +39,7 @@ char *get_line_from_buffer(buffer *b) {
     newbuff = malloc(b->size);
     
     if(!newbuff) {
-      fprintf(stderr, "%s: malloc: %s\n", __func__, strerror(errno));
+      print( ERROR, "malloc: %s", strerror(errno) );
       b->size += line_len + 1;
       return NULL;
     }
@@ -53,7 +53,7 @@ char *get_line_from_buffer(buffer *b) {
   if(!line) { 
     // this should be impossible, new size is lesser then the current one.
     // manage it anyway, just in case.
-    fprintf(stderr, "%s: realloc: %s\n", __func__, strerror(errno));
+    print( ERROR, "realloc: %s", strerror(errno) );
     if(newbuff)
       free(newbuff);
     b->size += line_len + 1;
@@ -81,7 +81,7 @@ int append_to_buffer(buffer *b, char *buff, int count) {
   newbuff = realloc(b->buffer, b->size);
   
   if (!newbuff) {
-    fprintf(stderr, "%s: realloc: %s\n", __func__, strerror(errno));
+    print( ERROR, "realloc: %s", strerror(errno) );
     free(b->buffer);
     b->buffer = NULL;
     b->size = 0;

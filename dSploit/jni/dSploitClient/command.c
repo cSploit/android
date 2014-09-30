@@ -173,284 +173,6 @@ int on_command(JNIEnv *env, message *m) {
   }
 }
 
-/*
-int __start_command(JNIEnv *env, jclass clazz, jstring jhandler, jobjectArray jargv) {
-  const char *arg, *hname;
-  jobject jarg;
-  int argc,i;
-  uint16_t curr_seq;
-  message *m;
-  handler *h;
-  struct cmd_start_info *start_info;
-  
-  hname = NULL;
-  jarg=NULL;
-  m=NULL;
-  argc = (*env)->GetArrayLength(env, jargv);
-  
-  hname = (*env)->GetStringUTFChars(env, jhandler, NULL);
-  
-  if(!hname) {
-    LOGE("%s: GetStringUTFChars(jhandler) fails", __func__);
-    goto error;
-  }
-  
-  i = strlen(hname);
-  
-  for(h=(handler *) handlers.head;h && strncmp(h->name, hname, i);h=(handler *) h->next);
-  
-  if(!h) {
-    LOGE("%s: handler \"%s\" not found", __func__, hname);
-    goto error;
-  }
-  
-  pthread_mutex_lock(&ctrl_seq_lock);
-  curr_seq=ctrl_seq++;
-  pthread_mutex_unlock(&ctrl_seq_lock);
-  
-  m=create_message(curr_seq, sizeof(struct cmd_start_info), CTRL_ID);
-  
-  if(!m) {
-    LOGE("%s: cannot create messages", __func__);
-    goto error;
-  }
-  
-  start_info = (struct cmd_start_info *) m->data;
-  
-  //TODO
-  
-  // free memory ASAP
-  (*env)->ReleaseStringUTFChars(env, hname);
-  hname=NULL;
-  
-  for(i=0;i<argc;i++) {
-    jarg = (*env)->GetObjectArrayElement(env, jargv, i);
-    
-    if(!jarg) {
-      LOGE("%s: NULL object from GetObjectArrayElement", __func__);
-      goto error;
-    }
-    
-    arg = (*env)->GetStringUTFChars(env, jarg, NULL);
-    
-    if(!arg) {
-      LOGE("%s: GetStringUTFChars(jarg) fails", __func__);
-      goto error;
-    }
-    
-    
-    
-    (*env)->ReleaseStringUTFChars(env, arg);
-    arg=NULL;
-    
-    (*env)->DeleteLocalRef(env, jarg);
-    jarg=NULL;
-  }
-  
-  i=0;
-  
-  goto cleanup;
-  
-  error:
-  i=-1;
-  
-  if((*env)->ExceptionCheck(env)) {
-    (*env)->ExceptionDescribe(env);
-    (*env)->ExceptionClear(env);
-  }
-  
-  cleanup:
-  
-  if(hname)
-    (*env)->ReleaseStringUTFChars(env, hname);
-  
-  if(m)
-    free_message(m);
-  
-  if(jarg)
-    (*env)->DeleteLocalRef(env, jarg);
-  
-  if(arg)
-    (*env)->ReleaseStringUTFChars(env, arg);
-  
-  
-  return i;
-}
-
-int _start_command(JNIEnv *env, jstring jcmd, char blind) {
-  const char *utf;
-  char *ccmd, *pos,*prev __attribute__((unused)),*arg_start, *arg_end, *ccmd_end;
-  char *write_pos;
-  int id;
-  uint16_t handler_id;
-  uint16_t curr_seq;
-  child_node *c;
-  size_t packed_size;
-  message *m;
-  struct cmd_start_info *start_info;
-  in_addr_t target;
-  
-  utf = (*env)->GetStringUTFChars(env, jcmd, NULL);
-  
-  if(!utf)
-    return -1;
-  
-  id=-1;
-  handler_id = -1;
-  packed_size = 0;
-  prev = arg_start = arg_end = write_pos = NULL;
-  m = NULL;
-  c = NULL;
-  
-  for(ccmd=(char *)utf;*ccmd != '\0' && isspace(*ccmd); ccmd++); // trim left
-  for(ccmd_end=ccmd;*ccmd_end!='\0';ccmd_end++); // find string end
-  
-  LOGD("%s: starting command: \"%s\"", __func__, ccmd);
-  
-  for(arg_start=pos=ccmd;pos < ccmd_end; prev=pos, pos++) {
-    if(isspace(*pos) || *pos=='\0') { // (TODO: parse space escapes)
-      if(arg_start) {
-        arg_end=pos;
-        if(!write_pos)
-          write_pos=arg_end; //OPTIMIZATION: use write_pos as argv[0] end pointer
-      }
-    } else if(!arg_start) {
-      arg_start=pos;
-    }
-    if(arg_start && arg_end) {
-      packed_size+= (arg_end - arg_start) + 1;
-      arg_start = arg_end = NULL;
-    }
-  }
-  
-  LOGD("%s: argv[0]: start=%d, end=%d", __func__, (arg_start-ccmd), (write_pos-ccmd));
-  
-  if(blind) {
-    handler_id = BLIND_HANDLER_ID;
-  } else {
-    if(((write_pos - 4) >= ccmd) && !strncmp("nmap", write_pos - 4, 4)) {
-      handler_id = NMAP_HANDLER_ID;
-    } else if(((write_pos - 8) >= ccmd) && !strncmp("ettercap", write_pos - 8, 8)) {
-      handler_id = ETTERCAP_HANDLER_ID;
-    } else if(((write_pos - 5) >= ccmd) && !strncmp("hydra", write_pos - 5, 5)) {
-      handler_id = HYDRA_HANDLER_ID;
-    } else {
-      handler_id = RAW_HANDLER_ID;
-    }
-  }
-  
-  // TODO: if(selected_handler->argv0)
-  if(handler_id != BLIND_HANDLER_ID && handler_id != RAW_HANDLER_ID) {
-    packed_size-=(write_pos-ccmd) + 1;
-  }
-  
-  LOGD("%s: packed_size=%d", __func__, packed_size);
-  
-  pthread_mutex_lock(&ctrl_seq_lock);
-  curr_seq = ++ctrl_seq;
-  pthread_mutex_unlock(&ctrl_seq_lock);
-  
-  m = create_message(curr_seq, sizeof(struct cmd_start_info) + packed_size, CTRL_ID);
-  
-  if(!m) {
-    LOGE("%s: cannot create messages", __func__);
-    goto cleanup;
-  }
-  
-  start_info = (struct cmd_start_info *) m->data;
-  start_info->cmd_action = CMD_START;
-  start_info->hid = handler_id;
-  
-  target = INADDR_ANY;
-  
-  write_pos = start_info->argv;
-  
-  for(arg_start=pos=ccmd;pos < ccmd_end; pos++) {
-    if(isspace(*pos)) {
-      if(arg_start) { // unsescaped space found
-        arg_end = pos;
-      }
-    } else if(!arg_start) {
-      arg_start=pos;
-    }
-    if(arg_start && arg_end) {
-      LOGD("%s: new argument found: start=%d, end=%d", __func__, (arg_start-ccmd), (arg_end-ccmd));
-      memcpy(write_pos, arg_start, (arg_end - arg_start));
-      write_pos += (arg_end - arg_start);
-      *write_pos = '\0';
-      write_pos++;
-      if(handler_id==NMAP_HANDLER_ID)
-        inet_aton(write_pos - (arg_end - arg_start), (struct in_addr *) &target);
-      arg_start = arg_end = NULL;
-    }
-  }
-  
-  c = create_child(m->head.seq);
-  
-  if(!c) {
-    LOGE("%s: cannot create child", __func__);
-    goto cleanup;
-  }
-  
-  c->target = target;
-  
-  pthread_mutex_lock(&(children.control.mutex));
-  list_add(&(children.list), (node *) c);
-  pthread_mutex_unlock(&(children.control.mutex));
-  
-  pthread_cond_broadcast(&(children.control.cond));
-  
-  pthread_mutex_lock(&write_lock);
-  m->head.id = send_message(sockfd, m); // use m->head.id as buffer
-  pthread_mutex_unlock(&write_lock);
-  
-  if(m->head.id) {
-    LOGE("%s: cannot send messages", __func__);
-    goto cleanup;
-  } else {
-    LOGD("%s: message sent", __func__);
-    android_dump_message(m);
-  }
-  
-  pthread_mutex_lock(&(children.control.mutex));
-  
-  while(c->seq && children.control.active)
-    pthread_cond_wait(&(children.control.cond), &(children.control.mutex));
-  
-  if(c->id == CTRL_ID || c->seq) { // command failed
-    list_del(&(children.list), (node *) c);
-    free_child(c);
-  } else {
-    id = c->id;
-  }
-  
-  c=NULL;
-  
-  pthread_mutex_unlock(&(children.control.mutex));
-  
-  if(id!=-1)
-    LOGI("%s: started child #%d", __func__, id);
-  
-  cleanup:
-  
-  if(m)
-    free_message(m);
-  
-  if(c) {
-    pthread_mutex_lock(&(children.control.mutex));
-    list_del(&(children.list), (node *) c);
-    pthread_mutex_unlock(&(children.control.mutex));
-  
-    pthread_cond_broadcast(&(children.control.cond));
-    free_child(c);
-  }
-  
-  (*env)->ReleaseStringUTFChars(env, jcmd, utf);
-  
-  return id;
-}
-*/
-
 #define INSIDE_SINGLE_QUOTE 1
 #define INSIDE_DOUBLE_QUOTE 2
 #define ESCAPE_FOUND 4
@@ -600,8 +322,6 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
     }
   }
   
-  android_dump_message(m); // debug
-  
   // create child
   
   c = create_child(m->head.seq);
@@ -700,14 +420,11 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
 
 void kill_child(JNIEnv *env, jclass clazz __attribute__((unused)), int id, int signal) {
   message *m;
-  uint16_t curr_seq;
+  int send_error;
   struct cmd_signal_info *signal_info;
   
-  pthread_mutex_lock(&ctrl_seq_lock);
-  curr_seq=++ctrl_seq;
-  pthread_mutex_unlock(&ctrl_seq_lock);
-  
-  m = create_message(curr_seq, sizeof(struct cmd_signal_info), CTRL_ID);
+  m = create_message(get_sequence(&ctrl_seq, &ctrl_seq_lock),
+                     sizeof(struct cmd_signal_info), CTRL_ID);
   
   if(!m) {
     LOGE("%s: cannot crate messages", __func__);
@@ -720,13 +437,10 @@ void kill_child(JNIEnv *env, jclass clazz __attribute__((unused)), int id, int s
   signal_info->signal = signal;
   
   pthread_mutex_lock(&write_lock);
-  curr_seq = send_message(sockfd, m);
+  send_error = send_message(sockfd, m);
   pthread_mutex_unlock(&write_lock);
   
-  if(curr_seq) {
+  if(send_error) {
     LOGE("%s: cannot send messages", __func__);
-  } else {
-    LOGD("%s: message sent", __func__);
-    android_dump_message(m);
   }
 }

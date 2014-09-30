@@ -114,10 +114,7 @@ jboolean send_to_child(JNIEnv *env, jclass clazz __attribute__((unused)), int id
     ret = JNI_TRUE;
   pthread_mutex_unlock(&write_lock);
   
-  if(ret) {
-    LOGD("%s: message sent", __func__);
-    android_dump_message(m);
-  } else {
+  if(!ret) {
     LOGE("%s: cannot send messages", __func__);
   }
   

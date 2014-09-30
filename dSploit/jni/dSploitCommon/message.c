@@ -12,12 +12,9 @@
 #include <ctype.h>
 #include <assert.h>
 
-#include "export.h"
+#include "logger.h"
 #include "message.h"
 #include "io.h"
-
-/// mutex to dump messages
-pthread_mutex_t dump_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /**
  * @brief create a message
@@ -32,14 +29,14 @@ message *create_message(uint16_t seq, uint16_t size, uint16_t id) {
   
   m=malloc(sizeof(struct message));
   if(!m) {
-    fprintf(stderr, "%s: malloc: %s\n",  __func__, strerror(errno));
+    print( ERROR, "malloc: %s", strerror(errno) );
     return NULL;
   }
   
   m->data = malloc(size);
   if(!m->data) {
     free(m);
-    fprintf(stderr, "%s: malloc: %s\n", __func__, strerror(errno));
+    print( ERROR, "malloc: %s", strerror(errno) );
     return NULL;
   }
   
@@ -62,7 +59,7 @@ message *read_message(int fd) {
   res = malloc(sizeof(struct message));
   
   if(!res) {
-    fprintf(stderr, "%s: malloc: %s\n", __func__, strerror(errno));
+    print( ERROR, "malloc: %s", strerror(errno) );
     return NULL;
   }
   
@@ -73,13 +70,13 @@ message *read_message(int fd) {
       res->data = read_chunk(fd, res->head.size);
       if(res->data) {
 #ifndef NDEBUG
-        printf("%s: received a message (fd=%d)\n", __func__, fd);
+        print( DEBUG, "received a message (fd=%d)", fd );
         dump_message(res);
 #endif
         return res;
       }
     } else {
-      fprintf(stderr, "%s: received a 0-length message\n", __func__);
+      print( ERROR, "received a 0-length message" );
       dump_message(res);
     }
   }
@@ -137,14 +134,12 @@ char *message_to_string(message *msg) {
  * @brief dump a message to stderr
  * @param m the message to dump
  */
-void dump_message(message *m) {
+void _dump_message(const char *func, message *m) {
   char *str;
   
   str = message_to_string(m);
   
-  pthread_mutex_lock(&dump_lock);
-  fprintf(stderr, "%s\n", str);
-  pthread_mutex_unlock(&dump_lock);
+  _print(DEBUG, "%s: %s", func, str);
   
   if(str)
     free(str);
@@ -174,7 +169,7 @@ message *msgdup(message *msg) {
   m=malloc(sizeof(message));
   
   if(!m) {
-    fprintf(stderr, "%s: malloc: %s\n", __func__, strerror(errno));
+    print( ERROR, "malloc: %s", strerror(errno) );
     return NULL;
   }
   
@@ -183,7 +178,7 @@ message *msgdup(message *msg) {
   m->data = malloc(msg->head.size);
   if(!m->data) {
     free(m);
-    fprintf(stderr, "%s: malloc: %s\n", __func__, strerror(errno));
+    print( ERROR, "malloc: %s", strerror(errno) );
     return NULL;
   }
   memcpy(m->data, msg->data, msg->head.size);
@@ -204,7 +199,7 @@ int send_message(int fd, message *msg) {
     return -1;
 
 #ifndef NDEBUG
-  printf("%s: message sent (fd=%d)\n", __func__, fd);
+  print( DEBUG, "message sent (fd=%d)", fd );
   dump_message(msg);
 #endif
 

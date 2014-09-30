@@ -25,8 +25,10 @@ message *create_message(uint16_t , uint16_t , uint16_t );
 message *read_message(int);
 void free_message(message *);
 char *message_to_string(message *);
-void dump_message(message *);
+void _dump_message(const char *, message *);
 message *msgdup(message *);
 int send_message(int, message *);
+
+#define dump_message(m) _dump_message(__func__, m)
 
 #endif

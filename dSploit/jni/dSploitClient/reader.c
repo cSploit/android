@@ -22,8 +22,6 @@ void *reader(void *arg) {
   message *m;
   
   while((m = read_message(sockfd))) {
-    LOGD("%s: message received", __func__);
-    android_dump_message(m);
     if(enqueue_message(&(incoming_messages), m)) {
       LOGE("%s: cannot enqueue messages", __func__);
     }

@@ -8,7 +8,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "export.h"
+#include "logger.h"
 #include "io.h"
 
 /**
@@ -31,11 +31,11 @@ int read_wrapper(int fd, void *buff, unsigned int size) {
   } while(read_bytes > 0 && pos < end);
   
   if(read_bytes < 0)
-    fprintf(stderr, "%s: read: %s\n", __func__, strerror(errno));
+    print( ERROR, "read: %s", strerror(errno) );
   else if(pos == end)
     return 0;
   else if(pos > buff) // 0 bytes read == fd closed
-    fprintf(stderr, "%s: cannot read %d bytes, got %d\n", __func__, size, (unsigned int)(pos - buff));
+    print( ERROR, "cannot read %d bytes, got %d", size, (unsigned int)(pos - buff) );
     
   
   return -1;
@@ -61,11 +61,11 @@ int write_wrapper(int fd, void *buff, unsigned int size) {
   } while(write_bytes > 0 && pos < end);
   
   if(write_bytes < 0)
-    fprintf(stderr, "%s: write: %s\n", __func__, strerror(errno));
+    print( ERROR, "write: %s", strerror(errno) );
   else if(pos == end)
     return 0;
   else if(pos>buff) // 0 bytes wrote == fd closed
-    fprintf(stderr, "%s: cannot write %d bytes, sent %d\n", __func__, size, (unsigned int)(pos - buff));
+    print( ERROR, "cannot write %d bytes, sent %d", size, (unsigned int)(pos - buff) );
   
   return -1;
 }
@@ -81,7 +81,7 @@ char *read_chunk(int fd, unsigned int size) {
   
   data = malloc(size);
   if(!data) {
-    fprintf(stderr, "%s: malloc: %s\n", __func__, strerror(errno));
+    print( ERROR, "malloc: %s", strerror(errno) );
     return NULL;
   }
   

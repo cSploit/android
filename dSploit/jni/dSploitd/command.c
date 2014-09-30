@@ -17,6 +17,7 @@
 #include <stddef.h>
 
 #include "dSploitd.h"
+#include "logger.h"
 #include "handler.h"
 #include "message.h"
 #include "child.h"
@@ -48,7 +49,7 @@ int on_child_done(child_node *c, int status) {
   }
   
   if(!msg) {
-    fprintf(stderr, "%s: cannot create messages\n", __func__);
+    print( ERROR, "cannot create messages" );
     return -1;
   }
   
@@ -65,14 +66,13 @@ int on_child_done(child_node *c, int status) {
     if(WIFSIGNALED(status)) {
       died_info->signal = WTERMSIG(status);
     } else {
-      fprintf(stderr, "%s: child exited unexpectly. status=%0*X\n",
-            __func__, (int) sizeof(int), status);
+      print(ERROR, "child exited unexpectly. status=%0*X", (int) sizeof(int), status);
       died_info->signal = 0;
     }
   }
   
   if(enqueue_message(&(c->conn->outcoming), msg)) {
-    fprintf(stderr, "%s: cannot enqueue messages\n", __func__);
+    print( ERROR, "cannot enqueue messages" );
     dump_message(msg);
     free_message(msg);
     return -1;
@@ -98,7 +98,7 @@ char **parse_argv(message *m, char skip_argv0) {
   n = string_array_size(m, start_info->argv);
   
   if(!n) {
-    fprintf(stderr, "%s: empty argv", __func__);
+    print( ERROR, "empty argv" );
     dump_message(m);
     return NULL;
   }
@@ -114,7 +114,7 @@ char **parse_argv(message *m, char skip_argv0) {
   argv = malloc(size);
   
   if(!argv) {
-    fprintf(stderr, "%s: malloc: %s", __func__, strerror(errno));
+    print( ERROR, "malloc: %s", strerror(errno) );
     return NULL;
   }
   
@@ -136,7 +136,7 @@ char **parse_argv(message *m, char skip_argv0) {
 
   strndup_error:
   
-  fprintf(stderr, "%s: strndup: %s\n", __func__, strerror(errno));
+  print( ERROR, "strndup: %s", strerror(errno) );
   for(i=0;i<n;i++)
     if(argv[i])
       free(argv[i]);
@@ -204,7 +204,7 @@ message *on_cmd_start(conn_node *conn, message *msg) {
   
   c = create_child(conn);
   if(!c) {
-    fprintf(stderr, "%s: cannot craete a new child\n", __func__);
+    print( ERROR, "cannot craete a new child" );
     goto start_fail;
   }
   
@@ -212,7 +212,7 @@ message *on_cmd_start(conn_node *conn, message *msg) {
   c->handler = h;
   
   if(!c->handler) {
-    fprintf(stderr, "%s: handler #%d not found\n", __func__, request_info->hid);
+    print( ERROR, "handler #%d not found", request_info->hid );
     goto start_fail;
   }
   
@@ -221,7 +221,7 @@ message *on_cmd_start(conn_node *conn, message *msg) {
   i = offsetof(struct cmd_start_info, argv);
   argv = parse_argv(msg, (cmd ? 1 : 0));
   if(!argv) {
-    fprintf(stderr, "%s: cannot parse argv\n", __func__);
+    print( ERROR, "cannot parse argv" );
     goto start_fail;
   }
   
@@ -230,7 +230,7 @@ message *on_cmd_start(conn_node *conn, message *msg) {
     cmd = parse_cmd(argv[0]);
     
     if(!cmd) {
-      fprintf(stderr, "%s: command not found: '%s'\n", __func__, argv[0]);
+      print( ERROR, "command not found: '%s'", argv[0] );
       goto start_fail;
     }
     
@@ -245,22 +245,22 @@ message *on_cmd_start(conn_node *conn, message *msg) {
   
   
   if(pipe2(pexec, O_CLOEXEC)) {
-    fprintf(stderr, "%s: exec pipe: %s\n", __func__, strerror(errno));
+    print( ERROR, "exec pipe: %s", strerror(errno) );
     goto start_fail;
   }
   
   if(h->have_stdin && pipe(pin)) {
-    fprintf(stderr, "%s: input pipe: %s\n", __func__, strerror(errno));
+    print( ERROR, "input pipe: %s", strerror(errno) );
     goto start_fail;
   }
   
   if(h->have_stdout && pipe(pout)) {
-    fprintf(stderr, "%s: output pipe: %s\n", __func__, strerror(errno));
+    print( ERROR, "output pipe: %s", strerror(errno) );
     goto start_fail;
   }
   
   if((pid = fork()) < 0) {
-    fprintf(stderr, "%s: fork: %s\n", __func__, strerror(errno));
+    print( ERROR, "fork: %s", strerror(errno) );
     goto start_fail;
   } else if(!pid) {
     // child
@@ -307,12 +307,12 @@ message *on_cmd_start(conn_node *conn, message *msg) {
     argv=NULL;
     
     if(read(pexec[0],&exec_errno, sizeof(int))) {
-      fprintf(stderr, "%s: execv: %s\n", __func__, strerror(exec_errno));
+      print( ERROR, "execv: %s", strerror(exec_errno) );
       waitpid(pid, NULL, 0);
       goto start_fail;
     }
 #ifndef NDEBUG
-    printf("%s: successfully started a child for '%s' (pid=%d)\n", __func__, h->name, pid);
+    print( DEBUG, "successfully started a child for '%s' (pid=%d)", h->name, pid );
 #endif
     close(pexec[0]);
   }
@@ -329,7 +329,7 @@ message *on_cmd_start(conn_node *conn, message *msg) {
   if(pthread_create(&(c->tid), NULL, &handle_child, c)) {
     i=errno;
     pthread_mutex_unlock(&(conn->children.control.mutex));
-    fprintf(stderr, "%s: pthread_craete: %s\n", __func__, strerror(i));
+    print( ERROR, "pthread_craete: %s", strerror(i) );
     goto start_fail;
   }
   list_add(&(conn->children.list), (node *)c);
@@ -340,7 +340,7 @@ message *on_cmd_start(conn_node *conn, message *msg) {
   msg = create_message(seq, sizeof(struct cmd_started_info), CTRL_ID);
   
   if(!msg) {
-    fprintf(stderr, "%s: cannot create messages\n", __func__);
+    print( ERROR, "cannot create messages" );
     goto start_fail;
   }
   
@@ -377,7 +377,7 @@ message *on_cmd_start(conn_node *conn, message *msg) {
   msg = create_message(seq, sizeof(struct cmd_fail_info), CTRL_ID);
   
   if(!msg) {
-    fprintf(stderr, "%s: cannot create messages\n", __func__);
+    print( ERROR, "cannot create messages" );
     return NULL;
   }
   
@@ -406,7 +406,7 @@ message *on_cmd_signal(conn_node *conn, message *msg) {
   pthread_mutex_unlock(&(conn->children.control.mutex));
   
   if(pid && kill(pid, info->signal)) {
-    fprintf(stderr, "%s: kill(%du, %d): %s\n", __func__, pid, info->signal, strerror(errno));
+    print( ERROR, "kill(%du, %d): %s", pid, info->signal, strerror(errno) );
   }
   
   return NULL;
@@ -429,7 +429,7 @@ int on_command_request(conn_node *c, message *msg) {
       reply = on_cmd_signal(c, msg);
       break;
     default:
-      fprintf(stderr, "%s: unknown command '%02hhX'\n", __func__, msg->data[0]);
+      print( ERROR, "unknown command '%02hhX'", msg->data[0] );
       reply = NULL;
       break;
   }
@@ -438,7 +438,7 @@ int on_command_request(conn_node *c, message *msg) {
     return 0;
   
   if(enqueue_message(&(c->outcoming), reply)) {
-    fprintf(stderr, "%s: cannot enqueue message", __func__);
+    print( ERROR, "cannot enqueue message" );
     dump_message(reply);
     free_message(reply);
     return -1;

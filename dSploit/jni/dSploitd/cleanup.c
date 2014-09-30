@@ -9,6 +9,7 @@
 #include <signal.h>
 #include <stdlib.h>
 
+#include "logger.h"
 #include "dSploitd.h"
 
 /**
@@ -31,10 +32,10 @@ int register_signal_handlers() {
   action.sa_flags = 0;
   
   if(sigaction(SIGINT, &action, NULL)) {
-    fprintf(stderr, "%s: sigaction(SIGINT): %s\n", __func__, strerror(errno));
+    print( ERROR, "sigaction(SIGINT): %s", strerror(errno) );
     return -1;
   } else if(sigaction(SIGTERM, &action, NULL)) {
-    fprintf(stderr, "%s: sigaction(SIGTERM): %s\n", __func__, strerror(errno));
+    print( ERROR, "sigaction(SIGTERM): %s", strerror(errno) );
     return -1;
   }
   

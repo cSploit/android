@@ -167,7 +167,7 @@ void *notifier(void *arg) {
     }
     if(ret) {
       LOGW("%s: cannot handle this", __func__);
-      android_dump_message(m);
+      dump_message(m);
     }
   }
   

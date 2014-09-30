@@ -14,6 +14,8 @@
 #include <linux/limits.h>
 #include <stdio.h>
 
+#include "logger.h"
+
 /**
  * @brief search @p cmd in the PATH environment variable.
  * @param cmd the command to search
@@ -24,20 +26,20 @@ char *find_cmd_in_path(char *cmd) {
   
   envpath = getenv("PATH");
   if(!envpath) {
-    fprintf(stderr, "%s: cannot get PATH environment variable!\n", __func__);
+    print( ERROR, "cannot get PATH environment variable!" );
     return NULL;
   }
   
   envpath = strdup(envpath);
   if(!envpath) {
-    fprintf(stderr, "%s: strdup: %s\n", __func__, strerror(errno));
+    print( ERROR, "strdup: %s", strerror(errno) );
     return NULL;
   }
   
   fpath=NULL;
   for(dir=strtok_r(envpath, ":", &lasts);dir && !fpath; dir=strtok_r(NULL, ":", &lasts)) {
     if(asprintf(&fpath, "%s/%s", dir, cmd) < 0) {
-      fprintf(stderr, "%s: asprintf: %s\n", __func__, strerror(errno));
+      print( ERROR, "asprintf: %s", strerror(errno) );
       fpath=NULL; // from "man asprintf": the contents of strp is undefined.
     } else if(access(fpath, X_OK)) {
       free(fpath);

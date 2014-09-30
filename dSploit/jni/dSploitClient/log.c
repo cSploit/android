@@ -1,19 +1,50 @@
 /* LICENSE
  * 
  */
-#include <stdlib.h>
+
+#include <android/log.h>
+#include <pthread.h>
 
 #include "log.h"
-#include "message.h"
+#include "logger.h"
 
-void android_dump_message(message *m) {
-  char *str;
+
+
+void android_logger(int level, char *fmt, ...) {
+  va_list argptr;
+  int prio;
   
-  str = message_to_string(m);
+  switch(level) {
+    case DEBUG:
+      prio = ANDROID_LOG_DEBUG;
+      break;
+    case INFO:
+      prio = ANDROID_LOG_INFO;
+      break;
+    case WARNING:
+      prio = ANDROID_LOG_WARN;
+      break;
+    case ERROR:
+      prio = ANDROID_LOG_ERROR;
+      break;
+    case FATAL:
+      prio = ANDROID_LOG_FATAL;
+      break;
+    default:
+      prio = ANDROID_LOG_VERBOSE;
+      break;
+  }
   
-  LOGD("%s", str);
+  va_start(argptr,fmt);
   
-  if(str)
-    free(str);
+  pthread_mutex_lock(&print_lock);
+  
+  __android_log_vprint(prio, LOG_TAG, fmt, argptr);
+  
+  pthread_mutex_unlock(&print_lock);
 }
-  
+
+
+void init_logger() {
+  register_logger(android_logger);
+}

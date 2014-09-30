@@ -11,7 +11,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#include "export.h"
+#include "logger.h"
 #include "list.h"
 #include "handler.h"
 #include "msgqueue.h"
@@ -36,7 +36,7 @@ int load_handlers() {
   d = opendir(HANDLERS_DIR);
   
   if(!d) {
-    fprintf(stderr, "%s: opendir: %s\n", __func__, strerror(errno));
+    print( ERROR, "opendir: %s", strerror(errno) );
     return -1;
   }
   
@@ -51,37 +51,37 @@ int load_handlers() {
       continue;
     
     if(asprintf(&path, HANDLERS_DIR "/%s", de->d_name) == -1) {
-      fprintf(stderr, "%s: asprintf: %s\n", __func__, strerror(errno));
+      print( ERROR, "asprintf: %s", strerror(errno) );
       continue;
     }
     
     if(!(handle = dlopen(path, RTLD_NOW))) {
-      fprintf(stderr, "%s: dlopen: %s\n", __func__, dlerror());
+      print( ERROR, "dlopen: %s", dlerror() );
       free(path);
       continue;
     }
     
     if(!(h = (handler *)dlsym(handle, "handler_info"))) {
-      fprintf(stderr, "%s: \"%s\": undefined reference to 'handler_info'\n", __func__, path);
+      print( ERROR, "\"%s\": undefined reference to 'handler_info'", path );
       goto close;
     }
     
     if(!(h->enabled)) {
-      fprintf(stderr, "%s: \"%s\": disabled\n", __func__, path);
+      print( ERROR, "\"%s\": disabled", path );
       goto close;
     }
     
     if(h->argv0 && access(h->argv0, X_OK)) {
-      fprintf(stderr, "%s: while loading \"%s\": access(\"%s\", X_OK): %s\n",
-              __func__, path, h->argv0, strerror(errno));
+      print(ERROR, "while loading \"%s\": access(\"%s\", X_OK): %s\n",
+            path, h->argv0, strerror(errno));
       goto close;
     }
     
     if(h->workdir) {
       test = opendir(h->workdir);
       if(!test) {
-        fprintf(stderr, "%s: \"%s\": opendir(\"%s\"): %s\n",
-                __func__, path, h->workdir, strerror(errno));
+        print(ERROR, "\"%s\": opendir(\"%s\"): %s\n",
+                path, h->workdir, strerror(errno));
         goto close;
       } else {
         closedir(test);
@@ -98,7 +98,7 @@ int load_handlers() {
     close:
       
     if(dlclose(handle))
-      fprintf(stderr, "%s: dlclose(\"%s\"): %s\n", __func__, path, dlerror());
+      print( ERROR, "dlclose(\"%s\"): %s", path, dlerror() );
     
     free(path);
   }
@@ -106,15 +106,15 @@ int load_handlers() {
   closedir(d);
   
   if(!handlers.head) {
-    fprintf(stderr, "%s: no handlers found\n", __func__);
+    print( ERROR, "no handlers found" );
     return -1;
   }
   
   for(h=(handler *) handlers.head;h->next;h=(handler *) h->next) {
     for(tmp=(handler *) h->next;tmp && tmp->id != h->id; tmp=(handler *) tmp->next);
     if(tmp) {
-      fprintf(stderr, "%s: \"%s\" and \"%s\" has the same id. (id=%d)\n",
-              __func__, h->name, tmp->name, h->id);
+      print(ERROR, "\"%s\" and \"%s\" has the same id. (id=%d)\n",
+              h->name, tmp->name, h->id);
       return -1;
     }
   }
@@ -130,7 +130,7 @@ void unload_handlers() {
   
   while((h=(handler *) queue_get(&(handlers)))) {
     if(dlclose(h->dl_handle))
-      fprintf(stderr, "%s: dlclose on \"%s\": %s\n", __func__, h->name, dlerror());
+      print( ERROR, "dlclose on \"%s\": %s", h->name, dlerror() );
   }
 }
 
@@ -160,7 +160,7 @@ int send_handlers_list(conn_node *conn) {
                      CTRL_ID);
   
   if(!m) {
-    fprintf(stderr, "%s: cannot create messages\n", __func__);
+    print( ERROR, "cannot create messages" );
     goto exit;
   }
   
@@ -181,7 +181,7 @@ int send_handlers_list(conn_node *conn) {
   }
   
   if(enqueue_message(&(conn->outcoming), m)) {
-    fprintf(stderr, "%s: cannot enqueue message\n", __func__);
+    print( ERROR, "cannot enqueue message" );
     dump_message(m);
     free_message(m);
   } else {
@@ -192,42 +192,6 @@ int send_handlers_list(conn_node *conn) {
   
   return ret;
 }
-/* one by one version ( draft )
-int send_handlers_list(void *conn) {
-  handler *h;
-  message *m;
-  struct hndl_list_info *handlers_info;
-  char error;
-  
-  error=0;
-  
-  for(h=(handler *) handlers;h;h=(handler *) h->next) {
-    m = create_message(0, sizeof(struct cmd_handler_info) + strlen(h->name) + 1, COMMAND_RECEIVER_ID);
-    
-    if(!m) {
-      fprintf(stderr, "%s: cannot create messages\n", __func__);
-      error=1;
-      continue;
-    }
-    
-    handler_info = (struct cmd_handler_info *) m->data;
-    handler_info->cmd_action = CMD_HNDL;
-    handler_info->id = h->id;
-    handler_info->flags = h->flags;
-    strcpy(handler_info->name, h->name);
-    
-    if(enqueue_message(&(outcoming_messages), m, conn) {
-      fprintf(stderr, "%s: cannot enqueue message\n", __func__);
-      dump_message(m);
-      free_message(m);
-      error=1;
-    }
-  }
-  
-  if(error)
-    return -1;
-  return 0;
-} */
 
 int on_handler_request(conn_node *c, message *m) {
   
@@ -235,7 +199,7 @@ int on_handler_request(conn_node *c, message *m) {
     case HNDL_LIST:
       return send_handlers_list(c);
     default:
-      fprintf(stderr, "%s: unknown request code: %02hhX\n", __func__, m->data[0]);
+      print( ERROR, "unknown request code: %02hhX", m->data[0] );
       return -1;
   }
 }

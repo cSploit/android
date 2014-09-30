@@ -8,8 +8,8 @@
 #include <string.h>
 #include <pthread.h>
 
-#include "export.h"
 #include "control.h"
+#include "logger.h"
 
 /* part of this code has been taken from:
  * Gentoo Linux Documentation - POSIX threads explained
@@ -22,11 +22,11 @@
  */
 int control_init(data_control *mycontrol) {
   if (pthread_mutex_init(&(mycontrol->mutex),NULL)) {
-    fprintf(stderr, "%s: pthread_mutex_init: %s\n", __func__, strerror(errno));
+    print( ERROR, "pthread_mutex_init: %s", strerror(errno) );
     return -1;
   }
   if (pthread_cond_init(&(mycontrol->cond),NULL)) {
-    fprintf(stderr, "%s: pthread_cond_init: %s\n", __func__, strerror(errno));
+    print( ERROR, "pthread_cond_init: %s", strerror(errno) );
     return -1;
   }
   mycontrol->active=1;
@@ -40,11 +40,11 @@ int control_init(data_control *mycontrol) {
  */
 int control_destroy(data_control *mycontrol) {
   if (pthread_cond_destroy(&(mycontrol->cond))) {
-    fprintf(stderr, "%s: pthread_cond_destroy: %s\n", __func__, strerror(errno));
+    print( ERROR, "pthread_cond_destroy: %s", strerror(errno) );
     return -1;
   }
   if (pthread_mutex_destroy(&(mycontrol->mutex))) {
-    fprintf(stderr, "%s: pthread_mutex_destroy: %s\n", __func__, strerror(errno));
+    print( ERROR, "pthread_mutex_destroy: %s", strerror(errno) );
     return -1;
   }
   mycontrol->active=0;
@@ -58,7 +58,7 @@ int control_destroy(data_control *mycontrol) {
  */
 int control_activate(data_control *mycontrol) {
   if (pthread_mutex_lock(&(mycontrol->mutex))) {
-    fprintf(stderr, "%s: pthread_mutex_lock: %s\n", __func__, strerror(errno));
+    print( ERROR, "pthread_mutex_lock: %s", strerror(errno) );
     return -1;
   }
   mycontrol->active=1;
@@ -74,7 +74,7 @@ int control_activate(data_control *mycontrol) {
  */
 int control_deactivate(data_control *mycontrol) {
   if (pthread_mutex_lock(&(mycontrol->mutex))) {
-    fprintf(stderr, "%s: pthread_mutex_lock: %s\n", __func__, strerror(errno));
+    print( ERROR, "pthread_mutex_lock: %s", strerror(errno) );
     return -1;
   }
   mycontrol->active=0;

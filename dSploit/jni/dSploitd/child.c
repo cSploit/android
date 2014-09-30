@@ -23,6 +23,7 @@
 #include "sequence.h"
 #include "handler.h"
 #include "io.h"
+#include "logger.h"
 
 #define MIN(a, b) (a < b ? a : b)
 
@@ -35,7 +36,7 @@ child_node *create_child(conn_node *conn) {
   
   c = malloc(sizeof(child_node));
   if(!c) {
-    fprintf(stderr, "%s: malloc: %s\n", __func__, strerror(errno));
+    print( ERROR, "malloc: %s", strerror(errno) );
     return NULL;
   }
   
@@ -63,7 +64,7 @@ int read_stdout(child_node *c) {
   buff = malloc(STDOUT_BUFF_SIZE);
     
   if(!buff) {
-    fprintf(stderr, "%s [%s]: malloc: %s\n", __func__, c->handler->name, strerror(errno));
+    print( ERROR, "malloc: %s", strerror(errno));
     return -1;
   }
   
@@ -80,8 +81,9 @@ int read_stdout(child_node *c) {
     while(!ret && (count=read(c->stdout_fd, buff, STDOUT_BUFF_SIZE)) > 0) {
       if(append_to_buffer(&(c->output_buff), buff, count)) {
         ret = -1;
+        continue;
       }
-      while(!ret && (line = get_line_from_buffer(&(c->output_buff)))) {
+      while((line = get_line_from_buffer(&(c->output_buff)))) {
         m = c->handler->output_parser(line);
         if(m) {
           m->head.id = c->id;
@@ -89,10 +91,10 @@ int read_stdout(child_node *c) {
           
 #ifdef BROADCAST_EVENTS
           if(broadcast_message(m)) {
-            fprintf(stderr, "%s [%s]: cannot broadcast message.\n", __func__, c->handler->name);
+            print( ERROR, "cannot broadcast messages.");
 #else
           if(enqueue_message(&(c->conn->outcoming), m)) {
-            fprintf(stderr, "%s [%s]: cannot enqueue the following message.\n", __func__, c->handler->name);
+            print( ERROR, "cannot enqueue messages.");
 #endif
             dump_message(m);
             free_message(m);
@@ -112,13 +114,13 @@ int read_stdout(child_node *c) {
       m = create_message(c->seq + 1, count, c->id);
       if(!m) {
         buff[MIN(count, STDOUT_BUFF_SIZE -1)] = '\0';
-        fprintf(stderr, "%s [%s]: cannot send the following output: '%s'\n", __func__, c->handler->name, buff);
+        print( ERROR, "cannot send the following output: '%s'", buff);
         ret = -1;
         break;
       }
       memcpy(m->data, buff, count);
       if(enqueue_message(&(c->conn->outcoming), m)) {
-        fprintf(stderr, "%s [%s]: cannot enqueue the following message.\n", __func__, c->handler->name);
+        print( ERROR, "cannot enqueue messages.");
         dump_message(m);
         free_message(m);
         ret = -1;
@@ -134,7 +136,7 @@ int read_stdout(child_node *c) {
   release_buffer(&(c->output_buff));
   
   if(count<0) {
-    fprintf(stderr, "%s [%s]: read: %s\n", __func__, c->handler->name, strerror(errno));
+    print( ERROR, "read: %s", strerror(errno));
     ret = -1;
   }
   return ret;
@@ -161,19 +163,19 @@ void *handle_child(void *arg) {
   wait_res = 0;
   
 #ifndef NDEBUG
-  printf("%s: new child started. (name=%s, pid=%d)\n", __func__, c->handler->name, c->pid);
+  print( DEBUG, "new child started. (name=%s, pid=%d)", c->handler->name, c->pid );
 #endif
   
   if(c->handler->have_stdout) {
     if((stdout_error = read_stdout(c))) {
-      fprintf(stderr, "%s [%s]: cannot read process stdout\n", __func__, c->handler->name);
+      print(ERROR, "cannot read process stdout");
     }
   }
   
   if((wait_res = waitpid(c->pid, &status, 0)) != c->pid) {
-    fprintf(stderr, "%s [%s]: waitpid: %s\n", __func__, c->handler->name, strerror(errno));
+    print(ERROR, "waitpid: %s", strerror(errno));
   } else if(on_child_done(c, status)) {
-    fprintf(stderr, "%s [%s]: cannot notify child termination.\n", __func__, c->handler->name);
+    print(ERROR, "cannot notify child termination.");
   } else if(!stdout_error)
     ret = 0;
   
@@ -182,7 +184,7 @@ void *handle_child(void *arg) {
   send_to_graveyard(c->tid);
 #else
   if(asprintf(&name, "%s(name=%s, pid=%d)", __func__, c->handler->name, c->pid)<0) {
-    fprintf(stderr, "%s: asprintf: %s\n", __func__, strerror(errno));
+    print( ERROR, "asprintf: %s", strerror(errno) );
     name=NULL;
   }
   _send_to_graveyard(c->tid, name);
@@ -261,11 +263,11 @@ int on_child_message(conn_node *conn, message *m) {
   pthread_mutex_unlock(&(conn->children.control.mutex));
   
   if(!c) {
-    fprintf(stderr, "%s: child #%u not found\n", __func__, m->head.id);
+    print( ERROR, "child #%u not found", m->head.id );
   } else if(write_error) {
-    fprintf(stderr, "%s: cannot send message to child #%u\n", __func__, m->head.id);
+    print( ERROR, "cannot send message to child #%u", m->head.id );
   } else if(blind_error) {
-    fprintf(stderr, "%s: received message for blind child #%u\n", __func__, m->head.id);
+    print( ERROR, "received message for blind child #%u", m->head.id );
   } else {
     return 0;
   }

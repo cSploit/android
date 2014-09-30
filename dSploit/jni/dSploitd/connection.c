@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "logger.h"
 #include "list.h"
 #include "control.h"
 #include "message.h"
@@ -77,7 +78,7 @@ void *connection_writer(void *arg) {
   c=(conn_node *) arg;
   
 #ifndef NDEBUG
-  printf("%s: started (fd=%d, tid=%lu)\n", __func__, c->fd, pthread_self());
+  print( DEBUG, "started (fd=%d, tid=%lu)", c->fd, pthread_self() );
 #endif
   
   pthread_mutex_lock(&(c->outcoming.control.mutex));
@@ -106,7 +107,7 @@ void *connection_writer(void *arg) {
     msg = mn->msg;
     
     if(send_message(c->fd, msg)) {
-      fprintf(stderr, "%s: cannot send the following message\n", __func__);
+      print( ERROR, "cannot send the following message" );
       dump_message(msg);
     }
     
@@ -137,7 +138,7 @@ void *connection_worker(void *arg) {
   c=(conn_node *) arg;
   
 #ifndef NDEBUG
-  printf("%s: started (fd=%d, tid=%lu)\n", __func__, c->fd, pthread_self());
+  print( DEBUG, "started (fd=%d, tid=%lu)", c->fd, pthread_self() );
 #endif
   
   pthread_mutex_lock(&(c->incoming.control.mutex));
@@ -159,12 +160,12 @@ void *connection_worker(void *arg) {
     
     if(IS_CTRL(msg)) {
       if(on_control_request(c, msg)) {
-        fprintf(stderr, "%s: cannot handle the following control message\n", __func__);
+        print( ERROR, "cannot handle the following control message" );
         dump_message(msg);
       }
     } else {
       if(on_child_message(c, msg)) {
-        fprintf(stderr, "%s: cannot handle the following message\n", __func__);
+        print( ERROR, "cannot handle the following message" );
         dump_message(msg);
       }
     }
@@ -199,7 +200,7 @@ void *connection_reader(void *arg) {
   c=(conn_node *) arg;
   
 #ifndef NDEBUG
-  printf("%s: started (fd=%d, tid=%lu)\n", __func__, c->fd, pthread_self());
+  print( DEBUG, "started (fd=%d, tid=%lu)", c->fd, pthread_self() );
 #endif
   
   while((msg = read_message(c->fd))) {
@@ -212,7 +213,7 @@ void *connection_reader(void *arg) {
     pthread_mutex_unlock(&(c->control.mutex));
     
     if(enqueue_message(&(c->incoming), msg)) {
-      fprintf(stderr, "%s: cannot enqueue received message\n", __func__);
+      print( ERROR, "cannot enqueue received message" );
       dump_message(msg);
       free_message(msg);
     }
@@ -235,7 +236,7 @@ void *connection_reader(void *arg) {
   close(c->fd);
 
 #ifndef NDEBUG
-  printf("%s: connection closed (fd=%d)\n", __func__, c->fd);
+  print( DEBUG, "connection closed (fd=%d)", c->fd );
 #endif
   
   // add me to the death list
@@ -262,7 +263,7 @@ int serve_new_client(int fd) {
   pthread_mutex_unlock(&(connections.control.mutex));
   
   if(!writer_created) {
-    fprintf(stderr, "%s: connections disabled\n", __func__);
+    print( ERROR, "connections disabled" );
     return -1;
   }
   
@@ -271,7 +272,7 @@ int serve_new_client(int fd) {
   c = malloc(sizeof(conn_node));
   
   if(!c) {
-    fprintf(stderr, "%s: malloc: %s\n", __func__, strerror(errno));
+    print( ERROR, "malloc: %s", strerror(errno) );
     return -1;
   }
 
@@ -279,7 +280,7 @@ int serve_new_client(int fd) {
   
   if(control_init(&(c->control)) || control_init(&(c->incoming.control)) ||
     control_init(&(c->outcoming.control))) {
-    fprintf(stderr, "%s: cannot init cotnrols\n", __func__);
+    print( ERROR, "cannot init cotnrols" );
     free_connection(c);
     return -1;
   }
@@ -292,7 +293,7 @@ int serve_new_client(int fd) {
       (worker_created = pthread_create(&dummy, NULL, &connection_worker, (void *)c)) ||
       pthread_create(&dummy, NULL, &connection_reader, (void *)c)) {
     pthread_mutex_unlock(&(connections.control.mutex));
-    fprintf(stderr, "%s: pthread_create: %s\n", __func__, strerror(errno));
+    print( ERROR, "pthread_create: %s", strerror(errno) );
     goto create_error;
   }
   

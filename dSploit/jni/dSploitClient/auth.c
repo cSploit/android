@@ -81,9 +81,6 @@ jboolean jlogin(JNIEnv *env, jclass clazz, jstring jusername, jstring jhash) {
   }
   pthread_mutex_unlock(&write_lock);
   
-  LOGD("%s: sent auth message", __func__);
-  android_dump_message(m);
-  
   pthread_mutex_lock(&logged.control.mutex);
   while(logged.status == LOGIN_WAIT && logged.control.active) {
     pthread_cond_wait(&(logged.control.cond), &(logged.control.mutex));

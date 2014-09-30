@@ -10,7 +10,7 @@
 #include <assert.h>
 #include <pthread.h>
 
-#include "export.h"
+#include "logger.h"
 #include "message.h"
 #include "msgqueue.h"
 
@@ -30,7 +30,7 @@ int enqueue_message(struct msgqueue *queue, message *msg) {
   if(queue->control.active) {
     if(!(m=malloc(sizeof(msg_node)))) {
       pthread_mutex_unlock(&(queue->control.mutex));
-      fprintf(stderr, "%s: malloc: %s\n", __func__, strerror(errno));
+      print( ERROR, "malloc: %s", strerror(errno) );
       return -1;
     }
     m->next=NULL;
@@ -45,7 +45,7 @@ int enqueue_message(struct msgqueue *queue, message *msg) {
   } else {
     pthread_mutex_unlock(&(queue->control.mutex));
     
-    fprintf(stderr, "%s: message queue disabled\n", __func__);
+    print( ERROR, "message queue disabled" );
     
     return -1;
   }
