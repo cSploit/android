@@ -24,6 +24,7 @@
 #include "reaper.h"
 #include "logger.h"
 #include "authenticator.h"
+#include "file_logger.h"
 
 int sockfd;
 
@@ -76,7 +77,6 @@ void stop_daemon() {
   close(sockfd);
 }
 
-
 int main(int argc, char **argv) {
   struct sockaddr_un addr;
   pid_t pid, sid;
@@ -116,20 +116,8 @@ int main(int argc, char **argv) {
   close(STDOUT_FILENO);
   close(STDERR_FILENO);
 
-  clfd = open(LOG_PATH, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-  
-  if(clfd==-1) {
-    print( FATAL, "open: %s", strerror(errno) );
-    return EXIT_FAILURE;
-  }
-  
-  setvbuf(stderr, NULL, _IOLBF, 1024);
-  setvbuf(stdout, NULL, _IOLBF, 1024);
-
-  if (dup2(clfd, fileno(stderr)) != fileno(stderr) ||
-      dup2(clfd, fileno(stdout)) != fileno(stdout))
-  {
-    print( FATAL, "dup2: %s", strerror(errno) );
+  if(open_logfile(LOG_PATH)) {
+    print( FATAL, "cannot open logfile");
     return EXIT_FAILURE;
   }
 

@@ -8,13 +8,11 @@
 
 #include "logger.h"
 
-void default_logger(int, char *, ...);
-
-void (*_print)(int, char *, ...) = default_logger;
+void (*_print)(int, char *, ...) = std_logger;
 
 pthread_mutex_t print_lock = PTHREAD_MUTEX_INITIALIZER;
 
-void default_logger(int level, char *fmt, ...) {
+void std_logger(int level, char *fmt, ...) {
   va_list argptr;
   FILE *stream;
   

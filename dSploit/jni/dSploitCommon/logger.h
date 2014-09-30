@@ -15,6 +15,8 @@ enum loglevel {
   FATAL,
 };
 
+extern void std_logger(int, char *, ...);
+
 extern pthread_mutex_t print_lock;
 extern void (*_print)(int, char *, ...);
 
