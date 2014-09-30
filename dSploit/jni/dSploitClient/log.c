@@ -8,8 +8,6 @@
 #include "log.h"
 #include "logger.h"
 
-
-
 void android_logger(int level, char *fmt, ...) {
   va_list argptr;
   int prio;
@@ -42,9 +40,4 @@ void android_logger(int level, char *fmt, ...) {
   __android_log_vprint(prio, LOG_TAG, fmt, argptr);
   
   pthread_mutex_unlock(&print_lock);
-}
-
-
-void init_logger() {
-  register_logger(android_logger);
 }

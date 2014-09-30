@@ -120,6 +120,8 @@ int main(int argc, char **argv) {
     print( FATAL, "cannot open logfile");
     return EXIT_FAILURE;
   }
+  
+  set_logger(file_logger);
 
   if(deamonize) {
     sid = setsid();

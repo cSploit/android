@@ -19,6 +19,6 @@
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG  , LOG_TAG, __VA_ARGS__)
 #define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
 
-void init_logger(void);
+void android_logger(int level, char *fmt, ...);
 
 #endif

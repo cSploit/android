@@ -21,6 +21,7 @@
 #include "child.h"
 #include "msgqueue.h"
 #include "auth.h"
+#include "logger.h"
 
 #define NUMELEM(a) (sizeof(a)/sizeof(a[0]))
 
@@ -67,7 +68,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* pVm, void* reserved _U_) {
   }
   
   init_structs();
-  init_logger();
+  set_logger(android_logger);
   
   if(init_controls()) {
     LOGF("%s: cannot init controls", __func__);
