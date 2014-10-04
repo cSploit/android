@@ -6,8 +6,10 @@
 #include <jni.h>
 #include <string.h>
 
+#include "log.h"
 #include "cache.h"
 
+JavaVM *jvm = NULL;
 struct cache cache;
 
 int init_class_cache(JNIEnv *env, struct class_cache *c, const char *class_name) {
@@ -174,7 +176,7 @@ int init_java_cache(JNIEnv *env) {
   return 0;
 }
 
-int init_cache(JNIEnv *env) {
+int _init_cache(JNIEnv *env) {
   if(init_java_cache(env))
     return -1;
   if(init_dsploit_cache(env))
@@ -182,7 +184,60 @@ int init_cache(JNIEnv *env) {
   return 0;
 }
 
-int free_cache(JNIEnv *env) {
-  //TODO
+int init_cache(JavaVM *pVm) {
+  int ret;
+  JNIEnv *env;
+  
+  ret = (*pVm)->GetEnv(pVm, (void **)&env, JNI_VERSION_1_6);
+  
+  if(ret != JNI_OK) {
+    LOGF("%s: GetEnv: %d", __func__, ret);
+    return -1;
+  }
+  
+  if(_init_cache(env))
+    return -1;  
+  
+  jvm = pVm;
+  
   return 0;
+  
+}
+
+void _free_cache(JNIEnv *env) {
+  int i;
+  jclass *global_refs[] = {
+    &(cache.java.net.inetaddress.class),
+    &(cache.dsploit.core.system.class),
+    &(cache.dsploit.core.client.class),
+    &(cache.dsploit.events.newline.class),
+    &(cache.dsploit.events.child_end.class),
+    &(cache.dsploit.events.child_died.class),
+    &(cache.dsploit.events.hop.class),
+    &(cache.dsploit.events.port.class),
+    &(cache.dsploit.events.os.class),
+  };
+  
+  for(i=0;i<NUMELEM(global_refs); i++) {
+    (*env)->DeleteGlobalRef(env, *(global_refs[i]));
+  }
+}
+
+void free_cache() {
+  JNIEnv *env;
+  int i;
+  
+  if(!jvm)
+    return;
+  
+  i=(*jvm)->GetEnv(jvm, (void **) &env, JNI_VERSION_1_6);
+  
+  if(i != JNI_OK) {
+    LOGE("%s: GetEnv: %d", __func__, i);
+    return;
+  }
+  
+  _free_cache(env);
+  
+  jvm = NULL;
 }

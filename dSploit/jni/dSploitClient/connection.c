@@ -10,6 +10,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #include "log.h"
 #include "control.h"
@@ -65,8 +66,6 @@ jboolean connect_unix(JNIEnv *env, jclass clazz __attribute__((unused)), jstring
     goto error;
   }
   
-  control_activate(&(incoming_messages.control));
-  
   if(start_reader()) {
     LOGE("%s: cannot start reader", __func__);
     goto error;
@@ -90,12 +89,11 @@ jboolean connect_unix(JNIEnv *env, jclass clazz __attribute__((unused)), jstring
   
   error:
   
-  control_deactivate(&(incoming_messages.control));
+  stop_notifier();
   
   close(sockfd);
   
   stop_reader();
-  stop_notifier();
   
   sockfd = -1;
   
@@ -108,11 +106,14 @@ jboolean connect_unix(JNIEnv *env, jclass clazz __attribute__((unused)), jstring
 }
 
 void disconnect_unix(JNIEnv *env __attribute__((unused)), jclass clazz __attribute__((unused))) {
-  control_deactivate(&(incoming_messages.control));
+  stop_notifier();
   
+  pthread_mutex_lock(&write_lock);
   close(sockfd);
+  sockfd=-1;
+  pthread_mutex_unlock(&write_lock);
   
   stop_reader();
-  stop_notifier();
+  
   unload_handlers();
 }

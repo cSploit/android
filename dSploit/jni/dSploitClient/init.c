@@ -22,10 +22,9 @@
 #include "msgqueue.h"
 #include "auth.h"
 #include "logger.h"
+#include "fini.h"
 
 #define NUMELEM(a) (sizeof(a)/sizeof(a[0]))
-
-JavaVM *jvm;
 
 void init_structs() {
   memset(&handlers, 0, sizeof(struct handlers_list));
@@ -58,13 +57,14 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* pVm, void* reserved _U_) {
     { "Disconnect", "()V", disconnect_unix },
     { "Kill", "(II)V", kill_child },
     { "SendTo", "(I[B)Z", send_to_child },
+    { "StartDaemon", "(Ljava/lang/String;)Z", start_daemon },
   };
   
   ret = (*pVm)->GetEnv(pVm, (void **)&env, JNI_VERSION_1_6);
   
   if(ret != JNI_OK) {
     LOGF("%s: GetEnv: %d", __func__, ret);
-    return -1;
+    goto error;
   }
   
   init_structs();
@@ -72,12 +72,12 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* pVm, void* reserved _U_) {
   
   if(init_controls()) {
     LOGF("%s: cannot init controls", __func__);
-    return -1;
+    goto error;
   }
   
-  if(init_cache(env)) {
+  if(_init_cache(env)) {
     LOGF("%s: cannot init cache", __func__);
-    return -1;
+    goto error;
   }
   
   ret = (*env)->RegisterNatives(env, cache.dsploit.core.client.class, nm, NUMELEM(nm));
@@ -91,11 +91,18 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* pVm, void* reserved _U_) {
     
     LOGF("%s: cannot register native methods: %d", __func__, ret);
     
-    return -1;
+    goto error;
   }
   
   jvm = pVm;
   
   return JNI_VERSION_1_6;
+  
+  error:
+  
+  destroy_controls();
+  _free_cache(env);
+  
+  return -1;
 }
 

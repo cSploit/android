@@ -55,6 +55,10 @@ extern struct cache {
   struct java_cache java;
 } cache;
 
-int init_cache(JNIEnv *);
+extern JavaVM *jvm;
 
+int _init_cache(JNIEnv *);
+int init_cache(JavaVM *);
+void _free_cache(JNIEnv *);
+void free_cache(void);
 #endif

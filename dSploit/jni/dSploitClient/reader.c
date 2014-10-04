@@ -25,6 +25,7 @@ void *reader(void *arg) {
     if(enqueue_message(&(incoming_messages), m)) {
       LOGE("%s: cannot enqueue messages", __func__);
     }
+    LOGD("%s: next round", __func__);
   }
   
   LOGI("%s: quitting", __func__);
@@ -40,8 +41,13 @@ int start_reader() {
   return 0;
 }
 
+/**
+ * @brief stop the reader thread.
+ * WARNING: ensure to close ::sockfd before call this.
+ */
 void stop_reader() {
   if(reader_tid) {
+    control_deactivate(&(incoming_messages.control));
     pthread_join(reader_tid, NULL);
     reader_tid = 0;
   }

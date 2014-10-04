@@ -14,7 +14,7 @@
 #include "child.h"
 #include "event.h"
 #include "controller.h"
-#include "init.h"
+#include "cache.h"
 #include "handler.h"
 #include "control_messages.h"
 
@@ -158,6 +158,10 @@ void *notifier(void *arg) {
     }
     
     mn = (msg_node *) queue_get(&(incoming_messages.list));
+    
+    if(!mn)
+      continue;
+    
     m=mn->msg;
     
     if(IS_CTRL(m)) {
@@ -193,6 +197,7 @@ int start_notifier() {
 
 void stop_notifier() {
   if(notifier_tid) {
+    control_deactivate(&(incoming_messages.control));
     pthread_join(notifier_tid, NULL);
     notifier_tid = 0;
   }
