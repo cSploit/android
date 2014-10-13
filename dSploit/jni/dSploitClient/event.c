@@ -137,17 +137,12 @@ jobject inaddr_to_inetaddress(JNIEnv *env, in_addr_t a) {
  * @returns the jobject on success, NULLl on error.
  */
 jobject create_hop_event(JNIEnv *env, child_node *c, void *arg) {
-  jobject addr1, addr2, res;
+  jobject addr, res;
   struct nmap_hop_info *hop_info;
-  
-  addr1 = inaddr_to_inetaddress(env, c->target);
-  
-  if(!addr1)
-    return NULL;
   
   hop_info = (struct nmap_hop_info*)arg;
   
-  addr2 = inaddr_to_inetaddress(env, hop_info->address);
+  addr = inaddr_to_inetaddress(env, hop_info->address);
   
   if(!addr2)
     return NULL;
@@ -155,10 +150,9 @@ jobject create_hop_event(JNIEnv *env, child_node *c, void *arg) {
   res = (*env)->NewObject(env,
                           cache.dsploit.events.hop.class,
                           cache.dsploit.events.hop.ctor,
-                          addr1, hop_info->hop, hop_info->usec, addr2);
+                          c->id, hop_info->hop, hop_info->usec, addr);
   
-  (*env)->DeleteLocalRef(env, addr1);
-  (*env)->DeleteLocalRef(env, addr2);
+  (*env)->DeleteLocalRef(env, addr);
   
   if(!res && (*env)->ExceptionCheck(env)) {
     (*env)->ExceptionDescribe(env);
@@ -175,17 +169,12 @@ jobject create_hop_event(JNIEnv *env, child_node *c, void *arg) {
  * @returns a new object on success, NULL on error.
  */
 jobject create_port_event(JNIEnv *env, child_node *c, void *arg) {
-  jobject addr, res;
+  jobject res;
   jstring jproto;
   jstring jservice, jversion;
   message *m;
   struct nmap_service_info *service_info;
   char *pos;
-  
-  addr = inaddr_to_inetaddress(env, c->target);
-  
-  if(!addr)
-    return NULL;
   
   res = NULL;
   jservice = jversion = NULL;
@@ -231,7 +220,7 @@ jobject create_port_event(JNIEnv *env, child_node *c, void *arg) {
   res = (*env)->NewObject(env,
                           cache.dsploit.events.port.class,
                           cache.dsploit.events.port.ctor,
-                          addr, jproto, service_info->port, jservice, jversion);
+                          c->id, jproto, service_info->port, jservice, jversion);
   
   cleanup:
   
@@ -250,8 +239,6 @@ jobject create_port_event(JNIEnv *env, child_node *c, void *arg) {
   if(jproto)
     (*env)->DeleteLocalRef(env, jproto);
   
-  (*env)->DeleteLocalRef(env, addr);
-  
   return res;
 }
 
@@ -263,14 +250,9 @@ jobject create_port_event(JNIEnv *env, child_node *c, void *arg) {
  */
 jobject create_os_event(JNIEnv *env, child_node *c, void *arg) {
   jstring jos, jtype;
-  jobject jtarget, res;
+  jobject res;
   struct nmap_os_info *os_info;
   char *pos;
-  
-  jtarget = inaddr_to_inetaddress(env, c->target);
-  
-  if(!jtarget)
-    return NULL;
   
   res = NULL;
   jtype = jos = NULL;
@@ -290,7 +272,7 @@ jobject create_os_event(JNIEnv *env, child_node *c, void *arg) {
   res = (*env)->NewObject(env,
                           cache.dsploit.events.os.class,
                           cache.dsploit.events.os.ctor,
-                          jtarget, os_info->accuracy, jos, jtype);
+                          c->id, os_info->accuracy, jos, jtype);
   
   cleanup:
   
@@ -304,9 +286,6 @@ jobject create_os_event(JNIEnv *env, child_node *c, void *arg) {
   
   if(jos)
     (*env)->DeleteLocalRef(env, jos);
-  
-  if(jtarget)
-    (*env)->DeleteLocalRef(env, jtarget);
   
   return res;
 }

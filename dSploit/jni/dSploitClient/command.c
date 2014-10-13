@@ -178,7 +178,7 @@ int on_command(JNIEnv *env, message *m) {
 #define ESCAPE_FOUND 4
 #define END_OF_STRING 8
 
-int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jhandler, jstring jcmd, jstring jtarget) {
+int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jhandler, jstring jcmd) {
   char status;
   char *pos, *start, *end;
   const char *utf;
@@ -332,23 +332,6 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
   }
   
   c->handler = h;
-  // check for optional target argument
-  if(jtarget) {
-    (*env)->ReleaseStringUTFChars(env, jcmd, utf);
-    utf = (*env)->GetStringUTFChars(env, jtarget, NULL);
-    utf_parent = &jtarget;
-    
-    
-    if(!utf) {
-      LOGE("%s: cannot get target string", __func__);
-      goto jni_error;
-    }
-    
-    if(!inet_pton(AF_INET, utf, &(c->target))) {
-      LOGE("%s: invalid IPv4 address: \"%s\"", __func__, utf);
-      goto exit;
-    }
-  }
   
   // add child to list
   

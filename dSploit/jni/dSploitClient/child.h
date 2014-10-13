@@ -22,8 +22,6 @@ typedef struct {
   
   struct handler *handler;  ///< handler for this child
   
-  in_addr_t target;         ///< target of this child
-  
   buffer    buffer;         ///< ::buffer for received output
   
 } child_node;

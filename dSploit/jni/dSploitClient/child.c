@@ -28,7 +28,6 @@ child_node *create_child(uint16_t pending_seq_no) {
   memset(c, 0, sizeof(child_node));
   c->pending = 1;
   c->seq = pending_seq_no;
-  c->target = INADDR_ANY;
   c->id = CTRL_ID;
   
   return c;
