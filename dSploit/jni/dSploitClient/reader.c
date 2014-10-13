@@ -25,7 +25,6 @@ void *reader(void *arg) {
     if(enqueue_message(&(incoming_messages), m)) {
       LOGE("%s: cannot enqueue messages", __func__);
     }
-    LOGD("%s: next round", __func__);
   }
   
   LOGI("%s: quitting", __func__);
