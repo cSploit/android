@@ -78,8 +78,8 @@ directories="/enc/trans/
 /racc/
 /"
 
-build_tools() {
-  echo "*** creating tools package ***"
+build_core() {
+  echo "*** creating core package ***"
 
   ndk_build=$(which ndk-build) || \
   (echo "android NDK not found, please ensure that it's directory is in your PATH"; die)
@@ -96,42 +96,67 @@ build_tools() {
       $sudo touch "${ndk_dir}${s}" >&3 2>&1 || die
     fi
   done
+  
+  
+  bins=$(readlink -f ../libs/armeabi/)
+  jni_root=$(readlink -f ./)
+  src=$(readlink -f ../src)
+  out="/tmp/dSploitCore"
+  
+  rm -rf "${out}" >&3 2>&1 || die
+  mkdir -p "${out}" >&3 2>&1 || die
 
   echo -n "building native executables..."
   ndk-build -j$(grep -E "^processor" /proc/cpuinfo | wc -l) >&3 2>&1 || die
   echo -ne "ok\ncopying programs..."
+  cp "${bins}/dSploitd" "${out}/"
   for tool in arpspoof tcpdump ettercap hydra nmap fusemounts; do
-    mkdir -p ./tools/$tool >&3 2>&1
-    cp ../libs/armeabi/$tool ./tools/$tool/$tool >&3 2>&1 || die
+    mkdir -p "${out}/tools/$tool" >&3 2>&1
+    cp "${bins}/$tool" "${out}/tools/$tool/$tool" >&3 2>&1 || die
   done
   echo -ne "ok\ncopying libraries..."
-  for ec_lib in ../libs/armeabi/libec_*.so; do
+  
+  mkdir -p "${out}/handlers" >&3 2>&1 || die
+  
+  for lib in ${bins}/libhandlers_*.so; do
+    lib=$(basename "$lib")
+    cp "${bins}/${lib}" "${out}/handlers/${lib:12}" >&3 2>&1 || die
+  done
+  
+  for ec_lib in ${bins}/libec_*.so; do
     ec_lib=$(basename "$ec_lib")
-    cp ../libs/armeabi/$ec_lib ./tools/ettercap/${ec_lib:3} >&3 2>&1 || die
+    cp "${bins}/$ec_lib" "${out}/tools/ettercap/${ec_lib:3}" >&3 2>&1 || die
   done
   echo -ne "ok\ncopying scripts..."
-  find ./nmap -name "*.lua" -print0 | rsync -aq --files-from=- --from0 ./ ./tools/ >&3 2>&1 || die
-  rsync -aq ./nmap/scripts/ ./tools/nmap/scripts/ >&3 2>&1 || die
+  
+  find "${jni_root}/nmap" -name "*.lua" -print0 | \
+    rsync -aq --files-from=- --from0 "/" "${out}/tools/" >&3 2>&1 || die
+  rsync -aq "${jni_root}/nmap/scripts/" "${out}/tools/nmap/scripts/" >&3 2>&1 || die
 
   echo -ne "ok\ncopying configuration/database files..."
   for f in $nmap_data; do
-    cp ./nmap/$f ./tools/nmap/ >&3 2>&1 || die
+    cp "${jni_root}/nmap/$f" "${out}/tools/nmap/" >&3 2>&1 || die
   done
 
-  mkdir -p ./tools/ettercap/share || die
+  mkdir -p "${out}/tools/ettercap/share" || die
 
   for f in $ettercap_share; do
-    cp ./ettercap*/share/$f ./tools/ettercap/share/ >&3 2>&1 || die
+    cp ${jni_root}/ettercap*/share/$f "${out}/tools/ettercap/share/" >&3 2>&1 || die
   done
 
+  echo "android:DEADBEEF" > "${out}/users" 2>&3 || die
+
   echo -ne "ok\ncreating archive..."
-  zip -qr tools.zip tools >&3 2>&1 || die
-  echo "ok"
-  rm -rf tools >&3 2>&1 || die
+  (cd ${out} && zip -qr ../core.zip ./) >&3 2>&1 || die
+  rm -rf "${out}" >&3 2>&1 || die
   if [ ! -d ../assets ]; then
     mkdir ../assets >&3 2>&1 || die
   fi
-  mv tools.zip ../assets/ >&3 2>&1 || die
+  mv /tmp/core.zip ../assets/ >&3 2>&1 || die
+  echo -ne "ok\ncopying native libraries to java project..."
+  { test -d "${src}/main/jniLibs/armeabi/" || mkdir -p "${src}/main/jniLibs/armeabi/" ;} >&3 2>&1 || die
+  cp "${bins}/libdSploitClient.so" "${bins}/libdSploitCommon.so" "${src}/main/jniLibs/armeabi/" >&3 2>&1 || die
+  echo "ok"
 }
 
 
@@ -211,14 +236,14 @@ build_ruby() {
   create_archive_metadata ../dist/ruby.tar.xz ../dist/ruby.json $RUBY_VERSION tar xz
 }
 
-pkg="tools"
+pkg="core"
 
 test "$#" -ne 1 || pkg=$1
 
 case $pkg in
 ruby) build_ruby
   ;;
-tools) build_tools
+core) build_core
   ;;
 *)
   scriptname=$(basename "$0")
