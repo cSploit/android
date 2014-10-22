@@ -24,6 +24,9 @@ void *reader(void *arg) {
   while((m = read_message(sockfd))) {
     if(enqueue_message(&(incoming_messages), m)) {
       LOGE("%s: cannot enqueue messages", __func__);
+      dump_message(m);
+      free_message(m);
+      break;
     }
   }
   
@@ -42,7 +45,7 @@ int start_reader() {
 
 /**
  * @brief stop the reader thread.
- * WARNING: ensure to close ::sockfd before call this.
+ * WARNING: ensure to shutdown ::sockfd before call this.
  */
 void stop_reader() {
   if(reader_tid) {
