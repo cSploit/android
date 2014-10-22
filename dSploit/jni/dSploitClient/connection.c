@@ -91,10 +91,11 @@ jboolean connect_unix(JNIEnv *env, jclass clazz __attribute__((unused)), jstring
   
   stop_notifier();
   
-  close(sockfd);
+  shutdown(sockfd, SHUT_WR);
   
   stop_reader();
   
+  close(sockfd);
   sockfd = -1;
   
   cleanup:
@@ -109,11 +110,12 @@ void disconnect_unix(JNIEnv *env __attribute__((unused)), jclass clazz __attribu
   stop_notifier();
   
   pthread_mutex_lock(&write_lock);
-  close(sockfd);
-  sockfd=-1;
+  shutdown(sockfd, SHUT_WR);
   pthread_mutex_unlock(&write_lock);
   
   stop_reader();
+  
+  close(sockfd);
   
   unload_handlers();
 }
