@@ -108,22 +108,20 @@ int main(int argc, char **argv) {
       return EXIT_SUCCESS;
     }
     close(pipefd[0]);
-  }
   
-  umask(0);
-  
-  close(STDIN_FILENO);
-  close(STDOUT_FILENO);
-  close(STDERR_FILENO);
+    umask(0);
 
-  if(open_logfile(LOG_PATH)) {
-    print( FATAL, "cannot open logfile");
-    return EXIT_FAILURE;
-  }
-  
-  set_logger(file_logger);
+    if(open_logfile(LOG_PATH)) {
+      print( FATAL, "cannot open logfile");
+      return EXIT_FAILURE;
+    }
 
-  if(deamonize) {
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+
+    set_logger(file_logger);
+
     sid = setsid();
     if(sid<0) {
       print( FATAL, "setsid: %s", strerror(errno) );
