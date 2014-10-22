@@ -36,10 +36,10 @@ int on_raw(JNIEnv *env, child_node *c, message *m) {
   }
   
   while((line=get_line_from_buffer(&(c->buffer)))) {
-    event = create_newline_event(env, c, line);
+    event = create_newline_event(env, line);
     if(!event) {
       LOGE("%s: cannot create event", __func__);
-    } else if(send_event(env, event)) {
+    } else if(send_event(env, c, event)) {
       LOGE("%s: cannot send event", __func__);
     }
     
@@ -59,14 +59,14 @@ int on_nmap(JNIEnv *env, child_node *c, message *m) {
   
   switch(m->data[0]) {
     case HOP:
-      event = create_hop_event(env, c, m->data);
+      event = create_hop_event(env, m->data);
       break;
     case PORT:
     case SERVICE:
-      event = create_port_event(env, c, m);
+      event = create_port_event(env, m);
       break;
     case OS:
-      event = create_os_event(env, c, m->data);
+      event = create_os_event(env, m->data);
       break;
     default:
       LOGW("%s: unkown nmap action: %02hhX", __func__, m->data[0]);
@@ -75,7 +75,7 @@ int on_nmap(JNIEnv *env, child_node *c, message *m) {
   
   if(!event) {
     LOGE("%s: cannot create event", __func__);
-  } else if(send_event(env, event)) {
+  } else if(send_event(env, c, event)) {
     LOGE("%s: cannot send event", __func__);
   } else {
     ret = 0;
@@ -87,6 +87,7 @@ int on_nmap(JNIEnv *env, child_node *c, message *m) {
   return ret;
 }
 
+// TODO
 #define on_ettercap(a, b, c) 0
 #define on_hydra(a, b, c) 0
 

@@ -22,14 +22,14 @@ struct events_cache {
         os;
 };
 
-struct core_system_cache {
+struct core_chlidmanager_cache {
   jclass class;
   jmethodID on_event;
 };
 
 struct core_cache {
-  struct core_system_cache  system;
-  struct class_cache        client;
+  struct core_chlidmanager_cache    childmanager;
+  struct class_cache                client;
 };
 
 struct java_net_inetaddress_cache {

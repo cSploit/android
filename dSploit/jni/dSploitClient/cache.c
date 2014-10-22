@@ -41,16 +41,16 @@ int init_class_cache(JNIEnv *env, struct class_cache *c, const char *class_name)
   return ret;
 }
 
-int init_dsploit_core_system_cache(JNIEnv *env) {
-  struct core_system_cache *c;
+int init_dsploit_core_childmanager_cache(JNIEnv *env) {
+  struct core_chlidmanager_cache *c;
   
-  c = &(cache.dsploit.core.system);
+  c = &(cache.dsploit.core.childmanager);
   
-  if(init_class_cache(env, (struct class_cache *) c, "it/evilsocket/dsploit/core/System"))
+  if(init_class_cache(env, (struct class_cache *) c, "it/evilsocket/dsploit/core/ChildManager"))
     return -1;
   
-  c->on_event = (*env)->GetStaticMethodID(env, c->class, "OnEvent",
-                                                 "(Lit/evilsocket/dsploit/events/Event;)V");
+  c->on_event = (*env)->GetStaticMethodID(env, c->class, "onEvent",
+                                                 "(ILit/evilsocket/dsploit/events/Event;)V");
   
   if(!c->on_event) goto error;
   
@@ -105,12 +105,12 @@ int init_dsploit_events_cache(JNIEnv *env) {
     const char *class_name;
     const char *ctor_signature;
   } events[] = {
-    { "it/evilsocket/dsploit/events/Newline", "(ILjava/lang/String;)V" },
-    { "it/evilsocket/dsploit/events/ChildEnd", "(II)V" },
-    { "it/evilsocket/dsploit/events/ChildDied", "(II)V" },
-    { "it/evilsocket/dsploit/events/Hop", "(Ljava/net/InetAddress;IILjava/net/InetAddress;)V" },
-    { "it/evilsocket/dsploit/events/Port", "(Ljava/net/InetAddress;Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)V" },
-    { "it/evilsocket/dsploit/events/Os", "(Ljava/net/InetAddress;SLjava/lang/String;Ljava/lang/String;)V" },
+    { "it/evilsocket/dsploit/events/Newline", "(Ljava/lang/String;)V" },
+    { "it/evilsocket/dsploit/events/ChildEnd", "(I)V" },
+    { "it/evilsocket/dsploit/events/ChildDied", "(I)V" },
+    { "it/evilsocket/dsploit/events/Hop", "(IJLjava/net/InetAddress;)V" },
+    { "it/evilsocket/dsploit/events/Port", "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)V" },
+    { "it/evilsocket/dsploit/events/Os", "(SLjava/lang/String;Ljava/lang/String;)V" },
   };
   struct class_and_ctor_cache *ptr;
   register int i;
@@ -124,7 +124,7 @@ int init_dsploit_events_cache(JNIEnv *env) {
 }
 
 int init_dsploit_core_cache(JNIEnv *env) {
-  if(init_dsploit_core_system_cache(env))
+  if(init_dsploit_core_childmanager_cache(env))
     return -1;
   if(init_dsploit_core_client_cache(env))
     return -1;
@@ -208,7 +208,7 @@ void _free_cache(JNIEnv *env) {
   int i;
   jclass *global_refs[] = {
     &(cache.java.net.inetaddress.class),
-    &(cache.dsploit.core.system.class),
+    &(cache.dsploit.core.childmanager.class),
     &(cache.dsploit.core.client.class),
     &(cache.dsploit.events.newline.class),
     &(cache.dsploit.events.child_end.class),

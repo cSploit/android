@@ -91,11 +91,11 @@ int on_cmd_end(JNIEnv *env, message *m) {
   
   pthread_cond_broadcast(&(children.control.cond));
   
-  event = create_child_end_event(env, c, &(end_info->exit_value));
+  event = create_child_end_event(env, &(end_info->exit_value));
   
   if(!event) {
     LOGE("%s: cannot create event", __func__);
-  } else if(send_event(env, event)) {
+  } else if(send_event(env, c, event)) {
     LOGE("%s: cannot send event", __func__);
   } else {
     ret = 0;
@@ -134,11 +134,11 @@ int on_cmd_died(JNIEnv *env, message *m) {
   
   pthread_cond_broadcast(&(children.control.cond));
   
-  event = create_child_died_event(env, c, &(died_info->signal));
+  event = create_child_died_event(env, &(died_info->signal));
   
   if(!event) {
     LOGE("%s: cannot create event", __func__);
-  } else if(send_event(env, event)) {
+  } else if(send_event(env, c, event)) {
     LOGE("%s: cannot send event", __func__);
   } else {
     ret = 0;
@@ -256,7 +256,7 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
           // copy it as a normal char
         } else if(status & INSIDE_DOUBLE_QUOTE) {
           status &= ~INSIDE_DOUBLE_QUOTE;
-          end = pos -1;
+          end = pos;
         } else {
           status |= INSIDE_DOUBLE_QUOTE;
         }
@@ -266,7 +266,7 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
           // copy it as a normal char
         } else if(status & INSIDE_SINGLE_QUOTE) {
           status &= ~INSIDE_SINGLE_QUOTE;
-          end = pos - 1;
+          end = pos;
         } else {
           status |= INSIDE_SINGLE_QUOTE;
         }
