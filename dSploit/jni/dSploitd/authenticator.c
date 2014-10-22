@@ -114,6 +114,7 @@ int load_users() {
   
   exit:
   release_buffer(&b);
+  close(fd);
   
   return ret;
 }
