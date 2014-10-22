@@ -65,6 +65,7 @@ void file_logger(int level, char *fmt, ...) {
   
   vfprintf(logfile, fmt, argptr);
   fprintf(logfile, "\n");
+  fflush(logfile);
   
   va_end(argptr);
   

@@ -49,6 +49,7 @@ void std_logger(int level, char *fmt, ...) {
   
   vfprintf(stream, fmt, argptr);
   fprintf(stream, "\n");
+  fflush(stream);
   
   va_end(argptr);
   
