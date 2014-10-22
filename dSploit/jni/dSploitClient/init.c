@@ -51,7 +51,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* pVm, void* reserved _U_) {
   jint ret;
   JNINativeMethod nm[] =  {
     { "LoadHandlers", "()Z", jload_handlers },
-    { "StartCommand", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I", start_command },
+    { "StartCommand", "(Ljava/lang/String;Ljava/lang/String;)I", start_command },
     { "Connect", "(Ljava/lang/String;)Z", connect_unix },
     { "Login", "(Ljava/lang/String;Ljava/lang/String;)Z", jlogin },
     { "Disconnect", "()V", disconnect_unix },
