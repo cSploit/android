@@ -43,3 +43,7 @@ include $(MY_LOCAL_PATH)/freetds/Android.mk
 include $(MY_LOCAL_PATH)/libifaddrs/Android.mk
 include $(MY_LOCAL_PATH)/libcurl/Android.mk
 include $(MY_LOCAL_PATH)/fusemounts/Android.mk
+include $(MY_LOCAL_PATH)/dSploitCommon/Android.mk
+include $(MY_LOCAL_PATH)/dSploitd/Android.mk
+include $(MY_LOCAL_PATH)/dSploitHandlers/Android.mk
+include $(MY_LOCAL_PATH)/dSploitClient/Android.mk
