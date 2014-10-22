@@ -91,8 +91,6 @@ jboolean send_to_child(JNIEnv *env, jclass clazz __attribute__((unused)), int id
   
   buff = (*env)->GetByteArrayElements(env, array, NULL);
   
-  LOGD("%s: buff=%p", __func__, buff);
-  
   if(!buff) goto jni_error;
   
   len = (*env)->GetArrayLength(env, array); // no error specified
