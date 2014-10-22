@@ -280,9 +280,7 @@ message *on_cmd_start(conn_node *conn, message *msg) {
     
     dup2(pin[0], STDIN_FILENO);
     dup2(pout[1], STDOUT_FILENO);
-#ifdef NDEBUG
     dup2(i, STDERR_FILENO);
-#endif
 
     close(i);
     close(pin[0]);
