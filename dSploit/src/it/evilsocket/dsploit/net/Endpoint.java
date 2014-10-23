@@ -83,8 +83,17 @@ public class Endpoint
     if(endpoint==null)
           return false;
 
-    else if(mHardware != null && endpoint.mHardware != null && mHardware.length == endpoint.mHardware.length)
-      return getHardwareAsString().equals(endpoint.getHardwareAsString());
+    else if(mHardware != null && endpoint.mHardware != null) {
+      if(mHardware.length != endpoint.mHardware.length)
+        return false;
+
+      for(int i=0;i<mHardware.length;i++) {
+        if(mHardware[i] != endpoint.mHardware[i])
+          return false;
+      }
+
+      return true;
+    }
 
     else
       return mAddress.equals(endpoint.getAddress());
@@ -112,15 +121,13 @@ public class Endpoint
     if(mHardware == null)
       return "";
 
-    StringBuilder builder = new StringBuilder(18);
-    for(byte b : mHardware){
-      if(builder.length() > 0)
-        builder.append(':');
-
-      builder.append(String.format("%02X", b));
+    try {
+      return String.format("%02X:%02X:%02X:%02X:%02X:%02X",
+          mHardware[0], mHardware[1], mHardware[2],
+          mHardware[3], mHardware[4], mHardware[5]);
+    } catch (IndexOutOfBoundsException e) {
+      return "";
     }
-
-    return builder.toString();
   }
 
   public void setHardware(byte[] hardware){
