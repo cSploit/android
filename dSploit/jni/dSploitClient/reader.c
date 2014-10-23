@@ -36,6 +36,13 @@ void *reader(void *arg) {
 }
 
 int start_reader() {
+  if(reader_tid)
+    stop_reader();
+  
+  if(control_activate(&(incoming_messages.control))) {
+    LOGE("%s: cannot activate incoming messages queue", __func__);
+    return -1;
+  }
   if(pthread_create(&reader_tid, NULL, reader, NULL)) {
     LOGE("%s: pthread_create: %s", __func__, strerror(errno));
     return -1;

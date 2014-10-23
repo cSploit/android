@@ -189,6 +189,14 @@ void *notifier(void *arg) {
 }
 
 int start_notifier() {
+  if(notifier_tid)
+    return 0;
+    
+  if(control_activate(&(incoming_messages.control))) {
+    LOGE("%s: cannot activate incoming messages queue", __func__);
+    return -1;
+  }
+    
   if(pthread_create(&notifier_tid, NULL, notifier, NULL)) {
     LOGE("%s: pthread_create: %s", __func__, strerror(errno));
     return -1;
