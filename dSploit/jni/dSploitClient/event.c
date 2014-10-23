@@ -286,6 +286,93 @@ jobject create_os_event(JNIEnv *env, void *arg) {
 }
 
 /**
+ * @brief create an it.evilsocket.dsploit.events.Ready
+ * @param arg unused
+ * @returns a new object on success, NULL on error.
+ */
+jobject create_ready_event(JNIEnv *env, void *arg _U_) {
+  jobject res;
+  
+  res = (*env)->NewObject(env,
+                        cache.dsploit.events.ready.class,
+                        cache.dsploit.events.ready.ctor);
+  
+  if((*env)->ExceptionCheck(env)) {
+    (*env)->ExceptionDescribe(env);
+    (*env)->ExceptionClear(env);
+  }
+  
+  return res;
+}
+
+/**
+ * @brief create an it.evilsocket.dsploit.events.Account
+ * @param arg the ::message containing the account info
+ * @returns a new object on success, NULL on error.
+ */
+jobject create_account_event(JNIEnv *env, void *arg) {
+  jstring jproto, juser, jpswd;
+  jobject res, addr;
+  struct ettercap_account_info *account_info;
+  message *m;
+  char *pos;
+  
+  res = NULL;
+  jproto = juser = jpswd = NULL;
+  m = (message *) arg;
+  
+  account_info = (struct ettercap_account_info *) m->data;
+  
+  addr = inaddr_to_inetaddress(env, account_info->address);
+  
+  if(!addr) return NULL;
+  
+  pos = account_info->data;
+  
+  jproto = (*env)->NewStringUTF(env, pos);
+  
+  if(!jproto) goto cleanup;
+  
+  pos = string_array_next(m, account_info->data, pos);
+  
+  juser = (*env)->NewStringUTF(env, pos);
+  
+  if(!juser) goto cleanup;
+  
+  pos = string_array_next(m, account_info->data, pos);
+  
+  jpswd = (*env)->NewStringUTF(env, pos);
+  
+  if(!jpswd) goto cleanup;
+  
+  res = (*env)->NewObject(env,
+                          cache.dsploit.events.account.class,
+                          cache.dsploit.events.account.ctor,
+                          addr, jproto, juser, jpswd);
+  
+  cleanup:
+  
+  if((*env)->ExceptionCheck(env)) {
+    (*env)->ExceptionDescribe(env);
+    (*env)->ExceptionClear(env);
+  }
+  
+  if(addr)
+    (*env)->DeleteLocalRef(env, addr);
+  
+  if(jproto)
+    (*env)->DeleteLocalRef(env, jproto);
+  
+  if(juser)
+    (*env)->DeleteLocalRef(env, juser);
+  
+  if(jpswd)
+    (*env)->DeleteLocalRef(env, jpswd);
+  
+  return res;
+}
+
+/**
  * @brief send an event to java.
  * @param c the child that generate this event
  * @param e the event to send

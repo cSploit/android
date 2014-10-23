@@ -88,7 +88,41 @@ int on_nmap(JNIEnv *env, child_node *c, message *m) {
 }
 
 // TODO
-#define on_ettercap(a, b, c) 0
+int on_ettercap(JNIEnv *env, child_node *c, message *m) {
+  jobject event;
+  int ret;
+  
+  ret = -1;
+  
+  switch(m->data[0]) {
+    case READY:
+      event = create_ready_event(env, m);
+      break;
+    case ACCOUNT:
+      event = create_account_event(env, m);
+      break;
+    default:
+      LOGW("%s: unkown ettercap action: %02hhX", __func__, m->data[0]);
+      return -1;
+  }
+  
+  if(!event) {
+    LOGE("%s: cannot create event", __func__);
+  } else if(send_event(env, c, event)) {
+    LOGE("%s: cannot send event", __func__);
+  } else {
+    ret = 0;
+  }
+  
+  if(event)
+    (*env)->DeleteLocalRef(env, event);
+  
+  return ret;
+}
+
+
+
+// TODO
 #define on_hydra(a, b, c) 0
 
 int on_message(JNIEnv *env, message *m) {

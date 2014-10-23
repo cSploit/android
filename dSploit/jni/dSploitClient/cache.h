@@ -19,7 +19,9 @@ struct events_cache {
         child_died,
         hop,
         port,
-        os;
+        os,
+        ready,
+        account;
 };
 
 struct core_chlidmanager_cache {
