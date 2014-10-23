@@ -15,6 +15,7 @@
 #include "handler.h"
 #include "sequence.h"
 #include "controller.h"
+#include "auth.h"
 
 #include "command.h"
 
@@ -194,6 +195,11 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
   id = -1;
   m=NULL;
   c=NULL;
+  
+  if(!authenticated()) {
+    LOGE("%s: not authenticated", __func__);
+    return -1;
+  }
   
   utf = (*env)->GetStringUTFChars(env, jhandler, NULL);
   utf_parent = &jhandler;

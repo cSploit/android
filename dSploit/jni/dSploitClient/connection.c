@@ -81,6 +81,8 @@ jboolean connect_unix(JNIEnv *env, jclass clazz _U_, jstring jsocket_path) {
   
   connected = 1;
   
+  on_connect();
+  
   ret = JNI_TRUE;
   
   goto cleanup;
@@ -138,6 +140,8 @@ void disconnect_unix(JNIEnv *env _U_, jclass clazz _U_) {
   close(sockfd);
   
   connected = 0;
+  
+  on_disconnect();
   
   unload_handlers();
 }

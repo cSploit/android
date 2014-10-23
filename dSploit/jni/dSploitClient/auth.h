@@ -9,6 +9,7 @@
 #include "control.h"
 
 int on_auth_status(message *);
+inline int authenticated(void);
 jboolean is_authenticated(JNIEnv *, jclass);
 jboolean jlogin(JNIEnv *, jclass, jstring, jstring );
 void auth_on_disconnect(void);

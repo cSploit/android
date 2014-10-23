@@ -112,12 +112,25 @@ jboolean jlogin(JNIEnv *env, jclass clazz, jstring jusername, jstring jhash) {
     return JNI_FALSE;
 }
 
+/**
+ * @brief try to find and terminate the task that triggered this AUTH_FAIL
+ * 
+ * if we received AUTH_FAIL and we are not trying to login, 
+ * some task has sent control data without checking login status.
+ * this is a bug.
+ */
+void on_unexcpected_auth_fail() {
+  LOGE("%s: received unexcpected AUTH_FAIL", __func__);
+}
+
 int on_auth_status(message *m) {
   struct auth_status_info *status_info;
+  enum login_status previous_status;
   
   status_info = (struct auth_status_info *) m->data;
   
   pthread_mutex_lock(&(logged.control.mutex));
+  previous_status = logged.status;
   if(status_info->auth_code == AUTH_OK) {
     logged.status = LOGIN_OK;
   } else {
@@ -127,31 +140,50 @@ int on_auth_status(message *m) {
   
   pthread_cond_broadcast(&(logged.control.cond));
   
+  if(status_info->auth_code != AUTH_OK && previous_status != LOGIN_WAIT) {
+    on_unexcpected_auth_fail();
+  }
+  
   return 0;
 }
 
-jboolean is_authenticated(JNIEnv *env _U_, jclass clazz _U_) {
-  jboolean ret;
+/**
+ * @brief check if we are authenticated into the server
+ * @returns 1 if logged in, 0 if not.
+ */
+inline int authenticated() {
+  register int ret;
   
   pthread_mutex_lock(&(logged.control.mutex));
-  ret = (logged.status == LOGIN_OK ? JNI_TRUE : JNI_FALSE);
+  if (logged.control.active && logged.status == LOGIN_OK)
+    ret = 1;
+  else
+    ret = 0;
   pthread_mutex_unlock(&(logged.control.mutex));
   
   return ret;
 }
 
-/**
- * @brief allocate resources used in runtime
- */
-void auth_on_connect() {
-  control_init(&(logged.control));
-  control_activate(&(logged.control));
+jboolean is_authenticated(JNIEnv *env _U_, jclass clazz _U_) {
+  return (authenticated() ? JNI_TRUE : JNI_FALSE);
 }
 
 /**
- * @brief relase resources because connection is shutting down
+ * @brief reset and enable auth data.
+ */
+void auth_on_connect() {
+  pthread_mutex_lock(&(logged.control.mutex));
+  logged.control.active = 1;
+  logged.status = LOGIN_FAIL;
+  pthread_mutex_unlock(&(logged.control.mutex));
+}
+
+/**
+ * @brief reset and disable auth data.
  */
 void auth_on_disconnect() {
-  control_deactivate(&(logged.control));
-  control_destroy(&(logged.control));
+  pthread_mutex_lock(&(logged.control.mutex));
+  logged.control.active = 0;
+  logged.status = LOGIN_FAIL;
+  pthread_mutex_unlock(&(logged.control.mutex));
 }

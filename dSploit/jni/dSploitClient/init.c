@@ -31,6 +31,7 @@ void init_structs() {
   memset(&cache, 0, sizeof(struct cache));
   memset(&children, 0, sizeof(struct child_list));
   memset(&incoming_messages, 0, sizeof(struct msgqueue));
+  memset(&logged, 0, sizeof(struct login_data));
 }
 
 int init_controls() {

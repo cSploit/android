@@ -14,15 +14,11 @@
 #include "sequence.h"
 #include "log.h"
 #include "connection.h"
+#include "auth.h"
 
 #include "handler.h"
 
 struct handlers_list handlers;
-
-/* TODO. need internet for writing it.
-jobjectarray jloaded_handlers(JNIEnv *env, jclass clazz _U_) {
-  
-} */
 
 /**
  * @brief load handlers from dSploitd
@@ -38,6 +34,11 @@ jboolean jload_handlers(JNIEnv *env _U_, jclass clazz _U_) {
   jboolean ret;
   
   send_error = -1;
+  
+  if(!authenticated()) {
+    LOGE("%s: not authenticated", __func__);
+    return JNI_FALSE;
+  }
   
   m = create_message(get_sequence(&ctrl_seq, &ctrl_seq_lock),
                      sizeof(struct hndl_list_info), CTRL_ID);
@@ -79,6 +80,33 @@ jboolean jload_handlers(JNIEnv *env _U_, jclass clazz _U_) {
 }
 
 /**
+ * @brief remove an handler by it's id.
+ * @param id of the handler to remove
+ * 
+ * take care of freeing it and removing any "by_name" reference.
+ */
+void remove_handler_by_id(uint16_t id) {
+  handler *h, **hh, **end;
+  
+  for(h=(handler *) handlers.list.head;h && h->id != id;h=(handler *) h->next);
+  
+  if(!h) return;
+  
+  LOGD("%s: removing handler #%u", __func__, id);
+  
+  list_del(&(handlers.list), (node *) h);
+  
+  hh=(handler **) &(handlers.by_name);
+  end= hh + sizeof(handlers.by_name);
+  for(;hh < end; hh++) {
+    if(*hh == h)
+      memset(hh, 0, sizeof(handler *));
+  }
+  free(h->name);
+  free(h);
+}
+
+/**
  * @brief load handlers from an ::HNDL_LIST ::message
  * @param m the received message
  * @returns 0 on success, -1 on error.
@@ -101,12 +129,7 @@ int on_handler_list(message *m) {
     LOGD("%s: id=%u, have_stdin=%u, have_stdout=%u, name=\"%s\"", __func__, handler_info->id,
          handler_info->have_stdin, handler_info->have_stdout, handler_info->name);
          
-    for(h=(handler *) handlers.list.head;h && h->id != handler_info->id;h=(handler *) h->next);
-    
-    if(h) {
-      LOGI("%s: updating handler #%u", __func__, handler_info->id);
-      list_del(&(handlers.list), (node *)h);
-    }
+    remove_handler_by_id(handler_info->id);
     
     h = malloc(sizeof(handler));
     
@@ -166,19 +189,24 @@ int on_handler_list(message *m) {
 
 /**
  * @brief unload handlers
- * 
- * this function in NOT thread-safe.
- * it's intended to run once at connection shutdown
  */
 void unload_handlers() {
   struct handler *h;
   
-  control_deactivate(&(handlers.control));
+  pthread_mutex_lock(&(handlers.control.mutex));
+  
+  handlers.control.active = 0;
   
   while((h=(handler *) queue_get(&handlers.list))) {
     free(h->name);
     free(h);
   }
+  
+  memset(&(handlers.by_name), 0, sizeof(handlers.by_name));
+  
+  pthread_mutex_unlock(&(handlers.control.mutex));
+  
+  pthread_cond_broadcast(&(handlers.control.cond));
 }
 
 /**
