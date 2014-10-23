@@ -5,11 +5,13 @@
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 
 #include "handler.h"
 #include "logger.h"
 #include "hydra.h"
 #include "message.h"
+#include "str_array.h"
 
 handler handler_info = {
   NULL,                   // next
@@ -125,65 +127,56 @@ message *parse_hydra_login(char *line) {
   regmatch_t pmatch[11];
   struct hydra_login_info *login_info;
   message *m;
-  size_t host_len, login_len, pswd_len;
-  uint8_t num_sep;
-  char *pswd_ptr;
   
   if(regexec(&login_pattern, line, 11, pmatch, 0))
     return NULL;
   
-  host_len  = (pmatch[3].rm_eo - pmatch[3].rm_so);
-  login_len = (pmatch[6].rm_eo - pmatch[6].rm_so);
-  pswd_len  = (pmatch[9].rm_eo - pmatch[9].rm_so);
-  
-  num_sep = 0;
-  
-  if(login_len) {
-    num_sep++;
-  }
-  if(pswd_len) {
-    num_sep++;
-  }
-  
-  m = create_message(0,
-        sizeof(struct hydra_login_info) + (num_sep) + (login_len + pswd_len)
-        , 0);
+  m = create_message(0, sizeof(struct hydra_login_info), 0);
   
   if(!m) {
     print( ERROR, "cannot create messages");
     return NULL;
   }
-  
-  // terminate substrings
+
   *(line + pmatch[1].rm_eo) = '\0';
-  *(line + pmatch[3].rm_eo) = '\0';
   
   login_info = (struct hydra_login_info *)m->data;
   login_info->hydra_action = HYDRA_LOGIN;
   login_info->port = strtoul(line + pmatch[1].rm_so, NULL, 10);
   login_info->contents = 0;
   
-  if(host_len) {
+  if(pmatch[3].rm_eo >= 0) {
+    *(line + pmatch[3].rm_eo) = '\0';
+
     login_info->contents |= HAVE_ADDRESS;
     login_info->address = inet_addr(line + pmatch[3].rm_so + 6);
   }
   
-  if(login_len) {
+  if(pmatch[6].rm_eo >= 0) {
+    *(line + pmatch[6].rm_eo) = '\0';
+
     login_info->contents |= HAVE_LOGIN;
-    memcpy(login_info->data, line + pmatch[6].rm_so, login_len);
-    *(login_info->data + login_len) = '\0';
-    pswd_ptr = login_info->data + login_len + 1;
-  } else {
-    pswd_ptr = login_info->data;
+    if(string_array_add(m, offsetof(struct hydra_login_info, data), line + pmatch[6].rm_so)) {
+      print( ERROR, "cannot add string to message");
+      goto error;
+    }
   }
   
-  if(pswd_len) {
+  if(pmatch[9].rm_eo >= 0) {
+    *(line + pmatch[9].rm_eo) = '\0';
+
     login_info->contents |= HAVE_PASSWORD;
-    memcpy(pswd_ptr, line + pmatch[9].rm_so, pswd_len);
-    *(pswd_ptr + pswd_len) = '\0';
+    if(string_array_add(m, offsetof(struct hydra_login_info, data), line + pmatch[9].rm_so)) {
+      print( ERROR, "cannot add string to message");
+      goto error;
+    }
   }
   
   return m;
+  
+  error:
+  free_message(m);
+  return NULL;
 }
 
 /**

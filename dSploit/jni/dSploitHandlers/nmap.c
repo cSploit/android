@@ -5,11 +5,13 @@
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 
 #include "handler.h"
 #include "logger.h"
 #include "nmap.h"
 #include "message.h"
+#include "str_array.h"
 
 handler handler_info = {
   NULL,                   // next
@@ -37,7 +39,7 @@ void nmap_init() {
   if((ret = regcomp(&port_pattern, "^Discovered open port ([0-9]+)/([a-z]+)", REG_EXTENDED | REG_ICASE))) {
     print( ERROR, "%s: regcomp(port_pattern): %d", ret);
   }
-  if((ret = regcomp(&xml_port_pattern, "<port protocol=\"([^\"]+)\" portid=\"([^\"]+)\"><state state=\"open\"[^>]+><service(.+product=\"([^\"]+)\")?(.+version=\"([^\"]+)\")?", REG_EXTENDED | REG_ICASE))) {
+  if((ret = regcomp(&xml_port_pattern, "<port protocol=\"([^\"]+)\" portid=\"([^\"]+)\"><state state=\"open\"[^>]+><service(.+(product|name)=\"([^\"]+)\")?(.+version=\"([^\"]+)\")?", REG_EXTENDED | REG_ICASE))) {
     print( ERROR, "%s: regcomp(xml_port_pattern): %d", ret);
   }
   if((ret = regcomp(&xml_os_pattern, "<osclass type=\"([^\"]+)\".+osfamily=\"([^\"]+)\".+accuracy=\"([^\"]+)\"", REG_EXTENDED | REG_ICASE))) {
@@ -148,25 +150,16 @@ message *parse_nmap_port(char *line) {
  * @returns a ::message on success, NULL on error.
  */
 message *parse_nmap_xml_port(char *line) {
-  regmatch_t pmatch[7];
+  regmatch_t pmatch[8];
   struct nmap_service_info *service_info;
   message *m;
-  uint16_t service_len, version_len;
   
-  if(regexec(&xml_port_pattern, line, 7, pmatch, 0))
+  if(regexec(&xml_port_pattern, line, 8, pmatch, 0))
     return NULL;
+    
+  print( DEBUG, "%s", line);
   
-  // when not found this expression is: var_len = ( (-1) - (-1) ) = 0;
-  service_len = ( pmatch[4].rm_eo - pmatch[4].rm_so );
-  version_len = ( pmatch[6].rm_eo - pmatch[6].rm_so );
-  
-  if(!service_len) { // no service found, only an open port.
-    m = create_message(0, sizeof(struct nmap_port_info), 0);
-  } else if(version_len) { // service and version found.
-    m = create_message(0, sizeof(struct nmap_service_info) + (service_len + 2 + version_len), 0);
-  } else { // only service found, no version.
-    m = create_message(0, sizeof(struct nmap_service_info) + service_len + 1, 0);
-  }
+  m = create_message(0, sizeof(struct nmap_port_info), 0);
   
   if(!m) {
     print( ERROR, "%s: cannot create messages" );
@@ -178,10 +171,16 @@ message *parse_nmap_xml_port(char *line) {
   // terminate parts
   *(line + pmatch[1].rm_eo) = '\0';
   *(line + pmatch[2].rm_eo) = '\0';
-  if(service_len)
-    *(line + pmatch[4].rm_eo) = '\0';
-  if(version_len)
-    *(line + pmatch[6].rm_eo) = '\0';
+  if(pmatch[5].rm_eo >= 0)
+    *(line + pmatch[5].rm_eo) = '\0';
+  if(pmatch[7].rm_eo >= 0)
+    *(line + pmatch[7].rm_eo) = '\0';
+  
+  // debug
+  print( DEBUG, "proto:   '%s'", (line + pmatch[1].rm_so));
+  print( DEBUG, "port:    '%s'", (line + pmatch[2].rm_so));
+  if(pmatch[5].rm_eo >= 0) print( DEBUG, "service: '%s'", (line + pmatch[5].rm_so));
+  if(pmatch[7].rm_eo >= 0) print( DEBUG, "version: '%s'", (line + pmatch[7].rm_so));
   
   if(!strncmp(line + pmatch[1].rm_so, "tcp", 4)) {
     service_info->proto = TCP;
@@ -197,19 +196,23 @@ message *parse_nmap_xml_port(char *line) {
   
   service_info->port = strtoul(line + pmatch[2].rm_so, NULL, 10);
   
-  if(service_len) {
+  if(pmatch[5].rm_eo >= 0) {
+    
     service_info->nmap_action = SERVICE;
-    memcpy(service_info->service, line + pmatch[4].rm_so, service_len);
-    *(service_info->service + service_len) = '\0';
-    if(version_len) {
-      memcpy(service_info->service + service_len + 1, line + pmatch[6].rm_so, version_len);
-      *(service_info->service + service_len + version_len + 1) = '\0';
+    if(string_array_add(m, offsetof(struct nmap_service_info, service), (line + pmatch[5].rm_so)) ||
+      (pmatch[7].rm_eo >= 0 && string_array_add(m, offsetof(struct nmap_service_info, service), (line + pmatch[7].rm_so)))) {
+      print( ERROR, "cannot add string to message");
+      goto error;
     }
   } else {
     service_info->nmap_action = PORT;
   }
   
   return m;
+  
+  error:
+  free_message(m);
+  return NULL;
 }
 
 /**
@@ -221,32 +224,32 @@ message *parse_nmap_xml_os(char *line) {
   regmatch_t pmatch[4];
   struct nmap_os_info *os_info;
   message *m;
-  uint16_t type_len, os_len;
   
-  if(regexec(&xml_os_pattern, line, 7, pmatch, 0))
+  if(regexec(&xml_os_pattern, line, 4, pmatch, 0))
     return NULL;
   
-  type_len = (pmatch[1].rm_eo - pmatch[1].rm_so);
-  os_len   = (pmatch[2].rm_eo - pmatch[2].rm_so);
-  
-  m = create_message(0, sizeof(struct nmap_os_info) + type_len + os_len + 2, 0);
+  m = create_message(0, sizeof(struct nmap_os_info), 0);
   
   if(!m) {
     print( ERROR, "cannot create messages" );
     return NULL;
   }
   
+  // terminate strings
+  *(line + pmatch[1].rm_eo) = '\0';
+  *(line + pmatch[2].rm_eo) = '\0';
   *(line + pmatch[3].rm_eo) = '\0';
   
   os_info = (struct nmap_os_info*) m->data;
   
   os_info->nmap_action = OS;
   os_info->accuracy = strtoul(line + pmatch[3].rm_so, NULL, 10);
-  memcpy(os_info->os, line + pmatch[2].rm_so, os_len);
-  *(os_info->os + os_len) = '\0';
-  memcpy(os_info->os + os_len + 1, line + pmatch[1].rm_so, type_len);
-  *(os_info->os + os_len + type_len + 1) = '\0';
-  
+  if(string_array_add(m, offsetof(struct nmap_os_info, os), line + pmatch[2].rm_so) ||
+      string_array_add(m, offsetof(struct nmap_os_info, os), line + pmatch[1].rm_so)) {
+    print( ERROR, "cannot add string to message");
+    free_message(m);
+    return NULL;
+  }
   return m;
 }
 

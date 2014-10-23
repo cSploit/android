@@ -5,11 +5,13 @@
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 
 #include "handler.h"
 #include "logger.h"
 #include "ettercap.h"
 #include "message.h"
+#include "str_array.h"
 
 handler handler_info = {
   NULL,                       // next
@@ -77,19 +79,12 @@ message *parse_ettercap_account(char *line) {
   regmatch_t pmatch[7];
   struct ettercap_account_info *account_info;
   message *m;
-  size_t proto_len, user_len, pswd_len;
+  int array_start;
   
   if(regexec(&account_pattern, line, 7, pmatch, 0))
     return NULL;
   
-  proto_len = (pmatch[1].rm_eo - pmatch[1].rm_so);
-  user_len  = (pmatch[4].rm_eo - pmatch[4].rm_so);
-  pswd_len  = (pmatch[5].rm_eo - pmatch[5].rm_so);
-  
-  
-  m = create_message(0,
-        sizeof(struct ettercap_account_info) + proto_len + user_len + pswd_len + 3,
-        0);
+  m = create_message(0, sizeof(struct ettercap_account_info), 0);
   
   if(!m) {
     print(ERROR, "cannot create messages");
@@ -102,15 +97,19 @@ message *parse_ettercap_account(char *line) {
   *(line + pmatch[4].rm_eo) = '\0';
   *(line + pmatch[5].rm_eo) = '\0';
   
+  array_start = offsetof(struct ettercap_account_info, data);
+  
   account_info = (struct ettercap_account_info *) m->data;
   account_info->ettercap_action = ACCOUNT;
   account_info->address = inet_addr(line + pmatch[2].rm_so);
-  memcpy(account_info->data, line + pmatch[1].rm_so, proto_len);
-  memcpy(account_info->data + proto_len + 1, line + pmatch[4].rm_so, user_len);
-  memcpy(account_info->data + proto_len + user_len + 2, line + pmatch[5].rm_so, pswd_len);
-  *(account_info->data + proto_len) = 
-  *(account_info->data + proto_len + user_len + 1) = 
-  *(account_info->data + proto_len + user_len + pswd_len + 2) = '\0';
+  
+  if(string_array_add(m, array_start, line + pmatch[1].rm_so) ||
+     string_array_add(m, array_start, line + pmatch[4].rm_so) ||
+     string_array_add(m, array_start, line + pmatch[5].rm_so)) {
+     print( ERROR, "cannot add string to message");
+     free_message(m);
+     return NULL;
+   }
   
   return m;
 }

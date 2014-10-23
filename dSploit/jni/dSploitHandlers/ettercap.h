@@ -20,7 +20,7 @@ struct ettercap_account_info {
   char          ettercap_action;  ///< must be set to ::ACCOUNT
   in_addr_t     address;          ///< the address that sent these credentials
   /**
-   * @brief array of strings ( separaed by ::STRING_SEPARATOR )
+   * @brief array of null-terminated strings
    * data[0] is the portocol
    * data[1] is the username
    * data[2] is the password
