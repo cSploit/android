@@ -15,6 +15,7 @@ struct message;
 jboolean jload_handlers(JNIEnv *, jclass);
 void unload_handlers(void);
 int on_handler(struct message *);
+jobjectArray get_handlers(JNIEnv *, jclass);
 
 typedef struct handler {
   node *next;

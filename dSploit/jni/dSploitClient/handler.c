@@ -195,3 +195,78 @@ int on_handler(message *m) {
       return -1;
   }
 }
+
+jobjectArray get_handlers(JNIEnv *env, jclass clazz) {
+  jobjectArray jarray;
+  jstring jstr;
+  size_t size,i;
+  handler *h;
+  char locked;
+  
+  clazz = NULL;
+  jstr = NULL;
+  jarray = NULL;
+  locked = 0;
+  
+  //HACK: use function parameter as variable
+  clazz = (*env)->FindClass(env, "java/lang/String");
+  
+  if(!clazz) goto jni_error;
+  
+  pthread_mutex_lock(&(handlers.control.mutex));
+  
+  locked = 1;
+  
+  h = (handler *) handlers.list.head;
+  for(size=0;h;h=(handler *) h->next, size++);
+  
+  if(!size) goto exit;
+  
+  jarray = (*env)->NewObjectArray(env, size, clazz, NULL);
+  
+  if(!jarray) goto jni_error;
+  
+  h = (handler *) handlers.list.head;
+  
+  for(i=0;h && i < size;h=(handler *) h->next, i++) {
+    jstr = (*env)->NewStringUTF(env, h->name);
+    
+    if(!jstr) goto jni_error;
+    
+    (*env)->SetObjectArrayElement(env, jarray, i, jstr);
+    
+    if((*env)->ExceptionCheck(env)) goto jni_error;
+  }
+  
+  goto exit;
+  
+  jni_error:
+  
+  // unlock mutex ASAP
+  if(locked) {
+    pthread_mutex_unlock(&(handlers.control.mutex));
+    locked = 0;
+  }
+  
+  if((*env)->ExceptionCheck(env)) {
+    (*env)->ExceptionDescribe(env);
+    (*env)->ExceptionClear(env);
+  }
+  
+  if(jarray) {
+    (*env)->DeleteLocalRef(env, jarray);
+    jarray = NULL;
+  }
+  
+  exit:
+  
+  if(locked) {
+    pthread_mutex_unlock(&(handlers.control.mutex));
+  }
+  
+  if(jstr) {
+    (*env)->DeleteLocalRef(env, jstr);
+  }
+  
+  return jarray;
+}
