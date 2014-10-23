@@ -416,6 +416,7 @@ void kill_child(JNIEnv *env, jclass clazz __attribute__((unused)), int id, int s
   
   signal_info = (struct cmd_signal_info *) m->data;
   
+  signal_info->cmd_action = CMD_SIGNAL;
   signal_info->id = id;
   signal_info->signal = signal;
   
