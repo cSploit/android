@@ -130,8 +130,8 @@ char *string_array_next(message *m, char *array_start, char *current_string) {
   
   for(pos=current_string;pos<end && *pos!='\0'; pos++);
   
-  if(pos==end)
+  if(pos==end || ++pos == end)
     return NULL;
   
-  return pos+1;
+  return pos;
 }
