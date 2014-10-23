@@ -22,6 +22,7 @@
 #include "connection.h"
 
 int sockfd;
+char connected = 0;
 pthread_mutex_t write_lock = PTHREAD_MUTEX_INITIALIZER;
 
 void on_connect() {
@@ -35,13 +36,15 @@ void on_disconnect() {
 /**
  * @brief connect to a dSploitd UNIX socket
  * @param jsocket_path path to the UNIX socket
- * @returns 
- * @throws 
+ * @returns true on success, false on error.
  */
-jboolean connect_unix(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jsocket_path) {
+jboolean connect_unix(JNIEnv *env, jclass clazz _U_, jstring jsocket_path) {
   const char *socket_path;
   jboolean ret;
   struct sockaddr_un addr;
+  
+  if(connected)
+    disconnect_unix(env, clazz);
   
   sockfd=-1;
   ret = JNI_FALSE;
@@ -76,6 +79,8 @@ jboolean connect_unix(JNIEnv *env, jclass clazz __attribute__((unused)), jstring
     goto error;
   }
   
+  connected = 1;
+  
   ret = JNI_TRUE;
   
   goto cleanup;
@@ -106,7 +111,22 @@ jboolean connect_unix(JNIEnv *env, jclass clazz __attribute__((unused)), jstring
   return ret;
 }
 
-void disconnect_unix(JNIEnv *env __attribute__((unused)), jclass clazz __attribute__((unused))) {
+/**
+ * @brief check if we are connected to a UNIX socket
+ * @returns true if already connected, false if not.
+ */
+jboolean is_unix_connected(JNIEnv *env _U_, jclass clazz _U_) {
+  return (connected ? JNI_TRUE : JNI_FALSE);
+}
+
+/**
+ * @brief disconnect from UNIX socket
+ */
+void disconnect_unix(JNIEnv *env _U_, jclass clazz _U_) {
+  
+  if(!connected)
+    return;
+  
   stop_notifier();
   
   pthread_mutex_lock(&write_lock);
@@ -116,6 +136,8 @@ void disconnect_unix(JNIEnv *env __attribute__((unused)), jclass clazz __attribu
   stop_reader();
   
   close(sockfd);
+  
+  connected = 0;
   
   unload_handlers();
 }

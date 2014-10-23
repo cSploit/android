@@ -57,6 +57,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* pVm, void* reserved _U_) {
     { "Disconnect", "()V", disconnect_unix },
     { "Kill", "(II)V", kill_child },
     { "SendTo", "(I[B)Z", send_to_child },
+    { "isConnected", "()Z", is_unix_connected },
+    { "isAuthenticated", "()Z", is_authenticated },
   };
   
   ret = (*pVm)->GetEnv(pVm, (void **)&env, JNI_VERSION_1_6);

@@ -130,6 +130,16 @@ int on_auth_status(message *m) {
   return 0;
 }
 
+jboolean is_authenticated(JNIEnv *env _U_, jclass clazz _U_) {
+  jboolean ret;
+  
+  pthread_mutex_lock(&(logged.control.mutex));
+  ret = (logged.status == LOGIN_OK ? JNI_TRUE : JNI_FALSE);
+  pthread_mutex_unlock(&(logged.control.mutex));
+  
+  return ret;
+}
+
 /**
  * @brief allocate resources used in runtime
  */
