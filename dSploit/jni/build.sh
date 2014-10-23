@@ -129,8 +129,7 @@ build_core() {
   done
   echo -ne "ok\ncopying scripts..."
   
-  find "${jni_root}/nmap" -name "*.lua" -print0 | \
-    rsync -aq --files-from=- --from0 "/" "${out}/tools/" >&3 2>&1 || die
+  rsync -aq --include "*/" --include "*.lua" --exclude "*" "${jni_root}/nmap/" "${out}/tools/nmap/" >&3 2>&1 || die
   rsync -aq "${jni_root}/nmap/scripts/" "${out}/tools/nmap/scripts/" >&3 2>&1 || die
 
   echo -ne "ok\ncopying configuration/database files..."
