@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
-#include <ctype.h>
 #include <assert.h>
 
 #include "logger.h"
@@ -98,7 +97,7 @@ char *message_to_string(message *msg) {
   pos=msg->data;
   end=pos+msg->head.size;
   for(;pos<end;pos++) {
-    if(isprint(*pos))
+    if(31 < *pos && *pos < 127)
       len++;
     else
       len+=4;
@@ -117,7 +116,7 @@ char *message_to_string(message *msg) {
           msg->head.seq, msg->head.size, msg->head.id);
   
   for(pos=msg->data;pos<end;pos++) {
-    if(isprint(*pos))
+    if(31 < *pos && *pos < 127)
       write += snprintf(write, 2, "%c", *pos);
     else
       write += snprintf(write, 5, "\\x%02hhX", *pos);
