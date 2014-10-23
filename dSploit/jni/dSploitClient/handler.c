@@ -19,6 +19,11 @@
 
 struct handlers_list handlers;
 
+/* TODO. need internet for writing it.
+jobjectarray jloaded_handlers(JNIEnv *env, jclass clazz _U_) {
+  
+} */
+
 /**
  * @brief load handlers from dSploitd
  * @returns true on success, false on error.
@@ -45,6 +50,7 @@ jboolean jload_handlers(JNIEnv *env _U_, jclass clazz _U_) {
   m->data[0] = HNDL_LIST;
   
   pthread_mutex_lock(&(handlers.control.mutex));
+  handlers.control.active = 1;
   handlers.status = HANDLER_WAIT;
   pthread_mutex_unlock(&(handlers.control.mutex));
   
@@ -94,6 +100,13 @@ int on_handler_list(message *m) {
     
     LOGD("%s: id=%u, have_stdin=%u, have_stdout=%u, name=\"%s\"", __func__, handler_info->id,
          handler_info->have_stdin, handler_info->have_stdout, handler_info->name);
+         
+    for(h=(handler *) handlers.list.head;h && h->id != handler_info->id;h=(handler *) h->next);
+    
+    if(h) {
+      LOGI("%s: updating handler #%u", __func__, handler_info->id);
+      list_del(&(handlers.list), (node *)h);
+    }
     
     h = malloc(sizeof(handler));
     
