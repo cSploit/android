@@ -373,6 +373,141 @@ jobject create_account_event(JNIEnv *env, void *arg) {
 }
 
 /**
+ * @brief create an it.evilsocket.dsploit.events.Ready
+ * @param m the received ::message
+ * @returns a new object on success, NULL on error.
+ */
+jobject create_message_event(JNIEnv *env, message *m) {
+  jobject res;
+  char *severity, *message;
+  jstring jseverity, jmessage;
+  
+  jseverity = jmessage = NULL;
+  res = NULL;
+  
+  switch(m->data[0]) {
+    case HYDRA_WARNING:
+      severity = "WARNING";
+      message = ((struct hydra_warning_info *) m->data)->text;
+      break;
+    case HYDRA_ERROR:
+      severity = "ERROR";
+      message = ((struct hydra_error_info *) m->data)->text;
+      break;
+    default:
+      LOGE("%s: unknown message code %02hhX", __func__, m->data[0]);
+      return NULL;
+  }
+  
+  jseverity = (*env)->NewStringUTF(env, severity);
+  if(!jseverity) goto cleanup;
+  
+  jmessage = (*env)->NewStringUTF(env, message);
+  if(!jmessage) goto cleanup;
+      
+  
+  res = (*env)->NewObject(env,
+                        cache.dsploit.events.message.class,
+                        cache.dsploit.events.message.ctor,
+                        jseverity, jmessage);
+  
+  cleanup:
+  
+  if((*env)->ExceptionCheck(env)) {
+    (*env)->ExceptionDescribe(env);
+    (*env)->ExceptionClear(env);
+  }
+  
+  return res;
+}
+
+/**
+ * @brief create an it.evilsocket.dsploit.events.Attempts
+ * @param arg a pointer to a ::message containing an ::hydra_attempts_info
+ * @returns a new object on success, NULL on error.
+ */
+jobject create_attempts_event(JNIEnv *env, message *m) {
+  jobject res;
+  struct hydra_attempts_info *attempts_info;
+  
+  attempts_info = (struct hydra_attempts_info *) m->data;
+  
+  res = (*env)->NewObject(env,
+                        cache.dsploit.events.attempts.class,
+                        cache.dsploit.events.attempts.ctor,
+                        attempts_info->sent, attempts_info->left,
+                        attempts_info->rate, attempts_info->elapsed,
+                        attempts_info->eta);
+  
+  if((*env)->ExceptionCheck(env)) {
+    (*env)->ExceptionDescribe(env);
+    (*env)->ExceptionClear(env);
+  }
+  
+  return res;
+}
+
+/**
+ * @brief create an it.evilsocket.dsploit.events.Login
+ * @param m the received ::message
+ * @returns a new object on success, NULL on error.
+ */
+jobject create_login_event(JNIEnv *env, message *m) {
+  jstring jlogin, jpswd;
+  jobject res, addr;
+  struct hydra_login_info *login_info;
+  char *pos;
+  
+  res = addr = NULL;
+  pos = NULL;
+  jlogin = jpswd = NULL;
+  
+  login_info = (struct hydra_login_info *) m->data;
+  
+  if(login_info->contents & HAVE_ADDRESS) {
+    addr = inaddr_to_inetaddress(env, login_info->address);
+    if(!addr) return NULL;
+  }
+  
+  if(login_info->contents & HAVE_LOGIN) {
+    pos = string_array_next(m, login_info->data, pos);
+    
+    jlogin = (*env)->NewStringUTF(env, pos);
+    if(!jlogin) goto cleanup;
+  }
+  
+  if(login_info->contents & HAVE_PASSWORD) {
+    pos = string_array_next(m, login_info->data, pos);
+    
+    jpswd = (*env)->NewStringUTF(env, pos);
+    if(!jpswd) goto cleanup;
+  }
+  
+  res = (*env)->NewObject(env,
+                          cache.dsploit.events.login.class,
+                          cache.dsploit.events.login.ctor,
+                          login_info->port, addr, jlogin, jpswd);
+  
+  cleanup:
+  
+  if((*env)->ExceptionCheck(env)) {
+    (*env)->ExceptionDescribe(env);
+    (*env)->ExceptionClear(env);
+  }
+  
+  if(addr)
+    (*env)->DeleteLocalRef(env, addr);
+  
+  if(jlogin)
+    (*env)->DeleteLocalRef(env, jlogin);
+  
+  if(jpswd)
+    (*env)->DeleteLocalRef(env, jpswd);
+  
+  return res;
+}
+
+/**
  * @brief send an event to java.
  * @param c the child that generate this event
  * @param e the event to send

@@ -113,6 +113,9 @@ int init_dsploit_events_cache(JNIEnv *env) {
     { "it/evilsocket/dsploit/events/Os", "(SLjava/lang/String;Ljava/lang/String;)V" },
     { "it/evilsocket/dsploit/events/Ready", "()V" },
     { "it/evilsocket/dsploit/events/Account", "(Ljava/net/InetAddress;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V" },
+    { "it/evilsocket/dsploit/events/Message", "(Ljava/lang/String;Ljava/lang/String;)V" },
+    { "it/evilsocket/dsploit/events/Login", "(ILjava/net/InetAddress;Ljava/lang/String;Ljava/lang/String;)V" },
+    { "it/evilsocket/dsploit/events/Attempts", "(JJJJJ)V" },
   };
   struct class_and_ctor_cache *ptr;
   register int i;

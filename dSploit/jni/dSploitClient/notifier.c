@@ -87,7 +87,6 @@ int on_nmap(JNIEnv *env, child_node *c, message *m) {
   return ret;
 }
 
-// TODO
 int on_ettercap(JNIEnv *env, child_node *c, message *m) {
   jobject event;
   int ret;
@@ -120,10 +119,41 @@ int on_ettercap(JNIEnv *env, child_node *c, message *m) {
   return ret;
 }
 
-
-
-// TODO
-#define on_hydra(a, b, c) 0
+int on_hydra(JNIEnv *env, child_node *c, message *m) {
+  jobject event;
+  int ret;
+  
+  ret = -1;
+  
+  switch(m->data[0]) {
+    case HYDRA_ATTEMPTS:
+      event = create_attempts_event(env, m);
+      break;
+    case HYDRA_WARNING:
+    case HYDRA_ERROR:
+      event = create_message_event(env, m);
+      break;
+    case HYDRA_LOGIN:
+      event = create_login_event(env, m);
+      break;
+    default:
+      LOGW("%s: unkown hydra action: %02hhX", __func__, m->data[0]);
+      return -1;
+  }
+  
+  if(!event) {
+    LOGE("%s: cannot create event", __func__);
+  } else if(send_event(env, c, event)) {
+    LOGE("%s: cannot send event", __func__);
+  } else {
+    ret = 0;
+  }
+  
+  if(event)
+    (*env)->DeleteLocalRef(env, event);
+  
+  return ret;
+}
 
 int on_message(JNIEnv *env, message *m) {
   child_node *c;

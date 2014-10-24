@@ -21,7 +21,10 @@ struct events_cache {
         port,
         os,
         ready,
-        account;
+        account,
+        message,
+        login,
+        attempts;
 };
 
 struct core_chlidmanager_cache {
