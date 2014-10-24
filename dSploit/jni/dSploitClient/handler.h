@@ -44,6 +44,7 @@ extern struct handlers_list {
     handler *nmap;
     handler *ettercap;
     handler *hydra;
+    handler *arpspoof;
   } by_name;              ///< access handlers by name
   enum handlers_loading_status status;
 } handlers;

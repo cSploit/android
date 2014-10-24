@@ -21,6 +21,7 @@
 #include "nmap.h"
 #include "ettercap.h"
 #include "hydra.h"
+#include "arpspoof.h"
 
 #include "notifier.h"
 
@@ -155,6 +156,35 @@ int on_hydra(JNIEnv *env, child_node *c, message *m) {
   return ret;
 }
 
+int on_arpspoof(JNIEnv *env, child_node *c, message *m) {
+  jobject event;
+  int ret;
+  
+  ret = -1;
+  
+  switch(m->data[0]) {
+    case ARPSPOOF_ERROR:
+      event = create_message_event(env, m);
+      break;
+    default:
+      LOGW("%s: unkown arpspoof action: %02hhX", __func__, m->data[0]);
+      return -1;
+  }
+  
+  if(!event) {
+    LOGE("%s: cannot create event", __func__);
+  } else if(send_event(env, c, event)) {
+    LOGE("%s: cannot send event", __func__);
+  } else {
+    ret = 0;
+  }
+  
+  if(event)
+    (*env)->DeleteLocalRef(env, event);
+  
+  return ret;
+}
+
 int on_message(JNIEnv *env, message *m) {
   child_node *c;
   int ret;
@@ -175,7 +205,7 @@ int on_message(JNIEnv *env, message *m) {
   }
   
   if( c->handler == handlers.by_name.blind ) {
-    LOGE("%s: received a message for a blind child", __func__);
+    LOGE("%s: received a message from a blind child", __func__);
   } else if( c->handler == handlers.by_name.raw ) {
     ret = on_raw(env, c, m);
   } else if( c->handler == handlers.by_name.nmap ) {
@@ -184,6 +214,8 @@ int on_message(JNIEnv *env, message *m) {
     ret = on_ettercap(env, c, m);
   } else if( c->handler == handlers.by_name.hydra) {
     ret = on_hydra(env, c, m);
+  } else if( c->handler == handlers.by_name.arpspoof) {
+    ret = on_arpspoof(env, c, m);
   } else {
     LOGW("%s: unkown handler: \"%s\" ( #%u )", __func__, c->handler->name, c->handler->id);
   }

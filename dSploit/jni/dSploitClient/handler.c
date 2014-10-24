@@ -162,6 +162,8 @@ int on_handler_list(message *m) {
       handlers.by_name.ettercap = h;
     } else if(!handlers.by_name.hydra && !strncmp(h->name, "hydra", 6)) {
       handlers.by_name.hydra = h;
+    } else if(!handlers.by_name.arpspoof && !strncmp(h->name, "arpspoof", 9)) {
+      handlers.by_name.arpspoof = h;
     }
     
     h->id = handler_info->id;

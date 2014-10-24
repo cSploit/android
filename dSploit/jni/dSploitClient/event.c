@@ -15,6 +15,7 @@
 #include "nmap.h"
 #include "hydra.h"
 #include "ettercap.h"
+#include "arpspoof.h"
 
 #include "event.h"
 
@@ -390,6 +391,7 @@ jobject create_message_event(JNIEnv *env, message *m) {
       severity = "WARNING";
       message = ((struct hydra_warning_info *) m->data)->text;
       break;
+    case ARPSPOOF_ERROR:
     case HYDRA_ERROR:
       severity = "ERROR";
       message = ((struct hydra_error_info *) m->data)->text;
