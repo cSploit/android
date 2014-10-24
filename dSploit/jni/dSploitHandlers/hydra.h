@@ -8,28 +8,31 @@
 #include <arpa/inet.h>
 
 enum hydra_action {
-  HYDRA_STATUS,
+  HYDRA_ATTEMPTS,
   HYDRA_WARNING,
   HYDRA_ERROR,
   HYDRA_LOGIN
 };
 
-/// hydra status info
-struct hydra_status_info {
-  char                hydra_action;   ///< must be set to ::STATUS
+/// hydra attempts info
+struct hydra_attempts_info {
+  char                hydra_action;   ///< must be set to ::HYDRA_ATTEMPTS
+  unsigned int        rate;           ///< # of attempts per hour
   unsigned long int   sent;           ///< # of sent logins
   unsigned long int   left;           ///< # of logins left to try
+  unsigned int        elapsed;        ///< elapsed time in minutes
+  unsigned int        eta;            ///< ETA in minutes
 };
 
 /// hydra warning info
 struct hydra_warning_info {
-  char                hydra_action;    ///< must be set to ::WARNING
+  char                hydra_action;    ///< must be set to ::HYDRA_WARNING
   char                text[];
 };
 
 /// hydra error info
 struct hydra_error_info {
-  char                hydra_action;    ///< must be set to ::ERROR
+  char                hydra_action;    ///< must be set to ::HYDRA_ERROR
   char                text[];
 };
 

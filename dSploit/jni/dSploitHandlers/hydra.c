@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <math.h>
 
 #include "handler.h"
 #include "logger.h"
@@ -33,7 +34,7 @@ __attribute__((constructor))
 void hydra_init() {
   int ret;
   
-  if((ret = regcomp(&status_pattern, "^\\[STATUS\\] .*, ([0-9]+) tries in [^,]+, ([0-9]+) todo", REG_EXTENDED))) {
+  if((ret = regcomp(&status_pattern, "^\\[STATUS\\] ([0-9,]+) tries/min, ([0-9]+) tries in ([0-9]{2}):([0-9]{2})h, ([0-9]+) todo in ([0-9]{2}):([0-9]{2})h", REG_EXTENDED))) {
     print( ERROR, "regcomp(status_pattern): %d", ret);
   }
   if((ret = regcomp(&alert_pattern, "^\\[(ERROR|WARNING)\\] ", REG_EXTENDED | REG_ICASE))) {
@@ -52,32 +53,53 @@ void hydra_fini() {
 }
 
 /**
- * @brief search for HOP in an nmap trace scan.
+ * @brief parse hydra status message
  * @returns a ::message on success, NULL on error.
  */
 message *parse_hydra_status(char *line) {
-  regmatch_t pmatch[3];
-  struct hydra_status_info *status_info;
+  regmatch_t pmatch[8];
+  struct hydra_attempts_info *status_info;
   message *m;
+  char *end;
+  float f;
   
-  if(regexec(&status_pattern, line, 3, pmatch, 0))
+  if(regexec(&status_pattern, line, 8, pmatch, 0))
     return NULL;
   
-  m = create_message(0, sizeof(struct hydra_status_info), 0);
+  m = create_message(0, sizeof(struct hydra_attempts_info), 0);
   if(!m) {
     print( ERROR, "cannot create messages");
     return NULL;
   }
   
-  // terminate lines for parsing single parts
+  // terminate parts
   *(line + pmatch[1].rm_eo) = '\0';
   *(line + pmatch[2].rm_eo) = '\0';
+  *(line + pmatch[3].rm_eo) = '\0';
+  *(line + pmatch[4].rm_eo) = '\0';
+  *(line + pmatch[5].rm_eo) = '\0';
+  *(line + pmatch[6].rm_eo) = '\0';
+  *(line + pmatch[7].rm_eo) = '\0';
   
   
-  status_info = (struct hydra_status_info *) m->data;
-  status_info->hydra_action = HYDRA_STATUS;
-  status_info->sent = strtoul(line + pmatch[1].rm_so, NULL, 10);
-  status_info->left = strtoul(line + pmatch[2].rm_so, NULL, 10);
+  status_info = (struct hydra_attempts_info *) m->data;
+  status_info->hydra_action = HYDRA_ATTEMPTS;
+  
+  f = strtof(line + pmatch[1].rm_so, &end);
+  
+  if(end==(line + pmatch[1].rm_so) || *end != 0 || f == HUGE_VALF || !f) {
+    print( WARNING, "cannot parse rate. input string='%s'. rate string='%s'",
+           line, line + pmatch[1].rm_so);
+  } else {
+    status_info->rate = (unsigned int) (f * 60);
+  }
+  
+  status_info->sent = strtoul(line + pmatch[2].rm_so, NULL, 10);
+  status_info->left = strtoul(line + pmatch[5].rm_so, NULL, 10);
+  status_info->elapsed = (strtoul(line + pmatch[3].rm_so, NULL, 10) * 60) + 
+                          strtoul(line + pmatch[4].rm_so, NULL, 10);
+  status_info->eta = (strtoul(line + pmatch[6].rm_so, NULL, 10) * 60) + 
+                      strtoul(line + pmatch[7].rm_so, NULL, 10);
   
   return m;
 }
