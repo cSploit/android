@@ -12,6 +12,7 @@
 #include "ettercap.h"
 #include "message.h"
 #include "str_array.h"
+#include "common_regex.h"
 
 handler handler_info = {
   NULL,                       // next
@@ -37,7 +38,7 @@ void ettercap_init() {
     print(ERROR, "regcomp(ready_pattern): %d", ret);
   }
   //TODO: search for dissectors that does not match this line and create a specific regex ( or change thier sources )
-  if((ret = regcomp(&account_pattern, "^([^ ]+).*[^0-9](([0-9]{1,3}\\.){3}[0-9]{1,3}).* -> USER: (.*)  PASS: ((.*)  [^ ]|(.*)$)", REG_EXTENDED | REG_ICASE))) {
+  if((ret = regcomp(&account_pattern, "^([^ ]+).*[^0-9](" IPv4_REGEX ").* -> USER: (.*)  PASS: ((.*)  [^ ]|(.*)$)", REG_EXTENDED | REG_ICASE))) {
     print(ERROR, "regcomp(account_pattern): %d", ret);
   }
 }
@@ -76,12 +77,12 @@ message *parse_ettercap_ready(char *line) {
  * @returns a ::message on success, NULL on error.
  */
 message *parse_ettercap_account(char *line) {
-  regmatch_t pmatch[7];
+  regmatch_t pmatch[6];
   struct ettercap_account_info *account_info;
   message *m;
   int array_start;
   
-  if(regexec(&account_pattern, line, 7, pmatch, 0))
+  if(regexec(&account_pattern, line, 6, pmatch, 0))
     return NULL;
   
   m = create_message(0, sizeof(struct ettercap_account_info), 0);
@@ -92,10 +93,10 @@ message *parse_ettercap_account(char *line) {
   }
   
   // terminate lines for parsing single parts
-  *(line + pmatch[2].rm_eo) = '\0';
   *(line + pmatch[1].rm_eo) = '\0';
+  *(line + pmatch[2].rm_eo) = '\0';
+  *(line + pmatch[3].rm_eo) = '\0';
   *(line + pmatch[4].rm_eo) = '\0';
-  *(line + pmatch[5].rm_eo) = '\0';
   
   array_start = offsetof(struct ettercap_account_info, data);
   
@@ -104,8 +105,8 @@ message *parse_ettercap_account(char *line) {
   account_info->address = inet_addr(line + pmatch[2].rm_so);
   
   if(string_array_add(m, array_start, line + pmatch[1].rm_so) ||
-     string_array_add(m, array_start, line + pmatch[4].rm_so) ||
-     string_array_add(m, array_start, line + pmatch[5].rm_so)) {
+     string_array_add(m, array_start, line + pmatch[3].rm_so) ||
+     string_array_add(m, array_start, line + pmatch[4].rm_so)) {
      print( ERROR, "cannot add string to message");
      free_message(m);
      return NULL;

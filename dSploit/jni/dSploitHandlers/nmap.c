@@ -12,6 +12,7 @@
 #include "nmap.h"
 #include "message.h"
 #include "str_array.h"
+#include "common_regex.h"
 
 handler handler_info = {
   NULL,                   // next
@@ -33,7 +34,7 @@ __attribute__((constructor))
 void nmap_init() {
   int ret;
   
-  if((ret = regcomp(&hop_pattern, "^([0-9]+) +(\\.\\.\\.|[0-9\\.]+ m?s) +([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}|[0-9]+)", REG_EXTENDED | REG_ICASE))) {
+  if((ret = regcomp(&hop_pattern, "^([0-9]+) +(\\.\\.\\.|[0-9\\.]+ m?s) +(" IPv4_REGEX "|[0-9]+)", REG_EXTENDED | REG_ICASE))) {
     print( ERROR, "%s: regcomp(hop_pattern): %d", ret);
   }
   if((ret = regcomp(&port_pattern, "^Discovered open port ([0-9]+)/([a-z]+)", REG_EXTENDED | REG_ICASE))) {
@@ -75,7 +76,7 @@ message *parse_nmap_hop(char *line) {
     return NULL;
   }
   
-  // terminate lines for parsing single parts
+  // terminate single parts
   *(line + pmatch[1].rm_eo) = '\0';
   *(line + pmatch[2].rm_eo) = '\0';
   *(line + pmatch[3].rm_eo) = '\0';
