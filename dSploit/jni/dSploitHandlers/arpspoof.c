@@ -60,6 +60,11 @@ message *arpspoof_output_parser(char *line) {
   
   m = create_message(0, (len - 6), 0);
   
+  if(!m) {
+    print(ERROR, "cannot create messages");
+    return NULL;
+  }
+  
   m->data[0] = ARPSPOOF_ERROR;
   memcpy(m->data + 1, line + 8, len - 7);
   
