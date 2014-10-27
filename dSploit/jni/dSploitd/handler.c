@@ -22,11 +22,51 @@
 list handlers;
 
 /**
+ * @brief handler sanity checks
+ * @param h the handler to check
+ * @returns 0 on success, -1 on error.
+ */
+int check_handler(handler *h) {
+  char *test;
+  int ret;
+  
+  if(!(h->enabled)) {
+    print( WARNING, "handler '%s' disabled", h->name);
+    return -1;
+  }
+  
+  if(h->argv0) {
+    if(h->workdir) {
+      if(asprintf(&test, "%s/%s", h->workdir, h->argv0) == -1) {
+        print( ERROR, "asprintf: %s", strerror(errno) );
+        return -1;
+      }
+    } else {
+      test = (char *) h->argv0;
+    }
+  } else if(h->workdir) {
+    test = (char *) h->workdir;
+  } else {
+    return 0;
+  }
+  
+  ret = access(test , X_OK);
+  if(ret) {
+    print( ERROR, "access(\"%s\", X_OK): %s", test, strerror(errno));
+  }
+    
+  if(test != h->argv0 && test != h->workdir)
+    free(test);
+  
+  return ret;
+}
+
+/**
  * @brief load all handlers found in the ::HANDLERS_DIR
  * @returns 0 on success, -1 on error.
  */
 int load_handlers() {
-  DIR *d, *test;
+  DIR *d;
   struct dirent *de;
   handler *h,*tmp;
   char *path;
@@ -66,26 +106,8 @@ int load_handlers() {
       goto close;
     }
     
-    if(!(h->enabled)) {
-      print( ERROR, "\"%s\": disabled", path );
+    if(check_handler(h)) {
       goto close;
-    }
-    
-    if(h->argv0 && access(h->argv0, X_OK)) {
-      print(ERROR, "while loading \"%s\": access(\"%s\", X_OK): %s\n",
-            path, h->argv0, strerror(errno));
-      goto close;
-    }
-    
-    if(h->workdir) {
-      test = opendir(h->workdir);
-      if(!test) {
-        print(ERROR, "\"%s\": opendir(\"%s\"): %s\n",
-                path, h->workdir, strerror(errno));
-        goto close;
-      } else {
-        closedir(test);
-      }
     }
     
     h->dl_handle = handle;
