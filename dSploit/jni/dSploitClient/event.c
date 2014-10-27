@@ -16,6 +16,7 @@
 #include "hydra.h"
 #include "ettercap.h"
 #include "arpspoof.h"
+#include "tcpdump.h"
 
 #include "event.h"
 
@@ -505,6 +506,39 @@ jobject create_login_event(JNIEnv *env, message *m) {
   
   if(jpswd)
     (*env)->DeleteLocalRef(env, jpswd);
+  
+  return res;
+}
+
+/**
+ * @brief create an it.evilsocket.dsploit.events.Packet
+ * @param m the received message
+ * @returns the jobject on success, NULLl on error.
+ */
+jobject create_packet_event(JNIEnv *env, message *m) {
+  jobject src, dst, res;
+  struct tcpdump_packet_info *packet_info;
+  
+  packet_info = (struct tcpdump_packet_info *) m->data;
+  
+  src = inaddr_to_inetaddress(env, packet_info->src);
+  if(!src) return NULL;
+  
+  dst = inaddr_to_inetaddress(env, packet_info->dst);
+  if(!dst) return NULL;
+  
+  res = (*env)->NewObject(env,
+                          cache.dsploit.events.packet.class,
+                          cache.dsploit.events.packet.ctor,
+                          src, dst, packet_info->len);
+  
+  (*env)->DeleteLocalRef(env, src);
+  (*env)->DeleteLocalRef(env, dst);
+  
+  if(!res && (*env)->ExceptionCheck(env)) {
+    (*env)->ExceptionDescribe(env);
+    (*env)->ExceptionClear(env);
+  }
   
   return res;
 }

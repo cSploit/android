@@ -24,7 +24,8 @@ struct events_cache {
         account,
         message,
         login,
-        attempts;
+        attempts,
+        packet;
 };
 
 struct core_chlidmanager_cache {

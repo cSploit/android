@@ -164,6 +164,8 @@ int on_handler_list(message *m) {
       handlers.by_name.hydra = h;
     } else if(!handlers.by_name.arpspoof && !strncmp(h->name, "arpspoof", 9)) {
       handlers.by_name.arpspoof = h;
+    } else if(!handlers.by_name.tcpdump && !strncmp(h->name, "tcpdump", 8)) {
+      handlers.by_name.tcpdump = h;
     }
     
     h->id = handler_info->id;
