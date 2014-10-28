@@ -25,6 +25,7 @@ typedef struct child_node {
   pid_t pid;                    ///< process managed by this child
   int stdin_fd;                 ///< stdin file descritor of the process
   int stdout_fd;                ///< stdout file descritor of the process
+  int stderr_fd;                ///< stderr file descritor of the process
   
   uint16_t seq;                 ///< sent messages sequence number
   buffer output_buff;           ///< ::buffer for ::handler.raw_output_parser
@@ -35,8 +36,11 @@ void *handle_child(void *);
 void stop_children(struct conn_node *);
 int on_child_message(struct conn_node *, struct message *);
 
-/// buffer size for process stdout
+/// buffer size for read stdout
 #define STDOUT_BUFF_SIZE 2048
+
+/// buffer size for read stderr
+#define STDERR_BUFF_SIZE 255
 
 /// signal to send to forked processes to stop them
 #define CHILD_STOP_SIGNAL 15

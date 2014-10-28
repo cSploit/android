@@ -35,7 +35,7 @@ int on_cmd_started(message *m) {
     return -1;
   }
   
-  c->pending=0;
+  c->seq=0;
   c->id = started_info->id;
   
   pthread_mutex_unlock(&(children.control.mutex));
@@ -57,7 +57,7 @@ int on_cmd_fail(message *m) {
     return -1;
   }
   
-  c->pending=0;
+  c->seq=0;
   c->id = CTRL_ID;
   
   pthread_mutex_unlock(&(children.control.mutex));
@@ -84,6 +84,11 @@ int on_cmd_end(JNIEnv *env, message *m) {
     pthread_mutex_unlock(&(children.control.mutex));
     LOGW("%s: child #%u not found", __func__, end_info->id);
     return -1;
+  }
+  
+  // ensure that start_command consumed the started notification
+  while(c->pending && children.control.active) {
+    pthread_cond_wait(&(children.control.cond), &(children.control.mutex));
   }
   
   list_del(&(children.list), (node *) c);
@@ -129,6 +134,11 @@ int on_cmd_died(JNIEnv *env, message *m) {
     return -1;
   }
   
+  // ensure that start_command consumed the started notification
+  while(c->pending && children.control.active) {
+    pthread_cond_wait(&(children.control.cond), &(children.control.mutex));
+  }
+  
   list_del(&(children.list), (node *) c);
   
   pthread_mutex_unlock(&(children.control.mutex));
@@ -153,6 +163,42 @@ int on_cmd_died(JNIEnv *env, message *m) {
   return ret;
 }
 
+int on_cmd_stderr(JNIEnv *env, message *m) {
+  jobject event;
+  struct cmd_stderr_info *stderr_info;
+  child_node *c;
+  int ret;
+  
+  ret = -1;
+  stderr_info = (struct cmd_stderr_info *) m->data;
+  
+  pthread_mutex_lock(&(children.control.mutex));
+  
+  for(c=(child_node *) children.list.head;c && c->id != stderr_info->id;c= (child_node *) c->next);
+  
+  pthread_mutex_unlock(&(children.control.mutex));
+  
+  if(!c) {
+    LOGW("%s: child #%u not found", __func__, stderr_info->id);
+    return -1;
+  }
+  
+  event = create_stderrnewline_event(env, stderr_info->line);
+  
+  if(!event) {
+    LOGE("%s: cannot create event", __func__);
+  } else if(send_event(env, c, event)) {
+    LOGE("%s: cannot send event", __func__);
+  } else {
+    ret = 0;
+  }
+  
+  if(event)
+    (*env)->DeleteLocalRef(env, event);
+  
+  return ret;
+}
+
 /**
  * @brief handle a command message
  * @param m the received message
@@ -168,6 +214,8 @@ int on_command(JNIEnv *env, message *m) {
       return on_cmd_end(env, m);
     case CMD_DIED:
       return on_cmd_died(env, m);
+    case CMD_STDERR:
+      return on_cmd_stderr(env, m);
     default:
       LOGW("%s: unkown command code: %02hhX", __func__, m->data[0]);
       return -1;
@@ -181,13 +229,13 @@ int on_command(JNIEnv *env, message *m) {
 
 int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jhandler, jstring jcmd) {
   char status;
-  char *pos, *start, *end;
+  char *pos, *start, *end, *rpos, *wpos;
   const char *utf;
   jstring *utf_parent;
   handler *h;
   uint32_t msg_size; // big enought to check for uint16_t overflow
   int id;
-  size_t arg_len;
+  size_t arg_len, escapes;
   struct cmd_start_info *start_info;
   message *m;
   child_node *c;
@@ -251,6 +299,7 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
   
   status = 0;
   arg_len = 0;
+  escapes = 0;
   start = end = NULL;
   
   for(pos=(char *) utf;!(status & END_OF_STRING);pos++) {
@@ -258,7 +307,9 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
     // string status parser
     switch (*pos) {
       case '"':
-        if(status & (INSIDE_SINGLE_QUOTE | ESCAPE_FOUND)) {
+        if(status & ESCAPE_FOUND) {
+          escapes++;
+        } else if(status & (INSIDE_SINGLE_QUOTE)) {
           // copy it as a normal char
         } else if(status & INSIDE_DOUBLE_QUOTE) {
           status &= ~INSIDE_DOUBLE_QUOTE;
@@ -268,7 +319,9 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
         }
         break;
       case '\'':
-        if(status & (INSIDE_DOUBLE_QUOTE | ESCAPE_FOUND)) {
+        if(status & ESCAPE_FOUND) {
+          escapes++;
+        } else if(status & INSIDE_DOUBLE_QUOTE) {
           // copy it as a normal char
         } else if(status & INSIDE_SINGLE_QUOTE) {
           status &= ~INSIDE_SINGLE_QUOTE;
@@ -279,16 +332,20 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
         break;
       case '\\':
         if(status & ESCAPE_FOUND) {
-          status &= ~ESCAPE_FOUND;
           // copy it as normal char
+          escapes++;
         } else {
           status |= ESCAPE_FOUND;
+          continue;
         }
         break;
       case ' ': // if(isspace(*pos))
       case '\t':
-        if(!status && start)
+        if(status & ESCAPE_FOUND) {
+          escapes++;
+        } else if(!status && start) {
           end=pos;
+        }
         break;
       case '\0':
         status |= END_OF_STRING;
@@ -299,11 +356,14 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
           start=pos;
     }
     
+    status &= ~ESCAPE_FOUND;
+    
     // copy the arg if found
     if(start && end) {
       
       LOGD("%s: argument found: start=%d, end=%d", __func__, (start-utf), (end-utf));
       arg_len=(end-start);
+      arg_len-= escapes;
       
       msg_size+=arg_len + 1;
       
@@ -319,12 +379,32 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
         goto exit;
       }
       
-      memcpy(m->data + m->head.size, start, arg_len);
+      wpos = m->data + m->head.size;
+      for(rpos=start;rpos<end;rpos++) {
+        if(status & ESCAPE_FOUND) {
+          status &= ~ESCAPE_FOUND;
+          if( *rpos != '\\' &&
+              *rpos != '"' &&
+              *rpos != '\'' &&
+              *rpos != ' ' &&
+              *rpos != '\t') {
+            // unrecognized escape sequence, copy the backslash as it is.
+            *wpos = '\\';
+            wpos++;
+          }
+        } else if(*rpos == '\\') {
+          status |= ESCAPE_FOUND;
+          continue;
+        }
+        *wpos=*rpos;
+        wpos++;
+      }
       *(m->data + msg_size -1) = '\0';
       
       m->head.size = msg_size;
       
       start = end = NULL;
+      escapes = 0;
     }
   }
   
@@ -348,11 +428,11 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
   // send message to dSploitd
   
   pthread_mutex_lock(&write_lock);
-  // OPTIMIZATION: use m->head.id to store return value for later check
-  m->head.id = send_message(sockfd, m);
+  // OPTIMIZATION: use escapes to store return value for later check
+  escapes = send_message(sockfd, m);
   pthread_mutex_unlock(&write_lock);
   
-  if(m->head.id) {
+  if(escapes) {
     LOGE("%s: cannot send messages", __func__);
     goto exit;
   }
@@ -361,14 +441,16 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
   
   pthread_mutex_lock(&(children.control.mutex));
   
-  while(c->pending && children.control.active)
+  while(c->seq && children.control.active)
     pthread_cond_wait(&(children.control.cond), &(children.control.mutex));
   
-  if(c->id == CTRL_ID || c->pending) { // command failed
+  if(c->id == CTRL_ID || c->seq) { // command failed
     list_del(&(children.list), (node *) c);
   } else {
     id = c->id;
   }
+  
+  c->pending = 0;
   
   pthread_mutex_unlock(&(children.control.mutex));
   
@@ -376,7 +458,7 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
   
   if(id != -1) {
     LOGI("%s: child #%d started", __func__, id);
-  } else if(c->pending) {
+  } else if(c->seq) {
     LOGW("%s: pending child cancelled", __func__);
   } else {
     LOGW("%s: cannot start command", __func__);
@@ -395,6 +477,7 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
     pthread_mutex_lock(&(children.control.mutex));
     list_del(&(children.list), (node *) c);
     pthread_mutex_unlock(&(children.control.mutex));
+    pthread_cond_broadcast(&(children.control.cond));
     free_child(c);
   }
   

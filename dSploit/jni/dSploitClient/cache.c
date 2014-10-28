@@ -108,6 +108,7 @@ int init_dsploit_events_cache(JNIEnv *env) {
     { "it/evilsocket/dsploit/events/Newline", "(Ljava/lang/String;)V" },
     { "it/evilsocket/dsploit/events/ChildEnd", "(I)V" },
     { "it/evilsocket/dsploit/events/ChildDied", "(I)V" },
+    { "it/evilsocket/dsploit/events/StderrNewline", "(Ljava/lang/String;)V" },
     { "it/evilsocket/dsploit/events/Hop", "(IJLjava/net/InetAddress;)V" },
     { "it/evilsocket/dsploit/events/Port", "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)V" },
     { "it/evilsocket/dsploit/events/Os", "(SLjava/lang/String;Ljava/lang/String;)V" },

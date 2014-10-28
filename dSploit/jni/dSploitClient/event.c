@@ -33,7 +33,7 @@ jobject create_newline_event(JNIEnv *env, void *arg) {
   
   str = (*env)->NewStringUTF(env, (const char *)arg);
   
-  if(!str) goto error;
+  if(!str) goto jni_error;
   
   newline =  (*env)->NewObject(env,
                                cache.dsploit.events.newline.class,
@@ -41,7 +41,8 @@ jobject create_newline_event(JNIEnv *env, void *arg) {
                                str);
   if(newline) goto cleanup;
   
-  error:
+  jni_error:
+  
   if((*env)->ExceptionCheck(env)) {
     (*env)->ExceptionDescribe(env);
     (*env)->ExceptionClear(env);
@@ -53,6 +54,43 @@ jobject create_newline_event(JNIEnv *env, void *arg) {
     (*env)->DeleteLocalRef(env, str);
   
   return newline;
+}
+
+/**
+ * @brief create an it.evilsocket.dsploit.events.StderrNewline
+ * @param arg the new line
+ */
+jobject create_stderrnewline_event(JNIEnv *env, void *arg) {
+  jstring str;
+  jobject stderr_newline;
+  
+  str = NULL;
+  stderr_newline = NULL;
+  
+  str = (*env)->NewStringUTF(env, (const char *) arg);
+  
+  if(!str) goto jni_error;
+  
+  stderr_newline = (*env)->NewObject(env,
+                                     cache.dsploit.events.stderrnewline.class,
+                                     cache.dsploit.events.stderrnewline.ctor,
+                                     str);
+  
+  if(stderr_newline) goto cleanup;
+  
+  jni_error:
+  
+  if((*env)->ExceptionCheck(env)) {
+    (*env)->ExceptionDescribe(env);
+    (*env)->ExceptionClear(env);
+  }
+  
+  cleanup:
+  
+  if(str)
+    (*env)->DeleteLocalRef(env, str);
+  
+  return stderr_newline;
 }
 
 /**

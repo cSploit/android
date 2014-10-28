@@ -131,14 +131,56 @@ int read_stdout(child_node *c) {
     }
   }
   
+  if(count<0) {
+    print( ERROR, "read: %s", strerror(errno));
+    ret = -1;
+  }
+  
   free(buff);
   
   release_buffer(&(c->output_buff));
+  
+  return ret;
+}
+
+/**
+ * @brief read process stderr
+ * @param c the child to read stderr from
+ * @returns 0 on success, -1 on error.
+ */
+int read_stderr(child_node *c) {
+  buffer bigbuff;
+  char buff[255];
+  char *line;
+  int count, ret;
+  
+  ret = 0;
+  memset(&(bigbuff), 0, sizeof(buffer));
+  
+  while((count=read(c->stderr_fd, buff, 255)) > 0) {
+    if(append_to_buffer(&(bigbuff), buff, count)) {
+      ret = -1;
+      goto exit;
+    }
+    
+    while((line = get_line_from_buffer(&(bigbuff)))) {
+      ret = on_cmd_stderr(c, line);
+      free(line);
+      
+      if(ret)
+        goto exit;
+    }
+  }
+  
+  exit:
   
   if(count<0) {
     print( ERROR, "read: %s", strerror(errno));
     ret = -1;
   }
+  
+  release_buffer(&(bigbuff));
+  
   return ret;
 }
 
@@ -171,6 +213,8 @@ void *handle_child(void *arg) {
       print(ERROR, "cannot read process stdout");
     }
   }
+  
+  stdout_error &= read_stderr(c);
   
   if((wait_res = waitpid(c->pid, &status, 0)) != c->pid) {
     print(ERROR, "waitpid: %s", strerror(errno));

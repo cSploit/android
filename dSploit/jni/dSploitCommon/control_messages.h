@@ -24,6 +24,7 @@ enum ctrl_code {
   CMD_SIGNAL,   ///< send signal to command
   CMD_END,      ///< command ends
   CMD_DIED,     ///< command died
+  CMD_STDERR,   ///< command printed on stderr
   HNDL_LIST,    ///< get handler definitions
   MOD_LIST,     ///< get modules definitions
   MOD_INFO,     ///< module definition
@@ -76,6 +77,13 @@ struct cmd_died_info {
   char cmd_action;  ///< must be set to ::CMD_DIED
   uint16_t id;      ///< id of the child that managed the dead command
   int signal;       ///< the signal that killed the command
+};
+
+/// command print something on it's stderr
+struct cmd_stderr_info {
+  char cmd_action;  ///< must be set to ::CMD_STDERR
+  uint16_t id;      ///< id of the child that printed ::cmd_stderr_info.line
+  char line[];      ///< a line coming from child stderr
 };
 
 /* --- authenticator structures --- */

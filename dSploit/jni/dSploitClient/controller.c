@@ -28,6 +28,7 @@ int on_control(JNIEnv *env, message *m) {
     case CMD_FAIL:
     case CMD_END:
     case CMD_DIED:
+    case CMD_STDERR:
       return on_command(env, m);
     case HNDL_LIST:
       return on_handler(m);

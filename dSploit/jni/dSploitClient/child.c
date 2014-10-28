@@ -129,10 +129,8 @@ jboolean send_to_child(JNIEnv *env, jclass clazz __attribute__((unused)), int id
   if(m)
     free_message(m);
   
-  if(buff) {
-    LOGD("%s: releasing array", __func__);
+  if(buff)
     (*env)->ReleaseByteArrayElements(env, array, buff, JNI_ABORT);
-  }
   
   return ret;
 }

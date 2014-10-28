@@ -29,7 +29,46 @@
 #include "str_array.h"
 
 /**
- * @brief notify the command received that a child has exited
+ * @brief notify the command receiver that a chid printed a line on it's stderr.
+ * @param c the child hat generated @p line
+ * @param line the line received from the child stderr
+ * @returns 0 on success, -1 on error.
+ */
+int on_cmd_stderr(child_node *c, char *line) {
+  message *m;
+  struct cmd_stderr_info *stderr_info;
+  size_t len;
+  uint16_t seq;
+  
+  seq = get_sequence(&(c->conn->ctrl_seq), &(c->conn->control.mutex));
+  
+  len = strlen(line) + 1;
+  
+  m = create_message(seq, sizeof(struct cmd_stderr_info) + len, CTRL_ID);
+  
+  if(!m) {
+    print(ERROR, "cannot create messages");
+    return -1;
+  }
+  
+  stderr_info = (struct cmd_stderr_info *) m->data;
+  stderr_info->cmd_action = CMD_STDERR;
+  stderr_info->id = c->id;
+  memcpy(stderr_info->line, line, len);
+  
+  if(enqueue_message(&(c->conn->outcoming), m)) {
+    print(ERROR, "cannot enqueue messages");
+    dump_message(m);
+    free_message(m);
+    return -1;
+  }
+  
+  return 0;
+}
+
+
+/**
+ * @brief notify the command receiver that a child has exited
  * @param c the terminated child
  * @param status the child status returned by waitpid()
  * @returns 0 on success, -1 on error.
@@ -183,7 +222,7 @@ message *on_cmd_start(conn_node *conn, message *msg) {
   int  exec_errno;
   handler *h;
   child_node *c;
-  int pin[2],pout[2],pexec[2];
+  int pin[2],pout[2],perr[2],pexec[2];
   int i;
   struct cmd_start_info *request_info;
   struct cmd_started_info *reply_info;
@@ -195,7 +234,7 @@ message *on_cmd_start(conn_node *conn, message *msg) {
   cmd = NULL;
   // ensure to set piped fd to invalid one,
   // or close(2) will close unexpected fd. ( like our stdin if 0 )
-  pin[0] = pin[1] = pout[0] = pout[1] = pexec[0] = pexec[1] = -1;
+  pin[0] = pin[1] = pout[0] = pout[1] = perr[0] = perr[1] = pexec[0] = pexec[1] = -1;
   request_info = (struct cmd_start_info *)msg->data;
   argv=NULL;
   free_argv0 = 1;
@@ -259,6 +298,11 @@ message *on_cmd_start(conn_node *conn, message *msg) {
     goto start_fail;
   }
   
+  if(pipe(perr)) {
+    print( ERROR, "error pipe: %s", strerror(errno));
+    goto start_fail;
+  }
+  
   if((pid = fork()) < 0) {
     print( ERROR, "fork: %s", strerror(errno) );
     goto start_fail;
@@ -267,6 +311,7 @@ message *on_cmd_start(conn_node *conn, message *msg) {
     close(pexec[0]);
     close(pin[1]);
     close(pout[0]);
+    close(perr[0]);
     
     i= open("/dev/null", O_RDWR);
     
@@ -280,11 +325,12 @@ message *on_cmd_start(conn_node *conn, message *msg) {
     
     dup2(pin[0], STDIN_FILENO);
     dup2(pout[1], STDOUT_FILENO);
-    dup2(i, STDERR_FILENO);
+    dup2(perr[1], STDERR_FILENO);
 
     close(i);
     close(pin[0]);
     close(pout[1]);
+    close(perr[1]);
     
     execv(argv[0], argv);
     i=errno;
@@ -296,6 +342,7 @@ message *on_cmd_start(conn_node *conn, message *msg) {
     close(pexec[1]);
     close(pin[0]);
     close(pout[1]);
+    close(perr[1]);
     
     if(free_argv0)
       free(argv[0]);
@@ -322,6 +369,8 @@ message *on_cmd_start(conn_node *conn, message *msg) {
   
   if(h->have_stdout)
     c->stdout_fd = pout[0];
+  
+  c->stderr_fd = perr[0];
   
   pthread_mutex_lock(&(conn->children.control.mutex));
   if(pthread_create(&(c->tid), NULL, &handle_child, c)) {
@@ -365,6 +414,8 @@ message *on_cmd_start(conn_node *conn, message *msg) {
   close(pin[1]);
   close(pout[0]);
   close(pout[1]);
+  close(perr[0]);
+  close(perr[1]);
   
   if(msg)
     dump_message(msg);

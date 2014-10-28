@@ -17,6 +17,7 @@ struct events_cache {
         newline,
         child_end,
         child_died,
+        stderrnewline,
         hop,
         port,
         os,
