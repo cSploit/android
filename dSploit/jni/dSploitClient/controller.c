@@ -36,6 +36,8 @@ void request_shutdown(JNIEnv *env _U_, jclass clazz _U_ ) {
     return;
   }
   
+  m->data[0] = DMON_STOP;
+  
   pthread_mutex_lock(&write_lock);
   ret = send_message(sockfd, m);
   pthread_mutex_unlock(&write_lock);
