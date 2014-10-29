@@ -69,7 +69,7 @@ struct cmd_signal_info {
 struct cmd_end_info {
   char cmd_action;    ///< must be set to ::CMD_END
   uint16_t id;        ///< id of the child that managed the exited command
-  int8_t exit_value;  ///< the value returned by the command
+  uint8_t exit_value; ///< the value returned by the command
 };
 
 /// command has died ( killed by a signal )

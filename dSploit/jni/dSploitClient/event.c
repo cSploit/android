@@ -104,7 +104,7 @@ jobject create_child_end_event(JNIEnv *env, void *arg) {
   event = (*env)->NewObject(env,
                             cache.dsploit.events.child_end.class,
                             cache.dsploit.events.child_end.ctor,
-                            *((int8_t *) arg));
+                            *((uint8_t *) arg));
   
   if(event)
     return event;
