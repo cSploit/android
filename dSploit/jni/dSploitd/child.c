@@ -264,10 +264,6 @@ void stop_children(conn_node *conn) {
   pthread_mutex_lock(&(conn->children.control.mutex));
   
   for(c=(child_node *)conn->children.list.head;c;c=(child_node *) c->next) {
-    if(c->handler->have_stdin)
-      close(c->stdin_fd);
-    if(c->handler->have_stdout)
-      close(c->stdout_fd);
     kill(c->pid, CHILD_STOP_SIGNAL);
   }
   
