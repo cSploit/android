@@ -17,6 +17,7 @@
 #include "command.h"
 #include "handler.h"
 #include "connection.h"
+#include "controller.h"
 #include "reader.h"
 #include "child.h"
 #include "msgqueue.h"
@@ -61,6 +62,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* pVm, void* reserved _U_) {
     { "isConnected", "()Z", is_unix_connected },
     { "isAuthenticated", "()Z", is_authenticated },
     { "getHandlers", "()[Ljava/lang/String;", get_handlers },
+    { "Shutdown", "()V", request_shutdown },
   };
   
   ret = (*pVm)->GetEnv(pVm, (void **)&env, JNI_VERSION_1_6);

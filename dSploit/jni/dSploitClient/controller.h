@@ -10,6 +10,7 @@
 
 struct message;
 
+void request_shutdown(JNIEnv *, jclass);
 int on_control(JNIEnv *, struct message *);
 
 extern pthread_mutex_t ctrl_seq_lock;

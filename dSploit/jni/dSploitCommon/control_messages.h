@@ -30,6 +30,7 @@ enum ctrl_code {
   MOD_INFO,     ///< module definition
   MOD_START,    ///< start a module
   MOD_END,      ///< stop a module
+  DMON_STOP,    ///< stop the daemon
 };
 
 /// id of the controller receiver
@@ -112,6 +113,13 @@ struct hndl_info {
 struct hndl_list_info {
   char hndl_code;           ///< must be set to ::HNDL_LIST
   struct hndl_info list[];  ///< a list of ::hndl_info
+};
+
+/* --- daemon structures --- */
+
+/// daemon stop request
+struct dmon_stop_info {
+  char dmon_code;   ///< must be set to ::DMON_STOP
 };
 
 /* --- modules structures --- */
