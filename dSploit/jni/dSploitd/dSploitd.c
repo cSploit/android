@@ -190,14 +190,13 @@ int main(int argc, char **argv) {
   
   while(1) {
     if((clfd=accept(sockfd, NULL, NULL)) < 0) {
-      if(errno == EBADF) {
+      if(errno == EINVAL) {
 #ifndef NDEBUG
         print( DEBUG, "socket closed" );
 #endif
-        break;
       }
       print( ERROR, "accept: %s", strerror(errno) );
-      continue;
+      break;
     }
     
     if(serve_new_client(clfd)) {
