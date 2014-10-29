@@ -1,43 +1,75 @@
 /*
- * This file is part of the dSploit.
+ * This file is part of the cSploit.
  *
- * Copyleft of Simone Margaritelli aka evilsocket <evilsocket@gmail.com>
+ * Copyleft of Massimo Dragano aka tux_mind <tux_mind@csploit.org>
  *
- * dSploit is free software: you can redistribute it and/or modify
+ * cSploit is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * dSploit is distributed in the hope that it will be useful,
+ * cSploit is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with dSploit.  If not, see <http://www.gnu.org/licenses/>.
+ * along with cSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
 package it.evilsocket.dsploit.tools;
 
-import android.content.Context;
+import java.net.InetAddress;
 
-import java.io.IOException;
-
-import it.evilsocket.dsploit.core.Shell.OutputReceiver;
+import it.evilsocket.dsploit.core.Child;
+import it.evilsocket.dsploit.core.ChildManager;
+import it.evilsocket.dsploit.core.Logger;
+import it.evilsocket.dsploit.events.Event;
+import it.evilsocket.dsploit.events.Packet;
 
 public class TcpDump extends Tool{
-  public TcpDump(Context context){
-    super("tcpdump/tcpdump", context);
+
+  public TcpDump() {
+    mHandler = "tcpdump";
+    mCmdPrefix = null;
   }
 
-  public Thread sniff(String filter, String pcap, OutputReceiver receiver){
-    if(pcap == null)
-      return super.async("-l -vv -s 0 " + (filter == null ? "" : filter), receiver);
+  public static abstract class TcpDumpReceiver extends Child.EventReceiver {
 
-    else
-      return super.async("-l -vv -s 0 -w '" + pcap + "' " + (filter == null ? "" : filter), receiver);
+    @Override
+    public void onEvent(Event e) {
+      if(e instanceof Packet) {
+        Packet p = (Packet)e;
+        onPacket(p.src, p.dst, p.len);
+      } else {
+        Logger.warning("Unknown event: " + e);
+      }
+    }
+
+    public abstract void onPacket(InetAddress src, InetAddress dst, short len);
   }
 
-  public void sniff(OutputReceiver receiver){
+  public Child sniff(String filter, String pcap, TcpDumpReceiver receiver) throws ChildManager.ChildNotStartedException {
+
+    StringBuilder sb = new StringBuilder("-nvs 0 ");
+
+    if(pcap != null) {
+      // TODO: find a way to receive tcpdump output when saving to a file
+      // NOTE: tcpdump -w - | tee file.pcap | tcpdump -r -
+      sb.append("-Uw '");
+      sb.append(pcap);
+      sb.append("' ");
+    } else {
+      sb.append("-l ");
+    }
+
+    if(filter != null) {
+      sb.append(filter);
+    }
+
+    return super.async(sb.toString(), receiver);
+  }
+
+  public void sniff(TcpDumpReceiver receiver) throws ChildManager.ChildNotStartedException {
     sniff(null, null, receiver);
   }
 }

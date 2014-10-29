@@ -18,9 +18,11 @@
  */
 package it.evilsocket.dsploit.plugins.mitm;
 
-import it.evilsocket.dsploit.core.Shell.OutputReceiver;
+import it.evilsocket.dsploit.core.Child;
+import it.evilsocket.dsploit.core.ChildManager;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.Target;
+import it.evilsocket.dsploit.tools.ArpSpoof;
 import it.evilsocket.dsploit.tools.Ettercap.OnAccountListener;
 import it.evilsocket.dsploit.R;
 
@@ -30,6 +32,8 @@ public class SpoofSession
   private boolean mWithServer = false;
   private String mServerFileName = null;
   private String mServerMimeType = null;
+  private Child mArpSpoofProcess = null;
+  private Child mEttercapProcess = null;
 
   public static abstract interface OnSessionReadyListener{
     public void onSessionReady();
@@ -48,7 +52,7 @@ public class SpoofSession
     this(true, false, null, null);
   }
 
-  public void start(Target target, final OnSessionReadyListener listener){
+  public void start(Target target, final OnSessionReadyListener listener) throws ChildManager.ChildNotStartedException {
     this.stop();
 
     if(mWithProxy){
@@ -83,76 +87,71 @@ public class SpoofSession
       }
     }
 
-    System.getArpSpoof().spoof(target, new OutputReceiver(){
+    mArpSpoofProcess = System.getTools().arpSpoof.spoof(target, new ArpSpoof.ArpSpoofReceiver() {
       @Override
-      public void onStart(String command){
-        System.setForwarding(true);
-
-        if(mWithProxy){
-          if(System.getSettings().getBoolean("PREF_HTTPS_REDIRECT", true))
-            System.getIPTables().portRedirect(443, System.HTTPS_REDIR_PORT);
-
-          System.getIPTables().portRedirect(80, System.HTTP_PROXY_PORT);
-        }
-
-        listener.onSessionReady();
+      public void onError(String line) {
+        listener.onError(line, 0);
       }
+    });
 
-      @Override
-      public void onNewLine(String line){
-        // android.util.Log.d( "ARPSPOOF", line );
+    System.setForwarding(true);
 
-        if(line.startsWith("[ERROR]"))
-          listener.onError(line.substring("[ERROR]".length() + 1).trim(),-1);
-      }
+    if (mWithProxy) {
+      if (System.getSettings().getBoolean("PREF_HTTPS_REDIRECT", true))
+        System.getTools().ipTables.portRedirect(443, System.HTTPS_REDIR_PORT);
 
-      @Override
-      public void onEnd(int exitCode){
-        // android.util.Log.d( "ARPSPOOF", "onEnd( " + exitCode + " )" );
-      }
-    }).start();
+      System.getTools().ipTables.portRedirect(80, System.HTTP_PROXY_PORT);
+    }
+
+    listener.onSessionReady();
   }
 
-  public void start(final Target target, final OnAccountListener listener){
+  public void start(final Target target, final OnAccountListener listener) throws ChildManager.ChildNotStartedException {
+
     this.stop();
-    System.getArpSpoof().spoof(target, new OutputReceiver(){
-      @Override
-      public void onStart(String command){
-        // Log.d( "ARPSPOOF", command );
 
-        System.setForwarding(true);
-        System.getEttercap().dissect(target, listener).start();
-      }
-
+    mArpSpoofProcess =
+    System.getTools().arpSpoof.spoof(target, new ArpSpoof.ArpSpoofReceiver() {
       @Override
-      public void onNewLine(String line){
-        // Log.d( "ARPSPOOF", line );
+      public void onError(String line) {
+        SpoofSession.this.stop();
       }
+    });
 
-      @Override
-      public void onEnd(int exitCode){
-        // Log.d( "ARPSPOOF", "onEnd( " + exitCode + " )" );
-      }
-    }).start();
+    //System.setForwarding(true);
+
+
+    try {
+      mEttercapProcess = System.getTools().ettercap.dissect(target, listener);
+    } catch (ChildManager.ChildNotStartedException e) {
+      this.stop();
+      throw e;
+    }
   }
 
-  public void start(final OnSessionReadyListener listener){
+  public void start(final OnSessionReadyListener listener) throws ChildManager.ChildNotStartedException {
     this.start(System.getCurrentTarget(), listener);
   }
 
-  public void start(OnAccountListener listener){
+  public void start(OnAccountListener listener) throws ChildManager.ChildNotStartedException {
     this.start(System.getCurrentTarget(), listener);
   }
 
   public void stop(){
-    System.getArpSpoof().kill();
-    System.getEttercap().kill();
+    if(mArpSpoofProcess!=null) {
+      mArpSpoofProcess.kill(2);
+      mArpSpoofProcess = null;
+    }
+    if(mEttercapProcess!=null) {
+      mEttercapProcess.kill(2);
+      mEttercapProcess = null;
+    }
     System.setForwarding(false);
 
     if(mWithProxy){
-      System.getIPTables().undoPortRedirect(80, System.HTTP_PROXY_PORT);
+      System.getTools().ipTables.undoPortRedirect(80, System.HTTP_PROXY_PORT);
       if(System.getSettings().getBoolean("PREF_HTTPS_REDIRECT", true)){
-        System.getIPTables().undoPortRedirect(443, System.HTTPS_REDIR_PORT);
+        System.getTools().ipTables.undoPortRedirect(443, System.HTTPS_REDIR_PORT);
 
         if(System.getHttpsRedirector() != null)
           System.getHttpsRedirector().stop();

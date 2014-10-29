@@ -40,6 +40,7 @@ import com.actionbarsherlock.view.MenuItem;
 import java.util.ArrayList;
 
 import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.core.ChildManager;
 import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Logger;
@@ -51,7 +52,7 @@ import it.evilsocket.dsploit.gui.dialogs.InputDialog.InputDialogListener;
 import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.Target.Port;
-import it.evilsocket.dsploit.tools.NMap.SynScanOutputReceiver;
+import it.evilsocket.dsploit.tools.NMap;
 
 public class PortScanner extends Plugin {
 	private ToggleButton mScanToggleButton = null;
@@ -73,7 +74,10 @@ public class PortScanner extends Plugin {
 	}
 
 	private void setStoppedState() {
-		System.getNMap().kill();
+		if(mProcess!=null) {
+      mProcess.kill();
+      mProcess = null;
+    }
 		mScanProgress.setVisibility(View.INVISIBLE);
 		mRunning = false;
 		mScanToggleButton.setChecked(false);
@@ -86,12 +90,16 @@ public class PortScanner extends Plugin {
 	private void setStartedState() {
 		createPortList();
 
-		System.getNMap()
-				.synScan(System.getCurrentTarget(), mScanReceiver, mCustomPorts)
-				.start();
+    try {
+      mProcess = System.getTools().nmap
+              .synScan(System.getCurrentTarget(), mScanReceiver, mCustomPorts);
 
-		mRunning = true;
-	}
+      mRunning = true;
+    } catch (ChildManager.ChildNotStartedException e) {
+      System.errorLogging(e);
+      Toast.makeText(PortScanner.this, "cannot start process", Toast.LENGTH_LONG).show();
+    }
+  }
 
   private void createPortList() {
     mPortList.clear();
@@ -284,7 +292,7 @@ public class PortScanner extends Plugin {
 		super.onBackPressed();
 	}
 
-	private class Receiver extends SynScanOutputReceiver {
+	private class Receiver extends NMap.SynScanReceiver {
 		@Override
 		public void onStart(String commandLine) {
 			super.onStart(commandLine);
@@ -310,13 +318,12 @@ public class PortScanner extends Plugin {
 			});
 		}
 
-		@Override
-		public void onPortFound(String port, String protocol) {
-			final int    portNumber = Integer.parseInt(port);
+    @Override
+    public void onPortFound(final int port, String protocol) {
 			final String portProtocol = protocol;
       final String resolvedProtocol = System.getProtocolByPort(port);
 
-      System.addOpenPort(portNumber, Network.Protocol.fromString(protocol));
+      System.addOpenPort(port, Network.Protocol.fromString(protocol));
 
 			PortScanner.this.runOnUiThread(new Runnable() {
 				@Override
@@ -324,10 +331,10 @@ public class PortScanner extends Plugin {
           String entry;
 
 					if (resolvedProtocol != null)
-						entry = portNumber + " ( " + resolvedProtocol + " )";
+						entry = port + " ( " + resolvedProtocol + " )";
 
 					else
-						entry = portProtocol + " : " + portNumber;
+						entry = portProtocol + " : " + port;
 
 					// add open port to the listview and notify the environment
 					// about the event

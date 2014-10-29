@@ -55,8 +55,7 @@ public class UpdateChecker extends Thread
     Logger.debug("Service started.");
 
     boolean checkMsfUpdates = System.getSettings().getBoolean("MSF_ENABLED", true) &&
-            System.getSettings().getBoolean("MSF_CHECK_UPDATES", true) &&
-            Shell.isRootGranted();
+            System.getSettings().getBoolean("MSF_CHECK_UPDATES", true);
 
     if(UpdateService.isUpdateAvailable())
       send(UPDATE_AVAILABLE, AVAILABLE_VERSION, UpdateService.getRemoteVersion());

@@ -25,13 +25,15 @@ import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.core.ChildManager;
 import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.Target;
-import it.evilsocket.dsploit.tools.NMap.TraceOutputReceiver;
+import it.evilsocket.dsploit.tools.NMap;
 
 public class Traceroute extends Plugin {
 	private ToggleButton mTraceToggleButton = null;
@@ -50,7 +52,10 @@ public class Traceroute extends Plugin {
 	}
 
 	private void setStoppedState() {
-		System.getNMap().kill();
+		if(mProcess!=null) {
+      mProcess.kill();
+      mProcess = null;
+    }
 		mTraceProgress.setVisibility(View.INVISIBLE);
 		mRunning = false;
 		mTraceToggleButton.setChecked(false);
@@ -59,11 +64,15 @@ public class Traceroute extends Plugin {
 	private void setStartedState() {
 		mListAdapter.clear();
 
-		System.getNMap().trace(System.getCurrentTarget(), mTraceReceiver)
-				.start();
+    try {
+      System.getTools().nmap.trace(System.getCurrentTarget(), mTraceReceiver);
 
-		mRunning = true;
-	}
+      mRunning = true;
+    } catch (ChildManager.ChildNotStartedException e) {
+      System.errorLogging(e);
+      Toast.makeText(Traceroute.this, "cannot start process", Toast.LENGTH_LONG).show();
+    }
+  }
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -102,7 +111,7 @@ public class Traceroute extends Plugin {
 		super.onBackPressed();
 	}
 
-	private class Receiver extends TraceOutputReceiver {
+	private class Receiver extends NMap.TraceReceiver {
 		@Override
 		public void onStart(String commandLine) {
 			super.onStart(commandLine);
@@ -128,15 +137,39 @@ public class Traceroute extends Plugin {
 			});
 		}
 
-		@Override
-		public void onHop(final String hop, final String time,
-				final String address) {
+    private String formatTime(long usec) {
+
+      if(usec == 0)
+        return "0 ms";
+
+      long msec = (usec / 1000);
+      long sec = (msec / 1000);
+      long min = (sec / 60);
+
+      usec %= 1000;
+      msec %= 1000;
+      sec %= 60;
+      min %= 60;
+
+      if(min > 0) {
+        return min + "m " + sec + " s";
+      } else if(sec > 0) {
+        return sec + "." + msec + " s";
+      } else if(msec > 0) {
+        return msec + "." + usec + " ms";
+      } else {
+        return "0." + usec + " ms";
+      }
+    }
+
+    @Override
+    public void onHop(int hop, final long usec, final String address) {
 
 			Traceroute.this.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					if (!time.equals("..."))
-						mListAdapter.add(address + " ( " + time + " )");
+					if (usec > 0)
+						mListAdapter.add(address + " ( " + formatTime(usec) + " )");
 
 					else
 						mListAdapter.add(address

@@ -1,98 +1,79 @@
 /*
- * This file is part of the dSploit.
+ * This file is part of the cSploit.
  *
- * Copyleft of Simone Margaritelli aka evilsocket <evilsocket@gmail.com>
+ * Copyleft of Massimo Dragano aka tux_mind <tux_mind@csploit.org>
  *
- * dSploit is free software: you can redistribute it and/or modify
+ * cSploit is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * dSploit is distributed in the hope that it will be useful,
+ * cSploit is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with dSploit.  If not, see <http://www.gnu.org/licenses/>.
+ * along with cSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
 package it.evilsocket.dsploit.tools;
 
-import android.content.Context;
-
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import it.evilsocket.dsploit.core.Child;
+import it.evilsocket.dsploit.core.ChildManager;
 import it.evilsocket.dsploit.core.Logger;
-import it.evilsocket.dsploit.core.Shell.OutputReceiver;
+import it.evilsocket.dsploit.events.Account;
+import it.evilsocket.dsploit.events.Event;
 import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.events.Ready;
 import it.evilsocket.dsploit.net.Target;
 
 public class Ettercap extends Tool
 {
-  public Ettercap(Context context){
-    super("ettercap/ettercap", context);
+  public Ettercap() {
+    mHandler = "ettercap";
+    mCmdPrefix = null;
   }
 
-  public static abstract class OnAccountListener implements OutputReceiver
+  public static abstract class OnAccountListener extends Child.EventReceiver
   {
-    private static final Pattern ACCOUNT_PATTERN = Pattern.compile("^([^\\s]+)\\s+:\\s+([^\\:]+):(\\d+).+", Pattern.CASE_INSENSITIVE);
-
     @Override
-    public void onStart(String command){
-
-    }
-
-    @Override
-    public void onNewLine(String line){
-      // when ettercap is ready, enable ip forwarding
-      if(line.toLowerCase().contains("for inline help")){
-        System.setForwarding(true);
-      } else{
-        Matcher matcher = ACCOUNT_PATTERN.matcher(line);
-
-        if(matcher != null && matcher.find()){
-          String protocol = matcher.group(1),
-            address = matcher.group(2),
-            port = matcher.group(3);
-
-          onAccount(protocol, address, port, line);
-        }
+    public void onEvent(Event e) {
+      if(e instanceof Ready) {
+        onReady();
+      } else if(e instanceof Account) {
+        Account a = (Account)e;
+        onAccount(a.protocol, a.address.getHostAddress(), a.username, a.password);
+      } else {
+        Logger.warning("unknown event: " + e);
       }
     }
 
-    @Override
-    public void onEnd(int exitCode){
-
-    }
-
-    public abstract void onAccount(String protocol, String address, String port, String line);
+    public abstract void onAccount(String protocol, String address, String username, String password);
+    public abstract void onReady();
   }
 
-  public Thread dissect(Target target, OnAccountListener listener){
-    String commandLine;
+  public Child dissect(Target target, OnAccountListener listener) throws ChildManager.ChildNotStartedException {
+    StringBuilder sb = new StringBuilder();
+
+    sb.append("-Tpq -i ");
+    try {
+      sb.append(System.getNetwork().getInterface().getDisplayName());
+    } catch (Exception e) {
+      System.errorLogging(e);
+      throw new ChildManager.ChildNotStartedException();
+    }
+
 
     // poison the entire network
     if(target.getType() == Target.Type.NETWORK)
-      commandLine = "// //";
+      sb.append(" /// ///");
       // router -> target poison
-    else
-      commandLine = "/" + target.getCommandLineRepresentation() + "/ //";
-
-    try{
-      // passive dissection, spoofing is performed by arpspoof which is more reliable
-      commandLine = "-Tq -i " + System.getNetwork().getInterface().getDisplayName() + " " + commandLine;
-    }
-    catch(Exception e){
-      System.errorLogging(e);
+    else {
+      sb.append("/");
+      sb.append(target.getCommandLineRepresentation());
+      sb.append("// ///");
     }
 
-    return super.async(commandLine, listener, true);
-  }
-
-  public boolean kill(){
-    // Ettercap needs SIGINT ( ctrl+c ) to restore arp table.
-    return super.kill("SIGINT");
+    return super.async(sb.toString(), listener);
   }
 }

@@ -40,7 +40,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.Logger;
 
@@ -139,7 +138,7 @@ public class NetworkDiscovery extends Thread
           fileReader.seek(0);
           sb.setLength(0);
 
-          while((c=fileReader.read()) >= 0) {
+          while((c=fileReader.read()) >= 0 && !mStopped) {
             sb.append((char)c);
             if(c!='\n')
               continue;
@@ -232,25 +231,6 @@ public class NetworkDiscovery extends Thread
           Thread.sleep(500);
         } catch(Exception e){
           System.errorLogging(e);
-          String msg = e.getMessage();
-          if(msg != null && msg.contains("EMFILE")) {
-            try {
-              Shell.exec("lsof | grep "+android.os.Process.myPid(),new Shell.OutputReceiver() {
-                @Override
-                public void onStart(String command) { }
-
-                @Override
-                public void onNewLine(String line) {
-                  Logger.debug(line);
-                }
-
-                @Override
-                public void onEnd(int exitCode) { }
-              });
-            } catch ( Exception e1) {
-              System.errorLogging(e1);
-            }
-          }
         }
       }
 
@@ -397,7 +377,7 @@ public class NetworkDiscovery extends Thread
 
       while(!mStopped && mNetwork != null && nhosts > 0){
         try{
-          for(i = 1, current = IP4Address.next(mNetwork.getStartAddress()); current != null && i <= nhosts; current = IP4Address.next(current), i++){
+          for(i = 1, current = IP4Address.next(mNetwork.getStartAddress()); !mStopped && current != null && i <= nhosts; current = IP4Address.next(current), i++){
             // rescanning the gateway could cause an issue when the gateway itself has multiple interfaces ( LAN, WAN ... )
             if(!current.equals(mNetwork.getGatewayAddress()) && !current.equals(mNetwork.getLocalAddress())){
               InetAddress address = current.toInetAddress();
@@ -414,7 +394,8 @@ public class NetworkDiscovery extends Thread
             }
           }
 
-          Thread.sleep(1000);
+          if(!mStopped)
+            Thread.sleep(1000);
         }
         catch(Exception e){ }
       }

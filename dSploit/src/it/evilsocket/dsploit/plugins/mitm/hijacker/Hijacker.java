@@ -60,6 +60,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.core.ChildManager;
+import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
@@ -516,26 +518,31 @@ public class Hijacker extends SherlockActivity {
 		if (System.getProxy() != null)
 			System.getProxy().setOnRequestListener(mRequestListener);
 
-		mSpoof.start(new OnSessionReadyListener() {
-			@Override
-			public void onSessionReady() {
-				Hijacker.this.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						mHijackToggleButton.setText("Stop");
-						mHijackProgress.setVisibility(View.VISIBLE);
-						mRunning = true;
-					}
-				});
-			}
+    try {
+      mSpoof.start(new OnSessionReadyListener() {
+        @Override
+        public void onSessionReady() {
+          Hijacker.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              mHijackToggleButton.setText("Stop");
+              mHijackProgress.setVisibility(View.VISIBLE);
+              mRunning = true;
+            }
+          });
+        }
 
-			@Override
-			public void onError(String error, int resId) {
-				error = error == null ? getString(resId) : error;
-				setSpoofErrorState(error);
-			}
-		});
-	}
+        @Override
+        public void onError(String error, int resId) {
+          error = error == null ? getString(resId) : error;
+          setSpoofErrorState(error);
+        }
+      });
+    } catch (ChildManager.ChildNotStartedException e) {
+      Logger.error(e.getMessage());
+      Toast.makeText(Hijacker.this, "cannot start process", Toast.LENGTH_LONG).show();
+    }
+  }
 
 	private void setSpoofErrorState(final String error) {
 		Hijacker.this.runOnUiThread(new Runnable() {

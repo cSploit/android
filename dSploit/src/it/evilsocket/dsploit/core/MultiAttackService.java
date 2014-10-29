@@ -54,6 +54,7 @@ public class MultiAttackService extends IntentService {
 
     private int tasks;
     private Target target;
+    private Child mProcess;
 
     private class Toggle {
       private boolean mValue;
@@ -102,62 +103,56 @@ public class MultiAttackService extends IntentService {
     }
 
     private void scan() throws InterruptedException {
-      Shell.StreamGobbler scanner = (Shell.StreamGobbler)System.getNMap().synScan(target, new NMap.SynScanOutputReceiver() {
-        @Override
-        public void onPortFound(String port, String protocol) {
-          target.addOpenPort(Integer.parseInt(port),Network.Protocol.fromString(protocol));
-        }
-      },null);
-      scanner.run();
-      if(scanner.exitValue==-1)
-        throw new InterruptedException("scan interrupted");
+      try {
+        mProcess = System.getTools().nmap.synScan(target, new NMap.SynScanReceiver() {
+          @Override
+          public void onPortFound(int port, String protocol) {
+            target.addOpenPort(port, Network.Protocol.fromString(protocol));
+          }
+        }, null);
+        mProcess.join();
+      } catch (ChildManager.ChildNotStartedException e) {
+        Logger.error("cannot start nmap process");
+      }
     }
 
     private void inspect() throws InterruptedException {
-      Shell.StreamGobbler inspector = (Shell.StreamGobbler)System.getNMap().inpsect(target, new NMap.InspectionReceiver() {
-        @Override
-        public void onOpenPortFound(int port, String protocol) {
-          target.addOpenPort(port, Network.Protocol.fromString(protocol));
-        }
+      try {
+        mProcess = System.getTools().nmap.inpsect(target, new NMap.InspectionReceiver() {
+          @Override
+          public void onOpenPortFound(int port, String protocol) {
+            target.addOpenPort(port, Network.Protocol.fromString(protocol));
+          }
 
-        @Override
-        public void onServiceFound(int port, String protocol, String service, String version) {
-          Target.Port p;
+          @Override
+          public void onServiceFound(int port, String protocol, String service, String version) {
+            Target.Port p;
 
-          if(service!=null && !service.isEmpty())
-            if(version!=null && !version.isEmpty())
-              p = new Target.Port(port,Network.Protocol.fromString(protocol), service, version);
+            if (service != null && !service.isEmpty())
+              if (version != null && !version.isEmpty())
+                p = new Target.Port(port, Network.Protocol.fromString(protocol), service, version);
+              else
+                p = new Target.Port(port, Network.Protocol.fromString(protocol), service);
             else
-              p = new Target.Port(port,Network.Protocol.fromString(protocol), service);
-          else
-            p = new Target.Port(port, Network.Protocol.fromString(protocol));
-          target.addOpenPort(p);
-        }
+              p = new Target.Port(port, Network.Protocol.fromString(protocol));
+            target.addOpenPort(p);
+          }
 
-        @Override
-        public void onOsFound(String os) {
-          target.setDeviceOS(os);
-        }
+          @Override
+          public void onOsFound(String os) {
+            target.setDeviceOS(os);
+          }
 
-        @Override
-        public void onGuessOsFound(String os) {
-          target.setDeviceOS(os);
-        }
+          @Override
+          public void onDeviceFound(String device) {
+            target.setDeviceType(device);
+          }
+        }, target.hasOpenPorts());
 
-        @Override
-        public void onDeviceFound(String device) {
-          target.setDeviceType(device);
-        }
-
-        @Override
-        public void onServiceInfoFound(String info) {
-          target.setDeviceOS(info);
-        }
-      }, target.hasOpenPorts());
-
-      inspector.run();
-      if(inspector.exitValue==-1)
-        throw new InterruptedException("inspection interrupted");
+        mProcess.join();
+      } catch (ChildManager.ChildNotStartedException e) {
+        Logger.error("cannot start nmap process");
+      }
     }
 
     private void vuln(boolean searchVersion) throws InterruptedException {
@@ -245,6 +240,11 @@ public class MultiAttackService extends IntentService {
 
     private void crack() {
       // not implemented yet
+    }
+
+    public void clean() {
+      if(mProcess!=null)
+        mProcess.kill();
     }
 
   }
@@ -358,7 +358,7 @@ public class MultiAttackService extends IntentService {
 
     // create and start threads
     final int fTasks = tasks;
-    Thread[] threadPool = new Thread[targets.length];
+    SingleWorker[] threadPool = new SingleWorker[targets.length];
 
     for(i = 0; i < threadPool.length;i++)
       (threadPool[i] = new SingleWorker(fTasks, targets[i])).start();
@@ -381,6 +381,9 @@ public class MultiAttackService extends IntentService {
         threadPool[i--].interrupt();
       Logger.debug("interrupted");
     } finally {
+      for(SingleWorker w : threadPool) {
+        w.clean();
+      }
       stopSelf();
       mRunning = false;
     }

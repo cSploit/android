@@ -14,8 +14,9 @@ import android.widget.Toast;
 
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.System;
-import it.evilsocket.dsploit.core.Shell;
+import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
 import it.evilsocket.dsploit.net.metasploit.*;
+import it.evilsocket.dsploit.tools.Raw;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
@@ -33,17 +34,14 @@ public class Console extends SherlockActivity {
   private ShellSession   mSession;
   private ConsoleReceiver mReceiver;
 
-  private class ConsoleReceiver implements Shell.OutputReceiver {
-    @Override
-    public void onStart(String command) { }
+  private class ConsoleReceiver extends ShellSession.RpcShellReceiver {
 
     @Override
-    public void onNewLine(String line) {
-      final String _line = line;
+    public void onNewLine(final String line) {
       Console.this.runOnUiThread( new Runnable() {
         @Override
         public void run() {
-          mOutput.append(_line + "\n");
+          mOutput.append(line + "\n");
         }
       });
     }
@@ -53,12 +51,22 @@ public class Console extends SherlockActivity {
       if(exitCode!=0)
         Toast.makeText(Console.this,"command returned "+exitCode,Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    public void onRpcClosed() {
+      new FatalDialog("Connection lost","RPC connection closed",Console.this).show();
+    }
+
+    @Override
+    public void onTimedOut() {
+      new FatalDialog("Command timed out","your submitted command generated an infinite loop or some connection error occurred.",Console.this).show();
+    }
   }
 
   private View.OnClickListener clickListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-      mSession.addCommand(mInput.getText().toString());
+      mSession.addCommand(mInput.getText().toString(), mReceiver);
     }
   };
 
@@ -83,8 +91,6 @@ public class Console extends SherlockActivity {
 
     mReceiver = new ConsoleReceiver();
     mSession = (ShellSession) System.getCurrentSession();
-    mSession.setReceiver(mReceiver);
-    mSession.wakeUp();
 
     runButton.setOnClickListener(clickListener);
 
@@ -104,7 +110,6 @@ public class Console extends SherlockActivity {
   public void onBackPressed() {
     super.onBackPressed();
     overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-    mSession.sleep();
     System.setCurrentSession(null);
   }
 

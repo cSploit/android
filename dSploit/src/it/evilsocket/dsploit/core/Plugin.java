@@ -39,6 +39,7 @@ public abstract class Plugin extends SherlockActivity{
   private Target.Type[] mAllowedTargetTypes = null;
   private int mLayoutId = 0;
   private int mIconId = 0;
+  protected Child mProcess = null;
 
   public Plugin(int nameStringId, int descStringId, Target.Type[] allowedTargetTypes, int layoutId, int iconResourceId){
     mNameStringId = nameStringId;

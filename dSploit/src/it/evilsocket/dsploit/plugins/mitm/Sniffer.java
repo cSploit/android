@@ -40,20 +40,20 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 
 import java.io.File;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import it.evilsocket.dsploit.R;
-import it.evilsocket.dsploit.core.Logger;
-import it.evilsocket.dsploit.core.Shell.OutputReceiver;
+import it.evilsocket.dsploit.core.Child;
+import it.evilsocket.dsploit.core.ChildManager;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
 import it.evilsocket.dsploit.gui.dialogs.ErrorDialog;
 import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.plugins.mitm.SpoofSession.OnSessionReadyListener;
+import it.evilsocket.dsploit.tools.TcpDump;
 
 public class Sniffer extends SherlockActivity
 {
@@ -67,7 +67,6 @@ public class Sniffer extends SherlockActivity
   };
 
   private static final String PCAP_FILTER = "not '(src host localhost or dst host localhost or arp)'";
-  private static final Pattern PARSER = Pattern.compile("^.+length\\s+(\\d+)\\)\\s+([\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3})\\.[^\\s]+\\s+>\\s+([\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3})\\.[^\\:]+:.+", Pattern.CASE_INSENSITIVE);
 
   private ToggleButton mSniffToggleButton = null;
   private Spinner mSortSpinner = null;
@@ -76,33 +75,34 @@ public class Sniffer extends SherlockActivity
   private ListView mListView = null;
   private StatListAdapter mAdapter = null;
   private boolean mRunning = false;
-  private double mSampleTime = 1.0;
+  private int mSampleTime = 1000; // sample every second
   private SpoofSession mSpoofSession = null;
   private boolean mDumpToFile = false;
   private String mPcapFileName = null;
+  private Child mTcpdumpProcess = null;
 
   public class AddressStats implements Comparable<AddressStats>{
     public String mAddress = "";
-    public int mPackets = 0;
-    public double mBandwidth = 0;
+    public long mBytes = 0;
+    public long mBandwidth = 0;
     public long mSampledTime = 0;
-    public int mSampledSize = 0;
+    public long mSampledBytes = 0;
 
     public AddressStats(String address){
       mAddress = address;
-      mPackets = 0;
+      mBytes = 0;
       mBandwidth = 0;
       mSampledTime = 0;
-      mSampledSize = 0;
+      mSampledBytes = 0;
     }
 
     @Override
     public int compareTo(AddressStats stats){
-      int[] cmp = null;
-      double va = 0,
-        vb = 0;
+      int[] cmp;
+      double va,vb;
 
       switch(getSortType()){
+        default:
         case 0:
           cmp = new int[]{-1, 1, 0};
           va = mBandwidth;
@@ -115,13 +115,13 @@ public class Sniffer extends SherlockActivity
           break;
         case 2:
           cmp = new int[]{-1, 1, 0};
-          va = mPackets;
-          vb = stats.mPackets;
+          va = mBytes;
+          vb = stats.mBytes;
           break;
         case 3:
           cmp = new int[]{1, -1, 0};
-          va = mPackets;
-          vb = stats.mPackets;
+          va = mBytes;
+          vb = stats.mBytes;
           break;
         case 4:
           cmp = new int[]{-1, 1, 0};
@@ -132,12 +132,6 @@ public class Sniffer extends SherlockActivity
           cmp = new int[]{1, -1, 0};
           va = mSampledTime;
           vb = stats.mSampledTime;
-          break;
-
-        default:
-          cmp = new int[]{-1, 1, 0};
-          va = mBandwidth;
-          vb = stats.mBandwidth;
           break;
       }
 
@@ -182,17 +176,17 @@ public class Sniffer extends SherlockActivity
 
       for(AddressStats sstats : mStats){
         if(sstats.mAddress.equals(stats.mAddress)){
-          sstats.mPackets = stats.mPackets;
+          sstats.mBytes = stats.mBytes;
           sstats.mBandwidth = stats.mBandwidth;
           sstats.mSampledTime = stats.mSampledTime;
-          sstats.mSampledSize = stats.mSampledSize;
+          sstats.mSampledBytes = stats.mSampledBytes;
 
           found = true;
           break;
         }
       }
 
-      if(found == false)
+      if(!found)
         mStats.add(stats);
 
       Collections.sort(mStats);
@@ -207,7 +201,7 @@ public class Sniffer extends SherlockActivity
       return mStats.size();
     }
 
-    private String formatSize(int size){
+    private String formatSize(long size){
       if(size < 1024)
         return size + " B";
 
@@ -221,7 +215,7 @@ public class Sniffer extends SherlockActivity
         return (size / (1024 * 1024 * 1024)) + " GB";
     }
 
-    private String formatSpeed(int speed){
+    private String formatSpeed(long speed){
       if(speed < 1024)
         return speed + " B/s";
 
@@ -272,7 +266,7 @@ public class Sniffer extends SherlockActivity
         (
           Html.fromHtml
             (
-              "<b>BANDWIDTH</b>: " + formatSpeed((int) stats.mBandwidth) + " | <b>TOTAL</b> " + formatSize(stats.mPackets)
+              "<b>BANDWIDTH</b>: " + formatSpeed(stats.mBandwidth) + " | <b>TOTAL</b> " + formatSize(stats.mBytes)
             )
         );
 
@@ -283,11 +277,13 @@ public class Sniffer extends SherlockActivity
   public void onCreate(Bundle savedInstanceState){
     super.onCreate(savedInstanceState);
     SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-	Boolean isDark = themePrefs.getBoolean("isDark", false);
-	if (isDark)
-		setTheme(R.style.Sherlock___Theme);
-	else
-		setTheme(R.style.AppTheme);
+  	Boolean isDark = themePrefs.getBoolean("isDark", false);
+
+    if (isDark)
+      setTheme(R.style.Sherlock___Theme);
+    else
+      setTheme(R.style.AppTheme);
+
     setTitle(System.getCurrentTarget() + " > MITM > Sniffer");
     setContentView(R.layout.plugin_mitm_sniffer);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -297,7 +293,7 @@ public class Sniffer extends SherlockActivity
     mSortSpinner = (Spinner) findViewById(R.id.sortSpinner);
     mListView = (ListView) findViewById(R.id.listView);
     mAdapter = new StatListAdapter(R.layout.plugin_mitm_sniffer_list_item);
-    mSampleTime = Double.parseDouble(System.getSettings().getString("PREF_SNIFFER_SAMPLE_TIME", "1.0"));
+    mSampleTime = (int)(Double.parseDouble(System.getSettings().getString("PREF_SNIFFER_SAMPLE_TIME", "1.0")) * 1000);
     mSpoofSession = new SpoofSession(false, false, null, null);
 
     mSortSpinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, SORT));
@@ -358,9 +354,11 @@ public class Sniffer extends SherlockActivity
   }
 
   private void setStoppedState(){
+    if(mTcpdumpProcess != null) {
+      mTcpdumpProcess.kill();
+      mTcpdumpProcess = null;
+    }
     mSpoofSession.stop();
-
-    System.getTcpDump().kill();
 
     mSniffProgress.setVisibility(View.INVISIBLE);
 
@@ -379,93 +377,87 @@ public class Sniffer extends SherlockActivity
   }
 
   private void setStartedState(){
-    // never say never :)
-    System.getTcpDump().kill();
 
     if(mDumpToFile)
       Toast.makeText(Sniffer.this, getString(R.string.dumping_traffic_to) + mPcapFileName, Toast.LENGTH_SHORT).show();
 
-    mSpoofSession.start(new OnSessionReadyListener(){
-      @Override
-      public void onError(String error, int resId){
-        error = error == null ? getString(resId) : error;
-        setSpoofErrorState(error);
-      }
+    try {
+      mSpoofSession.start(new OnSessionReadyListener(){
+        @Override
+        public void onError(String error, int resId){
+          error = error == null ? getString(resId) : error;
+          setSpoofErrorState(error);
+        }
 
-      @Override
-      public void onSessionReady(){
-
-        System.getTcpDump().sniff(PCAP_FILTER, mPcapFileName, new OutputReceiver(){
-          @Override
-          public void onStart(String command){
-            Logger.debug( "TCPDUMP: " + command );
+        @Override
+        public void onSessionReady(){
+          if(mTcpdumpProcess!=null) {
+            mTcpdumpProcess.kill();
           }
 
-          @Override
-          public void onNewLine(String line){
-            Logger.debug( line );
+          try {
+            mRunning = true;
+            mSniffProgress.setVisibility(View.VISIBLE);
 
-            try{
-              Matcher matcher = PARSER.matcher(line.trim());
+            mTcpdumpProcess = System.getTools().tcpDump.sniff(PCAP_FILTER, mPcapFileName, new TcpDump.TcpDumpReceiver() {
 
-              if(matcher != null && matcher.find()){
-                String length = matcher.group(1),
-                  source = matcher.group(2),
-                  dest = matcher.group(3);
-                int ilength = Integer.parseInt(length);
-                long now = java.lang.System.currentTimeMillis();
-                double deltat = 0.0;
-                AddressStats stats = null;
+              @Override
+              public void onPacket(InetAddress src, InetAddress dst, short len) {
+              long now = java.lang.System.currentTimeMillis();
+              long deltat;
+              AddressStats stats = null;
+              String stringAddress = null;
 
-                if(System.getNetwork().isInternal(source)){
-                  stats = mAdapter.getStats(source);
-                }
-                else if(System.getNetwork().isInternal(dest)){
-                  source = dest;
-                  stats = mAdapter.getStats(dest);
-                }
-
-                if(stats == null){
-                  stats = new AddressStats(source);
-                  stats.mPackets = ilength;
-                  stats.mSampledTime = now;
-                }
-                else{
-                  stats.mPackets += ilength;
-
-                  deltat = (now - stats.mSampledTime) / 1000.0;
-
-                  if(deltat >= mSampleTime){
-                    stats.mBandwidth = (stats.mPackets - stats.mSampledSize) / deltat;
-                    stats.mSampledTime = java.lang.System.currentTimeMillis();
-                    stats.mSampledSize = stats.mPackets;
-                  }
-                }
-
-                final AddressStats fstats = stats;
-                Sniffer.this.runOnUiThread(new Runnable(){
-                  @Override
-                  public void run(){
-                    mAdapter.addStats(fstats);
-                    mAdapter.notifyDataSetChanged();
-                  }
-                });
+              if (System.getNetwork().isInternal(src)) {
+                stringAddress = src.getHostAddress();
+                stats = mAdapter.getStats(stringAddress);
+              } else if (System.getNetwork().isInternal(dst)) {
+                stringAddress = dst.getHostAddress();
+                stats = mAdapter.getStats(stringAddress);
               }
-            }
-            catch(Exception e){
-              System.errorLogging(e);
-            }
-          }
 
-          @Override
-          public void onEnd(int exitCode){
-          }
-        }).start();
-      }
-    });
+              if (stats == null) {
+                if(stringAddress==null)
+                  return;
+                stats = new AddressStats(stringAddress);
+                stats.mBytes = len;
+                stats.mSampledTime = now;
+              } else {
+                stats.mBytes += len;
 
-    mSniffProgress.setVisibility(View.VISIBLE);
-    mRunning = true;
+                deltat = (now - stats.mSampledTime);
+
+                if (deltat >= mSampleTime) {
+                  stats.mBandwidth = (stats.mBytes - stats.mSampledBytes) / deltat;
+                  stats.mSampledTime = java.lang.System.currentTimeMillis();
+                  stats.mSampledBytes = stats.mBytes;
+                }
+              }
+
+              final AddressStats fstats = stats;
+              Sniffer.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                  mAdapter.addStats(fstats);
+                  mAdapter.notifyDataSetChanged();
+                }
+              });
+              }
+            });
+          } catch( ChildManager.ChildNotStartedException e ) {
+            Sniffer.this.runOnUiThread( new Runnable() {
+              @Override
+              public void run() {
+                Toast.makeText(Sniffer.this, "cannot start process", Toast.LENGTH_LONG).show();
+                setStoppedState();
+              }
+            });
+          }
+        }
+      });
+    } catch (ChildManager.ChildNotStartedException e) {
+      setStoppedState();
+    }
   }
 
   @Override

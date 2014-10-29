@@ -44,6 +44,7 @@ import it.evilsocket.dsploit.net.Target;
 import it.evilsocket.dsploit.net.metasploit.RPCClient;
 import it.evilsocket.dsploit.net.metasploit.Session;
 import it.evilsocket.dsploit.net.metasploit.ShellSession;
+import it.evilsocket.dsploit.tools.Raw;
 
 public class Sessions extends Plugin {
 	private ListView mListView = null;
@@ -88,24 +89,26 @@ public class Sessions extends Plugin {
               new ErrorDialog(s.getName(),message,Sessions.this).show();
               break;
             case R.string.clear_event_log:
-              boolean succeeded = false;
-              int exitCode = -1;
-              try {
-                exitCode = ((ShellSession)s).runCommand("clearev");
-                succeeded = true;
-              } catch (InterruptedException e) {
-                System.errorLogging(e);
-              } catch (IOException e) {
-                System.errorLogging(e);
-              } catch (TimeoutException e) {
-                System.errorLogging(e);
-              } catch (RPCClient.MSFException e) {
-                System.errorLogging(e);
-              }
-              if(!succeeded)
-                Toast.makeText(Sessions.this,"command failed",Toast.LENGTH_SHORT).show();
-              else if(exitCode != 0)
-                Toast.makeText(Sessions.this,"command returned "+exitCode,Toast.LENGTH_LONG).show();
+
+              ((ShellSession)s).addCommand("clearev", new ShellSession.RpcShellReceiver() {
+                @Override
+                public void onNewLine(String line) { }
+
+                @Override
+                public void onEnd(int exitValue) {
+                  Toast.makeText(Sessions.this,"command returned "+exitValue,Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onRpcClosed() {
+                  Toast.makeText(Sessions.this,"RPC channel has been closed",Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onTimedOut() {
+                  Toast.makeText(Sessions.this,"command timed out",Toast.LENGTH_LONG).show();
+                }
+              });
               break;
             case R.string.delete:
               s.stopSession();

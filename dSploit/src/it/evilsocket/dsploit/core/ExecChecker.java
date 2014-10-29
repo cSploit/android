@@ -14,17 +14,32 @@ import it.evilsocket.dsploit.tools.Fusemounts;
  */
 public class ExecChecker {
 
-  private static final ArrayList<fuseBind> mFuseBinds = new ArrayList<fuseBind>();
+  private static final ArrayList<FuseBind> mFuseBinds = new ArrayList<FuseBind>();
 
-  private static class fuseBind {
+  private final static ExecChecker mRubyChecker = new ExecChecker();
+  private final static ExecChecker mMsfChecker = new ExecChecker();
+
+  private String modifiedMountpoit = null;
+  private String resolvedDir = null;
+
+
+  public static ExecChecker ruby() {
+    return mRubyChecker;
+  }
+
+  public static ExecChecker msf() {
+    return mMsfChecker;
+  }
+
+  private static class FuseBind {
     public String source,mountpoint;
 
     @Override
     public boolean equals(Object o) {
-      if(o.getClass() != fuseBind.class)
+      if(o.getClass() != FuseBind.class)
         return false;
 
-      fuseBind b = (fuseBind)o;
+      FuseBind b = (FuseBind)o;
 
       if(b.source != null) {
         if(!b.source.equals(this.source))
@@ -47,7 +62,7 @@ public class ExecChecker {
    * @param dir the directory to check
    * @return true if root can create executable files inside {@code dir}
    */
-  public static boolean root(String dir) {
+  private boolean root(String dir) {
 
     if(dir==null)
       return false;
@@ -56,43 +71,39 @@ public class ExecChecker {
       String tmpname;
       do {
         tmpname = dir + "/" + UUID.randomUUID().toString();
-      } while (Shell.exec(String.format("test -f '%s'", tmpname))==0);
+      } while (System.getTools().raw.run(String.format("test -f '%s'", tmpname))==0);
 
-      return Shell.exec(
+      return System.getTools().shell.run(
               String.format("touch '%1$s' && chmod %2$o '%1$s' && test -x '%1$s' && rm '%1$s'",
                       tmpname, 0755)) == 0;
-    } catch (InterruptedException e) {
-      Logger.error(e.getMessage());
-    } catch (IOException e) {
+    } catch (Exception e) {
       Logger.error(e.getMessage());
     }
     return false;
   }
 
   private static void updateFuseBinds() {
-    final StringBuilder sb = new StringBuilder();
+    try {
+      System.getTools().fusemounts.getSources(new Fusemounts.fuseReceiver() {
+        @Override
+        public void onNewMountpoint(String source, String mountpoint) {
+          boolean newMountpointFound;
+          FuseBind fb = new FuseBind();
+          fb.mountpoint = mountpoint;
+          fb.source = source;
 
-    System.getFusemounts().getSources(new Fusemounts.fuseReceiver() {
-      @Override
-      public void onNewMountpoint(String source, String mountpoint) {
-        sb.append(source);
-        sb.append("\t");
-        sb.append(mountpoint);
-        sb.append("\n");
-      }
-    }).run();
+          synchronized (mFuseBinds) {
+            newMountpointFound = !mFuseBinds.contains(fb);
+            if(newMountpointFound)
+              mFuseBinds.add(fb);
+          }
 
-    if (sb.length() == 0) {
-      Logger.warning("no fuse mounts found.");
-      return;
-    }
-
-    for (String line : sb.toString().split("\n")) {
-      fuseBind b = new fuseBind();
-      String[] parts = line.split("\t");
-      b.source = parts[0];
-      b.mountpoint = parts[1];
-      mFuseBinds.add(b);
+          if(newMountpointFound)
+            Logger.info("found a fuse mount: source='" + source + "' mountpoint='" + mountpoint + "'");
+        }
+      }).join();
+    } catch (Exception e) {
+      Logger.error(e.getMessage());
     }
   }
 
@@ -102,16 +113,17 @@ public class ExecChecker {
    * @param file the file/directory to check
    * @return the unrestricted path to file, or null if not found
    */
-  public static String getRealPath(final String file) {
+  private String getRealPath(final String file) {
 
     if(file==null)
       return null;
 
+    if(mFuseBinds.size()==0)
+      updateFuseBinds();
+
     synchronized (mFuseBinds) {
-      if (mFuseBinds.size() == 0)
-        updateFuseBinds();
       if(mFuseBinds.size()>0) {
-        for(fuseBind b : mFuseBinds) {
+        for(FuseBind b : mFuseBinds) {
           if(file.startsWith(b.mountpoint)) {
             return b.source + file.substring(b.mountpoint.length());
           }
@@ -126,7 +138,7 @@ public class ExecChecker {
    * @param dir directory to check
    * @return true if can execute files into {@code dir}, false otherwise
    */
-  public static boolean user(String dir) {
+  private boolean user(String dir) {
     String tmpname;
     File tmpfile = null;
 
@@ -162,13 +174,10 @@ public class ExecChecker {
    * flag.
    *
    * @param dir the directory to check
-   * @param restore restore the mountpoint flags after checking
    */
-  public static boolean remount(String dir, boolean restore) {
+  private boolean remount(String dir) {
     BufferedReader mounts = null;
     String line,mountpoint,tmp;
-    boolean ret;
-    ArrayList<String> mountpoints;
 
     try {
       // find the mountpoint
@@ -189,32 +198,77 @@ public class ExecChecker {
         return false;
 
       // remount
-      if(Shell.exec(String.format("mount -oremount,exec '%s'", mountpoint))!=0) {
+      if(System.getTools().raw.run(String.format("mount -oremount,exec '%s'", mountpoint))!=0) {
         Logger.warning(String.format("cannot remount '%s' with exec flag", mountpoint));
         return false;
       }
 
       // check it now
-      ret = user(dir);
-
-      // restore
-      if((!ret || restore) && Shell.exec(String.format("mount -oremount,noexec '%s'", mountpoint))!=0) {
-        Logger.warning(String.format("cannot remount '%s' with noexec flag", mountpoint));
+      if(user(dir)) {
+        synchronized (this) {
+          if(modifiedMountpoit != null && !modifiedMountpoit.equals(mountpoint))
+            restoreMountpoint(modifiedMountpoit);
+          modifiedMountpoit = mountpoint;
+          resolvedDir = dir;
+        }
+        return true;
       }
-
-      return ret;
-
     } catch (Exception e) {
       System.errorLogging(e);
     } finally {
       if(mounts!=null) {
         try { mounts.close(); }
-        catch (IOException e) {
-          //ignored
-        }
+        catch (IOException ignored) { }
       }
     }
 
     return false;
+  }
+
+  private void restoreMountpoint(String mountpoint) {
+    try {
+      if(System.getTools().raw.run(String.format("mount -oremount,noexec '%s'", mountpoint))!=0) {
+        Logger.warning(String.format("cannot remount '%s' with noexec flag", mountpoint));
+      }
+    } catch (Exception e) {
+      Logger.error(e.getMessage());
+    }
+  }
+
+  public boolean canExecuteInDir(String dir) {
+
+    if(!user(dir) && !remount(dir)) {
+      dir = getRealPath(dir);
+      if(!root(dir)) {
+        dir = null;
+      }
+    }
+
+    if(dir != null) {
+      synchronized (this) {
+        resolvedDir = dir;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  public String getRoot() {
+    return resolvedDir;
+  }
+
+  public void clear() {
+    synchronized (this) {
+      if(modifiedMountpoit!=null) {
+        restoreMountpoint(modifiedMountpoit);
+        modifiedMountpoit = null;
+      }
+    }
+  }
+
+  @Override
+  protected void finalize() throws Throwable {
+    clear();
+    super.finalize();
   }
 }

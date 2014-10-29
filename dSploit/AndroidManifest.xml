@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="it.evilsocket.dsploit"
           android:versionCode="1"
-          android:versionName="1.1.3c">
+          android:versionName="1.2.0a">
 
     <uses-sdk
             android:minSdkVersion="9"

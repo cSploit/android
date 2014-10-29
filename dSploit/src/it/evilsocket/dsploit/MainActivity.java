@@ -31,14 +31,17 @@ import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_NAME;
 import static it.evilsocket.dsploit.net.NetworkDiscovery.ENDPOINT_UPDATE;
 import static it.evilsocket.dsploit.net.NetworkDiscovery.NEW_ENDPOINT;
 
+import it.evilsocket.dsploit.core.Child;
+import it.evilsocket.dsploit.core.ChildManager;
+import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.core.ManagedReceiver;
 import it.evilsocket.dsploit.core.MultiAttackService;
 import it.evilsocket.dsploit.core.Plugin;
-import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.ToolsInstaller;
 import it.evilsocket.dsploit.core.UpdateChecker;
 import it.evilsocket.dsploit.core.UpdateService;
+import it.evilsocket.dsploit.events.Event;
 import it.evilsocket.dsploit.gui.dialogs.AboutDialog;
 import it.evilsocket.dsploit.gui.dialogs.ChangelogDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
@@ -54,9 +57,22 @@ import it.evilsocket.dsploit.net.Endpoint;
 import it.evilsocket.dsploit.net.Network;
 import it.evilsocket.dsploit.net.NetworkDiscovery;
 import it.evilsocket.dsploit.net.Target;
-import it.evilsocket.dsploit.net.metasploit.RPCServer;
+import it.evilsocket.dsploit.net.metasploit.RPCClient;
+import it.evilsocket.dsploit.plugins.ExploitFinder;
+import it.evilsocket.dsploit.plugins.Inspector;
+import it.evilsocket.dsploit.plugins.LoginCracker;
+import it.evilsocket.dsploit.plugins.PacketForger;
+import it.evilsocket.dsploit.plugins.PortScanner;
+import it.evilsocket.dsploit.plugins.RouterPwn;
+import it.evilsocket.dsploit.plugins.Sessions;
+import it.evilsocket.dsploit.plugins.Traceroute;
+import it.evilsocket.dsploit.plugins.VulnerabilityFinder;
+import it.evilsocket.dsploit.plugins.mitm.MITM;
+import it.evilsocket.dsploit.tools.MsfRpcd;
+import it.evilsocket.dsploit.tools.ToolBox;
 
 import java.io.IOException;
+import java.net.NoRouteToHostException;
 import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
@@ -91,7 +107,6 @@ import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.bugsense.trace.BugSenseHandler;
 
 @SuppressLint("NewApi")
 public class MainActivity extends SherlockListActivity {
@@ -102,8 +117,7 @@ public class MainActivity extends SherlockListActivity {
 	private NetworkDiscovery mNetworkDiscovery = null;
 	private EndpointReceiver mEndpointReceiver = null;
 	private UpdateReceiver mUpdateReceiver = null;
-	private RPCServer mRPCServer = null;
-	private MsfrpcdReceiver mMsfRpcdReceiver = null;
+	private WipeReceiver mWipeReceiver = null;
 	private Menu mMenu = null;
 	private TextView mUpdateStatus = null;
 	private Toast mToast = null;
@@ -131,11 +145,11 @@ public class MainActivity extends SherlockListActivity {
 		if (mUpdateReceiver == null)
 			mUpdateReceiver = new UpdateReceiver();
 
-		if (mMsfRpcdReceiver == null)
-			mMsfRpcdReceiver = new MsfrpcdReceiver();
+		if (mWipeReceiver == null)
+			mWipeReceiver = new WipeReceiver();
 
 		mUpdateReceiver.unregister();
-		mMsfRpcdReceiver.unregister();
+		mWipeReceiver.unregister();
 
 		mUpdateReceiver.register(MainActivity.this);
 
@@ -169,6 +183,9 @@ public class MainActivity extends SherlockListActivity {
 	}
 
 	public void createOnlineLayout() {
+    if(mTargetAdapter != null)
+      return;
+
 		mTargetAdapter = new TargetAdapter();
 
 		setListAdapter(mTargetAdapter);
@@ -197,16 +214,16 @@ public class MainActivity extends SherlockListActivity {
 		if (mUpdateReceiver == null)
 			mUpdateReceiver = new UpdateReceiver();
 
-		if (mMsfRpcdReceiver == null)
-			mMsfRpcdReceiver = new MsfrpcdReceiver();
+		if (mWipeReceiver == null)
+			mWipeReceiver = new WipeReceiver();
 
 		mEndpointReceiver.unregister();
 		mUpdateReceiver.unregister();
-		mMsfRpcdReceiver.unregister();
+		mWipeReceiver.unregister();
 
 		mEndpointReceiver.register(MainActivity.this);
 		mUpdateReceiver.register(MainActivity.this);
-		mMsfRpcdReceiver.register(MainActivity.this);
+		mWipeReceiver.register(MainActivity.this);
 
 		startUpdateChecker();
 		startNetworkDiscovery(false);
@@ -227,6 +244,25 @@ public class MainActivity extends SherlockListActivity {
 		}
 	}
 
+  private void createLayout() {
+    boolean wifiAvailable = Network.isWifiConnected(this);
+    boolean connectivityAvailable = wifiAvailable || Network.isConnectivityAvailable(this);
+
+    // initialization ok, but wifi is down
+    if (!wifiAvailable) {
+      // just inform the user his wifi is down
+      if (connectivityAvailable)
+        createUpdateLayout();
+
+        // no connectivity at all
+      else
+        createOfflineLayout();
+    }
+    // we are online, and the system was already initialized
+    else
+      createOnlineLayout();
+  }
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -236,14 +272,14 @@ public class MainActivity extends SherlockListActivity {
 			setTheme(R.style.Sherlock___Theme);
 		else
 			setTheme(R.style.AppTheme);
-		
 	
 		setContentView(R.layout.target_layout);
 		NO_WIFI_UPDATE_MESSAGE = getString(R.string.no_wifi_available);
 		isWifiAvailable = Network.isWifiConnected(this);
-		boolean connectivityAvailable = isWifiAvailable
-				|| Network.isConnectivityAvailable(this);
-		
+
+    // initialize the ui for the first time
+    final ProgressDialog dialog = ProgressDialog.show(this, "",
+        getString(R.string.initializing), true, false);
 
 		// make sure system object was correctly initialized during application
 		// startup
@@ -251,94 +287,109 @@ public class MainActivity extends SherlockListActivity {
 			// wifi available but system failed to initialize, this is a fatal
 			// :(
 			if (isWifiAvailable) {
-				new FatalDialog(getString(R.string.initialization_error),
-						System.getLastError(), this).show();
-				return;
+        // retry
+        try {
+          dialog.show();
+          System.init(MainActivity.this.getApplicationContext());
+
+          System.registerPlugin(new RouterPwn());
+          System.registerPlugin(new Traceroute());
+          System.registerPlugin(new PortScanner());
+          System.registerPlugin(new Inspector());
+          System.registerPlugin(new VulnerabilityFinder());
+          System.registerPlugin(new ExploitFinder());
+          System.registerPlugin(new LoginCracker());
+          System.registerPlugin(new Sessions());
+          System.registerPlugin(new MITM());
+          System.registerPlugin(new PacketForger());
+        } catch (Exception e) {
+          if(!(e instanceof NoRouteToHostException))
+            System.errorLogging(e);
+
+          new FatalDialog(getString(R.string.initialization_error),
+                  System.getLastError(), this).show();
+
+          return;
+        }
 			}
 		}
 
-		// initialization ok, but wifi is down
-		if (!isWifiAvailable) {
-			// just inform the user his wifi is down
-			if (connectivityAvailable)
-				createUpdateLayout();
+    // this is necessary to not block the user interface while
+    // initializing
+    if(!System.isCoreInitialized()) {
+      long startTime = java.lang.System.currentTimeMillis();
+      new Thread(new Runnable() {
+        @Override
+        public void run() {
+          dialog.show();
+          Context appContext = MainActivity.this
+                  .getApplicationContext();
+          String fatal = null;
+          ToolsInstaller installer = new ToolsInstaller(appContext);
 
-			// no connectivity at all
-			else
-				createOfflineLayout();
-		}
-		// we are online, and the system was already initialized
-		else if (mTargetAdapter != null)
-			createOnlineLayout();
-		// initialize the ui for the first time
-		else {
-			final ProgressDialog dialog = ProgressDialog.show(this, "",
-					getString(R.string.initializing), true, false);
+          if (!System.isARM())
+            fatal = getString(R.string.arm_error)
+                    + getString(R.string.arm_error2);
 
-			// this is necessary to not block the user interface while
-			// initializing
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					dialog.show();
+          else if (installer.needed() && !installer.install())
+            fatal = getString(R.string.install_error);
 
-					Context appContext = MainActivity.this
-							.getApplicationContext();
-					String fatal = null;
-					ToolsInstaller installer = new ToolsInstaller(appContext);
+          else {
+            try {
+              System.initCore();
+            } catch (System.SuException e) {
+              Logger.error(e.getMessage());
+              fatal = getString(R.string.only_4_root);
+            } catch (System.DaemonException e) {
+              Logger.error(e.getMessage());
+              fatal = "heart attack!";
+            }
+          }
 
-					if (!Shell.isRootGranted())
-						fatal = getString(R.string.only_4_root);
+          dialog.dismiss();
 
-					else if (!Shell.isBinaryAvailable("killall", true))
-						fatal = getString(R.string.busybox_required);
+          if (fatal != null) {
+            final String ffatal = fatal;
+            MainActivity.this.runOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                new FatalDialog(getString(R.string.error),
+                        ffatal, ffatal.contains(">"),
+                        MainActivity.this).show();
+              }
+            });
+            return;
+          }
 
-					else if (!System.isARM())
-						fatal = getString(R.string.arm_error)
-								+ getString(R.string.arm_error2);
+          MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              if (!System.getAppVersionName().equals(
+                      System.getSettings().getString(
+                              "DSPLOIT_INSTALLED_VERSION", "0"))) {
+                new ChangelogDialog(MainActivity.this).show();
+                Editor editor = System.getSettings().edit();
+                editor.putString("DSPLOIT_INSTALLED_VERSION",
+                        System.getAppVersionName());
+                editor.apply();
+              }
+            }
+          });
+        }
+      }).start();
 
-					else if (installer.needed() && !installer.install())
-						fatal = getString(R.string.install_error);
+      Logger.debug("initializer thread created and started in " +
+          (java.lang.System.currentTimeMillis() - startTime) + " ms");
 
-
-					dialog.dismiss();
-
-					if (fatal != null) {
-						final String ffatal = fatal;
-						MainActivity.this.runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								new FatalDialog(getString(R.string.error),
-										ffatal, ffatal.contains(">"),
-										MainActivity.this).show();
-							}
-						});
-					}
-
-					MainActivity.this.runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							if (!System.getAppVersionName().equals(
-									System.getSettings().getString(
-											"DSPLOIT_INSTALLED_VERSION", "0"))) {
-								new ChangelogDialog(MainActivity.this).show();
-								Editor editor = System.getSettings().edit();
-								editor.putString("DSPLOIT_INSTALLED_VERSION",
-										System.getAppVersionName());
-								editor.commit();
-							}
-							try {
-								createOnlineLayout();
-							} catch (Exception e) {
-								new FatalDialog(getString(R.string.error), e
-										.getMessage(), MainActivity.this)
-										.show();
-							}
-						}
-					});
-				}
-			}).start();
-		}
+      try {
+        createLayout();
+      } catch (Exception e) {
+        new FatalDialog(getString(R.string.error), e
+                .getMessage(), MainActivity.this)
+                .show();
+      }
+    }
+    dialog.dismiss();
 	}
 
 	@Override
@@ -373,20 +424,20 @@ public class MainActivity extends SherlockListActivity {
 			item.setTitle(getString(R.string.start_monitor));
 
 		item = menu.findItem(R.id.ss_msfrpcd);
+    ToolBox tools = System.getTools();
 
-    if(!System.getSettings().getBoolean("MSF_ENABLED",true)) {
+    if((tools == null || !tools.msfRpcd.isEnabled())) {
       item.setEnabled(false);
-    } else if(!RPCServer.isLocal()) {
+    } else if(!MsfRpcd.isLocal()) {
       item.setEnabled(true);
       if(System.getMsfRpc()==null)
         item.setTitle(getString(R.string.connect_msf));
       else
         item.setTitle(getString(R.string.disconnect_msf));
-    } else if(RPCServer.exists() &&
-            !System.isServiceRunning("it.evilsocket.dsploit.core.UpdateService")) {
+    } else if(!System.isServiceRunning("it.evilsocket.dsploit.core.UpdateService")) {
       item.setEnabled(true);
       if (System.getMsfRpc() != null
-          || (mRPCServer != null && mRPCServer.isRunning()))
+          || (System.getTools().msfRpcd.isRunning()))
         item.setTitle(getString(R.string.stop_msfrpcd));
       else
         item.setTitle(getString(R.string.start_msfrpcd));
@@ -508,25 +559,55 @@ public class MainActivity extends SherlockListActivity {
 					Toast.LENGTH_SHORT).show();
 	}
 
-	public void stopNetworkDiscovery(boolean silent, boolean joinThreads) {
+	public void stopNetworkDiscovery(final boolean silent, boolean joinThreads) {
 		if (mNetworkDiscovery != null) {
 			if (mNetworkDiscovery.isRunning()) {
 				mNetworkDiscovery.exit();
 
 				if (joinThreads) {
-					try {
-						mNetworkDiscovery.join();
-					} catch (Exception e) {
-					}
-				}
 
-				if (!silent)
-					Toast.makeText(this,
-							getString(R.string.net_discovery_stopped),
-							Toast.LENGTH_SHORT).show();
+          MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              mMenu.findItem(R.id.ss_monitor).setEnabled(false);
+            }
+          });
+
+          new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+              try {
+                mNetworkDiscovery.join();
+              } catch (Exception e) {
+              }
+
+              MainActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                  mMenu.findItem(R.id.ss_monitor).setEnabled(true);
+
+                  if(!silent)
+                    Toast.makeText(MainActivity.this,
+                      getString(R.string.net_discovery_stopped),
+                      Toast.LENGTH_SHORT).show();
+                }
+              });
+
+              mNetworkDiscovery = null;
+            }
+          }).start();
+				} else {
+
+          mNetworkDiscovery = null;
+
+          if (!silent)
+            Toast.makeText(this,
+                getString(R.string.net_discovery_stopped),
+                Toast.LENGTH_SHORT).show();
+        }
 			}
-
-			mNetworkDiscovery = null;
 		}
 	}
 
@@ -541,22 +622,77 @@ public class MainActivity extends SherlockListActivity {
     new Thread( new Runnable() {
       @Override
       public void run() {
-        try {
-          if (mRPCServer != null) {
-            if(mRPCServer.isRunning()) {
-              mRPCServer.exit();
-              mRPCServer.join();
-            }
-            mRPCServer = null;
+        SharedPreferences prefs = System.getSettings();
+
+        final String msfHost     = prefs.getString("MSF_RPC_HOST", "127.0.0.1");
+        final String msfUser     = prefs.getString("MSF_RPC_USER", "msf");
+        final String msfPassword = prefs.getString("MSF_RPC_PSWD", "msf");
+        final int msfPort        = System.MSF_RPC_PORT;
+        final boolean msfSsl     = prefs.getBoolean("MSF_RPC_SSL", false);
+
+        if(msfHost.equals("127.0.0.1")) {
+          try {
+            System.getTools().msfRpcd.start(msfUser, msfPassword, msfPort, msfSsl, new MsfRpcd.MsfRpcdReceiver() {
+              @Override
+              public void onReady() {
+                try {
+                  System.setMsfRpc(new RPCClient(msfHost, msfUser, msfPassword, msfPort, msfSsl));
+                  Logger.info("successfully connected to MSF RPC Daemon ");
+                  MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                      Toast.makeText(MainActivity.this, "connected to MSF RPC Daemon", Toast.LENGTH_SHORT).show();
+                    }
+                  });
+                } catch (Exception e) {
+                  Logger.error(e.getClass().getName() + ": " + e.getMessage());
+                  MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                      Toast.makeText(MainActivity.this, "connection to MSF RPC Daemon failed", Toast.LENGTH_LONG).show();
+                    }
+                  });
+                }
+              }
+
+              @Override
+              public void onEnd(final int exitValue) {
+                MainActivity.this.runOnUiThread(new Runnable() {
+                  @Override
+                  public void run() {
+                    Toast.makeText(MainActivity.this, "MSF RPC Daemon returned #" + exitValue, Toast.LENGTH_LONG).show();
+                  }
+                });
+              }
+
+              @Override
+              public void onDeath(final int signal) {
+                MainActivity.this.runOnUiThread(new Runnable() {
+                  @Override
+                  public void run() {
+                    Toast.makeText(MainActivity.this, " MSF RPC Daemon killed by signal #" + signal, Toast.LENGTH_LONG).show();
+                  }
+                });
+              }
+            });
+          } catch (ChildManager.ChildNotStartedException e) {
+            Logger.error(e.getMessage());
+            MainActivity.this.runOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                Toast.makeText(MainActivity.this, "cannot start process", Toast.LENGTH_LONG).show();
+              }
+            });
           }
-          System.setMsfRpc(null);
-        } catch ( Exception e) {
-          // woop
-        }
-        // start MSF RPC Daemon only if it exists, user want it and no updates are in progress
-        if((RPCServer.isInternal() || (RPCServer.isLocal() && RPCServer.exists())) && System.getSettings().getBoolean("MSF_ENABLED",true) && !System.isServiceRunning("it.evilsocket.dsploit.core.UpdateService")) {
-          mRPCServer = new RPCServer(MainActivity.this);
-          mRPCServer.start();
+        } else {
+          try {
+            System.setMsfRpc(new RPCClient(msfHost, msfUser, msfPassword, msfPort, msfSsl));
+            Logger.info("successfully connected to MSF RPC Daemon ");
+            Toast.makeText(MainActivity.this, "connected to MSF RPC Daemon", Toast.LENGTH_SHORT).show();
+          } catch (Exception e) {
+            Logger.error(e.getClass().getName() + ": " + e.getMessage());
+            Toast.makeText(MainActivity.this, "connection to MSF RPC Daemon failed", Toast.LENGTH_LONG).show();
+          }
         }
       }
     }).start();
@@ -567,23 +703,30 @@ public class MainActivity extends SherlockListActivity {
    * @param silent show an information Toast if {@code false}
    */
 	public void StopRPCServer(final boolean silent) {
+
+    if(System.getMsfRpc() == null && !System.getTools().msfRpcd.isRunning())
+      return;
+
     new Thread( new Runnable() {
       @Override
       public void run() {
         try {
-          if (mRPCServer != null) {
-            if(mRPCServer.isRunning()) {
-              mRPCServer.exit();
-              mRPCServer.join();
-            }
-            mRPCServer = null;
-          }
           System.setMsfRpc(null);
-          Shell.exec("killall msfrpcd");
-          if(!silent)
-            Toast.makeText(MainActivity.this, getString(R.string.rpcd_stopped),Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-          // woop
+
+          if(!MsfRpcd.isLocal()) {
+            System.getTools().msfRpcd.stop();
+          }
+
+          if(!silent) {
+            MainActivity.this.runOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                Toast.makeText(MainActivity.this, getString(R.string.rpcd_stopped), Toast.LENGTH_SHORT).show();
+              }
+            });
+          }
+        } catch (InterruptedException e) {
+          Logger.error("interrupted while stopping rpc daemon");
         }
       }
     }).start();
@@ -766,15 +909,15 @@ public class MainActivity extends SherlockListActivity {
 			return true;
 
 		case R.id.ss_msfrpcd:
-      if(System.getMsfRpc()!=null || (mRPCServer!=null && mRPCServer.isRunning())) {
+      if(System.getMsfRpc()!=null || (System.getTools().msfRpcd.isRunning())) {
 				StopRPCServer(false);
-        if(RPCServer.isLocal())
+        if(MsfRpcd.isLocal())
 				  item.setTitle(R.string.start_msfrpcd);
         else
           item.setTitle(R.string.connect_msf);
 			} else {
 				StartRPCServer();
-        if(RPCServer.isLocal())
+        if(MsfRpcd.isLocal())
 				  item.setTitle(R.string.stop_msfrpcd);
         else
           item.setTitle(R.string.disconnect_msf);
@@ -869,13 +1012,11 @@ public class MainActivity extends SherlockListActivity {
 		if (mUpdateReceiver != null)
 			mUpdateReceiver.unregister();
 
-		if (mMsfRpcdReceiver != null)
-			mMsfRpcdReceiver.unregister();
+		if (mWipeReceiver != null)
+			mWipeReceiver.unregister();
 
 		// make sure no zombie process is running before destroying the activity
 		System.clean(true);
-
-		BugSenseHandler.closeSession(getApplicationContext());
 
 		super.onDestroy();
 	}
@@ -1043,16 +1184,13 @@ public class MainActivity extends SherlockListActivity {
 		}
 	}
 
-	private class MsfrpcdReceiver extends ManagedReceiver {
+	private class WipeReceiver extends ManagedReceiver {
 		private IntentFilter mFilter = null;
 
-		public MsfrpcdReceiver() {
+		public WipeReceiver() {
 			mFilter = new IntentFilter();
 
-			mFilter.addAction(RPCServer.ERROR);
-			mFilter.addAction(RPCServer.TOAST);
       mFilter.addAction(SettingsActivity.SETTINGS_WIPE_START);
-      mFilter.addAction(SettingsActivity.SETTINGS_MSF_CHANGED);
 		}
 
 		public IntentFilter getFilter() {
@@ -1061,32 +1199,8 @@ public class MainActivity extends SherlockListActivity {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			/*
-			 * optimization NOTES see?! no extra if(intent.getAction(...))
-			 * required! just take the R.string.id to show from the intent
-			 * extra, easy, fast and portable ;) we should use it for every
-			 * ManagedReceiver, IMHO -- tux_mind
-			 */
-			final int message_id = intent.getIntExtra(RPCServer.STRINGID, R.string.error);
 
-			if (intent.getAction().equals(RPCServer.ERROR)) {
-				MainActivity.this.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						new ErrorDialog(getString(R.string.error_rpc),
-								getString(message_id), MainActivity.this).show();
-					}
-				});
-			} else if(intent.getAction().equals(RPCServer.TOAST)){
-				MainActivity.this.runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            Toast.makeText(MainActivity.this,
-                    getString(message_id), Toast.LENGTH_SHORT)
-                    .show();
-          }
-        });
-			} else if(intent.getAction().equals(SettingsActivity.SETTINGS_WIPE_START)) {
+      if(intent.getAction().equals(SettingsActivity.SETTINGS_WIPE_START)) {
         try {
           String path;
 
@@ -1097,28 +1211,23 @@ public class MainActivity extends SherlockListActivity {
           }
 
           StopRPCServer(true);
-          Shell.async("rm -rf '" + path + "'", new Shell.OutputReceiver() {
-            @Override
-            public void onStart(String command) {
-
-            }
-
-            @Override
-            public void onNewLine(String line) {
-
-            }
-
+          System.getTools().raw.async("rm -rf '" + path + "'", new Child.EventReceiver() {
             @Override
             public void onEnd(int exitCode) {
               MainActivity.this.sendBroadcast(new Intent(SettingsActivity.SETTINGS_WIPE_DONE));
             }
-          }).start();
+
+            @Override
+            public void onDeath(int signal) {
+              MainActivity.this.sendBroadcast(new Intent(SettingsActivity.SETTINGS_WIPE_DONE));
+            }
+
+            @Override
+            public void onEvent(Event e) { }
+          });
         } catch ( Exception e) {
           System.errorLogging(e);
         }
-      } else if(intent.getAction().equals(SettingsActivity.SETTINGS_MSF_CHANGED)){
-        StopRPCServer(true);
-        StartRPCServer();
       }
 		}
 	}

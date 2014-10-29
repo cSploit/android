@@ -50,6 +50,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.core.ChildManager;
 import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.core.System;
@@ -108,7 +109,10 @@ public class LoginCracker extends Plugin {
 	}
 
 	private void setStoppedState(final String user, final String pass) {
-		System.getHydra().kill();
+    if(mProcess!=null) {
+      mProcess.kill();
+      mProcess = null;
+    }
 		mRunning = false;
 		mAccountFound = true;
 
@@ -126,7 +130,10 @@ public class LoginCracker extends Plugin {
 	}
 
 	private void setStoppedState() {
-		System.getHydra().kill();
+		if(mProcess!=null) {
+      mProcess.kill();
+      mProcess = null;
+    }
 		mRunning = false;
 
 		LoginCracker.this.runOnUiThread(new Runnable() {
@@ -152,21 +159,28 @@ public class LoginCracker extends Plugin {
 
 		mAccountFound = false;
 
-		mActivity.setVisibility(View.VISIBLE);
-		mStatusText.setTextColor(Color.DKGRAY);
-		mStatusText.setText(getString(R.string.starting_dots));
+    try {
+      mProcess =
+      System.getTools().hydra
+          .crack(System.getCurrentTarget(),
+                  Integer.parseInt((String) mPortSpinner
+                          .getSelectedItem()),
+                  (String) mProtocolSpinner.getSelectedItem(),
+                  mCustomCharset == null ? CHARSETS_MAPPING[mCharsetSpinner
+                          .getSelectedItemPosition()] : mCustomCharset,
+                  min, max, (String) mUserSpinner.getSelectedItem(),
+                  mUserWordlist, mPassWordlist, mReceiver);
 
-		System.getHydra()
-				.crack(System.getCurrentTarget(),
-						Integer.parseInt((String) mPortSpinner
-								.getSelectedItem()),
-						(String) mProtocolSpinner.getSelectedItem(),
-						mCustomCharset == null ? CHARSETS_MAPPING[mCharsetSpinner
-								.getSelectedItemPosition()] : mCustomCharset,
-						min, max, (String) mUserSpinner.getSelectedItem(),
-						mUserWordlist, mPassWordlist, mReceiver).start();
+      mActivity.setVisibility(View.VISIBLE);
+      mStatusText.setTextColor(Color.DKGRAY);
+      mStatusText.setText(getString(R.string.starting_dots));
+      mRunning = true;
 
-		mRunning = true;
+    } catch (ChildManager.ChildNotStartedException e) {
+      setStoppedState();
+    }
+
+
 	}
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -297,6 +311,8 @@ public class LoginCracker extends Plugin {
 		mStatusText = (TextView) findViewById(R.id.statusText);
 		mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 		mActivity = (ProgressBar) findViewById(R.id.activity);
+
+    mProgressBar.setMax(100);
 
 		mReceiver = new AttemptReceiver();
 
@@ -551,9 +567,8 @@ public class LoginCracker extends Plugin {
 		}
 
 		@Override
-		public void onNewAttempt(String login, String password,
-				final int progress, final int total) {
-			String status = getString(R.string.trying) + " " + login + ":" + password;
+		public void onAttemptStatus(final long progress, final long total) {
+			String status = "";
 
 			mNow = java.lang.System.currentTimeMillis();
 
@@ -573,14 +588,14 @@ public class LoginCracker extends Plugin {
 			}
 
 			final String text = status;
+      final int percentage = (int) ((progress/total) * 100);
 
 			LoginCracker.this.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					mStatusText.setTextColor(Color.DKGRAY);
 					mStatusText.setText(text);
-					mProgressBar.setMax(total);
-					mProgressBar.setProgress(progress);
+					mProgressBar.setProgress(percentage);
 				}
 			});
 		}
@@ -598,7 +613,7 @@ public class LoginCracker extends Plugin {
 		}
 
 		@Override
-		public void onError(String message) {
+		public void onWarning(String message) {
 			reset();
 
 			final String error = message;
@@ -613,7 +628,7 @@ public class LoginCracker extends Plugin {
 		}
 
 		@Override
-		public void onFatal(String message) {
+		public void onError(String message) {
 			reset();
 
 			final String error = message;

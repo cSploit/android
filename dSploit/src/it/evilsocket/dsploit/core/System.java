@@ -42,6 +42,7 @@ import android.util.SparseIntArray;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -61,6 +62,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -85,13 +87,8 @@ import it.evilsocket.dsploit.net.http.proxy.HTTPSRedirector;
 import it.evilsocket.dsploit.net.http.proxy.Proxy;
 import it.evilsocket.dsploit.net.http.server.Server;
 import it.evilsocket.dsploit.net.metasploit.Session;
-import it.evilsocket.dsploit.tools.ArpSpoof;
-import it.evilsocket.dsploit.tools.Ettercap;
-import it.evilsocket.dsploit.tools.Fusemounts;
-import it.evilsocket.dsploit.tools.Hydra;
-import it.evilsocket.dsploit.tools.IPTables;
-import it.evilsocket.dsploit.tools.NMap;
-import it.evilsocket.dsploit.tools.TcpDump;
+import it.evilsocket.dsploit.tools.Raw;
+import it.evilsocket.dsploit.tools.ToolBox;
 
 public class System
 {
@@ -124,14 +121,8 @@ public class System
   // registered plugins
   private static ArrayList<Plugin> mPlugins = null;
   private static Plugin mCurrentPlugin = null;
-  // tools singleton
-  private static NMap mNmap = null;
-  private static ArpSpoof mArpSpoof = null;
-  private static Ettercap mEttercap = null;
-  private static IPTables mIptables = null;
-  private static Hydra mHydra = null;
-  private static TcpDump mTcpdump = null;
-  private static Fusemounts mFusemounts = null;
+  // toolbox singleton
+  private static ToolBox mTools = null;
 
   private static HTTPSRedirector mRedirector = null;
   private static Proxy mProxy = null;
@@ -151,11 +142,17 @@ public class System
   private static Payload mPayload       = null;
   private static Session mMsfSession    = null;
 
+  private static boolean mCoreInitialized = false;
+
+  private final static LinkedList<SettingReceiver> mSettingReceivers = new LinkedList<SettingReceiver>();
+
   public static void init(Context context) throws Exception{
     mContext = context;
     try{
+      Logger.debug("initializing System...");
       mStoragePath = getSettings().getString("PREF_SAVE_PATH", Environment.getExternalStorageDirectory().toString());
       mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
+      mTools = new ToolBox();
       mUpdateService = new UpdateService();
       mPlugins = new ArrayList<Plugin>();
       mOpenPorts = new SparseIntArray(3);
@@ -192,8 +189,6 @@ public class System
         HTTPS_REDIR_PORT = 8082;
       }
 
-      reloadTools();
-
       // initialize network data at the end
       mNetwork = new Network(mContext);
 
@@ -211,20 +206,144 @@ public class System
       mInitialized = true;
     }
     catch(Exception e){
-      errorLogging(e);
+      if(!(e instanceof NoRouteToHostException))
+        errorLogging(e);
 
       throw e;
     }
   }
 
   public static void reloadTools() {
-    mNmap = new NMap(mContext);
-    mArpSpoof = new ArpSpoof(mContext);
-    mEttercap = new Ettercap(mContext);
-    mIptables = new IPTables();
-    mHydra = new Hydra(mContext);
-    mTcpdump = new TcpDump(mContext);
-    mFusemounts = new Fusemounts(mContext);
+    if(mTools == null)
+      mTools = new ToolBox();
+    mTools.reload();
+  }
+
+  public static class SuException extends Exception {
+    public SuException() {
+      super("super user access denied");
+    }
+  }
+
+  public static class DaemonException extends Exception {
+    public DaemonException(String message) {
+      super(message);
+    }
+  }
+
+  private static void startCoreDaemon() throws SuException, DaemonException {
+    boolean access_granted = false;
+    DataOutputStream writer = null;
+    BufferedReader reader = null;
+    String line;
+    int ret = -1;
+
+    try {
+      Process shell = Runtime.getRuntime().exec("su");
+      writer = new DataOutputStream(shell.getOutputStream());
+      String cmd;
+
+      cmd = String.format("{ echo 'ACCESS GRANTED' >&2; cd '%s' && exec ./dSploitd ;} || exit 1\n",
+          mContext.getFilesDir().getAbsoluteFile());
+
+      writer.write(cmd.getBytes());
+      writer.flush();
+
+      ret = shell.waitFor();
+
+      if(ret != 0) {
+        reader = new BufferedReader(new InputStreamReader(shell.getErrorStream()));
+
+        while((line = reader.readLine()) != null) {
+          if(line.equals("ACCESS GRANTED")) {
+            access_granted = true;
+            Logger.debug("'ACCESS GRANTED' found");
+          } else
+            Logger.warning("STDERR: " + line);
+        }
+      } else
+        access_granted = true;
+
+    } catch ( IOException e) {
+      // command "su" not found or cannot write to it's stdin
+      Logger.error(e.getMessage());
+    } catch (InterruptedException e) {
+      // interrupted while waiting for shell exit value
+      Logger.error(e.getMessage());
+    } finally {
+      if(writer != null)
+        try { writer.close(); } catch (IOException ignored) {}
+      if(reader != null)
+        try { reader.close(); } catch (IOException ignored) {}
+      reader = null;
+      writer = null;
+    }
+
+    if(!access_granted)
+      throw new SuException();
+
+    if(ret != 0) {
+      File log = new File(mContext.getFilesDir().getAbsolutePath(), "dSploitd.log");
+      if(log.exists() && log.canRead()) {
+        try {
+          reader = new BufferedReader(new FileReader(log));
+
+          while((line = reader.readLine()) != null) {
+            Logger.error("core daemon log: " + line);
+          }
+        } catch ( IOException e) {
+          Logger.error(e.getMessage());
+        } finally {
+          if(reader != null)
+            try { reader.close(); } catch (IOException ignored) {}
+        }
+      }
+      throw new DaemonException("core daemon returned " + ret);
+    }
+  }
+
+  /**
+   * shutdown the core daemon
+   */
+  public static void shutdownCoreDaemon(){
+    if(!Client.isConnected() && !Client.Connect(mContext.getFilesDir().getAbsolutePath() + "/dSploit.sock")) {
+      return; // daemon is not running
+    }
+    if(!Client.isAuthenticated() && !Client.Login("android", "DEADBEEF")) {
+      Logger.error("cannot login to daemon");
+    }
+    Client.Shutdown();
+    Client.Disconnect();
+  }
+
+  public static void initCore() throws DaemonException, SuException {
+
+    if(mCoreInitialized)
+      return;
+
+    String socket_path = mContext.getFilesDir().getAbsolutePath() + "/dSploit.sock";
+
+    if(!Client.isConnected()) {
+      if(!Client.Connect(socket_path)) {
+        startCoreDaemon();
+        if (!Client.Connect(socket_path))
+          throw new DaemonException("cannot connect to core daemon");
+      }
+    }
+
+    if (!Client.isAuthenticated() && !Client.Login("android", "DEADBEEF")) {
+      throw new DaemonException("cannot login to core daemon");
+    }
+
+    if (!Client.LoadHandlers()) {
+      throw new DaemonException("cannot load handlers");
+    }
+
+    ChildManager.storeHandlers();
+
+    reloadTools();
+
+    mCoreInitialized = true;
   }
 
   public static void reloadNetworkMapping(){
@@ -425,6 +544,29 @@ public class System
     }
 
     return "su";
+  }
+
+  public static void registerSettingListener(SettingReceiver receiver) {
+    synchronized (mSettingReceivers) {
+      if(!mSettingReceivers.contains(receiver)) {
+        mSettingReceivers.add(receiver);
+      }
+    }
+  }
+
+  public static void onSettingChanged(String key) {
+    synchronized (mSettingReceivers) {
+      for(SettingReceiver r : mSettingReceivers) {
+        if(r.getFilter().contains(key))
+          r.onSettingChanged(key);
+      }
+    }
+  }
+
+  public static void unregisterSettingListener(SettingReceiver receiver) {
+    synchronized (mSettingReceivers) {
+      mSettingReceivers.remove(receiver);
+    }
   }
 
   private static void preloadServices(){
@@ -755,32 +897,8 @@ public class System
       throw new Exception(filename + " does not exists or is empty.");
   }
 
-  public static NMap getNMap(){
-    return mNmap;
-  }
-
-  public static ArpSpoof getArpSpoof(){
-    return mArpSpoof;
-  }
-
-  public static Ettercap getEttercap(){
-    return mEttercap;
-  }
-
-  public static IPTables getIPTables(){
-    return mIptables;
-  }
-
-  public static Hydra getHydra(){
-    return mHydra;
-  }
-
-  public static TcpDump getTcpDump(){
-    return mTcpdump;
-  }
-
-  public static Fusemounts getFusemounts() {
-    return mFusemounts;
+  public static ToolBox getTools() {
+    return mTools;
   }
 
   public static RPCClient getMsfRpc() {
@@ -878,6 +996,10 @@ public class System
     return mInitialized;
   }
 
+  public static boolean isCoreInitialized() {
+    return mCoreInitialized;
+  }
+
   public static String getMacVendor(byte[] mac){
     preloadVendors();
 
@@ -891,6 +1013,10 @@ public class System
     preloadServices();
 
     return mPorts.containsKey(port) ? mPorts.get(port) : null;
+  }
+
+  public static String getProtocolByPort(int port) {
+    return getProtocolByPort(Integer.toString(port));
   }
 
   public static int getPortByProtocol(String protocol){
@@ -1119,10 +1245,10 @@ public class System
       cmd = "echo " + status + " > " + IPV4_FORWARD_FILEPATH;
 
     try{
-      Shell.exec(cmd);
+      mTools.shell.run(cmd);
     }
     catch(Exception e){
-      errorLogging(e);
+      Logger.error(e.getMessage());
     }
   }
 
@@ -1130,13 +1256,6 @@ public class System
     setForwarding(false);
 
     try{
-      String tools = "msfrpcd ";
-      for(String tool : ToolsInstaller.TOOLS)
-        tools += tool + " ";
-
-      Logger.debug("Killing any running instance of " + tools);
-      Shell.exec("killall -9 " + tools.trim());
-
       if(releaseLocks){
         Logger.debug("Releasing locks.");
 
@@ -1150,6 +1269,9 @@ public class System
       for(Target t : mTargets)
         for(Session s : t.getSessions())
           s.stopSession();
+
+      Client.Disconnect();
+      mCoreInitialized = false;
     }
     catch(Exception e){
       errorLogging(e);

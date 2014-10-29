@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.core.ChildManager;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.dialogs.FatalDialog;
 import it.evilsocket.dsploit.tools.Ettercap.OnAccountListener;
@@ -255,32 +256,70 @@ public class PasswordSniffer extends SherlockActivity {
 			new FatalDialog("Error", e.toString(), PasswordSniffer.this).show();
 		}
 
-		Toast.makeText(PasswordSniffer.this, "Logging to " + mFileOutput,
-				Toast.LENGTH_LONG).show();
 
-		mSpoofSession.start(new OnAccountListener() {
-			@Override
-			public void onAccount(final String protocol, final String address,
-					final String port, final String line) {
-				PasswordSniffer.this.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						if (mAdapter.hasChild(protocol, line) == false) {
-							try {
-								mBufferedWriter.write(line + "\n");
-							} catch (IOException e) {
-								System.errorLogging(e);
-							}
+    try {
+      mSpoofSession.start(new OnAccountListener() {
+        @Override
+        public void onAccount(final String protocol, final String address,
+            final String username, final String password) {
+          final String line = username + ": " + password;
+          PasswordSniffer.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              if (mAdapter.hasChild(protocol, line) == false) {
+                try {
+                  mBufferedWriter.write(line + "\n");
+                } catch (IOException e) {
+                  System.errorLogging(e);
+                }
 
-							mAdapter.addChild(protocol, line);
-						}
-					}
-				});
-			}
-		});
+                mAdapter.addChild(protocol, line);
+              }
+            }
+          });
+        }
 
-		mSniffProgress.setVisibility(View.VISIBLE);
-		mRunning = true;
+        @Override
+        public void onReady() {
+
+        }
+
+        @Override
+        public void onEnd(final int exitValue) {
+          PasswordSniffer.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              if(exitValue!=0) {
+                Toast.makeText(PasswordSniffer.this, "ettercap returned #" + exitValue, Toast.LENGTH_LONG).show();
+              }
+              setStoppedState();
+            }
+          });
+        }
+
+        @Override
+        public void onDeath(final int signal) {
+          PasswordSniffer.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              Toast.makeText(PasswordSniffer.this, "ettercap killed by signal #" + signal, Toast.LENGTH_LONG).show();
+              setStoppedState();
+            }
+          });
+        }
+      });
+
+      Toast.makeText(PasswordSniffer.this, "Logging to " + mFileOutput,
+              Toast.LENGTH_LONG).show();
+
+      mSniffProgress.setVisibility(View.VISIBLE);
+      mRunning = true;
+
+    } catch (ChildManager.ChildNotStartedException e) {
+      System.errorLogging(e);
+      mSniffToggleButton.setChecked(false);
+      Toast.makeText(PasswordSniffer.this, "cannot start process", Toast.LENGTH_LONG).show();
+    }
 	}
 
 	@Override

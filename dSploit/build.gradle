@@ -36,10 +36,6 @@ android {
     }
 
     buildTypes {
-        debug {
-            applicationIdSuffix ".debug"
-        }
-
         release {
             if (System.getenv("KEYSTORE_FILE") != null) {
                 signingConfig signingConfigs.release

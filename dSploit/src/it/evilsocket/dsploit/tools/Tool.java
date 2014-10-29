@@ -1,92 +1,104 @@
 /*
- * This file is part of the dSploit.
+ * This file is part of the cSploit.
  *
- * Copyleft of Simone Margaritelli aka evilsocket <evilsocket@gmail.com>
+ * Copyleft of Massimo Dragano aka tux_mind <tux_mind@csploit.org>
  *
- * dSploit is free software: you can redistribute it and/or modify
+ * cSploit is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * dSploit is distributed in the hope that it will be useful,
+ * cSploit is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with dSploit.  If not, see <http://www.gnu.org/licenses/>.
+ * along with cSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
 package it.evilsocket.dsploit.tools;
 
-import android.content.Context;
-
-import java.io.File;
-import java.io.IOException;
-
+import it.evilsocket.dsploit.core.Child;
+import it.evilsocket.dsploit.core.ChildManager;
 import it.evilsocket.dsploit.core.Logger;
-import it.evilsocket.dsploit.core.Shell;
-import it.evilsocket.dsploit.core.Shell.OutputReceiver;
-import it.evilsocket.dsploit.core.System;
 
-public class Tool
+public abstract class Tool
 {
-  protected String mPath = null;
-  protected String mBasename = null;
-  protected String mDirectory = null;
+  protected boolean mEnabled = true;
+  protected String mHandler = null;
+  protected String mCmdPrefix = null;
 
-  public Tool(String name, Context context){
-    File stat;
+  public int run(String args, Child.EventReceiver receiver) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
 
-    mPath = context.getFilesDir().getAbsolutePath() + "/tools/" + name;
-    mDirectory = mPath.substring(0, mPath.lastIndexOf('/'));
-    stat = new File(mPath);
-    if(!stat.exists()) {
-      Logger.error("cannot find tool: '"+name+"'");
-      Logger.error(mPath +": No such file or directory");
-      Logger.error("this tool will be disabled.");
-      mPath = "false";
-    } else {
-      mBasename = stat.getName();
+    // debugging inheritance
+    String stack = "";
+    for(StackTraceElement element : Thread.currentThread().getStackTrace()) {
+      if(element.getClassName().startsWith("it.evilsocket.dsploit"))
+        stack += String.format("at %s.%s(%s)\n",
+                element.getClassName(), element.getMethodName(),
+                (element.getLineNumber() >= 0 ? element.getFileName() + ":" + element.getLineNumber() : "NativeMethod"));
     }
-  }
+    Logger.debug(stack);
 
-  public Tool(String name){
-    mPath = mBasename = name;
-  }
-
-  public void run(String args, OutputReceiver receiver) throws IOException, InterruptedException{
-    Shell.exec(mPath + " " + args, receiver);
-  }
-
-  public void run(String args) throws IOException, InterruptedException{
-    run(args, null);
-  }
-
-  public Thread async(String args, OutputReceiver receiver){
-    return Shell.async(mPath + " " + args, receiver);
-  }
-
-  public Thread async(String args, OutputReceiver receiver, boolean chdir) {
-    if(chdir)
-      return Shell.async("cd '" + mDirectory + "' && " + mPath + " " + args, receiver);
-    else
-      return Shell.async(mPath + " " + args, receiver);
-  }
-
-  public boolean kill(){
-    return kill("9");
-  }
-
-  public boolean kill(String signal){
-    try{
-      Shell.exec("killall -" + signal + " " + mBasename);
-
-      return true;
-    }
-    catch(Exception e){
-      System.errorLogging(e);
+    if(!mEnabled) {
+      Logger.warning(mHandler + ":" + mCmdPrefix + ": disabled");
+      throw new ChildManager.ChildNotStartedException();
     }
 
-    return false;
+    if(mCmdPrefix!=null) {
+      args = mCmdPrefix + " " + args;
+    }
+
+    return ChildManager.exec(mHandler, args, receiver);
+  }
+
+  public int run(String args) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
+    return run(args, null);
+  }
+
+  public Child async(String args, Child.EventReceiver receiver) throws ChildManager.ChildNotStartedException {
+
+    // debugging inheritance
+    String stack = "";
+    for(StackTraceElement element : Thread.currentThread().getStackTrace()) {
+      if(element.getClassName().startsWith("it.evilsocket.dsploit"))
+        stack += String.format("at %s.%s(%s)\n",
+                element.getClassName(), element.getMethodName(),
+                (element.getLineNumber() >= 0 ? element.getFileName() + ":" + element.getLineNumber() : "NativeMethod"));
+    }
+    Logger.debug(stack);
+
+    if(!mEnabled) {
+      Logger.warning(mHandler + (mCmdPrefix != null ? ":" + mCmdPrefix : "" ) + ": disabled");
+      throw new ChildManager.ChildNotStartedException();
+    }
+
+    if(mCmdPrefix!=null) {
+      if(args != null) {
+        args = mCmdPrefix + " " + args;
+      } else {
+        args = mCmdPrefix;
+      }
+    }
+
+    return ChildManager.async(mHandler, args, receiver);
+  }
+
+  public Child async(String args) throws ChildManager.ChildNotStartedException {
+    return this.async(args, null);
+  }
+
+  public Child async(Child.EventReceiver receiver) throws ChildManager.ChildNotStartedException {
+    return async(null, receiver);
+  }
+
+  public boolean isEnabled() {
+    return mEnabled;
+  }
+
+  public void setEnabled() {
+    if(ChildManager.handlers != null) {
+      mEnabled = ChildManager.handlers.contains(mHandler);
+    }
   }
 }

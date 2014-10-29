@@ -33,6 +33,7 @@ import java.net.NoRouteToHostException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.core.System;
 
 public class Network
@@ -162,27 +163,28 @@ public class Network
     return mInfo.equals(network.getInfo());
   }
 
-  public boolean isInternal(int ip){
-    return isInternal((ip & 0xFF) + "." + ((ip >> 8) & 0xFF) + "." + ((ip >> 16) & 0xFF) + "." + ((ip >> 24) & 0xFF));
+  public boolean isInternal(byte[] address) {
+    byte[] gateway = mGateway.toByteArray();
+    byte[] mask = mNetmask.toByteArray();
+
+    for(int i = 0; i < gateway.length; i++)
+      if((gateway[i] & mask[i]) != (address[i] & mask[i]))
+        return false;
+
+    return true;
   }
 
   public boolean isInternal(String ip){
-    try{
-      byte[] gateway = mGateway.toByteArray();
-      byte[] address = InetAddress.getByName(ip).getAddress();
-      byte[] mask = mNetmask.toByteArray();
-
-      for(int i = 0; i < gateway.length; i++)
-        if((gateway[i] & mask[i]) != (address[i] & mask[i]))
-          return false;
-
-      return true;
+    try {
+      return isInternal(InetAddress.getByName(ip).getAddress());
+    } catch (UnknownHostException e) {
+      Logger.error(e.getMessage());
     }
-    catch(UnknownHostException e){
-      System.errorLogging(e);
-    }
-
     return false;
+  }
+
+  public boolean isInternal(InetAddress address) {
+    return isInternal(address.getAddress());
   }
 
   public static boolean isWifiConnected(Context context){

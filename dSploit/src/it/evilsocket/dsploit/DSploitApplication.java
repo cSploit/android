@@ -21,8 +21,6 @@ package it.evilsocket.dsploit;
 import android.app.Application;
 import android.content.SharedPreferences;
 
-import com.bugsense.trace.BugSenseHandler;
-
 import java.net.NoRouteToHostException;
 
 import it.evilsocket.dsploit.core.System;
@@ -49,21 +47,13 @@ public class DSploitApplication extends Application{
 		
     super.onCreate();
 
-    try{
-      BugSenseHandler.initAndStartSession(this, "d5d1ed80");
-    } catch(Exception e){
-      System.errorLogging(e);
-    }
-
     // initialize the system
     try{
       System.init(this);
     } catch(Exception e){
-      System.errorLogging(e);
-
       // ignore exception when the user has wifi off
       if(!(e instanceof NoRouteToHostException))
-        BugSenseHandler.sendException(e);
+        System.errorLogging(e);
     }
 
     // load system modules even if the initialization failed

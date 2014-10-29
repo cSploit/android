@@ -16,30 +16,35 @@
  * You should have received a copy of the GNU General Public License
  * along with cSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package it.evilsocket.dsploit.tools;
 
-import it.evilsocket.dsploit.core.Child;
-import it.evilsocket.dsploit.core.ChildManager;
-import it.evilsocket.dsploit.events.Event;
+import it.evilsocket.dsploit.core.ExecChecker;
+import it.evilsocket.dsploit.core.System;
 
-public class Fusemounts extends Tool
-{
-  public Fusemounts() {
-    mHandler = "fusemounts";
-    mCmdPrefix = null;
+/**
+ * a shell with proper environment variables to run msf binaries
+ */
+public class MsfShell extends RubyShell {
+
+  @Override
+  public void setEnabled() {
+    super.setEnabled();
+
+    mEnabled = mEnabled && (ExecChecker.msf().getRoot() != null ||
+            ExecChecker.msf().canExecuteInDir(System.getMsfPath()));
   }
 
-  public static abstract class fuseReceiver extends Child.EventReceiver {
-
-    @Override
-    public void onEvent(Event e) {
-      //TODO
-    }
-
-    public abstract void onNewMountpoint(String source, String mountpoint);
+  @Override
+  protected void registerSettingReceiver() {
+    super.registerSettingReceiver();
+    onSettingsChanged.addFilter("MSF_DIR");
   }
 
-  public Child getSources(fuseReceiver receiver) throws ChildManager.ChildNotStartedException {
-    return super.async(receiver);
+  @Override
+  protected void setupEnvironment() {
+    super.setupEnvironment();
+
+    mPreCmd += "export PATH=\"$PATH:" + ExecChecker.msf().getRoot() + "\"\n";
   }
 }

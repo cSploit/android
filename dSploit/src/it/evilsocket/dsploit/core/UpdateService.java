@@ -47,12 +47,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.security.KeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -60,6 +62,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import it.evilsocket.dsploit.R;
@@ -67,6 +70,8 @@ import it.evilsocket.dsploit.net.GemParser;
 import it.evilsocket.dsploit.net.GitHubParser;
 import it.evilsocket.dsploit.core.ArchiveMetadata.archiveAlgorithm;
 import it.evilsocket.dsploit.core.ArchiveMetadata.compressionAlgorithm;
+import it.evilsocket.dsploit.tools.Raw;
+import it.evilsocket.dsploit.tools.Shell;
 
 public class UpdateService extends IntentService
 {
@@ -80,6 +85,7 @@ public class UpdateService extends IntentService
   private static final String LOCAL_MSF_NAME = "%s.zip";
   private static final String REMOTE_GEM_SERVER = "http://gems.dsploit.net/";
   private static final Pattern VERSION_CHECK = Pattern.compile("^[0-9]+\\.[0-9]+\\.[0-9]+[a-z]?$");
+  private static final Pattern GEM_FROM_LIST = Pattern.compile("^([^ ]+) \\(([^ ]+) ");
 
   // Intent defines
   public static final String START    = "UpdateService.action.START";
@@ -107,7 +113,7 @@ public class UpdateService extends IntentService
           mCurrentTask                = null;
   final private StringBuffer
           mErrorOutput                = new StringBuffer();
-  private Shell.OutputReceiver
+  private Raw.RawReceiver
           mErrorReceiver              = null;
 
   private NotificationManager mNotificationManager = null;
@@ -124,7 +130,7 @@ public class UpdateService extends IntentService
   public UpdateService(){
     super("UpdateService");
     // prepare error receiver
-    mErrorReceiver = new Shell.OutputReceiver() {
+    mErrorReceiver = new Raw.RawReceiver() {
       @Override
       public void onStart(String command) {
         mErrorOutput.delete(0, mErrorOutput.length());
@@ -135,6 +141,12 @@ public class UpdateService extends IntentService
 
       @Override
       public void onNewLine(String line) {
+        mErrorOutput.append(line);
+        mErrorOutput.append("\n");
+      }
+
+      @Override
+      public void onStderr(String line) {
         mErrorOutput.append(line);
         mErrorOutput.append("\n");
       }
@@ -310,25 +322,20 @@ public class UpdateService extends IntentService
         }
 
         mRubyInfo.outputDir = System.getRubyPath();
+        mRubyInfo.executableOutputDir = ExecChecker.ruby().getRoot();
+
+        if (!mSettingReceiver.getFilter().contains("RUBY_DIR")) {
+          mSettingReceiver.addFilter("RUBY_DIR");
+          System.registerSettingListener(mSettingReceiver);
+        }
 
         exitForError = false;
-
-        if (ExecChecker.user(mRubyInfo.outputDir) || ExecChecker.remount(mRubyInfo.outputDir, true)) {
-          mRubyInfo.executableOutputDir = mRubyInfo.outputDir;
-        } else {
-          String realPath = ExecChecker.getRealPath(mRubyInfo.outputDir);
-          if(ExecChecker.root(realPath))
-            mRubyInfo.executableOutputDir = realPath;
-          else {
-            Logger.error(String.format("cannot create executable files in '%s' or '%s'",
-                    mRubyInfo.outputDir, realPath));
-            return false;
-          }
-        }
 
         if (localVersion == null || localVersion < mRubyInfo.version)
           return true;
       }
+    } catch (UnknownHostException e) {
+      Logger.error(e.getMessage());
     } catch(Exception e){
       System.errorLogging(e);
     } finally {
@@ -418,28 +425,23 @@ public class UpdateService extends IntentService
         mMsfInfo.name = name;
         mMsfInfo.path = path;
         mMsfInfo.outputDir = System.getMsfPath();
+        mMsfInfo.executableOutputDir = ExecChecker.msf().getRoot();
         mMsfInfo.archiver = archiveAlgorithm.zip;
         mMsfInfo.dirToExtract = "metasploit-framework-" + branch + "/";
         mMsfInfo.modeMap = msfModeMap;
 
-        exitForError = false;
-
-        if (ExecChecker.user(mMsfInfo.outputDir) || ExecChecker.remount(mMsfInfo.outputDir, true)) {
-          mMsfInfo.executableOutputDir = mMsfInfo.outputDir;
-        } else {
-          String realPath = ExecChecker.getRealPath(mMsfInfo.outputDir);
-          if (ExecChecker.root(realPath)) {
-            mMsfInfo.executableOutputDir = realPath;
-          } else {
-            Logger.error(String.format("cannot create executable files in '%s' or '%s'",
-                    mMsfInfo.outputDir, realPath));
-            return false;
-          }
+        if (!mSettingReceiver.getFilter().contains("MSF_DIR")) {
+          mSettingReceiver.addFilter("MSF_DIR");
+          System.registerSettingListener(mSettingReceiver);
         }
+
+        exitForError = false;
 
         if (!mMsfInfo.version.equals(localVersion))
           return true;
       }
+    } catch (UnknownHostException e) {
+      Logger.error(e.getMessage());
     } catch (Exception e) {
       System.errorLogging(e);
     } finally {
@@ -448,6 +450,24 @@ public class UpdateService extends IntentService
     }
     return false;
   }
+
+  private static SettingReceiver mSettingReceiver = new SettingReceiver() {
+
+    @Override
+    public void onSettingChanged(String key) {
+      if(key.equals("RUBY_DIR")) {
+        synchronized (mRubyInfo) {
+          mRubyInfo.outputDir = System.getRubyPath();
+          mRubyInfo.executableOutputDir = ExecChecker.ruby().getRoot();
+        }
+      } else if(key.equals("MSF_DIR")) {
+        synchronized (mMsfInfo) {
+          mMsfInfo.outputDir = System.getMsfPath();
+          mMsfInfo.executableOutputDir = ExecChecker.msf().getRoot();
+        }
+      }
+    }
+  };
 
   public static String[] getMsfBranches() {
     synchronized (mMsfRepoParser) {
@@ -559,7 +579,7 @@ public class UpdateService extends IntentService
       return;
 
     try {
-      Shell.exec("rm -rf '"+mCurrentTask.outputDir+"'");
+      System.getTools().raw.run("rm -rf '" + mCurrentTask.outputDir + "'");
       return;
     } catch (Exception e) {
       System.errorLogging(e);
@@ -628,31 +648,29 @@ public class UpdateService extends IntentService
 
   /**
    * wait that a shell terminate or user cancel the notification.
-   * @param shell the Thread returned by {@link it.evilsocket.dsploit.core.Shell#async(String, it.evilsocket.dsploit.core.Shell.OutputReceiver, boolean)}
+   * @param child the Child returned by {@link it.evilsocket.dsploit.tools.Tool#async(String)}
    * @param cancellationMessage the message of the CancellationException
    * @throws java.io.IOException when cannot execute shell
    * @throws java.util.concurrent.CancellationException when user cancelled the notification
    */
-  private int execShell(Thread shell, String cancellationMessage) throws IOException, CancellationException, InterruptedException {
-    if(!(shell instanceof Shell.StreamGobbler))
-      throw new IOException("cannot execute shell commands");
-    shell.start();
-    while(mRunning && shell.getState()!= Thread.State.TERMINATED)
+  private int execShell(Child child, String cancellationMessage) throws IOException, CancellationException, InterruptedException {
+    while(mRunning && child.running)
       Thread.sleep(10);
     if(!mRunning) {
-      shell.interrupt();
+      child.kill();
       throw new CancellationException(cancellationMessage);
     } else
-      shell.join();
+      child.join();
 
-    int ret = ((Shell.StreamGobbler)shell).exitValue;
-
-    if(ret!=0 && mErrorOutput.length() > 0)
+    if((child.exitValue!=0 || child.signal >= 0) && mErrorOutput.length() > 0)
       for(String line : mErrorOutput.toString().split("\n"))
         if(line.length()>0)
           Logger.error(line);
 
-    return ret;
+    if(child.signal>=0) {
+      return 128 + child.signal;
+    }
+    return child.exitValue;
   }
 
   /**
@@ -756,7 +774,7 @@ public class UpdateService extends IntentService
       if(!file.canWrite() || !file.canRead()) {
         read = -1;
         try {
-          read = Shell.exec(String.format("chmod 777 '%s'", mCurrentTask.path));
+          read = System.getTools().raw.run(String.format("chmod 777 '%s'", mCurrentTask.path));
         } catch ( Exception e) {
           System.errorLogging(e);
         }
@@ -1059,7 +1077,7 @@ public class UpdateService extends IntentService
    * correct file modes on extracted files
    * @throws CancellationException if task get cancelled by user
    */
-  private void correctModes() throws CancellationException, IOException, RuntimeException, InterruptedException {
+  private void correctModes() throws CancellationException, IOException, RuntimeException, InterruptedException, ChildManager.ChildNotStartedException {
     /*
      * NOTE:  this horrible solution to chmod is only
      *        a temporary way to changing mode to files.
@@ -1082,7 +1100,7 @@ public class UpdateService extends IntentService
             .setProgress(100, 0, true);
     mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
 
-    if (execShell(Shell.async(
+    if (execShell(System.getTools().raw.async(
             "chmod -R 755 '" + mCurrentTask.executableOutputDir + "'",
             mErrorReceiver), "chmod cancelled") != 0) {
       throw new IOException("cannot chmod extracted files.");
@@ -1097,7 +1115,7 @@ public class UpdateService extends IntentService
    * @throws RuntimeException if something goes wrong
    * @throws java.util.concurrent.CancellationException if user cancelled this task
    */
-  private void patchShebang() throws IOException, InterruptedException, RuntimeException, CancellationException {
+  private void patchShebang() throws IOException, InterruptedException, RuntimeException, CancellationException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
 
     if(mCurrentTask.outputDir==null)
       return;
@@ -1114,28 +1132,21 @@ public class UpdateService extends IntentService
             .setProgress(100, 0, true);
     mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
 
-    if (Shell.exec("which env", new Shell.OutputReceiver() {
-      @Override
-      public void onStart(String command) {
-      }
+    if (System.getTools().raw.run("which env", new Raw.RawReceiver() {
 
       @Override
       public void onNewLine(String line) {
-        if(line.length()>0) {
+        if (line.length() > 0) {
           envPath.delete(0, envPath.length());
           envPath.append(line);
         }
       }
-
-      @Override
-      public void onEnd(int exitCode) {
-      }
-    }) != 0)
+    }) != 0 || envPath.length() == 0)
       throw new RuntimeException("cannot find 'env' executable");
 
     Logger.debug("envPath: " + envPath);
 
-    Thread shell = Shell.async(
+    Child shell = System.getTools().shell.async(
             String.format("sed -i '1s,^#!/usr/bin/env,#!%s,' $(find '%s' -type f -perm +111 )",
                     envPath.toString(), mCurrentTask.executableOutputDir), mErrorReceiver);
 
@@ -1146,8 +1157,10 @@ public class UpdateService extends IntentService
   /**
    * install gems required by the MSF
    */
-  private void installGems() throws CancellationException, RuntimeException, IOException, InterruptedException {
+  private void installGems() throws CancellationException, RuntimeException, IOException, InterruptedException, ChildManager.ChildNotStartedException {
     String msfPath = System.getMsfPath();
+    final ArrayList<String> ourGems = new ArrayList<String>();
+    StringBuilder sb = new StringBuilder();
 
     mBuilder.setContentTitle(getString(R.string.installing_gems))
             .setContentText(getString(R.string.installing_bundle))
@@ -1155,10 +1168,12 @@ public class UpdateService extends IntentService
             .setSmallIcon(android.R.drawable.stat_sys_download)
             .setProgress(100, 0, true);
     mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-    Shell.setupRubyEnviron();
-    Thread shell;
+    Child shell;
 
-    shell = Shell.async("gem install bundle", mErrorReceiver);
+    //TODO: use rubyShell.async() ( do not spawn a shell for every command, or maybe not [ spawn child with custom environment ? ] )
+    //TODO: run install bundle while patching msf files.
+    //TODO: avoid using find, we already known which file must be patched.
+    shell = System.getTools().rubyShell.async("which bundle || gem install bundle", mErrorReceiver);
 
     // install bundle gem, required for install msf
     if(execShell(shell,"cancelled while install bundle")!=0)
@@ -1167,30 +1182,61 @@ public class UpdateService extends IntentService
     mBuilder.setContentText(getString(R.string.installing_msf_gems));
     mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
 
+    // get gems stored on our gem server.
+
+    shell = System.getTools().rubyShell.async(
+        String.format("gem list -r --clear-sources --source '%s'", REMOTE_GEM_SERVER),
+        new Raw.RawReceiver() {
+          @Override
+          public void onNewLine(String line) {
+            Matcher matcher = GEM_FROM_LIST.matcher(line);
+            if(matcher.find()) {
+              ourGems.add(matcher.group(1) + " " + matcher.group(2));
+            }
+          }
+        });
+
+    if(execShell(shell, "cancelled while retrieving compiled gem list")!=0)
+      throw new RuntimeException("cannot fetch remote gem info");
+
+    // substitute gems version and gem sources with our one
+
+    sb.append("sed -i ");
+
     // append our REMOTE_GEM_SERVER to msf Gemfile sources.
     // we use an our gem server to provide cross compiled gems,
     // because android does not comes with a compiler.
+    sb.append(String.format("-e \"/source 'https:\\/\\/rubygems.org'/a\\\nsource '%s'\" ",
+                    REMOTE_GEM_SERVER));
 
-    shell = Shell.async( String.format(
-            "sed -i \"/source 'https:\\/\\/rubygems.org'/a\\\nsource '%s'\" '%s/Gemfile'",
-            REMOTE_GEM_SERVER, msfPath), mErrorReceiver);
+    for(String compiledGem : ourGems) {
+      String[] parts = compiledGem.split(" ");
 
-    if(execShell(shell, "cancelled while adding our gem server")!=0)
-      throw new RuntimeException("cannot add our gem server");
+      // patch Gemfile
+      sb.append(String.format("-e \"s/gem  *'%1$s'.*/gem '%1$s', '%2$s', :source => '%3$s'/g\" ",
+              parts[0], parts[1], REMOTE_GEM_SERVER));
+      // patch gemspec
+      sb.append(String.format("-e \"s/spec.add_runtime_dependency  *'%1$s'.*/spec.add_runtime_dependency '%1$s', '%2$s'/g\" ",
+              parts[0], parts[1]));
+    }
 
-    // i was able to cross compile pcaprub 0.10.0,
-    // newer version use pcap version that are not used by android.
+    // android does not have git, but we downloaded the archive from the git repo.
+    // so it's content it's exactly the same seen by git.
+    sb.append("-e 's/`git ls-files`/`find . -type f`/' ");
 
-    shell = Shell.async(String.format(
-            "sed -i \"s/'pcaprub'\\$/'pcaprub', '0.10.0'/\" '%s/Gemfile'",
-            msfPath
-    ), mErrorReceiver);
+    // send files to work on
+    sb.append(String.format("'%1$s/Gemfile' '%1$s/metasploit-framework.gemspec'", msfPath));
 
-    if(execShell(shell, "cancelled while patching pcaprub version")!=0)
-      throw new RuntimeException("cannot specify pcaprub version");
+    shell = System.getTools().raw.async(sb.toString(), mErrorReceiver);
 
-    shell = Shell.async(
-            String.format("cd '%s' && bundle install --without development test", msfPath),
+    if(execShell(shell, "cancelled while patching bundle files")!=0)
+      throw new RuntimeException("cannot patch bundle files");
+
+    // remove cache version file
+    new File(msfPath, "Gemfile.lock").delete();
+
+    shell = System.getTools().rubyShell.async(
+            String.format("cd '%s' && bundle install --verbose --without development test", msfPath),
             mErrorReceiver);
 
     // install gem required by msf using bundle
@@ -1198,18 +1244,17 @@ public class UpdateService extends IntentService
       throw new RuntimeException("cannot install msf gems");
   }
 
-  private void updateGems() throws IOException, InterruptedException, CancellationException, RuntimeException, KeyException, NoSuchAlgorithmException {
+  private void updateGems() throws IOException, InterruptedException, CancellationException, RuntimeException, KeyException, NoSuchAlgorithmException, ChildManager.ChildNotStartedException {
     GemParser.RemoteGemInfo[] gemsToUpdate = mGemUploadParser.getGemsToUpdate();
 
     if(gemsToUpdate==null||gemsToUpdate.length==0)
       return;
 
-    Shell.setupRubyEnviron();
     String localFormat = String.format("%s/%%s",System.getStoragePath());
     String remoteFormat = String.format("%s/gems/%%s", REMOTE_GEM_SERVER);
     mCurrentTask.archiver = archiveAlgorithm.tar;
 
-    Thread shell;
+    Child shell;
 
     for(GemParser.RemoteGemInfo gemInfo : gemsToUpdate) {
 
@@ -1227,7 +1272,7 @@ public class UpdateService extends IntentService
               .setProgress(100, 0, true);
       mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
 
-      shell = Shell.async(String.format(
+      shell = System.getTools().rubyShell.async(String.format(
               "gem uninstall --force -x -v '%s' '%s' && gem install -l '%s'",
               gemInfo.version, gemInfo.name, mCurrentTask.path), mErrorReceiver);
 
@@ -1249,7 +1294,7 @@ public class UpdateService extends IntentService
       return;
 
     try {
-      Shell.exec(String.format("rm -rf '%s/lib/ruby/gems/1.9.1/cache/'", System.getRubyPath()));
+      System.getTools().raw.run(String.format("rm -rf '%s/lib/ruby/gems/1.9.1/cache/'", System.getRubyPath()));
     } catch (Exception e) {
       System.errorLogging(e);
     }
@@ -1363,6 +1408,12 @@ public class UpdateService extends IntentService
       else
         Logger.error(e.getClass().getName() + ": " + e.getMessage());
     } catch (InterruptedException e) {
+      sendError(R.string.error_occured);
+      System.errorLogging(e);
+    } catch (ChildManager.ChildNotStartedException e) {
+      sendError(R.string.error_occured);
+      System.errorLogging(e);
+    } catch (ChildManager.ChildDiedException e) {
       sendError(R.string.error_occured);
       System.errorLogging(e);
     } finally {

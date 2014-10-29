@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.Logger;
-import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.net.Target;
 

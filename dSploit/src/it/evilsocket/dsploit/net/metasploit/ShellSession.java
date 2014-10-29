@@ -9,8 +9,8 @@ import java.util.concurrent.TimeoutException;
 
 import it.evilsocket.dsploit.R;
 import it.evilsocket.dsploit.core.Logger;
-import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.System;
+import it.evilsocket.dsploit.tools.Raw;
 
 /**
  * Extends Session with some method to read and write to shell
@@ -21,36 +21,49 @@ public class ShellSession extends Session {
   // max time to wait for command execution
   private final static int TIMEOUT = 60000;
 
-  protected Shell.OutputReceiver mReceiver;
-  protected final Stack<String> mCommands  = new Stack<String>();
-  protected boolean mSleep = true;
-  protected int exitCode = -1;
+  public static abstract class RpcShellReceiver extends Raw.RawReceiver {
+
+    public abstract void onRpcClosed();
+    public abstract void onTimedOut();
+  }
+
+  private class CmdAndReceiver {
+    public final String command;
+    public final RpcShellReceiver receiver;
+
+    public CmdAndReceiver(String command, RpcShellReceiver receiver) {
+      this.command = command;
+      this.receiver = receiver;
+    }
+  }
+
+  protected final Stack<CmdAndReceiver> mCommands  = new Stack<CmdAndReceiver>();
 
   public ShellSession(Integer id, Map<String,Object> map) throws UnknownHostException {
     super(id,map);
-    mReceiver = null;
     start();
   }
 
   @SuppressWarnings("unchecked")
-  protected void processCommand(String command) throws TimeoutException, IOException, RPCClient.MSFException, InterruptedException {
+  protected void processCommand(CmdAndReceiver cmd) throws TimeoutException, IOException, RPCClient.MSFException, InterruptedException {
     String token = UUID.randomUUID().toString();
     StringBuilder buffer = new StringBuilder();
     Boolean tokenFound = false;
-    long start;
     int newline;
+    long timeout;
     RPCClient client = System.getMsfRpc();
 
     if(client==null) {
-      mReceiver.onEnd(126); // @see http://stackoverflow.com/questions/1101957/are-there-any-standard-exit-status-codes-in-linux
-      return;
+      if(cmd.receiver != null)
+        cmd.receiver.onRpcClosed();
+      throw new IOException("RPC Client unavailable");
     }
 
     // send command
-    client.call("session.shell_write", mJobId,command+"\necho\necho \"$?"+token+"\"\n");
+    client.call("session.shell_write", mJobId,cmd.command+"\necho\necho \"$?"+token+"\"\n");
 
     // read until token is found
-    start = java.lang.System.currentTimeMillis();
+    timeout = java.lang.System.currentTimeMillis() + TIMEOUT;
     do
     {
       String data = (((Map<String, String>)client.call("session.shell_read",mJobId )).get("data") + "");
@@ -62,72 +75,44 @@ public class ShellSession extends Session {
           newline = Integer.parseInt(buffer.toString().substring(0,buffer.length() - token.length()));
           break;
         }
-        mReceiver.onNewLine(buffer.toString());
+        if(cmd.receiver!=null)
+          cmd.receiver.onNewLine(buffer.toString());
         buffer.delete(0,buffer.length());
         // substring(start) => start is inclusive , we want remove the '\n'
         data=data.substring(newline+1);
         newline = data.indexOf('\n');
       }
       if(tokenFound) {
-        mReceiver.onEnd(newline);
+        if(cmd.receiver!=null)
+          cmd.receiver.onEnd(newline);
         return;
       }
       buffer.append(data);
 
       Thread.sleep(100);
-    }while ((java.lang.System.currentTimeMillis() - start) < TIMEOUT);
+    }while (java.lang.System.currentTimeMillis() < timeout);
 
     // no token found, TIMEOUT!
+    if(cmd.receiver!=null)
+      cmd.receiver.onTimedOut();
     throw new TimeoutException("token not found");
   }
 
-  public void addCommand(String command) {
-    synchronized (this) {
-      if (mReceiver==null || command.trim().equals(""))
+  public void addCommand(String command, RpcShellReceiver receiver) {
+    synchronized (mCommands) {
+      if (command.trim().equals(""))
         return;
-      mCommands.push(command);
+      mCommands.push(new CmdAndReceiver(command, receiver));
+      mCommands.notify();
     }
   }
 
-  public int runCommand(String cmd) throws InterruptedException, TimeoutException, RPCClient.MSFException, IOException {
-    synchronized (this) {
-      Shell.OutputReceiver oldReceiver = mReceiver;
-      exitCode = -1;
-
-      mReceiver = new Shell.OutputReceiver() {
-        @Override
-        public void onStart(String command) {
-
-        }
-
-        @Override
-        public void onNewLine(String line) {
-
-        }
-
-        @Override
-        public void onEnd(int ret) {
-          exitCode = ret;
-        }
-      };
-      processCommand(cmd);
-      mReceiver = oldReceiver;
-      return exitCode;
-    }
-  }
-
-  protected String grabCommand() {
-    synchronized (this) {
-      if(mCommands.size()>0)
-        return mCommands.pop();
-      else
-        return null;
-    }
-  }
-
-  public void setReceiver(Shell.OutputReceiver receiver) {
-    synchronized (this) {
-      mReceiver = receiver;
+  protected CmdAndReceiver grabCommand() throws InterruptedException {
+    synchronized (mCommands) {
+      while(mCommands.size() == 0) {
+        mCommands.wait();
+      }
+      return mCommands.pop();
     }
   }
 
@@ -136,14 +121,7 @@ public class ShellSession extends Session {
     try {
       //noinspection InfiniteLoopStatement
       while(true) {
-        while(mSleep)
-          Thread.sleep(200);
-        String next = grabCommand();
-        if (next != null) {
-          processCommand(next);
-          Thread.sleep(50);
-        }
-        else Thread.sleep(200);
+        processCommand(grabCommand());
       }
     } catch (InterruptedException e) {
       Logger.warning("interrupted");
@@ -162,14 +140,6 @@ public class ShellSession extends Session {
   public int getResourceId() {
     //TODO
     return R.drawable.exploit_msf;
-  }
-
-  public void sleep() {
-    mSleep=true;
-  }
-
-  public void wakeUp() {
-    mSleep=false;
   }
 
   @Override

@@ -19,19 +19,21 @@
 package it.evilsocket.dsploit.core;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class ToolsInstaller{
-  private final static String TOOLS_FILENAME = "tools.zip";
+  private final static String TOOLS_FILENAME = "core.zip";
   private final static int BUFFER_SIZE = 4096;
 
   public final static String[] TOOLS = {
@@ -57,6 +59,7 @@ public class ToolsInstaller{
     "chmod 666 {PATH}/hydra/*",
     "chmod 755 {PATH}/hydra/hydra",
     "chmod 755 {PATH}/fusemounts/fusemounts",
+    "chmod 755 {PATH}/../dSploitd",
     "mount -o remount,rw /system /system && ( chmod 6755 /system/*/su; mount -o remount,ro /system /system )",
     "chmod 755 {FILES}"
   };
@@ -104,6 +107,8 @@ public class ToolsInstaller{
     // Avoid some binary file being busy as a running process.
     System.clean(false);
 
+    System.shutdownCoreDaemon();
+
     ZipInputStream zipInput;
     ZipEntry zipEntry;
     byte[] buffer = new byte[BUFFER_SIZE];
@@ -131,20 +136,26 @@ public class ToolsInstaller{
 
           fileOutput.close();
           zipInput.closeEntry();
+
+          file.setExecutable(true, false);
+          file.setReadable(true, false);
+          file.setWritable(true, true);
         }
       }
 
       zipInput.close();
 
-      String cmd = "";
+      file = new File(mVersionFile);
 
-      for(String install_cmd : INSTALL_COMMANDS){
-        cmd += install_cmd.replace("{PATH}", mDestPath + "/tools").replace("{FILES}", mDestPath) + "; ";
-      }
+      fileOutput = new FileOutputStream(file);
 
-      Shell.exec(cmd);
+      fileOutput.write(mAppVersion.getBytes());
 
-      Shell.exec("echo '" + mAppVersion + "' > '" + mVersionFile + "' && chmod 777 '" + mVersionFile + "'");
+      fileOutput.close();
+
+      file.setExecutable(true, false);
+      file.setReadable(true, false);
+      file.setWritable(true, false);
 
       System.reloadTools();
 

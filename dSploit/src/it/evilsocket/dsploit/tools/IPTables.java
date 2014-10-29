@@ -1,20 +1,20 @@
 /*
- * This file is part of the dSploit.
+ * This file is part of the cSploit.
  *
- * Copyleft of Simone Margaritelli aka evilsocket <evilsocket@gmail.com>
+ * Copyleft of Massimo Dragano aka tux_mind <tux_mind@csploit.org>
  *
- * dSploit is free software: you can redistribute it and/or modify
+ * cSploit is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * dSploit is distributed in the hope that it will be useful,
+ * cSploit is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with dSploit.  If not, see <http://www.gnu.org/licenses/>.
+ * along with cSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
 package it.evilsocket.dsploit.tools;
 
@@ -24,7 +24,8 @@ import it.evilsocket.dsploit.core.Logger;
 public class IPTables extends Tool
 {
   public IPTables(){
-    super("iptables");
+    mHandler = "raw";
+    mCmdPrefix = "iptables";
   }
 
   public void trafficRedirect(String to){

@@ -18,14 +18,15 @@
  */
 package it.evilsocket.dsploit;
 
+import it.evilsocket.dsploit.core.ChildManager;
 import it.evilsocket.dsploit.core.ExecChecker;
 import it.evilsocket.dsploit.core.Logger;
-import it.evilsocket.dsploit.core.Shell;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.UpdateService;
 import it.evilsocket.dsploit.gui.DirectoryPicker;
 import it.evilsocket.dsploit.gui.dialogs.ChoiceDialog;
 import it.evilsocket.dsploit.gui.dialogs.ConfirmDialog;
+import it.evilsocket.dsploit.tools.Raw;
 
 import java.io.File;
 
@@ -155,37 +156,37 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
   }
 
   private void measureMsfSize() {
-    Shell.async(String.format("du -xsm '%s' '%s'",System.getRubyPath(), System.getMsfPath()),
-            new Shell.OutputReceiver() {
-              private int size = 0;
+    try {
+      System.getTools().raw.async(String.format("du -xsm '%s' '%s'", System.getRubyPath(), System.getMsfPath()),
+              new Raw.RawReceiver() {
+                private int size = 0;
 
-              @Override
-              public void onStart(String command) {
-
-              }
-
-              @SuppressWarnings("StatementWithEmptyBody")
-              @Override
-              public void onNewLine(String line) {
-                if(line.isEmpty())
-                  return;
-                try {
-                  int start,end;
-                  for(start=0;start<line.length()&&java.lang.Character.isSpaceChar(line.charAt(start));start++);
-                  for(end=start+1;end<line.length()&&java.lang.Character.isDigit(line.charAt(end));end++);
-                  size += Integer.parseInt(line.substring(start,end));
-                } catch ( Exception e ) {
-                  System.errorLogging(e);
+                @SuppressWarnings("StatementWithEmptyBody")
+                @Override
+                public void onNewLine(String line) {
+                  if (line.isEmpty())
+                    return;
+                  try {
+                    int start, end;
+                    for (start = 0; start < line.length() && java.lang.Character.isSpaceChar(line.charAt(start)); start++)
+                      ;
+                    for (end = start + 1; end < line.length() && java.lang.Character.isDigit(line.charAt(end)); end++)
+                      ;
+                    size += Integer.parseInt(line.substring(start, end));
+                  } catch (Exception e) {
+                    System.errorLogging(e);
+                  }
                 }
-              }
 
-              @Override
-              public void onEnd(int exitCode) {
-                if(exitCode==0)
-                  mMsfSize = size;
-              }
-            }
-            ).start();
+                @Override
+                public void onEnd(int exitCode) {
+                  if (exitCode == 0)
+                    mMsfSize = size;
+                }
+              });
+    } catch (ChildManager.ChildNotStartedException e) {
+      Logger.error(e.getMessage());
+    }
   }
 
   @Override
@@ -211,12 +212,16 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
       }
 
       folder = new File(path);
+      ExecChecker checker = null;
 
 
-      if(key.equals("RUBY_DIR"))
+      if(key.equals("RUBY_DIR")) {
         oldPath = System.getRubyPath();
-      else if (key.equals("MSF_DIR"))
+        checker = ExecChecker.ruby();
+      } else if (key.equals("MSF_DIR")) {
         oldPath = System.getMsfPath();
+        checker = ExecChecker.msf();
+      }
 
       if(!folder.exists())
         Toast.makeText(SettingsActivity.this, getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_exists), Toast.LENGTH_SHORT).show();
@@ -224,7 +229,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
       else if(!folder.canWrite())
         Toast.makeText(SettingsActivity.this, getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_writable), Toast.LENGTH_SHORT).show();
 
-      else if(!ExecChecker.user(folder.getAbsolutePath()) && !ExecChecker.remount(folder.getAbsolutePath(), true) && !ExecChecker.root(ExecChecker.getRealPath(folder.getAbsolutePath())))
+      else if(checker!=null && !checker.canExecuteInDir(path))
         Toast.makeText(SettingsActivity.this, getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_executable), Toast.LENGTH_LONG).show();
 
       else {
@@ -279,9 +284,6 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
         sampleTime = 1.0;
       }
 
-      if(message != null)
-        Toast.makeText(SettingsActivity.this, message, Toast.LENGTH_SHORT).show();
-
       mSnifferSampleTime.setText(Double.toString(sampleTime));
     }
     else if(key.endsWith("_PORT")) {
@@ -302,9 +304,6 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
         message = getString(R.string.pref_err_invalid_number);
         port = 0;
       }
-
-      if(message!=null)
-        Toast.makeText(SettingsActivity.this, message, Toast.LENGTH_SHORT).show();
 
       if(key.equals("PREF_HTTP_PROXY_PORT")) {
         if(port==0)
@@ -343,9 +342,6 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
         maxBufferSize = 10485760;
       }
 
-      if(message != null)
-        Toast.makeText(SettingsActivity.this, message, Toast.LENGTH_SHORT).show();
-
       mHttpBufferSize.setText(Integer.toString(maxBufferSize));
     }
     else if(key.equals("PREF_PASSWORD_FILENAME")){
@@ -363,22 +359,16 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
         passFileName = "dsploit-password-sniff.log";
       }
 
-      if(message != null)
-        Toast.makeText(SettingsActivity.this, message, Toast.LENGTH_SHORT).show();
-
       mPasswordFilename.setText(passFileName);
     } else if (key.equals("MSF_ENABLED")) {
       if (mMsfEnabled.isChecked())
         onMsfEnabled();
-      sendBroadcast(new Intent(SETTINGS_MSF_CHANGED));
-    } else if (key.equals("MSF_BRANCH")) {
-      // don't send SETTINGS_MSF_CHANGED, this change will affect he app on next restart
-    } else if (key.contains("MSF")) {
-      sendBroadcast(new Intent(SETTINGS_MSF_CHANGED));
-    } else if (key.contains("RUBY")) {
-      sendBroadcast(new Intent(SETTINGS_MSF_CHANGED));
-      Shell.rubySettingsChanged();
     }
+
+    if(message != null)
+      Toast.makeText(SettingsActivity.this, message, Toast.LENGTH_SHORT).show();
+
+    System.onSettingChanged(key);
   }
 
   private void onMsfEnabled() {
