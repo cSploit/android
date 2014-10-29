@@ -30,6 +30,8 @@ void *reader(void *arg) {
     }
   }
   
+  control_deactivate(&(incoming_messages.control));
+  
   LOGI("%s: quitting", __func__);
   
   return 0;
