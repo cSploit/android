@@ -240,14 +240,14 @@ void *handle_child(void *arg) {
   
   pthread_cond_broadcast(&(c->conn->children.control.cond));
   
+  if(wait_res!=c->pid)
+    kill(c->pid, 9); // SIGKILL, process didn't returned as expected
+  
   if(c->handler->have_stdout)
     close(c->stdout_fd);
   if(c->handler->have_stdin)
     close(c->stdin_fd);
   close(c->stderr_fd);
-  
-  if(wait_res!=c->pid)
-    kill(c->pid, 9); // SIGKILL, process didn't returned as expected
   
   free(c);
   
