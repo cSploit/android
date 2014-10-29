@@ -107,7 +107,7 @@ build_core() {
   mkdir -p "${out}" >&3 2>&1 || die
 
   echo -n "building native executables..."
-  ndk-build -j$(grep -E "^processor" /proc/cpuinfo | wc -l) >&3 2>&1 || die
+  ndk-build APP_OPTIM=debug NDK_DEBUG=1 -j$(grep -E "^processor" /proc/cpuinfo | wc -l) >&3 2>&1 || die
   echo -ne "ok\ncopying programs..."
   cp "${bins}/dSploitd" "${out}/"
   for tool in arpspoof tcpdump ettercap hydra nmap fusemounts; do
