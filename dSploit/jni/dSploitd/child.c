@@ -244,6 +244,7 @@ void *handle_child(void *arg) {
     close(c->stdout_fd);
   if(c->handler->have_stdin)
     close(c->stdin_fd);
+  close(c->stderr_fd);
   
   if(wait_res!=c->pid)
     kill(c->pid, 9); // SIGKILL, process didn't returned as expected
