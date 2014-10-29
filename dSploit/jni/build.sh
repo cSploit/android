@@ -162,6 +162,14 @@ build_core() {
 build_ruby() {
   echo -e "*** creating ruby package ***"
 
+  system_ruby=""
+
+  for bin in ruby ruby19; do 
+    test -n "$(which $bin)" && grep -q "1.9" <<<$($bin -v) && system_ruby="${bin}"
+  done
+
+  test -n "${system_ruby}" || { echo "ruby 1.9 not found" >&2; echo "ruby 1.9 not found" >&3; die ;}
+
   echo -n "creating rubyroot..."
 
   rm -rf rubyroot >&3 2>&1 || die
@@ -210,10 +218,9 @@ build_ruby() {
   export RUBYLIB="${rubyroot}/lib/ruby/site_ruby/1.9.1:${rubyroot}/lib/ruby/site_ruby:${rubyroot}/lib/ruby/vendor_ruby/1.9.1:${rubyroot}/lib/ruby/vendor_ruby:${rubyroot}/lib/ruby/1.9.1"
   export HOME="${rubyroot}/home/ruby"
   echo "RUBYLIB=${RUBYLIB}" >&3
-  system_ruby=$(which ruby) || die
   mv "${rubyroot}/bin/ruby" "${rubyroot}/bin/ruby.arm" >&3 2>&1 || die
   ln -s "${system_ruby}" "${rubyroot}/bin/ruby" >&3 2>&1 || die
-  ruby "${rubyroot}/bin/gem" "update" "--system" "--no-ri" "--no-rdoc" "-V" >&3 2>&1 || die
+  $system_ruby "${rubyroot}/bin/gem" "update" "--system" "--no-ri" "--no-rdoc" "-V" >&3 2>&1 || die
   rm "${rubyroot}/bin/ruby" >&3 2>&1 || die
   rm "${rubyroot}/lib/ruby/1.9.1/rbconfig.rb" >&3 2>&1 || die
   rm -rf "${rubyroot}/home/ruby/.gem" >&3 2>&1 || die
