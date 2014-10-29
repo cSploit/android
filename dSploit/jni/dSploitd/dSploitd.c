@@ -74,7 +74,7 @@ void destroy_structs() {
  * @brief stop the main thread by closing the main socket
  */
 void stop_daemon() {
-  close(sockfd);
+  shutdown(sockfd, SHUT_RD);
 }
 
 int main(int argc, char **argv) {
