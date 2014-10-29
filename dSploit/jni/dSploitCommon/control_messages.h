@@ -60,9 +60,9 @@ struct cmd_fail_info {
 
 /// send a signal to a command
 struct cmd_signal_info {
-  char cmd_action;  ///< must be set to ::CMD_SIGNAL
-  uint16_t id;      ///< child id to send the signal to
-  int signal;       ///< the signal to send
+  char cmd_action;      ///< must be set to ::CMD_SIGNAL
+  uint16_t id;          ///< child id to send the signal to
+  unsigned int signal;  ///< the signal to send
 };
 
 /// command has exited

@@ -127,7 +127,7 @@ jobject create_child_died_event(JNIEnv *env, void *arg) {
   event = (*env)->NewObject(env,
                             cache.dsploit.events.child_died.class,
                             cache.dsploit.events.child_died.ctor,
-                            *((int *) arg));
+                            *((unsigned int *) arg));
   
   if(event)
     return event;
