@@ -9,6 +9,7 @@ dependencies {
     compile 'commons-net:commons-net:3.3'
     compile 'junit:junit:3.8.1'
     compile 'joda-time:joda-time:1.6.2'
+    compile 'com.github.zafarkhaja:java-semver:0.8.0'
 }
 
 android {

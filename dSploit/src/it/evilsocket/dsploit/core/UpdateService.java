@@ -28,6 +28,8 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
+import com.github.zafarkhaja.semver.Version;
+
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -50,7 +52,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -79,7 +80,6 @@ public class UpdateService extends IntentService
   private static final String REMOTE_MSF_URL = "https://github.com/rapid7/metasploit-framework/archive/%s.zip";
   private static final String LOCAL_MSF_NAME = "%s.zip";
   private static final String REMOTE_GEM_SERVER = "http://gems.dsploit.net/";
-  private static final Pattern VERSION_CHECK = Pattern.compile("^[0-9]+\\.[0-9]+\\.[0-9]+[a-z]?$");
   private static final Pattern GEM_FROM_LIST = Pattern.compile("^([^ ]+) \\(([^ ]+) ");
 
   // Intent defines
@@ -154,44 +154,6 @@ public class UpdateService extends IntentService
     };
   }
 
-  /**
-   * <p>
-   * parse a string containing the version of the apk
-   * into a double for easily compare them.
-   * </p>
-   * <p>
-   * the algorithm works as follows:
-   * </p>
-   * <p>
-   * {@code version = "1.2.3d"}
-   * <br/>
-   * {@code output = ((1 * 10000) + (2 * 100) + (3 * 1))}
-   * <br/>
-   * {@code output = 2304}
-   * </p>
-   * @param version the apk version
-   * @return the input version represented as double
-   */
-  private static long getVersionCode(String version){
-    long code = 0,
-           multipliers[] = { 10000, 100, 1 };
-    String parts[] = version.split( "[^0-9a-zA-Z]", 3 ),
-           item;
-
-    for(int i = 0; i < 3; i++ )
-    {
-      item = parts[i];
-
-      if(item.matches("\\d+"))
-        code += multipliers[i] * Integer.parseInt(item);
-
-      else
-        code += multipliers[i];
-    }
-
-    return code;
-  }
-
   public static boolean isUpdateAvailable(){
     boolean exitForError = true;
     String localVersion = System.getAppVersionName();
@@ -217,10 +179,7 @@ public class UpdateService extends IntentService
           reader.close();
           mApkInfo.url = REMOTE_APK_URL;
           mApkInfo.versionString = buffer.split("\n")[0].trim();
-          if (!VERSION_CHECK.matcher(mApkInfo.versionString).matches())
-            throw new org.apache.http.ParseException(
-                    String.format("remote version parse failed: '%s'", mApkInfo.versionString));
-          mApkInfo.version = getVersionCode(mApkInfo.versionString);
+          mApkInfo.version = Version.valueOf(mApkInfo.versionString);
           mApkInfo.name = String.format("dSploit-%s.apk", mApkInfo.versionString);
           mApkInfo.path = String.format("%s/%s", System.getStoragePath(), mApkInfo.name);
           mApkInfo.contentIntent = new Intent(Intent.ACTION_VIEW);
@@ -229,14 +188,14 @@ public class UpdateService extends IntentService
         }
 
         // Compare versions
-        double installedVersionCode = getVersionCode(localVersion);
+        Version installedVersion = Version.valueOf(localVersion);
 
-        Logger.debug(String.format("mApkInstalledVersion = %s ( %s ) ", localVersion, installedVersionCode));
+        Logger.debug(String.format("mApkInstalledVersion = %s ( %s ) ", localVersion, installedVersion));
         Logger.debug(String.format("mRemoteVersion       = %s ( %s ) ", mApkInfo.versionString, mApkInfo.version));
 
         exitForError = false;
 
-        if (mApkInfo.version > installedVersionCode)
+        if (mApkInfo.version.compareTo(installedVersion) > 0)
           return true;
       }
     } catch (org.apache.http.ParseException e) {
@@ -264,7 +223,7 @@ public class UpdateService extends IntentService
     BufferedReader reader = null;
     String line;
     boolean exitForError = true;
-    Long localVersion = System.getLocalRubyVersion();
+    String localVersion = System.getLocalRubyVersion();
 
     try {
       synchronized (mRubyInfo) {
@@ -287,8 +246,8 @@ public class UpdateService extends IntentService
 
           JSONObject info = new JSONObject(sb.toString());
           mRubyInfo.url = info.getString("url");
-          mRubyInfo.version = info.getLong("version");
-          mRubyInfo.versionString = String.format("%d", mRubyInfo.version.intValue());
+          mRubyInfo.versionString = info.getString("version");
+          mRubyInfo.version = Version.valueOf(mRubyInfo.versionString);
           mRubyInfo.path = String.format("%s/%s", System.getStoragePath(), info.getString("name"));
           mRubyInfo.archiver = archiveAlgorithm.valueOf(info.getString("archiver"));
           mRubyInfo.compression = compressionAlgorithm.valueOf(info.getString("compression"));
@@ -306,7 +265,7 @@ public class UpdateService extends IntentService
 
         exitForError = false;
 
-        if (localVersion == null || localVersion < mRubyInfo.version)
+        if (localVersion == null || mRubyInfo.version.compareTo(Version.valueOf(localVersion)) > 0)
           return true;
       }
     } catch (UnknownHostException e) {
@@ -362,6 +321,16 @@ public class UpdateService extends IntentService
     return false;
   }
 
+  public static void setMsfBranch(String branch) {
+    try {
+      synchronized (mMsfRepoParser) {
+        mMsfRepoParser.setBranch(branch);
+      }
+    } catch (Exception e) {
+      Logger.error(e.getMessage());
+    }
+  }
+
   /**
    * is a MetaSploitFramework update available?
    * @return true if the framework can be updated, false otherwise
@@ -369,7 +338,7 @@ public class UpdateService extends IntentService
   public static boolean isMsfUpdateAvailable() {
     boolean exitForError = true;
     String branch = System.getSettings().getString("MSF_BRANCH", "release");
-    Long localVersion = System.getLocalMsfVersion();
+    String localVersion = System.getLocalMsfVersion();
 
     try {
       String name = String.format(LOCAL_MSF_NAME, branch);
@@ -380,16 +349,12 @@ public class UpdateService extends IntentService
 
         if (local.exists() && local.isFile() && local.canRead()) {
           mMsfInfo.url = null;
-          mMsfInfo.version = (localVersion != null ? localVersion + 1 : 0);
+          mMsfInfo.versionString = "FORCE_UPDATE";
         } else if (mMsfInfo.url == null) {
+          mMsfInfo.url = String.format(REMOTE_MSF_URL, branch);
           synchronized (mMsfRepoParser) {
-            if (!branch.equals(mMsfRepoParser.getBranch()))
-              mMsfRepoParser.setBranch(branch);
             mMsfInfo.versionString = mMsfRepoParser.getLastCommitSha();
           }
-          mMsfInfo.url = String.format(REMOTE_MSF_URL, branch);
-          // see System.getLocalMsfVersion for more info about this line of code
-          mMsfInfo.version = (new BigInteger(mMsfInfo.versionString.substring(0, 7), 16)).longValue();
         }
 
         mMsfInfo.name = name;
@@ -401,16 +366,19 @@ public class UpdateService extends IntentService
 
         if (!mSettingReceiver.getFilter().contains("MSF_DIR")) {
           mSettingReceiver.addFilter("MSF_DIR");
-          System.registerSettingListener(mSettingReceiver);
         }
+
+        if(!mSettingReceiver.getFilter().contains("MSF_BRANCH")) {
+          mSettingReceiver.addFilter("MSF_BRANCH");
+        }
+
+        System.registerSettingListener(mSettingReceiver);
 
         exitForError = false;
 
         if (!mMsfInfo.version.equals(localVersion))
           return true;
       }
-    } catch (UnknownHostException e) {
-      Logger.error(e.getMessage());
     } catch (Exception e) {
       System.errorLogging(e);
     } finally {
@@ -434,19 +402,28 @@ public class UpdateService extends IntentService
           mMsfInfo.outputDir = System.getMsfPath();
           mMsfInfo.executableOutputDir = ExecChecker.msf().getRoot();
         }
+      } else if(key.equals("MSF_BRANCH")) {
+        try {
+          synchronized (mMsfRepoParser) {
+            mMsfRepoParser.setBranch(System.getSettings().getString("MSF_BRANCH", "release"));
+          }
+        } catch (Exception e) {
+          Logger.error(e.getMessage());
+        }
       }
     }
   };
 
   public static String[] getMsfBranches() {
-    synchronized (mMsfRepoParser) {
-      try {
+
+    try {
+      synchronized (mMsfRepoParser) {
         return mMsfRepoParser.getBranches();
-      } catch (JSONException e) {
-        System.errorLogging(e);
-      } catch (IOException e) {
-        Logger.warning("getMsfBranches: " + e.getMessage());
       }
+    } catch (JSONException e) {
+      System.errorLogging(e);
+    } catch (IOException e) {
+      Logger.warning("getMsfBranches: " + e.getMessage());
     }
     return new String[] {"master"};
   }

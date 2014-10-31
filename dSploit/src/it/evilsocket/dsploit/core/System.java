@@ -54,7 +54,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NoRouteToHostException;
@@ -87,7 +86,6 @@ import it.evilsocket.dsploit.net.http.proxy.HTTPSRedirector;
 import it.evilsocket.dsploit.net.http.proxy.Proxy;
 import it.evilsocket.dsploit.net.http.server.Server;
 import it.evilsocket.dsploit.net.metasploit.Session;
-import it.evilsocket.dsploit.tools.Raw;
 import it.evilsocket.dsploit.tools.ToolBox;
 
 public class System
@@ -132,8 +130,8 @@ public class System
   private static String mSessionName = null;
 
   private static String mLocalApkVersion = null;
-  private static Long mLocalRubyVersion = null;
-  private static Long mLocalMsfVersion = null;
+  private static String mLocalRubyVersion = null;
+  private static String mLocalMsfVersion = null;
 
   private static Object mCustomData = null;
 
@@ -202,6 +200,8 @@ public class System
       mTargets.add(network);
       mTargets.add(gateway);
       mTargets.add(device);
+
+      UpdateService.setMsfBranch(getSettings().getString("MSF_BRANCH", "release"));
 
       mInitialized = true;
     }
@@ -656,13 +656,14 @@ public class System
       PackageManager manager = mContext.getPackageManager();
       PackageInfo info = manager != null ? manager.getPackageInfo(mContext.getPackageName(), 0) : null;
 
-      return (mLocalApkVersion = info.versionName);
+      if(info != null)
+        return (mLocalApkVersion = info.versionName);
     }
     catch(NameNotFoundException e){
       errorLogging(e);
     }
 
-    return "?";
+    return "0.0.1";
   }
 
   /**
@@ -696,12 +697,12 @@ public class System
    * get version of installed ruby
    * @return the installed version of ruby
    */
-  public static Long getLocalRubyVersion() {
+  public static String getLocalRubyVersion() {
     if(mLocalRubyVersion!=null)
       return mLocalRubyVersion;
     String line = readFirstLine(getRubyPath() + "/VERSION");
     if(line!=null)
-      return (mLocalRubyVersion = Long.valueOf(line));
+      return (mLocalRubyVersion = line);
     return null;
   }
 
@@ -714,24 +715,13 @@ public class System
    * get version of installed MetaSploit Framework
    * @return the version of installed MetaSploit Framework
    */
-  public static Long getLocalMsfVersion() {
-    /**
-     * short SHA it's the first 7 chars of the commit SHA,
-     * which is surely shorter than a 64-bit signed integer.
-     * thus no overflow is possible.
-     */
+  public static String getLocalMsfVersion() {
     if(mLocalMsfVersion!=null)
       return mLocalMsfVersion;
 
-    String line = readFirstLine(getMsfPath() + "/VERSION");
-    if(line==null)
-      return null;
-    if(line.length()<7) {
-      Logger.error("msf version is shorter then 7 characters");
-      return null;
-    }
+    mLocalMsfVersion = readFirstLine(getMsfPath() + "/VERSION");
 
-    return (mLocalMsfVersion = (new BigInteger(line.substring(0,7), 16).longValue()));
+    return mLocalMsfVersion;
   }
 
   public static void updateLocalMsfVersion() {

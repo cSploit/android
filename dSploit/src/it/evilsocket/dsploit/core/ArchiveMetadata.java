@@ -1,10 +1,8 @@
 package it.evilsocket.dsploit.core;
 
 import android.content.Intent;
-import android.util.SparseArray;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import com.github.zafarkhaja.semver.Version;
 
 /**
  * just a simple struct to handle archives metadata
@@ -20,7 +18,7 @@ public class ArchiveMetadata {
           dirToExtract,
           md5,
           sha1;
-  public Long
+  public Version
           version;
   public compressionAlgorithm
           compression;
