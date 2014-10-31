@@ -78,7 +78,6 @@ public class UpdateService extends IntentService
   // Resources defines
   private static final String REMOTE_VERSION_URL = "http://update.dsploit.net/version";
   private static final String REMOTE_APK_URL = "http://update.dsploit.net/apk";
-  private static final String VERSION_CHAR_MAP = "zyxwvutsrqponmlkjihgfedcba";
   private static final String REMOTE_RUBY_VERSION_URL = "https://gist.githubusercontent.com/tux-mind/e594b1cf923183cfcdfe/raw/ruby.json";
   private static final String REMOTE_GEMS_VERSION_URL = "https://gist.githubusercontent.com/tux-mind/9c85eced88fd88367fa9/raw/gems.json";
   private static final String REMOTE_MSF_URL = "https://github.com/rapid7/metasploit-framework/archive/%s.zip";
@@ -170,45 +169,25 @@ public class UpdateService extends IntentService
    * <p>
    * {@code version = "1.2.3d"}
    * <br/>
-   * {@code output = (((1+1) * 1000) + ((2+1) * 100) + ((3+1) * 1)) - ((charOffset+1) / 100.0)}
+   * {@code output = ((1 * 10000) + (2 * 100) + (3 * 1))}
    * <br/>
-   * {@code output = 2304.77}
-   * </p>
-   * <p>
-   * where {@code charOffset} is the distance of the letter from the 'z'
-   * in the ASCII table.
+   * {@code output = 2304}
    * </p>
    * @param version the apk version
    * @return the input version represented as double
    */
-  private static double getVersionCode(String version){
-    double code = 0,
-           multipliers[] = { 1000, 100, 1 };
+  private static long getVersionCode(String version){
+    long code = 0,
+           multipliers[] = { 10000, 100, 1 };
     String parts[] = version.split( "[^0-9a-zA-Z]", 3 ),
-           item, digit, letter;
-    int i, j;
-    char c;
+           item;
 
-    for( i = 0; i < 3; i++ )
+    for(int i = 0; i < 3; i++ )
     {
       item = parts[i];
 
-      if( item.matches("\\d+[a-zA-Z]")){
-        digit = "";
-        letter = "";
-
-        for(j = 0; j < item.length(); j++){
-          c = item.charAt(j);
-          if(c >= '0' && c <= '9')
-            digit += c;
-          else
-            letter += c;
-        }
-
-        code += multipliers[i] * ( Integer.parseInt(digit) + 1 ) - ((VERSION_CHAR_MAP.indexOf(letter.toLowerCase()) + 1) / 100.0);
-      }
-      else if(item.matches("\\d+"))
-        code += multipliers[i] * ( Integer.parseInt(item) + 1 );
+      if(item.matches("\\d+"))
+        code += multipliers[i] * Integer.parseInt(item);
 
       else
         code += multipliers[i];
@@ -289,7 +268,7 @@ public class UpdateService extends IntentService
     BufferedReader reader = null;
     String line;
     boolean exitForError = true;
-    Double localVersion = System.getLocalRubyVersion();
+    Long localVersion = System.getLocalRubyVersion();
 
     try {
       synchronized (mRubyInfo) {
@@ -312,7 +291,7 @@ public class UpdateService extends IntentService
 
           JSONObject info = new JSONObject(sb.toString());
           mRubyInfo.url = info.getString("url");
-          mRubyInfo.version = info.getDouble("version");
+          mRubyInfo.version = info.getLong("version");
           mRubyInfo.versionString = String.format("%d", mRubyInfo.version.intValue());
           mRubyInfo.path = String.format("%s/%s", System.getStoragePath(), info.getString("name"));
           mRubyInfo.archiver = archiveAlgorithm.valueOf(info.getString("archiver"));
@@ -394,7 +373,7 @@ public class UpdateService extends IntentService
   public static boolean isMsfUpdateAvailable() {
     boolean exitForError = true;
     String branch = System.getSettings().getString("MSF_BRANCH", "release");
-    Double localVersion = System.getLocalMsfVersion();
+    Long localVersion = System.getLocalMsfVersion();
     HashMap<Integer, String> msfModeMap = new HashMap<Integer, String>() {
       {
         put(0755, "msfrpcd msfconsole msfcli $(find . -name '*.rb')");
@@ -419,7 +398,7 @@ public class UpdateService extends IntentService
           }
           mMsfInfo.url = String.format(REMOTE_MSF_URL, branch);
           // see System.getLocalMsfVersion for more info about this line of code
-          mMsfInfo.version = (new BigInteger(mMsfInfo.versionString.substring(0, 7), 16)).doubleValue();
+          mMsfInfo.version = (new BigInteger(mMsfInfo.versionString.substring(0, 7), 16)).longValue();
         }
 
         mMsfInfo.name = name;

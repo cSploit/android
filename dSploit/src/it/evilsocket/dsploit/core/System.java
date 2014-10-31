@@ -132,8 +132,8 @@ public class System
   private static String mSessionName = null;
 
   private static String mLocalApkVersion = null;
-  private static Double mLocalRubyVersion = null;
-  private static Double mLocalMsfVersion = null;
+  private static Long mLocalRubyVersion = null;
+  private static Long mLocalMsfVersion = null;
 
   private static Object mCustomData = null;
 
@@ -696,12 +696,12 @@ public class System
    * get version of installed ruby
    * @return the installed version of ruby
    */
-  public static Double getLocalRubyVersion() {
+  public static Long getLocalRubyVersion() {
     if(mLocalRubyVersion!=null)
       return mLocalRubyVersion;
     String line = readFirstLine(getRubyPath() + "/VERSION");
     if(line!=null)
-      return (mLocalRubyVersion = Double.valueOf(line));
+      return (mLocalRubyVersion = Long.valueOf(line));
     return null;
   }
 
@@ -714,11 +714,10 @@ public class System
    * get version of installed MetaSploit Framework
    * @return the version of installed MetaSploit Framework
    */
-  public static Double getLocalMsfVersion() {
+  public static Long getLocalMsfVersion() {
     /**
-     * short SHA it's the first 7 chars of the commit SHA.
-     * it's max value is 0xFFFFFFF = 268435455 < 3*(10^8)
-     * Double maximum value is about 1.7*(10^308)
+     * short SHA it's the first 7 chars of the commit SHA,
+     * which is surely shorter than a 64-bit signed integer.
      * thus no overflow is possible.
      */
     if(mLocalMsfVersion!=null)
@@ -732,7 +731,7 @@ public class System
       return null;
     }
 
-    return (mLocalMsfVersion = (new BigInteger(line.substring(0,7), 16)).doubleValue());
+    return (mLocalMsfVersion = (new BigInteger(line.substring(0,7), 16).longValue()));
   }
 
   public static void updateLocalMsfVersion() {

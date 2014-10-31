@@ -18,7 +18,7 @@ public class ArchiveMetadata {
           dirToExtract,
           md5,
           sha1;
-  public Double
+  public Long
           version;
   public compressionAlgorithm
           compression;
