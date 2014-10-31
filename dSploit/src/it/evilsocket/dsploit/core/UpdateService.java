@@ -47,7 +47,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -59,8 +58,6 @@ import java.security.KeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -71,7 +68,6 @@ import it.evilsocket.dsploit.net.GitHubParser;
 import it.evilsocket.dsploit.core.ArchiveMetadata.archiveAlgorithm;
 import it.evilsocket.dsploit.core.ArchiveMetadata.compressionAlgorithm;
 import it.evilsocket.dsploit.tools.Raw;
-import it.evilsocket.dsploit.tools.Shell;
 
 public class UpdateService extends IntentService
 {
@@ -374,11 +370,6 @@ public class UpdateService extends IntentService
     boolean exitForError = true;
     String branch = System.getSettings().getString("MSF_BRANCH", "release");
     Long localVersion = System.getLocalMsfVersion();
-    HashMap<Integer, String> msfModeMap = new HashMap<Integer, String>() {
-      {
-        put(0755, "msfrpcd msfconsole msfcli $(find . -name '*.rb')");
-      }
-    };
 
     try {
       String name = String.format(LOCAL_MSF_NAME, branch);
@@ -407,7 +398,6 @@ public class UpdateService extends IntentService
         mMsfInfo.executableOutputDir = ExecChecker.msf().getRoot();
         mMsfInfo.archiver = archiveAlgorithm.zip;
         mMsfInfo.dirToExtract = "metasploit-framework-" + branch + "/";
-        mMsfInfo.modeMap = msfModeMap;
 
         if (!mSettingReceiver.getFilter().contains("MSF_DIR")) {
           mSettingReceiver.addFilter("MSF_DIR");
@@ -638,8 +628,7 @@ public class UpdateService extends IntentService
     if(!mRunning) {
       child.kill();
       throw new CancellationException(cancellationMessage);
-    } else
-      child.join();
+    }
 
     if((child.exitValue!=0 || child.signal >= 0) && mErrorOutput.length() > 0)
       for(String line : mErrorOutput.toString().split("\n"))
@@ -949,18 +938,24 @@ public class UpdateService extends IntentService
    * @throws java.util.concurrent.CancellationException if task is cancelled by user
    * @throws java.lang.InterruptedException when the the running thread get cancelled.
    */
-  private void extract() throws CancellationException, RuntimeException, IOException, InterruptedException {
+  private void extract() throws CancellationException, RuntimeException, IOException, InterruptedException, ChildManager.ChildNotStartedException {
     ArchiveInputStream is = null;
     ArchiveEntry entry;
     CountingInputStream counter;
+    BufferedOutputStream bof = null;
     File f,inFile;
     File[] list;
     String name;
+    String envPath;
+    final StringBuffer sb = new StringBuffer();
     byte data[] = new byte[2048];
     int mode;
     int count;
+    int absCount;
     long total;
+    boolean isTar, r,w,x, isElf, isScript;
     short percentage,old_percentage;
+    Child which;
 
     if(mCurrentTask.path==null||mCurrentTask.outputDir==null)
       return;
@@ -975,23 +970,33 @@ public class UpdateService extends IntentService
     Logger.info(String.format("extracting '%s' to '%s'",mCurrentTask.path, mCurrentTask.outputDir));
 
     try {
+      which = System.getTools().raw.async("which env", new Raw.RawReceiver() {
+        @Override
+        public void onNewLine(String line) {
+          sb.delete(0, sb.length());
+          sb.append(line);
+        }
+      });
+
       inFile = new File(mCurrentTask.path);
       total = inFile.length();
       counter = new CountingInputStream(new FileInputStream(inFile));
       is = openArchiveStream(counter);
-      old_percentage=-1;
+      isTar = mCurrentTask.archiver.equals(archiveAlgorithm.tar);
+      old_percentage = -1;
 
       f = new File(mCurrentTask.outputDir);
-      if(f.exists() && f.isDirectory() && (list = f.listFiles()) != null &&  list.length > 2)
+      if (f.exists() && f.isDirectory() && (list = f.listFiles()) != null && list.length > 2)
         wipe();
 
-      if(is instanceof TarArchiveInputStream && mCurrentTask.modeMap==null)
-        mCurrentTask.modeMap = new HashMap<Integer, String>();
+      if(execShell(which, "cancelled while retrieving env path") != 0)
+        throw new RuntimeException("cannot find 'env' executable");
+      envPath = sb.toString();
 
       while (mRunning && (entry = is.getNextEntry()) != null) {
         name = entry.getName().replaceFirst("^\\./?", "");
 
-        if(mCurrentTask.dirToExtract!=null) {
+        if (mCurrentTask.dirToExtract != null) {
           if (!name.startsWith(mCurrentTask.dirToExtract))
             continue;
           else
@@ -1000,6 +1005,8 @@ public class UpdateService extends IntentService
 
         f = new File(mCurrentTask.outputDir, name);
 
+        isElf = isScript = false;
+
         if (entry.isDirectory()) {
           if (!f.exists()) {
             if (!f.mkdirs()) {
@@ -1007,130 +1014,92 @@ public class UpdateService extends IntentService
             }
           }
         } else {
-          BufferedOutputStream bof = new BufferedOutputStream(new FileOutputStream(f));
+          bof = new BufferedOutputStream(new FileOutputStream(f));
 
-          while(mRunning && (count = is.read(data)) != -1) {
+          // check il file is an ELF or a script
+          if(!isTar && entry.getSize() > 4) {
+            // read the first 4 bytes of the file
+            for (absCount = 0, count = -1;
+                 mRunning && absCount < 4 && (count = is.read(data, absCount, 4 - absCount)) != -1;
+                 absCount += count);
+
+            if (count == -1) {
+              // don't go further, we reached EOF
+            } else if (data[0] == 0x7F && data[1] == 0x45 && data[2] == 0x4C && data[3] == 0x46) {
+              isElf = true;
+            } else if (data[0] == '#' && data[1] == '!') {
+              isScript = true;
+              // read until a '\n' is found ( assume that the first line is longer than 4 bytes )
+              while (mRunning && is.read(data, absCount, 1) != -1) {
+                if (data[absCount++] == '\n')
+                  break;
+              }
+              byte[] firstLine = new String(data, 0, absCount).replace("/usr/bin/env", envPath).getBytes();
+              absCount = firstLine.length;
+              java.lang.System.arraycopy(firstLine, 0, data, 0, absCount);
+            }
+
+            bof.write(data, 0, absCount);
+          }
+
+          while (mRunning && (count = is.read(data)) != -1) {
             bof.write(data, 0, count);
-            percentage=(short)(((double)counter.getBytesRead()/total)*100);
-            if(percentage!=old_percentage) {
-              mBuilder.setProgress(100,percentage,false)
-                      .setContentInfo(percentage+"%");
-              mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
-              old_percentage=percentage;
+            percentage = (short) (((double) counter.getBytesRead() / total) * 100);
+            if (percentage != old_percentage) {
+              mBuilder.setProgress(100, percentage, false)
+                      .setContentInfo(percentage + "%");
+              mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+              old_percentage = percentage;
             }
           }
           bof.flush();
           bof.close();
+          bof=null;
         }
         // Zip does not store file permissions.
-        if(entry instanceof TarArchiveEntry) {
-          mode=((TarArchiveEntry)entry).getMode();
+        if (isTar) {
+          mode = ((TarArchiveEntry) entry).getMode();
 
-          if(!mCurrentTask.modeMap.containsKey(mode))
-            mCurrentTask.modeMap.put(mode, entry.getName() + " ");
-          else
-            mCurrentTask.modeMap.put(mode,
-                    mCurrentTask.modeMap.get(mode).concat(entry.getName() + " "));
+          r = (mode & 0400) > 0;
+          w = (mode & 0200) > 0;
+          x = (mode & 0100) > 0;
+        } else if( isElf || isScript) {
+          r = w = x = true;
+        } else {
+          continue;
+        }
+
+        if(f.setExecutable(x, true)) {
+          Logger.warning(String.format("cannot set executable permission of '%s'",name));
+        }
+
+        if(f.setWritable(w, true)) {
+          Logger.warning(String.format("cannot set writable permission of '%s'",name));
+        }
+
+        if(f.setReadable(r, true)) {
+          Logger.warning(String.format("cannot set readable permission of '%s'",name));
         }
       }
 
-      if(!mRunning)
+      if (!mRunning)
         throw new CancellationException("extraction cancelled.");
 
       Logger.info("extraction completed");
 
       f = new File(mCurrentTask.outputDir, ".nomedia");
-      if(f.createNewFile())
+      if (f.createNewFile())
         Logger.info(".nomedia created");
 
       mBuilder.setContentInfo("")
-              .setProgress(100,100,true);
-      mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
+              .setProgress(100, 100, true);
+      mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     } finally {
       if(is != null)
         is.close();
+      if(bof != null)
+        bof.close();
     }
-  }
-
-  /**
-   * correct file modes on extracted files
-   * @throws CancellationException if task get cancelled by user
-   */
-  private void correctModes() throws CancellationException, IOException, RuntimeException, InterruptedException, ChildManager.ChildNotStartedException {
-    /*
-     * NOTE:  this horrible solution to chmod is only
-     *        a temporary way to changing mode to files.
-     *        we have to run chmod as root, our android App
-     *        does not usually have write permissions
-     *        outside of it's data dir.
-     *        we will make a better way to achieve that shortly
-     *        by executing native code as root.
-     */
-    if(mCurrentTask.modeMap==null||mCurrentTask.modeMap.size()==0)
-      return;
-
-    if(mCurrentTask.executableOutputDir==null)
-      throw new IOException("output directory does not allow executable contents.");
-
-    mBuilder.setContentTitle(getString(R.string.setting_file_modes))
-            .setContentText("")
-            .setContentInfo("")
-            .setSmallIcon(android.R.drawable.ic_popup_sync)
-            .setProgress(100, 0, true);
-    mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-
-    if (execShell(System.getTools().raw.async(
-            "chmod -R 755 '" + mCurrentTask.executableOutputDir + "'",
-            mErrorReceiver), "chmod cancelled") != 0) {
-      throw new IOException("cannot chmod extracted files.");
-    }
-  }
-
-  /**
-   * patch shebang on extracted files.
-   * simply replace standard '/usr/bin/env' with busybox one
-   * @throws IOException if cannot execute shell commands
-   * @throws InterruptedException if current thread get interrupted
-   * @throws RuntimeException if something goes wrong
-   * @throws java.util.concurrent.CancellationException if user cancelled this task
-   */
-  private void patchShebang() throws IOException, InterruptedException, RuntimeException, CancellationException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
-
-    if(mCurrentTask.outputDir==null)
-      return;
-
-    if(mCurrentTask.executableOutputDir==null)
-      throw new IOException("output directory does not allow executable contents.");
-
-    final StringBuilder envPath = new StringBuilder();
-
-    mBuilder.setContentTitle(getString(R.string.patching_shebang))
-            .setContentText("")
-            .setContentInfo("")
-            .setSmallIcon(android.R.drawable.ic_popup_sync)
-            .setProgress(100, 0, true);
-    mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-
-    if (System.getTools().raw.run("which env", new Raw.RawReceiver() {
-
-      @Override
-      public void onNewLine(String line) {
-        if (line.length() > 0) {
-          envPath.delete(0, envPath.length());
-          envPath.append(line);
-        }
-      }
-    }) != 0 || envPath.length() == 0)
-      throw new RuntimeException("cannot find 'env' executable");
-
-    Logger.debug("envPath: " + envPath);
-
-    Child shell = System.getTools().shell.async(
-            String.format("sed -i '1s,^#!/usr/bin/env,#!%s,' $(find '%s' -type f -perm +111 )",
-                    envPath.toString(), mCurrentTask.executableOutputDir), mErrorReceiver);
-
-    if (execShell(shell, "cancelled while changing shebangs") != 0)
-      throw new RuntimeException("cannot change shebang");
   }
 
   /**
@@ -1151,7 +1120,6 @@ public class UpdateService extends IntentService
 
     //TODO: use rubyShell.async() ( do not spawn a shell for every command, or maybe not [ spawn child with custom environment ? ] )
     //TODO: run install bundle while patching msf files.
-    //TODO: avoid using find, we already known which file must be patched.
     shell = System.getTools().rubyShell.async("which bundle || gem install bundle", mErrorReceiver);
 
     // install bundle gem, required for install msf
@@ -1349,8 +1317,6 @@ public class UpdateService extends IntentService
         if (!haveLocalFile())
           downloadFile();
         extract();
-        correctModes();
-        patchShebang();
 
         if (what_to_do == action.msf_update)
           installGems();
@@ -1390,9 +1356,6 @@ public class UpdateService extends IntentService
       sendError(R.string.error_occured);
       System.errorLogging(e);
     } catch (ChildManager.ChildNotStartedException e) {
-      sendError(R.string.error_occured);
-      System.errorLogging(e);
-    } catch (ChildManager.ChildDiedException e) {
       sendError(R.string.error_occured);
       System.errorLogging(e);
     } finally {

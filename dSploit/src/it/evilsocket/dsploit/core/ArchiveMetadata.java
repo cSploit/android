@@ -1,7 +1,9 @@
 package it.evilsocket.dsploit.core;
 
 import android.content.Intent;
+import android.util.SparseArray;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -26,8 +28,6 @@ public class ArchiveMetadata {
           archiver;
   public Intent
           contentIntent;
-  public HashMap<Integer, String>
-          modeMap;
 
   public ArchiveMetadata() {
     reset();
@@ -40,7 +40,6 @@ public class ArchiveMetadata {
     compression = null;
     archiver = null;
     contentIntent = null;
-    modeMap = null;
   }
 
   public enum compressionAlgorithm {
