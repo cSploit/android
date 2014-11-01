@@ -18,8 +18,12 @@ public class Logger
       if(currClassName.startsWith("it.evilsocket.dsploit.") && !currClassName.equals(mClassName)) {
         className = currClassName.replace("it.evilsocket.dsploit.", "");
         methodName = element.getMethodName();
+        break;
       }
     }
+
+    if(message == null)
+      message = "(null)";
 
     Log.println( priority, TAG + "[" + className + "." + methodName + "]", message );
   }
