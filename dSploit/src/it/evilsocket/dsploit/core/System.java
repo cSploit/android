@@ -698,12 +698,9 @@ public class System
    * @return the installed version of ruby
    */
   public static String getLocalRubyVersion() {
-    if(mLocalRubyVersion!=null)
-      return mLocalRubyVersion;
-    String line = readFirstLine(getRubyPath() + "/VERSION");
-    if(line!=null)
-      return (mLocalRubyVersion = line);
-    return null;
+    if(mLocalRubyVersion==null)
+      mLocalRubyVersion = readFirstLine(getRubyPath() + "/VERSION");
+    return mLocalRubyVersion;
   }
 
   public static void updateLocalRubyVersion() {
@@ -716,10 +713,8 @@ public class System
    * @return the version of installed MetaSploit Framework
    */
   public static String getLocalMsfVersion() {
-    if(mLocalMsfVersion!=null)
-      return mLocalMsfVersion;
-
-    mLocalMsfVersion = readFirstLine(getMsfPath() + "/VERSION");
+    if(mLocalMsfVersion==null)
+      mLocalMsfVersion = readFirstLine(getMsfPath() + "/VERSION");
 
     return mLocalMsfVersion;
   }

@@ -327,7 +327,7 @@ public class UpdateService extends IntentService
         mMsfRepoParser.setBranch(branch);
       }
     } catch (Exception e) {
-      Logger.error(e.getMessage());
+      Logger.error(e.getClass().getName() + ": " + e.getMessage());
     }
   }
 
@@ -376,7 +376,7 @@ public class UpdateService extends IntentService
 
         exitForError = false;
 
-        if (!mMsfInfo.version.equals(localVersion))
+        if (localVersion == null || !localVersion.equals(mMsfInfo.versionString))
           return true;
       }
     } catch (Exception e) {
