@@ -31,13 +31,15 @@ public class ArchiveMetadata {
     reset();
   }
 
-  synchronized public void reset() {
-    url = name = md5 = sha1 = versionString = path =
-    outputDir = dirToExtract = executableOutputDir = null;
-    version = null;
-    compression = null;
-    archiver = null;
-    contentIntent = null;
+  public void reset() {
+    synchronized (this) {
+      url = name = md5 = sha1 = versionString = path =
+              outputDir = dirToExtract = executableOutputDir = null;
+      version = null;
+      compression = null;
+      archiver = null;
+      contentIntent = null;
+    }
   }
 
   public enum compressionAlgorithm {
