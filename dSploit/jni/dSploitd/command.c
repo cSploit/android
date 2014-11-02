@@ -23,7 +23,6 @@
 #include "child.h"
 #include "connection.h"
 #include "command.h"
-#include "FS.h"
 #include "sequence.h"
 #include "control_messages.h"
 #include "str_array.h"
@@ -185,32 +184,6 @@ char **parse_argv(message *m, char skip_argv0) {
 }
 
 /**
- * @brief ensure that @p cmd is a valid command by searching it in CWD and PATH. 
- * @param cmd the command to search
- * @returns the path of the resolved command on success, NULL on error.
- */
-char *parse_cmd(char *cmd) {
-  int length;
-  char *ret;
-  
-  if(!cmd)
-    return NULL;
-  
-  length = strlen(cmd);
-  
-  if(!length)
-    return NULL;
-  
-  if(!access(cmd, X_OK)) {
-    ret = cmd;
-  } else {
-    ret = find_cmd_in_path(cmd);
-  }
-  
-  return ret;
-}
-
-/**
  * @brief handle a start command request.
  * @param msg the request ::message.
  * @param conn the connection that send the @p message
@@ -257,31 +230,16 @@ message *on_cmd_start(conn_node *conn, message *msg) {
   
   cmd = (char *)c->handler->argv0;
   
-  i = offsetof(struct cmd_start_info, argv);
   argv = parse_argv(msg, (cmd ? 1 : 0));
   if(!argv) {
     print( ERROR, "cannot parse argv" );
     goto start_fail;
   }
   
-  if(!cmd) {
-    // argv[0] in message, must resolve it
-    cmd = parse_cmd(argv[0]);
-    
-    if(!cmd) {
-      print( ERROR, "command not found: '%s'", argv[0] );
-      goto start_fail;
-    }
-    
-    if(cmd != argv[0]) {
-      free(argv[0]);
-      argv[0] = cmd;
-    }
-  } else {
+  if(cmd) {
     argv[0] = cmd;
     free_argv0 = 0;
   }
-  
   
   if(pipe2(pexec, O_CLOEXEC)) {
     print( ERROR, "exec pipe: %s", strerror(errno) );
@@ -332,7 +290,7 @@ message *on_cmd_start(conn_node *conn, message *msg) {
     close(pout[1]);
     close(perr[1]);
     
-    execv(argv[0], argv);
+    execvp(argv[0], argv);
     i=errno;
     write(pexec[1], &i, sizeof(int));
     close(pexec[1]);
@@ -352,7 +310,7 @@ message *on_cmd_start(conn_node *conn, message *msg) {
     argv=NULL;
     
     if(read(pexec[0],&exec_errno, sizeof(int))) {
-      print( ERROR, "execv: %s", strerror(exec_errno) );
+      print( ERROR, "execvp: %s", strerror(exec_errno) );
       waitpid(pid, NULL, 0);
       goto start_fail;
     }
