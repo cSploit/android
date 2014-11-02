@@ -316,16 +316,6 @@ public class UpdateService extends IntentService
     return false;
   }
 
-  public static void setMsfBranch(String branch) {
-    try {
-      synchronized (mMsfRepo) {
-        mMsfRepo.setBranch(branch);
-      }
-    } catch (Exception e) {
-      Logger.error(e.getClass().getName() + ": " + e.getMessage());
-    }
-  }
-
   /**
    * is a MetaSploitFramework update available?
    * @return true if the framework can be updated, false otherwise

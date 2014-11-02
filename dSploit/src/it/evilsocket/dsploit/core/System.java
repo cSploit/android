@@ -201,8 +201,6 @@ public class System
       mTargets.add(gateway);
       mTargets.add(device);
 
-      UpdateService.setMsfBranch(getSettings().getString("MSF_BRANCH", "release"));
-
       mInitialized = true;
     }
     catch(Exception e){
