@@ -73,12 +73,8 @@ import it.evilsocket.dsploit.tools.Raw;
 public class UpdateService extends IntentService
 {
   // Resources defines
-  private static final String REMOTE_VERSION_URL = "http://update.dsploit.net/version";
-  private static final String REMOTE_APK_URL = "http://update.dsploit.net/apk";
   private static final String REMOTE_RUBY_VERSION_URL = "https://gist.githubusercontent.com/tux-mind/e594b1cf923183cfcdfe/raw/ruby.json";
   private static final String REMOTE_GEMS_VERSION_URL = "https://gist.githubusercontent.com/tux-mind/9c85eced88fd88367fa9/raw/gems.json";
-  private static final String REMOTE_MSF_URL = "https://github.com/rapid7/metasploit-framework/archive/%s.zip";
-  private static final String LOCAL_MSF_NAME = "%s.zip";
   private static final String REMOTE_GEM_SERVER = "http://gems.dsploit.net/";
   private static final Pattern GEM_FROM_LIST = Pattern.compile("^([^ ]+) \\(([^ ]+) ");
 
@@ -99,7 +95,8 @@ public class UpdateService extends IntentService
   private static final ArchiveMetadata  mApkInfo          = new ArchiveMetadata();
   private static final ArchiveMetadata  mMsfInfo          = new ArchiveMetadata();
   private static final ArchiveMetadata  mRubyInfo         = new ArchiveMetadata();
-  private static final GitHubParser     mMsfRepoParser    = new GitHubParser("rapid7", "metasploit-framework");
+  private static final GitHubParser     mMsfRepo          = new GitHubParser("rapid7", "metasploit-framework");
+  private static final GitHubParser     mcSploitRepo      = new GitHubParser("cSploit", "android");
   private static final GemParser        mGemUploadParser  = new GemParser(REMOTE_GEMS_VERSION_URL);
 
   private boolean
@@ -157,30 +154,31 @@ public class UpdateService extends IntentService
   public static boolean isUpdateAvailable(){
     boolean exitForError = true;
     String localVersion = System.getAppVersionName();
+    String remoteVersion, remoteURL;
 
     // cannot retrieve installed apk version
     if(localVersion==null)
       return false;
 
     try {
+      synchronized (mcSploitRepo) {
+        remoteVersion = mcSploitRepo.getLastReleaseVersion();
+        remoteURL = mcSploitRepo.getLastReleaseAssetUrl();
+      }
+
+      if(remoteVersion == null)
+        return false;
+
+      Logger.debug(String.format("localVersion   = %s", localVersion));
+      Logger.debug(String.format("remoteVersion  = %s", remoteVersion));
+
       synchronized (mApkInfo) {
         // Read remote version
         if (mApkInfo.version == null) {
-          URL url = new URL(REMOTE_VERSION_URL);
-          HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-          BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-          String line,
-                  buffer = "";
-
-          while ((line = reader.readLine()) != null) {
-            buffer += line + "\n";
-          }
-
-          reader.close();
-          mApkInfo.url = REMOTE_APK_URL;
-          mApkInfo.versionString = buffer.split("\n")[0].trim();
+          mApkInfo.url = remoteURL;
+          mApkInfo.versionString = remoteVersion;
           mApkInfo.version = Version.valueOf(mApkInfo.versionString);
-          mApkInfo.name = String.format("dSploit-%s.apk", mApkInfo.versionString);
+          mApkInfo.name = String.format("cSploit-%s.apk", mApkInfo.versionString);
           mApkInfo.path = String.format("%s/%s", System.getStoragePath(), mApkInfo.name);
           mApkInfo.contentIntent = new Intent(Intent.ACTION_VIEW);
           mApkInfo.contentIntent.setDataAndType(Uri.fromFile(new File(mApkInfo.path)), "application/vnd.android.package-archive");
@@ -189,9 +187,6 @@ public class UpdateService extends IntentService
 
         // Compare versions
         Version installedVersion = Version.valueOf(localVersion);
-
-        Logger.debug(String.format("mApkInstalledVersion = %s ( %s ) ", localVersion, installedVersion));
-        Logger.debug(String.format("mRemoteVersion       = %s ( %s ) ", mApkInfo.versionString, mApkInfo.version));
 
         exitForError = false;
 
@@ -323,8 +318,8 @@ public class UpdateService extends IntentService
 
   public static void setMsfBranch(String branch) {
     try {
-      synchronized (mMsfRepoParser) {
-        mMsfRepoParser.setBranch(branch);
+      synchronized (mMsfRepo) {
+        mMsfRepo.setBranch(branch);
       }
     } catch (Exception e) {
       Logger.error(e.getClass().getName() + ": " + e.getMessage());
@@ -337,32 +332,35 @@ public class UpdateService extends IntentService
    */
   public static boolean isMsfUpdateAvailable() {
     boolean exitForError = true;
-    String branch = System.getSettings().getString("MSF_BRANCH", "release");
+    String branch;
     String localVersion = System.getLocalMsfVersion();
 
     try {
-      String name = String.format(LOCAL_MSF_NAME, branch);
-      String path = String.format("%s/%s", System.getStoragePath(), name);
-      File local = new File(path);
-
       synchronized (mMsfInfo) {
+        if (mMsfInfo.url == null) {
+          branch = System.getSettings().getString("MSF_BRANCH", "release");
+
+          synchronized (mMsfRepo) {
+            if(!branch.equals(mMsfRepo.getBranch()))
+              mMsfRepo.setBranch(branch);
+            mMsfInfo.url = mMsfRepo.getZipballUrl();
+            mMsfInfo.versionString = mMsfRepo.getLastCommitSha();
+            mMsfInfo.name = mMsfRepo.getZipballName();
+            mMsfInfo.dirToExtract = mMsfRepo.getZipballRoot();
+          }
+          mMsfInfo.path = String.format("%s/%s", System.getStoragePath(), mMsfInfo.name);
+        }
+
+        File local = new File(mMsfInfo.path);
 
         if (local.exists() && local.isFile() && local.canRead()) {
           mMsfInfo.url = null;
           mMsfInfo.versionString = "FORCE_UPDATE";
-        } else if (mMsfInfo.url == null) {
-          mMsfInfo.url = String.format(REMOTE_MSF_URL, branch);
-          synchronized (mMsfRepoParser) {
-            mMsfInfo.versionString = mMsfRepoParser.getLastCommitSha();
-          }
         }
 
-        mMsfInfo.name = name;
-        mMsfInfo.path = path;
         mMsfInfo.outputDir = System.getMsfPath();
         mMsfInfo.executableOutputDir = ExecChecker.msf().getRoot();
         mMsfInfo.archiver = archiveAlgorithm.zip;
-        mMsfInfo.dirToExtract = "metasploit-framework-" + branch + "/";
 
         if (!mSettingReceiver.getFilter().contains("MSF_DIR")) {
           mSettingReceiver.addFilter("MSF_DIR");
@@ -376,8 +374,7 @@ public class UpdateService extends IntentService
 
         exitForError = false;
 
-        if (localVersion == null || !localVersion.equals(mMsfInfo.versionString))
-          return true;
+        return !mMsfInfo.versionString.equals(localVersion);
       }
     } catch (Exception e) {
       System.errorLogging(e);
@@ -404,8 +401,8 @@ public class UpdateService extends IntentService
         }
       } else if(key.equals("MSF_BRANCH")) {
         try {
-          synchronized (mMsfRepoParser) {
-            mMsfRepoParser.setBranch(System.getSettings().getString("MSF_BRANCH", "release"));
+          synchronized (mMsfRepo) {
+            mMsfRepo.setBranch(System.getSettings().getString("MSF_BRANCH", "release"));
           }
         } catch (Exception e) {
           Logger.error(e.getMessage());
@@ -417,8 +414,8 @@ public class UpdateService extends IntentService
   public static String[] getMsfBranches() {
 
     try {
-      synchronized (mMsfRepoParser) {
-        return mMsfRepoParser.getBranches();
+      synchronized (mMsfRepo) {
+        return mMsfRepo.getBranches();
       }
     } catch (JSONException e) {
       System.errorLogging(e);
@@ -574,14 +571,22 @@ public class UpdateService extends IntentService
    * else assign it to the notification onClick
    */
   private void finishNotification() {
-    if(mCurrentTask.contentIntent==null){
+    boolean errorOccurred;
+    Intent contentIntent;
+
+    synchronized (mCurrentTask) {
+      errorOccurred = mCurrentTask.errorOccurred;
+      contentIntent = mCurrentTask.contentIntent;
+    }
+
+    if(errorOccurred || contentIntent==null){
       Logger.debug("deleting notifications");
       if(mNotificationManager!=null)
         mNotificationManager.cancel(NOTIFICATION_ID);
     } else {
-      Logger.debug("assign '"+mCurrentTask.contentIntent.toString()+"' to notification");
+      Logger.debug("assign '"+contentIntent.toString()+"' to notification");
      if(mBuilder!=null&&mNotificationManager!=null) {
-       mBuilder.setContentIntent(PendingIntent.getActivity(this, DOWNLOAD_COMPLETE_CODE, mCurrentTask.contentIntent, 0));
+       mBuilder.setContentIntent(PendingIntent.getActivity(this, DOWNLOAD_COMPLETE_CODE, contentIntent, 0));
        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
      }
     }
@@ -1291,6 +1296,7 @@ public class UpdateService extends IntentService
       setupNotification();
 
       synchronized (mCurrentTask) {
+        mCurrentTask.errorOccurred = true;
         if (!haveLocalFile())
           downloadFile();
         extract();
@@ -1302,8 +1308,10 @@ public class UpdateService extends IntentService
 
         deleteTemporaryFiles();
         createVersionFile();
+
+        mCurrentTask.errorOccurred = exitForError = false;
       }
-      exitForError=false;
+
       if(what_to_do==action.msf_update)
         System.updateLocalMsfVersion();
       if(what_to_do==action.ruby_update)
@@ -1337,7 +1345,8 @@ public class UpdateService extends IntentService
       System.errorLogging(e);
     } finally {
       if(exitForError) {
-        clearGemsCache();
+        if(what_to_do == action.msf_update || what_to_do == action.gems_update)
+          clearGemsCache();
         wipe();
       }
       stopSelf();

@@ -35,44 +35,106 @@ import it.evilsocket.dsploit.core.Logger;
 
 /**
  * This class parses JSON from api.github.com
- * @see <a href="https://developer.github.com/v3/repos/commits/">github documentation</a>
+ * @see <a href="https://developer.github.com/v3/">github documentation</a>
  */
 public class GitHubParser {
   private static final String BRANCHES_URL = "https://api.github.com/repos/%s/%s/branches";
+  private static final String RELEASES_URL = "https://api.github.com/repos/%s/%s/releases";
+  private static final String ZIPBALL_URL  = "https://github.com/%s/%s/archive/%s.zip";
 
-  public String mUsername;
-  public String mProject;
+  public final String username;
+  public final String project;
 
   private JSONArray mBranches = null;
   private JSONObject mBranch = null;
   private JSONObject mLastCommit = null;
+  private JSONObject mLastRelease = null;
 
   public GitHubParser(String username, String project) {
-    mUsername = username;
-    mProject = project;
+    this.username = username;
+    this.project = project;
+  }
+
+  private String fetchRemoteData(String _url) throws IOException {
+    HttpURLConnection connection;
+    HttpURLConnection.setFollowRedirects(true);
+    URL url = new URL(_url);
+
+    connection = (HttpURLConnection) url.openConnection();
+
+    try {
+      connection.connect();
+      int ret = connection.getResponseCode();
+
+      if (ret != 200)
+        throw new IOException(String.format("unable to fetch remote data: '%s' => %d",
+                _url, ret));
+
+      StringBuilder sb = new StringBuilder();
+      BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+      String line;
+
+      while ((line = reader.readLine()) != null)
+        sb.append(line);
+
+      return sb.toString();
+    } finally {
+      connection.disconnect();
+    }
+  }
+
+  private void fetchLastRelease() throws IOException, JSONException {
+    JSONArray releases;
+    JSONObject release;
+
+    releases = new JSONArray(
+            fetchRemoteData(
+                    String.format(RELEASES_URL, username, project)
+            )
+    );
+
+    for(int i=0;i<releases.length();i++) {
+      release = releases.getJSONObject(i);
+
+      if(!release.getBoolean("draft") && !release.getBoolean("prerelease")) {
+        mLastRelease = release;
+        break;
+      }
+    }
   }
 
   private void fetchBranches() throws IOException, JSONException {
-    HttpURLConnection connection;
-    HttpURLConnection.setFollowRedirects(true);
-    URL url = new URL(String.format(BRANCHES_URL, mUsername, mProject));
-    connection = (HttpURLConnection) url.openConnection();
-    connection.connect();
-    int ret = connection.getResponseCode();
+    mBranches = new JSONArray(
+            fetchRemoteData(
+                    String.format(BRANCHES_URL, username, project)
+            )
+    );
+  }
 
-    if (ret != 200)
-      throw new IOException(String.format("unable to retrieve branches from github: '%s' => %d",
-              String.format(BRANCHES_URL, mUsername, mProject),
-              ret));
+  public String getLastReleaseVersion() throws JSONException, IOException {
+    if(mLastRelease==null)
+      fetchLastRelease();
 
-    StringBuilder sb = new StringBuilder();
-    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-    String line;
+    if(mLastRelease==null)
+      return null;
 
-    while((line = reader.readLine())!=null)
-      sb.append(line);
+    return mLastRelease.getString("tag_name").substring(1);
+  }
 
-    mBranches = new JSONArray(sb.toString());
+  public String getLastReleaseAssetUrl() throws JSONException, IOException {
+    if(mLastRelease==null)
+      fetchLastRelease();
+
+    if(mLastRelease==null)
+      return null;
+
+    JSONArray assets = mLastRelease.getJSONArray("assets");
+
+    if(assets.length() != 1) {
+      return null;
+    }
+
+    return assets.getJSONObject(0).getString("browser_download_url");
   }
 
   public String[] getBranches() throws JSONException, IOException {
@@ -116,10 +178,29 @@ public class GitHubParser {
     return mLastCommit.getString("sha");
   }
 
+  public String getZipballUrl() throws JSONException, IllegalStateException {
+    if(mBranch == null)
+      throw new IllegalStateException("no branch has been selected yet");
+    return String.format(ZIPBALL_URL, username, project, mBranch.getString("name"));
+  }
+
+  public String getZipballName() throws JSONException, IllegalStateException {
+    if(mBranch == null)
+      throw new IllegalStateException("no branch has been selected yet");
+    return String.format("%s.zip", mBranch.getString("name"));
+  }
+
+  public String getZipballRoot() throws JSONException, IllegalStateException {
+    if(mBranch == null)
+      throw new IllegalStateException("no branch has been selected yet");
+    return String.format("%s-%s/", project, mBranch.getString("name"));
+  }
+
   public void reset() {
     mLastCommit = null;
     mBranch = null;
     mBranches = null;
+    mLastRelease = null;
   }
 
 }

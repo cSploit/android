@@ -26,6 +26,8 @@ public class ArchiveMetadata {
           archiver;
   public Intent
           contentIntent;
+  public boolean
+          errorOccurred;
 
   public ArchiveMetadata() {
     reset();
@@ -39,6 +41,7 @@ public class ArchiveMetadata {
       compression = null;
       archiver = null;
       contentIntent = null;
+      errorOccurred = false;
     }
   }
 
