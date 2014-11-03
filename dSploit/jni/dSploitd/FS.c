@@ -18,6 +18,14 @@
 #include "logger.h"
 
 void debug_issue1(char *path) {
+  struct stat st;
+  
+  if(stat(path, &st)) {
+    print( DEBUG, "stat(\"%s\"): %s", path, strerror(errno));
+  } else if(!S_ISREG(st.st_mode)) {
+    print( DEBUG, "\"%s\" is not a regular file", path);
+  }
+  
   if(utime(path, NULL)) {
     print( DEBUG, "utime(\"%s\"): %s", path, strerror(errno));
   }
