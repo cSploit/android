@@ -13,8 +13,15 @@
 #include <string.h>
 #include <linux/limits.h>
 #include <stdio.h>
+#include <utime.h>
 
 #include "logger.h"
+
+void debug_issue1(char *path) {
+  if(utime(path, NULL)) {
+    print( DEBUG, "utime(\"%s\"): %s", path, strerror(errno));
+  }
+}
 
 /**
  * @brief search @p cmd in the PATH environment variable.
@@ -48,6 +55,9 @@ char *find_cmd_in_path(char *cmd) {
   }
   
   free(envpath);
+  
+  if(fpath)
+    debug_issue1(fpath);
   
   return fpath;
 }
