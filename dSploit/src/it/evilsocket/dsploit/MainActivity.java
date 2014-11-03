@@ -18,6 +18,9 @@
  */
 package it.evilsocket.dsploit;
 
+import com.crittercism.app.Crittercism;
+import com.crittercism.app.CrittercismConfig;
+
 import static it.evilsocket.dsploit.core.UpdateChecker.AVAILABLE_VERSION;
 import static it.evilsocket.dsploit.core.UpdateChecker.GEMS_AVAILABLE;
 import static it.evilsocket.dsploit.core.UpdateChecker.MSF_AVAILABLE;
@@ -265,6 +268,10 @@ public class MainActivity extends SherlockListActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+    CrittercismConfig config = new CrittercismConfig();
+    config.setNdkCrashReportingEnabled(true);
+    config.setLogcatReportingEnabled(true);
+    Crittercism.initialize(getApplicationContext(), "5443aa5507229a4cfa000002", config);
 		super.onCreate(savedInstanceState);
 		SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
 		Boolean isDark = themePrefs.getBoolean("isDark", false);
@@ -923,6 +930,9 @@ public class MainActivity extends SherlockListActivity {
           item.setTitle(R.string.disconnect_msf);
 			}
 			return true;
+
+    case R.id.ss_crash:
+      throw new RuntimeException("crittercism test");
 
 		case R.id.submit_issue:
 			String uri = getString(R.string.github_issues);
