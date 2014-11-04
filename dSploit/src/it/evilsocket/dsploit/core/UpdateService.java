@@ -1041,15 +1041,15 @@ public class UpdateService extends IntentService
           continue;
         }
 
-        if(f.setExecutable(x, true)) {
+        if(!f.setExecutable(x, true)) {
           Logger.warning(String.format("cannot set executable permission of '%s'",name));
         }
 
-        if(f.setWritable(w, true)) {
+        if(!f.setWritable(w, true)) {
           Logger.warning(String.format("cannot set writable permission of '%s'",name));
         }
 
-        if(f.setReadable(r, true)) {
+        if(!f.setReadable(r, true)) {
           Logger.warning(String.format("cannot set readable permission of '%s'",name));
         }
       }
