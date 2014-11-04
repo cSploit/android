@@ -69,7 +69,7 @@ int load_handlers() {
   DIR *d;
   struct dirent *de;
   handler *h,*tmp;
-  char *path;
+  char *path, *cwd;
   void *handle;
   size_t len;
   
@@ -77,6 +77,21 @@ int load_handlers() {
   
   if(!d) {
     print( ERROR, "opendir: %s", strerror(errno) );
+    return -1;
+  }
+  
+  cwd = malloc(PATH_MAX);
+  
+  if(!cwd) {
+    print( ERROR, "malloc: %s", strerror(errno));
+    closedir(d);
+    return -1;
+  }
+  
+  if(!getcwd(cwd, PATH_MAX)) {
+    print( ERROR, "getcwd: %s", strerror(errno));
+    free(cwd);
+    closedir(d);
     return -1;
   }
   
@@ -90,7 +105,7 @@ int load_handlers() {
     if(strncmp(de->d_name + (len - 3), ".so", 3))
       continue;
     
-    if(asprintf(&path, HANDLERS_DIR "/%s", de->d_name) == -1) {
+    if(asprintf(&path, "%s/" HANDLERS_DIR "/%s", cwd, de->d_name) == -1) {
       print( ERROR, "asprintf: %s", strerror(errno) );
       continue;
     }
@@ -126,6 +141,8 @@ int load_handlers() {
   }
   
   closedir(d);
+  
+  free(cwd);
   
   if(!handlers.head) {
     print( ERROR, "no handlers found" );
