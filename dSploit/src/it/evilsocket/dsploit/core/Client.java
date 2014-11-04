@@ -6,6 +6,7 @@ package it.evilsocket.dsploit.core;
 public class Client {
 
   static {
+    java.lang.System.loadLibrary("dSploitCommon");
     java.lang.System.loadLibrary("dSploitClient");
   }
 
