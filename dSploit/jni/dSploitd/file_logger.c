@@ -20,7 +20,7 @@ FILE *logfile = NULL;
  * @returns 0 on success, -1 on error.
  */
 int open_logfile(char *filepath) {
-  logfile = fopen(filepath, "w");
+  logfile = fopen(filepath, "we");
   
   if(!logfile) {
     print(ERROR, "fopen: %s", strerror(errno));
