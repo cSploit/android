@@ -261,6 +261,7 @@ message *on_cmd_start(conn_node *conn, message *msg) {
     goto start_fail;
   }
   
+  
   if((pid = fork()) < 0) {
     print( ERROR, "fork: %s", strerror(errno) );
     goto start_fail;
@@ -271,28 +272,39 @@ message *on_cmd_start(conn_node *conn, message *msg) {
     close(pout[0]);
     close(perr[0]);
     
-    i= open("/dev/null", O_RDWR);
-    
-    if(pin[0] == -1)
-      pin[0] = i;
-    if(pout[1] == -1)
-      pout[1] = i;
+    if(pin[0] == -1 || pout[1] == -1) {
+      i= open("/dev/null", O_RDWR);
+      
+      if(pin[0] == -1)
+        pin[0] = dup(i);
+      if(pout[1] == -1)
+        pout[1] = dup(i);
+      
+      close(i);
+    }
     
     if(h->workdir)
       chdir(h->workdir);
     
     dup2(pin[0], STDIN_FILENO);
-    dup2(pout[1], STDOUT_FILENO);
-    dup2(perr[1], STDERR_FILENO);
-
-    close(i);
+    
     close(pin[0]);
+    
+    dup2(pout[1], STDOUT_FILENO);
+    
     close(pout[1]);
+    
+    dup2(perr[1], STDERR_FILENO);
+    
     close(perr[1]);
     
     execvp(argv[0], argv);
     i=errno;
+    
     write(pexec[1], &i, sizeof(int));
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
     close(pexec[1]);
     exit(-1);
   } else {
