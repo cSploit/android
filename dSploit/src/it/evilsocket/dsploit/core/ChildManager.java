@@ -24,17 +24,18 @@ public class ChildManager {
 
   /**
    * execute a command
-   * @param handler the command handler
-   * @param cmd the command to execute
+   * @param handler name of the handler
+   * @param env     custom environment variables
+   * @param cmd     arguments for the child
    * @param receiver the {@link it.evilsocket.dsploit.core.Child.EventReceiver} that will receive child events
    * @return the process exit value
    * @throws InterruptedException if current thread get interrupted
    * @throws ChildDiedException if child get killed
    */
-  public static int exec(String handler, String cmd, EventReceiver receiver) throws InterruptedException, ChildDiedException, ChildNotStartedException {
+  public static int exec(String handler, String cmd, String[] env, EventReceiver receiver) throws InterruptedException, ChildDiedException, ChildNotStartedException {
     Child c;
 
-    c = async(handler, cmd, receiver);
+    c = async(handler, cmd, env, receiver);
 
     synchronized (children) {
       while (c.running)
@@ -48,19 +49,29 @@ public class ChildManager {
   }
 
   public static int exec(String handler, String cmd) throws InterruptedException, ChildDiedException, ChildNotStartedException {
-    return exec(handler, cmd, null);
+    return exec(handler, cmd, null, null);
   }
 
   static int exec(String cmd) throws InterruptedException, ChildDiedException, ChildNotStartedException {
-    return exec("blind", cmd, null);
+    return exec("blind", cmd, null, null);
   }
 
-  public static Child async(String handler, String cmd, EventReceiver receiver) throws ChildNotStartedException {
+  /**
+   * spawn a child asynchronously
+   *
+   * @param handler   name of the handler
+   * @param cmd       arguments for the child
+   * @param env       custom environment variables
+   * @param receiver  receiver for events fired by the child
+   * @return the spawned {@link it.evilsocket.dsploit.core.Child}
+   * @throws ChildNotStartedException when cannot start a child.
+   */
+  public static Child async(String handler, String cmd, String[] env, EventReceiver receiver) throws ChildNotStartedException {
     Child c;
 
     c = new Child();
 
-    c.id = Client.StartCommand(handler, cmd);
+    c.id = Client.StartCommand(handler, cmd, env);
     if (c.id == -1)
       throw new ChildNotStartedException();
 
@@ -80,11 +91,11 @@ public class ChildManager {
   }
 
   public static Child async(String handler, String cmd) throws ChildNotStartedException {
-    return async(handler, cmd, null);
+    return async(handler, cmd, null, null);
   }
 
   public static Child async(String cmd) throws ChildNotStartedException {
-    return async("blind", cmd, null);
+    return async("blind", cmd, null, null);
   }
 
   public static void join(Child c) throws InterruptedException {

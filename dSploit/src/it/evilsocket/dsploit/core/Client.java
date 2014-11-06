@@ -18,7 +18,7 @@ public class Client {
 
   native static String[] getHandlers();
 
-  native static int StartCommand(String handler, String cmd);
+  native static int StartCommand(String handler, String cmd, String[] env);
 
   native static boolean Connect(String path);
 
@@ -31,8 +31,4 @@ public class Client {
   native static void Kill(int id, int signal);
 
   native static boolean SendTo(int id, byte[] array);
-
-  static int StartCommand(String cmd) {
-    return StartCommand("blind", cmd);
-  }
 }

@@ -119,66 +119,126 @@ int on_child_done(child_node *c, int status) {
   return 0;
 }
 
+/// data extracted from ::cmd_start_info
+struct cmd_start_data {
+  int argc;         ///< ::argv size
+  char free_argv0;  ///< should argv[0] be freed ?
+  char **argv;      ///< command arguments
+  /**
+   * @brief start of environment inside the received message body.
+   * 
+   * while using another char* array can seems more clear,
+   * it is very unefficient.
+   * we have to read the environment from the message,
+   * store it allocating memory,
+   * read it again and call putenv for every argument.
+   * 
+   * we can just read the environment from the message
+   * and directly call putenv. and ge very higher performance.
+   */
+  char *env_start;
+};
+
 /**
- * @brief read @p argv from @p m
+ * @brief free all resources used ::cmd_start_data
+ * @param data a the ::cmd_start_dta to free
+ */
+void free_start_data(struct cmd_start_data *data) {
+  int i;
+  
+  if(data->argv) {
+    i = (data->free_argv0 ? 0 : 1);
+    for(;i < data->argc;i++)
+      if(data->argv[i])
+        free(data->argv[i]);
+    free(data->argv);
+  }
+  
+  free(data);
+}
+
+/**
+ * @brief read ::cmd_start_data from @p m
  * @param m the message to parse
  * @param skip_argv0 start building from argv[1]
- * @returns the parsed argv on success, NULL on error.
+ * @returns a ::cmd_start_data pointer on success, NULL on error.
  */
-char **parse_argv(message *m, char skip_argv0) {
-  char **argv, *arg, *end;
-  int i,n;
+struct cmd_start_data *extract_start_data(message *m, char skip_argv0) {
+  char *arg, *end;
+  int i, n;
   size_t size;
+  struct cmd_start_data *data;
   struct cmd_start_info *start_info;
   
   start_info = (struct cmd_start_info *) m->data;
   
-  n = string_array_size(m, start_info->argv);
+  n = string_array_size(m, start_info->data);
   
-  if(!n) {
-    print( ERROR, "empty argv" );
-    dump_message(m);
+  if(!n && !skip_argv0) {
+    print( ERROR, "empty array");
     return NULL;
   }
+  
+  data = malloc(sizeof(struct cmd_start_data));
+  
+  if(!data) {
+    print( ERROR, "malloc: %s", strerror(errno));
+    return NULL;
+  }
+  
+  memset(data, 0, sizeof(struct cmd_start_data));
+  
+  if(!n) {
+    print( DEBUG, "empty array" );
+    return data;
+  }
+  
+  if(start_info->argc > n) {
+    print( ERROR, "argc out of bounds ( argc=%d, n=%d )", start_info->argc, n);
+    goto error;
+  }
+  
+  data->argc = start_info->argc;
   
   if(skip_argv0) {
     i=1;
-    n++;
+    data->argc++;
   } else {
     i=0;
+    data->free_argv0 = 1;
   }
   
-  size = (sizeof(char *) * (n+1));
-  argv = malloc(size);
+  size = (sizeof(char *) * (data->argc+1));
+  data->argv = malloc(size);
   
-  if(!argv) {
+  if(!data->argv) {
     print( ERROR, "malloc: %s", strerror(errno) );
-    return NULL;
+    goto error;
   }
   
-  memset(argv, 0, size);
+  memset(data->argv, 0, size);
   
   end = m->data + m->head.size;
   arg=NULL;
   
-  while((i<n && (arg=string_array_next(m, start_info->argv, arg)))) {
+  for(;i < data->argc && (arg=string_array_next(m, start_info->data, arg)); i++) {
+    data->argv[i] = strndup(arg, (end-arg));
     
-    argv[i] = strndup(arg, (end-arg));
-    
-    if(!argv[i]) goto strndup_error;
-    
-    i++;
+    if(!data->argv[i]) {
+      print( ERROR, "strndup: %s", strerror(errno));
+      goto error;
+    }
   }
   
-  return argv;
-
-  strndup_error:
+  if(arg) {
+    data->env_start = string_array_next(m, start_info->data, arg);
+  }
   
-  print( ERROR, "strndup: %s", strerror(errno) );
-  for(i=0;i<n;i++)
-    if(argv[i])
-      free(argv[i]);
-  free(argv);
+  return data;
+
+  error:
+  
+  free_start_data(data);
   
   return NULL;
 }
@@ -190,9 +250,8 @@ char **parse_argv(message *m, char skip_argv0) {
  * @returns a reply message on success, NULL on error.
  */
 message *on_cmd_start(conn_node *conn, message *msg) {
-  char **argv;
+  struct cmd_start_data *data;
   char *cmd;
-  int  exec_errno;
   handler *h;
   child_node *c;
   int pin[2],pout[2],perr[2],pexec[2];
@@ -200,7 +259,6 @@ message *on_cmd_start(conn_node *conn, message *msg) {
   struct cmd_start_info *request_info;
   struct cmd_started_info *reply_info;
   pid_t pid;
-  char free_argv0;
   uint16_t seq;
   
   c = NULL;
@@ -209,8 +267,7 @@ message *on_cmd_start(conn_node *conn, message *msg) {
   // or close(2) will close unexpected fd. ( like our stdin if 0 )
   pin[0] = pin[1] = pout[0] = pout[1] = perr[0] = perr[1] = pexec[0] = pexec[1] = -1;
   request_info = (struct cmd_start_info *)msg->data;
-  argv=NULL;
-  free_argv0 = 1;
+  data=NULL;
   pid = 0;
   seq = msg->head.seq;
   
@@ -230,15 +287,14 @@ message *on_cmd_start(conn_node *conn, message *msg) {
   
   cmd = (char *)c->handler->argv0;
   
-  argv = parse_argv(msg, (cmd ? 1 : 0));
-  if(!argv) {
-    print( ERROR, "cannot parse argv" );
+  data = extract_start_data(msg, (cmd ? 1 : 0));
+  if(!data) {
+    print( ERROR, "cannot extract data" );
     goto start_fail;
   }
   
   if(cmd) {
-    argv[0] = cmd;
-    free_argv0 = 0;
+    data->argv[0] = cmd;
   }
   
   if(pipe2(pexec, O_CLOEXEC)) {
@@ -298,10 +354,21 @@ message *on_cmd_start(conn_node *conn, message *msg) {
     
     close(perr[1]);
     
-    execvp(argv[0], argv);
-    i=errno;
+    cmd = data->env_start;
+    if(cmd) {
+      while((cmd=string_array_next(msg, request_info->data, cmd))) {
+        if(putenv(cmd)) {
+          print( ERROR, "putenv(\"%s\"): %s", cmd, strerror(errno));
+          goto error;
+        }
+      }
+    }
     
-    write(pexec[1], &i, sizeof(int));
+    execvp(data->argv[0], data->argv);
+    
+    error:
+    
+    write(pexec[1], "!", 1);
     close(STDIN_FILENO);
     close(STDOUT_FILENO);
     close(STDERR_FILENO);
@@ -314,15 +381,10 @@ message *on_cmd_start(conn_node *conn, message *msg) {
     close(pout[1]);
     close(perr[1]);
     
-    if(free_argv0)
-      free(argv[0]);
-    for(i=1;argv[i];i++)
-      free(argv[i]);
-    free(argv);
-    argv=NULL;
+    free_start_data(data);
+    data = NULL;
     
-    if(read(pexec[0],&exec_errno, sizeof(int))) {
-      print( ERROR, "execvp: %s", strerror(exec_errno) );
+    if(read(pexec[0], &i, 1)) {
       waitpid(pid, NULL, 0);
       goto start_fail;
     }
@@ -370,13 +432,8 @@ message *on_cmd_start(conn_node *conn, message *msg) {
   start_fail:
   if(c)
     free(c);
-  if(argv) {
-    if(free_argv0)
-      free(argv[0]);
-    for(i=1;argv[i];i++)
-      free(argv[i]);
-    free(argv);
-  }
+  if(data)
+    free_start_data(data);
   // no care about EBADF, ensure to close all opened fd
   close(pexec[0]);
   close(pexec[1]);

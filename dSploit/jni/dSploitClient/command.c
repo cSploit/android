@@ -16,6 +16,7 @@
 #include "sequence.h"
 #include "controller.h"
 #include "auth.h"
+#include "str_array.h"
 
 #include "command.h"
 
@@ -227,7 +228,8 @@ int on_command(JNIEnv *env, message *m) {
 #define ESCAPE_FOUND 4
 #define END_OF_STRING 8
 
-int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jhandler, jstring jcmd) {
+//TODO: split this function into smaller ones
+int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jhandler, jstring jcmd, jobjectArray jenv) {
   char status;
   char *pos, *start, *end, *rpos, *wpos;
   const char *utf;
@@ -272,6 +274,8 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
     LOGE("%s: handler \"%s\" not found", __func__, utf);
     goto exit;
   }
+  
+  // parse cmd
   
   (*env)->ReleaseStringUTFChars(env, jhandler, utf);
   utf = (*env)->GetStringUTFChars(env, jcmd, NULL);
@@ -373,6 +377,7 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
       }
       
       m->data = realloc(m->data, msg_size);
+      start_info = (struct cmd_start_info *) m->data;
       
       if(!m->data) {
         LOGE("%s: realloc: %s", __func__, strerror(errno));
@@ -403,8 +408,35 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
       
       m->head.size = msg_size;
       
+      start_info->argc++;
+      
       start = end = NULL;
       escapes = 0;
+    }
+  }
+  
+  // parse env
+  
+  if(jenv != NULL)
+    arg_len = (*env)->GetArrayLength(env, jenv);
+  else
+    arg_len = 0;
+  
+  for(escapes=0;escapes < arg_len; escapes++) {
+    // reuse jcmd, we don't have to release object that java send us.
+    jcmd = (jstring) (*env)->GetObjectArrayElement(env, jenv, escapes);
+    
+    if(!jcmd) goto jni_error;
+    
+    (*env)->ReleaseStringUTFChars(env, *utf_parent, utf);
+    utf = (*env)->GetStringUTFChars(env, jcmd, NULL);
+    utf_parent = &jcmd;
+    
+    if(!utf) goto jni_error;
+    
+    if(string_array_add(m, offsetof(struct cmd_start_info, data), (char *) utf)) {
+      LOGE("%s: cannot append '%s' to message", __func__, utf);
+      goto exit;
     }
   }
   

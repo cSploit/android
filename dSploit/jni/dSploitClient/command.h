@@ -8,6 +8,6 @@
 
 int on_command(JNIEnv *, message *);
 int start_blind_command(JNIEnv *, jclass, jstring);
-int start_command(JNIEnv *, jclass, jstring, jstring);
+int start_command(JNIEnv *, jclass, jstring, jstring, jobjectArray);
 void kill_child(JNIEnv *, jclass, int, int);
 #endif

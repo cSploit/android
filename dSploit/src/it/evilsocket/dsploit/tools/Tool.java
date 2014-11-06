@@ -27,6 +27,7 @@ public abstract class Tool
   protected boolean mEnabled = true;
   protected String mHandler = null;
   protected String mCmdPrefix = null;
+  protected String[] mEnv = null;
 
   public int run(String args, Child.EventReceiver receiver) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
 
@@ -49,7 +50,7 @@ public abstract class Tool
       args = mCmdPrefix + " " + args;
     }
 
-    return ChildManager.exec(mHandler, args, receiver);
+    return ChildManager.exec(mHandler, args, mEnv, receiver);
   }
 
   public int run(String args) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
@@ -81,7 +82,7 @@ public abstract class Tool
       }
     }
 
-    return ChildManager.async(mHandler, args, receiver);
+    return ChildManager.async(mHandler, args, mEnv, receiver);
   }
 
   public Child async(String args) throws ChildManager.ChildNotStartedException {

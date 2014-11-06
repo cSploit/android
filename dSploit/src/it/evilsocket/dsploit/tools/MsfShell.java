@@ -45,6 +45,6 @@ public class MsfShell extends RubyShell {
   protected void setupEnvironment() {
     super.setupEnvironment();
 
-    mPreCmd += "export PATH=\"$PATH:" + ExecChecker.msf().getRoot() + "\"\n";
+    mEnv[1] += ":" + ExecChecker.msf().getRoot();
   }
 }

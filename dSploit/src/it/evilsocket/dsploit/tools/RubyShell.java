@@ -74,14 +74,14 @@ public class RubyShell extends Shell {
 
   protected void setupEnvironment() {
     String rubyRoot;
-    StringBuilder sb = new StringBuilder();
+    String path;
+    mEnv = new String[3];
 
     rubyRoot = ExecChecker.ruby().getRoot();
+    path = java.lang.System.getenv("PATH");
 
-    sb.append(String.format("export RUBYLIB=\"" + rubyLib + "\"\n", rubyRoot + "/lib/ruby"));
-    sb.append(String.format("export PATH=\"$PATH:%s\"\n", rubyRoot + "/bin"));
-    sb.append(String.format("export HOME=\"%s\"\n", rubyRoot + "/home/ruby"));
-
-    mPreCmd = sb.toString();
+    mEnv[0] = String.format("RUBYLIB=" + rubyLib, rubyRoot + "/lib/ruby");
+    mEnv[1] = String.format("PATH=%s:%s", path, rubyRoot + "/bin");
+    mEnv[2] = String.format("HOME=%s", rubyRoot + "/home/ruby");
   }
 }

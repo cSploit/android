@@ -18,20 +18,15 @@
  */
 package it.evilsocket.dsploit.tools;
 
-import java.io.IOException;
-
 import it.evilsocket.dsploit.core.Child;
-import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.ChildManager;
 
 public class Shell extends Raw {
 
-  protected String mPreCmd;
-
   public Shell() {
     mHandler = "raw";
     mCmdPrefix = "sh";
-    mPreCmd = null;
+    mEnv = null;
   }
 
   /**
@@ -41,24 +36,7 @@ public class Shell extends Raw {
    */
   @Override
   public int run(String cmd, RawReceiver receiver) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
-    if(mPreCmd == null)
-      return super.run("-c '" + cmd.replaceAll("'", "\\'") + "'", receiver);
-
-    Child c = super.async(null, receiver);
-
-    try {
-      c.send(mPreCmd + cmd + "; exit $?\n");
-    } catch (IOException e) {
-      System.errorLogging(e);
-      throw new ChildManager.ChildNotStartedException();
-    }
-
-    c.join();
-
-    if(c.signal>=0)
-      throw new ChildManager.ChildDiedException(c.signal);
-
-    return c.exitValue;
+    return super.run("-c '" + cmd.replaceAll("'", "\\'") + "'", receiver);
   }
 
   public int run(String cmd) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
@@ -72,24 +50,10 @@ public class Shell extends Raw {
   public Child async(String cmd, RawReceiver receiver) throws ChildManager.ChildNotStartedException {
     Child c;
 
-    if(mPreCmd==null) {
-      if(cmd != null) {
-        c = super.async("-c '" + cmd.replace("'", "\\'") + "'", receiver);
-      } else {
-        c = super.async(receiver);
-      }
+    if(cmd != null) {
+      c = super.async("-c '" + cmd.replace("'", "\\'") + "'", receiver);
     } else {
-      c = super.async(null, receiver);
-      try {
-        if(cmd!=null) {
-          c.send(mPreCmd + cmd + "; exit $?\n");
-        } else {
-          c.send(mPreCmd);
-        }
-      } catch (IOException e) {
-        System.errorLogging(e);
-        throw new ChildManager.ChildNotStartedException();
-      }
+      c = super.async(receiver);
     }
 
     return c;

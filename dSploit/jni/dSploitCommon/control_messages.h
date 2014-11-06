@@ -45,7 +45,11 @@ enum ctrl_code {
 struct cmd_start_info {
   char cmd_action;  ///< must be set to ::CMD_START
   char hid;         ///< id of the ::handler for this command
-  char argv[];      ///< command argv, a list of null-terminated strings
+  uint8_t argc;     ///< argv size
+  /**
+   * @brief string array of argv and environment
+   */
+  char data[];
 };
 
 /// command has been successfully started
