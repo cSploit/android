@@ -73,25 +73,30 @@ int load_handlers() {
   void *handle;
   size_t len;
   
+  len = 50;
+  cwd = malloc(len);
+  
+  while(cwd && len < PATH_MAX) {
+    if(getcwd(cwd, len)) break;
+    if(errno != ERANGE) {
+      print( ERROR, "getcwd: %s", strerror(errno));
+      free(cwd);
+      return -1;
+    }
+    len += 50;
+    cwd = realloc(cwd, len);
+  }
+  
+  if(!cwd) {
+    print( ERROR, "malloc(%d): %s", len, strerror(errno));
+    return -1;
+  }
+  
   d = opendir(HANDLERS_DIR);
   
   if(!d) {
     print( ERROR, "opendir: %s", strerror(errno) );
-    return -1;
-  }
-  
-  cwd = malloc(PATH_MAX);
-  
-  if(!cwd) {
-    print( ERROR, "malloc: %s", strerror(errno));
-    closedir(d);
-    return -1;
-  }
-  
-  if(!getcwd(cwd, PATH_MAX)) {
-    print( ERROR, "getcwd: %s", strerror(errno));
     free(cwd);
-    closedir(d);
     return -1;
   }
   
