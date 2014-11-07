@@ -1166,7 +1166,7 @@ public class UpdateService extends IntentService
         throw new RuntimeException("cannot install msf gems");
     } finally {
       if(bundleInstallTask != null && bundleInstallTask.running)
-        bundleInstallTask.kill();
+        bundleInstallTask.kill(2);
     }
   }
 
