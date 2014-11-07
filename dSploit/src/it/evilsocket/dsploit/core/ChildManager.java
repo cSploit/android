@@ -181,21 +181,22 @@ public class ChildManager {
       }
     }
 
-    if(c.receiver != null) {
-      if(end) {
-        c.exitValue = ((ChildEnd) event).exit_status;
-        Logger.debug("Child #" + c.id + " exited ( exitValue=" + c.exitValue + " )");
+    if(end) {
+      c.exitValue = ((ChildEnd) event).exit_status;
+      Logger.debug("Child #" + c.id + " exited ( exitValue=" + c.exitValue + " )");
+      if(c.receiver != null)
         c.receiver.onEnd(c.exitValue);
-      } else if(died) {
-        c.signal = ((ChildDied) event).signal;
-        Logger.debug("Child #" + c.id + " died ( signal=" + c.signal + " )");
+    } else  if(died) {
+      c.signal = ((ChildDied) event).signal;
+      Logger.debug("Child #" + c.id + " died ( signal=" + c.signal + " )");
+      if(c.receiver != null)
         c.receiver.onDeath(c.signal);
-      } else if(stderr) {
-        Logger.warning("Child #" + c.id + " sent '" + ((StderrNewline) event).line + "' to stderr");
+    } else if(stderr) {
+      Logger.warning("Child #" + c.id + " sent '" + ((StderrNewline) event).line + "' to stderr");
+      if(c.receiver != null)
         c.receiver.onStderr(((StderrNewline) event).line);
-      } else {
-        c.receiver.onEvent(event);
-      }
+    } else if(c.receiver != null) {
+      c.receiver.onEvent(event);
     }
 
     if(end || died) {
