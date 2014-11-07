@@ -466,7 +466,9 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
   
   if(escapes) {
     LOGE("%s: cannot send messages", __func__);
-    goto exit;
+    // mark it as failed
+    c->id = CTRL_ID;
+    c->seq = 0;
   }
   
   // wait for CMD_STARTED or CMD_FAIL
@@ -505,13 +507,6 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
   }
   
   exit:
-  if(c && id==-1) {
-    pthread_mutex_lock(&(children.control.mutex));
-    list_del(&(children.list), (node *) c);
-    pthread_mutex_unlock(&(children.control.mutex));
-    pthread_cond_broadcast(&(children.control.cond));
-    free_child(c);
-  }
   
   if(m)
     free_message(m);
