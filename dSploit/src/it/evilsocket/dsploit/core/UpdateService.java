@@ -1090,79 +1090,84 @@ public class UpdateService extends IntentService
     mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     Child bundleInstallTask, task;
 
-    // install bundle gem, required for install msf
-    if(System.getTools().ruby.run("which bundle") != 0) {
-      bundleInstallTask = System.getTools().ruby.async("gem install bundle", mErrorReceiver);
-    } else {
-      bundleInstallTask = null;
+    bundleInstallTask = null;
+
+    try {
+      // install bundle gem, required for install msf
+      if (System.getTools().ruby.run("which bundle") != 0) {
+        bundleInstallTask = System.getTools().ruby.async("gem install bundle", mErrorReceiver);
+      }
+
+      mBuilder.setContentText(getString(R.string.installing_msf_gems));
+      mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+
+      // get gems stored on our gem server.
+
+      task = System.getTools().ruby.async(
+              String.format("gem list -r --clear-sources --source '%s'", REMOTE_GEM_SERVER),
+              new Raw.RawReceiver() {
+                @Override
+                public void onNewLine(String line) {
+                  Matcher matcher = GEM_FROM_LIST.matcher(line);
+                  if (matcher.find()) {
+                    ourGems.add(matcher.group(1) + " " + matcher.group(2));
+                  }
+                }
+              });
+
+      if (execShell(task, "cancelled while retrieving compiled gem list") != 0)
+        throw new RuntimeException("cannot fetch remote gem info");
+
+      // substitute gems version and gem sources with our one
+
+      sb.append("sed -i ");
+
+      // append our REMOTE_GEM_SERVER to msf Gemfile sources.
+      // we use an our gem server to provide cross compiled gems,
+      // because android does not comes with a compiler.
+      sb.append(String.format("-e \"/source 'https:\\/\\/rubygems.org'/a\\\nsource '%s'\" ",
+              REMOTE_GEM_SERVER));
+
+      for (String compiledGem : ourGems) {
+        String[] parts = compiledGem.split(" ");
+
+        // patch Gemfile
+        sb.append(String.format("-e \"s/gem  *'%1$s'.*/gem '%1$s', '%2$s', :source => '%3$s'/g\" ",
+                parts[0], parts[1], REMOTE_GEM_SERVER));
+        // patch gemspec
+        sb.append(String.format("-e \"s/spec.add_runtime_dependency  *'%1$s'.*/spec.add_runtime_dependency '%1$s', '%2$s'/g\" ",
+                parts[0], parts[1]));
+      }
+
+      // android does not have git, but we downloaded the archive from the git repo.
+      // so it's content it's exactly the same seen by git.
+      sb.append("-e 's/`git ls-files`/`find . -type f`/' ");
+
+      // send files to work on
+      sb.append(String.format("'%1$s/Gemfile' '%1$s/metasploit-framework.gemspec'", msfPath));
+
+      task = System.getTools().raw.async(sb.toString(), mErrorReceiver);
+
+      if (execShell(task, "cancelled while patching bundle files") != 0)
+        throw new RuntimeException("cannot patch bundle files");
+
+      // remove cache version file
+      new File(msfPath, "Gemfile.lock").delete();
+
+      if (bundleInstallTask != null && execShell(bundleInstallTask, "cancelled while install bundle") != 0)
+        throw new RuntimeException("cannot install bundle");
+
+      bundleInstallTask = System.getTools().ruby.async(
+              String.format("bundle install --verbose --gemfile '%s/Gemfile' --without development test", msfPath),
+              mErrorReceiver);
+
+      // install gem required by msf using bundle
+      if (execShell(bundleInstallTask, "cancelled on bundle install") != 0)
+        throw new RuntimeException("cannot install msf gems");
+    } finally {
+      if(bundleInstallTask != null && bundleInstallTask.running)
+        bundleInstallTask.kill();
     }
-
-    mBuilder.setContentText(getString(R.string.installing_msf_gems));
-    mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-
-    // get gems stored on our gem server.
-
-    task = System.getTools().ruby.async(
-        String.format("gem list -r --clear-sources --source '%s'", REMOTE_GEM_SERVER),
-        new Raw.RawReceiver() {
-          @Override
-          public void onNewLine(String line) {
-            Matcher matcher = GEM_FROM_LIST.matcher(line);
-            if(matcher.find()) {
-              ourGems.add(matcher.group(1) + " " + matcher.group(2));
-            }
-          }
-        });
-
-    if(execShell(task, "cancelled while retrieving compiled gem list")!=0)
-      throw new RuntimeException("cannot fetch remote gem info");
-
-    // substitute gems version and gem sources with our one
-
-    sb.append("sed -i ");
-
-    // append our REMOTE_GEM_SERVER to msf Gemfile sources.
-    // we use an our gem server to provide cross compiled gems,
-    // because android does not comes with a compiler.
-    sb.append(String.format("-e \"/source 'https:\\/\\/rubygems.org'/a\\\nsource '%s'\" ",
-                    REMOTE_GEM_SERVER));
-
-    for(String compiledGem : ourGems) {
-      String[] parts = compiledGem.split(" ");
-
-      // patch Gemfile
-      sb.append(String.format("-e \"s/gem  *'%1$s'.*/gem '%1$s', '%2$s', :source => '%3$s'/g\" ",
-              parts[0], parts[1], REMOTE_GEM_SERVER));
-      // patch gemspec
-      sb.append(String.format("-e \"s/spec.add_runtime_dependency  *'%1$s'.*/spec.add_runtime_dependency '%1$s', '%2$s'/g\" ",
-              parts[0], parts[1]));
-    }
-
-    // android does not have git, but we downloaded the archive from the git repo.
-    // so it's content it's exactly the same seen by git.
-    sb.append("-e 's/`git ls-files`/`find . -type f`/' ");
-
-    // send files to work on
-    sb.append(String.format("'%1$s/Gemfile' '%1$s/metasploit-framework.gemspec'", msfPath));
-
-    task = System.getTools().raw.async(sb.toString(), mErrorReceiver);
-
-    if(execShell(task, "cancelled while patching bundle files")!=0)
-      throw new RuntimeException("cannot patch bundle files");
-
-    // remove cache version file
-    new File(msfPath, "Gemfile.lock").delete();
-
-    if(bundleInstallTask != null && execShell(bundleInstallTask, "cancelled while install bundle") != 0)
-      throw new RuntimeException("cannot install bundle");
-
-    bundleInstallTask = System.getTools().ruby.async(
-            String.format("bundle install --verbose --gemfile '%s/Gemfile' --without development test", msfPath),
-            mErrorReceiver);
-
-    // install gem required by msf using bundle
-    if(execShell(bundleInstallTask, "cancelled on bundle install")!=0)
-      throw new RuntimeException("cannot install msf gems");
   }
 
   private void updateGems() throws IOException, InterruptedException, CancellationException, RuntimeException, KeyException, NoSuchAlgorithmException, ChildManager.ChildNotStartedException {
