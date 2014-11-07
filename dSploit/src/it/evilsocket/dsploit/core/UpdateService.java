@@ -1132,10 +1132,10 @@ public class UpdateService extends IntentService
         String[] parts = compiledGem.split(" ");
 
         // patch Gemfile
-        sb.append(String.format("-e \"s/gem  *'%1$s'.*/gem '%1$s', '%2$s', :source => '%3$s'/g\" ",
+        sb.append(String.format("-e \"s#gem  *'%1$s'.*#gem '%1$s', '%2$s', :source => '%3$s'#g\" ",
                 parts[0], parts[1], REMOTE_GEM_SERVER));
         // patch gemspec
-        sb.append(String.format("-e \"s/spec.add_runtime_dependency  *'%1$s'.*/spec.add_runtime_dependency '%1$s', '%2$s'/g\" ",
+        sb.append(String.format("-e \"s#spec.add_runtime_dependency  *'%1$s'.*#spec.add_runtime_dependency '%1$s', '%2$s'#g\" ",
                 parts[0], parts[1]));
       }
 
