@@ -1077,7 +1077,7 @@ public class UpdateService extends IntentService
   /**
    * install gems required by the MSF
    */
-  private void installGems() throws CancellationException, RuntimeException, IOException, InterruptedException, ChildManager.ChildNotStartedException {
+  private void installGems() throws CancellationException, RuntimeException, IOException, InterruptedException, ChildManager.ChildNotStartedException, ChildManager.ChildDiedException {
     String msfPath = System.getMsfPath();
     final ArrayList<String> ourGems = new ArrayList<String>();
     StringBuilder sb = new StringBuilder();
@@ -1088,22 +1088,21 @@ public class UpdateService extends IntentService
             .setSmallIcon(android.R.drawable.stat_sys_download)
             .setProgress(100, 0, true);
     mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-    Child shell;
-
-    //TODO: use rubyShell.async() ( do not spawn a shell for every command, or maybe not [ spawn child with custom environment ? ] )
-    //TODO: run install bundle while patching msf files.
-    shell = System.getTools().rubyShell.async("which bundle || gem install bundle", mErrorReceiver);
+    Child bundleInstallTask, task;
 
     // install bundle gem, required for install msf
-    if(execShell(shell,"cancelled while install bundle")!=0)
-      throw new RuntimeException("cannot install bundle");
+    if(System.getTools().ruby.run("which bundle") != 0) {
+      bundleInstallTask = System.getTools().ruby.async("gem install bundle", mErrorReceiver);
+    } else {
+      bundleInstallTask = null;
+    }
 
     mBuilder.setContentText(getString(R.string.installing_msf_gems));
     mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
 
     // get gems stored on our gem server.
 
-    shell = System.getTools().rubyShell.async(
+    task = System.getTools().ruby.async(
         String.format("gem list -r --clear-sources --source '%s'", REMOTE_GEM_SERVER),
         new Raw.RawReceiver() {
           @Override
@@ -1115,7 +1114,7 @@ public class UpdateService extends IntentService
           }
         });
 
-    if(execShell(shell, "cancelled while retrieving compiled gem list")!=0)
+    if(execShell(task, "cancelled while retrieving compiled gem list")!=0)
       throw new RuntimeException("cannot fetch remote gem info");
 
     // substitute gems version and gem sources with our one
@@ -1146,20 +1145,23 @@ public class UpdateService extends IntentService
     // send files to work on
     sb.append(String.format("'%1$s/Gemfile' '%1$s/metasploit-framework.gemspec'", msfPath));
 
-    shell = System.getTools().raw.async(sb.toString(), mErrorReceiver);
+    task = System.getTools().raw.async(sb.toString(), mErrorReceiver);
 
-    if(execShell(shell, "cancelled while patching bundle files")!=0)
+    if(execShell(task, "cancelled while patching bundle files")!=0)
       throw new RuntimeException("cannot patch bundle files");
 
     // remove cache version file
     new File(msfPath, "Gemfile.lock").delete();
 
-    shell = System.getTools().rubyShell.async(
-            String.format("cd '%s' && bundle install --verbose --without development test", msfPath),
+    if(bundleInstallTask != null && execShell(bundleInstallTask, "cancelled while install bundle") != 0)
+      throw new RuntimeException("cannot install bundle");
+
+    bundleInstallTask = System.getTools().ruby.async(
+            String.format("bundle install --verbose --gemfile '%s/Gemfile' --without development test", msfPath),
             mErrorReceiver);
 
     // install gem required by msf using bundle
-    if(execShell(shell, "cancelled on bundle install")!=0)
+    if(execShell(bundleInstallTask, "cancelled on bundle install")!=0)
       throw new RuntimeException("cannot install msf gems");
   }
 
@@ -1191,7 +1193,7 @@ public class UpdateService extends IntentService
               .setProgress(100, 0, true);
       mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
 
-      shell = System.getTools().rubyShell.async(String.format(
+      shell = System.getTools().ruby.async(String.format(
               "gem uninstall --force -x -v '%s' '%s' && gem install -l '%s'",
               gemInfo.version, gemInfo.name, mCurrentTask.path), mErrorReceiver);
 
@@ -1331,6 +1333,9 @@ public class UpdateService extends IntentService
       sendError(R.string.error_occured);
       System.errorLogging(e);
     } catch (ChildManager.ChildNotStartedException e) {
+      sendError(R.string.error_occured);
+      System.errorLogging(e);
+    } catch (ChildManager.ChildDiedException e) {
       sendError(R.string.error_occured);
       System.errorLogging(e);
     } finally {

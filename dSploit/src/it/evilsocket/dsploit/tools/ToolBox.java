@@ -24,7 +24,7 @@ package it.evilsocket.dsploit.tools;
 public class ToolBox {
   public final Raw raw;
   public final Shell shell;
-  public final RubyShell rubyShell;
+  public final Ruby ruby;
   public final NMap nmap;
   public final Hydra hydra;
   public final ArpSpoof arpSpoof;
@@ -32,13 +32,12 @@ public class ToolBox {
   public final Fusemounts fusemounts;
   public final IPTables ipTables;
   public final TcpDump tcpDump;
-  public final MsfShell msfShell;
-  public final MsfRpcd msfRpcd;
+  public final Msf msf;
 
   public ToolBox() {
     raw = new Raw();
     shell = new Shell();
-    rubyShell = new RubyShell();
+    ruby = new Ruby();
     nmap = new NMap();
     hydra = new Hydra();
     arpSpoof = new ArpSpoof();
@@ -46,14 +45,13 @@ public class ToolBox {
     fusemounts = new Fusemounts();
     ipTables = new IPTables();
     tcpDump = new TcpDump();
-    msfShell = new MsfShell();
-    msfRpcd = new MsfRpcd();
+    msf = new Msf();
   }
 
   public void reload() {
     raw.setEnabled();
     shell.setEnabled();
-    rubyShell.setEnabled();
+    ruby.setEnabled();
     nmap.setEnabled();
     hydra.setEnabled();
     arpSpoof.setEnabled();
@@ -61,7 +59,6 @@ public class ToolBox {
     fusemounts.setEnabled();
     ipTables.setEnabled();
     tcpDump.setEnabled();
-    msfShell.setEnabled();
-    msfRpcd.setEnabled();
+    msf.setEnabled();
   }
 }

@@ -24,15 +24,15 @@ import it.evilsocket.dsploit.core.SettingReceiver;
 import it.evilsocket.dsploit.core.System;
 
 /**
- * a shell with a modified environment to execute ruby binaries
+ * run commands with custom environment variables to provide access to ruby binaries
  */
-public class RubyShell extends Shell {
+public class Ruby extends Tool {
 
   private final static String rubyLib = "%1$s/site_ruby/1.9.1:%1$s/site_ruby/1.9.1/arm-linux-androideabi:%1$s/site_ruby:%1$s/vendor_ruby/1.9.1:%1$s/vendor_ruby/1.9.1/arm-linux-androideabi:%1$s/vendor_ruby:%1$s/1.9.1:%1$s/1.9.1/arm-linux-androideabi";
 
 
-  public RubyShell() {
-    super();
+  public Ruby() {
+    mHandler = "raw";
 
     setEnabled();
 

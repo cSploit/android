@@ -16,23 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with cSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.evilsocket.dsploit.tools;
+package it.evilsocket.dsploit.net.metasploit;
 
 import it.evilsocket.dsploit.core.Child;
 import it.evilsocket.dsploit.core.System;
 import it.evilsocket.dsploit.core.ChildManager;
+import it.evilsocket.dsploit.events.Event;
+import it.evilsocket.dsploit.events.Ready;
 
 /**
  * create instance of the MSF RPC daemon
  */
-public class MsfRpcd extends MsfShell {
+public class MsfRpcd {
 
   private Child mProcess = null;
 
-  public static abstract class MsfRpcdReceiver extends RawReceiver {
+  public static abstract class MsfRpcdReceiver extends Child.EventReceiver {
     @Override
-    public void onNewLine(String line) {
-      if(line.contains("MSGRPC ready at"))
+    public void onEvent(Event e) {
+      if(e instanceof Ready)
         onReady();
     }
 
@@ -55,7 +57,7 @@ public class MsfRpcd extends MsfShell {
     args = String.format("msfrpcd -P '%s' -U '%s' -p '%d' -a 127.0.0.1 -n %s -t Msg -f",
             pswd, user, port, (ssl ? "" : "-S"));
 
-    mProcess = async(args, receiver);
+    mProcess = System.getTools().msf.async(args, receiver);
   }
 
   public boolean isRunning() {

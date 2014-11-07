@@ -23,9 +23,9 @@ import it.evilsocket.dsploit.core.ExecChecker;
 import it.evilsocket.dsploit.core.System;
 
 /**
- * a shell with proper environment variables to run msf binaries
+ * run commands with custom environment variables to provide access to msf binaries
  */
-public class MsfShell extends RubyShell {
+public class Msf extends Ruby {
 
   @Override
   public void setEnabled() {

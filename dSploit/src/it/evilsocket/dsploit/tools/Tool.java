@@ -30,27 +30,7 @@ public abstract class Tool
   protected String[] mEnv = null;
 
   public int run(String args, Child.EventReceiver receiver) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
-
-    // debugging inheritance
-    String stack = "";
-    for(StackTraceElement element : Thread.currentThread().getStackTrace()) {
-      if(element.getClassName().startsWith("it.evilsocket.dsploit"))
-        stack += String.format("at %s.%s(%s)\n",
-                element.getClassName(), element.getMethodName(),
-                (element.getLineNumber() >= 0 ? element.getFileName() + ":" + element.getLineNumber() : "NativeMethod"));
-    }
-    Logger.debug(stack);
-
-    if(!mEnabled) {
-      Logger.warning(mHandler + ":" + mCmdPrefix + ": disabled");
-      throw new ChildManager.ChildNotStartedException();
-    }
-
-    if(mCmdPrefix!=null) {
-      args = mCmdPrefix + " " + args;
-    }
-
-    return ChildManager.exec(mHandler, args, mEnv, receiver);
+    return ChildManager.wait(async(args, receiver));
   }
 
   public int run(String args) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
@@ -58,16 +38,6 @@ public abstract class Tool
   }
 
   public Child async(String args, Child.EventReceiver receiver) throws ChildManager.ChildNotStartedException {
-
-    // debugging inheritance
-    String stack = "";
-    for(StackTraceElement element : Thread.currentThread().getStackTrace()) {
-      if(element.getClassName().startsWith("it.evilsocket.dsploit"))
-        stack += String.format("at %s.%s(%s)\n",
-                element.getClassName(), element.getMethodName(),
-                (element.getLineNumber() >= 0 ? element.getFileName() + ":" + element.getLineNumber() : "NativeMethod"));
-    }
-    Logger.debug(stack);
 
     if(!mEnabled) {
       Logger.warning(mHandler + (mCmdPrefix != null ? ":" + mCmdPrefix : "" ) + ": disabled");

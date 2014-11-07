@@ -23,6 +23,25 @@ public class ChildManager {
   public static List<String> handlers = null;
 
   /**
+   * wait for a child termination
+   * @param c  the child to wait for
+   * @return the child exit code
+   * @throws InterruptedException if current thread gets interrupted while waiting
+   * @throws ChildDiedException if child has been killed by a signal
+   */
+  public static int wait(Child c) throws InterruptedException, ChildDiedException {
+    synchronized (children) {
+      while (c.running)
+        children.wait();
+    }
+
+    if(c.signal >= 0) {
+      throw new ChildDiedException(c.signal);
+    }
+    return c.exitValue;
+  }
+
+  /**
    * execute a command
    * @param handler name of the handler
    * @param env     custom environment variables
@@ -33,19 +52,7 @@ public class ChildManager {
    * @throws ChildDiedException if child get killed
    */
   public static int exec(String handler, String cmd, String[] env, EventReceiver receiver) throws InterruptedException, ChildDiedException, ChildNotStartedException {
-    Child c;
-
-    c = async(handler, cmd, env, receiver);
-
-    synchronized (children) {
-      while (c.running)
-        children.wait();
-    }
-
-    if(c.signal >= 0) {
-      throw new ChildDiedException(c.exitValue);
-    }
-    return c.exitValue;
+    return wait(async(handler, cmd, env, receiver));
   }
 
   public static int exec(String handler, String cmd) throws InterruptedException, ChildDiedException, ChildNotStartedException {
@@ -202,10 +209,6 @@ public class ChildManager {
 
   public static class ChildDiedException extends Exception {
     public ChildDiedException(int signal) {super("process terminated by signal " + signal);}
-  }
-
-  public static class ChildNotFoundException extends Exception {
-    public ChildNotFoundException(int id) { super("child #" + id + " not found"); }
   }
 
   public static class ChildNotStartedException extends Exception {

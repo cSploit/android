@@ -68,7 +68,7 @@ import it.evilsocket.dsploit.plugins.Sessions;
 import it.evilsocket.dsploit.plugins.Traceroute;
 import it.evilsocket.dsploit.plugins.VulnerabilityFinder;
 import it.evilsocket.dsploit.plugins.mitm.MITM;
-import it.evilsocket.dsploit.tools.MsfRpcd;
+import it.evilsocket.dsploit.net.metasploit.MsfRpcd;
 import it.evilsocket.dsploit.tools.ToolBox;
 
 import java.io.IOException;
@@ -115,6 +115,7 @@ public class MainActivity extends SherlockListActivity {
 	private boolean isWifiAvailable = false;
 	private TargetAdapter mTargetAdapter = null;
 	private NetworkDiscovery mNetworkDiscovery = null;
+  private MsfRpcd mMsfRpcd = null;
 	private EndpointReceiver mEndpointReceiver = null;
 	private UpdateReceiver mUpdateReceiver = null;
 	private WipeReceiver mWipeReceiver = null;
@@ -426,24 +427,22 @@ public class MainActivity extends SherlockListActivity {
 		item = menu.findItem(R.id.ss_msfrpcd);
     ToolBox tools = System.getTools();
 
-    if((tools == null || !tools.msfRpcd.isEnabled())) {
-      item.setEnabled(false);
-    } else if(!MsfRpcd.isLocal()) {
-      item.setEnabled(true);
-      if(System.getMsfRpc()==null)
-        item.setTitle(getString(R.string.connect_msf));
-      else
-        item.setTitle(getString(R.string.disconnect_msf));
-    } else if(!System.isServiceRunning("it.evilsocket.dsploit.core.UpdateService")) {
-      item.setEnabled(true);
+    if(MsfRpcd.isLocal()) {
       if (System.getMsfRpc() != null
-          || (System.getTools().msfRpcd.isRunning()))
+              || (mMsfRpcd != null && mMsfRpcd.isRunning()))
         item.setTitle(getString(R.string.stop_msfrpcd));
       else
         item.setTitle(getString(R.string.start_msfrpcd));
     } else {
-      item.setEnabled(false);
+      if(System.getMsfRpc()==null)
+        item.setTitle(getString(R.string.connect_msf));
+      else
+        item.setTitle(getString(R.string.disconnect_msf));
     }
+
+    item.setEnabled(!MsfRpcd.isLocal() ||
+                    (tools != null && tools.msf.isEnabled() &&
+                            !System.isServiceRunning("it.evilsocket.dsploit.core.UpdateService")));
 
 		mMenu = menu;
 
@@ -619,6 +618,11 @@ public class MainActivity extends SherlockListActivity {
    * start MSF RPC Daemon
    */
 	public void StartRPCServer() {
+    StopRPCServer(true);
+
+    if(mMsfRpcd == null)
+      mMsfRpcd = new MsfRpcd();
+
     new Thread( new Runnable() {
       @Override
       public void run() {
@@ -632,7 +636,7 @@ public class MainActivity extends SherlockListActivity {
 
         if(msfHost.equals("127.0.0.1")) {
           try {
-            System.getTools().msfRpcd.start(msfUser, msfPassword, msfPort, msfSsl, new MsfRpcd.MsfRpcdReceiver() {
+            mMsfRpcd.start(msfUser, msfPassword, msfPort, msfSsl, new MsfRpcd.MsfRpcdReceiver() {
               @Override
               public void onReady() {
                 try {
@@ -704,7 +708,7 @@ public class MainActivity extends SherlockListActivity {
    */
 	public void StopRPCServer(final boolean silent) {
 
-    if(System.getMsfRpc() == null && !System.getTools().msfRpcd.isRunning())
+    if(System.getMsfRpc() == null && ( mMsfRpcd == null || !mMsfRpcd.isRunning() ))
       return;
 
     new Thread( new Runnable() {
@@ -713,9 +717,8 @@ public class MainActivity extends SherlockListActivity {
         try {
           System.setMsfRpc(null);
 
-          if(!MsfRpcd.isLocal()) {
-            System.getTools().msfRpcd.stop();
-          }
+          if(mMsfRpcd.isRunning())
+            mMsfRpcd.stop();
 
           if(!silent) {
             MainActivity.this.runOnUiThread(new Runnable() {
@@ -909,7 +912,7 @@ public class MainActivity extends SherlockListActivity {
 			return true;
 
 		case R.id.ss_msfrpcd:
-      if(System.getMsfRpc()!=null || (System.getTools().msfRpcd.isRunning())) {
+      if(System.getMsfRpc()!=null || (mMsfRpcd != null && mMsfRpcd.isRunning())) {
 				StopRPCServer(false);
         if(MsfRpcd.isLocal())
 				  item.setTitle(R.string.start_msfrpcd);
