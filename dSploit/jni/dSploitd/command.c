@@ -367,6 +367,7 @@ message *on_cmd_start(conn_node *conn, message *msg) {
     execvp(data->argv[0], data->argv);
     
     error:
+    print( ERROR, "execvp: %s", strerror(errno));
     
     write(pexec[1], "!", 1);
     close(STDIN_FILENO);
