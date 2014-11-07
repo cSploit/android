@@ -989,7 +989,7 @@ public class UpdateService extends IntentService
           bof = new BufferedOutputStream(new FileOutputStream(f));
 
           // check il file is an ELF or a script
-          if(!isTar && entry.getSize() > 4) {
+          if(entry.getSize() > 4) {
             // read the first 4 bytes of the file
             for (absCount = 0, count = -1;
                  mRunning && absCount < 4 && (count = is.read(data, absCount, 4 - absCount)) != -1;
