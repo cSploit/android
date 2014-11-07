@@ -223,15 +223,16 @@ int on_message(JNIEnv *env, message *m) {
   
   pthread_mutex_lock(&(children.control.mutex));
   for(c=(child_node *) children.list.head;c && c->id != m->head.id;c=(child_node *) c->next);
+  pthread_mutex_unlock(&(children.control.mutex));
   
   if(!c) {
     LOGW("%s: child #%u not found", __func__, m->head.id);
-    goto exit;
+    return -1;
   }
   
   if(!(c->handler->have_stdout)) {
     LOGW("%s: received a message from child #%u, which does not have stdout", __func__, m->head.id);
-    goto exit;
+    return -1;
   }
   
   if( c->handler == handlers.by_name.blind ) {
@@ -251,10 +252,6 @@ int on_message(JNIEnv *env, message *m) {
   } else {
     LOGW("%s: unkown handler: \"%s\" ( #%u )", __func__, c->handler->name, c->handler->id);
   }
-  
-  exit:
-  
-  pthread_mutex_unlock(&(children.control.mutex));
   
   return ret;
   
