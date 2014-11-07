@@ -355,13 +355,13 @@ message *on_cmd_start(conn_node *conn, message *msg) {
     close(perr[1]);
     
     cmd = data->env_start;
-    if(cmd) {
-      while((cmd=string_array_next(msg, request_info->data, cmd))) {
-        if(putenv(cmd)) {
-          print( ERROR, "putenv(\"%s\"): %s", cmd, strerror(errno));
-          goto error;
-        }
+    
+    while(cmd) {
+      if(putenv(cmd)) {
+        print( ERROR, "putenv(\"%s\"): %s", cmd, strerror(errno));
+        goto error;
       }
+      cmd=string_array_next(msg, request_info->data, cmd);
     }
     
     execvp(data->argv[0], data->argv);
