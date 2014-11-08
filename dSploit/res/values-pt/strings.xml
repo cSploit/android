@@ -2,7 +2,7 @@
     <string name="app_name">dSploit</string>
     <string name="menu_settings">Configurações</string>
     <string name="title_activity_main">dSploit</string>
-    <string name="crash_toast_text">Oooops! Eu dei crash, mas um relatório será enviado para o meu desenvolvedor para ajudar a corrigir o problema :)</string>
+    <string name="crash_toast_text">Oooops! houve um erro , mas um relatório será enviado para o meu desenvolvedor para ajudar a corrigir o problema :)</string>
     <string name="toggle_button">Botão de Alternância</string>
     <string name="enter_redirection_details">Digite os detalhes de redirecionamento abaixo::</string>
     <string name="address">Endereço</string>
@@ -22,7 +22,7 @@
     <string name="protocol">Protocolo</string>
     <string name="dsploit_catchphrase">dSploit - Uma suíte android de penetração de rede.</string>
     <string name="dsploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
-    <string name="dsploit_url">http://www.dsploit.net/</string>
+    <string name="dsploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">Disclaimer</string>
     <string name="dsploit_disclaimer">
         <![CDATA[ Esta aplicação não é para ser usada para quaisquer fins que não para demonstrar suas funções, e só deve ser utilizado em redes para as quais você tem permissão para fazer isso. Qualquer outro uso não é de responsabilidade do desenvolvedor.Em outras palavras, Não seja estúpido, e não direcionar as pessoas com raiva para mim.]]></string>
@@ -50,7 +50,7 @@
     <string name="no_updates_available">Não há atualizações disponíveis.</string>
     <string name="new_msf_update_desc">Uma atualização do Metasploit Framework</string>
     <string name="new_version">Nova Versão</string>
-    <string name="new_version2">Encontrado!</string>
+    <string name="new_version2">Encontrada!</string>
     <string name="downloading_update">Baixando Atualização&#8230;</string>
     <string name="connecting">Conectando&#8230;</string>
     <string name="cancel">Cancelar</string>
@@ -66,11 +66,11 @@
     <string name="start_msfrpcd">Iniciar MetaSploit RPCD</string>
     <string name="stop_msfrpcd">Parar MetaSploit RPCD</string>
     <string name="exit">Sair</string>
-    <string name="close_confirm">Isto irá fechar o dSploit, você tem certeza que deseja continuar?
+    <string name="close_confirm">Isto irá fechar o cSploit, você tem certeza que deseja continuar?
     </string>
     <string name="press_back">Pressione voltar novamente para fechar este aplicativo.</string>
     <string name="selected_">Selecionado&#160;</string>
-    <string name="github_issues">https://github.com/evilsocket/dsploit/issues/new</string>
+    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">Nenhum arquivo de sessão encontrado no cartão SD.</string>
     <string name="select_session_file">Selecione um arquivo de sessão a partir do cartão SD :</string>
     <string name="select_session">Selecionar Sessão</string>
