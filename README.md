@@ -4,7 +4,6 @@ dSploit - An Android network penetration suite.
 Copyleft Margaritelli of Simone aka evilsocket and then fused with zANTI2 continued by tux-mind.
 
 - <http://www.csploit.org/>
-- <http://www.evilsocket.net/>
 
 [![Click here to lend your support to: dSploit and make a donation at www.paypal.com](https://www.paypalobjects.com/en_GB/i/btn/btn_donate_LG.gif?skin_name=chrome)](https://www.paypal.com/uk/cgi-bin/webscr?cmd=_flow&SESSION=EwygVeYrR5hGy6I_JvufErbWg_YacpUSv3qdc-HvjHyNXaW0d7lVbhN7H6a&dispatch=5885d80a13c0db1f8e263663d3faee8d66f31424b43e9a70645c907a6cbd8fb4)
 
