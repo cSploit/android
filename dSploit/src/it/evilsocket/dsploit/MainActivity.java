@@ -404,8 +404,6 @@ public class MainActivity extends SherlockListActivity {
 			menu.findItem(R.id.new_session).setEnabled(false);
 			menu.findItem(R.id.save_session).setEnabled(false);
 			menu.findItem(R.id.restore_session).setEnabled(false);
-			menu.findItem(R.id.settings).setEnabled(false);
-			menu.findItem(R.id.ss_monitor).setEnabled(false);
 			menu.findItem(R.id.ss_monitor).setEnabled(false);
 			menu.findItem(R.id.ss_msfrpcd).setEnabled(false);
 		}
