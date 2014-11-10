@@ -1199,14 +1199,23 @@ public class UpdateService extends IntentService
       mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
 
       shell = System.getTools().ruby.async(String.format(
-              "gem uninstall --force -x -v '%s' '%s' && gem install -l '%s'",
-              gemInfo.version, gemInfo.name, mCurrentTask.path), mErrorReceiver);
+              "gem uninstall --force -x -v '%s' '%s'",
+              gemInfo.version, gemInfo.name), mErrorReceiver);
 
-      String cancelMessage = String.format("cancelled while updating '%s-%s'",
+      String cancelMessage = String.format("cancelled while deleting '%s-%s'",
               gemInfo.name, gemInfo.version);
 
       if(execShell(shell,cancelMessage)!=0)
-        throw new RuntimeException(String.format("cannot update '%s-%s'", gemInfo.name, gemInfo.version));
+        throw new RuntimeException(String.format("cannot delete '%s-%s'", gemInfo.name, gemInfo.version));
+
+      shell = System.getTools().ruby.async(
+          String.format("gem install -l '%s'", mCurrentTask.path), mErrorReceiver);
+
+      cancelMessage = String.format("cancelled while installing '%s-%s'",
+          gemInfo.name, gemInfo.version);
+
+      if(execShell(shell,cancelMessage)!=0)
+        throw new RuntimeException(String.format("cannot install '%s-%s'", gemInfo.name, gemInfo.version));
 
       if(!(new File(mCurrentTask.path).delete()))
         Logger.warning(String.format("cannot delete downloaded gem '%s'", mCurrentTask.path));

@@ -44,26 +44,6 @@ public class ToolsInstaller{
     "hydra"
   };
 
-  private final static String[] INSTALL_COMMANDS = {
-    "chmod 777 {PATH}/*/",
-    "chmod 777 {PATH}/ettercap/share",
-    "chmod 777 {PATH}/ettercap/share/*",
-    "chmod 777 {PATH}/ettercap/filters",
-    "chmod 777 {PATH}/ettercap/filters/*",
-    "chmod 755 {PATH}/ettercap/ettercap",
-    "chmod 755 {PATH}/ettercap/etterfilter",
-    "chmod 755 {PATH}/ettercap/etterlog",
-    "chmod 755 {PATH}/nmap/nmap",
-    "chmod 755 {PATH}/arpspoof/arpspoof",
-    "chmod 755 {PATH}/tcpdump/tcpdump",
-    "chmod 666 {PATH}/hydra/*",
-    "chmod 755 {PATH}/hydra/hydra",
-    "chmod 755 {PATH}/fusemounts/fusemounts",
-    "chmod 755 {PATH}/../dSploitd",
-    "mount -o remount,rw /system /system && ( chmod 6755 /system/*/su; mount -o remount,ro /system /system )",
-    "chmod 755 {FILES}"
-  };
-
   private Context mAppContext = null;
   private String mDestPath = null;
   private String mVersionFile = null;
