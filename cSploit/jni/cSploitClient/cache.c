@@ -41,16 +41,16 @@ int init_class_cache(JNIEnv *env, struct class_cache *c, const char *class_name)
   return ret;
 }
 
-int init_dsploit_core_childmanager_cache(JNIEnv *env) {
+int init_csploit_core_childmanager_cache(JNIEnv *env) {
   struct core_chlidmanager_cache *c;
   
-  c = &(cache.dsploit.core.childmanager);
+  c = &(cache.csploit.core.childmanager);
   
-  if(init_class_cache(env, (struct class_cache *) c, "it/evilsocket/dsploit/core/ChildManager"))
+  if(init_class_cache(env, (struct class_cache *) c, "org/csploit/android/core/ChildManager"))
     return -1;
   
   c->on_event = (*env)->GetStaticMethodID(env, c->class, "onEvent",
-                                                 "(ILit/evilsocket/dsploit/events/Event;)V");
+                                                 "(ILorg/csploit/android/events/Event;)V");
   
   if(!c->on_event) goto error;
   
@@ -66,12 +66,12 @@ int init_dsploit_core_childmanager_cache(JNIEnv *env) {
   return -1;
 }
   
-int init_dsploit_core_client_cache(JNIEnv *env) {
+int init_csploit_core_client_cache(JNIEnv *env) {
   struct class_cache *c;
   
-  c = &(cache.dsploit.core.client);
+  c = &(cache.csploit.core.client);
   
-  if(init_class_cache(env, c, "it/evilsocket/dsploit/core/Client"))
+  if(init_class_cache(env, c, "org/csploit/android/core/Client"))
     return -1;
   
   return 0;
@@ -100,29 +100,29 @@ int init_class_and_ctor_cache(JNIEnv *env, struct class_and_ctor_cache *c,
 
 #define NUMELEM(a) (sizeof(a)/sizeof(a[0]))
 
-int init_dsploit_events_cache(JNIEnv *env) {
+int init_csploit_events_cache(JNIEnv *env) {
   struct class_and_ctor_signature {
     const char *class_name;
     const char *ctor_signature;
   } events[] = {
-    { "it/evilsocket/dsploit/events/Newline", "(Ljava/lang/String;)V" },
-    { "it/evilsocket/dsploit/events/ChildEnd", "(I)V" },
-    { "it/evilsocket/dsploit/events/ChildDied", "(I)V" },
-    { "it/evilsocket/dsploit/events/StderrNewline", "(Ljava/lang/String;)V" },
-    { "it/evilsocket/dsploit/events/Hop", "(IJLjava/net/InetAddress;)V" },
-    { "it/evilsocket/dsploit/events/Port", "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)V" },
-    { "it/evilsocket/dsploit/events/Os", "(SLjava/lang/String;Ljava/lang/String;)V" },
-    { "it/evilsocket/dsploit/events/Ready", "()V" },
-    { "it/evilsocket/dsploit/events/Account", "(Ljava/net/InetAddress;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V" },
-    { "it/evilsocket/dsploit/events/Message", "(Ljava/lang/String;Ljava/lang/String;)V" },
-    { "it/evilsocket/dsploit/events/Login", "(ILjava/net/InetAddress;Ljava/lang/String;Ljava/lang/String;)V" },
-    { "it/evilsocket/dsploit/events/Attempts", "(JJJJJ)V" },
-    { "it/evilsocket/dsploit/events/Packet", "(Ljava/net/InetAddress;Ljava/net/InetAddress;S)V" },
+    { "org/csploit/android/events/Newline", "(Ljava/lang/String;)V" },
+    { "org/csploit/android/events/ChildEnd", "(I)V" },
+    { "org/csploit/android/events/ChildDied", "(I)V" },
+    { "org/csploit/android/events/StderrNewline", "(Ljava/lang/String;)V" },
+    { "org/csploit/android/events/Hop", "(IJLjava/net/InetAddress;)V" },
+    { "org/csploit/android/events/Port", "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)V" },
+    { "org/csploit/android/events/Os", "(SLjava/lang/String;Ljava/lang/String;)V" },
+    { "org/csploit/android/events/Ready", "()V" },
+    { "org/csploit/android/events/Account", "(Ljava/net/InetAddress;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V" },
+    { "org/csploit/android/events/Message", "(Ljava/lang/String;Ljava/lang/String;)V" },
+    { "org/csploit/android/events/Login", "(ILjava/net/InetAddress;Ljava/lang/String;Ljava/lang/String;)V" },
+    { "org/csploit/android/events/Attempts", "(JJJJJ)V" },
+    { "org/csploit/android/events/Packet", "(Ljava/net/InetAddress;Ljava/net/InetAddress;S)V" },
   };
   struct class_and_ctor_cache *ptr;
   register int i;
   
-  ptr=(struct class_and_ctor_cache *) &(cache.dsploit.events);
+  ptr=(struct class_and_ctor_cache *) &(cache.csploit.events);
   for(i=0;i<NUMELEM(events);i++, ptr++)
     if(init_class_and_ctor_cache(env, ptr, events[i].class_name, events[i].ctor_signature))
       return -1;
@@ -130,18 +130,18 @@ int init_dsploit_events_cache(JNIEnv *env) {
   return 0;
 }
 
-int init_dsploit_core_cache(JNIEnv *env) {
-  if(init_dsploit_core_childmanager_cache(env))
+int init_csploit_core_cache(JNIEnv *env) {
+  if(init_csploit_core_childmanager_cache(env))
     return -1;
-  if(init_dsploit_core_client_cache(env))
+  if(init_csploit_core_client_cache(env))
     return -1;
   return 0;
 }
 
-int init_dsploit_cache(JNIEnv *env) {
-  if(init_dsploit_core_cache(env))
+int init_csploit_cache(JNIEnv *env) {
+  if(init_csploit_core_cache(env))
     return -1;
-  if(init_dsploit_events_cache(env))
+  if(init_csploit_events_cache(env))
     return -1;
   return 0;
 }
@@ -186,7 +186,7 @@ int init_java_cache(JNIEnv *env) {
 int _init_cache(JNIEnv *env) {
   if(init_java_cache(env))
     return -1;
-  if(init_dsploit_cache(env))
+  if(init_csploit_cache(env))
     return -1;
   return 0;
 }
@@ -215,14 +215,14 @@ void _free_cache(JNIEnv *env) {
   int i;
   jclass *global_refs[] = {
     &(cache.java.net.inetaddress.class),
-    &(cache.dsploit.core.childmanager.class),
-    &(cache.dsploit.core.client.class),
-    &(cache.dsploit.events.newline.class),
-    &(cache.dsploit.events.child_end.class),
-    &(cache.dsploit.events.child_died.class),
-    &(cache.dsploit.events.hop.class),
-    &(cache.dsploit.events.port.class),
-    &(cache.dsploit.events.os.class),
+    &(cache.csploit.core.childmanager.class),
+    &(cache.csploit.core.client.class),
+    &(cache.csploit.events.newline.class),
+    &(cache.csploit.events.child_end.class),
+    &(cache.csploit.events.child_died.class),
+    &(cache.csploit.events.hop.class),
+    &(cache.csploit.events.port.class),
+    &(cache.csploit.events.os.class),
   };
   
   for(i=0;i<NUMELEM(global_refs); i++) {

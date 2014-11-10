@@ -34,7 +34,7 @@ void on_disconnect() {
 }
 
 /**
- * @brief connect to a dSploitd UNIX socket
+ * @brief connect to a cSploitd UNIX socket
  * @param jsocket_path path to the UNIX socket
  * @returns true on success, false on error.
  */

@@ -85,7 +85,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* pVm, void* reserved _U_) {
     goto error;
   }
   
-  ret = (*env)->RegisterNatives(env, cache.dsploit.core.client.class, nm, NUMELEM(nm));
+  ret = (*env)->RegisterNatives(env, cache.csploit.core.client.class, nm, NUMELEM(nm));
   
   if(ret != JNI_OK) {
     

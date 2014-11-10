@@ -16,7 +16,7 @@
 #include <errno.h>
 #include <stddef.h>
 
-#include "dSploitd.h"
+#include "cSploitd.h"
 #include "logger.h"
 #include "handler.h"
 #include "message.h"

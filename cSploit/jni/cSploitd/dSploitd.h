@@ -6,10 +6,10 @@
 #define DSPLOITD_H
 
 /// path of the socket
-#define SOCKET_PATH "dSploit.sock"
+#define SOCKET_PATH "cSploit.sock"
 
 /// path to logfile
-#define LOG_PATH "dSploitd.log"
+#define LOG_PATH "cSploitd.log"
 
 void stop_daemon(void);
 

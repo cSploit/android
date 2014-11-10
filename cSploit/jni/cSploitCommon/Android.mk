@@ -11,7 +11,7 @@ LOCAL_EXPORT_LDLIBS:= -ldl
   
 LOCAL_SRC_FILES:= $(wildcard $(LOCAL_PATH)/*.c)
 
-LOCAL_MODULE:= dSploitCommon
+LOCAL_MODULE:= cSploitCommon
 
 include $(BUILD_SHARED_LIBRARY)
 
@@ -22,6 +22,6 @@ LOCAL_EXPORT_LDLIBS:= -ldl
   
 LOCAL_SRC_FILES:= $(wildcard $(LOCAL_PATH)/*.c)
 
-LOCAL_MODULE:= dSploitCommon_static
+LOCAL_MODULE:= cSploitCommon_static
 
 include $(BUILD_STATIC_LIBRARY)

@@ -20,7 +20,7 @@
 struct login_data logged;
 
 /**
- * @brief login to to dSploitd
+ * @brief login to to cSploitd
  * @param jusername the username
  * @param jhash the password hash
  * @returns true on success, false on error.

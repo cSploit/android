@@ -1,20 +1,20 @@
-dSploitd
+cSploitd
 ======
 
 a simple command dispatcher.
 
 what it does
 ---------------
-dSploitd receive your command requests, start them as children and report to you their output and exit code.
+cSploitd receive your command requests, start them as children and report to you their output and exit code.
 it allow you to send data to a child stdin.
-a cool feature that dSploitd has it's the handlers.
-handlers are plugins that pre-parse programs stdin and stdout. for example we can parse the output of nmap in search of useful infos and send it as binary format instead of send thousands of bytes to the dSploitd clients.
+a cool feature that cSploitd has it's the handlers.
+handlers are plugins that pre-parse programs stdin and stdout. for example we can parse the output of nmap in search of useful infos and send it as binary format instead of send thousands of bytes to the cSploitd clients.
 
 
 how it work
 -------------
 
-dSploitd has 6 kind of threads:
+cSploitd has 6 kind of threads:
 
   - main: listen for new connection on the main socket.
   - connection: read messages from a connected client.

@@ -21,7 +21,7 @@
 #include "event.h"
 
 /**
- * @brief create an it.evilsocket.dsploit.events.Newline
+ * @brief create an org.csploit.android.events.Newline
  * @param arg the new line
  */
 jobject create_newline_event(JNIEnv *env, void *arg) {
@@ -36,8 +36,8 @@ jobject create_newline_event(JNIEnv *env, void *arg) {
   if(!str) goto jni_error;
   
   newline =  (*env)->NewObject(env,
-                               cache.dsploit.events.newline.class,
-                               cache.dsploit.events.newline.ctor,
+                               cache.csploit.events.newline.class,
+                               cache.csploit.events.newline.ctor,
                                str);
   if(newline) goto cleanup;
   
@@ -57,7 +57,7 @@ jobject create_newline_event(JNIEnv *env, void *arg) {
 }
 
 /**
- * @brief create an it.evilsocket.dsploit.events.StderrNewline
+ * @brief create an org.csploit.android.events.StderrNewline
  * @param arg the new line
  */
 jobject create_stderrnewline_event(JNIEnv *env, void *arg) {
@@ -72,8 +72,8 @@ jobject create_stderrnewline_event(JNIEnv *env, void *arg) {
   if(!str) goto jni_error;
   
   stderr_newline = (*env)->NewObject(env,
-                                     cache.dsploit.events.stderrnewline.class,
-                                     cache.dsploit.events.stderrnewline.ctor,
+                                     cache.csploit.events.stderrnewline.class,
+                                     cache.csploit.events.stderrnewline.ctor,
                                      str);
   
   if(stderr_newline) goto cleanup;
@@ -94,7 +94,7 @@ jobject create_stderrnewline_event(JNIEnv *env, void *arg) {
 }
 
 /**
- * @brief create an it.evilsocket.dsploit.events.ChildEnd
+ * @brief create an org.csploit.android.events.ChildEnd
  * @param arg a pointer to the exit status
  * @returns the jobject on success, NULLl on error.
  */
@@ -102,8 +102,8 @@ jobject create_child_end_event(JNIEnv *env, void *arg) {
   jobject event;
   
   event = (*env)->NewObject(env,
-                            cache.dsploit.events.child_end.class,
-                            cache.dsploit.events.child_end.ctor,
+                            cache.csploit.events.child_end.class,
+                            cache.csploit.events.child_end.ctor,
                             *((uint8_t *) arg));
   
   if(event)
@@ -117,7 +117,7 @@ jobject create_child_end_event(JNIEnv *env, void *arg) {
 }
 
 /**
- * @brief create an it.evilsocket.dsploit.events.ChildDied
+ * @brief create an org.csploit.android.events.ChildDied
  * @param arg a poitner to the signal that caused the death
  * @returns the jobject on success, NULLl on error.
  */
@@ -125,8 +125,8 @@ jobject create_child_died_event(JNIEnv *env, void *arg) {
   jobject event;
   
   event = (*env)->NewObject(env,
-                            cache.dsploit.events.child_died.class,
-                            cache.dsploit.events.child_died.ctor,
+                            cache.csploit.events.child_died.class,
+                            cache.csploit.events.child_died.ctor,
                             *((unsigned int *) arg));
   
   if(event)
@@ -169,7 +169,7 @@ jobject inaddr_to_inetaddress(JNIEnv *env, in_addr_t a) {
 }
 
 /**
- * @brief create an it.evilsocket.dsploit.events.Hop
+ * @brief create an org.csploit.android.events.Hop
  * @param arg a pointer to an ::nmap_hop_info
  * @returns the jobject on success, NULLl on error.
  */
@@ -185,8 +185,8 @@ jobject create_hop_event(JNIEnv *env, void *arg) {
     return NULL;
   
   res = (*env)->NewObject(env,
-                          cache.dsploit.events.hop.class,
-                          cache.dsploit.events.hop.ctor,
+                          cache.csploit.events.hop.class,
+                          cache.csploit.events.hop.ctor,
                           hop_info->hop, hop_info->usec, addr);
   
   (*env)->DeleteLocalRef(env, addr);
@@ -200,7 +200,7 @@ jobject create_hop_event(JNIEnv *env, void *arg) {
 }
 
 /**
- * @brief create an it.evilsocket.dsploit.events.Port
+ * @brief create an org.csploit.android.events.Port
  * @param arg a poiner to the received ::message
  * @returns a new object on success, NULL on error.
  */
@@ -254,8 +254,8 @@ jobject create_port_event(JNIEnv *env, void *arg) {
   }
   
   res = (*env)->NewObject(env,
-                          cache.dsploit.events.port.class,
-                          cache.dsploit.events.port.ctor,
+                          cache.csploit.events.port.class,
+                          cache.csploit.events.port.ctor,
                           jproto, service_info->port, jservice, jversion);
   
   cleanup:
@@ -279,7 +279,7 @@ jobject create_port_event(JNIEnv *env, void *arg) {
 }
 
 /**
- * @brief create an it.evilsocket.dsploit.events.Os
+ * @brief create an org.csploit.android.events.Os
  * @param arg a pointer to ::nmap_os_info
  * @returns a new object on success, NULL on error.
  */
@@ -305,8 +305,8 @@ jobject create_os_event(JNIEnv *env, void *arg) {
   if(!jtype) goto cleanup;
   
   res = (*env)->NewObject(env,
-                          cache.dsploit.events.os.class,
-                          cache.dsploit.events.os.ctor,
+                          cache.csploit.events.os.class,
+                          cache.csploit.events.os.ctor,
                           os_info->accuracy, jos, jtype);
   
   cleanup:
@@ -326,7 +326,7 @@ jobject create_os_event(JNIEnv *env, void *arg) {
 }
 
 /**
- * @brief create an it.evilsocket.dsploit.events.Ready
+ * @brief create an org.csploit.android.events.Ready
  * @param arg unused
  * @returns a new object on success, NULL on error.
  */
@@ -334,8 +334,8 @@ jobject create_ready_event(JNIEnv *env, void *arg _U_) {
   jobject res;
   
   res = (*env)->NewObject(env,
-                        cache.dsploit.events.ready.class,
-                        cache.dsploit.events.ready.ctor);
+                        cache.csploit.events.ready.class,
+                        cache.csploit.events.ready.ctor);
   
   if((*env)->ExceptionCheck(env)) {
     (*env)->ExceptionDescribe(env);
@@ -346,7 +346,7 @@ jobject create_ready_event(JNIEnv *env, void *arg _U_) {
 }
 
 /**
- * @brief create an it.evilsocket.dsploit.events.Account
+ * @brief create an org.csploit.android.events.Account
  * @param arg the ::message containing the account info
  * @returns a new object on success, NULL on error.
  */
@@ -386,8 +386,8 @@ jobject create_account_event(JNIEnv *env, void *arg) {
   if(!jpswd) goto cleanup;
   
   res = (*env)->NewObject(env,
-                          cache.dsploit.events.account.class,
-                          cache.dsploit.events.account.ctor,
+                          cache.csploit.events.account.class,
+                          cache.csploit.events.account.ctor,
                           addr, jproto, juser, jpswd);
   
   cleanup:
@@ -413,7 +413,7 @@ jobject create_account_event(JNIEnv *env, void *arg) {
 }
 
 /**
- * @brief create an it.evilsocket.dsploit.events.Ready
+ * @brief create an org.csploit.android.events.Ready
  * @param m the received ::message
  * @returns a new object on success, NULL on error.
  */
@@ -448,8 +448,8 @@ jobject create_message_event(JNIEnv *env, message *m) {
       
   
   res = (*env)->NewObject(env,
-                        cache.dsploit.events.message.class,
-                        cache.dsploit.events.message.ctor,
+                        cache.csploit.events.message.class,
+                        cache.csploit.events.message.ctor,
                         jseverity, jmessage);
   
   cleanup:
@@ -463,7 +463,7 @@ jobject create_message_event(JNIEnv *env, message *m) {
 }
 
 /**
- * @brief create an it.evilsocket.dsploit.events.Attempts
+ * @brief create an org.csploit.android.events.Attempts
  * @param arg a pointer to a ::message containing an ::hydra_attempts_info
  * @returns a new object on success, NULL on error.
  */
@@ -474,8 +474,8 @@ jobject create_attempts_event(JNIEnv *env, message *m) {
   attempts_info = (struct hydra_attempts_info *) m->data;
   
   res = (*env)->NewObject(env,
-                        cache.dsploit.events.attempts.class,
-                        cache.dsploit.events.attempts.ctor,
+                        cache.csploit.events.attempts.class,
+                        cache.csploit.events.attempts.ctor,
                         attempts_info->sent, attempts_info->left,
                         attempts_info->rate, attempts_info->elapsed,
                         attempts_info->eta);
@@ -489,7 +489,7 @@ jobject create_attempts_event(JNIEnv *env, message *m) {
 }
 
 /**
- * @brief create an it.evilsocket.dsploit.events.Login
+ * @brief create an org.csploit.android.events.Login
  * @param m the received ::message
  * @returns a new object on success, NULL on error.
  */
@@ -525,8 +525,8 @@ jobject create_login_event(JNIEnv *env, message *m) {
   }
   
   res = (*env)->NewObject(env,
-                          cache.dsploit.events.login.class,
-                          cache.dsploit.events.login.ctor,
+                          cache.csploit.events.login.class,
+                          cache.csploit.events.login.ctor,
                           login_info->port, addr, jlogin, jpswd);
   
   cleanup:
@@ -549,7 +549,7 @@ jobject create_login_event(JNIEnv *env, message *m) {
 }
 
 /**
- * @brief create an it.evilsocket.dsploit.events.Packet
+ * @brief create an org.csploit.android.events.Packet
  * @param m the received message
  * @returns the jobject on success, NULLl on error.
  */
@@ -566,8 +566,8 @@ jobject create_packet_event(JNIEnv *env, message *m) {
   if(!dst) return NULL;
   
   res = (*env)->NewObject(env,
-                          cache.dsploit.events.packet.class,
-                          cache.dsploit.events.packet.ctor,
+                          cache.csploit.events.packet.class,
+                          cache.csploit.events.packet.ctor,
                           src, dst, packet_info->len);
   
   (*env)->DeleteLocalRef(env, src);
@@ -588,8 +588,8 @@ jobject create_packet_event(JNIEnv *env, message *m) {
  * @returns 0 on success, -1 on error.
  */
 int send_event(JNIEnv *env, child_node *c, jobject e) {
-  (*env)->CallStaticVoidMethod(env, cache.dsploit.core.childmanager.class,
-                               cache.dsploit.core.childmanager.on_event, c->id, e);
+  (*env)->CallStaticVoidMethod(env, cache.csploit.core.childmanager.class,
+                               cache.csploit.core.childmanager.on_event, c->id, e);
   
   if((*env)->ExceptionCheck(env)) {
     (*env)->ExceptionDescribe(env);

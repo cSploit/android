@@ -32,7 +32,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = dSploitd
+PROJECT_NAME           = cSploitd
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -51,14 +51,14 @@ PROJECT_BRIEF          =
 # and the maximum width should not exceed 200 pixels. Doxygen will copy the logo
 # to the output directory.
 
-PROJECT_LOGO           = /media/data/documents/programs/dsploit/dSploit/ic_launcher-web.png
+PROJECT_LOGO           = /media/data/documents/programs/csploit/cSploit/ic_launcher-web.png
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
 # into which the generated documentation will be written. If a relative path is
 # entered, it will be relative to the location where doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = /media/data/documents/programs/dsploit/dSploit/jni/dSploitd/doc
+OUTPUT_DIRECTORY       = /media/data/documents/programs/csploit/cSploit/jni/cSploitd/doc
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 4096 sub-
 # directories (in 2 levels) under the output directory of each output format and
@@ -743,7 +743,7 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = /media/data/documents/programs/dsploit/dSploit/jni/dSploitd
+INPUT                  = /media/data/documents/programs/csploit/cSploit/jni/cSploitd
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 #include "logger.h"
-#include "dSploitd.h"
+#include "cSploitd.h"
 
 /**
  * @brief SIGINT, SIGTERM handler

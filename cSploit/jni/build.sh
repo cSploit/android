@@ -154,7 +154,7 @@ build_core() {
   mv /tmp/core.zip ../assets/ >&3 2>&1 || die
   echo -ne "ok\ncopying native libraries to java project..."
   { test -d "${src}/main/jniLibs/armeabi/" || mkdir -p "${src}/main/jniLibs/armeabi/" ;} >&3 2>&1 || die
-  cp "${bins}/libdSploitClient.so" "${bins}/libdSploitCommon.so" "${src}/main/jniLibs/armeabi/" >&3 2>&1 || die
+  cp "${bins}/libcSploitClient.so" "${bins}/libcSploitCommon.so" "${src}/main/jniLibs/armeabi/" >&3 2>&1 || die
   echo "ok"
 }
 

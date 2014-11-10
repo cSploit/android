@@ -11,13 +11,13 @@ define NEW_HANDLER
 include $$(CLEAR_VARS)
 
 LOCAL_CFLAGS:= -Wall -Werror
-#LOCAL_SHARED_LIBRARIES:= dSploitCommon
+#LOCAL_SHARED_LIBRARIES:= cSploitCommon
 
 LOCAL_ALLOW_UNDEFINED_SYMBOLS:= true
 
 LOCAL_C_INCLUDES:= \
-  dSploitCommon/ \
-  dSploitd/
+  cSploitCommon/ \
+  cSploitd/
 
 LOCAL_SRC_FILES:= $1.c
 

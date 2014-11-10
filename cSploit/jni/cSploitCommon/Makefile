@@ -14,16 +14,16 @@ CFLAGS := -g -O0 -Werror -Wall -I. -fPIC
 SRCS:=$(wildcard *.c )
 OBJS := $(SRCS:.c=.o)
 
-all: libdSploitCommon.so libdSploitCommon_static.a
+all: libcSploitCommon.so libcSploitCommon_static.a
 
-libdSploitCommon.so: $(OBJS)
+libcSploitCommon.so: $(OBJS)
 	$(LD) $(LDFLAGS) -shared -o $@ $^ $(LIBS)
 	
-libdSploitCommon_static.a: $(OBJS)
+libcSploitCommon_static.a: $(OBJS)
 	$(AR) -r $@ $^
 	
 .c.o:
 	$(CC) $(CFLAGS) -c -o $@ $<
 	
 clean:
-	rm -f dSploitd $(OBJS)
+	rm -f cSploitd $(OBJS)

@@ -9,7 +9,7 @@
 
 #include "message.h"
 
-#define LOG_TAG "dSploitClient"
+#define LOG_TAG "cSploitClient"
 
 #define LOGS(...) __android_log_print(ANDROID_LOG_SILENT , LOG_TAG, __VA_ARGS__)
 #define LOGF(...) __android_log_print(ANDROID_LOG_FATAL  , LOG_TAG, __VA_ARGS__)

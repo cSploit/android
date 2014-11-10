@@ -21,7 +21,7 @@
 struct handlers_list handlers;
 
 /**
- * @brief load handlers from dSploitd
+ * @brief load handlers from cSploitd
  * @returns true on success, false on error.
  * 
  * call it once a time for connection,

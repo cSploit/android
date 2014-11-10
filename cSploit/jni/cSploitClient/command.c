@@ -457,7 +457,7 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
   list_add(&(children.list), (node *) c);
   pthread_mutex_unlock(&(children.control.mutex));
   
-  // send message to dSploitd
+  // send message to cSploitd
   
   pthread_mutex_lock(&write_lock);
   // OPTIMIZATION: use escapes to store return value for later check

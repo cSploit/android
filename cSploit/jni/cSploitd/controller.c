@@ -11,7 +11,7 @@
 #include "command.h"
 #include "handler.h"
 #include "logger.h"
-#include "dSploitd.h"
+#include "cSploitd.h"
 
 #include "control_messages.h"
 

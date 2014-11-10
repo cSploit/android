@@ -16,7 +16,7 @@
 #include <string.h>
 #include <pthread.h>
 
-#include "dSploitd.h"
+#include "cSploitd.h"
 #include "message.h"
 #include "connection.h"
 #include "cleanup.h"

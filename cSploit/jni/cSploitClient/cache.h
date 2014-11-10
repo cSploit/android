@@ -52,13 +52,13 @@ struct java_cache {
   struct java_net_cache net;
 };
 
-struct dsploit_cache {
+struct csploit_cache {
   struct events_cache events;
   struct core_cache   core;
 };
 
 extern struct cache {
-  struct dsploit_cache dsploit;
+  struct csploit_cache csploit;
   struct java_cache java;
 } cache;
 
