@@ -1,18 +1,18 @@
-dSploit - An Android network penetration suite.
+cSploit - An Android network penetration suite.
 ==============================
 
 Copyleft Margaritelli of Simone aka evilsocket and then fused with zANTI2 continued by tux-mind.
 
 - <http://www.csploit.org/>
 
-[![Click here to lend your support to: dSploit and make a donation at www.paypal.com](https://www.paypalobjects.com/en_GB/i/btn/btn_donate_LG.gif?skin_name=chrome)](https://www.paypal.com/uk/cgi-bin/webscr?cmd=_flow&SESSION=EwygVeYrR5hGy6I_JvufErbWg_YacpUSv3qdc-HvjHyNXaW0d7lVbhN7H6a&dispatch=5885d80a13c0db1f8e263663d3faee8d66f31424b43e9a70645c907a6cbd8fb4)
+[![Click here to lend your support to: cSploit and make a donation at www.paypal.com](https://www.paypalobjects.com/en_GB/i/btn/btn_donate_LG.gif?skin_name=chrome)](https://www.paypal.com/uk/cgi-bin/webscr?cmd=_flow&SESSION=BBgUDlBOyEpm2SBPeuhVH1hHoyi9MORuTT2tAq-WBPfZFlhoXxa1AymS0je&dispatch=5885d80a13c0db1f8e263663d3faee8d66f31424b43e9a70645c907a6cbd8fb4)
 
 -------------
 
-dSploit is an Android network analysis and penetration suite which aims to offer to IT security experts/geeks
+cSploit is an Android network analysis and penetration suite which aims to offer to IT security experts/geeks
 **the most complete and advanced professional toolkit** to perform network security assesments on a mobile device.
 
-Once dSploit is started, you will be able to easily map your network, fingerprint alive hosts operating systems
+Once cSploit is started, you will be able to easily map your network, fingerprint alive hosts operating systems
 and running services, search for **known vulnerabilities**, crack logon procedures of many tcp protocols, perform
 man in the middle attacks such as **password sniffing** ( with common protocols dissection ), real time **traffic
 manipulation**, etc, etc .
