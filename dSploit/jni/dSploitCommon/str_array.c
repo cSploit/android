@@ -48,12 +48,6 @@ int string_array_add(message *m, size_t array_offset, char *string) {
       ;prev=array_end++);
   
   needed_bytes = (strlen(string) + 1) - (end - array_end);
-
-#ifndef NDEBUG
-  dump_message(m);
-  print( DEBUG, "string=\"%s\", needed_bytes=%d, end=%u, array_start=%d, array_end=%d",
-         string, needed_bytes, m->head.size, (array_start-m->data), (array_end-m->data));
-#endif
   
   if(needed_bytes > 0) {
     needed_bytes += m->head.size;
