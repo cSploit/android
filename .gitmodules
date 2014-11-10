@@ -1,125 +1,125 @@
-[submodule "dSploit/jni/libnet"]
-	path = dSploit/jni/libnet
+[submodule "cSploit/jni/libnet"]
+	path = cSploit/jni/libnet
 	url = https://github.com/tux-mind/libnet.git
-[submodule "dSploit/jni/libexpat"]
-	path = dSploit/jni/libexpat
+[submodule "cSploit/jni/libexpat"]
+	path = cSploit/jni/libexpat
 	url = https://github.com/tux-mind/libexpat.git
-[submodule "dSploit/jni/libbthread"]
-	path = dSploit/jni/libbthread
+[submodule "cSploit/jni/libbthread"]
+	path = cSploit/jni/libbthread
 	url = https://github.com/tux-mind/libbthread.git
-[submodule "dSploit/jni/ncurses"]
-	path = dSploit/jni/ncurses
+[submodule "cSploit/jni/ncurses"]
+	path = cSploit/jni/ncurses
 	url = https://github.com/tux-mind/platform_external_ncurses.git
-[submodule "dSploit/jni/icu4c"]
-	path = dSploit/jni/icu4c
+[submodule "cSploit/jni/icu4c"]
+	path = cSploit/jni/icu4c
 	url = https://github.com/tux-mind/platform_external_icu4c.git
-[submodule "dSploit/jni/openssl"]
-	path = dSploit/jni/openssl
+[submodule "cSploit/jni/openssl"]
+	path = cSploit/jni/openssl
 	url = https://github.com/android/platform_external_openssl.git
 	branch = gingerbread-release
-[submodule "dSploit/jni/libyaml"]
-	path = dSploit/jni/libyaml
+[submodule "cSploit/jni/libyaml"]
+	path = cSploit/jni/libyaml
 	url = https://github.com/tux-mind/libyaml.git
-[submodule "dSploit/jni/zlib"]
-	path = dSploit/jni/zlib
+[submodule "cSploit/jni/zlib"]
+	path = cSploit/jni/zlib
 	url = https://github.com/tux-mind/platform_external_zlib.git
-[submodule "dSploit/jni/libpcap"]
-	path = dSploit/jni/libpcap
+[submodule "cSploit/jni/libpcap"]
+	path = cSploit/jni/libpcap
 	url = https://github.com/android/platform_external_libpcap.git
 	branch = origin/gingerbread-release
-[submodule "dSploit/jni/libxml2"]
-	path = dSploit/jni/libxml2
+[submodule "cSploit/jni/libxml2"]
+	path = cSploit/jni/libxml2
 	url = https://github.com/tux-mind/platform_external_libxml2.git
-[submodule "dSploit/jni/libxslt"]
-	path = dSploit/jni/libxslt
+[submodule "cSploit/jni/libxslt"]
+	path = cSploit/jni/libxslt
 	url = https://github.com/tux-mind/platform_external_libxslt.git
-[submodule "dSploit/jni/libreadline"]
-	path = dSploit/jni/libreadline
+[submodule "cSploit/jni/libreadline"]
+	path = cSploit/jni/libreadline
 	url = https://github.com/tux-mind/platform_external_libreadline.git
-[submodule "dSploit/jni/libtommath"]
-	path = dSploit/jni/libtommath
+[submodule "cSploit/jni/libtommath"]
+	path = cSploit/jni/libtommath
 	url = https://github.com/tux-mind/libtommath.git
-[submodule "dSploit/jni/libedit"]
-	path = dSploit/jni/libedit
+[submodule "cSploit/jni/libedit"]
+	path = cSploit/jni/libedit
 	url = https://github.com/tux-mind/platform_external_libedit.git
-[submodule "dSploit/jni/firebird"]
-	path = dSploit/jni/firebird
+[submodule "cSploit/jni/firebird"]
+	path = cSploit/jni/firebird
 	url = https://github.com/tux-mind/platform_external_firebird.git
-[submodule "dSploit/jni/libmysqlclient"]
-	path = dSploit/jni/libmysqlclient
+[submodule "cSploit/jni/libmysqlclient"]
+	path = cSploit/jni/libmysqlclient
 	url = https://github.com/tux-mind/platform_external_libmysqlclient.git
-[submodule "dSploit/jni/apr"]
-	path = dSploit/jni/apr
+[submodule "cSploit/jni/apr"]
+	path = cSploit/jni/apr
 	url = https://github.com/tux-mind/platform_external_apr.git
-[submodule "dSploit/jni/freetds"]
-	path = dSploit/jni/freetds
+[submodule "cSploit/jni/freetds"]
+	path = cSploit/jni/freetds
 	url = https://github.com/tux-mind/platform_external_freetds.git
-[submodule "dSploit/jni/unixODBC"]
-	path = dSploit/jni/unixODBC
+[submodule "cSploit/jni/unixODBC"]
+	path = cSploit/jni/unixODBC
 	url = https://github.com/tux-mind/platform_external_unixODBC.git
-[submodule "dSploit/jni/openldap"]
-	path = dSploit/jni/openldap
+[submodule "cSploit/jni/openldap"]
+	path = cSploit/jni/openldap
 	url = https://github.com/tux-mind/platform_external_openldap.git
-[submodule "dSploit/jni/postgresql"]
-	path = dSploit/jni/postgresql
+[submodule "cSploit/jni/postgresql"]
+	path = cSploit/jni/postgresql
 	url = https://github.com/tux-mind/platform_external_postgresql.git
-[submodule "dSploit/jni/libiconv"]
-	path = dSploit/jni/libiconv
+[submodule "cSploit/jni/libiconv"]
+	path = cSploit/jni/libiconv
 	url = https://github.com/tux-mind/platform_external_libiconv.git
-[submodule "dSploit/jni/bdb"]
-	path = dSploit/jni/bdb
+[submodule "cSploit/jni/bdb"]
+	path = cSploit/jni/bdb
 	url = https://github.com/tux-mind/platform_external_bdb.git
-[submodule "dSploit/jni/sqlite"]
-	path = dSploit/jni/sqlite
+[submodule "cSploit/jni/sqlite"]
+	path = cSploit/jni/sqlite
 	url = https://github.com/android/platform_external_sqlite.git
-[submodule "dSploit/jni/apr-util"]
-	path = dSploit/jni/apr-util
+[submodule "cSploit/jni/apr-util"]
+	path = cSploit/jni/apr-util
 	url = https://github.com/tux-mind/platform_external_apr-util.git
-[submodule "dSploit/jni/libneon"]
-	path = dSploit/jni/libneon
+[submodule "cSploit/jni/libneon"]
+	path = cSploit/jni/libneon
 	url = https://github.com/tux-mind/platform_external_libneon.git
-[submodule "dSploit/jni/subversion"]
-	path = dSploit/jni/subversion
+[submodule "cSploit/jni/subversion"]
+	path = cSploit/jni/subversion
 	url = https://github.com/tux-mind/platform_external_subversion.git
-[submodule "dSploit/jni/libpcre"]
-	path = dSploit/jni/libpcre
+[submodule "cSploit/jni/libpcre"]
+	path = cSploit/jni/libpcre
 	url = https://github.com/tux-mind/platform_external_libpcre.git
-[submodule "dSploit/jni/libidn"]
-	path = dSploit/jni/libidn
+[submodule "cSploit/jni/libidn"]
+	path = cSploit/jni/libidn
 	url = https://github.com/tux-mind/platform_external_libidn.git
-[submodule "dSploit/jni/libncp"]
-	path = dSploit/jni/libncp
+[submodule "cSploit/jni/libncp"]
+	path = cSploit/jni/libncp
 	url = https://github.com/tux-mind/platform_external_libncp.git
-[submodule "dSploit/jni/tcpdump"]
-	path = dSploit/jni/tcpdump
+[submodule "cSploit/jni/tcpdump"]
+	path = cSploit/jni/tcpdump
 	url = https://github.com/android/platform_external_tcpdump.git
-[submodule "dSploit/jni/libssh"]
-	path = dSploit/jni/libssh
+[submodule "cSploit/jni/libssh"]
+	path = cSploit/jni/libssh
 	url = https://github.com/tux-mind/platform_external_libssh.git
-[submodule "dSploit/jni/arpspoof"]
-	path = dSploit/jni/arpspoof
+[submodule "cSploit/jni/arpspoof"]
+	path = cSploit/jni/arpspoof
 	url = https://github.com/evilsocket/dsploit-arpspoof.git
-[submodule "dSploit/jni/thomson"]
-	path = dSploit/jni/thomson
+[submodule "cSploit/jni/thomson"]
+	path = cSploit/jni/thomson
 	url = https://github.com/evilsocket/dsploit-thomson.git
-[submodule "dSploit/jni/ettercap-ng"]
-	path = dSploit/jni/ettercap-ng
+[submodule "cSploit/jni/ettercap-ng"]
+	path = cSploit/jni/ettercap-ng
 	url = https://github.com/tux-mind/platform_external_ettercap.git
-[submodule "dSploit/jni/nmap"]
-	path = dSploit/jni/nmap
+[submodule "cSploit/jni/nmap"]
+	path = cSploit/jni/nmap
 	url = https://github.com/tux-mind/platform_external_nmap.git
-[submodule "dSploit/jni/libifaddrs"]
-	path = dSploit/jni/libifaddrs
+[submodule "cSploit/jni/libifaddrs"]
+	path = cSploit/jni/libifaddrs
 	url = https://github.com/tux-mind/platform_external_libifaddrs.git
-[submodule "dSploit/jni/libcurl"]
-	path = dSploit/jni/libcurl
+[submodule "cSploit/jni/libcurl"]
+	path = cSploit/jni/libcurl
 	url = https://github.com/tux-mind/platform_external_libcurl.git
-[submodule "dSploit/jni/hydra"]
-	path = dSploit/jni/hydra
+[submodule "cSploit/jni/hydra"]
+	path = cSploit/jni/hydra
 	url = https://github.com/vanhauser-thc/thc-hydra.git
-[submodule "dSploit/jni/ruby"]
-	path = dSploit/jni/ruby
+[submodule "cSploit/jni/ruby"]
+	path = cSploit/jni/ruby
 	url = https://github.com/tux-mind/ruby.git
-[submodule "dSploit/jni/fusemounts"]
-	path = dSploit/jni/fusemounts
+[submodule "cSploit/jni/fusemounts"]
+	path = cSploit/jni/fusemounts
 	url = https://github.com/tux-mind/fusemounts.git
