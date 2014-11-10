@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">dSploit</string>
+    <string name="app_name">cSploit</string>
     <string name="menu_settings">Configurações</string>
-    <string name="title_activity_main">dSploit</string>
+    <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Oooops! houve um erro , mas um relatório será enviado para o meu desenvolvedor para ajudar a corrigir o problema :)</string>
     <string name="toggle_button">Botão de Alternância</string>
     <string name="enter_redirection_details">Digite os detalhes de redirecionamento abaixo::</string>
@@ -20,7 +20,7 @@
     <string name="request">Pedir</string>
     <string name="wait_for_response">Esperar por uma resposta</string>
     <string name="protocol">Protocolo</string>
-    <string name="dsploit_catchphrase">dSploit - Uma suíte android de penetração de rede.</string>
+    <string name="dsploit_catchphrase">cSploit - Uma suíte android de penetração de rede.</string>
     <string name="dsploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
     <string name="dsploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">Disclaimer</string>
