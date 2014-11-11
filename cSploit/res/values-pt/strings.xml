@@ -20,11 +20,11 @@
     <string name="request">Pedir</string>
     <string name="wait_for_response">Esperar por uma resposta</string>
     <string name="protocol">Protocolo</string>
-    <string name="dsploit_catchphrase">cSploit - Uma suíte android de penetração de rede.</string>
-    <string name="dsploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
-    <string name="dsploit_url">http://www.csploit.org/</string>
+    <string name="csploit_catchphrase">cSploit - Uma suíte android de penetração de rede.</string>
+    <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
+    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">Disclaimer</string>
-    <string name="dsploit_disclaimer">
+    <string name="csploit_disclaimer">
         <![CDATA[ Esta aplicação não é para ser usada para quaisquer fins que não para demonstrar suas funções, e só deve ser utilizado em redes para as quais você tem permissão para fazer isso. Qualquer outro uso não é de responsabilidade do desenvolvedor.Em outras palavras, Não seja estúpido, e não direcionar as pessoas com raiva para mim.]]></string>
     <string name="license">Licença</string>
     <string name="gpl_license">Este programa é software livre: você pode redistribuí-lo e / ou modificá-lo sob os termos da GNU General Public License como publicado pela Free Software Foundation, tanto a versão 3 da Licença, ou (a seu critério) qualquer versão posterior.Este programa é distribuído na esperança que será útil, mas SEM NENHUMA GARANTIA;sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou ADEQUAÇÃO A UM DETERMINADO FIM.Veja a GNU General Public License para mais detalhes.Você deve ter recebido uma cópia da GNU General Public License juntamente com este programa.Se não, veja http://www.gnu.org/licenses/.</string>
@@ -82,14 +82,14 @@
     <string name="warning">Aviso</string>
     <string name="warning_new_session">Iniciando uma nova sessão irá apagar a atual, continuar?</string>
     <string name="fatal_error_html">
-        <![CDATA[<p>Parece que sua ROM tem o <b>LD_LIBRARY_PATH bug</b>, desculpe mas não é compatível com dSploit.</p>]]></string>
+        <![CDATA[<p>Parece que sua ROM tem o <b>LD_LIBRARY_PATH bug</b>, desculpe mas não é compatível com cSploit.</p>]]></string>
     <string name="fatal_error_html2">
-        <![CDATA[<p>Para mais informações, leia o <a href=\"http://dsploit.net/#faq\">FAQ</a>.</p>]]></string>
+        <![CDATA[<p>Para mais informações, leia o <a href=\"http://csploit.net/#faq\">FAQ</a>.</p>]]></string>
     <string name="install_error">Erro durante a instalação de arquivos!</string>
     <string name="arm_error">
-        <![CDATA[<p>Parece que o processador do dispositivo não é um ARM,desculpe,mas não é compatível com dSploit.</p>]]></string>
+        <![CDATA[<p>Parece que o processador do dispositivo não é um ARM,desculpe,mas não é compatível com cSploit.</p>]]></string>
     <string name="arm_error2">
-        <![CDATA[<p>Para mais informações, leia o <a href=\"http://dsploit.net/#requirements\">requirements</a> section.</p>]]></string>
+        <![CDATA[<p>Para mais informações, leia o <a href=\"http://csploit.net/#requirements\">requirements</a> section.</p>]]></string>
     <string name="busybox_required">Necessária a instalação completa do BusyBox, binário killall não encontrado (talvez você tenha uma versão antiga busybox).
     </string>
     <string name="only_4_root">Este aplicativo pode ser executado apenas em dispositivos com Root.</string>
@@ -138,7 +138,7 @@
     <string name="port_must_be_greater">Porta tem de ser maior que 0 e menor do que 65535.</string>
     <string name="invalid_ports">Portas especificadas inválidas.</string>
     <string name="empty_port_list">Lista de porta vazia.</string>
-    <string name="about_dsploit_v_">Sobre dSploit v</string>
+    <string name="about_csploit_v_">Sobre cSploit v</string>
     <string name="select_target">Selecione um alvo abaixo, clicando em uma linha ou longo clique nele para escrever um nome.
     </string>
     <string name="generating_keys">gerando chaves&#8230;</string>

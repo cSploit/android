@@ -101,7 +101,7 @@ build_core() {
   bins=$(readlink -f ../libs/armeabi/)
   jni_root=$(readlink -f ./)
   src=$(readlink -f ../src)
-  out="/tmp/dSploitCore"
+  out="/tmp/cSploitCore"
   
   rm -rf "${out}" >&3 2>&1 || die
   mkdir -p "${out}" >&3 2>&1 || die
@@ -109,7 +109,7 @@ build_core() {
   echo -n "building native executables..."
   ndk-build APP_OPTIM=debug NDK_DEBUG=1 -j$(grep -E "^processor" /proc/cpuinfo | wc -l) >&3 2>&1 || die
   echo -ne "ok\ncopying programs..."
-  cp "${bins}/dSploitd" "${out}/"
+  cp "${bins}/cSploitd" "${out}/"
   for tool in arpspoof tcpdump ettercap hydra nmap fusemounts; do
     mkdir -p "${out}/tools/$tool" >&3 2>&1
     cp "${bins}/$tool" "${out}/tools/$tool/$tool" >&3 2>&1 || die
@@ -253,7 +253,7 @@ core) build_core
   ;;
 *)
   scriptname=$(basename "$0")
-  echo -e "Usage: $scriptname <task>\n\ntask must be one of:\n  - ruby : build the ruby archive\n  - tools: build native tools used by dSploit (default)" >&2
+  echo -e "Usage: $scriptname <task>\n\ntask must be one of:\n  - ruby : build the ruby archive\n  - tools: build native tools used by cSploit (default)" >&2
   ;;
 esac
 

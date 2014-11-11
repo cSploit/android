@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">dSploit</string>
+    <string name="app_name">cSploit</string>
     <string name="menu_settings">Настройки</string>
-    <string name="title_activity_main">dSploit</string>
+    <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Ой! Я вынужден завершить работу, но отправка отчета об ошибке моему разработчику поможет исправить проблему :)
     </string>
     <string name="toggle_button">Выключатель</string>
@@ -22,11 +22,11 @@
     <string name="request">Запрос</string>
     <string name="wait_for_response">Ожидание ответа</string>
     <string name="protocol">Протокол</string>
-    <string name="dsploit_catchphrase">dSploit - набор инструментов для проникновения в сеть под Android.</string>
-    <string name="dsploit_copyleft">Копилефт Simone Margaritelli aka evilsocket.</string>
-    <string name="dsploit_url">http://www.dsploit.net/</string>
+    <string name="csploit_catchphrase">cSploit - набор инструментов для проникновения в сеть под Android.</string>
+    <string name="csploit_copyleft">Копилефт Simone Margaritelli aka evilsocket.</string>
+    <string name="csploit_url">http://www.csploit.net/</string>
     <string name="disclaimer">Предупреждение</string>
-    <string name="dsploit_disclaimer">
+    <string name="csploit_disclaimer">
         <![CDATA[Данное приложение предназначено только для демонстрации его функционала и может использоваться только в сетях, где вы имеете право выполнять данный функционал. За любое другое использование, разработчик приложения ответственности не несет. Другими словами, не будьте дураками и не направляйте ко мне злых людей.]]></string>
     <string name="license">Лицензия</string>
     <string name="gpl_license">Данная программа является свободным программным обеспечением. Вы вправе распространять ее и/или модифицировать в соответствии с GNU General Public License версии 3 либо по вашему выбору с условиями более поздней версии Стандартной Общественной Лицензии GNU, опубликованной Free Software Foundation. Мы распространяем данную программу в надежде на то, что она будет вам полезной, однако НЕ ПРЕДОСТАВЛЯЕМ НА НЕЕ НИКАКИХ ГАРАНТИЙ, в том числе ГАРАНТИИ ТОВАРНОГО СОСТОЯНИЯ ПРИ ПРОДАЖЕ и ПРИГОДНОСТИ ДЛЯ ИСПОЛЬЗОВАНИЯ В КОНКРЕТНЫХ ЦЕЛЯХ. Для получения более подробной информации ознакомьтесь со Стандартной Общественной Лицензией GNU.
@@ -71,11 +71,11 @@
     <string name="start_msfrpcd">Запустить MetaSploit RPCD</string>
     <string name="stop_msfrpcd">Остановить MetaSploit RPCD</string>
     <string name="exit">Выход</string>
-    <string name="close_confirm">Приложение dSploit будет закрыто, вы уверены, что хотите продолжить?
+    <string name="close_confirm">Приложение cSploit будет закрыто, вы уверены, что хотите продолжить?
     </string>
     <string name="press_back">Нажмите назад ещё раз, чтобы закрыть приложение.</string>
     <string name="selected_">Выбрано&#160;</string>
-    <string name="github_issues">https://github.com/evilsocket/dsploit/issues/new</string>
+    <string name="github_issues">https://github.com/evilsocket/csploit/issues/new</string>
     <string name="no_session_found">Не найдено файлов сессии на карте памяти.</string>
     <string name="select_session_file">Выберите файл сессии с карты памяти:</string>
     <string name="select_session">Выбор сессии</string>
@@ -87,14 +87,14 @@
     <string name="warning">Предупреждение</string>
     <string name="warning_new_session">Начало новой сессии удалить текущую, продолжить?</string>
     <string name="fatal_error_html">
-        <![CDATA[<p>Похоже, ваша прошивка имеет ошибку <b>LD_LIBRARY_PATH</b>, извините, но dSploit не совместим с вашей прошивкой.</p>]]></string>
+        <![CDATA[<p>Похоже, ваша прошивка имеет ошибку <b>LD_LIBRARY_PATH</b>, извините, но cSploit не совместим с вашей прошивкой.</p>]]></string>
     <string name="fatal_error_html2">
-        <![CDATA[<p>Для дополнительной информации посетите страницу <a href=\"http://dsploit.net/#faq\">вопросов и ответов</a>.</p>]]></string>
+        <![CDATA[<p>Для дополнительной информации посетите страницу <a href=\"http://csploit.net/#faq\">вопросов и ответов</a>.</p>]]></string>
     <string name="install_error">Ошибка во время установки файлов!</string>
     <string name="arm_error">
-        <![CDATA[<p>Похоже, архитектура вашего процессора не ARM, извините, но dSploit не совместим с вашим устройством.</p>]]></string>
+        <![CDATA[<p>Похоже, архитектура вашего процессора не ARM, извините, но cSploit не совместим с вашим устройством.</p>]]></string>
     <string name="arm_error2">
-        <![CDATA[<p>Для дополнительной информации посетите страницу <a href=\"http://dsploit.net/#faq\">вопросов и ответов</a>.</p>]]></string>
+        <![CDATA[<p>Для дополнительной информации посетите страницу <a href=\"http://csploit.net/#faq\">вопросов и ответов</a>.</p>]]></string>
     <string name="busybox_required">Требуется полный пакет BusyBox, исполняемый файл killall не найден (возможно, вы используете старую версию BusyBox).
     </string>
     <string name="only_4_root">Данное приложение может быть запущено только с наличием root-прав.</string>
@@ -142,7 +142,7 @@
     <string name="port_must_be_greater">Номер порта должен быть больше 0 и меньше 65535.</string>
     <string name="invalid_ports">Указан неверный номер порта.</string>
     <string name="empty_port_list">Список портов пуст.</string>
-    <string name="about_dsploit_v_">О приложении dSploit v</string>
+    <string name="about_csploit_v_">О приложении cSploit v</string>
     <string name="select_target">Выберите цель ниже. Нажмите и удерживайте, если вы хотите изменить псеводним цели или для выполнения множественной атаки.
     </string>
     <string name="generating_keys">Генерация ключей&#8230;</string>

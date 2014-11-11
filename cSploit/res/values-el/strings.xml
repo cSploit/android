@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">dSploit</string>
+    <string name="app_name">cSploit</string>
     <string name="menu_settings">Ρυθμίσεις</string>
-    <string name="title_activity_main">dSploit</string>
+    <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Όπα, πρόβλημα, θα σταλεί email στον προγραματιστή για να
         βοηθήσει στη διόρθωση των προβλημάτων.
     </string>
@@ -24,12 +24,12 @@
     <string name="request">Αίτηση</string>
     <string name="wait_for_response">Αναμονή για απάντηση</string>
     <string name="protocol">Πρωτόκολλο</string>
-    <string name="dsploit_catchphrase">dSploit - Μία σουίτα δικτυακής διείσδυσης για Android.
+    <string name="csploit_catchphrase">cSploit - Μία σουίτα δικτυακής διείσδυσης για Android.
     </string>
-    <string name="dsploit_copyleft">Copyleft του Simone Margaritelli άλλος evilsocket.</string>
-    <string name="dsploit_url">http://www.dsploit.net/</string>
+    <string name="csploit_copyleft">Copyleft του Simone Margaritelli άλλος evilsocket.</string>
+    <string name="csploit_url">http://www.csploit.net/</string>
     <string name="disclaimer">Αποποίηση ευθύνης</string>
-    <string name="dsploit_disclaimer">
+    <string name="csploit_disclaimer">
         <![CDATA[Η εφαρμογή αυτή δεν πρέπει να χρησιμοποιηθεί για σκοπούς άλλους από το να αποδείξει τις λειτουργίες της, και πρέπει να χρησιμοποιείται μόνο σε δίκτυα για τα οποία έχετε το δικαίωμα. Οποιαδήποτε άλλη χρήση δεν είναι η ευθύνη των developer. Με άλλα λόγια, μην είστε ηλίθιοι, και μην κατευθύνετε θυμωμένους ανθρώπους απέναντί μου.]]></string>
     <string name="license">Άδεια</string>
     <string name="gpl_license">This program is free software: you can redistribute it and/or modify
@@ -76,10 +76,10 @@
     <string name="start_monitor">Ξεκίνησε η παρακολούθηση του δικτύου</string>
     <string name="stop_monitor">Σταμάτησε η παρακολούθηση του δικτύου</string>
     <string name="exit">Έξοδος</string>
-    <string name="close_confirm">Κλείσιμο του dSploit, είσαστε σίγουροι;</string>
+    <string name="close_confirm">Κλείσιμο του cSploit, είσαστε σίγουροι;</string>
     <string name="press_back">Πατήστε ξανά το κουμπί επιστροφής για να κλείσετε το app.</string>
     <string name="selected_">Επιλογή&#160;</string>
-    <string name="github_issues">https://github.com/evilsocket/dsploit/issues/new</string>
+    <string name="github_issues">https://github.com/evilsocket/csploit/issues/new</string>
     <string name="no_session_found">Δεν βρέθηκε αρχείο συνεδρίας στο sd card.</string>
     <string name="select_session_file">Επιλέξτε αρχείο συνεδρίας απο το sd card :</string>
     <string name="select_session">Επιλέξτε συνεδρία</string>
@@ -93,14 +93,14 @@
         προχωρίσει
     </string>
     <string name="fatal_error_html">
-        <![CDATA[<p>Φαίνεται πως το ROM σας έχει το <b>LD_LIBRARY_PATH bug</b>, συγνώμη αλλά δεν είναι συμβατό με το dSploit.</p>]]></string>
+        <![CDATA[<p>Φαίνεται πως το ROM σας έχει το <b>LD_LIBRARY_PATH bug</b>, συγνώμη αλλά δεν είναι συμβατό με το cSploit.</p>]]></string>
     <string name="fatal_error_html2">
-        <![CDATA[<p>Για περισότερες πληροφορίες <a href=\"http://dsploit.net/#faq\">FAQ</a>.</p>]]></string>
+        <![CDATA[<p>Για περισότερες πληροφορίες <a href=\"http://csploit.net/#faq\">FAQ</a>.</p>]]></string>
     <string name="install_error">Σφάλμα κατά την εγκατάσταση των αρχείων!</string>
     <string name="arm_error">
-        <![CDATA[<p>Φαίνετε πως ο επεξεργαστής της συσκευής σας δεν είναι ARM, δεμ είναι συμβατή με το dSploit.</p>]]></string>
+        <![CDATA[<p>Φαίνετε πως ο επεξεργαστής της συσκευής σας δεν είναι ARM, δεμ είναι συμβατή με το cSploit.</p>]]></string>
     <string name="arm_error2">
-        <![CDATA[<p>Για περισότερες πληροφορίες <a href=\"http://dsploit.net/#requirements\">απαιτήσεις</a></p>]]></string>
+        <![CDATA[<p>Για περισότερες πληροφορίες <a href=\"http://csploit.net/#requirements\">απαιτήσεις</a></p>]]></string>
     <string name="busybox_required">Απαιτείται ολοκληρομένη εγκατάσταση του BusyBox, killall binary
         not found (πιθανόν να έχετε παλιό busybox).
     </string>
@@ -152,7 +152,7 @@
     </string>
     <string name="invalid_ports">Δηλώθηκε λάθος θύρα.</string>
     <string name="empty_port_list">Κενή λίστα θύρων.</string>
-    <string name="about_dsploit_v_">Σχετικά με το dSploit v</string>
+    <string name="about_csploit_v_">Σχετικά με το cSploit v</string>
     <string name="select_target">Επιλέξτε στόχο πιο πάκω κάνοντας κλικ σε μία γραμή, συνεχόμενο κλικ
         για να προσθέσετε όνομα.
     </string>

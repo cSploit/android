@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">dSploit</string>
+    <string name="app_name">cSploit</string>
     <string name="menu_settings">Innstillinger</string>
-    <string name="title_activity_main">dSploit</string>
+    <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Ooooops! Jeg krasjet, men en rapport kommer til å bli sendt til min 
          utbygger å bidra til å løse problemet :)
     </string>
@@ -23,11 +23,11 @@
     <string name="request">forespørsel</string>
     <string name="wait_for_response">Vent på respons</string>
     <string name="protocol">Protokoll</string>
-    <string name="dsploit_catchphrase">dSploit - An Android network penetration suite.</string>
-    <string name="dsploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
-    <string name="dsploit_url">http://www.dsploit.net/</string>
+    <string name="csploit_catchphrase">cSploit - An Android network penetration suite.</string>
+    <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
+    <string name="csploit_url">http://www.csploit.net/</string>
     <string name="disclaimer">ansvarsfraskrivelse</string>
-    <string name="dsploit_disclaimer">
+    <string name="csploit_disclaimer">
         <![CDATA[This application is not to be used for any purposes other than to demonstrate its functions, and must only be used on networks for which you have permission to do so. Any other use is not the responsibility of the developer.In other words, don&apos;t be stupid, and don&apos;t direct angry people towards me.]]></string>
     <string name="license">License</string>
     <string name="gpl_license">This program is free software: you can redistribute it and/or modify
@@ -83,7 +83,7 @@
     </string>
     <string name="press_back">trykk igjen for å avslutte.</string>
     <string name="selected_">Valgt&#160;</string>
-    <string name="github_issues">https://github.com/evilsocket/dsploit/issues/new</string>
+    <string name="github_issues">https://github.com/evilsocket/csploit/issues/new</string>
     <string name="no_session_found">Ingen økt funnet på SD kort.</string>
     <string name="select_session_file">Velg en økt fil fra SD kortet :</string>
     <string name="select_session">Velg økt</string>
@@ -97,14 +97,14 @@
          fortsette?
     </string>
     <string name="fatal_error_html">
-        <![CDATA[<p>It seems like your ROM has the <b>LD_LIBRARY_PATH bug</b>, i\'m sorry but it\'s not compatible with dSploit.</p>]]></string>
+        <![CDATA[<p>It seems like your ROM has the <b>LD_LIBRARY_PATH bug</b>, i\'m sorry but it\'s not compatible with cSploit.</p>]]></string>
     <string name="fatal_error_html2">
-        <![CDATA[<p>For more info read the <a href=\"http://dsploit.net/#faq\">FAQ</a>.</p>]]></string>
+        <![CDATA[<p>For more info read the <a href=\"http://csploit.net/#faq\">FAQ</a>.</p>]]></string>
     <string name="install_error">feil under fil installasjon!</string>
     <string name="arm_error">
-        <![CDATA[<p>It seems like your device processor is not an ARM, i\'m sorry but it\'s not compatible with dSploit.</p>]]></string>
+        <![CDATA[<p>It seems like your device processor is not an ARM, i\'m sorry but it\'s not compatible with cSploit.</p>]]></string>
     <string name="arm_error2">
-        <![CDATA[<p>For more info read the <a href=\"http://dsploit.net/#requirements\">requirements</a> section.</p>]]></string>
+        <![CDATA[<p>For more info read the <a href=\"http://csploit.net/#requirements\">requirements</a> section.</p>]]></string>
     <string name="busybox_required">Full busybox installasjon kreves, killall binære ikke 
          funnet (kanskje du har en gammel busybox versjon).
     </string>
@@ -155,7 +155,7 @@
     <string name="port_must_be_greater">Port må være større enn 0 og mindre enn 65535.</string>
     <string name="invalid_ports">Ugyldige porter spesifisert.</string>
     <string name="empty_port_list">Tom Port liste.</string>
-    <string name="about_dsploit_v_">Om dSploit v</string>
+    <string name="about_csploit_v_">Om cSploit v</string>
     <string name="select_target">Velg et mål under ved å klikke på rad, eller lang klikk på den for å 
          angi et alias eller starte en flere angrep.
     </string>

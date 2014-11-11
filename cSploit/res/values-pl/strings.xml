@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">dSploit</string>
+    <string name="app_name">cSploit</string>
     <string name="menu_settings">Ustawienia</string>
-    <string name="title_activity_main">dSploit</string>
+    <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Ooooops! Wywaliłem się, ale zamierzam wysłać raport do mojego twórcy
         żeby pomóc naprawić problem :)
     </string>
@@ -23,11 +23,11 @@
     <string name="request">Żądanie</string>
     <string name="wait_for_response">Czekaj na odpowiedź</string>
     <string name="protocol">Protokół</string>
-    <string name="dsploit_catchphrase">dSploit - Zestaw penetracyjny dla systemu Android.</string>
-    <string name="dsploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
-    <string name="dsploit_url">http://www.dsploit.net/</string>
+    <string name="csploit_catchphrase">cSploit - Zestaw penetracyjny dla systemu Android.</string>
+    <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
+    <string name="csploit_url">http://www.csploit.net/</string>
     <string name="disclaimer">Wyłączenie odpowiedzialności</string>
-    <string name="dsploit_disclaimer">
+    <string name="csploit_disclaimer">
         <![CDATA[Ta aplikacja nie powinna być używana w innym celu niż prezentacja jej funkcji. Może być tylko używana w sieciach, w kótrych masz pozwolenie na takie zabawy. Za żaden inny przypadek użycia, twórca nie ponosi odpowiedzialności. Innymi słowy, nie bądź głupi, nie napuszczać wkurzonych ludzi na mnie.]]></string>
     <string name="license">Licencja</string>
     <string name="gpl_license">This program is free software: you can redistribute it and/or modify
@@ -78,11 +78,11 @@
     <string name="start_msfrpcd">Rozpocznij MetaSploit RPCD</string>
     <string name="stop_msfrpcd">Zatrzymaj MetaSploit RPCD</string>
     <string name="exit">Wyjdź</string>
-    <string name="close_confirm">To zamknie dSploit, jesteś pewien, że chcesz kontynuować?
+    <string name="close_confirm">To zamknie cSploit, jesteś pewien, że chcesz kontynuować?
     </string>
     <string name="press_back">Naciśnij wstecz jeszcze raz by opuścić aplikację.</string>
     <string name="selected_">Wybrano&#160;</string>
-    <string name="github_issues">https://github.com/evilsocket/dsploit/issues/new</string>
+    <string name="github_issues">https://github.com/evilsocket/csploit/issues/new</string>
     <string name="no_session_found">Nie znaleziono pliku sesji na karcie sd.</string>
     <string name="select_session_file">Wybierz plik sesji ze swojej karty sd :</string>
     <string name="select_session">Wybierz sesję</string>
@@ -95,14 +95,14 @@
     <string name="warning_new_session">Rozpoczęcie nowej sesji usunie obecną. Chcesz kontynuować?
     </string>
     <string name="fatal_error_html">
-        <![CDATA[<p>Wygląda na to, że Twój ROM ma błąd <b>LD_LIBRARY_PATH</b>. Przykro mi, ale to znaczy, że nie jest kompatybilny z dSploit.</p>]]></string>
+        <![CDATA[<p>Wygląda na to, że Twój ROM ma błąd <b>LD_LIBRARY_PATH</b>. Przykro mi, ale to znaczy, że nie jest kompatybilny z cSploit.</p>]]></string>
     <string name="fatal_error_html2">
-        <![CDATA[<p>Tu znajdziesz więcej informacji: <a href=\"http://dsploit.net/#faq\">FAQ</a>.</p>]]></string>
+        <![CDATA[<p>Tu znajdziesz więcej informacji: <a href=\"http://csploit.net/#faq\">FAQ</a>.</p>]]></string>
     <string name="install_error">Błąd podczas instalacji plików!</string>
     <string name="arm_error">
-        <![CDATA[<p>Wygląda na to, że Twoje urządzenie ma inny procesor niż ARM. Przykro mi, ale to znaczy, że nie jest kompatybilne z dSploit.</p>]]></string>
+        <![CDATA[<p>Wygląda na to, że Twoje urządzenie ma inny procesor niż ARM. Przykro mi, ale to znaczy, że nie jest kompatybilne z cSploit.</p>]]></string>
     <string name="arm_error2">
-        <![CDATA[<p>Tu znajdziesz więcej informacji: <a href=\"http://dsploit.net/#requirements\">Wymagania</a>.</p>]]></string>
+        <![CDATA[<p>Tu znajdziesz więcej informacji: <a href=\"http://csploit.net/#requirements\">Wymagania</a>.</p>]]></string>
     <string name="busybox_required">Pełna instalacja BusyBox jest wymagana.
                                     Nie mogę znaleźć binarnej wersji killall (może masz starą wersję busyboxa).
     </string>
@@ -151,7 +151,7 @@
     <string name="port_must_be_greater">Port musi być większy od 0 i mniejszy niż 65535.</string>
     <string name="invalid_ports">Wprowadzono błędne porty.</string>
     <string name="empty_port_list">Lista portów jest pusta.</string>
-    <string name="about_dsploit_v_">O dSploit v</string>
+    <string name="about_csploit_v_">O cSploit v</string>
     <string name="select_target">Wskaż cel poniżej klikając na wiersz albo wprowadź alias przytrzymując wiersz dłużej.
     </string>
     <string name="generating_keys">Generowanie kluczy&#8230;</string>
@@ -283,7 +283,7 @@
     <string name="menu_restore_session">Odtwórz sesję</string>
     <string name="menu_stop_monitor">Zatrzymaj Network Monitor</string>
     <string name="menu_submit_issue">Submit Issue</string>
-    <string name="menu_about">O dSploit</string>
+    <string name="menu_about">O cSploit</string>
     <string name="scanner_select_ports">Wybierz własne porty</string>
     <string name="wifi_initializing">Inicjalizuję &#8230;</string>
     <string name="wifi_activating_iface">Aktywuję interfejs WiFi &#8230;</string>

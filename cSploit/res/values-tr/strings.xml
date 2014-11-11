@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">dSploit</string>
+    <string name="app_name">cSploit</string>
     <string name="menu_settings">Ayarlar</string>
-    <string name="title_activity_main">dSploit</string>
+    <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Ooooops! Bir hata oluştu. Üzülmeyin bunu geliştiricime haber ettim :)</string>
     <string name="toggle_button">Geçiş Butonu</string>
     <string name="enter_redirection_details">Yönlendirme bilgilerini girin:</string>
@@ -21,11 +21,11 @@
     <string name="request">İstek</string>
     <string name="wait_for_response">Cevap bekleniyor</string>
     <string name="protocol">Protokol</string>
-    <string name="dsploit_catchphrase">dSploit - An Android network penetration suite.</string>
-    <string name="dsploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
-    <string name="dsploit_url">http://www.dsploit.net/</string>
+    <string name="csploit_catchphrase">cSploit - An Android network penetration suite.</string>
+    <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
+    <string name="csploit_url">http://www.csploit.net/</string>
     <string name="disclaimer">Yasal Uyarı</string>
-    <string name="dsploit_disclaimer">
+    <string name="csploit_disclaimer">
         <![CDATA[Bu uygulama gösteriş amaçlı kullanmak için değildir. Sadece izniniz olan ağlarda bunu kullanabilirsiniz. Aksi durumlarda sorumluluk geliştiricinin değildir. Aptal ve öfkeli insalar lütfen kullanmasın.]]></string>
     <string name="license">Lisans</string>
     <string name="gpl_license">This program is free software: you can redistribute it and/or modify
@@ -77,11 +77,11 @@
     <string name="start_msfrpcd">MetaSploit RPCD Başlat</string>
     <string name="stop_msfrpcd">MetaSploit RPCD Durdur</string>
     <string name="exit">Çıkış</string>
-    <string name="close_confirm">dSploit i kapatmak istediğinize emin misiniz?
+    <string name="close_confirm">cSploit i kapatmak istediğinize emin misiniz?
     </string>
     <string name="press_back">Tekrar geri tuşuna basın ve uygulamayı kapatın.</string>
     <string name="selected_">Seçildi&#160;</string>
-    <string name="github_issues">https://github.com/evilsocket/dsploit/issues/new</string>
+    <string name="github_issues">https://github.com/evilsocket/csploit/issues/new</string>
     <string name="no_session_found">SD Kartınız da oturum dosyası bulunamadı.</string>
     <string name="select_session_file">SD Kartınızdan oturum dosyası seçin :</string>
     <string name="select_session">Oturum Seç</string>
@@ -94,14 +94,14 @@
     <string name="warning_new_session">Yeni oturum başlatıp mevcut oturumu kapatmak mı istiyorsunuz?
     </string>
     <string name="fatal_error_html">
-        <![CDATA[<p>Kullandığınız ROM da <b>LD_LIBRARY_PATH bugı</b> mevcut görünüyor, üzgünüz dSploit bu durumla uyumlu değil.</p>]]></string>
+        <![CDATA[<p>Kullandığınız ROM da <b>LD_LIBRARY_PATH bugı</b> mevcut görünüyor, üzgünüz cSploit bu durumla uyumlu değil.</p>]]></string>
     <string name="fatal_error_html2">
-        <![CDATA[<p>Detaylı bilgi almak için <a href=\"http://dsploit.net/#faq\">SSK</a> sayfasını ziyaret edin.</p>]]></string>
+        <![CDATA[<p>Detaylı bilgi almak için <a href=\"http://csploit.net/#faq\">SSK</a> sayfasını ziyaret edin.</p>]]></string>
     <string name="install_error">Yükleme dosyalarında hata var!</string>
     <string name="arm_error">
-        <![CDATA[<p>İşlemciniz ARM tabanlı görünüyorum, üzgünüz dSploit bu durumla uyumlu değil.</p>]]></string>
+        <![CDATA[<p>İşlemciniz ARM tabanlı görünüyorum, üzgünüz cSploit bu durumla uyumlu değil.</p>]]></string>
     <string name="arm_error2">
-        <![CDATA[<p>Detaylı bilgi almak için <a href=\"http://dsploit.net/#requirements\">Gerekenler</a> sayfasını ziyaret edin.</p>]]></string>
+        <![CDATA[<p>Detaylı bilgi almak için <a href=\"http://csploit.net/#requirements\">Gerekenler</a> sayfasını ziyaret edin.</p>]]></string>
     <string name="busybox_required">Tam BusyBox yüklemesi gerekmektedir, killall binary bulunamadı(belki de eski sürüm BusyBox kullanıyorsunuz).
     </string>
     <string name="only_4_root">Bu uygulama yalnızca root edilmiş cihazlarda çalışmaktadır.</string>
@@ -149,7 +149,7 @@
     <string name="port_must_be_greater">Port numarası 0 ile 65535 arasında olmalıdır</string>
     <string name="invalid_ports">Belirtilen portlar geçersiz.</string>
     <string name="empty_port_list">Boş port listesi.</string>
-    <string name="about_dsploit_v_">dSploit hakkında v</string>
+    <string name="about_csploit_v_">cSploit hakkında v</string>
     <string name="select_target">Bir satıra tıklayarak hedef seçebilirsiniz ya da uzun basıp çoklu seçerek çoklu saldırı yapabilirsiniz.
     </string>
     <string name="generating_keys">Anahtarlar üretiliyor&#8230;</string>

@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">dSploit</string>
+    <string name="app_name">cSploit</string>
     <string name="menu_settings">Impostazioni</string>
-    <string name="title_activity_main">dSploit</string>
+    <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Ooooops! Sono crashato, ma un report verrà inviato al mio
         sviluppatore in modo tale che il problema venga risolto.
     </string>
@@ -25,12 +25,12 @@
     <string name="request">Richiesta</string>
     <string name="wait_for_response">Attendere una risposta</string>
     <string name="protocol">Protocollo</string>
-    <string name="dsploit_catchphrase">dSploit - An Android network penetration suite.</string>
-    <string name="dsploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.
+    <string name="csploit_catchphrase">cSploit - An Android network penetration suite.</string>
+    <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.
     </string>
-    <string name="dsploit_url">http://www.dsploit.net/</string>
+    <string name="csploit_url">http://www.csploit.net/</string>
     <string name="disclaimer">Disclaimer</string>
-    <string name="dsploit_disclaimer">
+    <string name="csploit_disclaimer">
         <![CDATA[Questa applicazione non è concepita per alcuno scopo se non come dimostrazione delle sue funzionalità e deve essere utilizzata solamente su reti
         per le quali si dispone del permesso di farlo.
         Ogni altro utilizzo non potrà quindi essere considerata una responsabilità dello sviluppaotre, in poche parole, non siate stupidi, e soprattutto
@@ -84,11 +84,11 @@
     <string name="start_monitor">Avvia Monitor di Rete</string>
     <string name="stop_monitor">Ferma Monitor di Rete</string>
     <string name="exit">Esci</string>
-    <string name="close_confirm">Questa azione chiuderà dSploit, sei sicuro di voler continuare?
+    <string name="close_confirm">Questa azione chiuderà cSploit, sei sicuro di voler continuare?
     </string>
     <string name="press_back">Premi nuovamente il tasto indietro per chiudere l\'app.</string>
     <string name="selected_">Selezionato&#160;</string>
-    <string name="github_issues">https://github.com/evilsocket/dsploit/issues/new</string>
+    <string name="github_issues">https://github.com/evilsocket/csploit/issues/new</string>
     <string name="no_session_found">Nessun file di sessione trovato sulla sd card.</string>
     <string name="select_session_file">Seleziona un file di sessione dalla sd card :</string>
     <string name="select_session">Seleziona Sessione</string>
@@ -102,14 +102,14 @@
         continuare?
     </string>
     <string name="fatal_error_html">
-        <![CDATA[<p>Sembra che la tua ROM sia affetta dal <b>bug LD_LIBRARY_PATH</b>, mi dispiace ma non è compatibile con dSploit.</p>]]></string>
+        <![CDATA[<p>Sembra che la tua ROM sia affetta dal <b>bug LD_LIBRARY_PATH</b>, mi dispiace ma non è compatibile con cSploit.</p>]]></string>
     <string name="fatal_error_html2">
-        <![CDATA[<p>Per ulteriori informazioni, leggi le <a href=\"http://dsploit.net/#faq\">FAQ</a>.</p>]]></string>
+        <![CDATA[<p>Per ulteriori informazioni, leggi le <a href=\"http://csploit.net/#faq\">FAQ</a>.</p>]]></string>
     <string name="install_error">Errore durante l\'installazione dei file!</string>
     <string name="arm_error">
-        <![CDATA[<p>Sembra che il processore del tuo dispositivo non sia un ARM, mi dispiace ma non è compatibile con dSploit.</p>]]></string>
+        <![CDATA[<p>Sembra che il processore del tuo dispositivo non sia un ARM, mi dispiace ma non è compatibile con cSploit.</p>]]></string>
     <string name="arm_error2">
-        <![CDATA[<p>Per ulteriori informazioni leggi la sezione dei <a href=\"http://dsploit.net/#requirements\">requisiti</a>.</p>]]></string>
+        <![CDATA[<p>Per ulteriori informazioni leggi la sezione dei <a href=\"http://csploit.net/#requirements\">requisiti</a>.</p>]]></string>
     <string name="busybox_required">E\' richiesta un installazione completa di BusyBox,
         l\'eseguibile killall non è stato trovato(potresti avere una vecchia versione di busybox).
     </string>
@@ -161,7 +161,7 @@
     </string>
     <string name="invalid_ports">Porte specificate non valide.</string>
     <string name="empty_port_list">Lista di porte vuota.</string>
-    <string name="about_dsploit_v_">About dSploit v</string>
+    <string name="about_csploit_v_">About cSploit v</string>
     <string name="select_target">Seleziona un obiettivo qui sotto cliccando su una riga, o tieni
         premuto su di essa per inserire un alias o iniziare un attacco multiplo.
     </string>

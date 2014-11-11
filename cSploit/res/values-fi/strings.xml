@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">dSploit</string>
+    <string name="app_name">cSploit</string>
     <string name="menu_settings">Asetukset</string>
-    <string name="title_activity_main">dSploit</string>
+    <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">No hupsista. Kaaduin, mutta raportti lähetetään kehittäjälleni
         jotta hän voi korjata ongelman.
     </string>
@@ -24,11 +24,11 @@
     <string name="request">Pyydä</string>
     <string name="wait_for_response">Odota vastausta</string>
     <string name="protocol">Protokolla</string>
-    <string name="dsploit_catchphrase">dSploit - Verkkotestaus sovellus Androidille.</string>
-    <string name="dsploit_copyleft">Copyleft: Simone Margaritelli, eli evilsocket.</string>
-    <string name="dsploit_url">http://www.dsploit.net/</string>
+    <string name="csploit_catchphrase">cSploit - Verkkotestaus sovellus Androidille.</string>
+    <string name="csploit_copyleft">Copyleft: Simone Margaritelli, eli evilsocket.</string>
+    <string name="csploit_url">http://www.csploit.net/</string>
     <string name="disclaimer">Käyttöehdot</string>
-    <string name="dsploit_disclaimer">
+    <string name="csploit_disclaimer">
         <![CDATA[Tätä sovellusta tulee käyttää vain demonstroimaan sen toimintoja, ja saa käyttää vain verkoissa joissa sinulla on oikeus tehdä niin. Mikään muu käyttötarkoitus ei ole kehittäjän vastuulla. Toisin sanoen, älä ole tyhmä ja lähetä vihaisia ihmisiä minulle]]></string>
     <string name="license">Lisenssi</string>
     <string name="gpl_license">Tämä ohjelma on vapaa sovellus: Voit jakaa ja/tai muokata sitä
@@ -79,11 +79,11 @@
     <string name="start_msfrpcd">Käynnistä MetaSploit RPCD</string>
     <string name="stop_msfrpcd">Lopeta MetaSploit RPCD</string>
     <string name="exit">Poistu</string>
-    <string name="close_confirm">Tämä sulkee dSploitin, Oletko varma että haluat jatkaa?
+    <string name="close_confirm">Tämä sulkee cSploitin, Oletko varma että haluat jatkaa?
     </string>
     <string name="press_back">Paina takaisin-näppäintä vielä kerran poistuaksesi.</string>
     <string name="selected_">Valittu&#160;</string>
-    <string name="github_issues">https://github.com/evilsocket/dsploit/issues/new</string>
+    <string name="github_issues">https://github.com/evilsocket/csploit/issues/new</string>
     <string name="no_session_found">Tilanteita ei löydetty SD-kortilta.</string>
     <string name="select_session_file">Valitse Tilanne-tiedosto SD-kortilta :</string>
     <string name="select_session">Valitse Tilanne</string>
@@ -96,14 +96,14 @@
     <string name="warning_new_session">Uuden session aloittaminen poistaa nykyisen, jatketaanko?
     </string>
     <string name="fatal_error_html">
-        <![CDATA[<p>Vaikuttaa että ROM:issasi on <b>LD_LIBRARY_PATH vika</b>, olen pahoillani, mutta se ei ole yhteensopiva dSploitin kanssa.</p>]]></string>
+        <![CDATA[<p>Vaikuttaa että ROM:issasi on <b>LD_LIBRARY_PATH vika</b>, olen pahoillani, mutta se ei ole yhteensopiva cSploitin kanssa.</p>]]></string>
     <string name="fatal_error_html2">
-        <![CDATA[<p>Jos haluat lisätietoja, lue <a href=\"http://dsploit.net/#faq\">UKK</a>.</p>]]></string>
+        <![CDATA[<p>Jos haluat lisätietoja, lue <a href=\"http://csploit.net/#faq\">UKK</a>.</p>]]></string>
     <string name="install_error">Virhe tiedostojen asentamisessa!</string>
     <string name="arm_error">
-        <![CDATA[<p>Vaikuttaa siltä että prosessorisi ei ole ARM, olen pahoillani, mutta se ei ole yhteensopiva dSploitin kanssa.</p>]]></string>
+        <![CDATA[<p>Vaikuttaa siltä että prosessorisi ei ole ARM, olen pahoillani, mutta se ei ole yhteensopiva cSploitin kanssa.</p>]]></string>
     <string name="arm_error2">
-        <![CDATA[<p>Jos haluat lisätietoja, lue <a href=\"http://dsploit.net/#requirements\">vaatimukset</a> kohta.</p>]]></string>
+        <![CDATA[<p>Jos haluat lisätietoja, lue <a href=\"http://csploit.net/#requirements\">vaatimukset</a> kohta.</p>]]></string>
     <string name="busybox_required">Täysi BusyBox asennus vaaditaan, killall-binääriä ei löydy(ehkä
         sinulla on vanha busybox-versio?).
     </string>
@@ -158,7 +158,7 @@
     </string>
     <string name="invalid_ports">Virheellinen portti syötetty.</string>
     <string name="empty_port_list">Tyhjennä portti lista.</string>
-    <string name="about_dsploit_v_">Tietoja dSploitista</string>
+    <string name="about_csploit_v_">Tietoja cSploitista</string>
     <string name="select_target">Valitse kohde alta ja näpäytä riviä, tai pidä pitkään pohjassa
         antaaksesi aliaksen.
     </string>
@@ -240,7 +240,7 @@
     <string name="rpcd_running">MetaSploit RPCD on jo käynnissä</string>
     <string name="rpcd_timedout">MetaSploit RPCD ei vastaa</string>
     <string name="error_rcpd_fatal">Tappava virhe tapahtui!, Etsin tätä virhettä, joten lähetä se kehittäjilleni.
-        jos en sulkeudu, sulje minut Asetukset->sovellukset->dSploit "Pakota Lopetus",
+        jos en sulkeudu, sulje minut Asetukset->sovellukset->cSploit "Pakota Lopetus",
         ja ILMOITA KEHITTÄJILLENI.
     </string>
 	

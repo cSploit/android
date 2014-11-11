@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">dSploit</string>
+    <string name="app_name">cSploit</string>
     <string name="menu_settings">Einstellungen</string>
-    <string name="title_activity_main">dSploit</string>
+    <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Uppps! Ich bin abgestürzt, aber ein Fehlerbericht wird an meinen Entwickler geschickt um bei der Behebung des Problems zu helfen :)</string>
     <string name="toggle_button">ToggleButton</string>
     <string name="enter_redirection_details">Umleitungseinstellungen bitte unten eingeben:</string>
@@ -20,11 +20,11 @@
     <string name="request">Anfrage</string>
     <string name="wait_for_response">Warte auf eine Antwort</string>
     <string name="protocol">Protokoll</string>
-    <string name="dsploit_catchphrase">dSploit - An Android network penetration suite.</string>
-    <string name="dsploit_copyleft">Copyleft von Simone Margaritelli aka evilsocket.</string>
-    <string name="dsploit_url">http://www.dsploit.net/</string>
+    <string name="csploit_catchphrase">cSploit - An Android network penetration suite.</string>
+    <string name="csploit_copyleft">Copyleft von Simone Margaritelli aka evilsocket.</string>
+    <string name="csploit_url">http://www.csploit.net/</string>
     <string name="disclaimer">Haftungsausschluss</string>
-    <string name="dsploit_disclaimer">
+    <string name="csploit_disclaimer">
         <![CDATA[Die Anwendung ist nicht für andere Zwecke außer der Demonstration ihrer Funktionen einzusetzen und darf ausschließlich in Netzwerken verwendet werden für die eine Genehmigung erteilt wurde. Für jeden anderen Einsatz liegt die Verantwortlichkeit nicht beim Entwickler. In anderen Worten, sei nicht dumm, und leite keine verärgerten Leute an mich weiter.]]></string>
     <string name="license">Lizenz</string>
     <string name="gpl_license">Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, entweder gemäß Version 3 der Lizenz oder (nach Ihrer Option) jeder späteren Version.
@@ -66,10 +66,10 @@
     <string name="start_monitor">Starte Netzwerkmonitor</string>
     <string name="stop_monitor">Stoppe Netzwerkmonitor</string>
     <string name="exit">Beenden</string>
-    <string name="close_confirm">dSploit wird sich beenden. Wirklich fortfahren?</string>
+    <string name="close_confirm">cSploit wird sich beenden. Wirklich fortfahren?</string>
     <string name="press_back">Nochmal auf Zurück drücken um die Anwendung zu beenden.</string>
     <string name="selected_">Ausgewählt&#160;</string>
-    <string name="github_issues">https://github.com/evilsocket/dsploit/issues/new</string>
+    <string name="github_issues">https://github.com/evilsocket/csploit/issues/new</string>
     <string name="no_session_found">Keine Sitzungsdatei auf der SD-Karte gefunden.</string>
     <string name="select_session_file">Wähle eine Sitzungsdatei von der SD-Karte:</string>
     <string name="select_session">Wähle Sitzung</string>
@@ -81,14 +81,14 @@
     <string name="warning">Warnung</string>
     <string name="warning_new_session">Das Starten einer neuen Sitzung wird die aktuelle löschen. Fortfahren?</string>
     <string name="fatal_error_html">
-        <![CDATA[<p>Ihr ROM hat anscheinend den <b>LD_LIBRARY_PATH Bug</b>, es ist leider nicht kompatibel mit dSploit.</p>]]></string>
+        <![CDATA[<p>Ihr ROM hat anscheinend den <b>LD_LIBRARY_PATH Bug</b>, es ist leider nicht kompatibel mit cSploit.</p>]]></string>
     <string name="fatal_error_html2">
-        <![CDATA[<p>Für weitere Informationen die <a href=\"http://dsploit.net/#faq\">FAQ</a> lesen.</p>]]></string>
+        <![CDATA[<p>Für weitere Informationen die <a href=\"http://csploit.net/#faq\">FAQ</a> lesen.</p>]]></string>
     <string name="install_error">Fehler während Dateiinstallation!</string>
     <string name="arm_error">
-        <![CDATA[<p>Der Prozessor Ihres Geräts ist anscheinend kein ARM und leider nicht kompatibel mit dSploit.</p>]]></string>
+        <![CDATA[<p>Der Prozessor Ihres Geräts ist anscheinend kein ARM und leider nicht kompatibel mit cSploit.</p>]]></string>
     <string name="arm_error2">
-        <![CDATA[<p>Für weitere Informationen den Abschnitt <a href=\"http://dsploit.net/#requirements\">Requirements</a> lesen.</p>]]></string>
+        <![CDATA[<p>Für weitere Informationen den Abschnitt <a href=\"http://csploit.net/#requirements\">Requirements</a> lesen.</p>]]></string>
     <string name="busybox_required">Eine vollständige Installation von BusyBox wird benötigt. killall Binary wurde nicht gefunden (vielleicht ist die BusyBox Version veraltet).</string>
     <string name="only_4_root">Die Anwendung kann nur auf gerooteten Geräten ausgeführt werden.</string>
     <string name="initializing">Initialisieren&#8230;</string>
@@ -126,7 +126,7 @@
     <string name="port_must_be_greater">Port muss größer als 0 und kleiner 65535 sein.</string>
     <string name="invalid_ports">Ungültige Ports angegeben.</string>
     <string name="empty_port_list">Leere Portliste.</string>
-    <string name="about_dsploit_v_">Über dSploit v</string>
+    <string name="about_csploit_v_">Über cSploit v</string>
     <string name="select_target">Ein untenstehendes Ziel wählen durch Drücken einer Zeile, oder Alias eingeben durch längeres Drücken.</string>
     <string name="generating_keys">Erzeuge Schlüssel&#8230;</string>
     <string name="no_wifi_available">Keine WLAN-Verbindung verfügbar. Die Anwendung wird nur nach Updates schauen. #STATUS#</string>

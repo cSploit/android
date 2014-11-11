@@ -1,7 +1,7 @@
 <resources>
-<string name="app_name">dSploit</string>
+<string name="app_name">cSploit</string>
 <string name="menu_settings">设置</string>
-<string name="title_activity_main">dSploit</string>
+<string name="title_activity_main">cSploit</string>
 <string name="crash_toast_text">额！崩溃了...不过我将给我的开发者发送报告来帮助解决这个问题。</string>
 <string name="toggle_button">切换按钮</string>
 <string name="enter_redirection_details">在下方键入跳转详情:</string>
@@ -20,11 +20,11 @@
 <string name="request">请求</string>
 <string name="wait_for_response">等待回应</string>
 <string name="protocol">协议</string>
-<string name="dsploit_catchphrase">dSploit - 安卓上的网络渗透套装.</string>
-<string name="dsploit_copyleft">非版权保护 来自 Simone Margaritelli 又名 evilsocket.</string>
-<string name="dsploit_url">http://www.dsploit.net/</string>
+<string name="csploit_catchphrase">cSploit - 安卓上的网络渗透套装.</string>
+<string name="csploit_copyleft">非版权保护 来自 Simone Margaritelli 又名 evilsocket.</string>
+<string name="csploit_url">http://www.csploit.net/</string>
 <string name="disclaimer">免责声明</string>
-<string name="dsploit_disclaimer">
+<string name="csploit_disclaimer">
 <![CDATA[这个程序仅仅用于演示它的功能, 必须运行在您有明确的权利来使用的网络上. 任何的其他用法与开发者无关。换句话说, 别干傻事, 不要把别人的愤怒转移到我身上。]]></string>
 <string name="license">授权</string>
 <string name="gpl_license">This program is free software: you can redistribute it and/or modify
@@ -73,10 +73,10 @@ If not, see http://www.gnu.org/licenses/.
 <string name="start_msfrpcd">启动 MetaSploit RPCD</string>
 <string name="stop_msfrpcd">停止 MetaSploit RPCD</string>
 <string name="exit">退出</string>
-<string name="close_confirm">将关闭 dSploit, 您确定继续么?</string>
+<string name="close_confirm">将关闭 cSploit, 您确定继续么?</string>
 <string name="press_back">再摁一次返回退出.</string>
 <string name="selected_">已选择&#160;</string>
-<string name="github_issues">https://github.com/evilsocket/dsploit/issues/new</string>
+<string name="github_issues">https://github.com/evilsocket/csploit/issues/new</string>
 <string name="no_session_found">没在在SD卡上找到会话文件.</string>
 <string name="select_session_file">请从SD卡中选择会话文件:</string>
 <string name="select_session">选择会话</string>
@@ -88,14 +88,14 @@ If not, see http://www.gnu.org/licenses/.
 <string name="warning">警告</string>
 <string name="warning_new_session">开始一个新的会话将覆盖当前的会话,继续?</string>
 <string name="fatal_error_html">
-<![CDATA[<p>您的固件有 <b>LD_LIBRARY_PATH 缺陷</b>, 很抱歉它和 dSploit 不兼容.</p>]]></string>
+<![CDATA[<p>您的固件有 <b>LD_LIBRARY_PATH 缺陷</b>, 很抱歉它和 cSploit 不兼容.</p>]]></string>
 <string name="fatal_error_html2">
-<![CDATA[<p>更多信息请前往 <a href=\"http://dsploit.net/faq/\">常见问题(英语)</a>.</p>]]></string>
+<![CDATA[<p>更多信息请前往 <a href=\"http://csploit.net/faq/\">常见问题(英语)</a>.</p>]]></string>
 <string name="install_error">在安装文件时遇到问题!</string>
 <string name="arm_error">
-<![CDATA[<p>您设备的处理器不是ARM的, 很抱歉它和 dSploit 不兼容..</p>]]></string>
+<![CDATA[<p>您设备的处理器不是ARM的, 很抱歉它和 cSploit 不兼容..</p>]]></string>
 <string name="arm_error2">
-<![CDATA[<p>更多信息请前往 <a href=\"http://dsploit.net/#requirements\">系统要求</a> section.</p>]]></string>
+<![CDATA[<p>更多信息请前往 <a href=\"http://csploit.net/#requirements\">系统要求</a> section.</p>]]></string>
 <string name="busybox_required">要求安装完全版的BusyBox, killall 二进制文件没有找到(可能你的BusyBox已经过时).</string>
 <string name="only_4_root">本程序只能运行在已经root的设备上.</string>
 <string name="initializing">正在初始化&#8230;</string>
@@ -140,7 +140,7 @@ If not, see http://www.gnu.org/licenses/.
 <string name="port_must_be_greater">端口号只能在0到65535之间.</string>
 <string name="invalid_ports">指定的端口无效.</string>
 <string name="empty_port_list">没有指定端口.</string>
-<string name="about_dsploit_v_">关于 dSploit v</string>
+<string name="about_csploit_v_">关于 cSploit v</string>
 <string name="select_target">通过在下方短摁以选择目标, 或者长摁以输入别名.
 </string>
 <string name="generating_keys">正在生成密钥&#8230;</string>

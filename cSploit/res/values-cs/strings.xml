@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">dSploit</string>
+    <string name="app_name">cSploit</string>
     <string name="menu_settings">Nastavení</string>
-    <string name="title_activity_main">dSploit</string>
+    <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Ops! Něco je špatně, ale zpráva bude odeslána vývojáři pro opravu chyby:)
     </string>
     <string name="toggle_button">Přepínač</string>
@@ -22,11 +22,11 @@
     <string name="request">Výzva</string>
     <string name="wait_for_response">Počkejte na odezvu</string>
     <string name="protocol">Protokol</string>
-    <string name="dsploit_catchphrase">dSploit - An Android network penetration suite.</string>
-    <string name="dsploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
-    <string name="dsploit_url">http://www.dsploit.net/</string>
+    <string name="csploit_catchphrase">cSploit - An Android network penetration suite.</string>
+    <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
+    <string name="csploit_url">http://www.csploit.net/</string>
     <string name="disclaimer">Záruka</string>
-    <string name="dsploit_disclaimer">
+    <string name="csploit_disclaimer">
         <![CDATA[Tato aplikace byla vytvořena pouze za účelem demonstrace jejích funkcí a může být použita pouze na sítích do kterých máte právo zasahovat. Za jiné použití vývojář nezodpovídá. Jinými slovy, nebuďte hloupí a neštvěte zlé lidi proti mě.]]></string>
     <string name="license">License</string>
     <string name="gpl_license">Tento program je svobodný software: můžete ho distribuovat a/nebo upravovat
@@ -81,7 +81,7 @@
     </string>
     <string name="press_back">Pro ukončení aplikace stiskněte znovu ZPĚT</string>
     <string name="selected_">Vybráno&#160;</string>
-    <string name="github_issues">https://github.com/evilsocket/dsploit/issues/new</string>
+    <string name="github_issues">https://github.com/evilsocket/csploit/issues/new</string>
     <string name="no_session_found">Na SD kartě nebyl nalezen žádný spoubor ze sezení</string>
     <string name="select_session_file">Vyberte soubor ze sezení na SD kartě :</string>
     <string name="select_session">Vyberte sezení</string>
@@ -94,14 +94,14 @@
     <string name="warning_new_session">Zahájení nového sezení smaže aktuální, pokračovat?
     </string>
     <string name="fatal_error_html">
-        <![CDATA[<p>Vypadá to že Váš ROM má<b>LD_LIBRARY_PATH bug</b>, omlouvám se ale není kompatibilní s dSploit.</p>]]></string>
+        <![CDATA[<p>Vypadá to že Váš ROM má<b>LD_LIBRARY_PATH bug</b>, omlouvám se ale není kompatibilní s cSploit.</p>]]></string>
     <string name="fatal_error_html2">
-        <![CDATA[<p>Pro více informací<a href=\"http://dsploit.net/#faq\">FAQ</a>.</p>]]></string>
+        <![CDATA[<p>Pro více informací<a href=\"http://csploit.net/#faq\">FAQ</a>.</p>]]></string>
     <string name="install_error">Chyba při instalaci spuborů</string>
     <string name="arm_error">
-        <![CDATA[<p>Vypadá to ze Váš Procesor není ARM a nelze použít s dSploit.</p>]]></string>
+        <![CDATA[<p>Vypadá to ze Váš Procesor není ARM a nelze použít s cSploit.</p>]]></string>
     <string name="arm_error2">
-        <![CDATA[<p>Pro více informací <a href=\"http://dsploit.net/#requirements\">requirements</a> section.</p>]]></string>
+        <![CDATA[<p>Pro více informací <a href=\"http://csploit.net/#requirements\">requirements</a> section.</p>]]></string>
     <string name="busybox_required">Je nutná plná BusyBox instalace, killall binary nenalezeno
         (že by stará verze BusyBoxu?).
     </string>
@@ -151,7 +151,7 @@
     <string name="port_must_be_greater">Port musí být větší než 0 a menší než 65535.</string>
     <string name="invalid_ports">Neplatný port.</string>
     <string name="empty_port_list">Prázdný list portů.</string>
-    <string name="about_dsploit_v_">O dSploitu v</string>
+    <string name="about_csploit_v_">O cSploitu v</string>
     <string name="select_target">Vyberte cíl, podržením k němu přiřaďte Alias.
     </string>
     <string name="generating_keys">Generuji klíče&#8230;</string>
