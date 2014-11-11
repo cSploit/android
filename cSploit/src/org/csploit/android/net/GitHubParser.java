@@ -20,6 +20,7 @@
 
 package org.csploit.android.net;
 
+import org.csploit.android.core.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,8 +31,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.InvalidKeyException;
-
-import org.csploit.android.core.Logger;
 
 /**
  * This class parses JSON from api.github.com
@@ -46,6 +45,7 @@ public class GitHubParser {
   public final String project;
 
   private JSONArray mBranches = null;
+  private JSONArray mReleases = null;
   private JSONObject mBranch = null;
   private JSONObject mLastCommit = null;
   private JSONObject mLastRelease = null;
@@ -94,9 +94,10 @@ public class GitHubParser {
     }
   }
 
-  private void fetchLastRelease() throws IOException, JSONException {
+  private void fetchReleases() throws IOException, JSONException {
     JSONArray releases;
     JSONObject release;
+    boolean found;
 
     releases = new JSONArray(
             fetchRemoteData(
@@ -104,12 +105,18 @@ public class GitHubParser {
             )
     );
 
+    mReleases = new JSONArray();
+    found = false;
+
     for(int i=0;i<releases.length();i++) {
       release = releases.getJSONObject(i);
 
       if(!release.getBoolean("draft") && !release.getBoolean("prerelease")) {
-        mLastRelease = release;
-        break;
+        if(!found) {
+          mLastRelease = release;
+          found = true;
+        }
+        mReleases.put(release);
       }
     }
   }
@@ -122,9 +129,44 @@ public class GitHubParser {
     );
   }
 
+  public synchronized String[] getReleasesTags() throws JSONException, IOException {
+    if(mReleases==null)
+      fetchReleases();
+
+    String[] result = new String[mReleases.length()];
+
+    for(int i=0; i < mReleases.length(); i++) {
+      result[i] = (mReleases.getJSONObject(i)).getString("tag_name");
+    }
+
+    return result;
+  }
+
+  public synchronized String getReleaseBody(int index) throws JSONException, IOException, IndexOutOfBoundsException {
+    if(mReleases==null)
+      fetchReleases();
+
+    return mReleases.getJSONObject(index).getString("body");
+  }
+
+  public synchronized String getReleaseBody(String tag_name) throws JSONException, IOException {
+    JSONObject release;
+    if(mReleases==null)
+      fetchReleases();
+
+    for(int i=0;i<mReleases.length();i++) {
+      release = mReleases.getJSONObject(i);
+      if(release.getString("tag_name").equals(tag_name))
+        return release.getString("body");
+    }
+
+
+    throw new JSONException(String.format("release '%s' not found", tag_name));
+  }
+
   public synchronized String getLastReleaseVersion() throws JSONException, IOException {
     if(mLastRelease==null)
-      fetchLastRelease();
+      fetchReleases();
 
     if(mLastRelease==null)
       return null;
@@ -134,7 +176,7 @@ public class GitHubParser {
 
   public synchronized String getLastReleaseAssetUrl() throws JSONException, IOException {
     if(mLastRelease==null)
-      fetchLastRelease();
+      fetchReleases();
 
     if(mLastRelease==null)
       return null;

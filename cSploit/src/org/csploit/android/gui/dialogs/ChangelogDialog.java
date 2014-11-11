@@ -23,12 +23,16 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import android.text.Html;
+import android.widget.TextView;
 
 import org.csploit.android.R;
+import org.csploit.android.core.Logger;
+import org.csploit.android.core.System;
+import org.csploit.android.net.GitHubParser;
+import org.json.JSONException;
+
+import java.io.IOException;
 
 public class ChangelogDialog extends AlertDialog
 {
@@ -43,53 +47,24 @@ public class ChangelogDialog extends AlertDialog
     this.setTitle("Changelog");
 
 
-    WebView view = new WebView(activity);
-    WebSettings settings = view.getSettings();
-
-    settings.setJavaScriptEnabled(true);
-    settings.setAppCacheEnabled(false);
-
-    view.setWebViewClient(new WebViewClient(){
-      @Override
-      public void onPageStarted(WebView view, String url, Bitmap favicon){
-        if(mLoader == null)
-          mLoader = ProgressDialog.show(activity, "", getContext().getString(R.string.loading_changelog));
-
-        super.onPageStarted(view, url, favicon);
-      }
-
-      @Override
-      public void onPageFinished(WebView view, String url){
-        super.onPageFinished(view, url);
-        mLoader.dismiss();
-      }
-
-      @Override
-      public void onReceivedError(WebView view, int errorCode, String description, String failingUrl){
-        try{
-          mLoader.dismiss();
-        } catch(Exception e){
-        }
-
-        try{
-          view.stopLoading();
-        } catch(Exception e){
-        }
-
-        try{
-          view.clearView();
-        } catch(Exception e){
-        }
-
-        view.loadData(ERROR_HTML.replace("{DESCRIPTION}", description), "text/html", "UTF-8");
-
-        super.onReceivedError(view, errorCode, description, failingUrl);
-      }
-    });
+    TextView view = new TextView(activity);;
 
     this.setView(view);
 
-    view.loadUrl("http://update.dsploit.net/changelog");
+    if(mLoader == null)
+      mLoader = ProgressDialog.show(activity, "", getContext().getString(R.string.loading_changelog));
+
+    try {
+      view.setText(GitHubParser.getcSploitRepo().getReleaseBody("v" + System.getAppVersionName()));
+    } catch (JSONException e) {
+      view.setText(Html.fromHtml(ERROR_HTML.replace("{DESCRIPTION}", e.getMessage())));
+      System.errorLogging(e);
+    } catch (IOException e) {
+      view.setText(Html.fromHtml(ERROR_HTML.replace("{DESCRIPTION}", e.getMessage())));
+      Logger.error(e.getMessage());
+    }
+
+    mLoader.dismiss();
 
     this.setCancelable(false);
     this.setButton("Ok", new DialogInterface.OnClickListener(){
