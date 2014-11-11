@@ -1,9 +1,9 @@
 [main]
 host = https://www.transifex.com
 
-[dsploit.strings]
-file_filter = dSploit/res/values-<lang>/strings.xml
-source_file = dSploit/res/values/strings.xml
+[csploit.strings]
+file_filter = cSploit/res/values-<lang>/strings.xml
+source_file = cSploit/res/values/strings.xml
 source_lang = en
-trans.zh    = dSploit/res/values-zh-rCN/strings.xml
+trans.zh    = cSploit/res/values-zh-rCN/strings.xml
 type = ANDROID
