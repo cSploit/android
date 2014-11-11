@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='UTF-8'?>
 <resources>
     <string name="app_name">cSploit</string>
     <string name="menu_settings">Настройки</string>
@@ -33,11 +34,11 @@
         Вместе с данной программой вы должны были получить экземпляр Стандартной Общественной Лицензии GNU. Если вы его не получили, перейдите по ссылке http://www.gnu.org/licenses/.
     </string>
     <string name="service">Сервис</string>
-    <string name="stopped">Остановлен&#8230;</string>
+    <string name="stopped">Остановлен…</string>
     <string name="start">Старт</string>
     <string name="stop">Стоп</string>
-    <string name="stopped_dots">Остановлен &#8230;</string>
-    <string name="starting_dots">Запуск &#8230;</string>
+    <string name="stopped_dots">Остановлен …</string>
+    <string name="starting_dots">Запуск …</string>
     <string name="max_length">Макс. длина</string>
     <string name="min_length">Мин. длина</string>
     <string name="username">Имя пользователя</string>
@@ -51,13 +52,13 @@
     <string name="update_available">Доступна новая вресия</string>
     <string name="new_update_desc">Доступно обновление до версии</string>
     <string name="new_update_desc2">. Выполнить обновление сейчас?</string>
-    <string name="checking">Проверка&#8230;</string>
+    <string name="checking">Проверка…</string>
     <string name="no_updates_available">Обновления не найдены.</string>
     <string name="new_msf_update_desc">Обновление Metasploit Framework</string>
     <string name="new_version">Доступна новая версия</string>
     <string name="new_version2">!</string>
-    <string name="downloading_update">Загрузка обновления&#8230;</string>
-    <string name="connecting">Подключение&#8230;</string>
+    <string name="downloading_update">Загрузка обновления…</string>
+    <string name="connecting">Подключение…</string>
     <string name="cancel">Отмена</string>
     <string name="error">Ошибка</string>
     <string name="error_occured">Произошла ошибка во время загрузки обновления.</string>
@@ -74,13 +75,13 @@
     <string name="close_confirm">Приложение cSploit будет закрыто, вы уверены, что хотите продолжить?
     </string>
     <string name="press_back">Нажмите назад ещё раз, чтобы закрыть приложение.</string>
-    <string name="selected_">Выбрано&#160;</string>
+    <string name="selected_">Выбрано </string>
     <string name="github_issues">https://github.com/evilsocket/csploit/issues/new</string>
     <string name="no_session_found">Не найдено файлов сессии на карте памяти.</string>
     <string name="select_session_file">Выберите файл сессии с карты памяти:</string>
     <string name="select_session">Выбор сессии</string>
     <string name="invalid_session">Неправильное название сессии.</string>
-    <string name="session_saved_to">Сессия сохранена в &#160;</string>
+    <string name="session_saved_to">Сессия сохранена в  </string>
     <string name="save_session">Сохранить сессию</string>
     <string name="enter_session_name">Введите название файла сессии:</string>
     <string name="new_session_started">Начата новая сессия</string>
@@ -98,7 +99,7 @@
     <string name="busybox_required">Требуется полный пакет BusyBox, исполняемый файл killall не найден (возможно, вы используете старую версию BusyBox).
     </string>
     <string name="only_4_root">Данное приложение может быть запущено только с наличием root-прав.</string>
-    <string name="initializing">Инициализация&#8230;</string>
+    <string name="initializing">Инициализация…</string>
     <string name="initialization_error">Ошибка инициализации</string>
     <string name="target_alias">Псевдоним цели</string>
     <string name="set_alias">Задайте псевдоним для цели:</string>
@@ -112,7 +113,7 @@
         <![CDATA[</b> завершилось <b><font color=\"red\">НЕУДАЧНО</font></b>.]]></string>
     <string name="enter_key_or_crack">Ввести ключ от WiFi (или попытаться взломать):</string>
     <string name="enter_wifi_key">Введите WiFi ключ:</string>
-    <string name="scanning">Сканирование&#8230;</string>
+    <string name="scanning">Сканирование…</string>
     <string name="invalid_filename">Неправильное имя файла.</string>
     <string name="something_went_wrong">Что-то пошло не так, пожалуйста, выберите правильную цель снова.
     </string>
@@ -132,7 +133,7 @@
     <string name="invalid_port">Указан неправильный порт.</string>
     <string name="request_empty">Запрос не может быть пустым.</string>
     <string name="request_sent">Запрос отправлен.</string>
-    <string name="customize_wol_port">Настройте порт WOL и нажмите "Отправить".</string>
+    <string name="customize_wol_port">Настройте порт WOL и нажмите \"Отправить\".</string>
     <string name="couldnt_send_wol_packet">Невозможно отправить пакет WOL цели с неизвестным MAC адресом.
     </string>
     <string name="no_activities_for_url">Нет приложений, которые могут открыть данный тип адреса.</string>
@@ -145,10 +146,10 @@
     <string name="about_csploit_v_">О приложении cSploit v</string>
     <string name="select_target">Выберите цель ниже. Нажмите и удерживайте, если вы хотите изменить псеводним цели или для выполнения множественной атаки.
     </string>
-    <string name="generating_keys">Генерация ключей&#8230;</string>
+    <string name="generating_keys">Генерация ключей…</string>
     <string name="no_wifi_available">Нет доступного WiFi подключения, приложение только проверит существование новых обновлений. #STATUS#
     </string>
-    <string name="loading_changelog">Загрузка списка изменений&#8230;</string>
+    <string name="loading_changelog">Загрузка списка изменений…</string>
     <string name="something_went_wrong_changelog">
         <![CDATA[<html><body><p><b>Что-то пошло не так при загрузке списка изменений:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
     <string name="cancel_dialog">Отмена</string>
@@ -157,7 +158,7 @@
     <string name="connect">Подключится</string>
     <string name="crack">Взломать</string>
     <string name="could_not_read_folder">Ошибка чтения содержания папки.</string>
-    <string name="choose_dir">Выбрать&#160;</string>
+    <string name="choose_dir">Выбрать </string>
     <string name="vulnerability_finder">Поиск уязвимостей</string>
     <string name="vulnerability_finder_desc">Поиск уязвимостей для сервисов, запущенных на цели, основываясь на национальной базе уязвимостей.
     </string>
@@ -178,18 +179,17 @@
     <string name="trace">Трассировка</string>
     <string name="trace_desc">Выполнить трассировку до цели.</string>
     <string name="mitm">MITM</string>
-    <string name="mitm_desc">Выполнить различные атаки man-in-the-middle, например, анализ сети, манипуляция над трафиком и т.д.&#8230;
+    <string name="mitm_desc">Выполнить различные атаки man-in-the-middle, например, анализ сети, манипуляция над трафиком и т.д.…
     </string>
     <string name="network_subnet_mask">Это ваша маска подсети</string>
     <string name="gateway_router">(Ваш сетевой шлюз / роутер)</string>
-    <string name="this_device">&#160;(Данное устройство)</string>
+    <string name="this_device"> (Данное устройство)</string>
     <string name="wifi_went_down">WiFi подключение разорвано.</string>
     <string name="hijack_session">Похитить сессию</string>
     <string name="start_hijacking">Остановить перехват сессий и запустить хищение сессии?</string>
     <string name="start_hijacking2">Выполнить хищение сессии?</string>
     <string name="set_session_filename">Укажите название файла сессии:</string>
     <string name="session_sniffer">Сниффер сессий</string>
-
     <string name="untraced_hops">нетрассированные хопы</string>
     <string name="add_username">Добавить имя пользователя</string>
     <string name="enter_username">Введите имя пользователя:</string>
@@ -211,14 +211,13 @@
     <string name="error_rpc">Ошибка RPC</string>
     <string name="error_rpcd_inval">неправильные настройки</string>
     <string name="error_rpcd_shell">невозможно запустить shell</string>
-    <string name="rpcd_starting">Запуск MetaSploit RPCD&#8230;</string>
+    <string name="rpcd_starting">Запуск MetaSploit RPCD…</string>
     <string name="rpcd_started">MetaSploit RPCD запущен</string>
     <string name="rpcd_stopped">MetaSploit RPCD остановлен</string>
     <string name="rpcd_running">MetaSploit RPCD уже запущен</string>
     <string name="rpcd_timedout">MetaSploit RPCD не отвечает</string>
-    <string name="error_rcpd_fatal">Произошла критическая ошибка, пожалуйста отправьте отчет об ошибке моим разработчикам. Если я не хочу закрываться, пожалуйста, закройте меня через системные настройки (Настройки -> Приложения) и СООБЩИТЕ ОБ ЭТОМ РАЗРАБОТЧИКАМ.
+    <string name="error_rcpd_fatal">Произошла критическая ошибка, пожалуйста отправьте отчет об ошибке моим разработчикам. Если я не хочу закрываться, пожалуйста, закройте меня через системные настройки (Настройки -&gt; Приложения) и СООБЩИТЕ ОБ ЭТОМ РАЗРАБОТЧИКАМ.
     </string>
-
     <!-- mitm modules -->
     <string name="mitm_simple_sniff">Простой сниффинг</string>
     <string name="mitm_simple_sniff_desc">Перенапралвние трафика через данное устройство и сохранение данных в pcap файл с показом статистики.</string>
@@ -262,15 +261,12 @@
     <string name="file_output">Сохранить трафик в файл</string>
     <string name="question_save_to_pcap">Вы хотите сохранять весь трафик в pcap файл?</string>
     <string name="dumping_traffic_to">Сохранение трафика в </string>
-
     <string name="error_mitm_proxy">Невозможно создать прокси, пожалуйста, проверьте ваше соединение и доступность порта.</string>
     <string name="error_mitm_https_redirector">Невозможно создать HTTPS перенаправитель, пожалуйста, проверьте ваше соединение и доступность порта.</string>
     <string name="error_mitm_resource_server">Невозможно создать сервер ресурсов, пожалуйста, проверьте ваше соединение и доступность порта.</string>
-
     <string name="hijacker_load_from_file">Загрузить из файла</string>
     <string name="login_user_wordlist">Словарь логинов</string>
     <string name="login_pass_wordlist">Словарь паролей</string>
-
     <string name="menu_new_session">Новая сессия</string>
     <string name="menu_save_session">Сохранить сессию</string>
     <string name="menu_restore_session">Восстановить сессию</string>
@@ -281,9 +277,9 @@
     <string name="scanner_select_ports">Выбрать свои порты</string>
 
     <string name="wifi_initializing">Инициализация &#8230;</string>
-    <string name="wifi_activating_iface">Активация WiFi интерфейса &#8230;</string>
+    <string name="wifi_activating_iface">Активация WiFi интерфейса …</string>
     <string name="wifi_activated">WiFi активирован.</string>
-    <string name="wifi_scanning">Сканирование &#8230;</string>
+    <string name="wifi_scanning">Сканирование …</string>
     <string name="wifi_attempting_to">Попытка подключения к</string>
     <string name="wifi_with_key">с помощью ключа</string>
     <string name="wifi_connecting_to">Подключение к</string>
@@ -378,7 +374,9 @@
     <string name="pref_err_buffer_size">Размер буфера может быть от 1024 до 104857600.</string>
     <string name="pref_persistent_network_monitor">Постоянный мониторинг сети</string>
     <string name="pref_persistent_network_monitor_desc">Постоянно продолжать мониторинг сети</string>
-
+    <string name="choose_branch">Выберите ветку:</string>
+    <string name="pref_performance_vuln_title">Настройки поиска</string>
+    <string name="pref_err_executable">Недопустимо создание исполняемого контента</string>
     <string name="exploit_finder">Поиск эксплойтов</string>
     <string name="exploit_finder_desc">Поиск эксплойтов к найденным уязвимостям.</string>
     <string name="exploit_launch_all">Запустить все</string>
@@ -415,7 +413,7 @@
     <string name="delete">Удалить</string>
     <string name="checksum_failed">Файл поврежден</string>
     <string name="extraction_failed">Ошибка распаковки</string>
-    <string name="extracting">Распаковка&#8230;</string>
+    <string name="extracting">Распаковка…</string>
     <string name="click_here_to_upgrade">Нажмите сюда для обновления</string>
     <string name="bad_permissions">Ваш локальный файл имеет неправильные права доступа, я не могу прочитать и/или записать в него!</string>
     <string name="restore_default_path">Восстановить путь по умолчанию</string>
