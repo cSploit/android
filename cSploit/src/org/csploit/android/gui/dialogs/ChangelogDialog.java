@@ -47,7 +47,7 @@ public class ChangelogDialog extends AlertDialog
     this.setTitle("Changelog");
 
 
-    TextView view = new TextView(activity);;
+    TextView view = new TextView(activity);
 
     this.setView(view);
 
@@ -55,7 +55,7 @@ public class ChangelogDialog extends AlertDialog
       mLoader = ProgressDialog.show(activity, "", getContext().getString(R.string.loading_changelog));
 
     try {
-      view.setText(GitHubParser.getcSploitRepo().getReleaseBody("v" + System.getAppVersionName()));
+      view.setText(GitHubParser.getcSploitRepo().getReleaseBody(System.getAppVersionName()));
     } catch (JSONException e) {
       view.setText(Html.fromHtml(ERROR_HTML.replace("{DESCRIPTION}", e.getMessage())));
       System.errorLogging(e);

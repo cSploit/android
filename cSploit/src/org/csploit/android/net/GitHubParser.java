@@ -151,12 +151,14 @@ public class GitHubParser {
 
   public synchronized String getReleaseBody(String tag_name) throws JSONException, IOException {
     JSONObject release;
+    String current;
     if(mReleases==null)
       fetchReleases();
 
     for(int i=0;i<mReleases.length();i++) {
       release = mReleases.getJSONObject(i);
-      if(release.getString("tag_name").equals(tag_name))
+      current = release.getString("tag_name");
+      if(current.equals(tag_name) || current.equals("v" + tag_name))
         return release.getString("body");
     }
 
