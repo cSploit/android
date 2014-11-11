@@ -28,9 +28,12 @@ import org.csploit.android.core.UpdateService;
 import org.csploit.android.gui.DirectoryPicker;
 import org.csploit.android.gui.dialogs.ChoiceDialog;
 import org.csploit.android.gui.dialogs.ConfirmDialog;
+import org.csploit.android.net.GitHubParser;
 import org.csploit.android.tools.Raw;
+import org.json.JSONException;
 
 import java.io.File;
+import java.io.IOException;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -473,13 +476,18 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
       return;
     }
 
-    final ListPreference pref = mMsfBranch;
     mMsfBranch.setEnabled(false);
     mBranchesWaiter = new Thread(new Runnable() {
       @Override
       public void run() {
-        UpdateService.getMsfBranches();
-        sendBroadcast(new Intent(SETTINGS_MSF_BRANCHES_AVAILABLE));
+        try {
+          GitHubParser.getMsfRepo().getBranches();
+          sendBroadcast(new Intent(SETTINGS_MSF_BRANCHES_AVAILABLE));
+        } catch (JSONException e) {
+          System.errorLogging(e);
+        } catch (IOException e) {
+          Logger.error(e.getMessage());
+        }
       }
     });
     mBranchesWaiter.start();
@@ -503,15 +511,23 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
   }
 
   private void onMsfBranchesAvailable() {
-    String [] branches = UpdateService.getMsfBranches();
+    String [] branches;
     boolean hasRelease = false;
-    mMsfBranch.setEntryValues(branches);
-    mMsfBranch.setEntries(branches);
-    for(int i = 0;!hasRelease&&i<branches.length; i++) {
-      hasRelease = branches[i].equals("release");
+
+    try {
+      branches = GitHubParser.getMsfRepo().getBranches();
+      mMsfBranch.setEntryValues(branches);
+      mMsfBranch.setEntries(branches);
+      for(int i = 0;!hasRelease&&i<branches.length; i++) {
+        hasRelease = branches[i].equals("release");
+      }
+      mMsfBranch.setDefaultValue((hasRelease ? "release" : "master"));
+      mMsfBranch.setEnabled(true);
+    } catch (JSONException e) {
+      System.errorLogging(e);
+    } catch (IOException e) {
+      Logger.error(e.getMessage());
     }
-    mMsfBranch.setDefaultValue((hasRelease ? "release" : "master"));
-    mMsfBranch.setEnabled(true);
   }
 
   @Override

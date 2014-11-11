@@ -50,6 +50,17 @@ public class GitHubParser {
   private JSONObject mLastCommit = null;
   private JSONObject mLastRelease = null;
 
+  private static GitHubParser msfRepo = new GitHubParser("rapid7", "metasploit-framework");
+  private static GitHubParser cSploitRepo = new GitHubParser("cSploit", "android");
+
+  public static GitHubParser getMsfRepo() {
+    return msfRepo;
+  }
+
+  public static GitHubParser getcSploitRepo() {
+    return cSploitRepo;
+  }
+
   public GitHubParser(String username, String project) {
     this.username = username;
     this.project = project;
@@ -111,7 +122,7 @@ public class GitHubParser {
     );
   }
 
-  public String getLastReleaseVersion() throws JSONException, IOException {
+  public synchronized String getLastReleaseVersion() throws JSONException, IOException {
     if(mLastRelease==null)
       fetchLastRelease();
 
@@ -121,7 +132,7 @@ public class GitHubParser {
     return mLastRelease.getString("tag_name").substring(1);
   }
 
-  public String getLastReleaseAssetUrl() throws JSONException, IOException {
+  public synchronized String getLastReleaseAssetUrl() throws JSONException, IOException {
     if(mLastRelease==null)
       fetchLastRelease();
 
@@ -137,7 +148,7 @@ public class GitHubParser {
     return assets.getJSONObject(0).getString("browser_download_url");
   }
 
-  public String[] getBranches() throws JSONException, IOException {
+  public synchronized String[] getBranches() throws JSONException, IOException {
     if(mBranches==null)
       fetchBranches();
 
@@ -150,7 +161,7 @@ public class GitHubParser {
     return result;
   }
 
-  public void setBranch(String branch) throws InvalidKeyException, JSONException, IOException {
+  public synchronized void setBranch(String branch) throws InvalidKeyException, JSONException, IOException {
     if(mBranches==null)
       fetchBranches();
 
@@ -164,7 +175,7 @@ public class GitHubParser {
     throw new InvalidKeyException("branch '" + branch + "' not found");
   }
 
-  public String getBranch() throws JSONException {
+  public synchronized String getBranch() throws JSONException {
     if(mBranch == null) {
       Logger.debug("no branch has been selected yet");
       return null;
@@ -172,31 +183,31 @@ public class GitHubParser {
     return mBranch.getString("name");
   }
 
-  public String getLastCommitSha() throws JSONException, IllegalStateException {
+  public synchronized String getLastCommitSha() throws JSONException, IllegalStateException {
     if(mLastCommit == null)
       throw new IllegalStateException("no branch has been selected yet");
     return mLastCommit.getString("sha");
   }
 
-  public String getZipballUrl() throws JSONException, IllegalStateException {
+  public synchronized String getZipballUrl() throws JSONException, IllegalStateException {
     if(mBranch == null)
       throw new IllegalStateException("no branch has been selected yet");
     return String.format(ZIPBALL_URL, username, project, mBranch.getString("name"));
   }
 
-  public String getZipballName() throws JSONException, IllegalStateException {
+  public synchronized String getZipballName() throws JSONException, IllegalStateException {
     if(mBranch == null)
       throw new IllegalStateException("no branch has been selected yet");
     return String.format("%s.zip", mBranch.getString("name"));
   }
 
-  public String getZipballRoot() throws JSONException, IllegalStateException {
+  public synchronized String getZipballRoot() throws JSONException, IllegalStateException {
     if(mBranch == null)
       throw new IllegalStateException("no branch has been selected yet");
     return String.format("%s-%s/", project, mBranch.getString("name"));
   }
 
-  public void reset() {
+  public synchronized void reset() {
     mLastCommit = null;
     mBranch = null;
     mBranches = null;

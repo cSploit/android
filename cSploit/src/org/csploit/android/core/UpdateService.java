@@ -95,8 +95,6 @@ public class UpdateService extends IntentService
   private static final ArchiveMetadata  mApkInfo          = new ArchiveMetadata();
   private static final ArchiveMetadata  mMsfInfo          = new ArchiveMetadata();
   private static final ArchiveMetadata  mRubyInfo         = new ArchiveMetadata();
-  private static final GitHubParser     mMsfRepo          = new GitHubParser("rapid7", "metasploit-framework");
-  private static final GitHubParser     mcSploitRepo      = new GitHubParser("cSploit", "android");
   private static final GemParser        mGemUploadParser  = new GemParser(REMOTE_GEMS_VERSION_URL);
 
   private boolean
@@ -161,10 +159,9 @@ public class UpdateService extends IntentService
       return false;
 
     try {
-      synchronized (mcSploitRepo) {
-        remoteVersion = mcSploitRepo.getLastReleaseVersion();
-        remoteURL = mcSploitRepo.getLastReleaseAssetUrl();
-      }
+
+      remoteVersion = GitHubParser.getcSploitRepo().getLastReleaseVersion();
+      remoteURL = GitHubParser.getcSploitRepo().getLastReleaseAssetUrl();
 
       if(remoteVersion == null)
         return false;
@@ -324,20 +321,19 @@ public class UpdateService extends IntentService
     boolean exitForError = true;
     String branch;
     String localVersion = System.getLocalMsfVersion();
+    GitHubParser msfRepo = GitHubParser.getMsfRepo();
 
     try {
       synchronized (mMsfInfo) {
         if (mMsfInfo.url == null) {
           branch = System.getSettings().getString("MSF_BRANCH", "release");
 
-          synchronized (mMsfRepo) {
-            if(!branch.equals(mMsfRepo.getBranch()))
-              mMsfRepo.setBranch(branch);
-            mMsfInfo.url = mMsfRepo.getZipballUrl();
-            mMsfInfo.versionString = mMsfRepo.getLastCommitSha();
-            mMsfInfo.name = mMsfRepo.getZipballName();
-            mMsfInfo.dirToExtract = mMsfRepo.getZipballRoot();
-          }
+          if(!branch.equals(msfRepo.getBranch()))
+            msfRepo.setBranch(branch);
+          mMsfInfo.url = msfRepo.getZipballUrl();
+          mMsfInfo.versionString = msfRepo.getLastCommitSha();
+          mMsfInfo.name = msfRepo.getZipballName();
+          mMsfInfo.dirToExtract = msfRepo.getZipballRoot();
           mMsfInfo.path = String.format("%s/%s", System.getStoragePath(), mMsfInfo.name);
         }
 
@@ -391,29 +387,13 @@ public class UpdateService extends IntentService
         }
       } else if(key.equals("MSF_BRANCH")) {
         try {
-          synchronized (mMsfRepo) {
-            mMsfRepo.setBranch(System.getSettings().getString("MSF_BRANCH", "release"));
-          }
+          GitHubParser.getMsfRepo().setBranch(System.getSettings().getString("MSF_BRANCH", "release"));
         } catch (Exception e) {
           Logger.error(e.getMessage());
         }
       }
     }
   };
-
-  public static String[] getMsfBranches() {
-
-    try {
-      synchronized (mMsfRepo) {
-        return mMsfRepo.getBranches();
-      }
-    } catch (JSONException e) {
-      System.errorLogging(e);
-    } catch (IOException e) {
-      Logger.warning("getMsfBranches: " + e.getMessage());
-    }
-    return new String[] {"master"};
-  }
 
   /**
    * notify activities that some error occurred
