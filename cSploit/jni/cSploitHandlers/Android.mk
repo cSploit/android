@@ -17,7 +17,7 @@ LOCAL_ALLOW_UNDEFINED_SYMBOLS:= true
 
 LOCAL_C_INCLUDES:= \
   cSploitCommon/ \
-  cSploitd/
+  cSploitDaemon/
 
 LOCAL_SRC_FILES:= $1.c
 
