@@ -123,3 +123,9 @@
 [submodule "cSploit/jni/fusemounts"]
 	path = cSploit/jni/fusemounts
 	url = https://github.com/tux-mind/fusemounts.git
+[submodule "cSploit/jni/cSploitCommon"]
+	path = cSploit/jni/cSploitCommon
+	url = https://github.com/cSploit/common.git
+[submodule "cSploit/jni/cSploitDaemon"]
+	path = cSploit/jni/cSploitDaemon
+	url = https://github.com/cSploit/daemon.git
