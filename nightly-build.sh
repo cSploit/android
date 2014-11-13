@@ -1,9 +1,6 @@
 #!/bin/bash
 
-# Copyleft (C) 2014 The dSploit Project
-#
-# Author: Louis Teboul (a.k.a Androguide.fr) 
-#         admin@androguide.fr
+# Copyleft (C) 2014 The cSploit Project
 #
 # Licensed under the GNU GENERAL PUBLIC LICENSE version 3 'or later'
 # The GNU General Public License is a free, copyleft license for software and other kinds of works.
@@ -16,7 +13,7 @@ RED="\\033[1;31m"
 RESET="\\e[0m"
 DATE=`date +%Y-%m-%d`
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LOG_DIR="${DIR}/logs/"
+LOG_DIR="${DIR}/logs"
 MAX_DAYS="15"
 PREVIOUS_COMMIT=$(cat "${LOG_DIR}last_commit")
 
@@ -29,7 +26,7 @@ die() {
 }
 
 jni_die() {
- cat "${DIR}/dSploit/jni/build.log" >&3
+ cat "${DIR}/cSploit/jni/build.log" >&3
  die
 }
 
@@ -38,7 +35,7 @@ if [ ! -d "${LOG_DIR}" ]; then
 fi
 
 if [ -z "${NIGHTLIES_OUT_DIR}" ]; then
-  NIGHTLIES_OUT_DIR="${DIR}/dSploit/build"
+  NIGHTLIES_OUT_DIR="${DIR}/cSploit/build"
 fi
 
 if [ ! -d "${NIGHTLIES_OUT_DIR}" ]; then
@@ -50,7 +47,7 @@ exec 3> $LOG_DIR/$DATE.log
 cd "${DIR}" >&3 2>&1 || die
 
 echo -n -e "${YELLOW}Cleaning old files${RESET}\n" | tee >(cat - >&3)
-LAST_APK=$(readlink "${NIGHTLIES_OUT_DIR}/dSploit-lastest.apk")
+LAST_APK=$(readlink "${NIGHTLIES_OUT_DIR}/cSploit-lastest.apk")
 find $NIGHTLIES_OUT_DIR -type f -a -mtime +${MAX_DAYS} -a ! -name "${LAST_APK}" -exec rm -f "{}" \; >&3 2>&1
 find $LOG_DIR -type f -a -mtime +${MAX_DAYS} -exec rm -f "{}" \; >&3 2>&1
 
@@ -65,18 +62,18 @@ if [ -n "${PREVIOUS_COMMIT}" -a "${PREVIOUS_COMMIT}" == "${LAST_COMMIT}" ]; then
     exit 0
 fi
 
-echo -n -e "${CYAN}Building dSploit...${RESET}\n" | tee >(cat - >&3)
-rm -f $(find . -name "dSploit-release.apk" -type f)
+echo -n -e "${CYAN}Building cSploit...${RESET}\n" | tee >(cat - >&3)
+rm -f $(find . -name "cSploit-release.apk" -type f)
 oldpwd=$(pwd)
-cd dSploit/jni >&3 2>&1 || die
+cd cSploit/jni >&3 2>&1 || die
 ./build.sh  >&3 2>&1 || jni_die
 cd "$oldpwd" >&3 2>&1 || die
 ./gradlew clean >&3 2>&1 || die
 ./gradlew assembleRelease >&3 2>&1 || die
 
 echo -n -e "${GREEN}Copying signed apk to output directory${RESET}\n" | tee >(cat - >&3)
-cp $(find . -name "dSploit-release.apk" -type f) $NIGHTLIES_OUT_DIR/dSploit-$LAST_COMMIT.apk >&3 2>&1 || die
-ln -sf "dSploit-${LAST_COMMIT}.apk" $NIGHTLIES_OUT_DIR/dSploit-nightly.apk >&3 2>&1 || die
+cp $(find . -name "cSploit-release.apk" -type f) $NIGHTLIES_OUT_DIR/cSploit-$LAST_COMMIT.apk >&3 2>&1 || die
+ln -sf "cSploit-${LAST_COMMIT}.apk" $NIGHTLIES_OUT_DIR/cSploit-nightly.apk >&3 2>&1 || die
 echo "${LAST_COMMIT}" > "${LOG_DIR}last_commit" 2>&3 || die
 
 echo -n -e "${GREEN}Done.${RESET}\n\n" | tee >(cat - >&3)
