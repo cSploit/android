@@ -60,8 +60,9 @@ public class Hydra extends Tool
         }
       } else if(e instanceof Login) {
         //TODO
+      } else {
+        Logger.error("Unknown event: " + e);
       }
-      Logger.error("Unknown event: " + e);
     }
   }
 
