@@ -36,7 +36,7 @@ public class Shell extends Raw {
    */
   @Override
   public int run(String cmd, RawReceiver receiver) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
-    return super.run("-c '" + cmd.replaceAll("'", "\\'") + "'", receiver);
+    return super.run("-c '" + cmd.replace("'", "\\'") + "'", receiver);
   }
 
   public int run(String cmd) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
