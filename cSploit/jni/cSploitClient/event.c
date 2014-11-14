@@ -31,6 +31,7 @@
 #include "ettercap.h"
 #include "arpspoof.h"
 #include "tcpdump.h"
+#include "fusemounts.h"
 
 #include "event.h"
 
@@ -110,7 +111,7 @@ jobject create_stderrnewline_event(JNIEnv *env, void *arg) {
 /**
  * @brief create an org.csploit.android.events.ChildEnd
  * @param arg a pointer to the exit status
- * @returns the jobject on success, NULLl on error.
+ * @returns the jobject on success, NULL on error.
  */
 jobject create_child_end_event(JNIEnv *env, void *arg) {
   jobject event;
@@ -133,7 +134,7 @@ jobject create_child_end_event(JNIEnv *env, void *arg) {
 /**
  * @brief create an org.csploit.android.events.ChildDied
  * @param arg a poitner to the signal that caused the death
- * @returns the jobject on success, NULLl on error.
+ * @returns the jobject on success, NULL on error.
  */
 jobject create_child_died_event(JNIEnv *env, void *arg) {
   jobject event;
@@ -185,7 +186,7 @@ jobject inaddr_to_inetaddress(JNIEnv *env, in_addr_t a) {
 /**
  * @brief create an org.csploit.android.events.Hop
  * @param arg a pointer to an ::nmap_hop_info
- * @returns the jobject on success, NULLl on error.
+ * @returns the jobject on success, NULL on error.
  */
 jobject create_hop_event(JNIEnv *env, void *arg) {
   jobject addr, res;
@@ -473,6 +474,12 @@ jobject create_message_event(JNIEnv *env, message *m) {
     (*env)->ExceptionClear(env);
   }
   
+  if(jseverity)
+    (*env)->DeleteLocalRef(env, jseverity);
+  
+  if(jmessage)
+    (*env)->DeleteLocalRef(env, jmessage);
+  
   return res;
 }
 
@@ -565,7 +572,7 @@ jobject create_login_event(JNIEnv *env, message *m) {
 /**
  * @brief create an org.csploit.android.events.Packet
  * @param m the received message
- * @returns the jobject on success, NULLl on error.
+ * @returns the jobject on success, NULL on error.
  */
 jobject create_packet_event(JNIEnv *env, message *m) {
   jobject src, dst, res;
@@ -591,6 +598,67 @@ jobject create_packet_event(JNIEnv *env, message *m) {
     (*env)->ExceptionDescribe(env);
     (*env)->ExceptionClear(env);
   }
+  
+  return res;
+}
+
+/**
+ * @brief create an org.csploit.android.events.FuseBind
+ * @param m the received message
+ * @returns the jobject on success, NULL on error.
+ */
+jobject create_fusebind_event(JNIEnv *env, message *m) {
+  jobject res;
+  char *src, *mnt;
+  jstring *jsrc, *jmnt;
+  struct fusemount_bind_info *bind_info;
+  
+  bind_info = (struct fusemount_bind_info *) m->data;
+  jsrc = jmnt = NULL;
+  
+  src = string_array_next(m, bind_info->data, NULL);
+  
+  if(!src) {
+    LOGE("%s: source not found", __func__);
+    return NULL;
+  }
+  
+  mnt = string_array_next(m, bind_info->data, src);
+  
+  if(!mnt) {
+    LOGE("%s: mountpoint not found", __func__);
+    return NULL;
+  }
+  
+  jsrc = (*env)->NewStringUTF(env, src);
+  
+  if(!jsrc) goto jni_error;
+  
+  jmnt = (*env)->NewStringUTF(env, mnt);
+  
+  if(!jmnt) goto jni_error;
+  
+  res = (*env)->NewObject(env,
+                          cache.csploit.events.fusebind.class,
+                          cache.csploit.events.fusebind.ctor,
+                          jsrc, jmnt);
+  
+  goto cleanup;
+  
+  jni_error:
+  
+  if((*env)->ExceptionCheck(env)) {
+    (*env)->ExceptionDescribe(env);
+    (*env)->ExceptionClear(env);
+  }
+  
+  cleanup:
+  
+  if(jsrc)
+    (*env)->DeleteLocalRef(env, jsrc);
+  
+  if(jmnt)
+    (*env)->DeleteLocalRef(env, jmnt);
   
   return res;
 }

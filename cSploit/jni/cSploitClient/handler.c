@@ -195,6 +195,8 @@ int on_handler_list(message *m) {
       handlers.by_name.arpspoof = h;
     } else if(!handlers.by_name.tcpdump && !strncmp(h->name, "tcpdump", 8)) {
       handlers.by_name.tcpdump = h;
+    } else if(!handlers.by_name.fusemounts && !strncmp(h->name, "fusemounts", 11)) {
+      handlers.by_name.fusemounts = h;
     }
     
     h->id = handler_info->id;
