@@ -282,7 +282,7 @@ end
 
 $list=[]
 $dir_stack=[]
-dir_re=/(?<action>(Entering|Leaving)) directory `(?<path>[^']+)'/
+dir_re=/(?<action>(Entering|Leaving)) directory [`'](?<path>[^']+)'/
 generic_get_inputs=/^[^-].*\.(c|cpp|cc|S|s|o|a|so(\.[0-9]+)*)$/
 generic_check=/(^| )(\/[^ ]+)?(?<prog>(gcc|ld|ar|g\+\+)) .*?[^ ]+\.(c|cpp|cc|S|s|o|a)( |$)/
 generic_get_target=/-o (?<target>[^ ]+\.(o|a))( |$)/
