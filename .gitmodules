@@ -129,3 +129,7 @@
 [submodule "cSploit/jni/cSploitDaemon"]
 	path = cSploit/jni/cSploitDaemon
 	url = https://github.com/cSploit/daemon.git
+[submodule "cSploit/jni/c-ares"]
+	path = cSploit/jni/c-ares
+	url = https://github.com/tux-mind/c-ares.git
+	branch = cares_1_10_0_android_arm_32
