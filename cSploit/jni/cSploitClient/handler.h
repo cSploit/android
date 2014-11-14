@@ -24,13 +24,6 @@
 #include "list.h"
 #include "control.h"
 
-struct message;
-
-jboolean jload_handlers(JNIEnv *, jclass);
-void unload_handlers(void);
-int on_handler(struct message *);
-jobjectArray get_handlers(JNIEnv *, jclass);
-
 typedef struct handler {
   node *next;
   
@@ -63,5 +56,13 @@ extern struct handlers_list {
   } by_name;              ///< access handlers by name
   enum handlers_loading_status status;
 } handlers;
+
+struct message;
+
+jboolean jload_handlers(JNIEnv *, jclass);
+void unload_handlers(void);
+int on_handler(struct message *);
+jobjectArray get_handlers(JNIEnv *, jclass);
+handler *get_handler_by_name(const char *);
 
 #endif

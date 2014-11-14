@@ -242,58 +242,20 @@ int on_command(JNIEnv *env, message *m) {
 #define ESCAPE_FOUND 4
 #define END_OF_STRING 8
 
-//TODO: split this function into smaller ones
-int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jhandler, jstring jcmd, jobjectArray jenv) {
+int parse_cmd(JNIEnv *env, handler *h, jstring jcmd, message *m) {
+  const char *utf;
+  struct cmd_start_info * start_info;
   char status;
   char *pos, *start, *end, *rpos, *wpos;
-  const char *utf;
-  jstring *utf_parent;
-  handler *h;
+  size_t arg_len;
   uint32_t msg_size; // big enought to check for uint16_t overflow
-  int id;
-  size_t arg_len, escapes;
-  struct cmd_start_info *start_info;
-  message *m;
-  child_node *c;
+  int escapes;
+  int ret;
   
-  id = -1;
-  m=NULL;
-  c=NULL;
+  ret = -1;
+  msg_size=m->head.size;
   
-  if(!authenticated()) {
-    LOGE("%s: not authenticated", __func__);
-    return -1;
-  }
-  
-  utf = (*env)->GetStringUTFChars(env, jhandler, NULL);
-  utf_parent = &jhandler;
-  
-  if(!utf) {
-    LOGE("%s: cannot get handler name", __func__);
-    goto jni_error;
-  }
-  
-  arg_len = (*env)->GetStringUTFLength(env, jhandler);
-  
-  if(!arg_len) {
-    LOGE("%s: empty handler name", __func__);
-    goto jni_error;
-  }
-  
-  arg_len++; // test even the '\0'
-  
-  for(h=(handler *) handlers.list.head;h && strncmp(utf, h->name, arg_len);h=(handler *) h->next);
-  
-  if(!h) {
-    LOGE("%s: handler \"%s\" not found", __func__, utf);
-    goto exit;
-  }
-  
-  // parse cmd
-  
-  (*env)->ReleaseStringUTFChars(env, jhandler, utf);
   utf = (*env)->GetStringUTFChars(env, jcmd, NULL);
-  utf_parent = &jcmd;
   
   if(!utf) {
     LOGE("%s: cannot get command string", __func__);
@@ -301,19 +263,6 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
   }
   
   LOGD("%s: parsing \"%s\"", __func__, utf);
-  
-  msg_size = sizeof(struct cmd_start_info);
-  m = create_message(get_sequence(&ctrl_seq, &ctrl_seq_lock),
-                      msg_size, CTRL_ID);
-  
-  if(!m) {
-    LOGE("%s: cannot create messages", __func__);
-    goto exit;
-  }
-  
-  start_info = (struct cmd_start_info *) m->data;
-  start_info->cmd_action = CMD_START;
-  start_info->hid = h->id;
   
   status = 0;
   arg_len = 0;
@@ -429,22 +378,41 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
     }
   }
   
-  // parse env
+  ret = 0;
   
-  if(jenv != NULL)
-    arg_len = (*env)->GetArrayLength(env, jenv);
-  else
-    arg_len = 0;
+  goto exit;
   
-  for(escapes=0;escapes < arg_len; escapes++) {
-    // reuse jcmd, we don't have to release object that java send us.
-    jcmd = (jstring) (*env)->GetObjectArrayElement(env, jenv, escapes);
+  jni_error:
+  if((*env)->ExceptionCheck(env)) {
+    (*env)->ExceptionDescribe(env);
+    (*env)->ExceptionClear(env);
+  }
+  
+  exit:
+  
+  if(utf)
+    (*env)->ReleaseStringUTFChars(env, jcmd, utf);
+  
+  return ret;
+}
+
+int parse_env(JNIEnv *env, jobjectArray jenv, message *m) {
+  size_t len;
+  const char *utf;
+  jstring *jstr;
+  int i, ret;
+  
+  len = (*env)->GetArrayLength(env, jenv);
+  ret = -1;
+  utf=NULL;
+  
+  for(i=0;i < len; i++) {
     
-    if(!jcmd) goto jni_error;
+    jstr = (jstring) (*env)->GetObjectArrayElement(env, jenv, i);
     
-    (*env)->ReleaseStringUTFChars(env, *utf_parent, utf);
-    utf = (*env)->GetStringUTFChars(env, jcmd, NULL);
-    utf_parent = &jcmd;
+    if(!jstr) goto jni_error;
+    
+    utf = (*env)->GetStringUTFChars(env, jstr, NULL);
     
     if(!utf) goto jni_error;
     
@@ -452,6 +420,90 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
       LOGE("%s: cannot append '%s' to message", __func__, utf);
       goto exit;
     }
+    
+    (*env)->ReleaseStringUTFChars(env, jstr, utf);
+    utf=NULL;
+  }
+  
+  ret = 0;
+  
+  goto exit;
+  
+  jni_error:
+  if((*env)->ExceptionCheck(env)) {
+    (*env)->ExceptionDescribe(env);
+    (*env)->ExceptionClear(env);
+  }
+  
+  exit:
+  
+  if(utf)
+    (*env)->ReleaseStringUTFChars(env, jstr, utf);
+  
+  return ret;
+  
+}
+
+int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jhandler, jstring jcmd, jobjectArray jenv) {
+  const char *utf;
+  handler *h;
+  int id;
+  struct cmd_start_info *start_info;
+  message *m;
+  child_node *c;
+  
+  id = -1;
+  m=NULL;
+  c=NULL;
+  utf=NULL;
+  
+  if(!authenticated()) {
+    LOGE("%s: not authenticated", __func__);
+    return -1;
+  }
+  
+  if(!jhandler) {
+    LOGE("%s: handler cannot be null", __func__);
+    return -1;
+  }
+  
+  utf = (*env)->GetStringUTFChars(env, jhandler, NULL);
+  
+  if(!utf) {
+    LOGE("%s: cannot get handler name", __func__);
+    goto jni_error;
+  }
+  
+  h = get_handler_by_name(utf);
+  
+  if(!h) {
+    LOGE("%s: handler \"%s\" not found", __func__, utf);
+    goto exit;
+  }
+  
+  (*env)->ReleaseStringUTFChars(env, jhandler, utf);
+  utf=NULL;
+  
+  m = create_message(get_sequence(&ctrl_seq, &ctrl_seq_lock),
+                      sizeof(struct cmd_start_info), CTRL_ID);
+  
+  if(!m) {
+    LOGE("%s: cannot create messages", __func__);
+    goto exit;
+  }
+  
+  start_info = (struct cmd_start_info *) m->data;
+  start_info->cmd_action = CMD_START;
+  start_info->hid = h->id;
+  
+  if(jcmd && parse_cmd(env, h, jcmd, m)) {
+    LOGE("%s: cannot parse command", __func__);
+    goto exit;
+  }
+  
+  if(jenv && parse_env(env, jenv, m)) {
+    LOGE("%s: cannot parse environment", __func__);
+    goto exit;
   }
   
   // create child
@@ -474,16 +526,18 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
   // send message to cSploitd
   
   pthread_mutex_lock(&write_lock);
-  // OPTIMIZATION: use escapes to store return value for later check
-  escapes = send_message(sockfd, m);
+  // OPTIMIZATION: use id to store return value for later check
+  id = send_message(sockfd, m);
   pthread_mutex_unlock(&write_lock);
   
-  if(escapes) {
+  if(id) {
     LOGE("%s: cannot send messages", __func__);
     // mark it as failed
     c->id = CTRL_ID;
     c->seq = 0;
   }
+  
+  id=-1;
   
   // wait for CMD_STARTED or CMD_FAIL
   
@@ -526,7 +580,7 @@ int start_command(JNIEnv *env, jclass clazz __attribute__((unused)), jstring jha
     free_message(m);
   
   if(utf)
-    (*env)->ReleaseStringUTFChars(env, *utf_parent, utf);
+    (*env)->ReleaseStringUTFChars(env, jhandler, utf);
   
   return id;
 }

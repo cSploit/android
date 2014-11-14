@@ -120,6 +120,21 @@ void remove_handler_by_id(uint16_t id) {
   free(h);
 }
 
+handler *get_handler_by_name(const char *name) {
+  handler *h;
+  size_t len;
+  
+  len = strlen(name) + 1;
+  
+  pthread_mutex_lock(&(handlers.control.mutex));
+  
+  for(h=(handler *) handlers.list.head;h && strncmp(h->name, name, len); h=(handler *) h->next);
+  
+  pthread_mutex_unlock(&(handlers.control.mutex));
+  
+  return h;
+}
+
 /**
  * @brief load handlers from an ::HNDL_LIST ::message
  * @param m the received message
