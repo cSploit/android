@@ -1108,6 +1108,18 @@ public class UpdateService extends IntentService
       sb.append(String.format("-e \"/source 'https:\\/\\/rubygems.org'/a\\\nsource '%s'\" ",
               REMOTE_GEM_SERVER));
 
+      sb.append(String.format("'%s/Gemfile'",msfPath));
+
+      task = System.getTools().raw.async(sb.toString(), mErrorReceiver);
+
+      if(execShell(task, "cancelled while patching Gemfile") != 0)
+        throw new RuntimeException("cannot patch Gemfile");
+
+      sb = new StringBuilder();
+
+      //patch all gemspec-Files
+      sb.append(String.format("find '%s' -name '*.gemspec' -exec sed -i ",msfPath));
+
       for (String compiledGem : ourGems) {
         String[] parts = compiledGem.split(" ");
 
@@ -1123,8 +1135,8 @@ public class UpdateService extends IntentService
       // so it's content it's exactly the same seen by git.
       sb.append("-e 's/`git ls-files`/`find . -type f`/' ");
 
-      // send files to work on
-      sb.append(String.format("'%1$s/Gemfile' '%1$s/metasploit-framework.gemspec'", msfPath));
+      //finalise find -exec command
+      sb.append("{} \\;");
 
       task = System.getTools().raw.async(sb.toString(), mErrorReceiver);
 
