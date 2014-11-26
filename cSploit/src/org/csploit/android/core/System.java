@@ -495,7 +495,7 @@ public class System
   }
 
   public static String getDefaultRubyPath() {
-    return mContext.getFilesDir().getAbsolutePath() + "/ruby";
+    return mContext.getExternalFilesDir(null).getAbsolutePath() + "/ruby";
   }
 
   public static String getRubyPath() {
@@ -503,19 +503,15 @@ public class System
   }
 
   public static String getDefaultMsfPath() {
-    return mContext.getFilesDir().getAbsolutePath() + "/msf";
+    return mContext.getExternalFilesDir(null).getAbsolutePath() + "/msf";
   }
 
   public static String getMsfPath() {
     return getSettings().getString("MSF_DIR", getDefaultMsfPath());
   }
 
-  public static String getFifosPath() {
-    return mContext.getFilesDir().getAbsolutePath() + "/fifos/";
-  }
-
   public static String getToolsPath() {
-    return mContext.getFilesDir().getAbsolutePath() + "/tools/";
+    return mContext.getExternalFilesDir(null).getAbsolutePath() + "/tools/";
   }
 
   public static String getCoreBinPath() {
