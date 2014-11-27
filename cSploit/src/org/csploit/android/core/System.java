@@ -242,7 +242,7 @@ public class System
       String cmd;
 
       cmd = String.format("{ echo 'ACCESS GRANTED' >&2; cd '%s' && exec ./cSploitd ;} || exit 1\n",
-          mContext.getFilesDir().getAbsoluteFile());
+          System.getCoreBinPath());
 
       writer.write(cmd.getBytes());
       writer.flush();
@@ -281,7 +281,7 @@ public class System
       throw new SuException();
 
     if(ret != 0) {
-      File log = new File(mContext.getFilesDir().getAbsolutePath(), "cSploitd.log");
+      File log = new File(System.getCoreBinPath(), "cSploitd.log");
       if(log.exists() && log.canRead()) {
         try {
           reader = new BufferedReader(new FileReader(log));
@@ -304,7 +304,7 @@ public class System
    * shutdown the core daemon
    */
   public static void shutdownCoreDaemon(){
-    if(!Client.isConnected() && !Client.Connect(mContext.getFilesDir().getAbsolutePath() + "/cSploit.sock")) {
+    if(!Client.isConnected() && !Client.Connect("/dev/socket/cSploit")) {
       return; // daemon is not running
     }
     if(!Client.isAuthenticated() && !Client.Login("android", "DEADBEEF")) {
@@ -319,7 +319,7 @@ public class System
     if(mCoreInitialized)
       return;
 
-    String socket_path = mContext.getFilesDir().getAbsolutePath() + "/cSploit.sock";
+    String socket_path = "/dev/socket/cSploit";
 
     if(!Client.isConnected()) {
       if(!Client.Connect(socket_path)) {
@@ -495,7 +495,7 @@ public class System
   }
 
   public static String getDefaultRubyPath() {
-    return mContext.getFilesDir().getAbsolutePath() + "/ruby";
+    return mContext.getExternalFilesDir(null).getAbsolutePath() + "/ruby";
   }
 
   public static String getRubyPath() {
@@ -503,19 +503,19 @@ public class System
   }
 
   public static String getDefaultMsfPath() {
-    return mContext.getFilesDir().getAbsolutePath() + "/msf";
+    return mContext.getExternalFilesDir(null).getAbsolutePath() + "/msf";
   }
 
   public static String getMsfPath() {
     return getSettings().getString("MSF_DIR", getDefaultMsfPath());
   }
 
-  public static String getFifosPath() {
-    return mContext.getFilesDir().getAbsolutePath() + "/fifos/";
+  public static String getToolsPath() {
+    return mContext.getExternalFilesDir(null).getAbsolutePath() + "/tools/";
   }
 
-  public static String getToolsPath() {
-    return mContext.getFilesDir().getAbsolutePath() + "/tools/";
+  public static String getCoreBinPath() {
+      return mContext.getExternalFilesDir(null).getAbsolutePath();
   }
 
   public static String getSuPath(){
