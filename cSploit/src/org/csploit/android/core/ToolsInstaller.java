@@ -49,7 +49,7 @@ public class ToolsInstaller{
   public ToolsInstaller(Context c){
     mAppContext = c;
     //noinspection ConstantConditions
-    mDestPath = mAppContext.getFilesDir().getAbsolutePath();
+    mDestPath = System.getCoreBinPath();
     mAppVersion = System.getAppVersionName();
     mVersionFile = mDestPath + "/tools/VERSION";
   }
