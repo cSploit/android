@@ -1099,7 +1099,6 @@ public class UpdateService extends IntentService
         throw new RuntimeException("cannot fetch remote gem info");
 
       // substitute gems version and gem sources with our one
-
       sb.append("sed -i ");
 
       // append our REMOTE_GEM_SERVER to msf Gemfile sources.
@@ -1124,7 +1123,13 @@ public class UpdateService extends IntentService
       sb.append("-e 's/`git ls-files`/`find . -type f`/' ");
 
       // send files to work on
-      sb.append(String.format("'%1$s/Gemfile' '%1$s/metasploit-framework.gemspec'", msfPath));
+      sb.append(String.format("'%s/Gemfile' ",msfPath));
+      for(File f: new File(msfPath).listFiles())
+      {
+        String fPath = f.getAbsolutePath();
+        if(fPath.endsWith(".gemspec"))
+          sb.append(String.format("'%s' ", fPath));
+      }
 
       task = System.getTools().raw.async(sb.toString(), mErrorReceiver);
 
