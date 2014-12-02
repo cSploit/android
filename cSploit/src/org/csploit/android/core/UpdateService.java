@@ -1075,7 +1075,7 @@ public class UpdateService extends IntentService
     try {
       // install bundle gem, required for install msf
       if (System.getTools().ruby.run("which bundle") != 0) {
-        bundleInstallTask = System.getTools().ruby.async("gem install bundle", mErrorReceiver);
+        bundleInstallTask = System.getTools().ruby.async("gem install bundle --source http://rubygems.org/", mErrorReceiver);
       }
 
       mBuilder.setContentText(getString(R.string.installing_msf_gems));
@@ -1104,7 +1104,7 @@ public class UpdateService extends IntentService
       // append our REMOTE_GEM_SERVER to msf Gemfile sources.
       // we use an our gem server to provide cross compiled gems,
       // because android does not comes with a compiler.
-      sb.append(String.format("-e \"/source 'https:\\/\\/rubygems.org'/a\\\nsource '%s'\" ",
+      sb.append(String.format("-e \"s#source 'https:\\/\\/rubygems.org'#source 'http:\\/\\/rubygems.org'\\\nsource '%s'#g\" ",
               REMOTE_GEM_SERVER));
 
       for (String compiledGem : ourGems) {
