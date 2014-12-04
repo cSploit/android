@@ -20,20 +20,22 @@
 
 package org.csploit.android.net;
 
-import org.joda.time.DateTime;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import android.util.Xml;
 
-import java.io.BufferedReader;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
 
 /**
- * This class parses JSON containing modification time of uploaded gems
+ * This class parses feed (XML/atom) containing modification time of uploaded gems
  */
 public class GemParser {
 
@@ -41,15 +43,9 @@ public class GemParser {
    * class that holds info about remote gem
    */
   public static class RemoteGemInfo {
-    public final String name;
-    public final String version;
-    public final Date uploaded;
-
-    private RemoteGemInfo(String name, String version, Date uploaded) {
-      this.name = name;
-      this.version = version;
-      this.uploaded = uploaded;
-    }
+    public String name;
+    public String version;
+    public Date uploaded;
   }
 
   private final String mUrl;
@@ -60,9 +56,9 @@ public class GemParser {
     mUrl = url;
   }
 
-  private void fetch() throws JSONException, IOException {
+  private void fetch() throws ParseException, XmlPullParserException, IOException {
     HttpURLConnection connection = null;
-    BufferedReader reader = null;
+    InputStream stream = null;
 
     try {
       HttpURLConnection.setFollowRedirects(true);
@@ -71,31 +67,57 @@ public class GemParser {
       int ret = connection.getResponseCode();
       if (ret != 200)
         throw new IOException("cannot retrieve remote json: " + ret);
-      reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-      StringBuilder sb = new StringBuilder();
-      String line;
 
-      while ((line = reader.readLine()) != null)
-        sb.append(line);
-      JSONArray jGems = new JSONArray(sb.toString());
-      mGems = new RemoteGemInfo[jGems.length()];
-      for (int i = 0; i < jGems.length(); i++) {
-        JSONObject gem = jGems.getJSONObject(i);
-        mGems[i] = new RemoteGemInfo(
-                gem.getString("name"),
-                gem.getString("version"),
-                (new DateTime(gem.getString("uploaded"))).toDate()
-        );
+      stream = connection.getInputStream();
+      XmlPullParser parser = Xml.newPullParser();
+      parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+      parser.setInput(stream, null);
+      parser.nextTag();
+      parser.require(XmlPullParser.START_TAG, null, "feed");
+
+      RemoteGemInfo gemInfo = null;
+      SimpleDateFormat parsingDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+
+      LinkedList<RemoteGemInfo> gems = new LinkedList<RemoteGemInfo>();
+
+      while(parser.next() != XmlPullParser.END_DOCUMENT) {
+
+        if(parser.getEventType() == XmlPullParser.END_TAG && parser.getName().equals("feed"))
+          break;
+
+        if(parser.getEventType() == XmlPullParser.START_TAG && parser.getName().equals("entry"))
+          gemInfo = new RemoteGemInfo();
+
+        if(gemInfo != null && gemInfo.name != null && parser.getEventType() == XmlPullParser.END_TAG && parser.getName().equals("entry")) {
+          gems.add(gemInfo);
+          gemInfo = null;
+        }
+
+        if(gemInfo != null && parser.getEventType() == XmlPullParser.START_TAG && parser.getName().equals("title"))
+        {
+          String[] titleParts = parser.nextText().split(" *[(\\-)] *");
+          gemInfo.name = titleParts[0];
+          gemInfo.version = titleParts[titleParts.length-1];
+        }
+
+        if(gemInfo != null && parser.getEventType() == XmlPullParser.START_TAG && parser.getName().equals("updated")) {
+          //convert UTC shortcut to offset. Android doesn't support Format X
+          String datetime = parser.nextText().replaceFirst("Z$","+00");
+          gemInfo.uploaded = parsingDateFormat.parse(datetime);
+        }
+
       }
+
+      mGems = gems.toArray(new RemoteGemInfo[gems.size()]);
     } finally {
-      if(reader!=null)
-        reader.close();
+      if(stream!=null)
+        stream.close();
       if(connection!=null)
         connection.disconnect();
     }
   }
 
-  public RemoteGemInfo[] parse() throws IOException, JSONException {
+  public RemoteGemInfo[] parse() throws IOException, XmlPullParserException, ParseException {
     if(mGems == null)
       fetch();
     return mGems;

@@ -39,7 +39,6 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 import org.apache.commons.compress.utils.CountingInputStream;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
@@ -74,7 +73,7 @@ public class UpdateService extends IntentService
 {
   // Resources defines
   private static final String REMOTE_RUBY_VERSION_URL = "https://gist.githubusercontent.com/tux-mind/e594b1cf923183cfcdfe/raw/ruby.json";
-  private static final String REMOTE_GEMS_VERSION_URL = "https://gist.githubusercontent.com/tux-mind/9c85eced88fd88367fa9/raw/gems.json";
+  private static final String REMOTE_GEMS_VERSION_URL = "http://gems.dsploit.net/atom.xml";
   private static final String REMOTE_GEM_SERVER = "http://gems.dsploit.net/";
   private static final Pattern GEM_FROM_LIST = Pattern.compile("^([^ ]+) \\(([^ ]+) ");
 
@@ -307,7 +306,7 @@ public class UpdateService extends IntentService
       }
     } catch (IOException e) {
       Logger.warning(e.getClass() + ": " + e.getMessage());
-    } catch (JSONException e) {
+    } catch (Exception e) {
       System.errorLogging(e);
     }
     return false;
