@@ -165,7 +165,8 @@ build_ruby() {
   system_ruby=""
 
   for bin in ruby ruby19; do 
-    test -n "$(which $bin)" && grep -q "1.9" <<<$($bin -v) && system_ruby="${bin}"
+    bin=$(which "$bin")
+    test -n "$bin" && grep -q "1.9" <<<$($bin -v) && system_ruby="${bin}"
   done
 
   test -n "${system_ruby}" || { echo "ruby 1.9 not found" >&2; echo "ruby 1.9 not found" >&3; die ;}
@@ -217,6 +218,7 @@ build_ruby() {
   unset RUBYOPT
   export RUBYLIB="${rubyroot}/lib/ruby/site_ruby/1.9.1:${rubyroot}/lib/ruby/site_ruby:${rubyroot}/lib/ruby/vendor_ruby/1.9.1:${rubyroot}/lib/ruby/vendor_ruby:${rubyroot}/lib/ruby/1.9.1"
   export HOME="${rubyroot}/home/ruby"
+  export GEM_HOME="${rubyroot}/lib/ruby/gems/1.9.1"
   echo "RUBYLIB=${RUBYLIB}" >&3
   mv "${rubyroot}/bin/ruby" "${rubyroot}/bin/ruby.arm" >&3 2>&1 || die
   ln -s "${system_ruby}" "${rubyroot}/bin/ruby" >&3 2>&1 || die
