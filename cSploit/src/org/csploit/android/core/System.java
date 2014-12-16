@@ -519,7 +519,7 @@ public class System
   }
 
   public static String getCoreBinPath() {
-      return mContext.getExternalFilesDir(null).getAbsolutePath();
+      return mContext.getFilesDir().getAbsolutePath();
   }
 
   public static String getSuPath(){
