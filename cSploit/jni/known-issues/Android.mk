@@ -24,6 +24,6 @@ LOCAL_CFLAGS:= -Wall -Werror
   
 LOCAL_SRC_FILES:= $(wildcard $(LOCAL_PATH)/*.c)
 
-LOCAL_MODULE:= know-issues
+LOCAL_MODULE:= known-issues
 
 include $(BUILD_EXECUTABLE)
