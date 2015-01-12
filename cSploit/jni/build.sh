@@ -109,7 +109,11 @@ build_core() {
   echo -n "building native executables..."
   ndk-build APP_OPTIM=debug NDK_DEBUG=1 -j$(grep -E "^processor" /proc/cpuinfo | wc -l) >&3 2>&1 || die
   echo -ne "ok\ncopying programs..."
-  cp "${bins}/cSploitd" "${out}/"
+  
+  for prog in cSploitd known-issues; do
+    cp "${bins}/${prog}" "${out}/" >&3 2>&1 || die
+  done
+
   for tool in arpspoof tcpdump ettercap hydra nmap fusemounts; do
     mkdir -p "${out}/tools/$tool" >&3 2>&1
     cp "${bins}/$tool" "${out}/tools/$tool/$tool" >&3 2>&1 || die
@@ -131,6 +135,8 @@ build_core() {
   
   rsync -aq --include "*/" --include "*.lua" --exclude "*" "${jni_root}/nmap/" "${out}/tools/nmap/" >&3 2>&1 || die
   rsync -aq "${jni_root}/nmap/scripts/" "${out}/tools/nmap/scripts/" >&3 2>&1 || die
+
+  cp "${jni_root}/known-issues/start_daemon.sh" "${out}/"
 
   echo -ne "ok\ncopying configuration/database files..."
   for f in $nmap_data; do

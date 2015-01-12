@@ -241,7 +241,7 @@ public class System
       writer = new DataOutputStream(shell.getOutputStream());
       String cmd;
 
-      cmd = String.format("{ echo 'ACCESS GRANTED' >&2; cd '%s' && exec ./cSploitd ;} || exit 1\n",
+      cmd = String.format("{ echo 'ACCESS GRANTED' >&2; cd '%s' && exec ./start_daemon.sh ;} || exit 1\n",
           System.getCoreBinPath());
 
       writer.write(cmd.getBytes());
