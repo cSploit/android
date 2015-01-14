@@ -15,22 +15,28 @@
  * along with cSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-
-/* WARNING: this check works if you DO NOT USE threads
- *          when using threads fork(2) become clone(2),
- *          which is not restricted.
- *          if you use threads within this project
- *          check the execve(2) syscall insted of fork(2).
- */
+#include <fcntl.h>
 
 void issue1() {
   pid_t pid;
+  char *argv[] = { "date", NULL };
+  int exec_errno, i;
+  int pexec[2];
+  
+  pexec[0] = pexec[1] = -1;
+  
+  if(pipe2(pexec, O_CLOEXEC)) {
+    fprintf(stderr, "%s: pipe2: %s\n", __func__, strerror(errno));
+    goto unsure;
+  }
   
   pid = fork();
   
@@ -38,23 +44,53 @@ void issue1() {
     if(errno == EACCES) {
       goto yes;
     } else {
+      fprintf(stderr, "%s: fork: %s\n", __func__, strerror(errno));
       goto unsure;
     }
   } else if(!pid) {
     // child
-    exit(0);
+    close(pexec[0]);
+    
+    execvp("date", argv);
+    
+    exec_errno = errno;
+    
+    write(pexec[1], &exec_errno, sizeof(int));
+    close(pexec[1]);
+    exit(1);
   }
+  
+  close(pexec[1]);
   
   waitpid(pid, NULL, 0);
   
-  return;
+  i = read(pexec[0], &exec_errno, sizeof(int));
+  
+  if ( i < 0 ) {
+    fprintf(stderr, "%s: read: %s\n", __func__, strerror(errno));
+    goto unsure;
+  } else if( i > 0 ) {
+    if(exec_errno == EACCES) {
+      goto yes;
+    } else {
+      fprintf(stderr, "%s: read: %s\n", __func__, strerror(errno));
+      goto unsure;
+    }
+  }
+  
+  
+  goto no;
   
   unsure:
   
-  fprintf(stderr, "%s: fork: %s\n", __func__, strerror(errno));
+  fprintf(stderr, "%s: assuming yes\n", __func__);
   
   yes:
-  
   printf("1\n");
+  
+  no:
+  
+  close(pexec[0]);
+  close(pexec[1]);
   
 }

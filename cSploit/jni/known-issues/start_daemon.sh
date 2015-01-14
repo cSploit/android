@@ -22,7 +22,7 @@ while read issue; do
     1)
        if [ ! -f "/cSploit/cSploitd" ]; then
           mount -o remount,rw / 2>&3 || die1 "remount rw failed"
-          mkdir /cSploit 2>&3 || die1 "mkdir failed"
+          test -d "/cSploit" || mkdir "/cSploit" 2>&3 || die1 "mkdir failed"
           mount -o bind "$script_dir" "/cSploit" 2>&3 || die1 "bind failed"
           mount -o remount,ro / 2>&3 || echo "remount ro failed" >&3
         fi
