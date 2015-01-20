@@ -473,9 +473,12 @@ public class UpdateService extends IntentService
    * @throws IOException if cannot delete something
    */
   private void deleteRecursively(File f) throws IOException {
-    if (f.isDirectory()) {
-      for (File c : f.listFiles())
+    File[] files = f.listFiles();
+
+    if(files != null) {
+      for( File c : files) {
         deleteRecursively(c);
+      }
     }
     if (!f.delete())
       throw new IOException("Failed to delete file: " + f);
