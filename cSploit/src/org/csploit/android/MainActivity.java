@@ -692,10 +692,20 @@ public class MainActivity extends SherlockListActivity {
           try {
             System.setMsfRpc(new RPCClient(msfHost, msfUser, msfPassword, msfPort, msfSsl));
             Logger.info("successfully connected to MSF RPC Daemon ");
-            Toast.makeText(MainActivity.this, "connected to MSF RPC Daemon", Toast.LENGTH_SHORT).show();
+            MainActivity.this.runOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                Toast.makeText(MainActivity.this, "connected to MSF RPC Daemon", Toast.LENGTH_SHORT).show();
+              }
+            });
           } catch (Exception e) {
             Logger.error(e.getClass().getName() + ": " + e.getMessage());
-            Toast.makeText(MainActivity.this, "connection to MSF RPC Daemon failed", Toast.LENGTH_LONG).show();
+            MainActivity.this.runOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                Toast.makeText(MainActivity.this, "connection to MSF RPC Daemon failed", Toast.LENGTH_LONG).show();
+              }
+            });
           }
         }
       }
