@@ -39,7 +39,7 @@
     <string name="min_length">Tamanho Mín.</string>
     <string name="username">Nome de Usuário</string>
     <string name="Charset">Conjunto de Caracteres</string>
-    <string name="filter_desc">Digite um filtro de substituição personalizado, incluindo um string simples ou expressões regulares.</string>
+    <string name="filter_desc">Digite um filtro de substituição personalizado, incluindo uma string simples ou expressões regulares.</string>
     <string name="from">De</string>
     <string name="to">Para</string>
     <string name="wake_on_lan">Wake On Lan</string>
@@ -67,7 +67,7 @@
     <string name="start_msfrpcd">Iniciar MetaSploit RPCD</string>
     <string name="stop_msfrpcd">Parar MetaSploit RPCD</string>
     <string name="exit">Sair</string>
-    <string name="close_confirm">Isto irá fechar o dSploit, você tem certeza que deseja continuar?
+    <string name="close_confirm">Isto irá fechar o cSploit, você tem certeza que deseja continuar?
     </string>
     <string name="press_back">Pressione voltar novamente para fechar este aplicativo.</string>
     <string name="selected_">Selecionado </string>
@@ -91,7 +91,7 @@
         <![CDATA[<p>Parece que o processador do dispositivo não é um ARM,desculpe,mas não é compatível com cSploit.</p>]]></string>
     <string name="arm_error2">
         <![CDATA[<p>Para mais informações, leia o <a href=\"http://csploit.net/#requirements\">requirements</a> section.</p>]]></string>
-    <string name="busybox_required">Necessária a instalação completa do BusyBox, binário killall não encontrado (talvez você tenha uma versão antiga do busybox).
+    <string name="busybox_required">Necessária a instalação completa do BusyBox,o binário killall não foi encontrado (talvez você tenha uma versão antiga do busybox).
     </string>
     <string name="only_4_root">Este aplicativo pode ser executado apenas em dispositivos com acesso Root.</string>
     <string name="initializing">Inicializando…</string>
