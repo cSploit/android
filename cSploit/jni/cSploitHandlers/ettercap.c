@@ -40,7 +40,7 @@ handler handler_info = {
   NULL,                       // raw_output_parser
   &ettercap_output_parser,    // output_parser
   NULL,                       // input_parser
-  "ettercap",                 // argv[0]
+  "./ettercap",               // argv[0]
   "tools/ettercap",           // workdir
   "ettercap"                  // handler name
 };
