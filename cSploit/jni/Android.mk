@@ -49,3 +49,4 @@ include $(MY_LOCAL_PATH)/cSploitHandlers/Android.mk
 include $(MY_LOCAL_PATH)/cSploitClient/Android.mk
 include $(MY_LOCAL_PATH)/libcares/Android.mk
 include $(MY_LOCAL_PATH)/known-issues/Android.mk
+include $(MY_LOCAL_PATH)/network-radar/Android.mk

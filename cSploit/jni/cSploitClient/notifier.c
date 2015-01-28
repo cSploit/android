@@ -38,6 +38,7 @@
 #include "arpspoof.h"
 #include "tcpdump.h"
 #include "fusemounts.h"
+#include "network-radar.h"
 
 #include "notifier.h"
 
@@ -259,6 +260,39 @@ int on_fusemounts(JNIEnv *env, child_node *c, message *m) {
   return ret;
 }
 
+int on_netradar(JNIEnv *env, child_node *c, message *m) {
+  jobject event;
+  int ret;
+  
+  ret = -1;
+  
+  switch(m->data[0]) {
+    case NRDR_HOST_ADD:
+    case NRDR_HOST_EDIT:
+      event = create_host_event(env, m);
+      break;
+    case NRDR_HOST_DEL:
+      event = create_hostlost_event(env, m);
+      break;
+    default:
+      LOGW("%s: unkown network-radar action: %02hhX", __func__, m->data[0]);
+      return -1;
+  }
+  
+  if(!event) {
+    LOGE("%s: cannot create event", __func__);
+  } else if(send_event(env, c, event)) {
+    LOGE("%s: cannot send event", __func__);
+  } else {
+    ret = 0;
+  }
+  
+  if(event)
+    (*env)->DeleteLocalRef(env, event);
+  
+  return ret;
+}
+
 int on_message(JNIEnv *env, message *m) {
   child_node *c;
   int ret;
@@ -295,6 +329,8 @@ int on_message(JNIEnv *env, message *m) {
     ret = on_tcpdump(env, c, m);
   } else if( c->handler == handlers.by_name.fusemounts) {
     ret = on_fusemounts(env, c, m);
+  } else if( c->handler == handlers.by_name.network_radar) {
+    ret = on_netradar(env, c, m);
   } else {
     LOGW("%s: unkown handler: \"%s\" ( #%u )", __func__, c->handler->name, c->handler->id);
   }

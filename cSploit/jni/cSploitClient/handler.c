@@ -197,6 +197,8 @@ int on_handler_list(message *m) {
       handlers.by_name.tcpdump = h;
     } else if(!handlers.by_name.fusemounts && !strncmp(h->name, "fusemounts", 11)) {
       handlers.by_name.fusemounts = h;
+    } else if(!handlers.by_name.network_radar && !strncmp(h->name, "network-radar", 14)) {
+      handlers.by_name.network_radar = h;
     }
     
     h->id = handler_info->id;

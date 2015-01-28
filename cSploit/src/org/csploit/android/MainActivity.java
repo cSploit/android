@@ -25,13 +25,8 @@ import static org.csploit.android.core.UpdateChecker.RUBY_AVAILABLE;
 import static org.csploit.android.core.UpdateChecker.UPDATE_AVAILABLE;
 import static org.csploit.android.core.UpdateChecker.UPDATE_CHECKING;
 import static org.csploit.android.core.UpdateChecker.UPDATE_NOT_AVAILABLE;
-import static org.csploit.android.net.NetworkDiscovery.ENDPOINT_ADDRESS;
-import static org.csploit.android.net.NetworkDiscovery.ENDPOINT_HARDWARE;
-import static org.csploit.android.net.NetworkDiscovery.ENDPOINT_NAME;
-import static org.csploit.android.net.NetworkDiscovery.ENDPOINT_UPDATE;
-import static org.csploit.android.net.NetworkDiscovery.NEW_ENDPOINT;
-
-import org.csploit.android.R;
+import static org.csploit.android.net.NetworkRadar.NRDR_STOPPED;
+import static org.csploit.android.net.NetworkRadar.TARGET_UPDATE;
 
 import org.csploit.android.core.Child;
 import org.csploit.android.core.ChildManager;
@@ -55,9 +50,8 @@ import org.csploit.android.gui.dialogs.InputDialog.InputDialogListener;
 import org.csploit.android.gui.dialogs.MultipleChoiceDialog;
 import org.csploit.android.gui.dialogs.SpinnerDialog;
 import org.csploit.android.gui.dialogs.SpinnerDialog.SpinnerDialogListener;
-import org.csploit.android.net.Endpoint;
 import org.csploit.android.net.Network;
-import org.csploit.android.net.NetworkDiscovery;
+import org.csploit.android.net.NetworkRadar;
 import org.csploit.android.net.Target;
 import org.csploit.android.net.metasploit.RPCClient;
 import org.csploit.android.plugins.ExploitFinder;
@@ -116,14 +110,15 @@ public class MainActivity extends SherlockListActivity {
 	private static final int WIFI_CONNECTION_REQUEST = 1012;
 	private boolean isWifiAvailable = false;
 	private TargetAdapter mTargetAdapter = null;
-	private NetworkDiscovery mNetworkDiscovery = null;
+  private NetworkRadar mNetworkRadar = null;
   private MsfRpcd mMsfRpcd = null;
-	private EndpointReceiver mEndpointReceiver = null;
+	private RadarReceiver mRadarReceiver = null;
 	private UpdateReceiver mUpdateReceiver = null;
 	private WipeReceiver mWipeReceiver = null;
 	private Menu mMenu = null;
 	private TextView mUpdateStatus = null;
 	private Toast mToast = null;
+  private ProgressDialog progressDialog;
 	private long mLastBackPressTime = 0;
   private ActionMode mActionMode = null;
 
@@ -157,7 +152,7 @@ public class MainActivity extends SherlockListActivity {
 		mUpdateReceiver.register(MainActivity.this);
 
 		startUpdateChecker();
-		stopNetworkDiscovery(true);
+		stopNetworkRadar(true);
 
 		if (Build.VERSION.SDK_INT >= 11)
 			invalidateOptionsMenu();
@@ -180,7 +175,7 @@ public class MainActivity extends SherlockListActivity {
 
 		layout.addView(mUpdateStatus);
 
-		stopNetworkDiscovery(true);
+		stopNetworkRadar(true);
 		if (Build.VERSION.SDK_INT >= 11)
 			invalidateOptionsMenu();
 	}
@@ -211,8 +206,8 @@ public class MainActivity extends SherlockListActivity {
 			}
 		});
 
-		if (mEndpointReceiver == null)
-			mEndpointReceiver = new EndpointReceiver();
+		if (mRadarReceiver == null)
+			mRadarReceiver = new RadarReceiver();
 
 		if (mUpdateReceiver == null)
 			mUpdateReceiver = new UpdateReceiver();
@@ -220,16 +215,16 @@ public class MainActivity extends SherlockListActivity {
 		if (mWipeReceiver == null)
 			mWipeReceiver = new WipeReceiver();
 
-		mEndpointReceiver.unregister();
+		mRadarReceiver.unregister();
 		mUpdateReceiver.unregister();
 		mWipeReceiver.unregister();
 
-		mEndpointReceiver.register(MainActivity.this);
+		mRadarReceiver.register(MainActivity.this);
 		mUpdateReceiver.register(MainActivity.this);
 		mWipeReceiver.register(MainActivity.this);
 
 		startUpdateChecker();
-		startNetworkDiscovery(false);
+		startNetworkRadar(false);
 		StartRPCServer();
 
 		// if called for the second time after wifi connection
@@ -266,6 +261,103 @@ public class MainActivity extends SherlockListActivity {
       createOnlineLayout();
   }
 
+  private void onInitializationStart() {
+
+    MainActivity.this.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        if(progressDialog == null) {
+          progressDialog = ProgressDialog.show(MainActivity.this, "",
+                  getString(R.string.initializing), true, false);
+        } else {
+          progressDialog.show();
+        }
+      }
+    });
+  }
+
+  private void onInitializationError(final String message) {
+    MainActivity.this.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        progressDialog.dismiss();
+        new FatalDialog(getString(R.string.initialization_error),
+                message, message.contains(">"),
+                MainActivity.this).show();
+      }
+    });
+  }
+
+  private void onInitializationSuccess() {
+    MainActivity.this.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          if(progressDialog != null)
+            progressDialog.dismiss();
+          createLayout();
+        } catch (Exception e) {
+          new FatalDialog(getString(R.string.error), e
+                  .getMessage(), MainActivity.this)
+                  .show();
+          return;
+        }
+
+        if (!System.getAppVersionName().equals(
+                System.getSettings().getString(
+                        "CSPLOIT_INSTALLED_VERSION", "0"))) {
+          new ChangelogDialog(MainActivity.this).show();
+          Editor editor = System.getSettings().edit();
+          editor.putString("CSPLOIT_INSTALLED_VERSION",
+                  System.getAppVersionName());
+          editor.apply();
+        }
+      }
+    });
+  }
+
+  private Runnable initializer = new Runnable() {
+    @Override
+    public void run() {
+
+      if(!System.isCoreInitialized()) {
+
+        onInitializationStart();
+
+        Context appContext = MainActivity.this
+                .getApplicationContext();
+        String fatal = null;
+        ToolsInstaller installer = new ToolsInstaller(appContext);
+
+        if (!System.isARM())
+          fatal = getString(R.string.arm_error)
+                  + getString(R.string.arm_error2);
+
+        else if (installer.needed() && !installer.install())
+          fatal = getString(R.string.install_error);
+
+        else {
+          try {
+            System.initCore();
+          } catch (System.SuException e) {
+            Logger.error(e.getMessage());
+            fatal = getString(R.string.only_4_root);
+          } catch (System.DaemonException e) {
+            Logger.error(e.getMessage());
+            fatal = "heart attack!";
+          }
+        }
+
+        if (fatal != null) {
+          onInitializationError(fatal);
+          return;
+        }
+      }
+
+      onInitializationSuccess();
+    }
+  };
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -280,19 +372,15 @@ public class MainActivity extends SherlockListActivity {
 		NO_WIFI_UPDATE_MESSAGE = getString(R.string.no_wifi_available);
 		isWifiAvailable = Network.isWifiConnected(this);
 
-    // initialize the ui for the first time
-    final ProgressDialog dialog = ProgressDialog.show(this, "",
-        getString(R.string.initializing), true, false);
+    // make sure system object was correctly initialized during application
+    // startup
+    if(!System.isInitialized()) {
+      // wifi available but system failed to initialize, this is a fatal
+      // :(
+      if(isWifiAvailable) {
 
-		// make sure system object was correctly initialized during application
-		// startup
-		if (!System.isInitialized()) {
-			// wifi available but system failed to initialize, this is a fatal
-			// :(
-			if (isWifiAvailable) {
         // retry
         try {
-          dialog.show();
           System.init(MainActivity.this.getApplicationContext());
 
           System.registerPlugin(new RouterPwn());
@@ -314,85 +402,12 @@ public class MainActivity extends SherlockListActivity {
 
           return;
         }
-			}
-		}
+      }
+    }
 
     // this is necessary to not block the user interface while
     // initializing
-    if(!System.isCoreInitialized()) {
-      long startTime = java.lang.System.currentTimeMillis();
-      new Thread(new Runnable() {
-        @Override
-        public void run() {
-          dialog.show();
-          Context appContext = MainActivity.this
-                  .getApplicationContext();
-          String fatal = null;
-          ToolsInstaller installer = new ToolsInstaller(appContext);
-
-          if (!System.isARM())
-            fatal = getString(R.string.arm_error)
-                    + getString(R.string.arm_error2);
-
-          else if (installer.needed() && !installer.install())
-            fatal = getString(R.string.install_error);
-
-          else {
-            try {
-              System.initCore();
-            } catch (System.SuException e) {
-              Logger.error(e.getMessage());
-              fatal = getString(R.string.only_4_root);
-            } catch (System.DaemonException e) {
-              Logger.error(e.getMessage());
-              fatal = "heart attack!";
-            }
-          }
-
-          dialog.dismiss();
-
-          if (fatal != null) {
-            final String ffatal = fatal;
-            MainActivity.this.runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                new FatalDialog(getString(R.string.error),
-                        ffatal, ffatal.contains(">"),
-                        MainActivity.this).show();
-              }
-            });
-            return;
-          }
-
-          MainActivity.this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-              if (!System.getAppVersionName().equals(
-                      System.getSettings().getString(
-                              "CSPLOIT_INSTALLED_VERSION", "0"))) {
-                new ChangelogDialog(MainActivity.this).show();
-                Editor editor = System.getSettings().edit();
-                editor.putString("CSPLOIT_INSTALLED_VERSION",
-                        System.getAppVersionName());
-                editor.apply();
-              }
-            }
-          });
-        }
-      }).start();
-
-      Logger.debug("initializer thread created and started in " +
-          (java.lang.System.currentTimeMillis() - startTime) + " ms");
-
-      try {
-        createLayout();
-      } catch (Exception e) {
-        new FatalDialog(getString(R.string.error), e
-                .getMessage(), MainActivity.this)
-                .show();
-      }
-    }
-    dialog.dismiss();
+    new Thread(initializer).start();
 	}
 
 	@Override
@@ -419,7 +434,7 @@ public class MainActivity extends SherlockListActivity {
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		MenuItem item = menu.findItem(R.id.ss_monitor);
 
-		if (mNetworkDiscovery != null && mNetworkDiscovery.isRunning())
+		if (mNetworkRadar != null && mNetworkRadar.isRunning())
 			item.setTitle(getString(R.string.stop_monitor));
 		else
 			item.setTitle(getString(R.string.start_monitor));
@@ -547,71 +562,28 @@ public class MainActivity extends SherlockListActivity {
 		}
 	}
 
-	public void startNetworkDiscovery(boolean silent) {
-		stopNetworkDiscovery(silent);
+	public void startNetworkRadar(boolean silent) {
+		stopNetworkRadar(silent);
 
-		mNetworkDiscovery = new NetworkDiscovery(this);
-		mNetworkDiscovery.start();
+		if(mNetworkRadar == null) {
+      mNetworkRadar = new NetworkRadar(this);
+    }
 
-		if (!silent)
-			Toast.makeText(this, getString(R.string.net_discovery_started),
-					Toast.LENGTH_SHORT).show();
-	}
+    try {
+      mNetworkRadar.start();
 
-	public void stopNetworkDiscovery(final boolean silent, boolean joinThreads) {
-		if (mNetworkDiscovery != null) {
-			if (mNetworkDiscovery.isRunning()) {
-				mNetworkDiscovery.exit();
-
-				if (joinThreads) {
-
-          MainActivity.this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-              mMenu.findItem(R.id.ss_monitor).setEnabled(false);
-            }
-          });
-
-          new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-              try {
-                mNetworkDiscovery.join();
-              } catch (Exception e) {
-              }
-
-              MainActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-                  mMenu.findItem(R.id.ss_monitor).setEnabled(true);
-
-                  if(!silent)
-                    Toast.makeText(MainActivity.this,
-                      getString(R.string.net_discovery_stopped),
-                      Toast.LENGTH_SHORT).show();
-                }
-              });
-
-              mNetworkDiscovery = null;
-            }
-          }).start();
-				} else {
-
-          mNetworkDiscovery = null;
-
-          if (!silent)
-            Toast.makeText(this,
-                getString(R.string.net_discovery_stopped),
+      if (!silent)
+        Toast.makeText(this, getString(R.string.net_discovery_started),
                 Toast.LENGTH_SHORT).show();
-        }
-			}
-		}
+    } catch (ChildManager.ChildNotStartedException e) {
+      Toast.makeText(this, "cannot start process", Toast.LENGTH_LONG).show();
+    }
 	}
 
-	public void stopNetworkDiscovery(boolean silent) {
-		stopNetworkDiscovery(silent, true);
+	public void stopNetworkRadar(boolean silent) {
+		if (mNetworkRadar != null && mNetworkRadar.isRunning()) {
+      mNetworkRadar.stop(!silent);
+		}
 	}
 
   /**
@@ -783,7 +755,7 @@ public class MainActivity extends SherlockListActivity {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					startNetworkDiscovery(true);
+					startNetworkRadar(true);
 
 					MainActivity.this.runOnUiThread(new Runnable() {
 						@Override
@@ -799,10 +771,10 @@ public class MainActivity extends SherlockListActivity {
 			return true;
 
 		case R.id.wifi_scan:
-			stopNetworkDiscovery(true);
+			stopNetworkRadar(true);
 
-			if (mEndpointReceiver != null)
-				mEndpointReceiver.unregister();
+			if (mRadarReceiver != null)
+				mRadarReceiver.unregister();
 
 			if (mUpdateReceiver != null)
 				mUpdateReceiver.unregister();
@@ -906,13 +878,13 @@ public class MainActivity extends SherlockListActivity {
 			return true;
 
 		case R.id.ss_monitor:
-			if (mNetworkDiscovery != null && mNetworkDiscovery.isRunning()) {
-				stopNetworkDiscovery(false);
+			if (mNetworkRadar != null && mNetworkRadar.isRunning()) {
+				stopNetworkRadar(false);
 
 				item.setTitle(getString(R.string.start_monitor));
 			} else {
         try {
-          startNetworkDiscovery(false);
+          startNetworkRadar(false);
 
           item.setTitle(getString(R.string.stop_monitor));
         } catch (Exception e) {
@@ -966,11 +938,6 @@ public class MainActivity extends SherlockListActivity {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				/*
-				 * Do not wait network discovery threads to exit since this
-				 * would cause a long waiting when it's scanning big networks.
-				 */
-				stopNetworkDiscovery(true, false);
 
 				startActivityForResult(new Intent(MainActivity.this,
 						ActionActivity.class), WIFI_CONNECTION_REQUEST);
@@ -1016,11 +983,11 @@ public class MainActivity extends SherlockListActivity {
 
 	@Override
 	public void onDestroy() {
-		stopNetworkDiscovery(true);
+		stopNetworkRadar(true);
 		StopRPCServer(true);
 
-		if (mEndpointReceiver != null)
-			mEndpointReceiver.unregister();
+		if (mRadarReceiver != null)
+			mRadarReceiver.unregister();
 
 		if (mUpdateReceiver != null)
 			mUpdateReceiver.unregister();
@@ -1143,14 +1110,14 @@ public class MainActivity extends SherlockListActivity {
 		}
 	}
 
-	private class EndpointReceiver extends ManagedReceiver {
+	private class RadarReceiver extends ManagedReceiver {
 		private IntentFilter mFilter = null;
 
-		public EndpointReceiver() {
+		public RadarReceiver() {
 			mFilter = new IntentFilter();
 
-			mFilter.addAction(NEW_ENDPOINT);
-			mFilter.addAction(ENDPOINT_UPDATE);
+			mFilter.addAction(TARGET_UPDATE);
+			mFilter.addAction(NRDR_STOPPED);
 		}
 
 		public IntentFilter getFilter() {
@@ -1160,40 +1127,22 @@ public class MainActivity extends SherlockListActivity {
 		@SuppressWarnings("ConstantConditions")
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent.getAction() != null)
-				if (intent.getAction().equals(NEW_ENDPOINT)) {
-					String address = (String) intent.getExtras().get(
-							ENDPOINT_ADDRESS), hardware = (String) intent
-							.getExtras().get(ENDPOINT_HARDWARE), name = (String) intent
-							.getExtras().get(ENDPOINT_NAME);
-					final Target target = Target.getFromString(address);
+      if(intent.getAction() == null)
+        return;
 
-					if (target != null && target.getEndpoint() != null) {
-						if (name != null && !name.isEmpty())
-							target.setAlias(name);
+      if (intent.getAction().equals(TARGET_UPDATE)) {
+        // refresh the target listview
+        MainActivity.this.runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            mTargetAdapter.notifyDataSetChanged();
+          }
+        });
+      } else if (intent.getAction().equals(NRDR_STOPPED)) {
 
-						target.getEndpoint().setHardware(
-								Endpoint.parseMacAddress(hardware));
-
-						// refresh the target listview
-						MainActivity.this.runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								if (System.addOrderedTarget(target)) {
-									mTargetAdapter.notifyDataSetChanged();
-								}
-							}
-						});
-					}
-				} else if (intent.getAction().equals(ENDPOINT_UPDATE)) {
-					// refresh the target listview
-					MainActivity.this.runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							mTargetAdapter.notifyDataSetChanged();
-						}
-					});
-				}
+        Toast.makeText(MainActivity.this, R.string.net_discovery_stopped,
+                Toast.LENGTH_SHORT).show();
+      }
 		}
 	}
 

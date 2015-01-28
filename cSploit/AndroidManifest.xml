@@ -35,10 +35,6 @@
 
         <!--suppress AndroidDomInspection -->
         <service
-                android:name="org.csploit.android.net.NetworkDiscovery"
-                android:enabled="true"/>
-        <!--suppress AndroidDomInspection -->
-        <service
                 android:name="org.csploit.android.core.UpdateChecker"
                 android:enabled="true"/>
         <service

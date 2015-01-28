@@ -44,7 +44,9 @@ struct events_cache {
         login,
         attempts,
         packet,
-        fusebind;
+        fusebind,
+        host,
+        hostlost;
 };
 
 struct core_chlidmanager_cache {

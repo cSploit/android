@@ -33,6 +33,7 @@ public class ToolBox {
   public final IPTables ipTables;
   public final TcpDump tcpDump;
   public final Msf msf;
+  public final NetworkRadar networkRadar;
 
   public ToolBox() {
     raw = new Raw();
@@ -46,6 +47,7 @@ public class ToolBox {
     ipTables = new IPTables();
     tcpDump = new TcpDump();
     msf = new Msf();
+    networkRadar = new NetworkRadar();
   }
 
   public void reload() {
@@ -60,5 +62,6 @@ public class ToolBox {
     ipTables.setEnabled();
     tcpDump.setEnabled();
     msf.setEnabled();
+    networkRadar.setEnabled();
   }
 }

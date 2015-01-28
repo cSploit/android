@@ -59,6 +59,7 @@ import java.net.InetSocketAddress;
 import java.net.NoRouteToHostException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -1090,14 +1091,27 @@ public class System
   }
 
   public static Target getTargetByAddress(String address){
-    int i, size = mTargets.size();
+    try {
+      return getTargetByAddress(InetAddress.getByName(address));
+    } catch ( UnknownHostException e) {
+      Logger.error("cannot convert '" + address + "' to InetAddress: " + e.getMessage());
+    }
+    return null;
+  }
 
-    for(i = 0; i < size; i++){
-      synchronized(mTargets){
+  public static Target getTargetByAddress(InetAddress address) {
+    int i, size;
+
+    synchronized (mTargets) {
+
+      size = mTargets.size();
+
+      for(i=0;i<size;i++) {
         Target t = mTargets.get(i);
 
-        if(t != null && t.getAddress() != null && t.getAddress().getHostAddress().equals(address))
+        if(t != null && t.getAddress() != null && t.getAddress().equals(address)) {
           return t;
+        }
       }
     }
 

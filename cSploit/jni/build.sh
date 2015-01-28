@@ -114,7 +114,7 @@ build_core() {
     cp "${bins}/${prog}" "${out}/" >&3 2>&1 || die
   done
 
-  for tool in arpspoof tcpdump ettercap hydra nmap fusemounts; do
+  for tool in arpspoof tcpdump ettercap hydra nmap fusemounts network-radar; do
     mkdir -p "${out}/tools/$tool" >&3 2>&1
     cp "${bins}/$tool" "${out}/tools/$tool/$tool" >&3 2>&1 || die
   done

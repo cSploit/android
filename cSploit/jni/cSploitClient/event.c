@@ -32,6 +32,7 @@
 #include "arpspoof.h"
 #include "tcpdump.h"
 #include "fusemounts.h"
+#include "network-radar.h"
 
 #include "event.h"
 
@@ -659,6 +660,92 @@ jobject create_fusebind_event(JNIEnv *env, message *m) {
   
   if(jmnt)
     (*env)->DeleteLocalRef(env, jmnt);
+  
+  return res;
+}
+
+/**
+ * @brief create an org.csploit.android.events.Host
+ * @param m the received message
+ * @returns the jobject on success, NULL on error.
+ */
+jobject create_host_event(JNIEnv *env, message *m) {
+  jstring jname;
+  jobject res, ip_addr;
+  jbyteArray eth_addr;
+  struct nrdr_host_info *hinfo;
+  char *pos;
+  
+  res = ip_addr = NULL;
+  pos = NULL;
+  jname = NULL;
+  
+  hinfo = (struct nrdr_host_info *) m->data;
+  
+  ip_addr = inaddr_to_inetaddress(env, hinfo->ip_addr);
+  if(!ip_addr) return NULL;
+  
+  eth_addr = (*env)->NewByteArray(env, 6);
+  if(!eth_addr) goto cleanup;
+  
+  (*env)->SetByteArrayRegion(env, eth_addr, 0, 6, (const jbyte *) hinfo->eth_addr);
+  
+  pos = string_array_next(m, hinfo->name, pos);
+  
+  if(pos) {
+    jname = (*env)->NewStringUTF(env, hinfo->name);
+    if(!jname) goto cleanup;
+  }
+  
+  res = (*env)->NewObject(env,
+                          cache.csploit.events.host.class,
+                          cache.csploit.events.host.ctor,
+                          eth_addr, ip_addr, jname);
+  
+  cleanup:
+  
+  if((*env)->ExceptionCheck(env)) {
+    (*env)->ExceptionDescribe(env);
+    (*env)->ExceptionClear(env);
+  }
+  
+  if(ip_addr)
+    (*env)->DeleteLocalRef(env, ip_addr);
+  
+  if(eth_addr)
+    (*env)->DeleteLocalRef(env, eth_addr);
+  
+  if(jname)
+    (*env)->DeleteLocalRef(env, jname);
+  
+  return res;
+}
+
+/**
+ * @brief create an org.csploit.android.events.HostLost
+ * @param m the received message
+ * @returns the jobject on success, NULL on error.
+ */
+jobject create_hostlost_event(JNIEnv *env, message *m) {
+  jobject res, addr;
+  struct nrdr_host_del_info *hinfo;
+  
+  hinfo = (struct nrdr_host_del_info *) m->data;
+  
+  addr = inaddr_to_inetaddress(env, hinfo->ip_addr);
+  if(!addr) return NULL;
+  
+  res = (*env)->NewObject(env,
+                          cache.csploit.events.hostlost.class,
+                          cache.csploit.events.hostlost.ctor,
+                          addr);
+  
+  if((*env)->ExceptionCheck(env)) {
+    (*env)->ExceptionDescribe(env);
+    (*env)->ExceptionClear(env);
+  }
+  
+  (*env)->DeleteLocalRef(env, addr);
   
   return res;
 }

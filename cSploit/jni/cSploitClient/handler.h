@@ -54,6 +54,7 @@ extern struct handlers_list {
     handler *arpspoof;
     handler *tcpdump;
     handler *fusemounts;
+    handler *network_radar;
   } by_name;              ///< access handlers by name
   enum handlers_loading_status status;
 } handlers;

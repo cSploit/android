@@ -37,6 +37,8 @@ jobject create_login_event(JNIEnv *, message *);
 jobject create_attempts_event(JNIEnv *, message *);
 jobject create_packet_event(JNIEnv *, message *);
 jobject create_fusebind_event(JNIEnv *, message *);
+jobject create_host_event(JNIEnv *, message *);
+jobject create_hostlost_event(JNIEnv *, message *);
 int send_event(JNIEnv *, child_node *, jobject);
 
 #endif

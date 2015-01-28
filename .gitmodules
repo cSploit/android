@@ -133,3 +133,6 @@
 	path = cSploit/jni/libcares
 	url = https://github.com/tux-mind/c-ares.git
 	branch = cares_1_10_0_android_arm_32
+[submodule "cSploit/jni/network-radar"]
+	path = cSploit/jni/network-radar
+	url = https://github.com/cSploit/network-radar.git
