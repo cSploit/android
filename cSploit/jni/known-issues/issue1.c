@@ -51,6 +51,10 @@ void issue1() {
     // child
     close(pexec[0]);
     
+    close(0);
+    close(1);
+    close(2);
+    
     execvp("date", argv);
     
     exec_errno = errno;
