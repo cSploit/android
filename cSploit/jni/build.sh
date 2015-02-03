@@ -2,8 +2,9 @@
 
 oldpwd=$(pwd)
 
-UPDATE_SERVER="http://update.dsploit.net/"
-RUBY_VERSION=1
+UPDATE_SERVER="http://update.csploit.org/"
+RUBY_VERSION=1.0.0
+CORE_VERSION=1.0.0
 
 die() {
 	echo "FAILED"
@@ -17,7 +18,6 @@ die() {
 }
 
 create_archive_metadata() {
-  echo -n "creating metadata file..."
   md5=$(md5sum "$1" 2>&3 | grep -oE "[0-9a-f]{32}")
   test -n "${md5}" || die
   sha1=$(sha1sum "$1" 2>&3 | grep -oE "[0-9a-f]{40}")
@@ -30,11 +30,11 @@ create_archive_metadata() {
   "version" : $3,
   "archiver" : "$4",
   "compression" : "$5",
+  "platform" : "android-${api}_${abi}",
   "md5" : "${md5}",
   "sha1" : "${sha1}"
 }
 EOF
-  echo -ne "ok\n"
 }
 
 test -d "${oldpwd}" || die
@@ -77,10 +77,10 @@ directories="/enc/trans/
 /mathn/
 /racc/
 /"
+api="9"
+abi="armeabi"
 
-build_core() {
-  echo "*** creating core package ***"
-
+check_ndk() {
   ndk_build=$(which ndk-build) || \
   (echo "android NDK not found, please ensure that it's directory is in your PATH"; die)
 
@@ -93,22 +93,55 @@ build_core() {
 
   for s in $ndk_empty_scripts; do
     if [ ! -f "${ndk_dir}${s}" ]; then
-      $sudo touch "${ndk_dir}${s}" >&3 2>&1 || die
+      { $sudo touch "${ndk_dir}${s}" 2>&1 | tee >(cat - >&3) ;} || die
     fi
   done
+}
+
+build_core() {
+  app_root=$(readlink -f ../)
   
+  ndk_args="V=1 APP_OPTIM=debug NDK_DEBUG=1 " # debug
+  ndk_args+="APP_PLATFORM=android-${api} " # force android api level 
+  ndk_args+="NDK_OUT=${app_root}/obj/android-${api} " # objects directory
+
+  echo
+  echo -n "[core] compiling for android-${api}..."
   
-  bins=$(readlink -f ../libs/armeabi/)
+  cpus=$(grep -E "^processor" /proc/cpuinfo | wc -l)
+  
+  echo "running: ndk-build $ndk_args -j${cpus}" >&3
+  
+  ndk-build $ndk_args -j${cpus} >&3 2>&1 || die
+  
+  echo "ok"
+}
+
+copy_java_libs() {
+  javaLibs=$(readlink -f ../src/main/jniLibs/${abi}/)
+  bins=$(readlink -f ../libs/${abi})
+  
+  echo
+  echo -n "[core] copying ${abi} libs to java project..."
+  
+  { test -d "${javaLibs}" || mkdir -p "${javaLibs}" ;} >&3 2>&1 || die
+  cp "${bins}/libcSploitClient.so" "${bins}/libcSploitCommon.so" "${javaLibs}" >&3 2>&1 || die
+  
+  echo "ok"
+}
+
+pack_core() {
+  echo
+  echo "[core] building android-${api}_${abi} package"
+  
   jni_root=$(readlink -f ./)
-  src=$(readlink -f ../src)
   out="/tmp/cSploitCore"
+  bins=$(readlink -f ../libs/${abi})
   
   rm -rf "${out}" >&3 2>&1 || die
   mkdir -p "${out}" >&3 2>&1 || die
-
-  echo -n "building native executables..."
-  ndk-build APP_OPTIM=debug NDK_DEBUG=1 -j$(grep -E "^processor" /proc/cpuinfo | wc -l) >&3 2>&1 || die
-  echo -ne "ok\ncopying programs..."
+  
+  echo -n "[core] -  copying programs..."
   
   for prog in cSploitd known-issues; do
     cp "${bins}/${prog}" "${out}/" >&3 2>&1 || die
@@ -118,7 +151,7 @@ build_core() {
     mkdir -p "${out}/tools/$tool" >&3 2>&1
     cp "${bins}/$tool" "${out}/tools/$tool/$tool" >&3 2>&1 || die
   done
-  echo -ne "ok\ncopying libraries..."
+  echo -ne "ok\n[core] -  copying libraries..."
   
   mkdir -p "${out}/handlers" >&3 2>&1 || die
   
@@ -131,14 +164,14 @@ build_core() {
     ec_lib=$(basename "$ec_lib")
     cp "${bins}/$ec_lib" "${out}/tools/ettercap/${ec_lib:3}" >&3 2>&1 || die
   done
-  echo -ne "ok\ncopying scripts..."
+  echo -ne "ok\n[core] -  copying scripts..."
   
   rsync -aq --include "*/" --include "*.lua" --exclude "*" "${jni_root}/nmap/" "${out}/tools/nmap/" >&3 2>&1 || die
   rsync -aq "${jni_root}/nmap/scripts/" "${out}/tools/nmap/scripts/" >&3 2>&1 || die
 
   cp "${jni_root}/known-issues/start_daemon.sh" "${out}/"
 
-  echo -ne "ok\ncopying configuration/database files..."
+  echo -ne "ok\n[core] -  copying configuration/database files..."
   for f in $nmap_data; do
     cp "${jni_root}/nmap/$f" "${out}/tools/nmap/" >&3 2>&1 || die
   done
@@ -151,17 +184,35 @@ build_core() {
 
   echo "android:DEADBEEF" > "${out}/users" 2>&3 || die
 
-  echo -ne "ok\ncreating archive..."
+  echo -ne "ok\n[core] -  creating archive..."
+  
   (cd ${out} && zip -qr ../core.zip ./) >&3 2>&1 || die
   rm -rf "${out}" >&3 2>&1 || die
-  if [ ! -d ../assets ]; then
-    mkdir ../assets >&3 2>&1 || die
+  if [ ! -d ../dist ]; then
+    mkdir ../dist >&3 2>&1 || die
   fi
-  mv /tmp/core.zip ../assets/ >&3 2>&1 || die
-  echo -ne "ok\ncopying native libraries to java project..."
-  { test -d "${src}/main/jniLibs/armeabi/" || mkdir -p "${src}/main/jniLibs/armeabi/" ;} >&3 2>&1 || die
-  cp "${bins}/libcSploitClient.so" "${bins}/libcSploitCommon.so" "${src}/main/jniLibs/armeabi/" >&3 2>&1 || die
+  
+  core_basename="core-v${CORE_VERSION}+android-${api}_${abi}"
+  core_path="../dist/${core_basename}.zip"
+  core_json="../dist/${core_basename}.json"
+  
+  mv /tmp/core.zip $core_path >&3 2>&1 || die
+  
+  echo -ne "ok\n[core] -  creating archive manifest..."
+  
+  create_archive_metadata $core_path $core_json $CORE_VERSION zip none
+  
   echo "ok"
+}
+
+build_cores() {
+  for api in 9 16; do
+    build_core
+    for abi in armeabi armeabi-v7a; do
+      copy_java_libs
+      pack_core
+    done
+  done
 }
 
 
@@ -245,23 +296,25 @@ build_ruby() {
   cd "${oldpwd}"
   rm -rf rubyroot
 
-  echo -ne "ok\n"
+  echo -ne "ok\ncreating archive manifest..."
 
   create_archive_metadata ../dist/ruby.tar.xz ../dist/ruby.json $RUBY_VERSION tar xz
+  
+  echo "ok"
 }
 
-pkg="core"
+pkg="cores"
 
 test "$#" -ne 1 || pkg=$1
 
 case $pkg in
 ruby) build_ruby
   ;;
-core) build_core
+core|cores) build_cores
   ;;
 *)
   scriptname=$(basename "$0")
-  echo -e "Usage: $scriptname <task>\n\ntask must be one of:\n  - ruby : build the ruby archive\n  - tools: build native tools used by cSploit (default)" >&2
+  echo -e "Usage: $scriptname <task>\n\ntask must be one of:\n  - ruby : build the ruby archive\n  - cores: build native tools used by cSploit (default)" >&2
   ;;
 esac
 
