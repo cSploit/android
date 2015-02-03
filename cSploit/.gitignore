@@ -1,9 +1,7 @@
 obj
-libs/armeabi
-libs/x86
-libs/mips
+libs
 dist
-src/main
+src/main/jniLibs
 *.so
 *.jks
 *.tar.*
