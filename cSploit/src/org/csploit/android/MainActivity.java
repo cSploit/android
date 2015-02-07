@@ -121,7 +121,6 @@ public class MainActivity extends SherlockListActivity {
   private ProgressDialog progressDialog;
 	private long mLastBackPressTime = 0;
   private ActionMode mActionMode = null;
-  private boolean mInitialization = false;
 
 	private void createUpdateLayout() {
 
@@ -242,8 +241,6 @@ public class MainActivity extends SherlockListActivity {
     } else {
       progressDialog.show();
     }
-
-    mInitialization = true;
   }
 
   private void onInitializationError(final String message) {
@@ -256,7 +253,6 @@ public class MainActivity extends SherlockListActivity {
                 MainActivity.this).show();
       }
     });
-    mInitialization = false;
   }
 
   private void onInitializationSuccess() {
@@ -284,7 +280,6 @@ public class MainActivity extends SherlockListActivity {
         }
       }
     });
-    mInitialization = false;
   }
 
 	@Override
@@ -374,6 +369,10 @@ public class MainActivity extends SherlockListActivity {
     }
 
     createLayout();
+
+    if(coreBeating) {
+      onInitializationSuccess();
+    }
 	}
 
 	@Override
