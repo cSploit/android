@@ -287,12 +287,6 @@ public class MainActivity extends SherlockListActivity {
     mInitialization = false;
   }
 
-  //TODO: this is horrible...
-  //TODO: create an "heartless" layout ... OK
-  //TODO: start UpdateChecker ... OK
-  //TODO: start UpdateService ... OK
-  //TODO: reinit
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
