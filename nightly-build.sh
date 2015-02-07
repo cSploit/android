@@ -52,7 +52,7 @@ find $NIGHTLIES_OUT_DIR -type f -a -mtime +${MAX_DAYS} -a ! -name "${LAST_APK}" 
 find $LOG_DIR -type f -a -mtime +${MAX_DAYS} -exec rm -f "{}" \; >&3 2>&1
 
 echo -n -e "${CYAN}Syncing git repo...${RESET}\n" | tee >(cat - >&3)
-git fetch --all && git reset --hard origin/master && git submodule update --init >&3 2>&1 || die
+git fetch --all && git reset --hard origin/master && git submodule update --recursive --init >&3 2>&1 || die
 
 LAST_COMMIT=$(git rev-parse HEAD)
 
