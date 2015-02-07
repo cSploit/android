@@ -26,7 +26,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
-import android.os.Binder;
 import android.support.v4.app.NotificationCompat;
 
 import com.github.zafarkhaja.semver.Version;
@@ -251,7 +250,7 @@ public class UpdateService extends IntentService
         mCoreInfo.path = String.format("%s/%s", System.getStoragePath(), mCoreInfo.name);
         mCoreInfo.archiver = archiveAlgorithm.tar;
         mCoreInfo.compression = compressionAlgorithm.xz;
-        mCoreInfo.executableOutputDir = mCoreInfo.outputDir = System.getCoreBinPath();
+        mCoreInfo.executableOutputDir = mCoreInfo.outputDir = System.getCorePath();
 
         exitForError = false;
 

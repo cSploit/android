@@ -1197,8 +1197,6 @@ public class MainActivity extends SherlockListActivity {
                     i.setAction(UpdateService.START);
                     i.putExtra(UpdateService.ACTION, target);
 
-                    Logger.debug("starting UpdateService with: " + ((Context)MainActivity.this).toString());
-
                     startService(i);
                   }
 

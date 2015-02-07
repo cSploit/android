@@ -242,7 +242,7 @@ public class System
       String cmd;
 
       cmd = String.format("{ echo 'ACCESS GRANTED' >&2; cd '%s' && exec ./start_daemon.sh ;} || exit 1\n",
-          System.getCoreBinPath());
+          System.getCorePath());
 
       writer.write(cmd.getBytes());
       writer.flush();
@@ -281,7 +281,7 @@ public class System
       throw new SuException();
 
     if(ret != 0) {
-      File log = new File(System.getCoreBinPath(), "cSploitd.log");
+      File log = new File(System.getCorePath(), "cSploitd.log");
       if(log.exists() && log.canRead()) {
         try {
           reader = new BufferedReader(new FileReader(log));
@@ -304,7 +304,7 @@ public class System
    * shutdown the core daemon
    */
   public static void shutdownCoreDaemon(){
-    if(!Client.isConnected() && !Client.Connect("/dev/socket/cSploit")) {
+    if(!Client.isConnected() && !Client.Connect(getCorePath() + "/cSploitd.sock")) {
       return; // daemon is not running
     }
     if(!Client.isAuthenticated() && !Client.Login("android", "DEADBEEF")) {
@@ -319,7 +319,7 @@ public class System
     if(mCoreInitialized)
       return;
 
-    String socket_path = "/dev/socket/cSploit";
+    String socket_path = getCorePath() + "/cSploitd.sock";
 
     if(!Client.isConnected()) {
       if(!Client.Connect(socket_path)) {
@@ -535,7 +535,7 @@ public class System
     return mContext.getFilesDir().getAbsolutePath() + "/tools/";
   }
 
-  public static String getCoreBinPath() {
+  public static String getCorePath() {
       return mContext.getFilesDir().getAbsolutePath();
   }
 
@@ -714,7 +714,7 @@ public class System
    */
   public static String getCoreVersion() {
     if(mCoreVersion == null)
-      mCoreVersion = readFirstLine(getCoreBinPath() + "/VERSION");
+      mCoreVersion = readFirstLine(getCorePath() + "/VERSION");
     return mCoreVersion;
   }
 
@@ -1006,7 +1006,7 @@ public class System
   }
 
   public static boolean isCoreInstalled() {
-    return new File(getCoreBinPath() + "/VERSION").exists();
+    return new File(getCorePath() + "/VERSION").exists();
   }
 
   public static boolean isCoreInitialized() {
