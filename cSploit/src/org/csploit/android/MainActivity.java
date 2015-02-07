@@ -542,7 +542,7 @@ public class MainActivity extends SherlockListActivity {
         Toast.makeText(this, getString(R.string.net_discovery_started),
                 Toast.LENGTH_SHORT).show();
     } catch (ChildManager.ChildNotStartedException e) {
-      Toast.makeText(this, "cannot start process", Toast.LENGTH_LONG).show();
+      Toast.makeText(this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
     }
 	}
 
@@ -622,7 +622,7 @@ public class MainActivity extends SherlockListActivity {
             MainActivity.this.runOnUiThread(new Runnable() {
               @Override
               public void run() {
-                Toast.makeText(MainActivity.this, "cannot start process", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
               }
             });
           }

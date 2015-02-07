@@ -448,7 +448,7 @@ public class Sniffer extends SherlockActivity
             Sniffer.this.runOnUiThread( new Runnable() {
               @Override
               public void run() {
-                Toast.makeText(Sniffer.this, "cannot start process", Toast.LENGTH_LONG).show();
+                Toast.makeText(Sniffer.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
                 setStoppedState();
               }
             });

@@ -540,7 +540,7 @@ public class Hijacker extends SherlockActivity {
       });
     } catch (ChildManager.ChildNotStartedException e) {
       Logger.error(e.getMessage());
-      Toast.makeText(Hijacker.this, "cannot start process", Toast.LENGTH_LONG).show();
+      Toast.makeText(Hijacker.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
     }
   }
 

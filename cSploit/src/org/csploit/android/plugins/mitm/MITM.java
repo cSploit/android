@@ -534,7 +534,7 @@ public class MITM extends Plugin
 
                 Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
               } catch (ChildManager.ChildNotStartedException e) {
-                Toast.makeText(MITM.this, "cannot start process", Toast.LENGTH_LONG).show();
+                Toast.makeText(MITM.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
               }
             }
           } else {
@@ -697,7 +697,7 @@ public class MITM extends Plugin
                               Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
 
                             } catch (ChildManager.ChildNotStartedException e) {
-                              Toast.makeText(MITM.this, "cannot start process", Toast.LENGTH_LONG).show();
+                              Toast.makeText(MITM.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
                             }
                           } else
                             new ErrorDialog(getString(R.string.error), getString(R.string.error_image_url), MITM.this).show();
@@ -784,7 +784,7 @@ public class MITM extends Plugin
 
                       } catch (ChildManager.ChildNotStartedException e) {
                         System.errorLogging(e);
-                        Toast.makeText(MITM.this, "cannot start process", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MITM.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
                       }
                     } else
                       new ErrorDialog(getString(R.string.error), getString(R.string.error_video_url), MITM.this).show();
@@ -865,7 +865,7 @@ public class MITM extends Plugin
 
                             } catch (ChildManager.ChildNotStartedException e) {
                               System.errorLogging(e);
-                              Toast.makeText(MITM.this, "cannot start process", Toast.LENGTH_LONG).show();
+                              Toast.makeText(MITM.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
                             }
                           } else
                             new ErrorDialog(getString(R.string.error), getString(R.string.error_js_code), MITM.this).show();
@@ -939,7 +939,7 @@ public class MITM extends Plugin
                   new ErrorDialog(getString(R.string.error), getString(R.string.error_filter) + ": " + e.getDescription() + " .", MITM.this).show();
                 } catch (ChildManager.ChildNotStartedException e) {
                   System.errorLogging(e);
-                  Toast.makeText(MITM.this, "cannot start process", Toast.LENGTH_LONG).show();
+                  Toast.makeText(MITM.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
                 }
               } else
                 new ErrorDialog(getString(R.string.error), getString(R.string.error_filter), MITM.this).show();

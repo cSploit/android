@@ -476,4 +476,5 @@
     <string name="mandatory_update">this update is required</string>
     <string name="new_core_found">Core version %s is available, do you want to upgrade ?</string>
     <string name="update_cancelled">update cancelled</string>
+    <string name="child_not_started">cannot start process</string>
 </resources>

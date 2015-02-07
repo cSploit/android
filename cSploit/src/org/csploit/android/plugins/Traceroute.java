@@ -70,7 +70,7 @@ public class Traceroute extends Plugin {
       mRunning = true;
     } catch (ChildManager.ChildNotStartedException e) {
       System.errorLogging(e);
-      Toast.makeText(Traceroute.this, "cannot start process", Toast.LENGTH_LONG).show();
+      Toast.makeText(Traceroute.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
     }
   }
 

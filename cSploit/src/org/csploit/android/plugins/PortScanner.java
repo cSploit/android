@@ -97,7 +97,7 @@ public class PortScanner extends Plugin {
       mRunning = true;
     } catch (ChildManager.ChildNotStartedException e) {
       System.errorLogging(e);
-      Toast.makeText(PortScanner.this, "cannot start process", Toast.LENGTH_LONG).show();
+      Toast.makeText(PortScanner.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
     }
   }
 

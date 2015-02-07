@@ -318,7 +318,7 @@ public class PasswordSniffer extends SherlockActivity {
     } catch (ChildManager.ChildNotStartedException e) {
       System.errorLogging(e);
       mSniffToggleButton.setChecked(false);
-      Toast.makeText(PasswordSniffer.this, "cannot start process", Toast.LENGTH_LONG).show();
+      Toast.makeText(PasswordSniffer.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
     }
 	}
 
