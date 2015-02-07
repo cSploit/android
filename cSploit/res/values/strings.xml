@@ -163,6 +163,12 @@
     <string name="no_wifi_available">No WiFi connection available, the application will just check
         for updates. #STATUS#
     </string>
+    <string name="missing_core_update">Core is not installed, the application will just check
+        for updates. #STATUS#
+    </string>
+    <string name="heart_attack_update">Heart attack occurred, the application will just check
+        for updates. #STATUS#
+    </string>
     <string name="loading_changelog">Loading changelog&#8230;</string>
     <string name="something_went_wrong_changelog">
         <![CDATA[<html><body><p><b>Something went wrong while retrieving the changelog:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
@@ -462,4 +468,12 @@
     <string name="installing_msf_gems">installing gems for MSF</string>
     <string name="installing_bundle">installing bundle</string>
     <string name="new_gems_update_desc">An update for ruby gems</string>
+    <string name="heart_attack">heart attack</string>
+    <string name="cannot_download_core">cannot download the core for your device</string>
+    <string name="unable_to_start_updateservice">unable to start update service</string>
+    <string name="no_core_no_connectivity">core is not installed, a network connection is needed for first initialization</string>
+    <string name="no_core_found">cannot find a core for this device</string>
+    <string name="mandatory_update">this update is required</string>
+    <string name="new_core_found">Core version %s is available, do you want to upgrade ?</string>
+    <string name="update_cancelled">update cancelled</string>
 </resources>

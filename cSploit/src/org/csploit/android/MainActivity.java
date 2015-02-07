@@ -18,7 +18,9 @@
  */
 package org.csploit.android;
 
+import static java.lang.Thread.MAX_PRIORITY;
 import static org.csploit.android.core.UpdateChecker.AVAILABLE_VERSION;
+import static org.csploit.android.core.UpdateChecker.CORE_AVAILABLE;
 import static org.csploit.android.core.UpdateChecker.GEMS_AVAILABLE;
 import static org.csploit.android.core.UpdateChecker.MSF_AVAILABLE;
 import static org.csploit.android.core.UpdateChecker.RUBY_AVAILABLE;
@@ -35,7 +37,6 @@ import org.csploit.android.core.ManagedReceiver;
 import org.csploit.android.core.MultiAttackService;
 import org.csploit.android.core.Plugin;
 import org.csploit.android.core.System;
-import org.csploit.android.core.ToolsInstaller;
 import org.csploit.android.core.UpdateChecker;
 import org.csploit.android.core.UpdateService;
 import org.csploit.android.events.Event;
@@ -106,21 +107,23 @@ import com.actionbarsherlock.view.MenuItem;
 
 @SuppressLint("NewApi")
 public class MainActivity extends SherlockListActivity {
-	private String NO_WIFI_UPDATE_MESSAGE;
+	private String UPDATE_MESSAGE;
 	private static final int WIFI_CONNECTION_REQUEST = 1012;
 	private boolean isWifiAvailable = false;
 	private TargetAdapter mTargetAdapter = null;
   private NetworkRadar mNetworkRadar = null;
   private MsfRpcd mMsfRpcd = null;
-	private RadarReceiver mRadarReceiver = null;
-	private UpdateReceiver mUpdateReceiver = null;
-	private WipeReceiver mWipeReceiver = null;
+	private RadarReceiver mRadarReceiver = new RadarReceiver();
+	private UpdateReceiver mUpdateReceiver = new UpdateReceiver();
+	private WipeReceiver mWipeReceiver = new WipeReceiver();
+  private UpdateChecker mUpdateChecker = null;
 	private Menu mMenu = null;
 	private TextView mUpdateStatus = null;
 	private Toast mToast = null;
   private ProgressDialog progressDialog;
 	private long mLastBackPressTime = 0;
   private ActionMode mActionMode = null;
+  private boolean mInitialization = false;
 
 	private void createUpdateLayout() {
 
@@ -136,18 +139,9 @@ public class MainActivity extends SherlockListActivity {
 		mUpdateStatus.setGravity(Gravity.CENTER);
 		mUpdateStatus.setLayoutParams(params);
 		mUpdateStatus
-				.setText(NO_WIFI_UPDATE_MESSAGE.replace("#STATUS#", "..."));
+				.setText(UPDATE_MESSAGE.replace("#STATUS#", "..."));
 
 		layout.addView(mUpdateStatus);
-
-		if (mUpdateReceiver == null)
-			mUpdateReceiver = new UpdateReceiver();
-
-		if (mWipeReceiver == null)
-			mWipeReceiver = new WipeReceiver();
-
-		mUpdateReceiver.unregister();
-		mWipeReceiver.unregister();
 
 		mUpdateReceiver.register(MainActivity.this);
 
@@ -189,35 +183,22 @@ public class MainActivity extends SherlockListActivity {
 		setListAdapter(mTargetAdapter);
 
 		getListView().setOnItemLongClickListener(new OnItemLongClickListener() {
-			@Override
-			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+      @Override
+      public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         Target t = System.getTarget(position);
-        if(t.getType() == Target.Type.NETWORK) {
-          if(mActionMode==null)
+        if (t.getType() == Target.Type.NETWORK) {
+          if (mActionMode == null)
             targetAliasPrompt(t);
           return true;
         }
-        if(mActionMode==null) {
+        if (mActionMode == null) {
           mTargetAdapter.clearSelection();
           mActionMode = startActionMode(mActionModeCallback);
         }
         mTargetAdapter.toggleSelection(position);
         return true;
-			}
-		});
-
-		if (mRadarReceiver == null)
-			mRadarReceiver = new RadarReceiver();
-
-		if (mUpdateReceiver == null)
-			mUpdateReceiver = new UpdateReceiver();
-
-		if (mWipeReceiver == null)
-			mWipeReceiver = new WipeReceiver();
-
-		mRadarReceiver.unregister();
-		mUpdateReceiver.unregister();
-		mWipeReceiver.unregister();
+      }
+    });
 
 		mRadarReceiver.register(MainActivity.this);
 		mUpdateReceiver.register(MainActivity.this);
@@ -245,35 +226,26 @@ public class MainActivity extends SherlockListActivity {
   private void createLayout() {
     boolean wifiAvailable = Network.isWifiConnected(this);
     boolean connectivityAvailable = wifiAvailable || Network.isConnectivityAvailable(this);
+    boolean coreBeating = System.isCoreInitialized();
 
-    // initialization ok, but wifi is down
-    if (!wifiAvailable) {
-      // just inform the user his wifi is down
-      if (connectivityAvailable)
-        createUpdateLayout();
-
-        // no connectivity at all
-      else
-        createOfflineLayout();
-    }
-    // we are online, and the system was already initialized
-    else
+    if(coreBeating && wifiAvailable) {
       createOnlineLayout();
+    } else if(connectivityAvailable) {
+      createUpdateLayout();
+    } else {
+      createOfflineLayout();
+    }
   }
 
   private void onInitializationStart() {
+    if(progressDialog == null) {
+      progressDialog = ProgressDialog.show(MainActivity.this, "",
+              getString(R.string.initializing), true, false);
+    } else {
+      progressDialog.show();
+    }
 
-    MainActivity.this.runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        if(progressDialog == null) {
-          progressDialog = ProgressDialog.show(MainActivity.this, "",
-                  getString(R.string.initializing), true, false);
-        } else {
-          progressDialog.show();
-        }
-      }
-    });
+    mInitialization = true;
   }
 
   private void onInitializationError(final String message) {
@@ -286,6 +258,7 @@ public class MainActivity extends SherlockListActivity {
                 MainActivity.this).show();
       }
     });
+    mInitialization = false;
   }
 
   private void onInitializationSuccess() {
@@ -293,9 +266,8 @@ public class MainActivity extends SherlockListActivity {
       @Override
       public void run() {
         try {
-          if(progressDialog != null)
+          if (progressDialog != null)
             progressDialog.dismiss();
-          createLayout();
         } catch (Exception e) {
           new FatalDialog(getString(R.string.error), e
                   .getMessage(), MainActivity.this)
@@ -314,63 +286,30 @@ public class MainActivity extends SherlockListActivity {
         }
       }
     });
+    mInitialization = false;
   }
 
-  private Runnable initializer = new Runnable() {
-    @Override
-    public void run() {
-
-      if(!System.isCoreInitialized()) {
-
-        onInitializationStart();
-
-        Context appContext = MainActivity.this
-                .getApplicationContext();
-        String fatal = null;
-        ToolsInstaller installer = new ToolsInstaller(appContext);
-
-        if (!System.isARM())
-          fatal = getString(R.string.arm_error)
-                  + getString(R.string.arm_error2);
-
-        else if (installer.needed() && !installer.install())
-          fatal = getString(R.string.install_error);
-
-        else {
-          try {
-            System.initCore();
-          } catch (System.SuException e) {
-            Logger.error(e.getMessage());
-            fatal = getString(R.string.only_4_root);
-          } catch (System.DaemonException e) {
-            Logger.error(e.getMessage());
-            fatal = "heart attack!";
-          }
-        }
-
-        if (fatal != null) {
-          onInitializationError(fatal);
-          return;
-        }
-      }
-
-      onInitializationSuccess();
-    }
-  };
+  //TODO: this is horrible...
+  //TODO: create an "heartless" layout ... OK
+  //TODO: start UpdateChecker ... OK
+  //TODO: start UpdateService ... OK
+  //TODO: reinit
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
 		Boolean isDark = themePrefs.getBoolean("isDark", false);
+    boolean connectivityAvailable;
+
 		if (isDark)
 			setTheme(R.style.Sherlock___Theme);
 		else
 			setTheme(R.style.AppTheme);
 	
 		setContentView(R.layout.target_layout);
-		NO_WIFI_UPDATE_MESSAGE = getString(R.string.no_wifi_available);
 		isWifiAvailable = Network.isWifiConnected(this);
+    connectivityAvailable = isWifiAvailable || Network.isConnectivityAvailable(this);
 
     // make sure system object was correctly initialized during application
     // startup
@@ -381,6 +320,8 @@ public class MainActivity extends SherlockListActivity {
 
         // retry
         try {
+          onInitializationStart();
+
           System.init(MainActivity.this.getApplicationContext());
 
           System.registerPlugin(new RouterPwn());
@@ -397,17 +338,50 @@ public class MainActivity extends SherlockListActivity {
           if(!(e instanceof NoRouteToHostException))
             System.errorLogging(e);
 
-          new FatalDialog(getString(R.string.initialization_error),
-                  System.getLastError(), this).show();
+          onInitializationError(System.getLastError());
 
           return;
         }
       }
     }
 
-    // this is necessary to not block the user interface while
-    // initializing
-    new Thread(initializer).start();
+    boolean coreInstalled = System.isCoreInstalled();
+    boolean coreBeating = System.isCoreInitialized();
+
+    if(coreInstalled && !coreBeating) {
+      try {
+        onInitializationStart();
+        System.initCore();
+        coreBeating = true;
+      } catch (System.SuException e) {
+        onInitializationError(getString(R.string.only_4_root));
+        return;
+      } catch (System.DaemonException e) {
+        Logger.error(e.getMessage());
+      }
+    }
+
+    if(!connectivityAvailable) {
+      if(!coreInstalled) {
+        onInitializationError(getString(R.string.no_core_no_connectivity));
+        return;
+      } else if(!coreBeating) {
+        onInitializationError(getString(R.string.heart_attack));
+        return;
+      }
+    }
+
+    if(!coreInstalled) {
+      onInitializationStart();
+      UPDATE_MESSAGE = getString(R.string.missing_core_update);
+    } else if(!coreBeating) {
+      onInitializationStart();
+      UPDATE_MESSAGE = getString(R.string.heart_attack_update);
+    } else if(!isWifiAvailable) {
+      UPDATE_MESSAGE = getString(R.string.no_wifi_available);
+    }
+
+    createLayout();
 	}
 
 	@Override
@@ -557,8 +531,12 @@ public class MainActivity extends SherlockListActivity {
 
 	public void startUpdateChecker() {
 		if (System.getSettings().getBoolean("PREF_CHECK_UPDATES", true)) {
-			UpdateChecker mUpdateChecker = new UpdateChecker(this);
-			mUpdateChecker.start();
+
+      if(mUpdateChecker == null)
+			  mUpdateChecker = new UpdateChecker(this);
+
+      if(!mUpdateChecker.isAlive())
+        mUpdateChecker.start();
 		}
 	}
 
@@ -773,11 +751,8 @@ public class MainActivity extends SherlockListActivity {
 		case R.id.wifi_scan:
 			stopNetworkRadar(true);
 
-			if (mRadarReceiver != null)
-				mRadarReceiver.unregister();
-
-			if (mUpdateReceiver != null)
-				mUpdateReceiver.unregister();
+      mRadarReceiver.unregister();
+      mUpdateReceiver.unregister();
 
 			startActivityForResult(new Intent(MainActivity.this,
 					WifiScannerActivity.class), WIFI_CONNECTION_REQUEST);
@@ -986,14 +961,9 @@ public class MainActivity extends SherlockListActivity {
 		stopNetworkRadar(true);
 		StopRPCServer(true);
 
-		if (mRadarReceiver != null)
-			mRadarReceiver.unregister();
-
-		if (mUpdateReceiver != null)
-			mUpdateReceiver.unregister();
-
-		if (mWipeReceiver != null)
-			mWipeReceiver.unregister();
+    mRadarReceiver.unregister();
+    mUpdateReceiver.unregister();
+    mWipeReceiver.unregister();
 
 		// make sure no zombie process is running before destroying the activity
 		System.clean(true);
@@ -1203,6 +1173,7 @@ public class MainActivity extends SherlockListActivity {
 			mFilter.addAction(UPDATE_CHECKING);
 			mFilter.addAction(UPDATE_AVAILABLE);
 			mFilter.addAction(UPDATE_NOT_AVAILABLE);
+      mFilter.addAction(CORE_AVAILABLE);
       mFilter.addAction(RUBY_AVAILABLE);
       mFilter.addAction(GEMS_AVAILABLE);
       mFilter.addAction(MSF_AVAILABLE);
@@ -1214,149 +1185,158 @@ public class MainActivity extends SherlockListActivity {
 			return mFilter;
 		}
 
+    private void onUpdateAvailable(final String desc, final UpdateService.action target, final boolean mandatory) {
+      MainActivity.this.runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          new ConfirmDialog(getString(R.string.update_available),
+                desc, MainActivity.this, new ConfirmDialogListener() {
+                  @Override
+                  public void onConfirm() {
+                    StopRPCServer(true);
+                    Intent i = new Intent(MainActivity.this, UpdateService.class);
+                    i.setAction(UpdateService.START);
+                    i.putExtra(UpdateService.ACTION, target);
+
+                    Logger.debug("starting UpdateService with: " + ((Context)MainActivity.this).toString());
+
+                    startService(i);
+                  }
+
+                  @Override
+                  public void onCancel() {
+                    if(!mandatory) {
+                      return;
+                    }
+
+                    onInitializationError(getString(R.string.mandatory_update));
+                  }
+                }
+              ).show();
+        }
+      });
+    }
+
+    private void onUpdateAvailable(final String desc, final UpdateService.action target) {
+      onUpdateAvailable(desc, target, false);
+    }
+
+    private void onUpdateDone(UpdateService.action target) {
+      switch (target) {
+        case core_update:
+          System.shutdownCoreDaemon();
+          try {
+            System.initCore();
+            onInitializationSuccess();
+          } catch (System.SuException e) {
+            onInitializationError(getString(R.string.only_4_root));
+          } catch (System.DaemonException e) {
+            onInitializationError(e.getMessage());
+          }
+          break;
+        case ruby_update:
+        case msf_update:
+        case gems_update:
+          StartRPCServer();
+          break;
+      }
+
+      // restart update checker after a successful update
+      startUpdateChecker();
+    }
+
+    private void onUpdateError(UpdateService.action target, final int message) {
+
+      if(target == UpdateService.action.core_update && progressDialog != null) {
+        onInitializationError(getString(message));
+        return;
+      }
+
+      MainActivity.this.runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          new ErrorDialog(getString(R.string.error),
+                  getString(message),MainActivity.this).show();
+        }
+      });
+    }
+
 		@SuppressWarnings("ConstantConditions")
 		@Override
 		public void onReceive(Context context, Intent intent) {
-      if (mUpdateStatus != null
-					&& intent.getAction().equals(UPDATE_CHECKING)
-					&& mUpdateStatus != null) {
-				mUpdateStatus.setText(NO_WIFI_UPDATE_MESSAGE.replace(
-						"#STATUS#", getString(R.string.checking)));
-			} else if (mUpdateStatus != null
-					&& intent.getAction().equals(UPDATE_NOT_AVAILABLE)
-					&& mUpdateStatus != null) {
-				mUpdateStatus.setText(NO_WIFI_UPDATE_MESSAGE.replace(
-						"#STATUS#", getString(R.string.no_updates_available)));
+      if (intent.getAction().equals(UPDATE_CHECKING)) {
+
+        if(mUpdateStatus != null)
+				  mUpdateStatus.setText(UPDATE_MESSAGE.replace(
+					  	"#STATUS#", getString(R.string.checking)));
+
+			} else if (intent.getAction().equals(UPDATE_NOT_AVAILABLE)) {
+
+        if(mUpdateStatus != null)
+				  mUpdateStatus.setText(UPDATE_MESSAGE.replace(
+					  	"#STATUS#", getString(R.string.no_updates_available)));
+
+        if(!System.isCoreInitialized()) {
+          new FatalDialog(getString(R.string.initialization_error),
+                  getString(R.string.no_core_found), MainActivity.this).show();
+        }
+
       } else if (intent.getAction().equals(RUBY_AVAILABLE)) {
-        MainActivity.this.runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            new ConfirmDialog(getString(R.string.update_available),
-                    getString(R.string.new_ruby_update_desc) + " " +  getString(R.string.new_update_desc2),
-                    MainActivity.this,
-                    new ConfirmDialogListener() {
-                      @Override
-                      public void onConfirm() {
-                        StopRPCServer(true);
-                        Intent i = new Intent(MainActivity.this,UpdateService.class);
-                        i.setAction(UpdateService.START);
-                        i.putExtra(UpdateService.ACTION, UpdateService.action.ruby_update);
-                        startService(i);
-                      }
+        final String description =  getString(R.string.new_ruby_update_desc) + " " +
+                              getString(R.string.new_update_desc2);
 
-                      @Override
-                      public void onCancel() {
-
-                      }
-                    }).show();
-          }
-        });
+        onUpdateAvailable(description, UpdateService.action.ruby_update);
       } else if (intent.getAction().equals(MSF_AVAILABLE)) {
         if (mUpdateStatus != null)
-          mUpdateStatus.setText(NO_WIFI_UPDATE_MESSAGE.replace(
+          mUpdateStatus.setText(UPDATE_MESSAGE.replace(
                   "#STATUS#",
                   getString(R.string.new_version) + " " +
                   getString(R.string.new_version2)
           ));
 
-        MainActivity.this.runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
+        final String description =  getString(R.string.new_msf_update_desc) + " " +
+                              getString(R.string.new_update_desc2);
 
-            new ConfirmDialog(getString(R.string.update_available),
-                    getString(R.string.new_msf_update_desc) + " " + getString(R.string.new_update_desc2),
-                    MainActivity.this,
-                    new ConfirmDialogListener() {
-                      @Override
-                      public void onConfirm() {
-                        StopRPCServer(true);
-                        Intent i = new Intent(MainActivity.this, UpdateService.class);
-                        i.setAction(UpdateService.START);
-                        i.putExtra(UpdateService.ACTION, UpdateService.action.msf_update);
-                        startService(i);
-                      }
-
-                      @Override
-                      public void onCancel() {
-
-                      }
-                    }
-            ).show();
-          }
-        });
+        onUpdateAvailable( description, UpdateService.action.msf_update);
       } else if ( intent.getAction().equals(GEMS_AVAILABLE)) {
-        MainActivity.this.runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            new ConfirmDialog(getString(R.string.update_available),
-                    getString(R.string.new_gems_update_desc) + " " +  getString(R.string.new_update_desc2),
-                    MainActivity.this,
-                    new ConfirmDialogListener() {
-                      @Override
-                      public void onConfirm() {
-                        StopRPCServer(true);
-                        Intent i = new Intent(MainActivity.this,UpdateService.class);
-                        i.setAction(UpdateService.START);
-                        i.putExtra(UpdateService.ACTION, UpdateService.action.gems_update);
-                        startService(i);
-                      }
 
-                      @Override
-                      public void onCancel() {
+        final String description = getString(R.string.new_gems_update_desc) + " " +
+                                    getString(R.string.new_update_desc2);
 
-                      }
-                    }).show();
-          }
-        });
+        onUpdateAvailable(description, UpdateService.action.gems_update);
 			} else if (intent.getAction().equals(UPDATE_AVAILABLE)) {
-				final String remoteVersion = (String) intent.getExtras().get(
-						AVAILABLE_VERSION);
+        final String remoteVersion = (String) intent.getExtras().get(
+                AVAILABLE_VERSION);
 
-				if (mUpdateStatus != null)
-					mUpdateStatus.setText(NO_WIFI_UPDATE_MESSAGE.replace(
-							"#STATUS#", getString(R.string.new_version)
-									+ remoteVersion
-									+ getString(R.string.new_version2)));
+        if (mUpdateStatus != null)
+          mUpdateStatus.setText(UPDATE_MESSAGE.replace(
+                  "#STATUS#", getString(R.string.new_version)
+                          + remoteVersion
+                          + getString(R.string.new_version2)));
 
-				MainActivity.this.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						new ConfirmDialog(getString(R.string.update_available),
-								getString(R.string.new_update_desc)
-										+ remoteVersion
-										+ getString(R.string.new_update_desc2),
-								MainActivity.this, new ConfirmDialogListener() {
-									@Override
-									public void onConfirm() {
-                    Intent i = new Intent(MainActivity.this,UpdateService.class);
-                    i.setAction(UpdateService.START);
-                    i.putExtra(UpdateService.ACTION, UpdateService.action.apk_update);
-                    startService(i);
-									}
+        final String description = getString(R.string.new_update_desc)
+                + " " + remoteVersion + " "
+                + getString(R.string.new_update_desc2);
 
-									@Override
-									public void onCancel() {
-									}
-								}).show();
-					}
-				});
+        onUpdateAvailable(description, UpdateService.action.apk_update);
+      } else if(intent.getAction().equals(CORE_AVAILABLE)) {
+
+        final String remoteVersion = (String) intent.getExtras().get(
+                AVAILABLE_VERSION);
+
+        if (mUpdateStatus != null)
+          mUpdateStatus.setText(UPDATE_MESSAGE.replace(
+                  "#STATUS#", getString(R.string.new_version) + " " +
+                          getString(R.string.new_version2)));
+
+        final String description = String.format(getString(R.string.new_core_found), remoteVersion);
+
+        onUpdateAvailable(description, UpdateService.action.core_update, !System.isCoreInstalled());
 			} else if(intent.getAction().equals(UpdateService.ERROR)) {
-        final int messageId = intent.getIntExtra(UpdateService.MESSAGE, R.string.error_occured);
-        MainActivity.this.runOnUiThread( new Runnable() {
-          @Override
-          public void run() {
-            new ErrorDialog(
-                    getString(R.string.error),
-                    getString(messageId),
-                    MainActivity.this)
-                    .show();
-          }
-        });
+        onUpdateError((UpdateService.action)intent.getSerializableExtra(UpdateService.ACTION),
+                intent.getIntExtra(UpdateService.MESSAGE, R.string.error_occured));
       } else if(intent.getAction().equals(UpdateService.DONE)) {
-        UpdateService.action a = (UpdateService.action)intent.getSerializableExtra(UpdateService.ACTION);
-        if(a == UpdateService.action.msf_update || a == UpdateService.action.gems_update || a == UpdateService.action.ruby_update)
-          StartRPCServer();
-        startUpdateChecker(); // restart update checker after a successful update
+        onUpdateDone((UpdateService.action)intent.getSerializableExtra(UpdateService.ACTION));
       }
 		}
 	}

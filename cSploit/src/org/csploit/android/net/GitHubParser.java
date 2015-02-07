@@ -52,6 +52,7 @@ public class GitHubParser {
 
   private static GitHubParser msfRepo = new GitHubParser("rapid7", "metasploit-framework");
   private static GitHubParser cSploitRepo = new GitHubParser("cSploit", "android");
+  private static GitHubParser coreRepo = new GitHubParser("cSploit", "android.native");
 
   public static GitHubParser getMsfRepo() {
     return msfRepo;
@@ -59,6 +60,10 @@ public class GitHubParser {
 
   public static GitHubParser getcSploitRepo() {
     return cSploitRepo;
+  }
+
+  public static GitHubParser getCoreRepo() {
+    return coreRepo;
   }
 
   public GitHubParser(String username, String project) {
@@ -185,11 +190,38 @@ public class GitHubParser {
 
     JSONArray assets = mLastRelease.getJSONArray("assets");
 
-    if(assets.length() != 1) {
+    if(assets.length() == 0) {
       return null;
     }
 
     return assets.getJSONObject(0).getString("browser_download_url");
+  }
+
+  /**
+   * if the last release of this repo has an assets that match {@code assetFilter}
+   * this function will return it's downloadable URL
+   *
+   * @param assetFilter asset must have this inside it's name
+   * @return the found asset URL
+   */
+  public synchronized String getLastReleaseAssetUrl(String assetFilter) throws JSONException, IOException {
+    if(mLastRelease==null)
+      fetchReleases();
+
+    if(mLastRelease==null)
+      return null;
+
+    JSONArray assets = mLastRelease.getJSONArray("assets");
+
+    for(int i=0; i<assets.length(); i++) {
+      JSONObject item = assets.getJSONObject(i);
+
+      if(item.getString("name").contains(assetFilter)) {
+        return item.getString("browser_download_url");
+      }
+    }
+
+    return null;
   }
 
   public synchronized String[] getBranches() throws JSONException, IOException {

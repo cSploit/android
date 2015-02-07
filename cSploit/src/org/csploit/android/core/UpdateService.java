@@ -1,20 +1,20 @@
 /*
- * This file is part of the dSploit.
+ * This file is part of the cSploit.
  *
- * Copyleft of Simone Margaritelli aka evilsocket <evilsocket@gmail.com>
+ * Copyleft of Massimo Dragano aka tux_mind <tux_mind@csploit.org>
  *
- * dSploit is free software: you can redistribute it and/or modify
+ * cSploit is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * dSploit is distributed in the hope that it will be useful,
+ * cSploit is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with dSploit.  If not, see <http://www.gnu.org/licenses/>.
+ * along with cSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.csploit.android.core;
 
@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
+import android.os.Binder;
 import android.support.v4.app.NotificationCompat;
 
 import com.github.zafarkhaja.semver.Version;
@@ -94,6 +95,7 @@ public class UpdateService extends IntentService
   private static final ArchiveMetadata  mApkInfo          = new ArchiveMetadata();
   private static final ArchiveMetadata  mMsfInfo          = new ArchiveMetadata();
   private static final ArchiveMetadata  mRubyInfo         = new ArchiveMetadata();
+  private static final ArchiveMetadata  mCoreInfo         = new ArchiveMetadata();
   private static final GemParser        mGemUploadParser  = new GemParser(REMOTE_GEMS_VERSION_URL);
 
   private boolean
@@ -111,6 +113,7 @@ public class UpdateService extends IntentService
 
   public enum action {
     apk_update,
+    core_update,
     ruby_update,
     gems_update,
     msf_update
@@ -160,26 +163,24 @@ public class UpdateService extends IntentService
     try {
 
       remoteVersion = GitHubParser.getcSploitRepo().getLastReleaseVersion();
-      remoteURL = GitHubParser.getcSploitRepo().getLastReleaseAssetUrl();
 
       if(remoteVersion == null)
         return false;
+
+      remoteURL = GitHubParser.getcSploitRepo().getLastReleaseAssetUrl();
 
       Logger.debug(String.format("localVersion   = %s", localVersion));
       Logger.debug(String.format("remoteVersion  = %s", remoteVersion));
 
       synchronized (mApkInfo) {
-        // Read remote version
-        if (mApkInfo.version == null) {
-          mApkInfo.url = remoteURL;
-          mApkInfo.versionString = remoteVersion;
-          mApkInfo.version = Version.valueOf(mApkInfo.versionString);
-          mApkInfo.name = String.format("cSploit-%s.apk", mApkInfo.versionString);
-          mApkInfo.path = String.format("%s/%s", System.getStoragePath(), mApkInfo.name);
-          mApkInfo.contentIntent = new Intent(Intent.ACTION_VIEW);
-          mApkInfo.contentIntent.setDataAndType(Uri.fromFile(new File(mApkInfo.path)), "application/vnd.android.package-archive");
-          mApkInfo.contentIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        }
+        mApkInfo.url = remoteURL;
+        mApkInfo.versionString = remoteVersion;
+        mApkInfo.version = Version.valueOf(mApkInfo.versionString);
+        mApkInfo.name = String.format("cSploit-%s.apk", mApkInfo.versionString);
+        mApkInfo.path = String.format("%s/%s", System.getStoragePath(), mApkInfo.name);
+        mApkInfo.contentIntent = new Intent(Intent.ACTION_VIEW);
+        mApkInfo.contentIntent.setDataAndType(Uri.fromFile(new File(mApkInfo.path)), "application/vnd.android.package-archive");
+        mApkInfo.contentIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         // Compare versions
         Version installedVersion = Version.valueOf(localVersion);
@@ -203,6 +204,83 @@ public class UpdateService extends IntentService
 
   public static String getRemoteVersion(){
     return mApkInfo.versionString;
+  }
+
+  /**
+   * check if an update for the core package is available
+   *
+   * @return true if an update is available, false if not.
+   */
+  public static boolean isCoreUpdateAvailable() {
+    boolean exitForError = true;
+    String localVersion = System.getCoreVersion();
+    String platform = System.getPlatform();
+    String remoteVersion, remoteURL;
+
+    try {
+
+      remoteVersion = GitHubParser.getCoreRepo().getLastReleaseVersion();
+
+      if(remoteVersion == null)
+        return false;
+
+      remoteURL = GitHubParser.getCoreRepo().getLastReleaseAssetUrl(platform + ".");
+
+      if(remoteURL == null) {
+        Logger.warning(String.format("unsupported platform ( %s )", platform));
+
+        platform = System.getCompatiblePlatform();
+        Logger.debug(String.format("trying with '%s'", platform));
+
+        remoteURL = GitHubParser.getCoreRepo().getLastReleaseAssetUrl(platform + ".");
+      }
+
+      Logger.debug(String.format("localVersion   = %s", localVersion));
+      Logger.debug(String.format("remoteVersion  = %s", remoteVersion));
+
+      if(remoteURL == null) {
+        Logger.warning(String.format("unsupported platform ( %s )", platform));
+      }
+
+      synchronized (mCoreInfo) {
+        // Read remote version
+        mCoreInfo.url = remoteURL;
+        mCoreInfo.versionString = remoteVersion;
+        mCoreInfo.version = Version.valueOf(mCoreInfo.versionString);
+        mCoreInfo.name = String.format("core-%s+%s.tar.xz", mCoreInfo.versionString, platform);
+        mCoreInfo.path = String.format("%s/%s", System.getStoragePath(), mCoreInfo.name);
+        mCoreInfo.archiver = archiveAlgorithm.tar;
+        mCoreInfo.compression = compressionAlgorithm.xz;
+        mCoreInfo.executableOutputDir = mCoreInfo.outputDir = System.getCoreBinPath();
+
+        exitForError = false;
+
+        if(remoteURL == null)
+          return false;
+
+        if(localVersion == null)
+          return true;
+
+        // Compare versions
+        Version installedVersion = Version.valueOf(localVersion);
+
+        if (mCoreInfo.version.compareTo(installedVersion) > 0)
+          return true;
+      }
+    } catch (org.apache.http.ParseException e) {
+      Logger.error(e.getMessage());
+    } catch(Exception e){
+      System.errorLogging(e);
+    } finally {
+      if(exitForError)
+        mCoreInfo.reset();
+    }
+
+    return false;
+  }
+
+  public static String getRemoteCoreVersion() {
+    return mCoreInfo.versionString;
   }
 
   /**
@@ -248,6 +326,7 @@ public class UpdateService extends IntentService
 
         mRubyInfo.outputDir = System.getRubyPath();
         mRubyInfo.executableOutputDir = ExecChecker.ruby().getRoot();
+        mRubyInfo.fixShebang = true;
 
         if (!mSettingReceiver.getFilter().contains("RUBY_DIR")) {
           mSettingReceiver.addFilter("RUBY_DIR");
@@ -396,11 +475,13 @@ public class UpdateService extends IntentService
 
   /**
    * notify activities that some error occurred
-   * @param message error message
+   * @param target the failed action
+   * @param message an error message
    */
-  private void sendError(int message) {
+  private void sendError(action target, int message) {
     Intent i = new Intent(ERROR);
-    i.putExtra(MESSAGE,message);
+    i.putExtra(ACTION, target);
+    i.putExtra(MESSAGE, message);
     sendBroadcast(i);
   }
 
@@ -527,7 +608,6 @@ public class UpdateService extends IntentService
         // user cancelled our notification
         if(action.equals(NOTIFICATION_CANCELLED)) {
           mRunning=false;
-          stopSelf();
         }
       }
     };
@@ -921,16 +1001,21 @@ public class UpdateService extends IntentService
             .setProgress(100, 0, false);
     mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
 
-    Logger.info(String.format("extracting '%s' to '%s'",mCurrentTask.path, mCurrentTask.outputDir));
+    Logger.info(String.format("extracting '%s' to '%s'", mCurrentTask.path, mCurrentTask.outputDir));
+
+    envPath = null;
+    which = null;
 
     try {
-      which = System.getTools().raw.async("which env", new Raw.RawReceiver() {
-        @Override
-        public void onNewLine(String line) {
-          sb.delete(0, sb.length());
-          sb.append(line);
-        }
-      });
+      if (mCurrentTask.fixShebang) {
+        which = System.getTools().raw.async("which env", new Raw.RawReceiver() {
+          @Override
+          public void onNewLine(String line) {
+            sb.delete(0, sb.length());
+            sb.append(line);
+          }
+        });
+      }
 
       inFile = new File(mCurrentTask.path);
       total = inFile.length();
@@ -943,9 +1028,12 @@ public class UpdateService extends IntentService
       if (f.exists() && f.isDirectory() && (list = f.listFiles()) != null && list.length > 2)
         wipe();
 
-      if(execShell(which, "cancelled while retrieving env path") != 0)
-        throw new RuntimeException("cannot find 'env' executable");
-      envPath = sb.toString();
+      if (mCurrentTask.fixShebang) {
+        if(execShell(which, "cancelled while retrieving env path") != 0) {
+          throw new RuntimeException("cannot find 'env' executable");
+        }
+        envPath = sb.toString();
+      }
 
       while (mRunning && (entry = is.getNextEntry()) != null) {
         name = entry.getName().replaceFirst("^\\./?", "");
@@ -971,7 +1059,7 @@ public class UpdateService extends IntentService
           bof = new BufferedOutputStream(new FileOutputStream(f));
 
           // check il file is an ELF or a script
-          if(entry.getSize() > 4) {
+          if((!isTar || mCurrentTask.fixShebang) && entry.getSize() > 4) {
             // read the first 4 bytes of the file
             for (absCount = 0, count = -1;
                  mRunning && absCount < 4 && (count = is.read(data, absCount, 4 - absCount)) != -1;
@@ -983,14 +1071,17 @@ public class UpdateService extends IntentService
               isElf = true;
             } else if (data[0] == '#' && data[1] == '!') {
               isScript = true;
-              // read until a '\n' is found ( assume that the first line is longer than 4 bytes )
-              while (mRunning && is.read(data, absCount, 1) != -1) {
-                if (data[absCount++] == '\n')
-                  break;
+
+              if(mCurrentTask.fixShebang) {
+                // read until a '\n' is found ( assume that the first line is longer than 4 bytes )
+                while (mRunning && is.read(data, absCount, 1) != -1) {
+                  if (data[absCount++] == '\n')
+                    break;
+                }
+                byte[] firstLine = new String(data, 0, absCount).replace("/usr/bin/env", envPath).getBytes();
+                absCount = firstLine.length;
+                java.lang.System.arraycopy(firstLine, 0, data, 0, absCount);
               }
-              byte[] firstLine = new String(data, 0, absCount).replace("/usr/bin/env", envPath).getBytes();
-              absCount = firstLine.length;
-              java.lang.System.arraycopy(firstLine, 0, data, 0, absCount);
             }
 
             bof.write(data, 0, absCount);
@@ -1274,6 +1365,9 @@ public class UpdateService extends IntentService
       case apk_update:
         mCurrentTask = mApkInfo;
         break;
+      case core_update:
+        mCurrentTask = mCoreInfo;
+        break;
       case ruby_update:
         mCurrentTask = mRubyInfo;
         break;
@@ -1292,12 +1386,20 @@ public class UpdateService extends IntentService
         mCurrentTask.errorOccurred = true;
         if (!haveLocalFile())
           downloadFile();
+
+        if (what_to_do == action.core_update)
+          System.shutdownCoreDaemon();
+
         extract();
 
         if (what_to_do == action.msf_update)
           installGems();
         else if (what_to_do == action.gems_update)
           updateGems();
+        else if (what_to_do == action.core_update) {
+          System.initCore();
+          System.reloadTools();
+        }
 
         deleteTemporaryFiles();
         createVersionFile();
@@ -1311,39 +1413,46 @@ public class UpdateService extends IntentService
         System.updateLocalRubyVersion();
       sendDone(what_to_do);
     } catch ( SecurityException e) {
-      sendError(R.string.bad_permissions);
+      sendError(what_to_do, R.string.bad_permissions);
       Logger.warning(e.getClass().getName() + ": " + e.getMessage());
     } catch (KeyException e) {
-      sendError(R.string.checksum_failed);
+      sendError(what_to_do, R.string.checksum_failed);
       Logger.warning(e.getClass().getName() + ": " + e.getMessage());
     } catch (NoSuchAlgorithmException e) {
-      sendError(R.string.error_occured);
+      sendError(what_to_do, R.string.error_occured);
       System.errorLogging(e);
     } catch (CancellationException e) {
+      sendError(what_to_do, R.string.update_cancelled);
       Logger.warning(e.getClass().getName() + ": " + e.getMessage());
     } catch (IOException e) {
-      sendError(R.string.error_occured);
+      sendError(what_to_do, R.string.error_occured);
       System.errorLogging(e);
     } catch ( RuntimeException e) {
-      sendError(R.string.error_occured);
+      sendError(what_to_do, R.string.error_occured);
       if(e.getClass() == NullPointerException.class)
         System.errorLogging(e);
       else
         Logger.error(e.getClass().getName() + ": " + e.getMessage());
     } catch (InterruptedException e) {
-      sendError(R.string.error_occured);
+      sendError(what_to_do, R.string.error_occured);
       System.errorLogging(e);
     } catch (ChildManager.ChildNotStartedException e) {
-      sendError(R.string.error_occured);
+      sendError(what_to_do, R.string.error_occured);
       System.errorLogging(e);
     } catch (ChildManager.ChildDiedException e) {
-      sendError(R.string.error_occured);
+      sendError(what_to_do, R.string.error_occured);
       System.errorLogging(e);
+    } catch (System.SuException e) {
+      sendError(what_to_do, R.string.only_4_root);
+    } catch (System.DaemonException e) {
+      sendError(what_to_do, R.string.heart_attack);
+      Logger.error(e.getMessage());
     } finally {
       if(exitForError) {
         if(what_to_do == action.msf_update || what_to_do == action.gems_update)
           clearGemsCache();
-        wipe();
+        if(what_to_do != action.core_update)
+          wipe();
       }
       stopSelf();
       mRunning = false;

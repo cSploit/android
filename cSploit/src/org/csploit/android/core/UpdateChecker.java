@@ -25,6 +25,7 @@ public class UpdateChecker extends Thread
 {
   public static final String UPDATE_CHECKING = "UpdateChecker.action.CHECKING";
   public static final String UPDATE_AVAILABLE = "UpdateChecker.action.UPDATE_AVAILABLE";
+  public static final String CORE_AVAILABLE = "UpdateChecker.action.CORE_AVAILABLE";
   public static final String RUBY_AVAILABLE = "UpdateChecker.action.RUBY_AVAILABLE";
   public static final String GEMS_AVAILABLE = "UpdateChecker.action.GEMS_AVAILABLE";
   public static final String MSF_AVAILABLE = "UpdateChecker.action.MSF_AVAILABLE";
@@ -48,6 +49,10 @@ public class UpdateChecker extends Thread
     mContext.sendBroadcast(intent);
   }
 
+  private void send(String msg) {
+    send(msg, null, null);
+  }
+
   public void run(){
 
     send(UPDATE_CHECKING, null, null);
@@ -59,14 +64,16 @@ public class UpdateChecker extends Thread
 
     if(UpdateService.isUpdateAvailable())
       send(UPDATE_AVAILABLE, AVAILABLE_VERSION, UpdateService.getRemoteVersion());
+    else if(UpdateService.isCoreUpdateAvailable())
+      send(CORE_AVAILABLE, AVAILABLE_VERSION, UpdateService.getRemoteCoreVersion());
     else if(checkMsfUpdates && UpdateService.isRubyUpdateAvailable())
-      send(RUBY_AVAILABLE, null, null);
+      send(RUBY_AVAILABLE);
     else if(checkMsfUpdates && UpdateService.isMsfUpdateAvailable()) {
-      send(MSF_AVAILABLE, null, null);
+      send(MSF_AVAILABLE);
     } else if(checkMsfUpdates && UpdateService.isGemUpdateAvailable()){
-      send(GEMS_AVAILABLE, null, null);
+      send(GEMS_AVAILABLE);
     } else
-      send(UPDATE_NOT_AVAILABLE, null, null);
+      send(UPDATE_NOT_AVAILABLE);
 
     Logger.debug("Service stopped.");
   }

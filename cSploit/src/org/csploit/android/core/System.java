@@ -105,7 +105,6 @@ public class System
   private static boolean mInitialized = false;
   private static String mLastError = "";
   private static String mSuPath = null;
-  private static UpdateService mUpdateService = null;
   private static Context mContext = null;
   private static WifiLock mWifiLock = null;
   private static WakeLock mWakeLock = null;
@@ -130,9 +129,10 @@ public class System
   private static String mStoragePath = null;
   private static String mSessionName = null;
 
-  private static String mLocalApkVersion = null;
-  private static String mLocalRubyVersion = null;
-  private static String mLocalMsfVersion = null;
+  private static String mApkVersion = null;
+  private static String mCoreVersion = null;
+  private static String mRubyVersion = null;
+  private static String mMsfVersion = null;
 
   private static Object mCustomData = null;
 
@@ -152,7 +152,6 @@ public class System
       mStoragePath = getSettings().getString("PREF_SAVE_PATH", Environment.getExternalStorageDirectory().toString());
       mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
       mTools = new ToolBox();
-      mUpdateService = new UpdateService();
       mPlugins = new ArrayList<Plugin>();
       mOpenPorts = new SparseIntArray(3);
 
@@ -475,6 +474,23 @@ public class System
     Logger.error(data);
   }
 
+  public static String getPlatform()
+  {
+    int api = Build.VERSION.SDK_INT;
+    String abi = Build.CPU_ABI;
+
+    return String.format("android%d.%s", api, abi);
+  }
+
+  public static String getCompatiblePlatform()
+  {
+    int api = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN ?
+                  Build.VERSION_CODES.JELLY_BEAN : Build.VERSION_CODES.GINGERBREAD);
+    String abi = Build.CPU_ABI;
+
+    return String.format("android%d.%s", api, abi);
+  }
+
   public static boolean isARM(){
     String abi = Build.CPU_ABI;
 
@@ -636,10 +652,6 @@ public class System
     }
   }
 
-  public static UpdateService getUpdateService(){
-    return mUpdateService;
-  }
-
   public static String getSessionName(){
     return mSessionName;
   }
@@ -653,14 +665,14 @@ public class System
   }
 
   public static String getAppVersionName(){
-    if(mLocalApkVersion!=null)
-      return mLocalApkVersion;
+    if(mApkVersion !=null)
+      return mApkVersion;
     try{
       PackageManager manager = mContext.getPackageManager();
       PackageInfo info = manager != null ? manager.getPackageInfo(mContext.getPackageName(), 0) : null;
 
       if(info != null)
-        return (mLocalApkVersion = info.versionName);
+        return (mApkVersion = info.versionName);
     }
     catch(NameNotFoundException e){
       errorLogging(e);
@@ -697,17 +709,27 @@ public class System
   }
 
   /**
+   * get currently installed core version
+   * @return the version of the core, null if not present.
+   */
+  public static String getCoreVersion() {
+    if(mCoreVersion == null)
+      mCoreVersion = readFirstLine(getCoreBinPath() + "/VERSION");
+    return mCoreVersion;
+  }
+
+  /**
    * get version of installed ruby
    * @return the installed version of ruby
    */
   public static String getLocalRubyVersion() {
-    if(mLocalRubyVersion==null)
-      mLocalRubyVersion = readFirstLine(getRubyPath() + "/VERSION");
-    return mLocalRubyVersion;
+    if(mRubyVersion ==null)
+      mRubyVersion = readFirstLine(getRubyPath() + "/VERSION");
+    return mRubyVersion;
   }
 
   public static void updateLocalRubyVersion() {
-    mLocalRubyVersion=null;
+    mRubyVersion =null;
     getLocalRubyVersion();
   }
 
@@ -716,14 +738,14 @@ public class System
    * @return the version of installed MetaSploit Framework
    */
   public static String getLocalMsfVersion() {
-    if(mLocalMsfVersion==null)
-      mLocalMsfVersion = readFirstLine(getMsfPath() + "/VERSION");
+    if(mMsfVersion ==null)
+      mMsfVersion = readFirstLine(getMsfPath() + "/VERSION");
 
-    return mLocalMsfVersion;
+    return mMsfVersion;
   }
 
   public static void updateLocalMsfVersion() {
-    mLocalMsfVersion = null;
+    mMsfVersion = null;
     getLocalMsfVersion();
   }
 
@@ -981,6 +1003,10 @@ public class System
 
   public static boolean isInitialized(){
     return mInitialized;
+  }
+
+  public static boolean isCoreInstalled() {
+    return new File(getCoreBinPath() + "/VERSION").exists();
   }
 
   public static boolean isCoreInitialized() {

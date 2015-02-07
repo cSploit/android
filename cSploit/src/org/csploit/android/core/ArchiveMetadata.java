@@ -27,6 +27,7 @@ public class ArchiveMetadata {
   public Intent
           contentIntent;
   public boolean
+          fixShebang,
           errorOccurred;
 
   public ArchiveMetadata() {
@@ -41,7 +42,7 @@ public class ArchiveMetadata {
       compression = null;
       archiver = null;
       contentIntent = null;
-      errorOccurred = false;
+      fixShebang = errorOccurred = false;
     }
   }
 
