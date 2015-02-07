@@ -18,7 +18,6 @@
  */
 package org.csploit.android;
 
-import static java.lang.Thread.MAX_PRIORITY;
 import static org.csploit.android.core.UpdateChecker.AVAILABLE_VERSION;
 import static org.csploit.android.core.UpdateChecker.CORE_AVAILABLE;
 import static org.csploit.android.core.UpdateChecker.GEMS_AVAILABLE;

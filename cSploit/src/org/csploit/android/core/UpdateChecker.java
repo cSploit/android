@@ -55,11 +55,13 @@ public class UpdateChecker extends Thread
 
   public void run(){
 
-    send(UPDATE_CHECKING, null, null);
+    send(UPDATE_CHECKING);
 
     Logger.debug("Service started.");
 
-    boolean checkMsfUpdates = System.getSettings().getBoolean("MSF_ENABLED", true) &&
+    boolean checkMsfUpdates =
+            System.isCoreInitialized() &&
+            System.getSettings().getBoolean("MSF_ENABLED", true) &&
             System.getSettings().getBoolean("MSF_CHECK_UPDATES", true);
 
     if(UpdateService.isUpdateAvailable())
