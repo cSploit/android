@@ -115,7 +115,6 @@ public class MainActivity extends SherlockListActivity {
 	private RadarReceiver mRadarReceiver = new RadarReceiver();
 	private UpdateReceiver mUpdateReceiver = new UpdateReceiver();
 	private WipeReceiver mWipeReceiver = new WipeReceiver();
-  private UpdateChecker mUpdateChecker = null;
 	private Menu mMenu = null;
 	private TextView mUpdateStatus = null;
 	private Toast mToast = null;
@@ -530,13 +529,10 @@ public class MainActivity extends SherlockListActivity {
 
 	public void startUpdateChecker() {
 		if (System.getSettings().getBoolean("PREF_CHECK_UPDATES", true)) {
-
-      if(mUpdateChecker == null)
-			  mUpdateChecker = new UpdateChecker(this);
-
-      if(!mUpdateChecker.isAlive())
-        mUpdateChecker.start();
-		}
+      new UpdateChecker(this).start();
+		} else {
+      MainActivity.this.sendBroadcast(new Intent(UPDATE_NOT_AVAILABLE));
+    }
 	}
 
 	public void startNetworkRadar(boolean silent) {
