@@ -435,4 +435,13 @@
     <string name="installing_msf_gems">Установка gems для MSF</string>
     <string name="installing_bundle">Установка бандла</string>
     <string name="new_gems_update_desc">Обновление для ruby gems</string>
+    <string name="heart_attack">Heart attack</string>
+    <string name="cannot_download_core">Невозможно скачать ядро cSploit для вашего устройства</string>
+    <string name="unable_to_start_updateservice">Невозможно запустить сервис обновлений</string>
+    <string name="no_core_no_connectivity">Ядро cSploit не установлено, для первичной инициализации требуется интернет соединение</string>
+    <string name="no_core_found">Невозможно найти ядро cSploit для вашего устройства</string>
+    <string name="mandatory_update">требуется это обновление</string>
+    <string name="new_core_found">Доступно ядро версии %s , вы хотите обновится? ?</string>
+    <string name="update_cancelled">Обновление отменено</string>
+    <string name="child_not_started">Невозможно запустить процесс</string>
 </resources>
