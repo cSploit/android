@@ -1209,17 +1209,6 @@ public class MainActivity extends SherlockListActivity {
 
     private void onUpdateDone(UpdateService.action target) {
       switch (target) {
-        case core_update:
-          System.shutdownCoreDaemon();
-          try {
-            System.initCore();
-            onInitializationSuccess();
-          } catch (System.SuException e) {
-            onInitializationError(getString(R.string.only_4_root));
-          } catch (System.DaemonException e) {
-            onInitializationError(e.getMessage());
-          }
-          break;
         case ruby_update:
         case msf_update:
         case gems_update:
