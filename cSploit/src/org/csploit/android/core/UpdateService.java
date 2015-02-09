@@ -1395,10 +1395,8 @@ public class UpdateService extends IntentService
           installGems();
         else if (what_to_do == action.gems_update)
           updateGems();
-        else if (what_to_do == action.core_update) {
+        else if (what_to_do == action.core_update)
           System.initCore();
-          System.reloadTools();
-        }
 
         deleteTemporaryFiles();
         createVersionFile();
