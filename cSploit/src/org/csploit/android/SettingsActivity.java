@@ -495,8 +495,6 @@ public class SettingsActivity extends SherlockPreferenceActivity implements OnSh
 
   private void onMsfPathChanged() {
     measureMsfSize();
-    System.updateLocalRubyVersion();
-    System.updateLocalMsfVersion();
     boolean haveMsf = false;
     File dir;
     File [] content;

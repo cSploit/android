@@ -1401,10 +1401,6 @@ public class UpdateService extends IntentService
         mCurrentTask.errorOccurred = exitForError = false;
       }
 
-      if(what_to_do==action.msf_update)
-        System.updateLocalMsfVersion();
-      if(what_to_do==action.ruby_update)
-        System.updateLocalRubyVersion();
       sendDone(what_to_do);
     } catch ( SecurityException e) {
       sendError(what_to_do, R.string.bad_permissions);

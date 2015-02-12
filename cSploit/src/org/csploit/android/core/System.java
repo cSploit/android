@@ -130,9 +130,6 @@ public class System
   private static String mSessionName = null;
 
   private static String mApkVersion = null;
-  private static String mCoreVersion = null;
-  private static String mRubyVersion = null;
-  private static String mMsfVersion = null;
 
   private static Object mCustomData = null;
 
@@ -715,9 +712,7 @@ public class System
    * @return the version of the core, null if not present.
    */
   public static String getCoreVersion() {
-    if(mCoreVersion == null)
-      mCoreVersion = readFirstLine(getCorePath() + "/VERSION");
-    return mCoreVersion;
+    return readFirstLine(getCorePath() + "/VERSION");
   }
 
   /**
@@ -725,14 +720,7 @@ public class System
    * @return the installed version of ruby
    */
   public static String getLocalRubyVersion() {
-    if(mRubyVersion ==null)
-      mRubyVersion = readFirstLine(getRubyPath() + "/VERSION");
-    return mRubyVersion;
-  }
-
-  public static void updateLocalRubyVersion() {
-    mRubyVersion =null;
-    getLocalRubyVersion();
+    return readFirstLine(getRubyPath() + "/VERSION");
   }
 
   /**
@@ -740,15 +728,7 @@ public class System
    * @return the version of installed MetaSploit Framework
    */
   public static String getLocalMsfVersion() {
-    if(mMsfVersion ==null)
-      mMsfVersion = readFirstLine(getMsfPath() + "/VERSION");
-
-    return mMsfVersion;
-  }
-
-  public static void updateLocalMsfVersion() {
-    mMsfVersion = null;
-    getLocalMsfVersion();
+    return readFirstLine(getMsfPath() + "/VERSION");
   }
 
   public static boolean isServiceRunning(String name){
