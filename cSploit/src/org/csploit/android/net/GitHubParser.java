@@ -53,6 +53,7 @@ public class GitHubParser {
   private static GitHubParser msfRepo = new GitHubParser("rapid7", "metasploit-framework");
   private static GitHubParser cSploitRepo = new GitHubParser("cSploit", "android");
   private static GitHubParser coreRepo = new GitHubParser("cSploit", "android.native");
+  private static GitHubParser rubyRepo = new GitHubParser("cSploit", "android.native.ruby");
 
   public static GitHubParser getMsfRepo() {
     return msfRepo;
@@ -64,6 +65,10 @@ public class GitHubParser {
 
   public static GitHubParser getCoreRepo() {
     return coreRepo;
+  }
+
+  public static GitHubParser getRubyRepo() {
+    return rubyRepo;
   }
 
   public GitHubParser(String username, String project) {

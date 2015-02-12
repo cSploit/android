@@ -72,7 +72,6 @@ import org.csploit.android.tools.Raw;
 public class UpdateService extends IntentService
 {
   // Resources defines
-  private static final String REMOTE_RUBY_VERSION_URL = "https://gist.githubusercontent.com/tux-mind/e594b1cf923183cfcdfe/raw/ruby.json";
   private static final String REMOTE_GEMS_VERSION_URL = "http://gems.dsploit.net/atom.xml";
   private static final String REMOTE_GEM_SERVER = "http://gems.dsploit.net/";
   private static final Pattern GEM_FROM_LIST = Pattern.compile("^([^ ]+) \\(([^ ]+) ");
@@ -239,6 +238,7 @@ public class UpdateService extends IntentService
 
       if(remoteURL == null) {
         Logger.warning(String.format("unsupported platform ( %s )", platform));
+        return false;
       }
 
       synchronized (mCoreInfo) {
@@ -253,9 +253,6 @@ public class UpdateService extends IntentService
         mCoreInfo.executableOutputDir = mCoreInfo.outputDir = System.getCorePath();
 
         exitForError = false;
-
-        if(remoteURL == null)
-          return false;
 
         if(localVersion == null)
           return true;
@@ -287,41 +284,45 @@ public class UpdateService extends IntentService
    * @return true if ruby can be updated, false otherwise
    */
   public static boolean isRubyUpdateAvailable() {
-    HttpURLConnection connection = null;
-    BufferedReader reader = null;
-    String line;
     boolean exitForError = true;
     String localVersion = System.getLocalRubyVersion();
+    String platform = System.getPlatform();
+    String remoteVersion, remoteURL;
 
     try {
+
+      remoteVersion = GitHubParser.getRubyRepo().getLastReleaseVersion();
+
+      if(remoteVersion == null)
+        return false;
+
+      remoteURL = GitHubParser.getRubyRepo().getLastReleaseAssetUrl(platform + ".");
+
+      if(remoteURL == null) {
+        Logger.warning(String.format("unsupported platform ( %s )", platform));
+
+        platform = System.getCompatiblePlatform();
+        Logger.debug(String.format("trying with '%s'", platform));
+
+        remoteURL = GitHubParser.getCoreRepo().getLastReleaseAssetUrl(platform + ".");
+      }
+
+      Logger.debug(String.format("localVersion   = %s", localVersion));
+      Logger.debug(String.format("remoteVersion  = %s", remoteVersion));
+
+      if(remoteURL == null) {
+        Logger.warning(String.format("unsupported platform ( %s )", platform));
+        return false;
+      }
+
       synchronized (mRubyInfo) {
-        if (mRubyInfo.version == null) {
-
-          HttpURLConnection.setFollowRedirects(true);
-          URL url = new URL(REMOTE_RUBY_VERSION_URL);
-          connection = (HttpURLConnection) url.openConnection();
-          connection.connect();
-
-          if (connection.getResponseCode() != 200)
-            return false;
-
-          reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-          StringBuilder sb = new StringBuilder();
-
-          while ((line = reader.readLine()) != null) {
-            sb.append(line);
-          }
-
-          JSONObject info = new JSONObject(sb.toString());
-          mRubyInfo.url = info.getString("url");
-          mRubyInfo.versionString = info.getString("version");
-          mRubyInfo.version = Version.valueOf(mRubyInfo.versionString);
-          mRubyInfo.path = String.format("%s/%s", System.getStoragePath(), info.getString("name"));
-          mRubyInfo.archiver = archiveAlgorithm.valueOf(info.getString("archiver"));
-          mRubyInfo.compression = compressionAlgorithm.valueOf(info.getString("compression"));
-          mRubyInfo.md5 = info.getString("md5");
-          mRubyInfo.sha1 = info.getString("sha1");
-        }
+        mRubyInfo.url = remoteURL;
+        mRubyInfo.versionString = remoteVersion;
+        mRubyInfo.version = Version.valueOf(mRubyInfo.versionString);
+        mRubyInfo.name = String.format("core-%s+%s.tar.xz", mRubyInfo.versionString, platform);
+        mRubyInfo.path = String.format("%s/%s", System.getStoragePath(), mRubyInfo.name);
+        mRubyInfo.archiver = archiveAlgorithm.tar;
+        mRubyInfo.compression = compressionAlgorithm.xz;
 
         mRubyInfo.outputDir = System.getRubyPath();
         mRubyInfo.executableOutputDir = ExecChecker.ruby().getRoot();
@@ -334,22 +335,18 @@ public class UpdateService extends IntentService
 
         exitForError = false;
 
-        if (localVersion == null || mRubyInfo.version.compareTo(Version.valueOf(localVersion)) > 0)
+        if(localVersion == null)
+          return true;
+
+        // Compare versions
+        Version installedVersion = Version.valueOf(localVersion);
+
+        if (mRubyInfo.version.compareTo(installedVersion) > 0)
           return true;
       }
-    } catch (UnknownHostException e) {
-      Logger.error(e.getMessage());
     } catch(Exception e){
       System.errorLogging(e);
     } finally {
-      try {
-        if (reader != null)
-          reader.close();
-      } catch (Exception e) {
-        //ignored
-      }
-      if(connection!=null)
-        connection.disconnect();
       if(exitForError)
         mRubyInfo.reset();
     }
