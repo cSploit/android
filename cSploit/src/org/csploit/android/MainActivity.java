@@ -203,7 +203,9 @@ public class MainActivity extends SherlockListActivity {
 
 		startUpdateChecker();
 		startNetworkRadar(false);
-		StartRPCServer();
+
+    if(!MsfRpcd.isLocal() || System.getLocalMsfVersion() != null )
+		  StartRPCServer();
 
 		// if called for the second time after wifi connection
 		if (Build.VERSION.SDK_INT >= 11)
