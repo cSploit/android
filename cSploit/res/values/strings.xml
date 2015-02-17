@@ -10,7 +10,7 @@
     <string name="address">Address</string>
     <string name="port">Port</string>
     <string name="target">Target</string>
-    <string name="unknown">unknown</string>
+    <string name="unknown">No information</string>
     <string name="services">Services</string>
     <string name="os">OS</string>
     <string name="device_type">Device Type</string>
@@ -428,7 +428,7 @@
     <string name="menu_add">Add</string>
     <string name="menu_scan">Scan</string>
     <string name="menu_wifi_scan">WiFi Scan</string>
-    <string name="menu_stop_msfrpcd">Stop msfrpcd</string>
+    <string name="menu_stop_msfrpcd">Stop MSFRPCD</string>
     
     <string name="pref_theme">Dark Theme</string>
     <string name="pref_choose_theme">Enable the dark theme, which is easier on the eyes</string>
@@ -449,24 +449,24 @@
     <string name="extracting">Extracting&#8230;</string>
     <string name="click_here_to_upgrade">Click here to upgrade</string>
     <string name="bad_permissions">The local file that you put on your storage have bad permissions, i can not read and/or write it!</string>
-    <string name="restore_default_path">restore default path</string>
-    <string name="choose_a_custom_path">choose a custom path</string>
-    <string name="error_symlink">destination device does not support symlinks, please select a decent filesystem.</string>
-    <string name="target_selected">target selected</string>
-    <string name="targets_selected">targets selected</string>
-    <string name="multiple_attack">multiple attack</string>
-    <string name="connect_msf">connect to MetaSploit</string>
-    <string name="disconnect_msf">disconnect from MetaSploit</string>
-    <string name="connected_msf">connected to MetaSploit</string>
-    <string name="connection_failed">connection FAILED!</string>
+    <string name="restore_default_path">Restore default path</string>
+    <string name="choose_a_custom_path">Choose a custom path</string>
+    <string name="error_symlink">Destination device does not support symlinks, please select a decent filesystem.</string>
+    <string name="target_selected">Target selected</string>
+    <string name="targets_selected">Targets selected</string>
+    <string name="multiple_attack">Multiple attack</string>
+    <string name="connect_msf">Connect to MetaSploit</string>
+    <string name="disconnect_msf">Disconnect from MetaSploit</string>
+    <string name="connected_msf">Connected to MetaSploit</string>
+    <string name="connection_failed">Connection FAILED!</string>
     <string name="new_ruby_update_desc">An update for ruby is available</string>
     <string name="delete_previous_location">Delete previous location?</string>
-    <string name="setting_file_modes">setting file permissions…</string>
-    <string name="updating_rubygem">updating RubyGems</string>
-    <string name="installing_gems">installing gems…</string>
-    <string name="patching_shebang">patching shebang</string>
-    <string name="installing_msf_gems">installing gems for MSF</string>
-    <string name="installing_bundle">installing bundle</string>
+    <string name="setting_file_modes">Setting file permissions…</string>
+    <string name="updating_rubygem">Updating RubyGems</string>
+    <string name="installing_gems">Installing gems…</string>
+    <string name="patching_shebang">Patching shebang</string>
+    <string name="installing_msf_gems">Installing gems for MSF</string>
+    <string name="installing_bundle">Installing bundle</string>
     <string name="new_gems_update_desc">An update for ruby gems</string>
     <string name="heart_attack">heart attack</string>
     <string name="cannot_download_core">cannot download the core for your device</string>
@@ -475,6 +475,6 @@
     <string name="no_core_found">cannot find a core for this device</string>
     <string name="mandatory_update">this update is required</string>
     <string name="new_core_found">Core version %s is available, do you want to upgrade ?</string>
-    <string name="update_cancelled">update cancelled</string>
-    <string name="child_not_started">cannot start process</string>
+    <string name="update_cancelled">Update cancelled</string>
+    <string name="child_not_started">Cannot start process</string>
 </resources>
