@@ -246,7 +246,7 @@ public class UpdateService extends IntentService
         mCoreInfo.url = remoteURL;
         mCoreInfo.versionString = remoteVersion;
         mCoreInfo.version = Version.valueOf(mCoreInfo.versionString);
-        mCoreInfo.name = String.format("core-%s+%s.tar.xz", mCoreInfo.versionString, platform);
+        mCoreInfo.name = "core.tar.xz";
         mCoreInfo.path = String.format("%s/%s", System.getStoragePath(), mCoreInfo.name);
         mCoreInfo.archiver = archiveAlgorithm.tar;
         mCoreInfo.compression = compressionAlgorithm.xz;
@@ -304,7 +304,7 @@ public class UpdateService extends IntentService
         platform = System.getCompatiblePlatform();
         Logger.debug(String.format("trying with '%s'", platform));
 
-        remoteURL = GitHubParser.getCoreRepo().getLastReleaseAssetUrl(platform + ".");
+        remoteURL = GitHubParser.getRubyRepo().getLastReleaseAssetUrl(platform + ".");
       }
 
       Logger.debug(String.format("localVersion   = %s", localVersion));
@@ -319,7 +319,7 @@ public class UpdateService extends IntentService
         mRubyInfo.url = remoteURL;
         mRubyInfo.versionString = remoteVersion;
         mRubyInfo.version = Version.valueOf(mRubyInfo.versionString);
-        mRubyInfo.name = String.format("core-%s+%s.tar.xz", mRubyInfo.versionString, platform);
+        mRubyInfo.name = "ruby.tar.xz";
         mRubyInfo.path = String.format("%s/%s", System.getStoragePath(), mRubyInfo.name);
         mRubyInfo.archiver = archiveAlgorithm.tar;
         mRubyInfo.compression = compressionAlgorithm.xz;
