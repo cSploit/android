@@ -40,7 +40,6 @@ import org.csploit.android.core.UpdateChecker;
 import org.csploit.android.core.UpdateService;
 import org.csploit.android.events.Event;
 import org.csploit.android.gui.dialogs.AboutDialog;
-import org.csploit.android.gui.dialogs.ChangelogDialog;
 import org.csploit.android.gui.dialogs.ConfirmDialog;
 import org.csploit.android.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
 import org.csploit.android.gui.dialogs.ErrorDialog;
@@ -72,12 +71,10 @@ import java.net.NoRouteToHostException;
 import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
@@ -118,32 +115,36 @@ public class MainActivity extends SherlockListActivity {
 	private Menu mMenu = null;
 	private TextView mUpdateStatus = null;
 	private Toast mToast = null;
-  private ProgressDialog progressDialog;
 	private long mLastBackPressTime = 0;
   private ActionMode mActionMode = null;
+
+  private void createUpdateStatusText() {
+    if(mUpdateStatus != null) return;
+
+    RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
+
+    mUpdateStatus = new TextView(this);
+
+    LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT,
+            LayoutParams.MATCH_PARENT);
+
+    mUpdateStatus.setGravity(Gravity.CENTER);
+    mUpdateStatus.setLayoutParams(params);
+
+    layout.addView(mUpdateStatus);
+  }
 
 	private void createUpdateLayout() {
 
 		getListView().setVisibility(View.GONE);
 		findViewById(R.id.textView).setVisibility(View.GONE);
 
-		RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
-		LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT,
-				LayoutParams.MATCH_PARENT);
+    createUpdateStatusText();
 
-		mUpdateStatus = new TextView(this);
-
-		mUpdateStatus.setGravity(Gravity.CENTER);
-		mUpdateStatus.setLayoutParams(params);
 		mUpdateStatus
 				.setText(UPDATE_MESSAGE.replace("#STATUS#", "..."));
 
-		layout.addView(mUpdateStatus);
-
 		mUpdateReceiver.register(MainActivity.this);
-
-		startUpdateChecker();
-		stopNetworkRadar(true);
 
 		if (Build.VERSION.SDK_INT >= 11)
 			invalidateOptionsMenu();
@@ -154,24 +155,21 @@ public class MainActivity extends SherlockListActivity {
 		getListView().setVisibility(View.GONE);
 		findViewById(R.id.textView).setVisibility(View.GONE);
 
-		RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
-		LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT,
-				LayoutParams.MATCH_PARENT);
+		createUpdateStatusText();
 
-		mUpdateStatus = new TextView(this);
-
-		mUpdateStatus.setGravity(Gravity.CENTER);
-		mUpdateStatus.setLayoutParams(params);
 		mUpdateStatus.setText(getString(R.string.no_connectivity));
 
-		layout.addView(mUpdateStatus);
-
-		stopNetworkRadar(true);
 		if (Build.VERSION.SDK_INT >= 11)
 			invalidateOptionsMenu();
 	}
 
 	public void createOnlineLayout() {
+    findViewById(R.id.textView).setVisibility(View.VISIBLE);
+    getListView().setVisibility(View.VISIBLE);
+
+    if(mUpdateStatus != null)
+      mUpdateStatus.setVisibility(View.GONE);
+
     if(mTargetAdapter != null)
       return;
 
@@ -200,12 +198,6 @@ public class MainActivity extends SherlockListActivity {
 		mRadarReceiver.register(MainActivity.this);
 		mUpdateReceiver.register(MainActivity.this);
 		mWipeReceiver.register(MainActivity.this);
-
-		startUpdateChecker();
-		startNetworkRadar(false);
-
-    if(!MsfRpcd.isLocal() || System.getLocalMsfVersion() != null )
-		  StartRPCServer();
 
 		// if called for the second time after wifi connection
 		if (Build.VERSION.SDK_INT >= 11)
@@ -236,20 +228,10 @@ public class MainActivity extends SherlockListActivity {
     }
   }
 
-  private void onInitializationStart() {
-    if(progressDialog == null) {
-      progressDialog = ProgressDialog.show(MainActivity.this, "",
-              getString(R.string.initializing), true, false);
-    } else {
-      progressDialog.show();
-    }
-  }
-
   private void onInitializationError(final String message) {
     MainActivity.this.runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        progressDialog.dismiss();
         new FatalDialog(getString(R.string.initialization_error),
                 message, message.contains(">"),
                 MainActivity.this).show();
@@ -257,29 +239,13 @@ public class MainActivity extends SherlockListActivity {
     });
   }
 
-  private void onInitializationSuccess() {
+  private void onCoreUpdated() {
     MainActivity.this.runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        try {
-          if (progressDialog != null)
-            progressDialog.dismiss();
-        } catch (Exception e) {
-          new FatalDialog(getString(R.string.error), e
-                  .getMessage(), MainActivity.this)
-                  .show();
-          return;
-        }
-
-        if (!System.getAppVersionName().equals(
-                System.getSettings().getString(
-                        "CSPLOIT_INSTALLED_VERSION", "0"))) {
-          new ChangelogDialog(MainActivity.this).show();
-          Editor editor = System.getSettings().edit();
-          editor.putString("CSPLOIT_INSTALLED_VERSION",
-                  System.getAppVersionName());
-          editor.apply();
-        }
+        System.reloadNetworkMapping();
+        createLayout();
+        startNetworkRadar(true);
       }
     });
   }
@@ -309,8 +275,6 @@ public class MainActivity extends SherlockListActivity {
 
         // retry
         try {
-          onInitializationStart();
-
           System.init(MainActivity.this.getApplicationContext());
 
           System.registerPlugin(new RouterPwn());
@@ -339,7 +303,6 @@ public class MainActivity extends SherlockListActivity {
 
     if(coreInstalled && !coreBeating) {
       try {
-        onInitializationStart();
         System.initCore();
         coreBeating = true;
       } catch (System.SuException e) {
@@ -361,20 +324,23 @@ public class MainActivity extends SherlockListActivity {
     }
 
     if(!coreInstalled) {
-      onInitializationStart();
       UPDATE_MESSAGE = getString(R.string.missing_core_update);
     } else if(!coreBeating) {
-      onInitializationStart();
       UPDATE_MESSAGE = getString(R.string.heart_attack_update);
     } else if(!isWifiAvailable) {
       UPDATE_MESSAGE = getString(R.string.no_wifi_available);
     }
 
-    createLayout();
+    if(connectivityAvailable)
+      startUpdateChecker();
 
-    if(coreBeating) {
-      onInitializationSuccess();
-    }
+    if(coreBeating && isWifiAvailable)
+      startNetworkRadar(true);
+
+    if(!MsfRpcd.isLocal() || System.getLocalMsfVersion() != null )
+      StartRPCServer();
+
+    createLayout();
 	}
 
 	@Override
@@ -1216,6 +1182,9 @@ public class MainActivity extends SherlockListActivity {
         case gems_update:
           StartRPCServer();
           break;
+        case core_update:
+          onCoreUpdated();
+          break;
       }
 
       // restart update checker after a successful update
@@ -1224,7 +1193,7 @@ public class MainActivity extends SherlockListActivity {
 
     private void onUpdateError(UpdateService.action target, final int message) {
 
-      if(target == UpdateService.action.core_update && progressDialog != null) {
+      if(target == UpdateService.action.core_update) {
         onInitializationError(getString(message));
         return;
       }
