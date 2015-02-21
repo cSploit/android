@@ -421,6 +421,7 @@ public class UpdateService extends IntentService
         mMsfInfo.outputDir = System.getMsfPath();
         mMsfInfo.executableOutputDir = ExecChecker.msf().getRoot();
         mMsfInfo.archiver = archiveAlgorithm.zip;
+        mMsfInfo.fixShebang = true;
 
         if (!mSettingReceiver.getFilter().contains("MSF_DIR")) {
           mSettingReceiver.addFilter("MSF_DIR");
