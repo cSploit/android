@@ -140,6 +140,8 @@ public class System
 
   private static boolean mCoreInitialized = false;
 
+  private static KnownIssues mKnownIssues = null;
+
   private final static LinkedList<SettingReceiver> mSettingReceivers = new LinkedList<SettingReceiver>();
 
   public static void init(Context context) throws Exception{
@@ -151,6 +153,7 @@ public class System
       mTools = new ToolBox();
       mPlugins = new ArrayList<Plugin>();
       mOpenPorts = new SparseIntArray(3);
+      mKnownIssues = new KnownIssues();
 
       // if we are here, network initialization didn't throw any error, lock wifi
       WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
@@ -273,6 +276,8 @@ public class System
       reader = null;
       writer = null;
     }
+
+    mKnownIssues.fromFile(String.format("%s/issues", getCorePath()));
 
     if(!access_granted)
       throw new SuException();
@@ -993,6 +998,10 @@ public class System
 
   public static boolean isCoreInitialized() {
     return mCoreInitialized;
+  }
+
+  public static KnownIssues getKnownIssues() {
+    return mKnownIssues;
   }
 
   public static String getMacVendor(byte[] mac){
