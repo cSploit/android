@@ -134,7 +134,7 @@ public class ExecChecker {
   }
 
   /**
-   * check if the dSploit user can create executable files inside a directory.
+   * check if the cSploit user can create executable files inside a directory.
    * @param dir directory to check
    * @return true if can execute files into {@code dir}, false otherwise
    */
@@ -245,6 +245,17 @@ public class ExecChecker {
     }
 
     if(dir != null) {
+      if(System.getKnownIssues().isIssueFound(1)) {
+        String corePath = System.getCorePath();
+        String realCorePath = getRealPath(corePath);
+
+        if(realCorePath != null)
+          corePath = realCorePath;
+
+
+        dir = dir.replace(corePath, "/cSploit");
+      }
+
       synchronized (this) {
         resolvedDir = dir;
       }
