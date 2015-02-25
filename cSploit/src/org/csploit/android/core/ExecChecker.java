@@ -247,13 +247,13 @@ public class ExecChecker {
     if(dir != null) {
       if(System.getKnownIssues().isIssueFound(1)) {
         String corePath = System.getCorePath();
-        String realCorePath = getRealPath(corePath);
-
-        if(realCorePath != null)
-          corePath = realCorePath;
-
 
         dir = dir.replace(corePath, "/cSploit");
+
+        corePath = getRealPath(corePath);
+
+        if(corePath != null)
+          dir = dir.replace(corePath, "/cSploit");
       }
 
       synchronized (this) {
