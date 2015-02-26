@@ -150,10 +150,11 @@ public class System
       Logger.debug("initializing System...");
       mStoragePath = getSettings().getString("PREF_SAVE_PATH", Environment.getExternalStorageDirectory().toString());
       mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
-      mTools = new ToolBox();
+      mKnownIssues = new KnownIssues();
+	  mTools = new ToolBox();
       mPlugins = new ArrayList<Plugin>();
       mOpenPorts = new SparseIntArray(3);
-      mKnownIssues = new KnownIssues();
+      
 
       // if we are here, network initialization didn't throw any error, lock wifi
       WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
