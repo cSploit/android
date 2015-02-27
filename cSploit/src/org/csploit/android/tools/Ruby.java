@@ -65,14 +65,10 @@ public class Ruby extends Tool {
 
     public void onSettingChanged(String key) {
       setEnabled();
-
-      if(mEnabled)
-        setupEnvironment();
     }
   };
 
-
-  protected void setupEnvironment() {
+  public void setupEnvironment() {
     String rubyRoot;
     String path;
     mEnv = new String[3];

@@ -63,5 +63,11 @@ public class ToolBox {
     tcpDump.setEnabled();
     msf.setEnabled();
     networkRadar.setEnabled();
+
+    if(ruby.isEnabled())
+      ruby.setupEnvironment();
+
+    if(msf.isEnabled())
+      msf.setupEnvironment();
   }
 }

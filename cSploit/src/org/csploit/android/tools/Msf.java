@@ -42,7 +42,7 @@ public class Msf extends Ruby {
   }
 
   @Override
-  protected void setupEnvironment() {
+  public void setupEnvironment() {
     super.setupEnvironment();
 
     mEnv[1] += ":" + ExecChecker.msf().getRoot();
