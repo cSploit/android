@@ -1208,6 +1208,9 @@ public class UpdateService extends IntentService
                 parts[0], parts[1]));
       }
 
+      // metasploit_data_models requires ruby >= 2.1 from 0.23
+      sb.append("-e \"s#spec.add_runtime_dependency  *'metasploit_data_models'.*#spec.add_runtime_dependency 'metasploit_data_models', '~> 0.22.8'#g\" ");
+
       // android does not have git, but we downloaded the archive from the git repo.
       // so it's content it's exactly the same seen by git.
       sb.append("-e 's,`git ls-files`.split($/),Dir[\"**/*\"].reject {|f| File.directory?(f) },' ");
