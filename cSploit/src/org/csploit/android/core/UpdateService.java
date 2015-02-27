@@ -1210,7 +1210,7 @@ public class UpdateService extends IntentService
 
       // android does not have git, but we downloaded the archive from the git repo.
       // so it's content it's exactly the same seen by git.
-      sb.append("-e 's,`git ls-files`.split\\(\\$/\\),Dir[\"**/*\"].reject {|f| File.directory?(f) },' ");
+      sb.append("-e 's,`git ls-files`.split($/),Dir[\"**/*\"].reject {|f| File.directory?(f) },' ");
 
       // send files to work on
       sb.append(String.format("'%s/Gemfile' ",msfPath));
