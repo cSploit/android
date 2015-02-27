@@ -68,8 +68,6 @@ public abstract class Tool
   }
 
   public void setEnabled() {
-    if(ChildManager.handlers != null) {
-      mEnabled = ChildManager.handlers.contains(mHandler);
-    }
+    mEnabled = ChildManager.handlers != null && ChildManager.handlers.contains(mHandler);
   }
 }
