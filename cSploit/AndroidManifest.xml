@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.csploit.android"
     android:versionCode="1"
-    android:versionName="1.4.8" >
+    android:versionName="1.4.9" >
 
     <uses-sdk
         android:minSdkVersion="9"
