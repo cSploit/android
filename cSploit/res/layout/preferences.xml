@@ -7,12 +7,6 @@
 
         <CheckBoxPreference
             android:defaultValue="true"
-            android:key="PREF_CHECK_UPDATES"
-            android:summary="@string/pref_check_updates_desc"
-            android:title="@string/pref_check_updates" />
-
-        <CheckBoxPreference
-            android:defaultValue="true"
             android:key="PREF_WAKE_LOCK"
             android:summary="@string/pref_wake_lock_desc"
             android:title="@string/pref_wake_lock" />
@@ -39,6 +33,50 @@
             android:key="PREF_DARK_THEME"
             android:summary="@string/pref_choose_theme"
             android:title="@string/pref_theme" />
+    </PreferenceCategory>
+
+    <PreferenceCategory  android:title="@string/pref_updates" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="PREF_CHECK_UPDATES"
+            android:summary="@string/pref_check_updates_desc"
+            android:title="@string/pref_check_updates" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="PREF_UPDATES_APP"
+            android:dependency="PREF_CHECK_UPDATES"
+            android:summary="@string/pref_updates_app_desc"
+            android:title="@string/pref_updates_app" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="PREF_UPDATES_CORE"
+            android:dependency="PREF_CHECK_UPDATES"
+            android:summary="@string/pref_updates_core_desc"
+            android:title="@string/pref_updates_core" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="PREF_UPDATES_RUBY"
+            android:dependency="PREF_CHECK_UPDATES"
+            android:summary="@string/pref_updates_ruby_desc"
+            android:title="@string/pref_updates_ruby" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="PREF_UPDATES_GEMS"
+            android:dependency="PREF_CHECK_UPDATES"
+            android:summary="@string/pref_updates_gems_desc"
+            android:title="@string/pref_updates_gems" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="PREF_UPDATES_MSF"
+            android:dependency="PREF_CHECK_UPDATES"
+            android:summary="@string/pref_updates_msf_desc"
+            android:title="@string/pref_updates_msf" />
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_modules" >
@@ -124,12 +162,6 @@
             android:key="MSF_ENABLED"
             android:title="@string/pref_msf_enable"
             android:summary="@string/pref_msf_enable_desc" />
-
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="MSF_CHECK_UPDATES"
-            android:summary="@string/pref_msf_check_updates_desc"
-            android:title="@string/pref_msf_check_updates" />
 
         <ListPreference
             android:key="MSF_BRANCH"

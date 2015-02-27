@@ -20,6 +20,7 @@ package org.csploit.android.core;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 
 public class UpdateChecker extends Thread
 {
@@ -59,20 +60,31 @@ public class UpdateChecker extends Thread
 
     Logger.debug("Service started.");
 
-    boolean checkMsfUpdates =
-            System.isCoreInitialized() &&
-            System.getSettings().getBoolean("MSF_ENABLED", true) &&
-            System.getSettings().getBoolean("MSF_CHECK_UPDATES", true);
+    SharedPreferences prefs = System.getSettings();
 
-    if(UpdateService.isUpdateAvailable())
+    boolean checkApp = prefs.getBoolean("PREF_UPDATES_APP", true);
+
+    boolean checkCore = prefs.getBoolean("PREF_UPDATES_CORE", true);
+
+    boolean canCheckMsf = System.isCoreInitialized() && prefs.getBoolean("MSF_ENABLED", true);
+
+    boolean checkRuby = canCheckMsf && prefs.getBoolean("PREF_UPDATES_RUBY", true);
+
+    boolean checkGems = canCheckMsf && prefs.getBoolean("PREF_UPDATES_GEMS", true) &&
+            System.getLocalRubyVersion() != null;
+
+    boolean checkMsf = canCheckMsf && prefs.getBoolean("PREF_UPDATES_MSF", true) &&
+            System.getLocalRubyVersion() != null;
+
+    if(checkApp && UpdateService.isUpdateAvailable())
       send(UPDATE_AVAILABLE, AVAILABLE_VERSION, UpdateService.getRemoteVersion());
-    else if(UpdateService.isCoreUpdateAvailable())
+    else if(checkCore && UpdateService.isCoreUpdateAvailable())
       send(CORE_AVAILABLE, AVAILABLE_VERSION, UpdateService.getRemoteCoreVersion());
-    else if(checkMsfUpdates && UpdateService.isRubyUpdateAvailable())
+    else if(checkRuby && UpdateService.isRubyUpdateAvailable())
       send(RUBY_AVAILABLE);
-    else if(checkMsfUpdates && UpdateService.isMsfUpdateAvailable()) {
+    else if(checkMsf && UpdateService.isMsfUpdateAvailable()) {
       send(MSF_AVAILABLE);
-    } else if(checkMsfUpdates && UpdateService.isGemUpdateAvailable()){
+    } else if(checkGems && UpdateService.isGemUpdateAvailable()){
       send(GEMS_AVAILABLE);
     } else
       send(UPDATE_NOT_AVAILABLE);

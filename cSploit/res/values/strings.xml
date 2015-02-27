@@ -477,4 +477,15 @@
     <string name="new_core_found">Core version %s is available, do you want to upgrade ?</string>
     <string name="update_cancelled">update cancelled</string>
     <string name="child_not_started">cannot start process</string>
+    <string name="pref_updates">Updates</string>
+    <string name="pref_updates_app">App</string>
+    <string name="pref_updates_app_desc">check for App updates</string>
+    <string name="pref_updates_core">Core</string>
+    <string name="pref_updates_core_desc">check for Core updates</string>
+    <string name="pref_updates_ruby">Ruby</string>
+    <string name="pref_updates_ruby_desc">check for Ruby updates</string>
+    <string name="pref_updates_msf">MSF</string>
+    <string name="pref_updates_msf_desc">check for MSF updates</string>
+    <string name="pref_updates_gems">RubyGems</string>
+    <string name="pref_updates_gems_desc">check for RubyGems updates</string>
 </resources>
