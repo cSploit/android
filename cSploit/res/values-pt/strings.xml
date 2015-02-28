@@ -445,5 +445,16 @@
     <string name="new_core_found">a versão do Core %s Está disponível, você deseja atualizar ?</string>
     <string name="update_cancelled">Atualização Cancelada</string>
     <string name="child_not_started">Processo não pode iniciar...</string>
+    <string name="pref_updates">Atualizações</string>
+    <string name="pref_updates_app">App</string>
+    <string name="pref_updates_app_desc">Verificar se há atualizações de Aplicativos</string>
+    <string name="pref_updates_core">Core</string>
+    <string name="pref_updates_core_desc">Verificar se há atualizações para o Core</string>
+    <string name="pref_updates_ruby">Ruby</string>
+    <string name="pref_updates_ruby_desc">verificar se há atualizações para o Ruby</string>
+    <string name="pref_updates_msf">MSF</string>
+    <string name="pref_updates_msf_desc">Verificar se há atualizações para o MSF</string>
+    <string name="pref_updates_gems">RubyGems</string>
+    <string name="pref_updates_gems_desc">Verificar se há atualizações para o RubyGems</string>
 
 </resources>
