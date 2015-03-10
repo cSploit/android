@@ -29,6 +29,7 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import com.github.zafarkhaja.semver.Version;
+import com.sksamuel.diffpatch.DiffMatchPatch;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
@@ -39,28 +40,31 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 import org.apache.commons.compress.utils.CountingInputStream;
+import org.apache.commons.compress.utils.IOUtils;
+import org.csploit.android.net.RemoteFetcher;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.security.KeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.concurrent.CancellationException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.csploit.android.R;
 import org.csploit.android.net.GemParser;
@@ -74,7 +78,6 @@ public class UpdateService extends IntentService
   // Resources defines
   private static final String REMOTE_GEMS_VERSION_URL = "http://gems.dsploit.net/atom.xml";
   private static final String REMOTE_GEM_SERVER = "http://gems.dsploit.net/";
-  private static final Pattern GEM_FROM_LIST = Pattern.compile("^([^ ]+) \\(([^ ]+) ");
 
   // Intent defines
   public static final String START    = "UpdateService.action.START";
@@ -387,27 +390,48 @@ public class UpdateService extends IntentService
     return false;
   }
 
+  private static void parseMsfManifest(String manifestUrl) throws IOException, JSONException {
+    JSONObject manifest, files;
+
+    manifest = new JSONObject(new String(RemoteFetcher.fetch(manifestUrl)));
+    files = manifest.getJSONObject("files");
+
+    mMsfInfo.url = manifest.getString("url");
+    mMsfInfo.patches = new HashMap<String, LinkedList<DiffMatchPatch.Patch>>();
+
+    Iterator<String> it = files.keys();
+    DiffMatchPatch dmp = new DiffMatchPatch();
+
+    while(it.hasNext()) {
+      String key = it.next();
+      mMsfInfo.patches.put(key, (LinkedList<DiffMatchPatch.Patch>) dmp.patch_fromText(files.getString(key)));
+    }
+  }
+
   /**
    * is a MetaSploitFramework update available?
    * @return true if the framework can be updated, false otherwise
    */
   public static boolean isMsfUpdateAvailable() {
     boolean exitForError = true;
-    String branch;
     String localVersion = System.getLocalMsfVersion();
     GitHubParser msfRepo = GitHubParser.getMsfRepo();
 
     try {
       synchronized (mMsfInfo) {
         if (mMsfInfo.url == null) {
-          branch = System.getSettings().getString("MSF_BRANCH", "release");
+          String customManifestUrl = System.getSettings().getString("MSF_MANIFEST_URL", "NONE");
 
-          if(!branch.equals(msfRepo.getBranch()))
-            msfRepo.setBranch(branch);
-          mMsfInfo.url = msfRepo.getZipballUrl();
-          mMsfInfo.versionString = msfRepo.getLastCommitSha();
-          mMsfInfo.name = msfRepo.getZipballName();
-          mMsfInfo.dirToExtract = msfRepo.getZipballRoot();
+          if(customManifestUrl.equals("NONE")) {
+            parseMsfManifest(msfRepo.getLastReleaseAssetUrl());
+            mMsfInfo.versionString = msfRepo.getLastReleaseVersion();
+            mMsfInfo.version = Version.valueOf(mMsfInfo.versionString);
+          } else {
+            parseMsfManifest(customManifestUrl);
+            mMsfInfo.versionString = "FORCE_UPDATE";
+          }
+
+          mMsfInfo.name = "msf.zip";
           mMsfInfo.path = String.format("%s/%s", System.getStoragePath(), mMsfInfo.name);
         }
 
@@ -421,6 +445,7 @@ public class UpdateService extends IntentService
         mMsfInfo.outputDir = System.getMsfPath();
         mMsfInfo.executableOutputDir = ExecChecker.msf().getRoot();
         mMsfInfo.archiver = archiveAlgorithm.zip;
+        mMsfInfo.skipRoot = true;
         mMsfInfo.fixShebang = true;
 
         if (!mSettingReceiver.getFilter().contains("MSF_DIR")) {
@@ -683,7 +708,7 @@ public class UpdateService extends IntentService
     CountingInputStream counter;
     ArchiveInputStream is;
     byte[] buffer;
-    boolean dirToExtractFound;
+    String rootDirectory;
 
     Logger.info("verifying archive integrity");
 
@@ -703,27 +728,44 @@ public class UpdateService extends IntentService
       throw new RuntimeException(String.format("archive '%s' does not exists", mCurrentTask.path));
     }
 
-    dirToExtractFound = mCurrentTask.dirToExtract == null;
-
     try {
       is = openArchiveStream(counter);
       ArchiveEntry entry;
       buffer = new byte[2048];
       total = f.length();
       old_percentage = -1;
+      rootDirectory = null;
+
       // consume the archive
-      while (mRunning && (entry = is.getNextEntry()) != null)
-        if(!dirToExtractFound && entry.getName().startsWith(mCurrentTask.dirToExtract))
-          dirToExtractFound=true;
-        while (mRunning && is.read(buffer) > 0) {
-          percentage = (short) (((double) counter.getBytesRead() / total) * 100);
-          if (percentage != old_percentage) {
-            mBuilder.setProgress(100, percentage, false)
-                    .setContentInfo(percentage + "%");
-            mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-            old_percentage = percentage;
+      while (mRunning && (entry = is.getNextEntry()) != null) {
+        if(!mCurrentTask.skipRoot) continue;
+
+        String name = entry.getName();
+
+        if(rootDirectory == null) {
+          if(name.contains("/")) {
+            rootDirectory = name.substring(0, name.indexOf('/'));
+          } else if(entry.isDirectory()) {
+            rootDirectory = name;
+          } else {
+            throw new IOException(String.format("archive '%s' contains files under it's root", mCurrentTask.path));
+          }
+        } else {
+          if(!name.startsWith(rootDirectory)) {
+            throw new IOException("multiple directories found in the archive root");
           }
         }
+      }
+
+      while (mRunning && is.read(buffer) > 0) {
+        percentage = (short) (((double) counter.getBytesRead() / total) * 100);
+        if (percentage != old_percentage) {
+          mBuilder.setProgress(100, percentage, false)
+                  .setContentInfo(percentage + "%");
+          mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+          old_percentage = percentage;
+        }
+      }
     } catch (IOException e) {
       throw new KeyException("corrupted archive: "+e.getMessage());
     }
@@ -731,8 +773,8 @@ public class UpdateService extends IntentService
     if(!mRunning)
       throw new CancellationException("archive integrity check cancelled");
 
-    if(!dirToExtractFound)
-      throw new KeyException(String.format("archive '%s' does not contains required '%s' directory", mCurrentTask.path, mCurrentTask.dirToExtract));
+    if(mCurrentTask.skipRoot && rootDirectory == null)
+      throw new KeyException(String.format("archive '%s' is empty", mCurrentTask.path));
   }
 
   /**
@@ -973,20 +1015,19 @@ public class UpdateService extends IntentService
     ArchiveInputStream is = null;
     ArchiveEntry entry;
     CountingInputStream counter;
-    BufferedOutputStream bof = null;
+    OutputStream outputStream = null;
     File f,inFile;
     File[] list;
     String name;
     String envPath;
     final StringBuffer sb = new StringBuffer();
-    byte data[] = new byte[2048];
     int mode;
     int count;
-    int absCount;
     long total;
     boolean isTar, r,w,x, isElf, isScript;
     short percentage,old_percentage;
     Child which;
+    DiffMatchPatch dmp;
 
     if(mCurrentTask.path==null||mCurrentTask.outputDir==null)
       return;
@@ -1020,6 +1061,7 @@ public class UpdateService extends IntentService
       is = openArchiveStream(counter);
       isTar = mCurrentTask.archiver.equals(archiveAlgorithm.tar);
       old_percentage = -1;
+      dmp = (mCurrentTask.patches != null && mCurrentTask.patches.size() > 0) ? new DiffMatchPatch() : null;
 
       f = new File(mCurrentTask.outputDir);
       if (f.exists() && f.isDirectory() && (list = f.listFiles()) != null && list.length > 2)
@@ -1035,11 +1077,11 @@ public class UpdateService extends IntentService
       while (mRunning && (entry = is.getNextEntry()) != null) {
         name = entry.getName().replaceFirst("^\\./?", "");
 
-        if (mCurrentTask.dirToExtract != null) {
-          if (!name.startsWith(mCurrentTask.dirToExtract))
+        if (mCurrentTask.skipRoot) {
+          if(name.contains("/"))
+            name = name.substring(name.indexOf('/') + 1);
+          else if(entry.isDirectory())
             continue;
-          else
-            name = name.substring(mCurrentTask.dirToExtract.length());
         }
 
         f = new File(mCurrentTask.outputDir, name);
@@ -1053,50 +1095,99 @@ public class UpdateService extends IntentService
             }
           }
         } else {
-          bof = new BufferedOutputStream(new FileOutputStream(f));
+          byte[] buffer = null;
+          byte[] writeMe = null;
+
+          // patch the file
+          if(dmp != null && mCurrentTask.patches.containsKey(name)) {
+            buffer = new byte[(int)entry.getSize()];
+            IOUtils.readFully(is, buffer);
+            writeMe = buffer = ((String)dmp.patch_apply(mCurrentTask.patches.get(name),
+                    new String(buffer))[0]).getBytes();
+          }
+
+          outputStream = new FileOutputStream(f);
 
           // check il file is an ELF or a script
           if((!isTar || mCurrentTask.fixShebang) && entry.getSize() > 4) {
-            // read the first 4 bytes of the file
-            for (absCount = 0, count = -1;
-                 mRunning && absCount < 4 && (count = is.read(data, absCount, 4 - absCount)) != -1;
-                 absCount += count);
+            if (buffer == null) {
+              writeMe = buffer = new byte[4];
 
-            if (count == -1) {
-              // don't go further, we reached EOF
-            } else if (data[0] == 0x7F && data[1] == 0x45 && data[2] == 0x4C && data[3] == 0x46) {
-              isElf = true;
-            } else if (data[0] == '#' && data[1] == '!') {
-              isScript = true;
+              IOUtils.readFully(is, buffer);
 
-              if(mCurrentTask.fixShebang) {
-                // read until a '\n' is found ( assume that the first line is longer than 4 bytes )
-                while (mRunning && is.read(data, absCount, 1) != -1) {
-                  if (data[absCount++] == '\n')
-                    break;
+              if (buffer[0] == 0x7F && buffer[1] == 0x45 && buffer[2] == 0x4C && buffer[3] == 0x46) {
+                isElf = true;
+              } else if (buffer[0] == '#' && buffer[1] == '!') {
+                isScript = true;
+
+                ByteArrayOutputStream firstLine = new ByteArrayOutputStream();
+                int newline = -1;
+
+                // assume that '\n' is more far then 4 chars.
+                firstLine.write(buffer);
+                buffer = new byte[1024];
+                count = 0;
+
+                while (mRunning && (count = is.read(buffer)) >= 0 &&
+                        (newline = Arrays.binarySearch(buffer, 0, count, (byte) 0x0A)) < 0) {
+                  firstLine.write(buffer, 0, count);
                 }
-                byte[] firstLine = new String(data, 0, absCount).replace("/usr/bin/env", envPath).getBytes();
-                absCount = firstLine.length;
-                java.lang.System.arraycopy(firstLine, 0, data, 0, absCount);
+
+                if (!mRunning) {
+                  throw new CancellationException("cancelled while searching for newline.");
+                } else if(count < 0) {
+                  newline = count = 0;
+                } else if(newline < 0) {
+                  newline = count;
+                }
+
+                firstLine.write(buffer, 0, newline);
+                firstLine.close();
+
+                byte[] newFirstLine = new String(firstLine.toByteArray()).replace("/usr/bin/env", envPath).getBytes();
+
+                writeMe = new byte[newFirstLine.length + (count - newline)];
+
+                java.lang.System.arraycopy(newFirstLine, 0, writeMe, 0, newFirstLine.length);
+                java.lang.System.arraycopy(buffer, newline, writeMe, newFirstLine.length, count - newline);
+              }
+            } else {
+              if (buffer[0] == 0x7F && buffer[1] == 0x45 && buffer[2] == 0x4C && buffer[3] == 0x46) {
+                isElf = true;
+              } else if (buffer[0] == '#' && buffer[1] == '!') {
+                isScript = true;
+
+                int newline = Arrays.binarySearch(buffer, (byte) 0x0A);
+
+                if (newline < 0)
+                  newline = buffer.length;
+
+                byte[] newFirstLine = new String(buffer, 0, newline).replace("/usr/bin/env", envPath).getBytes();
+
+                writeMe = new byte[buffer.length + (newFirstLine.length - newline)];
+
+                java.lang.System.arraycopy(newFirstLine, 0, writeMe, 0, newFirstLine.length);
+                java.lang.System.arraycopy(buffer, newline, writeMe, newFirstLine.length, newFirstLine.length - newline);
               }
             }
-
-            bof.write(data, 0, absCount);
           }
 
-          while (mRunning && (count = is.read(data)) != -1) {
-            bof.write(data, 0, count);
-            percentage = (short) (((double) counter.getBytesRead() / total) * 100);
-            if (percentage != old_percentage) {
-              mBuilder.setProgress(100, percentage, false)
-                      .setContentInfo(percentage + "%");
-              mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-              old_percentage = percentage;
-            }
+          if(writeMe != null) {
+            outputStream.write(writeMe);
           }
-          bof.flush();
-          bof.close();
-          bof=null;
+
+          IOUtils.copy(is, outputStream);
+
+          outputStream.close();
+          outputStream = null;
+
+          percentage = (short) (((double) counter.getBytesRead() / total) * 100);
+          if (percentage != old_percentage) {
+            mBuilder.setProgress(100, percentage, false)
+                    .setContentInfo(percentage + "%");
+            mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+            old_percentage = percentage;
+          }
         }
         // Zip does not store file permissions.
         if (isTar) {
@@ -1139,8 +1230,8 @@ public class UpdateService extends IntentService
     } finally {
       if(is != null)
         is.close();
-      if(bof != null)
-        bof.close();
+      if(outputStream != null)
+        outputStream.close();
     }
   }
 
@@ -1149,8 +1240,6 @@ public class UpdateService extends IntentService
    */
   private void installGems() throws CancellationException, RuntimeException, IOException, InterruptedException, ChildManager.ChildNotStartedException, ChildManager.ChildDiedException {
     String msfPath = System.getMsfPath();
-    final ArrayList<String> ourGems = new ArrayList<String>();
-    StringBuilder sb = new StringBuilder();
 
     mBuilder.setContentTitle(getString(R.string.installing_gems))
             .setContentText(getString(R.string.installing_bundle))
@@ -1158,7 +1247,7 @@ public class UpdateService extends IntentService
             .setSmallIcon(android.R.drawable.stat_sys_download)
             .setProgress(100, 0, true);
     mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-    Child bundleInstallTask, task;
+    Child bundleInstallTask;
 
     bundleInstallTask = null;
 
@@ -1170,67 +1259,6 @@ public class UpdateService extends IntentService
 
       mBuilder.setContentText(getString(R.string.installing_msf_gems));
       mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-
-      // get gems stored on our gem server.
-
-      task = System.getTools().ruby.async(
-              String.format("gem list -r --clear-sources --source '%s'", REMOTE_GEM_SERVER),
-              new Raw.RawReceiver() {
-                @Override
-                public void onNewLine(String line) {
-                  Matcher matcher = GEM_FROM_LIST.matcher(line);
-                  if (matcher.find()) {
-                    ourGems.add(matcher.group(1) + " " + matcher.group(2));
-                  }
-                }
-              });
-
-      if (execShell(task, "cancelled while retrieving compiled gem list") != 0)
-        throw new RuntimeException("cannot fetch remote gem info");
-
-      // substitute gems version and gem sources with our one
-      sb.append("sed -i ");
-
-      // append our REMOTE_GEM_SERVER to msf Gemfile sources.
-      // we use an our gem server to provide cross compiled gems,
-      // because android does not comes with a compiler.
-      sb.append(String.format("-e \"/source 'https:\\/\\/rubygems.org'/a\\\nsource '%s'\" ",
-              REMOTE_GEM_SERVER));
-
-      for (String compiledGem : ourGems) {
-        String[] parts = compiledGem.split(" ");
-
-        // patch Gemfile
-        sb.append(String.format("-e \"s#gem  *'%1$s'.*#gem '%1$s', '%2$s', :source => '%3$s'#g\" ",
-                parts[0], parts[1], REMOTE_GEM_SERVER));
-        // patch gemspec
-        sb.append(String.format("-e \"s#spec.add_runtime_dependency  *'%1$s'.*#spec.add_runtime_dependency '%1$s', '%2$s'#g\" ",
-                parts[0], parts[1]));
-      }
-
-      // metasploit_data_models requires ruby >= 2.1 from 0.23
-      sb.append("-e \"s#spec.add_runtime_dependency  *'metasploit_data_models'.*#spec.add_runtime_dependency 'metasploit_data_models', '~> 0.22.8'#g\" ");
-
-      // metasploit-credential 0.14 depends on metasploit_data_models ~> 0.23
-      sb.append("-e \"s#spec.add_runtime_dependency  *'metasploit-credential'.*#spec.add_runtime_dependency 'metasploit-credential', '~> 0.13.19'#g\" ");
-
-      // android does not have git, but we downloaded the archive from the git repo.
-      // so it's content it's exactly the same seen by git.
-      sb.append("-e 's,`git ls-files`.split($/),Dir[\"**/*\"].reject {|f| File.directory?(f) },' ");
-
-      // send files to work on
-      sb.append(String.format("'%s/Gemfile' ",msfPath));
-      for(File f: new File(msfPath).listFiles())
-      {
-        String fPath = f.getAbsolutePath();
-        if(fPath.endsWith(".gemspec"))
-          sb.append(String.format("'%s' ", fPath));
-      }
-
-      task = System.getTools().raw.async(sb.toString(), mErrorReceiver);
-
-      if (execShell(task, "cancelled while patching bundle files") != 0)
-        throw new RuntimeException("cannot patch bundle files");
 
       // remove cache version file
       new File(msfPath, "Gemfile.lock").delete();
@@ -1424,12 +1452,24 @@ public class UpdateService extends IntentService
     } catch (IOException e) {
       sendError(what_to_do, R.string.error_occured);
       System.errorLogging(e);
-    } catch ( RuntimeException e) {
+    } catch (RuntimeException e) {
       sendError(what_to_do, R.string.error_occured);
-      if(e.getClass() == NullPointerException.class)
-        System.errorLogging(e);
-      else
-        Logger.error(e.getClass().getName() + ": " + e.getMessage());
+
+      StackTraceElement[] stack = e.getStackTrace();
+      StackTraceElement frame = e.getStackTrace()[0];
+
+      for(StackTraceElement f : stack) {
+        if(f.getClassName().startsWith("org.csploit.android")) {
+          frame = f;
+          break;
+        }
+      }
+
+      Logger.error(
+              String.format("%s: %s [%s:%d]",
+                      e.getClass().getName(), e.getMessage(),
+                      frame.getFileName(), frame.getLineNumber()
+                      ));
     } catch (InterruptedException e) {
       sendError(what_to_do, R.string.error_occured);
       System.errorLogging(e);

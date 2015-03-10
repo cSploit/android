@@ -50,7 +50,7 @@ public class GitHubParser {
   private JSONObject mLastCommit = null;
   private JSONObject mLastRelease = null;
 
-  private static GitHubParser msfRepo = new GitHubParser("rapid7", "metasploit-framework");
+  private static GitHubParser msfRepo = new GitHubParser("cSploit", "android.MSF");
   private static GitHubParser cSploitRepo = new GitHubParser("cSploit", "android");
   private static GitHubParser coreRepo = new GitHubParser("cSploit", "android.native");
   private static GitHubParser rubyRepo = new GitHubParser("cSploit", "android.native.ruby");
@@ -76,43 +76,15 @@ public class GitHubParser {
     this.project = project;
   }
 
-  private String fetchRemoteData(String _url) throws IOException {
-    HttpURLConnection connection;
-    HttpURLConnection.setFollowRedirects(true);
-    URL url = new URL(_url);
-
-    connection = (HttpURLConnection) url.openConnection();
-
-    try {
-      connection.connect();
-      int ret = connection.getResponseCode();
-
-      if (ret != 200)
-        throw new IOException(String.format("unable to fetch remote data: '%s' => %d",
-                _url, ret));
-
-      StringBuilder sb = new StringBuilder();
-      BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-      String line;
-
-      while ((line = reader.readLine()) != null)
-        sb.append(line);
-
-      return sb.toString();
-    } finally {
-      connection.disconnect();
-    }
-  }
-
   private void fetchReleases() throws IOException, JSONException {
     JSONArray releases;
     JSONObject release;
     boolean found;
 
     releases = new JSONArray(
-            fetchRemoteData(
+            new String(RemoteFetcher.fetch(
                     String.format(RELEASES_URL, username, project)
-            )
+            ))
     );
 
     mReleases = new JSONArray();
@@ -133,9 +105,9 @@ public class GitHubParser {
 
   private void fetchBranches() throws IOException, JSONException {
     mBranches = new JSONArray(
-            fetchRemoteData(
+            new String(RemoteFetcher.fetch(
                     String.format(BRANCHES_URL, username, project)
-            )
+            ))
     );
   }
 

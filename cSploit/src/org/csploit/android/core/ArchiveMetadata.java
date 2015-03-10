@@ -3,6 +3,10 @@ package org.csploit.android.core;
 import android.content.Intent;
 
 import com.github.zafarkhaja.semver.Version;
+import com.sksamuel.diffpatch.DiffMatchPatch;
+
+import java.util.HashMap;
+import java.util.LinkedList;
 
 /**
  * just a simple struct to handle archives metadata
@@ -15,7 +19,6 @@ public class ArchiveMetadata {
           versionString,
           outputDir,
           executableOutputDir,
-          dirToExtract,
           md5,
           sha1;
   public Version
@@ -27,8 +30,11 @@ public class ArchiveMetadata {
   public Intent
           contentIntent;
   public boolean
+          skipRoot,
           fixShebang,
           errorOccurred;
+  public HashMap<String, LinkedList<DiffMatchPatch.Patch>>
+          patches;
 
   public ArchiveMetadata() {
     reset();
@@ -37,12 +43,13 @@ public class ArchiveMetadata {
   public void reset() {
     synchronized (this) {
       url = name = md5 = sha1 = versionString = path =
-              outputDir = dirToExtract = executableOutputDir = null;
+              outputDir = executableOutputDir = null;
       version = null;
       compression = null;
       archiver = null;
       contentIntent = null;
-      fixShebang = errorOccurred = false;
+      fixShebang = errorOccurred = skipRoot = false;
+      patches = null;
     }
   }
 
