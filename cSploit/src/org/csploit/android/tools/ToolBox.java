@@ -34,6 +34,7 @@ public class ToolBox {
   public final TcpDump tcpDump;
   public final Msf msf;
   public final NetworkRadar networkRadar;
+  public final MsfRpcd msfrpcd;
 
   public ToolBox() {
     raw = new Raw();
@@ -48,6 +49,7 @@ public class ToolBox {
     tcpDump = new TcpDump();
     msf = new Msf();
     networkRadar = new NetworkRadar();
+    msfrpcd = new MsfRpcd();
   }
 
   public void reload() {
@@ -63,11 +65,15 @@ public class ToolBox {
     tcpDump.setEnabled();
     msf.setEnabled();
     networkRadar.setEnabled();
+    msfrpcd.setEnabled();
 
     if(ruby.isEnabled())
       ruby.setupEnvironment();
 
     if(msf.isEnabled())
       msf.setupEnvironment();
+
+    if(msfrpcd.isEnabled())
+      msfrpcd.setupEnvironment();
   }
 }

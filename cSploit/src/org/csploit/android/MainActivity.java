@@ -63,7 +63,7 @@ import org.csploit.android.plugins.Sessions;
 import org.csploit.android.plugins.Traceroute;
 import org.csploit.android.plugins.VulnerabilityFinder;
 import org.csploit.android.plugins.mitm.MITM;
-import org.csploit.android.net.metasploit.MsfRpcd;
+import org.csploit.android.tools.MsfRpcd;
 import org.csploit.android.tools.ToolBox;
 
 import java.io.IOException;
@@ -108,7 +108,7 @@ public class MainActivity extends SherlockListActivity {
 	private boolean isWifiAvailable = false;
 	private TargetAdapter mTargetAdapter = null;
   private NetworkRadar mNetworkRadar = null;
-  private MsfRpcd mMsfRpcd = null;
+  private Child mMsfRpcd = null;
 	private RadarReceiver mRadarReceiver = new RadarReceiver();
 	private UpdateReceiver mUpdateReceiver = new UpdateReceiver();
 	private WipeReceiver mWipeReceiver = new WipeReceiver();
@@ -377,7 +377,7 @@ public class MainActivity extends SherlockListActivity {
 
     if(MsfRpcd.isLocal()) {
       if (System.getMsfRpc() != null
-              || (mMsfRpcd != null && mMsfRpcd.isRunning()))
+              || (mMsfRpcd != null && mMsfRpcd.running))
         item.setTitle(getString(R.string.stop_msfrpcd));
       else
         item.setTitle(getString(R.string.start_msfrpcd));
@@ -389,7 +389,7 @@ public class MainActivity extends SherlockListActivity {
     }
 
     item.setEnabled(!MsfRpcd.isLocal() ||
-                    (tools != null && tools.msf.isEnabled() &&
+                    (tools != null && tools.msfrpcd.isEnabled() &&
                             !System.isServiceRunning("org.csploit.android.core.UpdateService")));
 
 		mMenu = menu;
@@ -526,9 +526,6 @@ public class MainActivity extends SherlockListActivity {
 	public void StartRPCServer() {
     StopRPCServer(true);
 
-    if(mMsfRpcd == null)
-      mMsfRpcd = new MsfRpcd();
-
     new Thread( new Runnable() {
       @Override
       public void run() {
@@ -542,49 +539,54 @@ public class MainActivity extends SherlockListActivity {
 
         if(msfHost.equals("127.0.0.1")) {
           try {
-            mMsfRpcd.start(msfUser, msfPassword, msfPort, msfSsl, new MsfRpcd.MsfRpcdReceiver() {
-              @Override
-              public void onReady() {
-                try {
-                  System.setMsfRpc(new RPCClient(msfHost, msfUser, msfPassword, msfPort, msfSsl));
-                  Logger.info("successfully connected to MSF RPC Daemon ");
-                  MainActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                      Toast.makeText(MainActivity.this, "connected to MSF RPC Daemon", Toast.LENGTH_SHORT).show();
-                    }
-                  });
-                } catch (Exception e) {
-                  Logger.error(e.getClass().getName() + ": " + e.getMessage());
-                  MainActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                      Toast.makeText(MainActivity.this, "connection to MSF RPC Daemon failed", Toast.LENGTH_LONG).show();
-                    }
-                  });
-                }
-              }
+            mMsfRpcd = System.getTools().msfrpcd.async(
+                    msfUser, msfPassword, msfPort, msfSsl,
+                    new MsfRpcd.MsfRpcdReceiver() {
+                      @Override
+                      public void onReady() {
+                        try {
+                          System.setMsfRpc(new RPCClient(msfHost, msfUser, msfPassword, msfPort, msfSsl));
+                          Logger.info("successfully connected to MSF RPC Daemon ");
+                          MainActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                              Toast.makeText(MainActivity.this, "connected to MSF RPC Daemon", Toast.LENGTH_SHORT).show();
+                            }
+                          });
+                        } catch (Exception e) {
+                          Logger.error(e.getClass().getName() + ": " + e.getMessage());
+                          MainActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                              Toast.makeText(MainActivity.this, "connection to MSF RPC Daemon failed", Toast.LENGTH_LONG).show();
+                            }
+                          });
+                        }
+                      }
 
-              @Override
-              public void onEnd(final int exitValue) {
-                MainActivity.this.runOnUiThread(new Runnable() {
-                  @Override
-                  public void run() {
-                    Toast.makeText(MainActivity.this, "MSF RPC Daemon returned #" + exitValue, Toast.LENGTH_LONG).show();
-                  }
-                });
-              }
+                      @Override
+                      public void onEnd(final int exitValue) {
+                        if (exitValue == 0)
+                          return;
 
-              @Override
-              public void onDeath(final int signal) {
-                MainActivity.this.runOnUiThread(new Runnable() {
-                  @Override
-                  public void run() {
-                    Toast.makeText(MainActivity.this, " MSF RPC Daemon killed by signal #" + signal, Toast.LENGTH_LONG).show();
-                  }
-                });
-              }
-            });
+                        MainActivity.this.runOnUiThread(new Runnable() {
+                          @Override
+                          public void run() {
+                            Toast.makeText(MainActivity.this, "MSF RPC Daemon returned #" + exitValue, Toast.LENGTH_LONG).show();
+                          }
+                        });
+                      }
+
+                      @Override
+                      public void onDeath(final int signal) {
+                        MainActivity.this.runOnUiThread(new Runnable() {
+                          @Override
+                          public void run() {
+                            Toast.makeText(MainActivity.this, " MSF RPC Daemon killed by signal #" + signal, Toast.LENGTH_LONG).show();
+                          }
+                        });
+                      }
+                    });
           } catch (ChildManager.ChildNotStartedException e) {
             Logger.error(e.getMessage());
             MainActivity.this.runOnUiThread(new Runnable() {
@@ -624,8 +626,11 @@ public class MainActivity extends SherlockListActivity {
    */
 	public void StopRPCServer(final boolean silent) {
 
-    if(System.getMsfRpc() == null && ( mMsfRpcd == null || !mMsfRpcd.isRunning() ))
+    if(System.getMsfRpc() == null && ( mMsfRpcd == null || !mMsfRpcd.running ))
       return;
+
+    final Child process = mMsfRpcd;
+    mMsfRpcd = null;
 
     new Thread( new Runnable() {
       @Override
@@ -633,8 +638,10 @@ public class MainActivity extends SherlockListActivity {
         try {
           System.setMsfRpc(null);
 
-          if(mMsfRpcd.isRunning())
-            mMsfRpcd.stop();
+          if(process.running) {
+            process.kill(2);
+            process.join();
+          }
 
           if(!silent) {
             MainActivity.this.runOnUiThread(new Runnable() {
@@ -825,7 +832,7 @@ public class MainActivity extends SherlockListActivity {
 			return true;
 
 		case R.id.ss_msfrpcd:
-      if(System.getMsfRpc()!=null || (mMsfRpcd != null && mMsfRpcd.isRunning())) {
+      if(System.getMsfRpc()!=null || (mMsfRpcd != null && mMsfRpcd.running)) {
 				StopRPCServer(false);
         if(MsfRpcd.isLocal())
 				  item.setTitle(R.string.start_msfrpcd);
@@ -1176,6 +1183,9 @@ public class MainActivity extends SherlockListActivity {
     }
 
     private void onUpdateDone(UpdateService.action target) {
+
+      System.reloadTools();
+
       switch (target) {
         case ruby_update:
         case msf_update:
@@ -1205,6 +1215,8 @@ public class MainActivity extends SherlockListActivity {
                   getString(message),MainActivity.this).show();
         }
       });
+
+      System.reloadTools();
     }
 
 		@SuppressWarnings("ConstantConditions")
