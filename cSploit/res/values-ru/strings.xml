@@ -444,4 +444,17 @@
     <string name="new_core_found">Доступно ядро версии %s , вы хотите обновится? ?</string>
     <string name="update_cancelled">Обновление отменено</string>
     <string name="child_not_started">Невозможно запустить процесс</string>
+    <string name="pref_updates">Обновления</string>
+    <string name="pref_updates_app">Приложение</string>
+    <string name="pref_updates_app_desc">Проверять обновления приложения</string>
+    <string name="pref_updates_core">Ядро</string>
+    <string name="pref_updates_core_desc">Проверять обновления ядра</string>
+    <string name="pref_updates_ruby">Ruby</string>
+    <string name="pref_updates_ruby_desc">Проверять обновления Ruby</string>
+    <string name="pref_updates_msf">MSF</string>
+    <string name="pref_updates_msf_desc">Проверять обновления MSF</string>
+    <string name="pref_updates_gems">RubyGems</string>
+    <string name="pref_updates_gems_desc">Проверять обновления RubyGems</string>
+    <string name="pref_msf_manifest">Пользовательский манифест</string>
+    <string name="pref_msf_manifest_desc">URL пользовательского манифеста MSF</string>
 </resources>
