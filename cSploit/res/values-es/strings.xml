@@ -75,7 +75,6 @@
     <string name="close_confirm">Esto cerrará cSploit, ¿seguro que desea continuar?</string>
     <string name="press_back">Pulse de nuevo para cerrar la aplicación.</string>
     <string name="selected_">Seleccionado&#160;</string>
-    <string name="github_issues">https://github.com/evilsocket/csploit/issues/new</string>
     <string name="no_session_found">No se ha encontrado ningún archivo de sesión en la tarjeta SD.</string>
     <string name="select_session_file">Seleccione un archivo de sesión de la tarjeta SD:</string>
     <string name="select_session">Seleccionar sesión</string>
