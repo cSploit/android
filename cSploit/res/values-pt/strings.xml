@@ -71,7 +71,6 @@
     </string>
     <string name="press_back">Pressione voltar novamente para fechar este aplicativo.</string>
     <string name="selected_">Selecionado </string>
-    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">Nenhum arquivo de sessão encontrado no cartão SD.</string>
     <string name="select_session_file">Selecione um arquivo de sessão a partir do cartão SD :</string>
     <string name="select_session">Selecionar Sessão</string>
