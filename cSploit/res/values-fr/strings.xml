@@ -82,7 +82,6 @@
     <string name="close_confirm">Ceci arrêtera cSploit, voulez-vous vraiment continuer ?</string>
     <string name="press_back">Appuyez sur retour à nouveau pour quitter l\'application.</string>
     <string name="selected_">Selectionné&#160;</string>
-    <string name="github_issues">https://github.com/evilsocket/csploit/issues/new</string>
     <string name="no_session_found">Aucune session trouvée sur la carte SD.</string>
     <string name="select_session_file">Choisir un fichier de session depuis la carte SD:</string>
     <string name="select_session">Choisir Session</string>
