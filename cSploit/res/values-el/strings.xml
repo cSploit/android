@@ -79,7 +79,6 @@
     <string name="close_confirm">Κλείσιμο του cSploit, είσαστε σίγουροι;</string>
     <string name="press_back">Πατήστε ξανά το κουμπί επιστροφής για να κλείσετε το app.</string>
     <string name="selected_">Επιλογή&#160;</string>
-    <string name="github_issues">https://github.com/evilsocket/csploit/issues/new</string>
     <string name="no_session_found">Δεν βρέθηκε αρχείο συνεδρίας στο sd card.</string>
     <string name="select_session_file">Επιλέξτε αρχείο συνεδρίας απο το sd card :</string>
     <string name="select_session">Επιλέξτε συνεδρία</string>
