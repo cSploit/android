@@ -76,7 +76,7 @@ If not, see http://www.gnu.org/licenses/.
 <string name="close_confirm">将关闭 cSploit, 您确定继续么?</string>
 <string name="press_back">再摁一次返回退出.</string>
 <string name="selected_">已选择&#160;</string>
-<string name="github_issues">https://github.com/evilsocket/csploit/issues/new</string>
+<string name="github_issues">https://github.com/cSploit/android/issues/new</string>
 <string name="no_session_found">没在在SD卡上找到会话文件.</string>
 <string name="select_session_file">请从SD卡中选择会话文件:</string>
 <string name="select_session">选择会话</string>
