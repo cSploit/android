@@ -69,7 +69,7 @@
     <string name="close_confirm">cSploit wird sich beenden. Wirklich fortfahren?</string>
     <string name="press_back">Nochmal auf Zurück drücken um die Anwendung zu beenden.</string>
     <string name="selected_">Ausgewählt&#160;</string>
-    <string name="github_issues">https://github.com/evilsocket/csploit/issues/new</string>
+    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">Keine Sitzungsdatei auf der SD-Karte gefunden.</string>
     <string name="select_session_file">Wähle eine Sitzungsdatei von der SD-Karte:</string>
     <string name="select_session">Wähle Sitzung</string>
