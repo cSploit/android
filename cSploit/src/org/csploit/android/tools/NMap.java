@@ -20,8 +20,6 @@ package org.csploit.android.tools;
 
 import android.text.TextUtils;
 
-import java.util.LinkedList;
-
 import org.csploit.android.core.Child;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Logger;
@@ -31,6 +29,8 @@ import org.csploit.android.events.Os;
 import org.csploit.android.events.Port;
 import org.csploit.android.net.Network;
 import org.csploit.android.net.Target;
+
+import java.util.LinkedList;
 
 public class NMap extends Tool {
 
@@ -141,18 +141,23 @@ public class NMap extends Tool {
   public Child inpsect( Target target, InspectionReceiver receiver, boolean focusedScan ) throws ChildManager.ChildNotStartedException {
     String cmd;
     LinkedList<Integer> tcp,udp;
+    Network.Protocol protocol;
+    int pNumber;
 
     if(focusedScan)
     {
       tcp = new LinkedList<Integer>();
       udp = new LinkedList<Integer>();
       for( Target.Port p : target.getOpenPorts()) {
-        if(p.protocol.equals(Network.Protocol.TCP)) {
-          if(!tcp.contains(p.number))
-            tcp.add(p.number);
-        } else if(p.protocol.equals(Network.Protocol.UDP)) {
-          if(!udp.contains(p.number))
-            udp.add(p.number);
+        protocol = p.getProtocol();
+        pNumber = p.getNumber();
+
+        if(protocol.equals(Network.Protocol.TCP)) {
+          if(!tcp.contains(pNumber))
+            tcp.add(pNumber);
+        } else if(protocol.equals(Network.Protocol.UDP)) {
+          if(!udp.contains(pNumber))
+            udp.add(pNumber);
         }
       }
       cmd = "-T4 -sV -O --privileged --send-ip --system-dns -Pn -oX - ";

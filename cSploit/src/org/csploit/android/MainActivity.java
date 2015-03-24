@@ -18,16 +18,36 @@
  */
 package org.csploit.android;
 
-import static org.csploit.android.core.UpdateChecker.AVAILABLE_VERSION;
-import static org.csploit.android.core.UpdateChecker.CORE_AVAILABLE;
-import static org.csploit.android.core.UpdateChecker.GEMS_AVAILABLE;
-import static org.csploit.android.core.UpdateChecker.MSF_AVAILABLE;
-import static org.csploit.android.core.UpdateChecker.RUBY_AVAILABLE;
-import static org.csploit.android.core.UpdateChecker.UPDATE_AVAILABLE;
-import static org.csploit.android.core.UpdateChecker.UPDATE_CHECKING;
-import static org.csploit.android.core.UpdateChecker.UPDATE_NOT_AVAILABLE;
-import static org.csploit.android.net.NetworkRadar.NRDR_STOPPED;
-import static org.csploit.android.net.NetworkRadar.TARGET_UPDATE;
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.graphics.Typeface;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.text.Html;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.actionbarsherlock.app.SherlockListActivity;
+import com.actionbarsherlock.view.ActionMode;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 
 import org.csploit.android.core.Child;
 import org.csploit.android.core.ChildManager;
@@ -61,7 +81,6 @@ import org.csploit.android.plugins.PortScanner;
 import org.csploit.android.plugins.RouterPwn;
 import org.csploit.android.plugins.Sessions;
 import org.csploit.android.plugins.Traceroute;
-import org.csploit.android.plugins.VulnerabilityFinder;
 import org.csploit.android.plugins.mitm.MITM;
 import org.csploit.android.tools.MsfRpcd;
 import org.csploit.android.tools.ToolBox;
@@ -70,36 +89,16 @@ import java.io.IOException;
 import java.net.NoRouteToHostException;
 import java.util.ArrayList;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.graphics.Typeface;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.text.Html;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.actionbarsherlock.app.SherlockListActivity;
-import com.actionbarsherlock.view.ActionMode;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
+import static org.csploit.android.core.UpdateChecker.AVAILABLE_VERSION;
+import static org.csploit.android.core.UpdateChecker.CORE_AVAILABLE;
+import static org.csploit.android.core.UpdateChecker.GEMS_AVAILABLE;
+import static org.csploit.android.core.UpdateChecker.MSF_AVAILABLE;
+import static org.csploit.android.core.UpdateChecker.RUBY_AVAILABLE;
+import static org.csploit.android.core.UpdateChecker.UPDATE_AVAILABLE;
+import static org.csploit.android.core.UpdateChecker.UPDATE_CHECKING;
+import static org.csploit.android.core.UpdateChecker.UPDATE_NOT_AVAILABLE;
+import static org.csploit.android.net.NetworkRadar.NRDR_STOPPED;
+import static org.csploit.android.net.NetworkRadar.TARGET_UPDATE;
 
 @SuppressLint("NewApi")
 public class MainActivity extends SherlockListActivity {
@@ -281,7 +280,6 @@ public class MainActivity extends SherlockListActivity {
           System.registerPlugin(new Traceroute());
           System.registerPlugin(new PortScanner());
           System.registerPlugin(new Inspector());
-          System.registerPlugin(new VulnerabilityFinder());
           System.registerPlugin(new ExploitFinder());
           System.registerPlugin(new LoginCracker());
           System.registerPlugin(new Sessions());
@@ -457,7 +455,6 @@ public class MainActivity extends SherlockListActivity {
                 public void onChoice(int[] choices) {
                   Intent intent = new Intent(MainActivity.this,MultiAttackService.class);
                   int[] selectedActions = new int[choices.length];
-                  int j=0;
 
                   for(int i =0; i< selectedActions.length;i++)
                     selectedActions[i] = actions[choices[i]];
@@ -507,10 +504,24 @@ public class MainActivity extends SherlockListActivity {
       mNetworkRadar.start();
 
       if (!silent)
-        Toast.makeText(this, getString(R.string.net_discovery_started),
-                Toast.LENGTH_SHORT).show();
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            Toast.makeText(MainActivity.this, getString(R.string.net_discovery_started),
+                    Toast.LENGTH_SHORT).show();
+          }
+        });
+
     } catch (ChildManager.ChildNotStartedException e) {
-      Toast.makeText(this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
+      runOnUiThread(
+              new Runnable() {
+                @Override
+                public void run() {
+                  Toast.makeText(MainActivity.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
+                }
+              }
+
+      );
     }
 	}
 

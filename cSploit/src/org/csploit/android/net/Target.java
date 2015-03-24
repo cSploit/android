@@ -20,20 +20,24 @@ package org.csploit.android.net;
 
 import android.os.StrictMode;
 
-import java.io.BufferedReader;
-import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.Locale;
-
 import org.csploit.android.R;
-import org.csploit.android.core.System;
 import org.csploit.android.core.Logger;
+import org.csploit.android.core.System;
 import org.csploit.android.net.Network.Protocol;
 import org.csploit.android.net.metasploit.MsfExploit;
 import org.csploit.android.net.metasploit.Session;
+import org.csploit.android.net.reference.Reference;
+
+import java.io.BufferedReader;
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Target
 {
@@ -61,11 +65,10 @@ public class Target
   }
 
   public static class Port{
-    public Protocol protocol;
-    public int number;
-    public String service = null;
-    public String	version = null;
-    private ArrayList<Vulnerability> vulns = new ArrayList<Target.Vulnerability>();
+    private Protocol protocol;
+    private int number;
+    private String service = null;
+    private String	version = null;
 
     public Port( int port, Protocol proto, String service, String version) {
       this.number = port;
@@ -82,42 +85,33 @@ public class Target
       this( port, proto, "", "" );
     }
 
-    public String getServiceQuery() {
-      return ""+service;
-    }
-
-    public String getServiceQueryWithVersion() {
-      if(version!=null)
-        return service + " " + version;
-      else
-        return ""+service;
-    }
-
     // needed for vulnerabilities hashmap
     public String toString(){
       return protocol.toString() + "|" + number + "|" + service + "|" + version;
     }
 
-    public void addVulnerability(Vulnerability vuln)
-    {
-      if(!vulns.contains(vuln))
-        vulns.add(vuln);
+    public int getNumber() {
+      return number;
     }
 
-    public void delVulnerability(Vulnerability vuln)
-    {
-      if(vulns.contains(vuln))
-        vulns.remove(vuln);
+    public Protocol getProtocol() {
+      return protocol;
     }
 
-    public void clearVulnerabilities()
-    {
-      vulns.clear();
+    public void setService(String service) {
+      this.service = service;
     }
 
-    public ArrayList<Vulnerability> getVulnerabilities()
-    {
-      return vulns;
+    public String getService() {
+      return service;
+    }
+
+    public void setVersion(String version) {
+      this.version = version;
+    }
+
+    public String getVersion() {
+      return version;
     }
 
     public boolean equals(Object o) {
@@ -142,157 +136,84 @@ public class Target
     }
   }
 
-  public static class Vulnerability
-  {
-    public String cve_id = null;
-    public int osvdb_id = 0;
-    public double severity   = 0;
-    public String summary	   = null;
-    private Port mPort = null;
-    public boolean has_msf_exploit = false; // used for speedup search
-    private ArrayList<Exploit> mExploits = new ArrayList<Target.Exploit>();
-
-    public Vulnerability(){
-
-    }
-
-    public Vulnerability( BufferedReader reader ) throws Exception {
-      String serialized = reader.readLine();
-      String[] parts	  = serialized.split( "\\|", 3 );
-
-      cve_id = parts[0];
-      severity   = Double.parseDouble( parts[1] );
-      summary	= parts[2];
-    }
-
-    public void from_osvdb( int id, double _severity, String _summary ) {
-      osvdb_id = id;
-      severity   = _severity;
-      summary	= _summary;
-    }
-
-    public String getIdentifier() {
-      if(osvdb_id>0)
-        return Integer.toString(osvdb_id);
-      else
-        return cve_id;
-    }
-
-    public void setIdentifier( String identifier ) {
-      this.cve_id = identifier;
-    }
-
-
-
-    public String toString(){
-      if(osvdb_id>0)
-        return Integer.toString(osvdb_id) + "|" + severity + "|" + summary;
-      else
-        return cve_id + "|" + severity + "|" + summary;
-    }
-
-    public String getHtmlColor( )
-    {
-      if( severity < 5.0 )
-        return "#59FF00";
-
-      else if( severity < 7 )
-        return "#FFD732";
-
-      else
-        return "#FF0000";
-    }
-
-    public Port getPort()
-    {
-      return mPort;
-    }
-
-    public void setPort(Port port)
-    {
-      if(mPort==port)
-        return;
-      if(mPort!=null)
-        mPort.delVulnerability(this);
-      mPort = port;
-    }
-
-    public ArrayList<Exploit> getExploits()
-    {
-      return mExploits;
-    }
-
-    public void clearExploit()
-    {
-      mExploits.clear();
-    }
-
-    public void addExploit(Exploit ex)
-    {
-      if(!mExploits.contains(ex))
-        mExploits.add(ex);
-    }
-
-    public void delExploit(Exploit ex)
-    {
-      if(mExploits.contains(ex))
-        mExploits.remove(ex);
-    }
-
-    public boolean equals(Object o) {
-      if(o == null || o.getClass() != this.getClass())
-        return false;
-      //TODO: split Vulnerability into 2 classes
-      if(this.cve_id!=null) {
-        if(this.cve_id.equals(((Vulnerability)o).cve_id))
-          return true;
-      } else if(this.osvdb_id > 0 && ((Vulnerability)o).osvdb_id == this.osvdb_id)
-        return true;
-      return false;
-    }
-  }
-
   public static class Exploit {
-    protected String mName;
-    protected String mDescription;
-    protected String mUrl;
-    protected Vulnerability mVuln;
+    protected String id;
+    protected String name;
+    protected String summary;
+    protected String description;
+    protected String url;
+    protected Port port;
+    protected final Collection<Reference> references = new LinkedList<Reference>();
+    protected boolean enabled = false;
+    protected Target parent;
 
-    public Exploit(String name, String url, String description) {
-      this.mName = name;
-      this.mUrl = url;
-      this.mDescription = description;
+    public Exploit() {}
+
+    public Exploit(String name, String url, String summary, Port port) {
+      this.name = name;
+      this.url = url;
+      this.summary = summary;
+      this.port = port;
+    }
+
+    public Exploit(String name, String url, String summary) {
+      this(name, url, summary, null);
     }
 
     public Exploit(String name, String url) {
-      this(name, url,"");
+      this(name, url, name, null);
+    }
+
+    public Target getParent() {
+      return parent;
+    }
+
+    public void setParent(Target parent) {
+      this.parent = parent;
+    }
+
+    public void setName(String name) {
+      this.name = name;
     }
 
     public String getName() {
-      return this.mName;
+      return this.name;
+    }
+
+    public void setSummary(String summary) {
+      this.summary = summary;
+    }
+
+    public String getSummary() {
+      return summary;
+    }
+
+    public void setDescription(String description) {
+      this.description = description;
     }
 
     public String getDescription() {
-      if(this.mDescription!=null)
-        return this.mDescription;
-      else
-        return this.mUrl;
+      return this.description;
+    }
+
+    public void setId(String id) {
+      this.id = id;
+    }
+
+    public String getId() {
+      return id;
+    }
+
+    public void setUrl(String url) {
+      this.url = url;
     }
 
     public String getUrl() {
-      return this.mUrl;
-    }
-
-    public void setVulnerability(Vulnerability vulnerability) {
-      this.mVuln = vulnerability;
-    }
-
-    public Vulnerability getVulnerability() {
-      return mVuln;
+      return this.url;
     }
 
     public String toString() {
-      return mName;
+      return name;
     }
 
     public int getDrawableResourceId() {
@@ -300,7 +221,38 @@ public class Target
     }
 
     public boolean equals(Object o) {
-      return !(o == null || o.getClass() != this.getClass()) && ((Exploit) o).getName().equals(this.mName);
+      return !(o == null || o.getClass() != this.getClass()) && ((Exploit) o).getId().equals(getId());
+    }
+
+    public void addReference(Reference ref) {
+      synchronized (references) {
+        Iterator<Reference> it = references.iterator();
+
+        while(it.hasNext()) {
+          if(ref.equals(it.next())) {
+            it.remove();
+            break;
+          }
+        }
+
+        references.add(ref);
+      }
+    }
+
+    public Collection<Reference> getReferences() {
+      return references;
+    }
+
+    public void setEnabled(boolean enabled) {
+      this.enabled = enabled;
+    }
+
+    public boolean isEnabled() {
+      return enabled;
+    }
+
+    public void setPort(Port port) {
+      this.port = port;
     }
   }
 
@@ -316,15 +268,14 @@ public class Target
   private String mAlias = null;
   private boolean mConnected = true;
   private boolean mSelected = false;
-  private ArrayList<Vulnerability> mVulnerabilities = new ArrayList<Vulnerability>();
-  private ArrayList<Exploit> mExploits = new ArrayList<Target.Exploit>();
+  private final ArrayList<Exploit> exploits = new ArrayList<Target.Exploit>();
   private ArrayList<Session> mSessions = new ArrayList<Session>();
 
   public static Target getFromString(String string){
     final Pattern PARSE_PATTERN = Pattern.compile("^(([a-z]+)://)?([0-9a-z\\-\\.]+)(:([\\d]+))?[0-9a-z\\-\\./]*$", Pattern.CASE_INSENSITIVE);
     final Pattern IP_PATTERN = Pattern.compile("^[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}$");
 
-    Matcher matcher = null;
+    Matcher matcher;
     Target target = null;
 
     try{
@@ -427,15 +378,6 @@ public class Target
       );
 
       mPorts.add(port);
-
-      int nvulns = Integer.parseInt(reader.readLine());
-      for(int j = 0; j < nvulns; j++){
-        Vulnerability v = new Vulnerability(reader);
-
-        v.setPort(port);
-        port.addVulnerability(v);
-        mVulnerabilities.add(v);
-      }
     }
   }
 
@@ -457,15 +399,6 @@ public class Target
     }
 
     builder.append(mPorts.size()).append("\n");
-    builder.append( mPorts.size() + "\n" );
-    for( Port port : mPorts )
-    {
-      String key = port.toString();
-      builder.append( key + "\n" );
-      builder.append(port.getVulnerabilities().size()+"\n");
-      for(Vulnerability vuln : port.getVulnerabilities())
-        builder.append(vuln.toString() + "\n");
-    }
   }
 
   public void setAlias(String alias){
@@ -706,9 +639,11 @@ public class Target
           return;
         }
       }
+      mPorts.add(port);
+    } else {
+      if (!mPorts.contains(port))
+        mPorts.add(port);
     }
-    if(!mPorts.contains(port))
-      mPorts.add( port );
   }
 
   public void addOpenPort(int port, Protocol protocol){
@@ -747,10 +682,6 @@ public class Target
     return false;
   }
 
-  public boolean hasVulnerabilities() {
-    return !mVulnerabilities.isEmpty();
-  }
-
   public void setDeviceType(String type){
     mDeviceType = type;
   }
@@ -767,50 +698,42 @@ public class Target
     return mDeviceOS;
   }
 
-  public void addVulnerability( Port port, Vulnerability v ) {
-    port.addVulnerability(v);
-    v.setPort(port);
-    if(mVulnerabilities.contains(v))
-      return;
-    mVulnerabilities.add(v);
+  public void addExploit(Exploit exploit) {
+
+    exploit.setParent(this);
+
+    synchronized (exploits) {
+      Iterator<Exploit> it = exploits.iterator();
+
+      while(it.hasNext()) {
+        if(exploit.equals(it.next())) {
+          it.remove();
+          break;
+        }
+      }
+
+      exploits.add(exploit);
+    }
   }
 
-  public ArrayList< Vulnerability > getVulnerabilities() {
-    return mVulnerabilities;
-  }
-
-  public void addExploit(Vulnerability v, Exploit ex) {
-    if (mExploits.contains(ex) || !mVulnerabilities.contains(v))
-      return;
-    mExploits.add(ex);
-    v.addExploit(ex);
-    ex.setVulnerability(v);
-  }
-
-  public ArrayList<Exploit> getExploits()
-  {
-    return mExploits;
-  }
-
-  public ArrayList<MsfExploit> getMsfExploits() {
-    ArrayList<MsfExploit> ret = new ArrayList<MsfExploit>();
-
-    for(Exploit e : mExploits)
-      if(e instanceof MsfExploit)
-        ret.add((MsfExploit)e);
-    return ret;
+  public Collection<Exploit> getExploits() {
+    return exploits;
   }
 
   public boolean hasExploits() {
-    return mExploits.size()>0;
+    return exploits.size()>0;
   }
 
   public boolean hasMsfExploits() {
-    boolean ret = false;
-    for(int i = 0; i < mExploits.size() && !ret; i++)
-      if(mExploits.get(i) instanceof MsfExploit)
-        ret = true;
-    return ret;
+
+    synchronized (exploits) {
+      for(Exploit e : exploits) {
+        if(e instanceof MsfExploit)
+          return true;
+      }
+    }
+
+    return false;
   }
 
   public ArrayList<Session> getSessions() {

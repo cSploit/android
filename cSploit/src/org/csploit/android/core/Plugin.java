@@ -28,7 +28,6 @@ import org.csploit.android.R;
 import org.csploit.android.net.Target;
 import org.csploit.android.net.Target.Exploit;
 import org.csploit.android.net.Target.Port;
-import org.csploit.android.net.Target.Vulnerability;
 import org.csploit.android.net.metasploit.RPCClient;
 
 public abstract class Plugin extends SherlockActivity{
@@ -125,14 +124,6 @@ public abstract class Plugin extends SherlockActivity{
   }
 
   public void onTargetNewOpenPort(Target target, Port port){
-
-  }
-
-  public void onTargetNewVulnerability(Target target, Port port, Vulnerability vulnerability){
-
-  }
-
-  public void onTargetNewExploit( Target target, Vulnerability vulnerability, Exploit ex ) {
 
   }
 

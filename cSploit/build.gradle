@@ -11,6 +11,7 @@ dependencies {
     compile 'joda-time:joda-time:1.6.2'
     compile 'com.github.zafarkhaja:java-semver:0.8.0'
     compile 'com.sksamuel.diff:diff:1.1.11'
+    compile 'org.unbescape:unbescape:1.1.0.RELEASE'
 }
 
 android {

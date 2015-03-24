@@ -1,11 +1,10 @@
 package org.csploit.android.net.metasploit;
 
 import org.apache.http.conn.util.InetAddressUtils;
+import org.csploit.android.core.Logger;
 
 import java.util.ArrayList;
 import java.util.Map;
-
-import org.csploit.android.core.Logger;
 
 /**
  * this class store data about MSF options.
@@ -97,6 +96,7 @@ public class Option {
     return enums;
   }
 
+  // TODO: make more setValue methods each with the corresponding type.
   public void setValue(String value) throws NumberFormatException {
     switch (mType) {
       case STRING:

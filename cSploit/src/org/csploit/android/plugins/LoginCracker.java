@@ -42,13 +42,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
-import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 import org.csploit.android.R;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Plugin;
@@ -60,6 +53,13 @@ import org.csploit.android.gui.dialogs.InputDialog.InputDialogListener;
 import org.csploit.android.net.Target;
 import org.csploit.android.net.Target.Port;
 import org.csploit.android.tools.Hydra;
+
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 public class LoginCracker extends Plugin {
 	private static final int SELECT_USER_WORDLIST = 1012;
@@ -198,7 +198,7 @@ public class LoginCracker extends Plugin {
 		final ArrayList<String> ports = new ArrayList<String>();
 
 		for (Port port : System.getCurrentTarget().getOpenPorts())
-			ports.add(Integer.toString(port.number));
+			ports.add(Integer.toString(port.getNumber()));
 
 		mProtocolAdapter = new ProtocolAdapter();
 
@@ -445,7 +445,7 @@ public class LoginCracker extends Plugin {
 
 		private boolean hasProtocolOpenPort(String sProtocol) {
 			for (Port port : mOpenPorts) {
-				String protocol = System.getProtocolByPort("" + port.number);
+				String protocol = System.getProtocolByPort("" + port.getNumber());
 				if (protocol != null
 						&& (protocol.equals(sProtocol) || sProtocol
 								.toLowerCase().contains(protocol))) {
@@ -477,7 +477,7 @@ public class LoginCracker extends Plugin {
 
 			for (int i = 0; i < mOpenPorts.size(); i++) {
 				portProtocol = System.getProtocolByPort(""
-						+ mOpenPorts.get(i).number);
+						+ mOpenPorts.get(i).getNumber());
 				if (portProtocol != null) {
 					if (portProtocol.equals(protocol)
 							|| protocol.toLowerCase().contains(portProtocol))

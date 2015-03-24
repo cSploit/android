@@ -9,14 +9,18 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.app.NotificationCompat;
 
-import org.csploit.android.MainActivity;
 import org.csploit.android.R;
 import org.csploit.android.net.Network;
 import org.csploit.android.net.Target;
+import org.csploit.android.net.datasource.Search;
 import org.csploit.android.net.metasploit.MsfExploit;
-import org.csploit.android.plugins.ExploitFinder;
-import org.csploit.android.plugins.VulnerabilityFinder;
 import org.csploit.android.tools.NMap;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Service for attack multiple targets in background
@@ -34,41 +38,28 @@ public class MultiAttackService extends IntentService {
   private final static int TRACE    = 1;
   private final static int SCAN     = 2;
   private final static int INSPECT  = 4;
-  private final static int VULN     = 8;
-  private final static int EXPLOIT  = 16;
-  private final static int CRACK    = 32;
+  private final static int EXPLOIT  = 8;
+  private final static int CRACK    = 16;
 
   private NotificationManager mNotificationManager;
   private NotificationCompat.Builder mBuilder;
   private BroadcastReceiver mReceiver;
   private Intent mContentIntent;
   private boolean mRunning = false;
+  private int totalTargets;
+  private int completedTargets;
+
 
   public MultiAttackService() {
     super("MultiAttackService");
   }
 
-  private class SingleWorker extends Thread {
+  private class SingleWorker implements Runnable {
 
     private int tasks;
     private Target target;
-    private Child mProcess;
-
-    private class Toggle {
-      private boolean mValue;
-
-      public Toggle(boolean startValue) {
-        mValue = startValue;
-      }
-
-      public boolean getBooleanValue() {
-        return mValue;
-      }
-
-      public void setBooleanValue(boolean value) {
-        mValue = value;
-      }
-    }
+    private Child process = null;
+    private Future future = null;
 
     public SingleWorker(final int tasks, final Target target) {
       this.tasks = tasks;
@@ -84,14 +75,24 @@ public class MultiAttackService extends IntentService {
           scan();
         if((tasks&INSPECT)!=0)
           inspect();
-        if((tasks&VULN)!=0)
-          vuln(true);
         if((tasks&EXPLOIT)!=0)
           exploit();
         if((tasks&CRACK)!=0)
           crack();
         Logger.debug(target+" done");
+
+        synchronized (MultiAttackService.this) {
+          completedTargets++;
+          mBuilder.setContentInfo(String.format("%d/%d",
+                  completedTargets, totalTargets));
+          mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+        }
+
       } catch (InterruptedException e) {
+        if(future != null && !future.isDone())
+          future.cancel(false);
+        if(process != null && process.running)
+          process.kill();
         Logger.info(e.getMessage());
       }
     }
@@ -102,13 +103,13 @@ public class MultiAttackService extends IntentService {
 
     private void scan() throws InterruptedException {
       try {
-        mProcess = System.getTools().nmap.synScan(target, new NMap.SynScanReceiver() {
+        process = System.getTools().nmap.synScan(target, new NMap.SynScanReceiver() {
           @Override
           public void onPortFound(int port, String protocol) {
             target.addOpenPort(port, Network.Protocol.fromString(protocol));
           }
         }, null);
-        mProcess.join();
+        process.join();
       } catch (ChildManager.ChildNotStartedException e) {
         Logger.error("cannot start nmap process");
       }
@@ -116,7 +117,7 @@ public class MultiAttackService extends IntentService {
 
     private void inspect() throws InterruptedException {
       try {
-        mProcess = System.getTools().nmap.inpsect(target, new NMap.InspectionReceiver() {
+        process = System.getTools().nmap.inpsect(target, new NMap.InspectionReceiver() {
           @Override
           public void onOpenPortFound(int port, String protocol) {
             target.addOpenPort(port, Network.Protocol.fromString(protocol));
@@ -147,102 +148,48 @@ public class MultiAttackService extends IntentService {
           }
         }, target.hasOpenPorts());
 
-        mProcess.join();
+        process.join();
       } catch (ChildManager.ChildNotStartedException e) {
         Logger.error("cannot start nmap process");
       }
     }
 
-    private void vuln(boolean searchVersion) throws InterruptedException {
-
-      if(!target.hasOpenPortsWithService())
-        return;
-
-      VulnerabilityFinder finder = null;
-      for(Plugin p : System.getPlugins()) {
-        if(p.getName() == R.string.vulnerability_finder)
-          finder = (VulnerabilityFinder)p;
-      }
-
-      if(finder == null)
-        return;
-
-      final Toggle endReached = new Toggle(false);
-
-      Thread searcher = finder.search(target, new VulnerabilityFinder.VulnerabilityReceiver() {
-        @Override
-        public void onVulnsFound(Target.Vulnerability[] vulns) { }
-
-        @Override
-        public void onEnd() {
-          endReached.setBooleanValue(true);
-        }
-      }, searchVersion);
-
-      searcher.run();
-      if(!endReached.getBooleanValue())
-        throw new InterruptedException("vuln scan interrupted");
-    }
-
     private void exploit() throws InterruptedException {
-      ExploitFinder finder = null;
-      boolean noVersionSearched = false;
 
-      for(Plugin p : System.getPlugins()) {
-        if(p.getName() == R.string.exploit_finder)
-          finder = (ExploitFinder)p;
-      }
-
-      if(finder == null)
-        return;
-
-      if(!target.hasVulnerabilities()) {
-        noVersionSearched = true;
-        vuln(false);
-        if(!target.hasVulnerabilities())
-          return;
-      }
-
-      final Toggle endReached = new Toggle(false);
-      ExploitFinder.ExploitFinderReceiver receiver = new ExploitFinder.ExploitFinderReceiver() {
+      future = Search.searchExploitForServices(target, new Search.Receiver<Target.Exploit>() {
         @Override
-        public void onExploitFound() { }
+        public void onItemFound(Target.Exploit exploit) {
+          target.addExploit(exploit);
+        }
+
+        @Override
+        public void onFoundItemChanged(Target.Exploit exploit) {
+
+        }
 
         @Override
         public void onEnd() {
-          endReached.setBooleanValue(true);
+
         }
-      };
+      });
 
-      Thread searcher = finder.search(target, receiver);
-      searcher.run();
-
-      if(!endReached.getBooleanValue())
-        throw new InterruptedException("exploit interrupted");
-
-      if(!noVersionSearched && !target.hasExploits()) {
-        vuln(false);
-        endReached.setBooleanValue(false);
-        searcher = finder.search(target,receiver);
-        searcher.run();
-
-        if(!endReached.getBooleanValue())
-          throw new InterruptedException("exploit interrupted");
+      try {
+        future.get();
+      } catch (ExecutionException e) {
+        System.errorLogging(e);
       }
 
-      if(System.getMsfRpc() != null && target.hasMsfExploits()) {
-        for(MsfExploit e : target.getMsfExploits())
-          e.tryLaunch();
+      if(System.getMsfRpc() != null) {
+        for(Target.Exploit e : target.getExploits()) {
+          if(e instanceof MsfExploit) {
+            ((MsfExploit)e).tryLaunch();
+          }
+        }
       }
     }
 
     private void crack() {
       // not implemented yet
-    }
-
-    public void clean() {
-      if(mProcess!=null)
-        mProcess.kill();
     }
 
   }
@@ -302,7 +249,8 @@ public class MultiAttackService extends IntentService {
   @Override
   protected void onHandleIntent(Intent intent) {
     int[] actions,targetsIndex;
-    int i=-1;
+    int i;
+    ExecutorService executorService;
 
     //initialize data
     int tasks = 0;
@@ -333,9 +281,6 @@ public class MultiAttackService extends IntentService {
         case R.string.inspector:
           tasks |=INSPECT;
           break;
-        case R.string.vulnerability_finder:
-          tasks |=VULN;
-          break;
         case R.string.exploit_finder:
           tasks |=EXPLOIT;
           break;
@@ -355,36 +300,29 @@ public class MultiAttackService extends IntentService {
             .setProgress(100, 0, true);
 
     // create and start threads
+    totalTargets = targets.length;
     final int fTasks = tasks;
-    SingleWorker[] threadPool = new SingleWorker[targets.length];
+    executorService = Executors.newFixedThreadPool(targets.length);
 
-    for(i = 0; i < threadPool.length;i++)
-      (threadPool[i] = new SingleWorker(fTasks, targets[i])).start();
-
-    //join them
-    try {
-      while(i>0&&mRunning) {
-        mBuilder.setContentInfo(String.format("%d/%d",targets.length-i, targets.length));
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-        threadPool[--i].join();
-      }
-      if(mRunning) {
-        mBuilder.setContentInfo(String.format("%d/%d",targets.length, targets.length)); // will be notified by finishNotification
-        mContentIntent = new Intent(this, MainActivity.class);
-      } else {
-        throw new InterruptedException("cancelled");
-      }
-    } catch (InterruptedException e) {
-      while(i>=0)
-        threadPool[i--].interrupt();
-      Logger.debug("interrupted");
-    } finally {
-      for(SingleWorker w : threadPool) {
-        w.clean();
-      }
-      stopSelf();
-      mRunning = false;
+    for(Target t : targets) {
+      executorService.submit(new SingleWorker(fTasks, t));
     }
+
+    executorService.shutdown();
+
+    while(mRunning) {
+      try {
+        executorService.awaitTermination(1, TimeUnit.SECONDS);
+      } catch (InterruptedException e) {
+        break;
+      }
+    }
+
+    executorService.shutdownNow();
+
+    stopSelf();
+
+    mRunning = false;
   }
 
   @Override

@@ -20,16 +20,12 @@
 
 package org.csploit.android.net;
 
-import org.csploit.android.core.*;
+import org.csploit.android.core.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.security.InvalidKeyException;
 
 /**
@@ -82,7 +78,7 @@ public class GitHubParser {
     boolean found;
 
     releases = new JSONArray(
-            new String(RemoteFetcher.fetch(
+            new String(RemoteReader.fetch(
                     String.format(RELEASES_URL, username, project)
             ))
     );
@@ -105,7 +101,7 @@ public class GitHubParser {
 
   private void fetchBranches() throws IOException, JSONException {
     mBranches = new JSONArray(
-            new String(RemoteFetcher.fetch(
+            new String(RemoteReader.fetch(
                     String.format(BRANCHES_URL, username, project)
             ))
     );

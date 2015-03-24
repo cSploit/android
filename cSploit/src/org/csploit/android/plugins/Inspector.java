@@ -78,17 +78,23 @@ public class Inspector extends Plugin{
   {
     synchronized (mDeviceServices) {
       StringBuilder sb = new StringBuilder();
-      for (Port port : System.getCurrentTarget().getOpenPorts()) {
-        if (port.service != null && !port.service.isEmpty()) {
-          sb.append(port.number);
-          sb.append(" ( ");
-          sb.append(port.protocol.toString());
-          sb.append(" ) : ");
-          sb.append(port.service);
+      String service;
+      String version;
 
-          if (port.version != null && !port.version.isEmpty()) {
+      for (Port port : System.getCurrentTarget().getOpenPorts()) {
+        service = port.getService();
+        version = port.getVersion();
+
+        if (service != null && !service.isEmpty()) {
+          sb.append(port.getNumber());
+          sb.append(" ( ");
+          sb.append(port.getProtocol().toString());
+          sb.append(" ) : ");
+          sb.append(service);
+
+          if (version != null && !version.isEmpty()) {
             sb.append(" - ");
-            sb.append(port.version);
+            sb.append(version);
           }
           sb.append("\n");
         }

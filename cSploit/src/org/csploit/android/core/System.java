@@ -39,6 +39,24 @@ import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.util.SparseIntArray;
 
+import org.csploit.android.R;
+import org.csploit.android.WifiScannerActivity;
+import org.csploit.android.net.Endpoint;
+import org.csploit.android.net.Network;
+import org.csploit.android.net.Network.Protocol;
+import org.csploit.android.net.Target;
+import org.csploit.android.net.Target.Exploit;
+import org.csploit.android.net.Target.Port;
+import org.csploit.android.net.Target.Type;
+import org.csploit.android.net.http.proxy.HTTPSRedirector;
+import org.csploit.android.net.http.proxy.Proxy;
+import org.csploit.android.net.http.server.Server;
+import org.csploit.android.net.metasploit.MsfExploit;
+import org.csploit.android.net.metasploit.Payload;
+import org.csploit.android.net.metasploit.RPCClient;
+import org.csploit.android.net.metasploit.Session;
+import org.csploit.android.tools.ToolBox;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -61,6 +79,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -69,25 +88,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
-import org.csploit.android.R;
-import org.csploit.android.WifiScannerActivity;
-import org.csploit.android.net.Endpoint;
-import org.csploit.android.net.Network;
-import org.csploit.android.net.Network.Protocol;
-import org.csploit.android.net.Target;
-import org.csploit.android.net.Target.Port;
-import org.csploit.android.net.Target.Type;
-import org.csploit.android.net.Target.Vulnerability;
-import org.csploit.android.net.Target.Exploit;
-import org.csploit.android.net.metasploit.MsfExploit;
-import org.csploit.android.net.metasploit.Payload;
-import org.csploit.android.net.metasploit.RPCClient;
-import org.csploit.android.net.http.proxy.HTTPSRedirector;
-import org.csploit.android.net.http.proxy.Proxy;
-import org.csploit.android.net.http.server.Server;
-import org.csploit.android.net.metasploit.Session;
-import org.csploit.android.tools.ToolBox;
 
 public class System
 {
@@ -104,7 +104,6 @@ public class System
 
   private static boolean mInitialized = false;
   private static String mLastError = "";
-  private static String mSuPath = null;
   private static Context mContext = null;
   private static WifiLock mWifiLock = null;
   private static WakeLock mWakeLock = null;
@@ -414,7 +413,7 @@ public class System
     return mLastError;
   }
 
-  public static synchronized void errorLogging(Exception e){
+  public static synchronized void errorLogging(Throwable e){
     String message = "Unknown error.",
       trace = "Unknown trace.",
       filename = (new File(Environment.getExternalStorageDirectory().toString(), ERROR_LOG_FILENAME)).getAbsolutePath();
@@ -454,28 +453,6 @@ public class System
     setLastError(message);
     Logger.error(message);
     Logger.error(trace);
-  }
-
-  public static synchronized void errorLog(String tag, String data){
-    String filename = (new File(Environment.getExternalStorageDirectory().toString(), ERROR_LOG_FILENAME)).getAbsolutePath();
-
-    data = data.trim();
-
-    if(mContext != null && getSettings().getBoolean("PREF_DEBUG_ERROR_LOGGING", false)){
-      try{
-        FileWriter fWriter = new FileWriter(filename, true);
-        BufferedWriter bWriter = new BufferedWriter(fWriter);
-
-        bWriter.write(data);
-
-        bWriter.close();
-      }
-      catch(IOException ioe){
-        Logger.error(ioe.toString());
-      }
-    }
-
-    Logger.error(data);
   }
 
   public static String getPlatform()
@@ -531,42 +508,12 @@ public class System
     return getSettings().getString("MSF_DIR", getDefaultMsfPath());
   }
 
-  public static String getFifosPath() {
-    return mContext.getFilesDir().getAbsolutePath() + "/fifos/";
-  }
-
   public static String getToolsPath() {
     return mContext.getFilesDir().getAbsolutePath() + "/tools/";
   }
 
   public static String getCorePath() {
       return mContext.getFilesDir().getAbsolutePath();
-  }
-
-  public static String getSuPath(){
-
-    if(mSuPath != null)
-      return mSuPath;
-
-    try{
-      Process process = Runtime.getRuntime().exec("which su");
-      BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-      String line;
-
-      while((line = reader.readLine()) != null){
-        if(!line.isEmpty() && line.startsWith("/")){
-          mSuPath = line;
-          break;
-        }
-      }
-
-      return mSuPath;
-    }
-    catch(Exception e){
-      errorLogging(e);
-    }
-
-    return "su";
   }
 
   public static void registerSettingListener(SettingReceiver receiver) {
@@ -1211,23 +1158,7 @@ public class System
     }
   }
 
-  public static void addVulnerability(Port port, Vulnerability v){
-    getCurrentTarget().addVulnerability(port, v);
-
-    for(Plugin plugin : getPluginsForTarget()){
-      plugin.onTargetNewVulnerability(getCurrentTarget(), port, v);
-    }
-  }
-
-  public static void addExploit( Vulnerability v, Exploit ex) {
-    getCurrentTarget().addExploit( v, ex );
-
-    for( Plugin plugin : getPluginsForTarget() ) {
-      plugin.onTargetNewExploit( getCurrentTarget(), v, ex );
-    }
-  }
-
-  public static ArrayList<Exploit> getCurrentExploits() {
+  public static Collection<Exploit> getCurrentExploits() {
     return getCurrentTarget().getExploits();
   }
 
@@ -1283,9 +1214,14 @@ public class System
           mWakeLock.release();
       }
 
-      for(Target t : mTargets)
-        for(Session s : t.getSessions())
-          s.stopSession();
+      synchronized (mTargets) {
+
+        for (Target t : mTargets)
+          for (Session s : t.getSessions())
+            s.stopSession();
+
+        mTargets.clear();
+      }
 
       Client.Disconnect();
       mCoreInitialized = false;

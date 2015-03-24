@@ -41,7 +41,13 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 import org.apache.commons.compress.utils.CountingInputStream;
 import org.apache.commons.compress.utils.IOUtils;
-import org.csploit.android.net.RemoteFetcher;
+import org.csploit.android.R;
+import org.csploit.android.core.ArchiveMetadata.archiveAlgorithm;
+import org.csploit.android.core.ArchiveMetadata.compressionAlgorithm;
+import org.csploit.android.net.GemParser;
+import org.csploit.android.net.GitHubParser;
+import org.csploit.android.net.RemoteReader;
+import org.csploit.android.tools.Raw;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -65,13 +71,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.CancellationException;
-
-import org.csploit.android.R;
-import org.csploit.android.net.GemParser;
-import org.csploit.android.net.GitHubParser;
-import org.csploit.android.core.ArchiveMetadata.archiveAlgorithm;
-import org.csploit.android.core.ArchiveMetadata.compressionAlgorithm;
-import org.csploit.android.tools.Raw;
 
 public class UpdateService extends IntentService
 {
@@ -393,17 +392,17 @@ public class UpdateService extends IntentService
   private static void parseMsfManifest(String manifestUrl) throws IOException, JSONException {
     JSONObject manifest, files;
 
-    manifest = new JSONObject(new String(RemoteFetcher.fetch(manifestUrl)));
+    manifest = new JSONObject(new String(RemoteReader.fetch(manifestUrl)));
     files = manifest.getJSONObject("files");
 
     mMsfInfo.url = manifest.getString("url");
     mMsfInfo.patches = new HashMap<String, LinkedList<DiffMatchPatch.Patch>>();
 
-    Iterator<String> it = files.keys();
+    Iterator it = files.keys();
     DiffMatchPatch dmp = new DiffMatchPatch();
 
     while(it.hasNext()) {
-      String key = it.next();
+      String key = (String) it.next();
       mMsfInfo.patches.put(key, (LinkedList<DiffMatchPatch.Patch>) dmp.patch_fromText(files.getString(key)));
     }
   }
@@ -768,6 +767,10 @@ public class UpdateService extends IntentService
       }
     } catch (IOException e) {
       throw new KeyException("corrupted archive: "+e.getMessage());
+    } finally {
+      try {
+        counter.close();
+      } catch (IOException ignore) { }
     }
 
     if(!mRunning)

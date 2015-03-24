@@ -1,19 +1,28 @@
 package org.csploit.android.net.metasploit;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.csploit.android.core.System;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * this class store MSF payload metadata
+ *
+ * TODO: extends MsfModule
+ *
+ * public abstract class MsfModule {
+ *   public onRpcConnected() {
+ *     refresh();
+ *   }
+ *   void refresh();
+ * }
  */
 public class Payload {
 
-  private Option[] mOptions = null;
+  private Collection<Option> options = new ArrayList<Option>();
   private String mName = null;
-
 
   public Payload(String name){
     mName = name;
@@ -23,30 +32,32 @@ public class Payload {
       System.errorLogging(e);
     } catch (IOException e) {
       System.errorLogging(e);
-    } finally {
-      if(mOptions==null)
-        mOptions = new Option[0];
     }
   }
 
   @SuppressWarnings("unchecked")
   private void retrieveOptions() throws IOException, RPCClient.MSFException {
-    int i = 0;
-    Map<String,Map<String, Object>> map =  (Map<String,Map<String, Object>>) System.getMsfRpc().call("module.options", "payload", mName);
-    Iterator<Map.Entry<String,Map<String, Object>>> it = map.entrySet().iterator();
-    mOptions = new Option[map.size()];
-    while(it.hasNext()) {
-      Map.Entry<String,Map<String,Object>> item = it.next();
-      String name = item.getKey();
-      mOptions[i] = new Option(name,item.getValue());
-      if(name.equals("LHOST"))
-        mOptions[i].setValue(System.getNetwork().getLocalAddress().getHostAddress());
-      i++;
+    Object res;
+
+    res = System.getMsfRpc().call("module.options", "payload", mName);
+
+    if(res == null)
+      return;
+
+    for(Map.Entry<String, Map<String, Object>> entry :
+            ((Map<String,Map<String, Object>>)res).entrySet()) {
+      Option o = new Option(entry.getKey(), entry.getValue());
+
+      if(entry.getKey().equals("LHOST")) {
+        o.setValue(System.getNetwork().getLocalAddress().getHostAddress());
+      }
+
+      options.add(o);
     }
   }
 
-  public Option[] getOptions() {
-    return mOptions;
+  public Collection<Option> getOptions() {
+    return options;
   }
 
   public String getName() {

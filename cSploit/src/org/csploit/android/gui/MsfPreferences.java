@@ -13,14 +13,15 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 
-import java.util.ArrayList;
-
 import org.csploit.android.R;
-import org.csploit.android.core.*;
+import org.csploit.android.core.Logger;
 import org.csploit.android.core.System;
 import org.csploit.android.net.metasploit.MsfExploit;
 import org.csploit.android.net.metasploit.Option;
 import org.csploit.android.net.metasploit.Payload;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * activity fo setting exploit options.
@@ -28,7 +29,7 @@ import org.csploit.android.net.metasploit.Payload;
 
 public class MsfPreferences extends SherlockPreferenceActivity {
 
-  private Option[] options;
+  private Collection<Option> options;
   private final Preference.OnPreferenceChangeListener listener = new Preference.OnPreferenceChangeListener() {
 
     public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -129,7 +130,7 @@ public class MsfPreferences extends SherlockPreferenceActivity {
     }
 
     if(options==null) {
-      options = new Option[0];
+      options = new ArrayList<Option>();
       title = getString(R.string.error);
       String error_message;
 
@@ -150,7 +151,7 @@ public class MsfPreferences extends SherlockPreferenceActivity {
     cat_evasion.setTitle(R.string.evasion);
 
     for(Option opt : options) {
-      Preference item;
+      Preference item = null;
       int inputType = 0;
 
       switch (opt.getType()) {
@@ -184,8 +185,6 @@ public class MsfPreferences extends SherlockPreferenceActivity {
           item.setTitle(opt.getName());
           item.setSummary(opt.getDescription());
           break;
-        default:
-          item = null;
       }
 
       switch (opt.getType()) {
@@ -211,10 +210,9 @@ public class MsfPreferences extends SherlockPreferenceActivity {
         required.add(item);
       else if(opt.isEvasion())
         evasion.add(item);
-      else if (item != null)
+      else
         general.add(item);
-      if(item!=null)
-        item.setOnPreferenceChangeListener(listener);
+      item.setOnPreferenceChangeListener(listener);
     }
 
     if(required.size()>0) {

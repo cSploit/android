@@ -67,7 +67,6 @@ public class ListChoiceDialog extends AlertDialog{
   /** create a list choice dialog from a String array
    * @param items Strings to choose from
    */
-
   public ListChoiceDialog(String title, String[] items, Activity activity, final ChoiceDialog.ChoiceDialogListener listener){
     super(activity);
 
@@ -94,7 +93,7 @@ public class ListChoiceDialog extends AlertDialog{
   }
 
   /** create a list choice dialog from generic objects array ( call toString on every object )
-   * @param items
+   * @param items array containing objects to choices from
    */
   public ListChoiceDialog(String title, Object[] items, Activity activity, final ChoiceDialog.ChoiceDialogListener listener) {
     super(activity);

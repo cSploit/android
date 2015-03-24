@@ -21,10 +21,6 @@ package org.csploit.android;
 import android.app.Application;
 import android.content.SharedPreferences;
 
-import java.net.NoRouteToHostException;
-
-import org.csploit.android.R;
-
 import org.csploit.android.core.System;
 import org.csploit.android.plugins.ExploitFinder;
 import org.csploit.android.plugins.Inspector;
@@ -32,10 +28,11 @@ import org.csploit.android.plugins.LoginCracker;
 import org.csploit.android.plugins.PacketForger;
 import org.csploit.android.plugins.PortScanner;
 import org.csploit.android.plugins.RouterPwn;
+import org.csploit.android.plugins.Sessions;
 import org.csploit.android.plugins.Traceroute;
 import org.csploit.android.plugins.mitm.MITM;
-import org.csploit.android.plugins.Sessions;
-import org.csploit.android.plugins.VulnerabilityFinder;
+
+import java.net.NoRouteToHostException;
 
 public class CSploitApplication extends Application{
   @Override
@@ -63,7 +60,6 @@ public class CSploitApplication extends Application{
     System.registerPlugin(new Traceroute());
     System.registerPlugin(new PortScanner());
     System.registerPlugin(new Inspector());
-    System.registerPlugin(new VulnerabilityFinder());
     System.registerPlugin(new ExploitFinder());
     System.registerPlugin(new LoginCracker());
     System.registerPlugin(new Sessions());

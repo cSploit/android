@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.csploit.android"
     android:versionCode="1"
-    android:versionName="1.5.1" >
+    android:versionName="1.5.2" >
 
     <uses-sdk
         android:minSdkVersion="9"
@@ -16,7 +16,6 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.ACCESS_SUPERUSER" />
-
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
@@ -40,7 +39,7 @@
             </intent-filter>
         </activity>
 
-        <!--suppress AndroidDomInspection -->
+        <!-- suppress AndroidDomInspection -->
         <service
             android:name=".core.UpdateChecker"
             android:enabled="true" />
@@ -98,11 +97,6 @@
         </activity>
         <activity
             android:name=".plugins.Inspector"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" >
-        </activity>
-        <activity
-            android:name=".plugins.VulnerabilityFinder"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_main" >
         </activity>

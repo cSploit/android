@@ -37,13 +37,11 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
-import java.util.ArrayList;
-
 import org.csploit.android.R;
 import org.csploit.android.core.ChildManager;
+import org.csploit.android.core.Logger;
 import org.csploit.android.core.Plugin;
 import org.csploit.android.core.System;
-import org.csploit.android.core.Logger;
 import org.csploit.android.gui.dialogs.ConfirmDialog;
 import org.csploit.android.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
 import org.csploit.android.gui.dialogs.ErrorDialog;
@@ -53,6 +51,8 @@ import org.csploit.android.net.Network;
 import org.csploit.android.net.Target;
 import org.csploit.android.net.Target.Port;
 import org.csploit.android.tools.NMap;
+
+import java.util.ArrayList;
 
 public class PortScanner extends Plugin {
 	private ToggleButton mScanToggleButton = null;
@@ -105,13 +105,14 @@ public class PortScanner extends Plugin {
     mPortList.clear();
 
     for(Port p : System.getCurrentTarget().getOpenPorts()) {
-      String resolvedProtocol = System.getProtocolByPort(""+p.number);
+      int pNumber = p.getNumber();
+      String resolvedProtocol = System.getProtocolByPort(pNumber);
       String str;
 
       if (resolvedProtocol != null)
-        str = p.number + " ( " + resolvedProtocol + " )";
+        str = pNumber + " ( " + resolvedProtocol + " )";
       else
-        str = p.protocol.toString().toLowerCase() + " : " + p.number;
+        str = p.getProtocol().toString().toLowerCase() + " : " + pNumber;
 
       if(!mPortList.contains(str))
         mPortList.add(str);
@@ -155,8 +156,8 @@ public class PortScanner extends Plugin {
 			public boolean onItemLongClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				int portNumber = System.getCurrentTarget().getOpenPorts()
-						.get(position).number;
-				String url = "";
+						.get(position).getNumber();
+				String url;
 
 				if (portNumber == 80)
 					url = "http://"
