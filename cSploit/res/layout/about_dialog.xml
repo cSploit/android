@@ -76,11 +76,29 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@+id/textView7"
-                android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/textView7"
                 android:text="@string/gpl_license"
                 android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+        <TextView
+            android:id="@+id/textView9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/textView8"
+            android:layout_below="@+id/textView8"
+            android:text="@string/buildinfo"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+        <TextView
+            android:id="@+id/buildinfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/textView9"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/textView9"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
     </RelativeLayout>
 
 </ScrollView>

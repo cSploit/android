@@ -30,13 +30,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.Socket;
-
 import org.csploit.android.R;
 import org.csploit.android.core.Plugin;
 import org.csploit.android.core.System;
@@ -44,6 +37,13 @@ import org.csploit.android.gui.dialogs.ErrorDialog;
 import org.csploit.android.net.Endpoint;
 import org.csploit.android.net.Target;
 import org.csploit.android.net.Target.Type;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.Socket;
 
 public class PacketForger extends Plugin implements OnClickListener {
 	private static final int TCP_PROTOCOL = 0;
@@ -73,7 +73,7 @@ public class PacketForger extends Plugin implements OnClickListener {
 		SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
 		Boolean isDark = themePrefs.getBoolean("isDark", false);
 		if (isDark)
-			setTheme(R.style.Sherlock___Theme);
+			setTheme(R.style.DarkTheme);
 		else
 			setTheme(R.style.AppTheme);
 		super.onCreate(savedInstanceState);

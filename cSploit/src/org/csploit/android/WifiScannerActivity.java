@@ -18,6 +18,7 @@
  */
 package org.csploit.android;
 
+import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -30,9 +31,13 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.text.ClipboardManager;
 import android.text.Html;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -41,19 +46,6 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.actionbarsherlock.app.SherlockListActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import org.csploit.android.R;
 
 import org.csploit.android.core.ManagedReceiver;
 import org.csploit.android.core.System;
@@ -67,12 +59,18 @@ import org.csploit.android.wifi.Keygen;
 import org.csploit.android.wifi.NetworkManager;
 import org.csploit.android.wifi.WirelessMatcher;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import static android.net.wifi.WifiManager.EXTRA_NEW_STATE;
 import static android.net.wifi.WifiManager.SCAN_RESULTS_AVAILABLE_ACTION;
 import static android.net.wifi.WifiManager.SUPPLICANT_STATE_CHANGED_ACTION;
 
 @SuppressWarnings("deprecation")
-public class WifiScannerActivity extends SherlockListActivity
+public class WifiScannerActivity extends ListActivity
 {
   public static final String CONNECTED = "WifiScannerActivity.CONNECTED";
   private WifiManager mWifiManager = null;
@@ -132,11 +130,11 @@ public class WifiScannerActivity extends SherlockListActivity
     SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
 	Boolean isDark = themePrefs.getBoolean("isDark", false);
 	if (isDark)
-		setTheme(R.style.Sherlock___Theme);
+		setTheme(R.style.DarkTheme);
 	else
 		setTheme(R.style.AppTheme);
     setContentView(R.layout.wifi_scanner);
-    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    //getActionBar().setDisplayHomeAsUpEnabled(true);
 
     mWifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
     mClipboard = (ClipboardManager) this.getSystemService(Context.CLIPBOARD_SERVICE);
@@ -164,8 +162,10 @@ public class WifiScannerActivity extends SherlockListActivity
 
     mScanReceiver.register(this);
 
-    if(mMenu != null)
-      mMenu.findItem(R.id.scan).setActionView(new ProgressBar(this));
+    if(mMenu != null) {
+      MenuItem menuScan = mMenu.findItem(R.id.scan);
+      MenuItemCompat.setActionView(menuScan, new ProgressBar(this));
+    }
 
     mStatusText.setText( getString(R.string.wifi_scanning) );
     mScanning = true;
@@ -359,20 +359,23 @@ public class WifiScannerActivity extends SherlockListActivity
   @Override
   public boolean onCreateOptionsMenu(Menu menu){
     mMenu = menu;
-    MenuInflater inflater = getSupportMenuInflater();
+    MenuInflater inflater = getMenuInflater();
     inflater.inflate(R.menu.wifi_scanner, menu);
 
-    if(mScanning)
-      mMenu.findItem(R.id.scan).setActionView(new ProgressBar(this));
-
+    if(mScanning) {
+      MenuItem menuScan = mMenu.findItem(R.id.scan);
+      MenuItemCompat.setActionView(menuScan, new ProgressBar(this));
+    }
     return super.onCreateOptionsMenu(menu);
   }
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item){
     if(item.getItemId() == R.id.scan){
-      if(mMenu != null)
-        mMenu.findItem(R.id.scan).setActionView(new ProgressBar(this));
+      if(mMenu != null){
+        MenuItem menuScan = mMenu.findItem(R.id.scan);
+        MenuItemCompat.setActionView(menuScan, new ProgressBar(this));
+      }
 
       mWifiManager.startScan();
 
@@ -574,8 +577,10 @@ public class WifiScannerActivity extends SherlockListActivity
         if(mScanning){
           mAdapter.reset();
 
-          if(mMenu != null)
-            mMenu.findItem(R.id.scan).setActionView(null);
+          if(mMenu != null){
+            MenuItem menuScan = mMenu.findItem(R.id.scan);
+            MenuItemCompat.setActionView(menuScan, null);
+          }
 
           List<ScanResult> results = mWifiManager.getScanResults();
 
@@ -584,7 +589,7 @@ public class WifiScannerActivity extends SherlockListActivity
           }
 
           mScanning = false;
-          mStatusText.setText( getString(R.string.wifi_scan_finished) );
+          mStatusText.setText(getString(R.string.wifi_scan_finished));
         }
 
         mAdapter.notifyDataSetChanged();

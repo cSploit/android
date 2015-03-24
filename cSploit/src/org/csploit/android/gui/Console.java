@@ -3,8 +3,12 @@ package org.csploit.android.gui;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -15,17 +19,12 @@ import android.widget.Toast;
 import org.csploit.android.R;
 import org.csploit.android.core.System;
 import org.csploit.android.gui.dialogs.FatalDialog;
-import org.csploit.android.net.metasploit.*;
-
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
+import org.csploit.android.net.metasploit.ShellSession;
 
 /**
  * this Activity allow user to run commands on pwned shells
  */
-public class Console extends SherlockActivity {
+public class Console extends ActionBarActivity {
 
   private EditText  mInput;
   private EditText  mOutput;
@@ -85,7 +84,7 @@ public class Console extends SherlockActivity {
     mOutput.setHorizontallyScrolling(true);
 
     // make TextView selectable ( require HONEYCOMB or newer )
-    if(Build.VERSION.SDK_INT >= 11)
+    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
       mOutput.setTextIsSelectable(true);
 
     mReceiver = new ConsoleReceiver();
@@ -114,7 +113,7 @@ public class Console extends SherlockActivity {
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu){
-    MenuInflater inflater = getSupportMenuInflater();
+    MenuInflater inflater = getMenuInflater();
     inflater.inflate(R.menu.console, menu);
     return super.onCreateOptionsMenu(menu);
   }

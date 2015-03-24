@@ -5,13 +5,12 @@ import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
 import android.text.InputType;
 import android.util.Patterns;
 import android.widget.Toast;
-
-import com.actionbarsherlock.app.SherlockPreferenceActivity;
 
 import org.csploit.android.R;
 import org.csploit.android.core.Logger;
@@ -27,7 +26,7 @@ import java.util.Collection;
  * activity fo setting exploit options.
  */
 
-public class MsfPreferences extends SherlockPreferenceActivity {
+public class MsfPreferences extends PreferenceActivity {
 
   private Collection<Option> options;
   private final Preference.OnPreferenceChangeListener listener = new Preference.OnPreferenceChangeListener() {
@@ -96,8 +95,8 @@ public class MsfPreferences extends SherlockPreferenceActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
-    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    // no actionbar in preferenceactivity
+    //getActionBar().setDisplayHomeAsUpEnabled(true);
 
     setPreferenceScreen(createPreferenceHierarchy());
   }

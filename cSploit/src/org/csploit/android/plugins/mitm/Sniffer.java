@@ -21,8 +21,10 @@ package org.csploit.android.plugins.mitm;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -36,14 +38,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.MenuItem;
-
-import java.io.File;
-import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.Collections;
-
 import org.csploit.android.R;
 import org.csploit.android.core.Child;
 import org.csploit.android.core.ChildManager;
@@ -55,7 +49,12 @@ import org.csploit.android.net.Target;
 import org.csploit.android.plugins.mitm.SpoofSession.OnSessionReadyListener;
 import org.csploit.android.tools.TcpDump;
 
-public class Sniffer extends SherlockActivity
+import java.io.File;
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Collections;
+
+public class Sniffer extends ActionBarActivity
 {
   private static final String[] SORT = {
     "Bandwidth ↓",
@@ -280,7 +279,7 @@ public class Sniffer extends SherlockActivity
   	Boolean isDark = themePrefs.getBoolean("isDark", false);
 
     if (isDark)
-      setTheme(R.style.Sherlock___Theme);
+      setTheme(R.style.DarkTheme);
     else
       setTheme(R.style.AppTheme);
 

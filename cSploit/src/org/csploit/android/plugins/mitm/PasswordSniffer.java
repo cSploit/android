@@ -22,6 +22,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -32,8 +34,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.MenuItem;
+import org.csploit.android.R;
+import org.csploit.android.core.ChildManager;
+import org.csploit.android.core.System;
+import org.csploit.android.gui.dialogs.FatalDialog;
+import org.csploit.android.tools.Ettercap.OnAccountListener;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -42,13 +47,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.csploit.android.R;
-import org.csploit.android.core.ChildManager;
-import org.csploit.android.core.System;
-import org.csploit.android.gui.dialogs.FatalDialog;
-import org.csploit.android.tools.Ettercap.OnAccountListener;
-
-public class PasswordSniffer extends SherlockActivity {
+public class PasswordSniffer extends ActionBarActivity {
 	private ToggleButton mSniffToggleButton = null;
 	private ProgressBar mSniffProgress = null;
 	private ExpandableListView mListView = null;
@@ -188,7 +187,7 @@ public class PasswordSniffer extends SherlockActivity {
 		SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
 		Boolean isDark = themePrefs.getBoolean("isDark", false);
 		if (isDark)
-			setTheme(R.style.Sherlock___Theme);
+			setTheme(R.style.DarkTheme);
 		else
 			setTheme(R.style.AppTheme);
 		setTitle(System.getCurrentTarget() + " > MITM > Password Sniffer");

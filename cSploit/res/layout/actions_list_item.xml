@@ -59,8 +59,7 @@
                 android:maxLines="50"
                 android:fontFamily="sans-serif-light"
                 android:textSize="14sp"
-                android:autoLink="all"
-                android:text="lorem ipsum dolor sit amet" />
+                android:autoLink="all" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

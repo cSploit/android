@@ -23,28 +23,27 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockListActivity;
-import com.actionbarsherlock.view.MenuItem;
-
-import java.util.ArrayList;
-
-import org.csploit.android.R;
-
 import org.csploit.android.core.Plugin;
 import org.csploit.android.core.System;
 import org.csploit.android.gui.dialogs.FinishDialog;
 
-public class ActionActivity extends SherlockListActivity {
+import java.util.ArrayList;
+
+public class ActionActivity extends ActionBarActivity {
     private ArrayList<Plugin> mAvailable = null;
+    private ListView theList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,7 +52,7 @@ public class ActionActivity extends SherlockListActivity {
         Boolean isDark = themePrefs.getBoolean("isDark", false);
 
         if (isDark)
-            setTheme(R.style.Sherlock___Theme);
+            setTheme(R.style.DarkTheme);
         else
             setTheme(R.style.AppTheme);
 
@@ -61,14 +60,36 @@ public class ActionActivity extends SherlockListActivity {
             setTitle("cSploit > " + System.getCurrentTarget());
             setContentView(R.layout.actions_layout);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+            theList = (ListView) findViewById(R.id.android_list);
             mAvailable = System.getPluginsForTarget();
             ActionsAdapter mActionsAdapter = new ActionsAdapter();
+            theList.setAdapter(mActionsAdapter);
+            theList.setOnItemClickListener(new ListView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-            setListAdapter(mActionsAdapter);
-        } else
+                    if (System.checkNetworking(getParent())) {
+                        Plugin plugin = mAvailable.get(position);
+                        System.setCurrentPlugin(plugin);
+
+                        if (plugin.hasLayoutToShow()) {
+                            Toast.makeText(ActionActivity.this, getString(R.string.selected) + getString(plugin.getName()), Toast.LENGTH_SHORT).show();
+
+                            startActivity(new Intent(
+                                    ActionActivity.this,
+                                    plugin.getClass()
+                            ));
+                            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+                        } else
+                            plugin.onActionClick(getApplicationContext());
+                    }
+                }
+            });
+        } else {
             new FinishDialog(getString(R.string.warning), getString(R.string.something_went_wrong), this).show();
+        }
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -84,26 +105,6 @@ public class ActionActivity extends SherlockListActivity {
         }
     }
 
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-
-        if (System.checkNetworking(this)) {
-            Plugin plugin = mAvailable.get(position);
-            System.setCurrentPlugin(plugin);
-
-            if (plugin.hasLayoutToShow()) {
-                Toast.makeText(ActionActivity.this, getString(R.string.selected) + getString(plugin.getName()), Toast.LENGTH_SHORT).show();
-
-                startActivity(new Intent(
-                        ActionActivity.this,
-                        plugin.getClass()
-                ));
-                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-            } else
-                plugin.onActionClick(this);
-        }
-    }
 
     @Override
     public void onBackPressed() {

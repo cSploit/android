@@ -79,7 +79,7 @@ public class Traceroute extends Plugin {
 		SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
 		Boolean isDark = themePrefs.getBoolean("isDark", false);
 		if (isDark)
-			setTheme(R.style.Sherlock___Theme);
+			setTheme(R.style.DarkTheme);
 		else
 			setTheme(R.style.AppTheme);
 		super.onCreate(savedInstanceState);

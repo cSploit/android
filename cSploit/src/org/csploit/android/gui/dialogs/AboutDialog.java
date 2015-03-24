@@ -23,21 +23,27 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 
+import org.csploit.android.BuildConfig;
 import org.csploit.android.R;
 import org.csploit.android.core.System;
+
+import java.text.DateFormat;
 
 public class AboutDialog extends AlertDialog{
   public AboutDialog(Activity activity){
     super(activity);
 
+    DateFormat df = DateFormat.getDateTimeInstance();
     final View view = LayoutInflater.from(activity).inflate(R.layout.about_dialog, null);
-
+    final TextView tv = (TextView) view.findViewById(R.id.buildinfo);
+    tv.setText("Built by " + BuildConfig.BUILD_NAME + " on " + df.format(BuildConfig.BUILD_TIME));
     this.setTitle(activity.getString(R.string.about_csploit_v_) + System.getAppVersionName());
     this.setView(view);
 
-    this.setButton("Ok", new DialogInterface.OnClickListener(){
-      public void onClick(DialogInterface dialog, int id){
+    this.setButton("Ok", new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int id) {
         dialog.dismiss();
       }
     });

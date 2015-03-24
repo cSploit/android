@@ -34,37 +34,37 @@ import org.csploit.android.plugins.mitm.MITM;
 
 import java.net.NoRouteToHostException;
 
-public class CSploitApplication extends Application{
-  @Override
-  public void onCreate(){
-	  SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-		Boolean isDark = themePrefs.getBoolean("isDark", false);
-		if (isDark)
-			setTheme(R.style.Sherlock___Theme);
-		else
-			setTheme(R.style.AppTheme);
-		
-    super.onCreate();
+public class CSploitApplication extends Application {
+    @Override
+    public void onCreate() {
+        SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+        Boolean isDark = themePrefs.getBoolean("isDark", false);
+        if (isDark)
+            setTheme(R.style.DarkTheme);
+        else
+            setTheme(R.style.AppTheme);
 
-    // initialize the system
-    try{
-      System.init(this);
-    } catch(Exception e){
-      // ignore exception when the user has wifi off
-      if(!(e instanceof NoRouteToHostException))
-        System.errorLogging(e);
+        super.onCreate();
+
+        // initialize the system
+        try {
+            System.init(this);
+        } catch (Exception e) {
+            // ignore exception when the user has wifi off
+            if (!(e instanceof NoRouteToHostException))
+                System.errorLogging(e);
+        }
+
+        // load system modules even if the initialization failed
+        System.registerPlugin(new RouterPwn());
+        System.registerPlugin(new Traceroute());
+        System.registerPlugin(new PortScanner());
+        System.registerPlugin(new Inspector());
+        System.registerPlugin(new ExploitFinder());
+        System.registerPlugin(new LoginCracker());
+        System.registerPlugin(new Sessions());
+        System.registerPlugin(new MITM());
+        System.registerPlugin(new PacketForger());
+
     }
-
-    // load system modules even if the initialization failed
-    System.registerPlugin(new RouterPwn());
-    System.registerPlugin(new Traceroute());
-    System.registerPlugin(new PortScanner());
-    System.registerPlugin(new Inspector());
-    System.registerPlugin(new ExploitFinder());
-    System.registerPlugin(new LoginCracker());
-    System.registerPlugin(new Sessions());
-    System.registerPlugin(new MITM());
-    System.registerPlugin(new PacketForger());
-
-  }
 }
