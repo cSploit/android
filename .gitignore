@@ -1,4 +1,5 @@
 .DS_Store
+*.DS_Store
 *.o
 
 # built application files
@@ -21,13 +22,16 @@ gen/
 *.iml
 .idea/
 .gradle/
+*.log
+us.stackdump*
 
 # Local configuration file (sdk path, etc)
 local.properties
 
 *.pydevproject
 .project
-.metadata
+.metadata/
+target/
 bin/**
 tmp/**
 tmp/**/*
@@ -35,7 +39,10 @@ tmp/**/*
 *.bak
 *.swp
 *~.nib
+*~
 local.properties
+project.properties
+proguard/
 .classpath
 .settings/
 .loadpath
