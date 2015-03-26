@@ -69,7 +69,7 @@ public class Ettercap extends Tool
       sb.append(" /// ///");
       // router -> target poison
     else {
-      sb.append("/");
+      sb.append(" /");
       sb.append(target.getCommandLineRepresentation());
       sb.append("// ///");
     }
