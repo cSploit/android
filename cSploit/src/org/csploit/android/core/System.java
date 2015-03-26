@@ -1021,6 +1021,11 @@ public class System
     mTargets.add(target);
   }
 
+  /**
+   * add a target to the list keeping it sorted.
+   * @param target the target to add
+   * @return true if target is added, false if already present
+   */
   public static boolean addOrderedTarget(Target target){
     if(target != null && !hasTarget(target)){
       for(int i = 0; i < getTargets().size(); i++){

@@ -98,10 +98,9 @@ import static org.csploit.android.core.UpdateChecker.UPDATE_AVAILABLE;
 import static org.csploit.android.core.UpdateChecker.UPDATE_CHECKING;
 import static org.csploit.android.core.UpdateChecker.UPDATE_NOT_AVAILABLE;
 import static org.csploit.android.net.NetworkRadar.NRDR_STOPPED;
-import static org.csploit.android.net.NetworkRadar.TARGET_UPDATE;
 
 @SuppressLint("NewApi")
-public class MainActivity extends SherlockListActivity {
+public class MainActivity extends SherlockListActivity implements NetworkRadar.TargetListener {
 	private String UPDATE_MESSAGE;
 	private static final int WIFI_CONNECTION_REQUEST = 1012;
 	private boolean isWifiAvailable = false;
@@ -501,7 +500,7 @@ public class MainActivity extends SherlockListActivity {
     }
 
     try {
-      mNetworkRadar.start();
+      mNetworkRadar.start(this);
 
       if (!silent)
         runOnUiThread(new Runnable() {
@@ -945,7 +944,30 @@ public class MainActivity extends SherlockListActivity {
 		super.onDestroy();
 	}
 
-	public class TargetAdapter extends ArrayAdapter<Target> {
+  @Override
+  public void onTargetFound(final Target t) {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        if(System.addOrderedTarget(t) && mTargetAdapter != null) {
+          mTargetAdapter.notifyDataSetChanged();
+        }
+      }
+    });
+  }
+
+  @Override
+  public void onTargetChanged(final Target t) {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        if(mTargetAdapter != null)
+          mTargetAdapter.notifyDataSetChanged();
+      }
+    });
+  }
+
+  public class TargetAdapter extends ArrayAdapter<Target> {
 		public TargetAdapter() {
 			super(MainActivity.this, R.layout.target_list_item);
 		}
@@ -1060,7 +1082,6 @@ public class MainActivity extends SherlockListActivity {
 		public RadarReceiver() {
 			mFilter = new IntentFilter();
 
-			mFilter.addAction(TARGET_UPDATE);
 			mFilter.addAction(NRDR_STOPPED);
 		}
 
@@ -1074,15 +1095,7 @@ public class MainActivity extends SherlockListActivity {
       if(intent.getAction() == null)
         return;
 
-      if (intent.getAction().equals(TARGET_UPDATE)) {
-        // refresh the target listview
-        MainActivity.this.runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            mTargetAdapter.notifyDataSetChanged();
-          }
-        });
-      } else if (intent.getAction().equals(NRDR_STOPPED)) {
+      if (intent.getAction().equals(NRDR_STOPPED)) {
 
         Toast.makeText(MainActivity.this, R.string.net_discovery_stopped,
                 Toast.LENGTH_SHORT).show();

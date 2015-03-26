@@ -14,7 +14,6 @@ import java.net.InetAddress;
  * network-radar process manager
  */
 public class NetworkRadar {
-  public static final String TARGET_UPDATE = "NetworkRadar.action.TARGET_UPDATE";
   public static final String NRDR_STOPPED = "NetworkRadar.action.STOPPED";
 
   private Child process;
@@ -26,14 +25,18 @@ public class NetworkRadar {
     mNotifyStopped = true;
   }
 
-  public void start() throws ChildManager.ChildNotStartedException {
+  public static interface TargetListener {
+    void onTargetFound(Target t);
+    void onTargetChanged(Target t);
+  }
+
+  public void start(final TargetListener listener) throws ChildManager.ChildNotStartedException {
     process = System.getTools().networkRadar.start( new org.csploit.android.tools.NetworkRadar.HostReceiver() {
+
       @Override
       public void onHostFound(byte[] macAddress, InetAddress ipAddress, String name) {
         Target t;
-        boolean notify;
-
-        notify = false;
+        boolean notify = false;
 
         t = System.getTargetByAddress(ipAddress);
 
@@ -43,8 +46,7 @@ public class NetworkRadar {
           if(name != null)
             t.setAlias(name);
 
-          System.addOrderedTarget(t);
-          notify = true;
+          listener.onTargetFound(t);
         } else {
           if( !t.isConnected() ) {
             t.setConneced(true);
@@ -55,10 +57,9 @@ public class NetworkRadar {
             t.setAlias(name);
             notify = true;
           }
-        }
 
-        if(notify) {
-          sendTargetUpdateNotification();
+          if(notify)
+            listener.onTargetChanged(t);
         }
       }
 
@@ -68,7 +69,7 @@ public class NetworkRadar {
 
         if(t != null) {
           t.setConneced(false);
-          sendTargetUpdateNotification();
+          listener.onTargetChanged(t);
         }
       }
 
@@ -99,10 +100,6 @@ public class NetworkRadar {
   public void finalize() throws Throwable {
     kill();
     super.finalize();
-  }
-
-  private void sendTargetUpdateNotification(){
-    mContext.sendBroadcast(new Intent(TARGET_UPDATE));
   }
 
   private void sendStoppedNotification() {
