@@ -9,15 +9,15 @@ public class Port implements Event {
   public final String service;
   public final String version;
 
-  public Port(String proto, int port) {
-    this.protocol = proto;
+  public Port(String protocol, int port) {
+    this.protocol = protocol;
     this.port = port;
     this.service = null;
     this.version = null;
   }
 
-  public Port(String proto, int port, String service, String version) {
-    this.protocol = proto;
+  public Port(String protocol, int port, String service, String version) {
+    this.protocol = protocol;
     this.port = port;
     this.service = service;
     this.version = version;

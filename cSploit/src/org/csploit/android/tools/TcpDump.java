@@ -45,7 +45,7 @@ public class TcpDump extends Tool{
       }
     }
 
-    public abstract void onPacket(InetAddress src, InetAddress dst, short len);
+    public abstract void onPacket(InetAddress src, InetAddress dst, int len);
   }
 
   public Child sniff(String filter, String pcap, TcpDumpReceiver receiver) throws ChildManager.ChildNotStartedException {

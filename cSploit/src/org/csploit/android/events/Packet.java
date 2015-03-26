@@ -8,9 +8,9 @@ import java.net.InetAddress;
 public class Packet implements Event {
   public final InetAddress src;
   public final InetAddress dst;
-  public final short len;
+  public final int len;
 
-  public Packet(InetAddress src, InetAddress dst, short len) {
+  public Packet(InetAddress src, InetAddress dst, int len) {
     this.src = src;
     this.dst = dst;
     this.len = len;

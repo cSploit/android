@@ -1,7 +1,7 @@
 package org.csploit.android.events;
 
 /**
- * Created by max on 28/10/14.
+ * a line has been printed on child stderr
  */
 public class StderrNewline implements Event {
   public final String line;

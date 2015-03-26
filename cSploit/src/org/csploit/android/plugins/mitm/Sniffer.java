@@ -402,7 +402,7 @@ public class Sniffer extends SherlockActivity
             mTcpdumpProcess = System.getTools().tcpDump.sniff(PCAP_FILTER, mPcapFileName, new TcpDump.TcpDumpReceiver() {
 
               @Override
-              public void onPacket(InetAddress src, InetAddress dst, short len) {
+              public void onPacket(InetAddress src, InetAddress dst, int len) {
               long now = java.lang.System.currentTimeMillis();
               long deltat;
               AddressStats stats = null;
