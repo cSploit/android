@@ -25,7 +25,7 @@
     <string name="protocol">Протокол</string>
     <string name="csploit_catchphrase">cSploit - набор инструментов для проникновения в сеть под Android.</string>
     <string name="csploit_copyleft">Копилефт Simone Margaritelli aka evilsocket.</string>
-    <string name="csploit_url">http://www.csploit.net/</string>
+    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">Предупреждение</string>
     <string name="csploit_disclaimer">
         <![CDATA[Данное приложение предназначено только для демонстрации его функционала и может использоваться только в сетях, где вы имеете право выполнять данный функционал. За любое другое использование, разработчик приложения ответственности не несет. Другими словами, не будьте дураками и не направляйте ко мне злых людей.]]></string>
