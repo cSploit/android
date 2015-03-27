@@ -22,7 +22,7 @@
 <string name="protocol">协议</string>
 <string name="csploit_catchphrase">cSploit - 安卓上的网络渗透套装.</string>
 <string name="csploit_copyleft">非版权保护 来自 Simone Margaritelli 又名 evilsocket.</string>
-<string name="csploit_url">http://www.csploit.net/</string>
+<string name="csploit_url">http://www.csploit.org/</string>
 <string name="disclaimer">免责声明</string>
 <string name="csploit_disclaimer">
 <![CDATA[这个程序仅仅用于演示它的功能, 必须运行在您有明确的权利来使用的网络上. 任何的其他用法与开发者无关。换句话说, 别干傻事, 不要把别人的愤怒转移到我身上。]]></string>
