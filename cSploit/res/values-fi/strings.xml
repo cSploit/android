@@ -26,7 +26,7 @@
     <string name="protocol">Protokolla</string>
     <string name="csploit_catchphrase">cSploit - Verkkotestaus sovellus Androidille.</string>
     <string name="csploit_copyleft">Copyleft: Simone Margaritelli, eli evilsocket.</string>
-    <string name="csploit_url">http://www.csploit.net/</string>
+    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">Käyttöehdot</string>
     <string name="csploit_disclaimer">
         <![CDATA[Tätä sovellusta tulee käyttää vain demonstroimaan sen toimintoja, ja saa käyttää vain verkoissa joissa sinulla on oikeus tehdä niin. Mikään muu käyttötarkoitus ei ole kehittäjän vastuulla. Toisin sanoen, älä ole tyhmä ja lähetä vihaisia ihmisiä minulle]]></string>
