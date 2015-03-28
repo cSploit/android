@@ -5,5 +5,5 @@
         android:checkable="true"
         android:checked="false"
         android:enabled="false"
-        android:title="focused scan"/>
+        android:title="@string/menu_focusedscan" />
 </menu>

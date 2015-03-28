@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:csploit="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/load"
         android:icon="@drawable/action_open"
-        android:showAsAction="always"
+        csploit:showAsAction="ifRoom"
         android:title="@string/hijacker_load_from_file"/>
 
 </menu>

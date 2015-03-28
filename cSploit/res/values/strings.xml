@@ -183,7 +183,7 @@
     <string name="vulnerability_finder_desc">Search for known vulnerabilities for target running
         services upon National Vulnerability Database.
     </string>
-    <string name="inspector">Inspector</string>
+    <string name="inspector">Service Inspector</string>
     <string name="inspector_desc">Perform target operating system and services deep detection
         (slower than port scanner, but more accurate).
     </string>
@@ -422,7 +422,7 @@
     <string name="exploit_choose_target">Choose target</string>
     <string name="open_url">Open URL</string>
     <string name="show_full_description">Show full description</string>
-    <string name="choose_an_option">choose an option</string>
+    <string name="choose_an_option">Choose an option</string>
     <string name="required">Required</string>
     
     <string name="menu_add">Add</string>
@@ -490,4 +490,7 @@
     <string name="pref_updates_gems_desc">check for RubyGems updates</string>
     <string name="pref_msf_manifest">Custom manifest</string>
     <string name="pref_msf_manifest_desc">custom MSF manifest URL</string>
+    <string name="buildinfo">Build Info</string>
+    <string name="menu_multiaction">Multi Action</string>
+    <string name="menu_focusedscan">focused scan</string>
 </resources>

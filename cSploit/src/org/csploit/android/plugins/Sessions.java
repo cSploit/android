@@ -19,8 +19,6 @@
  */
 package org.csploit.android.plugins;
 
-import java.util.ArrayList;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -42,6 +40,8 @@ import org.csploit.android.net.Target;
 import org.csploit.android.net.metasploit.RPCClient;
 import org.csploit.android.net.metasploit.Session;
 import org.csploit.android.net.metasploit.ShellSession;
+
+import java.util.ArrayList;
 
 public class Sessions extends Plugin {
 	private ListView mListView = null;
@@ -138,7 +138,7 @@ public class Sessions extends Plugin {
 		SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
 		Boolean isDark = themePrefs.getBoolean("isDark", false);
 		if (isDark)
-			setTheme(R.style.Sherlock___Theme);
+			setTheme(R.style.DarkTheme);
 		else
 			setTheme(R.style.AppTheme);
 		super.onCreate(savedInstanceState);

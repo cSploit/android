@@ -20,9 +20,8 @@ package org.csploit.android.core;
 
 import android.content.Context;
 import android.os.Bundle;
-
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.MenuItem;
+import android.support.v7.app.ActionBarActivity;
+import android.view.MenuItem;
 
 import org.csploit.android.R;
 import org.csploit.android.net.Target;
@@ -30,7 +29,7 @@ import org.csploit.android.net.Target.Exploit;
 import org.csploit.android.net.Target.Port;
 import org.csploit.android.net.metasploit.RPCClient;
 
-public abstract class Plugin extends SherlockActivity{
+public abstract class Plugin extends ActionBarActivity {
   public static final int NO_LAYOUT = -1;
 
   private int mNameStringId = -1;

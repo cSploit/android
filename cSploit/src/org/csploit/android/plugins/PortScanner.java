@@ -23,6 +23,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -32,10 +35,6 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 
 import org.csploit.android.R;
 import org.csploit.android.core.ChildManager;
@@ -125,7 +124,7 @@ public class PortScanner extends Plugin {
 		SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
 		Boolean isDark = themePrefs.getBoolean("isDark", false);
 		if (isDark)
-			setTheme(R.style.Sherlock___Theme);
+			setTheme(R.style.DarkTheme);
 		else
 			setTheme(R.style.AppTheme);
 		super.onCreate(savedInstanceState);
@@ -219,7 +218,7 @@ public class PortScanner extends Plugin {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getSupportMenuInflater();
+		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.port_scanner, menu);
 		return super.onCreateOptionsMenu(menu);
 	}

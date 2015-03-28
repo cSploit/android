@@ -20,6 +20,11 @@ package org.csploit.android.plugins.mitm.hijacker;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.Window;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
@@ -27,18 +32,11 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Window;
-
 import org.apache.http.impl.cookie.BasicClientCookie;
-
 import org.csploit.android.R;
 import org.csploit.android.core.System;
 
-public class HijackerWebView extends SherlockActivity {
+public class HijackerWebView extends ActionBarActivity {
 	private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4";
 
 	private WebSettings mSettings = null;
@@ -49,12 +47,12 @@ public class HijackerWebView extends SherlockActivity {
 		SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
 		Boolean isDark = themePrefs.getBoolean("isDark", false);
 		if (isDark)
-			setTheme(R.style.Sherlock___Theme);
+			setTheme(R.style.DarkTheme);
 		else
 			setTheme(R.style.AppTheme);
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		requestWindowFeature(Window.FEATURE_PROGRESS);
+		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		supportRequestWindowFeature(Window.FEATURE_PROGRESS);
 		setTitle(System.getCurrentTarget() + " > MITM > Session Hijacker");
 		setContentView(R.layout.plugin_mitm_hijacker_webview);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -85,7 +83,7 @@ public class HijackerWebView extends SherlockActivity {
 				// Normalize our progress along the progress bar's scale
 				int mmprogress = (Window.PROGRESS_END - Window.PROGRESS_START)
 						/ 100 * progress;
-				setSupportProgress(mmprogress);
+				setProgress(mmprogress);
 
 				if (progress == 100)
 					setSupportProgressBarIndeterminateVisibility(false);
@@ -135,7 +133,7 @@ public class HijackerWebView extends SherlockActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getSupportMenuInflater();
+		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.browser, menu);
 		return super.onCreateOptionsMenu(menu);
 	}

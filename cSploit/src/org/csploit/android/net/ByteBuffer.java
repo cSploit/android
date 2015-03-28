@@ -18,12 +18,11 @@
  */
 package org.csploit.android.net;
 
+import org.csploit.android.core.System;
 import org.mozilla.universalchardet.UniversalDetector;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
-
-import org.csploit.android.core.System;
 
 public class ByteBuffer{
   private byte[] mBuffer = null;

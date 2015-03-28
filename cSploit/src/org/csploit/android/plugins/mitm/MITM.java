@@ -40,18 +40,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
 import org.csploit.android.R;
 import org.csploit.android.SettingsActivity;
 import org.csploit.android.core.Child;
 import org.csploit.android.core.ChildManager;
+import org.csploit.android.core.Logger;
 import org.csploit.android.core.Plugin;
 import org.csploit.android.core.System;
 import org.csploit.android.gui.dialogs.ChoiceDialog;
@@ -70,9 +63,16 @@ import org.csploit.android.net.Target;
 import org.csploit.android.net.http.proxy.Proxy;
 import org.csploit.android.net.http.proxy.Proxy.ProxyFilter;
 import org.csploit.android.plugins.mitm.SpoofSession.OnSessionReadyListener;
-import org.csploit.android.core.Logger;
 import org.csploit.android.plugins.mitm.hijacker.Hijacker;
 import org.csploit.android.tools.ArpSpoof;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 //TODO: completely rewrite this class, it's monstrous
 public class MITM extends Plugin
@@ -397,7 +397,7 @@ public class MITM extends Plugin
 	  SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
 		Boolean isDark = themePrefs.getBoolean("isDark", false);
 		if (isDark)
-			setTheme(R.style.Sherlock___Theme);
+			setTheme(R.style.DarkTheme);
 		else
 			setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);

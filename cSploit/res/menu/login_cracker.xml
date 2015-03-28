@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
-
+<menu xmlns:csploit="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/user_wordlist"
-        android:showAsAction="always"
+        csploit:showAsAction="ifRoom"
         android:title="@string/login_user_wordlist"/>
     <item
         android:id="@+id/pass_wordlist"
-        android:showAsAction="always"
+        csploit:showAsAction="ifRoom"
         android:title="@string/login_pass_wordlist"/>
 
 </menu>

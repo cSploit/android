@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="background_window">#FFE5E5E5</color>
+    <color name="background_window_dark">#ff505050</color>
     <color name="app_color">#FF3F9FE0</color>
+    <color name="app_color_dark">#ff3786bd</color>
     <color name="gray_text">#FF888888</color>
+    <color name="gray_text_dark">#ff484848</color>
     <color name="holo_blue">#33B5E5</color>
+    <color name="holo_blue_dark">#ff0d222f</color>
     <color name="selectable_blue">#ff36ccff</color>
+    <color name="selectable_blue_dark">#ff144d5d</color>
 </resources>
