@@ -493,4 +493,8 @@
     <string name="buildinfo">Build Info</string>
     <string name="menu_multiaction">Multi Action</string>
     <string name="menu_focusedscan">focused scan</string>
+
+    <string name="crash_dialog_title">cSploit crash reporter</string>
+    <string name="crash_dialog_text">Oooops!\ncSploit has crashed!</string>
+    <string name="crash_dialog_comment">Please describe here what happened [optional]</string>
 </resources>

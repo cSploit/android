@@ -36,4 +36,6 @@
         <item name="android:windowBackground">@color/background_window_dark</item>
     </style>
 
+    <style name="Theme.Dialog" parent="@android:style/Theme.Dialog" />
+
 </resources>

@@ -21,6 +21,10 @@ package org.csploit.android;
 import android.app.Application;
 import android.content.SharedPreferences;
 
+import org.acra.ACRA;
+import org.acra.ReportingInteractionMode;
+import org.acra.annotation.ReportsCrashes;
+import org.acra.sender.HttpSender;
 import org.csploit.android.core.System;
 import org.csploit.android.plugins.ExploitFinder;
 import org.csploit.android.plugins.Inspector;
@@ -34,37 +38,50 @@ import org.csploit.android.plugins.mitm.MITM;
 
 import java.net.NoRouteToHostException;
 
+@ReportsCrashes(
+  httpMethod = HttpSender.Method.PUT,
+  reportType = HttpSender.Type.JSON,
+  formUri = "http://csploit-bug.iriscouch.com/acra-csploit/_design/acra-storage/_update/report",
+  formUriBasicAuthLogin = "android",
+  formUriBasicAuthPassword = "DEADBEEF",
+  mode = ReportingInteractionMode.DIALOG,
+  resDialogText = R.string.crash_dialog_text,
+  resDialogIcon = R.drawable.dsploit_icon,
+  resDialogTitle = R.string.crash_dialog_title,
+  resDialogCommentPrompt = R.string.crash_dialog_comment
+)
 public class CSploitApplication extends Application {
-    @Override
-    public void onCreate() {
-        SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-        Boolean isDark = themePrefs.getBoolean("isDark", false);
-        if (isDark)
-            setTheme(R.style.DarkTheme);
-        else
-            setTheme(R.style.AppTheme);
+  @Override
+  public void onCreate() {
+    SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+    Boolean isDark = themePrefs.getBoolean("isDark", false);
+    if (isDark)
+      setTheme(R.style.DarkTheme);
+    else
+      setTheme(R.style.AppTheme);
 
-        super.onCreate();
+    super.onCreate();
 
-        // initialize the system
-        try {
-            System.init(this);
-        } catch (Exception e) {
-            // ignore exception when the user has wifi off
-            if (!(e instanceof NoRouteToHostException))
-                System.errorLogging(e);
-        }
+    ACRA.init(this);
 
-        // load system modules even if the initialization failed
-        System.registerPlugin(new RouterPwn());
-        System.registerPlugin(new Traceroute());
-        System.registerPlugin(new PortScanner());
-        System.registerPlugin(new Inspector());
-        System.registerPlugin(new ExploitFinder());
-        System.registerPlugin(new LoginCracker());
-        System.registerPlugin(new Sessions());
-        System.registerPlugin(new MITM());
-        System.registerPlugin(new PacketForger());
-
+    // initialize the system
+    try {
+      System.init(this);
+    } catch (Exception e) {
+      // ignore exception when the user has wifi off
+      if (!(e instanceof NoRouteToHostException))
+        System.errorLogging(e);
     }
+
+    // load system modules even if the initialization failed
+    System.registerPlugin(new RouterPwn());
+    System.registerPlugin(new Traceroute());
+    System.registerPlugin(new PortScanner());
+    System.registerPlugin(new Inspector());
+    System.registerPlugin(new ExploitFinder());
+    System.registerPlugin(new LoginCracker());
+    System.registerPlugin(new Sessions());
+    System.registerPlugin(new MITM());
+    System.registerPlugin(new PacketForger());
+  }
 }
