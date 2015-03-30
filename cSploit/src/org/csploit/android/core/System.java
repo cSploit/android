@@ -39,6 +39,8 @@ import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.util.SparseIntArray;
 
+import org.acra.ACRA;
+import org.acra.ACRAConfiguration;
 import org.csploit.android.R;
 import org.csploit.android.WifiScannerActivity;
 import org.csploit.android.net.Endpoint;
@@ -272,8 +274,6 @@ public class System
         try { writer.close(); } catch (IOException ignored) {}
       if(reader != null)
         try { reader.close(); } catch (IOException ignored) {}
-      reader = null;
-      writer = null;
     }
 
     mKnownIssues.fromFile(String.format("%s/issues", getCorePath()));
@@ -283,21 +283,14 @@ public class System
 
     if(ret != 0) {
       File log = new File(System.getCorePath(), "cSploitd.log");
+      DaemonException daemonException = new DaemonException("core daemon returned " + ret);
       if(log.exists() && log.canRead()) {
-        try {
-          reader = new BufferedReader(new FileReader(log));
-
-          while((line = reader.readLine()) != null) {
-            Logger.error("core daemon log: " + line);
-          }
-        } catch ( IOException e) {
-          Logger.error(e.getMessage());
-        } finally {
-          if(reader != null)
-            try { reader.close(); } catch (IOException ignored) {}
-        }
+        ACRAConfiguration conf = ACRA.getConfig();
+        conf.setApplicationLogFile(log.getAbsolutePath());
+        ACRA.setConfig(conf);
+        ACRA.getErrorReporter().handleException(daemonException, false);
       }
-      throw new DaemonException("core daemon returned " + ret);
+      throw daemonException;
     }
   }
 

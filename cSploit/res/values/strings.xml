@@ -497,4 +497,5 @@
     <string name="crash_dialog_title">cSploit crash reporter</string>
     <string name="crash_dialog_text">Oooops!\ncSploit has crashed!</string>
     <string name="crash_dialog_comment">Please describe here what happened [optional]</string>
+    <string name="JNI_crash_detected">JNI library has previously crashed, I hope you sent the report.</string>
 </resources>

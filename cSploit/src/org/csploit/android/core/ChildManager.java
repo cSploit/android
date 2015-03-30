@@ -153,11 +153,11 @@ public class ChildManager {
    *
    * this function is the main entry point for generated events.
    */
-  public static void onEvent(int childID, Event event) {
+  public static void onEvent(final int childID, final Event event) {
     Child c;
-    boolean end, died, stderr;
+    boolean end, died, stderr, crash;
 
-    died = stderr = false;
+    died = stderr = crash = false;
 
     end = event instanceof ChildEnd;
     if(!end) {
@@ -186,11 +186,13 @@ public class ChildManager {
       Logger.debug("Child #" + c.id + " exited ( exitValue=" + c.exitValue + " )");
       if(c.receiver != null)
         c.receiver.onEnd(c.exitValue);
+      crash = c.exitValue > 126 && c.exitValue != 130 && c.exitValue != 137;
     } else  if(died) {
       c.signal = ((ChildDied) event).signal;
       Logger.debug("Child #" + c.id + " died ( signal=" + c.signal + " )");
       if(c.receiver != null)
         c.receiver.onDeath(c.signal);
+      crash = c.signal != 2 && c.signal != 9;
     } else if(stderr) {
       Logger.warning("Child #" + c.id + " sent '" + ((StderrNewline) event).line + "' to stderr");
       if(c.receiver != null)
@@ -206,6 +208,16 @@ public class ChildManager {
         children.notifyAll();
       }
     }
+
+    // starting commands under onEvent is not allowed ( should fix it ? )
+    if(crash) {
+      new Thread(new Runnable() {
+        @Override
+        public void run() {
+          CrashReporter.beginChildCrashReport(childID, event);
+        }
+      }).start();
+    }
   }
 
   public static class ChildDiedException extends Exception {
@@ -216,6 +228,5 @@ public class ChildManager {
     public ChildNotStartedException() {
       super("cannot start commands");
     }
-
   }
 }

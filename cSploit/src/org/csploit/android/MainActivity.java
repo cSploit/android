@@ -50,6 +50,8 @@ import android.widget.Toast;
 
 import org.csploit.android.core.Child;
 import org.csploit.android.core.ChildManager;
+import org.csploit.android.core.Client;
+import org.csploit.android.core.CrashReporter;
 import org.csploit.android.core.Logger;
 import org.csploit.android.core.ManagedReceiver;
 import org.csploit.android.core.MultiAttackService;
@@ -335,15 +337,21 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         boolean coreBeating = System.isCoreInitialized();
 
         if (coreInstalled && !coreBeating) {
-            try {
-                System.initCore();
-                coreBeating = true;
-            } catch (System.SuException e) {
-                onInitializationError(getString(R.string.only_4_root));
-                return;
-            } catch (System.DaemonException e) {
-                Logger.error(e.getMessage());
+          try {
+            System.initCore();
+            coreBeating = true;
+
+            if(Client.hadCrashed()) {
+              Logger.warning("Client has previously crashed, building a crash report.");
+              CrashReporter.beginNativeCrashReport("JNI Library crashed");
+              onInitializationError(getString(R.string.JNI_crash_detected));
             }
+          } catch (System.SuException e) {
+            onInitializationError(getString(R.string.only_4_root));
+            return;
+          } catch (System.DaemonException e) {
+            Logger.error(e.getMessage());
+          }
         }
 
         if (!connectivityAvailable) {

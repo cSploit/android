@@ -1,7 +1,7 @@
 package org.csploit.android.core;
 
 /**
- * the dSploitd client
+ * the cSploitd client
  */
 public class Client {
 
@@ -31,4 +31,6 @@ public class Client {
   native static void Kill(int id, int signal);
 
   native static boolean SendTo(int id, byte[] array);
+
+  public native static boolean hadCrashed();
 }
