@@ -456,5 +456,10 @@
     <string name="pref_updates_msf_desc">Verificar se há atualizações para o MSF</string>
     <string name="pref_updates_gems">RubyGems</string>
     <string name="pref_updates_gems_desc">Verificar se há atualizações para o RubyGems</string>
+    <string name="pref_msf_manifest">Manifesto Personalizado</string>
+    <string name="pref_msf_manifest_desc">URL do Manifesto Personalizado MSF</string>
+    <string name="buildinfo">Informações da Build</string>
+    <string name="menu_multiaction">Ações Múltiplas</string>
+    <string name="menu_focusedscan">scan Focado</string>
 
 </resources>
