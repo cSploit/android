@@ -73,6 +73,8 @@ public class CSploitApplication extends Application {
         System.errorLogging(e);
     }
 
+    ACRA.setConfig(ACRA.getConfig().setApplicationLogFile(System.getCorePath() + "/cSploitd.log"));
+
     // load system modules even if the initialization failed
     System.registerPlugin(new RouterPwn());
     System.registerPlugin(new Traceroute());

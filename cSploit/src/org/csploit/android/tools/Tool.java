@@ -33,6 +33,10 @@ public abstract class Tool
     return ChildManager.wait(async(args, receiver));
   }
 
+  public int run(Child.EventReceiver receiver) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
+    return run(null, receiver);
+  }
+
   public int run(String args) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
     return run(args, null);
   }

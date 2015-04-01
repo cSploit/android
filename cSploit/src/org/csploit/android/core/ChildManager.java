@@ -79,12 +79,15 @@ public class ChildManager {
     c = new Child();
 
     c.id = Client.StartCommand(handler, cmd, env);
-    if (c.id == -1)
+    if (c.id == -1) {
+      Logger.debug(String.format("{ handler='%s', cmd='%s' } => FAILED", handler, cmd));
       throw new ChildNotStartedException();
+    }
+
+    Logger.debug(String.format("{ handler='%s', cmd='%s' } => %d", handler, cmd, c.id));
 
     c.running = true;
     c.receiver = receiver;
-
 
     if(c.receiver!=null)
       c.receiver.onStart(cmd);
@@ -153,7 +156,7 @@ public class ChildManager {
    *
    * this function is the main entry point for generated events.
    */
-  public static void onEvent(final int childID, final Event event) {
+  public static void onEvent(final int childID, Event event) {
     Child c;
     boolean end, died, stderr, crash;
 
@@ -209,12 +212,13 @@ public class ChildManager {
       }
     }
 
-    // starting commands under onEvent is not allowed ( should fix it ? )
+    // starting commands from onEvent is not allowed ( should fix it ? )
     if(crash) {
+      final int signal = (end ? c.exitValue - 128 : c.signal);
       new Thread(new Runnable() {
         @Override
         public void run() {
-          CrashReporter.beginChildCrashReport(childID, event);
+          CrashReporter.notifyChildCrashed(childID, signal);
         }
       }).start();
     }

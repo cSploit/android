@@ -35,6 +35,7 @@ public class ToolBox {
   public final Msf msf;
   public final NetworkRadar networkRadar;
   public final MsfRpcd msfrpcd;
+  public final Logcat logcat;
 
   public ToolBox() {
     raw = new Raw();
@@ -50,6 +51,7 @@ public class ToolBox {
     msf = new Msf();
     networkRadar = new NetworkRadar();
     msfrpcd = new MsfRpcd();
+    logcat = new Logcat();
   }
 
   public void reload() {
@@ -66,6 +68,7 @@ public class ToolBox {
     msf.setEnabled();
     networkRadar.setEnabled();
     msfrpcd.setEnabled();
+    logcat.setEnabled();
 
     if(ruby.isEnabled())
       ruby.setupEnvironment();

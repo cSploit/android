@@ -343,7 +343,7 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
 
             if(Client.hadCrashed()) {
               Logger.warning("Client has previously crashed, building a crash report.");
-              CrashReporter.beginNativeCrashReport("JNI Library crashed");
+              CrashReporter.notifyNativeLibraryCrash();
               onInitializationError(getString(R.string.JNI_crash_detected));
             }
           } catch (System.SuException e) {

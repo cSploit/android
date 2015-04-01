@@ -121,7 +121,7 @@ public class System
   private static ArrayList<Plugin> mPlugins = null;
   private static Plugin mCurrentPlugin = null;
   // toolbox singleton
-  private static ToolBox mTools = null;
+  private static ToolBox mTools = new ToolBox();
 
   private static HTTPSRedirector mRedirector = null;
   private static Proxy mProxy = null;
@@ -152,7 +152,6 @@ public class System
       mStoragePath = getSettings().getString("PREF_SAVE_PATH", Environment.getExternalStorageDirectory().toString());
       mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
       mKnownIssues = new KnownIssues();
-      mTools = new ToolBox();
       mPlugins = new ArrayList<Plugin>();
       mOpenPorts = new SparseIntArray(3);
 
