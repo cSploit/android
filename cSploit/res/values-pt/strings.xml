@@ -465,6 +465,10 @@
     <string name="buildinfo">Informações da Build</string>
     <string name="menu_multiaction">Ações Múltiplas</string>
     <string name="menu_focusedscan">scan Focado</string>
+    <string name="crash_dialog_title">cSploit deu erro</string>
+    <string name="crash_dialog_text">Ocorreu um erro inesperado forçando a aplicação ou um componente para parar. Por favor, ajude-nos a corrigir isso , enviando-nos os dados de erro , tudo que você tem a fazer é clicar \'OK\'.</string>
+    <string name="crash_dialog_comment">Você pode adicionar o seu comentário sobre o problema abaixo</string>
+    <string name="JNI_crash_detected">Biblioteca JNI já havia deixado de funcionar, eu espero que você envie o relatório.</string>
 
 
 </resources>
