@@ -144,6 +144,10 @@
     <string name="generating_keys">Gerando chaves…</string>
     <string name="no_wifi_available">Não há conexões Wi-Fi disponíveis, a aplicação irá apenas verificar se há atualizações. #STATUS#
     </string>
+    <string name="missing_core_update">Core não é instalado , o aplicativo irá apenas verificar
+    por atualizações. #STATUS#</string>
+    <string name="heart_attack_update">Heart attack ocorrido , o aplicativo só irá verificar
+    por atualizações. #STATUS#</string>
   <string name="loading_changelog">Carregando log de alterações…</string>
     <string name="something_went_wrong_changelog">
         <![CDATA[<html><body><p><b>Algo deu errado ao recuperar o log de alterações:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
@@ -434,17 +438,17 @@
     <string name="installing_gems">instalaçao de gems…</string>
     <string name="patching_shebang">patching shebang</string>
     <string name="installing_msf_gems">Instalação de gems para MSF</string>
-    <string name="installing_bundle">Instalação de Pacote</string>
+    <string name="installing_bundle">Instalação do Pacote</string>
     <string name="new_gems_update_desc">Uma atualização para ruby gems</string>
-    <string name="heart_attack">heart attack</string>
+    <string name="heart_attack">Heart Attack</string>
     <string name="cannot_download_core">Não é possível baixar o core para o seu dispositivo</string>
     <string name="unable_to_start_updateservice">Incapaz de iniciar o serviço de atualização</string>
     <string name="no_core_no_connectivity">O Core não está instalado , uma conexão de rede é necessária para a primeira inicialização</string>
     <string name="no_core_found">Core não encontrado para esse dispositivo</string>
     <string name="mandatory_update">Esta atualização é necessária</string>
-    <string name="new_core_found">a versão do Core %s Está disponível, você deseja atualizar ?</string>
+    <string name="new_core_found">A versão do Core %s Está disponível, você deseja atualizar ?</string>
     <string name="update_cancelled">Atualização Cancelada</string>
-    <string name="child_not_started">Processo não pode iniciar...</string>
+    <string name="child_not_started">Processo não pode iniciar…</string>
     <string name="pref_updates">Atualizações</string>
     <string name="pref_updates_app">App</string>
     <string name="pref_updates_app_desc">Verificar se há atualizações de Aplicativos</string>
@@ -461,5 +465,6 @@
     <string name="buildinfo">Informações da Build</string>
     <string name="menu_multiaction">Ações Múltiplas</string>
     <string name="menu_focusedscan">scan Focado</string>
+
 
 </resources>
