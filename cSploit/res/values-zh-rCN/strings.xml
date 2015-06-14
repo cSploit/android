@@ -410,7 +410,7 @@ If not, see http://www.gnu.org/licenses/.
 <string name="no_core_found">无法为该设备找到核心</string>
 <string name="mandatory_update">此更新必要</string>
 <string name="new_core_found">核心版本 %s 可用, 您希望更新吗?</string>
-<string name="update_cancelled">更新已取消</string></string>
+<string name="update_cancelled">更新已取消</string>
 <string name="child_not_started">无法启动进程</string>
 <string name="pref_updates">更新</string>
 <string name="pref_updates_app">软件</string>
