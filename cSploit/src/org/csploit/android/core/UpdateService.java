@@ -1269,6 +1269,11 @@ public class UpdateService extends IntentService
       if (bundleInstallTask != null && execShell(bundleInstallTask, "cancelled while install bundle") != 0)
         throw new RuntimeException("cannot install bundle");
 
+      msgpack = System.errorLogging. getTools().ruby.async (gem install -f msgpack); //force installation of msgpack, need 
+                                                                                     //to do that for all "broken" gems
+      if (execShell (msgpack, "cancelled on msgpack install") != 0)
+        throw new RuntimeException("cannot force msgpack installation");
+
       bundleInstallTask = System.getTools().ruby.async(
               String.format("bundle install --verbose --gemfile '%s/Gemfile' --without development test", msfPath),
               mErrorReceiver);
