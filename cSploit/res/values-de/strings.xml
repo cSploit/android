@@ -300,7 +300,7 @@
     <string name="menu_focusedscan">Gezielter Scan</string>
 
     <string name="crash_dialog_title">cSploit ist abgestürzt</string>
-    <string name="crash_dialog_text">Ein unerwarteter Fehler trat beim erzwungenen Beenden der Anwendung oder einer ihrer Komponenten auf. Bitte hilf uns das zu beheben, indem du auf '\OK\' drückst.</string>
+    <string name="crash_dialog_text">Ein unerwarteter Fehler trat beim erzwungenen Beenden der Anwendung oder einer ihrer Komponenten auf. Bitte hilf uns das zu beheben, indem du auf \'OK\' drückst.</string>
     <string name="crash_dialog_comment">Du kannst unten ein Kommentar über das Problem hinzufügen</string>
     <string name="JNI_crash_detected">Die JNI Bibliothek ist zuvor abgestürzt. Ich hoffe du sendest einen Bericht.</string>
     <string name="about">Über</string>
