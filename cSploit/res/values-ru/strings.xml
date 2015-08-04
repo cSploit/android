@@ -441,7 +441,7 @@
     <string name="no_core_no_connectivity">Ядро cSploit не установлено, для первичной инициализации требуется интернет соединение</string>
     <string name="no_core_found">Невозможно найти ядро cSploit для вашего устройства</string>
     <string name="mandatory_update">требуется это обновление</string>
-    <string name="new_core_found">Доступно ядро версии %s , вы хотите обновится? ?</string>
+    <string name="new_core_found">Доступно ядро версии %s , вы хотите обновится?</string>
     <string name="update_cancelled">Обновление отменено</string>
     <string name="child_not_started">Невозможно запустить процесс</string>
     <string name="pref_updates">Обновления</string>
@@ -457,4 +457,12 @@
     <string name="pref_updates_gems_desc">Проверять обновления RubyGems</string>
     <string name="pref_msf_manifest">Пользовательский манифест</string>
     <string name="pref_msf_manifest_desc">URL пользовательского манифеста MSF</string>
+    <string name="buildinfo">Информация о сборке</string>
+    <string name="menu_multiaction">Множественные действия</string>
+    <string name="menu_focusedscan">точное сканирование</string>
+    <string name="crash_dialog_title">cSploit неожиданно завершил свою работу</string>
+    <string name="crash_dialog_text">Неожиданная ошибка заставила приложение и/или его компоненты завершить работу. Пожалуйста помогите нам исправить эту ошибку отправкой отчета об ошибке, все что вам нужно сделать это нажать. \'OK\'.</string>
+    <string name="crash_dialog_comment">Вы можете добавить комментарий ниже</string>
+    <string name="JNI_crash_detected">Библиотека JNI недавно завершила свою работу падением, я надеюсь ты отправил отчет об ошибке.</string>
+    <string name="missing_core_update">Ядро не установлено так, что приложение только проверит обновления. #STATUS#</string>
 </resources>
