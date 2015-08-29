@@ -247,8 +247,9 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                System.reloadNetworkMapping();
-                createLayout();
+              System.reloadNetworkMapping();
+              createLayout();
+              if(System.isInitialized())
                 startNetworkRadar(true);
             }
         });
