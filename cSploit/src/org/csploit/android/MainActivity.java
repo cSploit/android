@@ -1232,7 +1232,6 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
             switch (target) {
                 case ruby_update:
                 case msf_update:
-                case gems_update:
                     StartRPCServer();
                     break;
                 case core_update:
@@ -1299,12 +1298,6 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
                         getString(R.string.new_update_desc2);
 
                 onUpdateAvailable(description, UpdateService.action.msf_update);
-            } else if (intent.getAction().equals(GEMS_AVAILABLE)) {
-
-                final String description = getString(R.string.new_gems_update_desc) + " " +
-                        getString(R.string.new_update_desc2);
-
-                onUpdateAvailable(description, UpdateService.action.gems_update);
             } else if (intent.getAction().equals(UPDATE_AVAILABLE)) {
                 final String remoteVersion = (String) intent.getExtras().get(
                         AVAILABLE_VERSION);

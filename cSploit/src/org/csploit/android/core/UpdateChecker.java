@@ -70,9 +70,6 @@ public class UpdateChecker extends Thread
 
     boolean checkRuby = canCheckMsf && prefs.getBoolean("PREF_UPDATES_RUBY", true);
 
-    boolean checkGems = canCheckMsf && prefs.getBoolean("PREF_UPDATES_GEMS", true) &&
-            System.getLocalRubyVersion() != null;
-
     boolean checkMsf = canCheckMsf && prefs.getBoolean("PREF_UPDATES_MSF", true) &&
             System.getLocalRubyVersion() != null;
 
@@ -84,8 +81,6 @@ public class UpdateChecker extends Thread
       send(RUBY_AVAILABLE);
     else if(checkMsf && UpdateService.isMsfUpdateAvailable()) {
       send(MSF_AVAILABLE);
-    } else if(checkGems && UpdateService.isGemUpdateAvailable()){
-      send(GEMS_AVAILABLE);
     } else
       send(UPDATE_NOT_AVAILABLE);
 
