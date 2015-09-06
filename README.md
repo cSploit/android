@@ -17,7 +17,7 @@ and running services, search for **known vulnerabilities**, crack logon procedur
 man in the middle attacks such as **password sniffing** ( with common protocols dissection ), real time **traffic
 manipulation**, etc, etc .
 
-This application is still in **beta stage**, a stable release will be available as soon as possible, but expect
+This application is still in the **beta stage**, a stable release will be available as soon as possible, but expect
 some crash or strange behaviour until then, in any case, feel free to submit an issue here on GitHub.
 
 Requirements
