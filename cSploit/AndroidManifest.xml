@@ -112,6 +112,10 @@
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_main" />
         <activity
+            android:name=".plugins.mitm.DNSSpoofing"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
             android:name=".plugins.mitm.hijacker.Hijacker"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_main" />

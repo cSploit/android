@@ -319,6 +319,10 @@
     <string name="wifi_error_keys">Could not generate keys.</string>
     <string name="wifi_scan_finished">Scanning finished.</string>
 
+    <string name="mitm_dns_spoofing">DNS Spoofing</string>
+    <string name="mitm_dns_spoofing_desc">Redirect domains to a different web/IP</string>
+    <string name="mitm_dns_spoofing_list_saved">Saved</string>
+
     <!-- preferences -->
     <string name="pref_general">General</string>
     <string name="pref_modules">Modules</string>

@@ -52,6 +52,12 @@ public class Ettercap extends Tool
     public abstract void onReady();
   }
 
+
+    public abstract static class OnEventReceiver extends Child.EventReceiver {
+      public abstract void onEvent(Event e);
+      public abstract void onStderr(String line);
+    }
+
   public Child dissect(Target target, OnAccountListener listener) throws ChildManager.ChildNotStartedException {
     StringBuilder sb = new StringBuilder();
 
@@ -73,6 +79,35 @@ public class Ettercap extends Tool
       sb.append(target.getCommandLineRepresentation());
       sb.append("// ///");
     }
+
+    return super.async(sb.toString(), listener);
+  }
+
+  public Child dnsSpoof(Target target, OnEventReceiver listener) throws ChildManager.ChildNotStartedException {
+    StringBuilder sb = new StringBuilder();
+
+    sb.append("-Tq -P dns_spoof -i ");
+
+    try {
+      sb.append(System.getNetwork().getInterface().getDisplayName());
+    } catch (Exception e) {
+      System.errorLogging(e);
+      throw new ChildManager.ChildNotStartedException();
+    }
+
+    // poison the entire network
+    if(target.getType() == Target.Type.NETWORK) {
+      sb.append(" /// ///");
+      // router -> target poison
+    }
+    else {
+      sb.append(" /");
+      sb.append(target.getCommandLineRepresentation());
+      sb.append("// ");
+      sb.append(" ///");
+    }
+
+    //sb.append(" 1>&2 ");
 
     return super.async(sb.toString(), listener);
   }
