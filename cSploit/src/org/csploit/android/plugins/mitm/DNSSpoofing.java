@@ -33,9 +33,6 @@ import org.csploit.android.R;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Logger;
 import org.csploit.android.core.System;
-import org.csploit.android.events.Event;
-import org.csploit.android.events.Message;
-import org.csploit.android.events.Newline;
 import org.csploit.android.tools.Ettercap;
 
 import java.io.BufferedReader;
@@ -162,18 +159,14 @@ public class DNSSpoofing extends ActionBarActivity {
 	private void setStartedState() {
 
     try {
-      mSpoofSession.start(new Ettercap.OnEventReceiver() {
+      mSpoofSession.start(new Ettercap.OnDNSSpoofedReceiver() {
         @Override
-        public void onEvent(Event e) {
-            Logger.info("DNSSpoofing.onevent() e: " + e.toString());
+        public void onSpoofed(String line) {
+            Logger.info("DNSSpoofing.onevent() line: " + line);
 
-            if (e instanceof Message) {
-                Message m = (Message) e;
-                Logger.info("DNSSpoofing.OnEvent() error message from ettercap: " + m);
-            }
-            else if (e instanceof Newline){
-                Logger.info("DNSSpoofing.OnEvent() NewLine: " + e);
-            }
+            if (line.contains("spoofed to"))
+                Toast.makeText(DNSSpoofing.this, line, Toast.LENGTH_LONG).show();
+
         }
 
         @Override
@@ -181,6 +174,10 @@ public class DNSSpoofing extends ActionBarActivity {
         {
             if (line.contains("spoofed to"))
                 Toast.makeText(DNSSpoofing.this, line, Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onReady(){
         }
 
         @Override

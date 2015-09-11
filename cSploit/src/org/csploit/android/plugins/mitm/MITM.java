@@ -474,7 +474,7 @@ public class MITM extends Plugin
               (
                getString(R.string.mitm_dns_spoofing),
                getString(R.string.mitm_dns_spoofing_desc),
-               R.drawable.action_passwords,
+               R.drawable.action_redirect,
                new OnClickListener() {
                @Override
                public void onClick(View v) {

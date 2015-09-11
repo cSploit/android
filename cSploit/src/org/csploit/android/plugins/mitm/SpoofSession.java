@@ -18,14 +18,15 @@
  */
 package org.csploit.android.plugins.mitm;
 
+import org.csploit.android.R;
 import org.csploit.android.core.Child;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.System;
 import org.csploit.android.net.Target;
 import org.csploit.android.tools.ArpSpoof;
-import org.csploit.android.tools.Ettercap;
 import org.csploit.android.tools.Ettercap.OnAccountListener;
-import org.csploit.android.R;
+import org.csploit.android.tools.Ettercap.OnDNSSpoofedReceiver;
+
 
 public class SpoofSession
 {
@@ -130,15 +131,15 @@ public class SpoofSession
     }
   }
 
-  public void start(final Ettercap.OnEventReceiver listener) throws ChildManager.ChildNotStartedException {
+  public void start(final OnDNSSpoofedReceiver listener) throws ChildManager.ChildNotStartedException {
 
-      mArpSpoofProcess =
-              System.getTools().arpSpoof.spoof(System.getCurrentTarget(), new ArpSpoof.ArpSpoofReceiver() {
-                @Override
-                public void onError(String line) {
-                  SpoofSession.this.stop();
-                }
-              });
+    mArpSpoofProcess =
+            System.getTools().arpSpoof.spoof(System.getCurrentTarget(), new ArpSpoof.ArpSpoofReceiver() {
+              @Override
+              public void onError(String line) {
+                SpoofSession.this.stop();
+              }
+            });
 
 
     try {

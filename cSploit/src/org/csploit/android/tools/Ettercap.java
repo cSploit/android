@@ -21,9 +21,11 @@ package org.csploit.android.tools;
 import org.csploit.android.core.Child;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Logger;
+import org.csploit.android.core.System;
 import org.csploit.android.events.Account;
 import org.csploit.android.events.Event;
-import org.csploit.android.core.System;
+import org.csploit.android.events.Message;
+import org.csploit.android.events.Newline;
 import org.csploit.android.events.Ready;
 import org.csploit.android.net.Target;
 
@@ -53,9 +55,33 @@ public class Ettercap extends Tool
   }
 
 
-    public abstract static class OnEventReceiver extends Child.EventReceiver {
-      public abstract void onEvent(Event e);
+  // TODO: ettercap has only implemented the onAccount() event
+    public static abstract class OnDNSSpoofedReceiver extends Child.EventReceiver {
+      @Override
+      public void onEvent(Event e) {
+        Logger.info("OnDNSSpooferReceiver() event: " + e);
+
+        if(e instanceof Ready) {
+          onReady();
+        }
+        else if(e instanceof Message) {
+          Logger.info("OnDNSSpooferReceiver() message: " + e);
+          Message m = (Message)e;
+          if (m.severity == Message.Severity.ERROR)
+            onEnd(0);
+        }
+        else if (e instanceof Newline){
+          Logger.info("OnDNSSpooferReceiver() Newline: " + e.toString());
+          onSpoofed(e.toString());
+        }
+        else {
+          onSpoofed(e.toString());
+        }
+      }
+      public abstract void onEnd(int exitValue);
+      public abstract void onSpoofed(String line);
       public abstract void onStderr(String line);
+      public abstract void onReady();
     }
 
   public Child dissect(Target target, OnAccountListener listener) throws ChildManager.ChildNotStartedException {
@@ -83,7 +109,7 @@ public class Ettercap extends Tool
     return super.async(sb.toString(), listener);
   }
 
-  public Child dnsSpoof(Target target, OnEventReceiver listener) throws ChildManager.ChildNotStartedException {
+  public Child dnsSpoof(Target target, OnDNSSpoofedReceiver listener) throws ChildManager.ChildNotStartedException {
     StringBuilder sb = new StringBuilder();
 
     sb.append("-Tq -P dns_spoof -i ");
