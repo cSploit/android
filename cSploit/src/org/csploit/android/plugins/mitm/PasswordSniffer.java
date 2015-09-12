@@ -247,9 +247,6 @@ public class PasswordSniffer extends ActionBarActivity {
 				startActivityForResult(_fields, 0);
 
 				return true;
-			case R.id.action_filters:
-				Toast.makeText(this, "not implemented. yet", Toast.LENGTH_SHORT).show();
-				return true;
 			case android.R.id.home:
 
 				onBackPressed();
