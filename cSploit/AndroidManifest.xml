@@ -127,6 +127,11 @@
             android:name=".plugins.PacketForger"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_main" />
+        <activity
+            android:name=".gui.FileEdit"
+            android:label="@string/title_activity_file_edit"
+            android:parentActivityName=".plugins.mitm.PasswordSniffer" >
+        </activity>
     </application>
 
 </manifest>
