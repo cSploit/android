@@ -9,13 +9,6 @@ Copyleft Margaritelli of Simone aka evilsocket and then fused with zANTI2 contin
 
 -------------
 
-I'm too busy right now, please check News on our official website.
-Project is __NOT__ dead, I just need some time to graduate.
-
-Sorry for that guys, tux-mind.
-
--------------
-
 cSploit is an Android network analysis and penetration suite which aims to offer to IT security experts/geeks
 **the most complete and advanced professional toolkit** to perform network security assesments on a mobile device.
 
@@ -33,6 +26,7 @@ Requirements
 - An Android device with at least the 2.3 ( Gingerbread ) version of the OS.
 - The device **must be rooted**.
 - The device must have a BusyBox **full install**, this means with **every** utility installed ( not the partial installation ).
+- You must install the SuperSu app.
 
 
 Disclaimer
