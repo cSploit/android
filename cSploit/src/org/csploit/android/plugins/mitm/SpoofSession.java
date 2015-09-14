@@ -97,10 +97,10 @@ public class SpoofSession
     System.setForwarding(true);
 
     if (mWithProxy) {
-      System.getTools().ipTables.portRedirect(80, System.HTTP_PROXY_PORT, true);
-
       if (System.getSettings().getBoolean("PREF_HTTPS_REDIRECT", true))
-        System.getTools().ipTables.portRedirect(443, System.HTTPS_REDIR_PORT, false);
+        System.getTools().ipTables.portRedirect(443, System.HTTPS_REDIR_PORT);
+
+      System.getTools().ipTables.portRedirect(80, System.HTTP_PROXY_PORT);
     }
 
     listener.onSessionReady();

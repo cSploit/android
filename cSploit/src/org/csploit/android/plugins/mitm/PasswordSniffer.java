@@ -247,14 +247,14 @@ public class PasswordSniffer extends ActionBarActivity {
 				startActivityForResult(_fields, 0);
 
 				return true;
-			case android.R.id.home:
+		case android.R.id.home:
 
-				onBackPressed();
+			onBackPressed();
 
-				return true;
+			return true;
 
-			default:
-				return super.onOptionsItemSelected(item);
+		default:
+			return super.onOptionsItemSelected(item);
 		}
 	}
 
