@@ -8,7 +8,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import org.csploit.android.R;
-import org.csploit.android.core.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,11 +33,8 @@ public class FileEdit extends ActionBarActivity {
 
         if (getIntent() != null && getIntent().getExtras() != null && getIntent().getExtras().getString(KEY_FILEPATH) != null) {
             mPath = getFilesDir().getAbsolutePath() + getIntent().getExtras().getString(KEY_FILEPATH);
-            Logger.info("Path: " + mPath);
             mFileEditText.setText(loadFile(mPath));
         }
-        else
-            Toast.makeText(this, "No file path provided, nothing to load, nothing to save", Toast.LENGTH_LONG).show();
 
 
         mCmdSave.setOnClickListener(new View.OnClickListener() {
@@ -46,8 +42,6 @@ public class FileEdit extends ActionBarActivity {
             public void onClick(View view) {
                 if (mPath != null)
                     saveFile(mFileEditText.getText().toString(), mPath);
-                else
-                    Toast.makeText(view.getContext(), "No file path provided, nothing to load, nothing to save", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -70,7 +64,6 @@ public class FileEdit extends ActionBarActivity {
         }
         catch (Exception e){
             Toast.makeText(this, "Error loading \"" + _path + "\"\n\n" + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-            Logger.error("loadFile error: " + e.getLocalizedMessage());
         }
         finally {
             try {
@@ -86,12 +79,11 @@ public class FileEdit extends ActionBarActivity {
     public boolean saveFile (String _file_text, String _path){
         FileOutputStream fos = null;
         try{
-            Logger.info("saveDNSList() saving dnss to: " + _path);
             File f = new File(_path);
             fos = new FileOutputStream(f);
             fos.write(_file_text.getBytes());
 
-            Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.saved), Toast.LENGTH_SHORT).show();
 
             return true;
         }
