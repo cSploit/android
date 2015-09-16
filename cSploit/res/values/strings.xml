@@ -307,6 +307,9 @@
     <string name="menu_submit_issue">Submit Issue</string>
     <string name="menu_about">About</string>
 
+    <string name="iface_dialog_title">Choose a network interface</string>
+    <string name="iface_error_no_available">There\'re no network interfaces available</string>
+
     <string name="scanner_select_ports">Select Custom Ports</string>
 
     <string name="wifi_initializing">Initializing &#8230;</string>
@@ -427,6 +430,7 @@
     
     <string name="menu_add">Add</string>
     <string name="menu_scan">Scan</string>
+    <string name="menu_ifaces">Net interfaces</string>
     <string name="menu_wifi_scan">WiFi Scan</string>
     <string name="menu_stop_msfrpcd">Stop msfrpcd</string>
     

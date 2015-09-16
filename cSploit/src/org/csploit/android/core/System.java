@@ -38,6 +38,7 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.util.SparseIntArray;
+import android.widget.Toast;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
@@ -145,10 +146,10 @@ public class System
 
   private final static LinkedList<SettingReceiver> mSettingReceivers = new LinkedList<SettingReceiver>();
 
-  public static void init(Context context) throws Exception{
+  public static void init(Context context, String iface) throws Exception{
     mContext = context;
     try{
-      Logger.debug("initializing System...");
+      Logger.debug("initializing System...iface: " + ((iface == null) ? "" : iface));
       mStoragePath = getSettings().getString("PREF_SAVE_PATH", Environment.getExternalStorageDirectory().toString());
       mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
       mKnownIssues = new KnownIssues();
@@ -187,19 +188,11 @@ public class System
         HTTPS_REDIR_PORT = 8082;
       }
 
-      // initialize network data at the end
-      mNetwork = new Network(mContext);
-
-      Target network = new Target(mNetwork),
-        gateway = new Target(mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware()),
-        device = new Target(mNetwork.getLocalAddress(), mNetwork.getLocalHardware());
-
-      gateway.setAlias(mNetwork.getSSID());
-      device.setAlias(android.os.Build.MODEL);
-
-      mTargets.add(network);
-      mTargets.add(gateway);
-      mTargets.add(device);
+      if (iface == null){
+        Logger.warning("network interface null, not initiating");
+        mInitialized = false;
+        return;
+      }
 
       mInitialized = true;
     }
@@ -339,9 +332,9 @@ public class System
     mCoreInitialized = true;
   }
 
-  public static void reloadNetworkMapping(){
+  public static void reloadNetworkMapping(String iface){
     try{
-      mNetwork = new Network(mContext);
+      mNetwork = new Network(mContext, iface);
 
       Target network = new Target(mNetwork),
         gateway = new Target(mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware()),
@@ -366,7 +359,11 @@ public class System
   }
 
   public static boolean checkNetworking(final Activity current){
-    if(!Network.isWifiConnected(mContext)){
+    if(!Network.isWifiConnected(mContext) && !mNetwork.isConnectivityAvailable(mContext)){
+      if (current == null){
+        Toast.makeText(mContext, "Error accesing The Net", Toast.LENGTH_SHORT).show();
+        return false;
+      }
       AlertDialog.Builder builder = new AlertDialog.Builder(current);
 
       builder.setCancelable(false);
@@ -928,6 +925,9 @@ public class System
   }
 
   public static boolean isInitialized(){
+    if (mNetwork == null || mNetwork.isConnected() == false || mNetwork.getInterface() == null)
+      return false;
+
     return mInitialized;
   }
 
@@ -1080,7 +1080,11 @@ public class System
   }
 
   public static void registerPlugin(Plugin plugin){
-    mPlugins.add(plugin);
+    if (mPlugins.contains(plugin)){
+      Logger.warning("registerPlugin() plugin " + plugin.getName() + " already added");
+    }
+    else
+      mPlugins.add(plugin);
   }
 
   public static ArrayList<Plugin> getPlugins(){
