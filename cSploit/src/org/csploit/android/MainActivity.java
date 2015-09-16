@@ -166,6 +166,8 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
             invalidateOptionsMenu();
 
+        configureMenu(mMenu, false);
+
         mIsOnlineLayout = false;
     }
 
@@ -176,8 +178,11 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         if (mUpdateStatus != null)
             mUpdateStatus.setVisibility(View.INVISIBLE);
 
-        if (mTargetAdapter != null)
+        if (mIsOnlineLayout && mTargetAdapter != null) {
+            configureMenu(mMenu, true);
+            mTargetAdapter.notifyDataSetChanged();
             return;
+        }
 
         mTargetAdapter = new TargetAdapter();
 
@@ -315,7 +320,7 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
 
         mIfacesList = new String[Network.getAvailableInterfaces().size()];
         isAnyNetInterfaceAvailable = (mIfacesList.length > 0);
-        connectivityAvailable = Network.isConnectivityAvailable(this);
+        connectivityAvailable = Network.isConnectivityAvailable(this)|| Network.isWifiConnected(this);
 
         boolean coreInstalled = System.isCoreInstalled();
         boolean coreBeating = System.isCoreInitialized();
@@ -384,19 +389,22 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
 
-        if (!isAnyNetInterfaceAvailable) {
-            menu.findItem(R.id.add).setVisible(false);
-            menu.findItem(R.id.scan).setVisible(false);
-            menu.findItem(R.id.new_session).setEnabled(false);
-            menu.findItem(R.id.save_session).setEnabled(false);
-            menu.findItem(R.id.restore_session).setEnabled(false);
-            menu.findItem(R.id.ss_monitor).setEnabled(false);
-            menu.findItem(R.id.ss_msfrpcd).setEnabled(false);
-        }
-
         mMenu = menu;
+        configureMenu(mMenu, isAnyNetInterfaceAvailable);
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    public void configureMenu (Menu menu, boolean enabled){
+        if (menu != null) {
+            menu.findItem(R.id.add).setVisible(enabled);
+            menu.findItem(R.id.scan).setVisible(enabled);
+            menu.findItem(R.id.new_session).setEnabled(enabled);
+            menu.findItem(R.id.save_session).setEnabled(enabled);
+            menu.findItem(R.id.restore_session).setEnabled(enabled);
+            menu.findItem(R.id.ss_monitor).setEnabled(enabled);
+            menu.findItem(R.id.ss_msfrpcd).setEnabled(enabled);
+        }
     }
 
     @Override
@@ -440,6 +448,7 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
                 Toast.makeText(this, getString(R.string.iface_error_no_available), Toast.LENGTH_LONG).show();
                 return;
             }
+            configureMenu(mMenu, true);
             System.init(MainActivity.this.getApplicationContext(), mIface);
 
             System.registerPlugin(new RouterPwn());
@@ -489,26 +498,25 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         }
         else if (forceDialog == true || mIfacesList.length > 1) {
             String _title = getString(R.string.iface_dialog_title);
-            if (mIfacesList.length == 0)
+            if (mIfacesList.length == 0) {
                 _title = getString(R.string.iface_error_no_available);
+                isAnyNetInterfaceAvailable = false;
+                configureMenu(mMenu, false);
+            }
 
             new ListChoiceDialog(_title, mIfacesList, MainActivity.this, new ChoiceDialog.ChoiceDialogListener() {
                 @Override
                 public void onChoice(int _iface_selected) {
                     mIface = mIfacesList[_iface_selected];
 
-                    if (forceDialog) {
-                        System.reloadNetworkMapping(mIface);
-                        stopNetworkRadar(true);
-                        startNetworkRadar(true);
+                    System.reloadNetworkMapping(mIface);
+                    isAnyNetInterfaceAvailable = true;
+                    createOnlineLayout();
 
-                        if (mIsOnlineLayout == false)
-                            createOnlineLayout();
-                    }
-                    else {
-                        createOnlineLayout();
+                    if (forceDialog == false)
                         initSystem();
-                    }
+                    else
+                        startNetworkRadar(true);
                 }
             }).show();
         }
@@ -624,7 +632,7 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         stopNetworkRadar(silent);
 
         if (isAnyNetInterfaceAvailable && mIface == null) {
-            displayNetworkInterfaces(false);
+            displayNetworkInterfaces(true);
             return;
         }
         else if (!isAnyNetInterfaceAvailable){
