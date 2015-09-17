@@ -39,7 +39,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -122,6 +121,10 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
     private static String mIface = null;
     private String[] mIfacesList = null;
     private boolean mIsOnlineLayout = false;
+    private boolean mIsCoreInstalled = false;
+    private boolean mIsDaemonBeating = false;
+    private boolean mIsConnectivityAvailable = false;
+    private boolean mIsUpdateDownloading = false;
 
     private void createUpdateStatusText() {
         if (mUpdateStatus != null) return;
@@ -148,10 +151,10 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
             mUpdateStatus
                     .setText(UPDATE_MESSAGE.replace("#STATUS#", "..."));
 
-        mUpdateReceiver.register(MainActivity.this);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
             invalidateOptionsMenu();
+
+        mUpdateReceiver.register(MainActivity.this);
     }
 
     private void createOfflineLayout() {
@@ -161,7 +164,8 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
 
         mUpdateStatus.setVisibility(View.VISIBLE);
 
-        mUpdateStatus.setText(getString(R.string.no_connectivity));
+        if (mUpdateStatus != null)
+            mUpdateStatus.setText(getString(R.string.no_connectivity));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
             invalidateOptionsMenu();
@@ -188,24 +192,6 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
 
         lv.setAdapter(mTargetAdapter);
 
-        lv.setOnItemLongClickListener(new OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Target t = System.getTarget(position);
-                if (t.getType() == Target.Type.NETWORK) {
-                    if (mActionMode == null)
-                        targetAliasPrompt(t);
-                    return true;
-                }
-                if (mActionMode == null) {
-                    mTargetAdapter.clearSelection();
-                    mActionMode = startSupportActionMode(mActionModeCallback);
-                }
-                mTargetAdapter.toggleSelection(position);
-                return true;
-            }
-        });
-
         mRadarReceiver.register(MainActivity.this);
         mUpdateReceiver.register(MainActivity.this);
         mWipeReceiver.register(MainActivity.this);
@@ -214,6 +200,7 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
             invalidateOptionsMenu();
 
+        configureMenu(mMenu, true);
         mIsOnlineLayout = true;
     }
 
@@ -222,12 +209,8 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
                                     Intent intent) {
         if (requestCode == WIFI_CONNECTION_REQUEST && resultCode == RESULT_OK
                 && intent.hasExtra(WifiScannerActivity.CONNECTED)) {
-            System.reloadNetworkMapping(mIface);
-            try {
-                onCreate(null);
-            } catch (IllegalStateException e) {
-                // already attached.  don't reattach.
-            }
+
+            init();
         }
     }
 
@@ -259,9 +242,7 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                System.reloadNetworkMapping(mIface);
-                createOnlineLayout();
-                startNetworkRadar(true);
+                init();
             }
         });
     }
@@ -271,7 +252,6 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         super.onCreate(savedInstanceState);
         SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
         Boolean isDark = themePrefs.getBoolean("isDark", false);
-        boolean connectivityAvailable;
 
         if (isDark)
             setTheme(R.style.DarkTheme);
@@ -279,14 +259,17 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
             setTheme(R.style.AppTheme);
 
         setContentView(R.layout.target_layout);
-        mUpdateStatus = new TextView(this);
-        RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
-        LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT);
-        mUpdateStatus.setGravity(Gravity.CENTER);
-        mUpdateStatus.setLayoutParams(params);
-        layout.addView(mUpdateStatus);
-        mUpdateStatus.setVisibility(View.GONE);
+
+        if (mUpdateStatus == null) {
+            mUpdateStatus = new TextView(this);
+            RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
+            LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT,
+                    LayoutParams.MATCH_PARENT);
+            mUpdateStatus.setGravity(Gravity.CENTER);
+            mUpdateStatus.setLayoutParams(params);
+            layout.addView(mUpdateStatus);
+            mUpdateStatus.setVisibility(View.GONE);
+        }
 
         lv = (ListView) findViewById(R.id.android_list);
         lv.setOnItemClickListener(new ListView.OnItemClickListener() {
@@ -318,27 +301,61 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
             }
         });
 
+        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Target t = System.getTarget(position);
+                if (t.getType() == Target.Type.NETWORK) {
+                    if (mActionMode == null)
+                        targetAliasPrompt(t);
+                    return true;
+                }
+                if (mActionMode == null) {
+                    mTargetAdapter.clearSelection();
+                    mActionMode = startSupportActionMode(mActionModeCallback);
+                }
+                mTargetAdapter.toggleSelection(position);
+                return true;
+            }
+        });
+
+        init();
+
+    }
+
+    /**
+     * Performs the firsts actions when the app starts.
+     * called also when the user connects to a wifi from the app, and when the core is updated.
+     *
+     */
+    public void init(){
         mIfacesList = new String[Network.getAvailableInterfaces().size()];
         isAnyNetInterfaceAvailable = (mIfacesList.length > 0);
-        connectivityAvailable = Network.isConnectivityAvailable(this)|| Network.isWifiConnected(this);
+        mIsConnectivityAvailable = isConnectivityAvailable();
 
-        boolean coreInstalled = System.isCoreInstalled();
-        boolean coreBeating = System.isCoreInitialized();
+        mIsCoreInstalled = System.isCoreInstalled();
+        mIsDaemonBeating = System.isCoreInitialized();
 
         // check minimum requirements for system initialization
 
-        if (!coreInstalled) {
+        if (!mIsCoreInstalled) {
             UPDATE_MESSAGE = getString(R.string.missing_core_update);
 
-            createUpdateLayout();
-            startUpdateChecker();
+            if (mIsConnectivityAvailable) {
+                createUpdateLayout();
+                startUpdateChecker();
+            }
+            else {
+                UPDATE_MESSAGE += "\n\n" + getString(R.string.no_connectivity);
+                createUpdateLayout();
+            }
 
             return;
         }
-        if (!coreBeating) {
+        if (mIsDaemonBeating == false) {
             try {
                 System.initCore();
-                coreBeating = true;
+                mIsDaemonBeating = System.isCoreInitialized();
 
                 if(Client.hadCrashed()) {
                     Logger.warning("Client has previously crashed, building a crash report.");
@@ -347,18 +364,20 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
                 }
             } catch (System.SuException e) {
                 onInitializationError(getString(R.string.only_4_root));
+                mIsDaemonBeating = false;
                 return;
             } catch (System.DaemonException e) {
                 Logger.error(e.getMessage());
 
                 UPDATE_MESSAGE = getString(R.string.heart_attack_update);
-                createOfflineLayout();
+                createUpdateLayout();
+                mIsDaemonBeating = false;
             }
         }
         // still not beating
         if (System.isCoreInitialized() == false) {
             UPDATE_MESSAGE = getString(R.string.heart_attack_update);
-            createOfflineLayout();
+            createUpdateLayout();
             return;
         }
 
@@ -383,7 +402,6 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
             createOfflineLayout();
         }
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -393,6 +411,15 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         configureMenu(mMenu, isAnyNetInterfaceAvailable);
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    public boolean isSystemReady(){
+        return mIsCoreInstalled && mIsDaemonBeating;
+    }
+
+    public boolean isConnectivityAvailable(){
+        mIsConnectivityAvailable = Network.isConnectivityAvailable(this)|| Network.isWifiConnected(this);
+        return mIsConnectivityAvailable;
     }
 
     public void configureMenu (Menu menu, boolean enabled){
@@ -484,7 +511,20 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
      * @param forceDialog forces to show the dialog even if there's only one interface
      */
     private void displayNetworkInterfaces (final boolean forceDialog){
-        // reload the interfaces list if we'''ve invoked the dialog from the menu
+        // this needs to be checked from this function, since it can be called from the menu
+        if (mIsCoreInstalled == false) {
+            Toast.makeText(this, getString(R.string.missing_core_update).replace("#STATUS#", ""), Toast.LENGTH_LONG).show();
+            if (forceDialog && mIsUpdateDownloading == false)
+                startUpdateChecker();
+
+            return ;
+        }
+        if (mIsDaemonBeating == false){
+            Toast.makeText(this, getString(R.string.heart_attack).replace("#STATUS#", "Restart the app."), Toast.LENGTH_LONG).show();
+            return ;
+        }
+
+        // reload the interfaces list if we've invoked the dialog from the menu
         if (forceDialog)
             mIfacesList = new String[Network.getAvailableInterfaces().size()];
 
@@ -492,9 +532,12 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
 
         if (forceDialog == false && mIfacesList.length == 1){
             mIface = mIfacesList[0];
-            System.reloadNetworkMapping(mIface);
-            createOnlineLayout();
-            initSystem();
+            if (System.reloadNetworkMapping(mIface) == true) {
+                createOnlineLayout();
+                initSystem();
+            }
+            else
+                Toast.makeText(MainActivity.this, "Error initializating " + mIface, Toast.LENGTH_LONG).show();
         }
         else if (forceDialog == true || mIfacesList.length > 1) {
             String _title = getString(R.string.iface_dialog_title);
@@ -509,14 +552,20 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
                 public void onChoice(int _iface_selected) {
                     mIface = mIfacesList[_iface_selected];
 
-                    System.reloadNetworkMapping(mIface);
-                    isAnyNetInterfaceAvailable = true;
-                    createOnlineLayout();
+                    if (System.reloadNetworkMapping(mIface) == true) {
+                        isAnyNetInterfaceAvailable = true;
+                        createOnlineLayout();
 
-                    if (forceDialog == false)
-                        initSystem();
-                    else
-                        startNetworkRadar(true);
+                        if (forceDialog == false)
+                            initSystem();
+                        else
+                            startNetworkRadar(true);
+                    }
+                    else{
+                        Toast.makeText(MainActivity.this, "Error initializating " + mIface
+                                + ((mIfacesList.length > 0) ? ". Select another interface from the list" : ""),
+                                Toast.LENGTH_LONG).show();
+                    }
                 }
             }).show();
         }
@@ -621,16 +670,20 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
     };
 
     public void startUpdateChecker() {
+        if (isConnectivityAvailable() == false || mIsUpdateDownloading)
+            return;
+
         if (System.getSettings().getBoolean("PREF_CHECK_UPDATES", true)) {
             new UpdateChecker(this).start();
+            mIsUpdateDownloading = true;
         } else {
             MainActivity.this.sendBroadcast(new Intent(UPDATE_NOT_AVAILABLE));
+            mIsUpdateDownloading = false;
         }
     }
 
     public void startNetworkRadar(boolean silent) {
-        stopNetworkRadar(silent);
-
+        // in order to start the network radar, we need: 1) an interface up and configured, 2) the daemon up and listening
         if (isAnyNetInterfaceAvailable && mIface == null) {
             displayNetworkInterfaces(true);
             return;
@@ -638,6 +691,12 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         else if (!isAnyNetInterfaceAvailable){
             return;
         }
+        else if (mIsDaemonBeating == false) {
+            Toast.makeText(this, getString(R.string.heart_attack_update).replace("#STATUS#", " Restart the app."), Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        stopNetworkRadar(silent);
 
         if (mNetworkRadar == null) {
             Logger.info("mNetworkRadar not initialized");
@@ -1312,10 +1371,12 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
                             i.putExtra(UpdateService.ACTION, target);
 
                             startService(i);
+                            mIsUpdateDownloading = true;
                         }
 
                         @Override
                         public void onCancel() {
+                            mIsUpdateDownloading = false;
                             if (!mandatory) {
                                 return;
                             }
@@ -1347,11 +1408,13 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
                     break;
             }
 
+            mIsUpdateDownloading = false;
             // restart update checker after a successful update
             startUpdateChecker();
         }
 
         private void onUpdateError(UpdateService.action target, final int message) {
+            mIsUpdateDownloading = false;
 
             if (target == UpdateService.action.core_update) {
                 onInitializationError(getString(message));

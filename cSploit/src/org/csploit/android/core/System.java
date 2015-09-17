@@ -299,7 +299,7 @@ public class System
     Client.Shutdown();
     Client.Disconnect();
 
-    mInitialized = false;
+    mCoreInitialized = mInitialized = false;
   }
 
   public static void initCore() throws DaemonException, SuException {
@@ -312,16 +312,20 @@ public class System
     if(!Client.isConnected()) {
       if(!Client.Connect(socket_path)) {
         startCoreDaemon();
-        if (!Client.Connect(socket_path))
+        if (!Client.Connect(socket_path)) {
+          mCoreInitialized = false;
           throw new DaemonException("cannot connect to core daemon");
+        }
       }
     }
 
     if (!Client.isAuthenticated() && !Client.Login("android", "DEADBEEF")) {
+      mCoreInitialized = false;
       throw new DaemonException("cannot login to core daemon");
     }
 
     if (!Client.LoadHandlers()) {
+      mCoreInitialized = false;
       throw new DaemonException("cannot load handlers");
     }
 
@@ -332,9 +336,11 @@ public class System
     mCoreInitialized = true;
   }
 
-  public static void reloadNetworkMapping(String iface){
+  public static boolean reloadNetworkMapping(String iface){
     try{
       mNetwork = new Network(mContext, iface);
+      if (mNetwork.getInterface() == null)
+        return false;
 
       Target network = new Target(mNetwork),
         gateway = new Target(mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware()),
@@ -349,6 +355,7 @@ public class System
       mTargets.add(device);
 
       mInitialized = true;
+      return mInitialized;
     }
     catch(NoRouteToHostException nrthe){
       // swallow bitch
@@ -356,6 +363,9 @@ public class System
     catch(Exception e){
       errorLogging(e);
     }
+
+    mInitialized = false;
+    return mInitialized;
   }
 
   public static boolean checkNetworking(final Activity current){
@@ -925,7 +935,7 @@ public class System
   }
 
   public static boolean isInitialized(){
-    if (mNetwork == null || mNetwork.isConnected() == false || mNetwork.getInterface() == null)
+    if (mNetwork == null || mNetwork.isConnected() == false || mNetwork.getInterface() == null && mCoreInitialized)
       return false;
 
     return mInitialized;

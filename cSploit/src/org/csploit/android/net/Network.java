@@ -22,18 +22,16 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
 import android.net.NetworkInfo;
-import android.net.RouteInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.telephony.TelephonyManager;
-import android.widget.Toast;
 
 import org.apache.commons.net.util.SubnetUtils;
+import org.csploit.android.core.Logger;
+import org.csploit.android.core.System;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
@@ -43,9 +41,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-
-import org.csploit.android.core.Logger;
-import org.csploit.android.core.System;
 
 public class Network
 {
@@ -124,16 +119,17 @@ public class Network
     mNetmask = getNetmask();
     mBase = new IP4Address(mInfo.netmask & mInfo.gateway);
 
-    if(isConnected() == false){
+    if(iface != null){
       if (initNetworkInterface(iface) == false) {
         try {
-          throw new Exception("Invalid wifi or not initialized yet");
+          throw new Exception("Invalid network interface or not initialized yet");
         } catch (Exception e) {
           e.printStackTrace();
         }
+        mInterface = null;
       }
     }
-    else{
+    else if (iface == null || isConnected()){
       try{
         mInterface = NetworkInterface.getByInetAddress(getLocalAddress());
         if(mInterface == null)
