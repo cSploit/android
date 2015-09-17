@@ -21,25 +21,26 @@ allprojects {
 apply plugin:  'com.android.application'
 
 dependencies {
-    compile 'com.android.support:support-v4:22.2.1'
-    compile 'com.android.support:appcompat-v7:22.2.1'
-    compile 'org.apache.commons:commons-compress:1.9'
-    compile 'org.apache.commons:commons-compress:1.9:sources'
+    compile 'com.android.support:support-v4:23.0.1'
+    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'org.apache.commons:commons-compress:1.10'
+    compile 'org.apache.commons:commons-compress:1.10:sources'
     compile 'commons-net:commons-net:3.3'
     compile 'junit:junit:4.12'
-    compile 'joda-time:joda-time:2.7'
+    compile 'joda-time:joda-time:2.8.2'
     compile 'com.github.zafarkhaja:java-semver:0.9.0'
     compile 'com.sksamuel.diff:diff:1.1.11'
     compile 'org.unbescape:unbescape:1.1.1.RELEASE'
-    compile 'org.msgpack:msgpack:0.6.11'
+    compile 'org.msgpack:msgpack:0.6.12'
     compile 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
     compile 'org.tukaani:xz:1.5'
     compile 'ch.acra:acra:4.6.2'
 }
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    compileSdkVersion 23
+    buildToolsVersion '23.0.1'
+    useLibrary 'org.apache.http.legacy'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
