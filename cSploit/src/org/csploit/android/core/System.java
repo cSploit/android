@@ -120,9 +120,6 @@ public class System
   // registered plugins
   private static ArrayList<Plugin> mPlugins = null;
   private static Plugin mCurrentPlugin = null;
-  // toolbox singleton
-  private static ToolBox mTools = new ToolBox();
-
   private static HTTPSRedirector mRedirector = null;
   private static Proxy mProxy = null;
   private static Server mServer = null;
@@ -144,6 +141,9 @@ public class System
   private static KnownIssues mKnownIssues = null;
 
   private final static LinkedList<SettingReceiver> mSettingReceivers = new LinkedList<SettingReceiver>();
+
+  // toolbox singleton
+  private static ToolBox mTools = new ToolBox();
 
   public static void init(Context context) throws Exception{
     mContext = context;
