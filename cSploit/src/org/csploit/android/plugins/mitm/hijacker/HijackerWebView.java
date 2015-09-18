@@ -32,9 +32,10 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import org.apache.http.impl.cookie.BasicClientCookie;
 import org.csploit.android.R;
 import org.csploit.android.core.System;
+
+import java.net.HttpCookie;
 
 public class HijackerWebView extends ActionBarActivity {
 	private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4";
@@ -97,7 +98,7 @@ public class HijackerWebView extends ActionBarActivity {
 		if (session != null) {
 			String domain = null, rawcookie = null;
 
-			for (BasicClientCookie cookie : session.mCookies.values()) {
+			for (HttpCookie cookie : session.mCookies.values()) {
 				domain = cookie.getDomain();
 				rawcookie = cookie.getName() + "=" + cookie.getValue()
 						+ "; domain=" + domain + "; path=/"

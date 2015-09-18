@@ -1,7 +1,9 @@
 package org.csploit.android.plugins.mitm.hijacker;
 
 import android.graphics.Bitmap;
-import org.apache.http.impl.cookie.BasicClientCookie;
+
+import org.csploit.android.core.System;
+import org.csploit.android.net.http.RequestParser;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,12 +11,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpCookie;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-import org.csploit.android.core.System;
-import org.csploit.android.net.http.RequestParser;
 
 public class Session
 {
@@ -25,10 +26,10 @@ public class Session
   public String mAddress = "";
   public String mDomain = "";
   public String mUserAgent = "";
-  public HashMap<String, BasicClientCookie> mCookies = null;
+  public HashMap<String, HttpCookie> mCookies = null;
 
   public Session(){
-    mCookies = new HashMap<String, BasicClientCookie>();
+    mCookies = new HashMap<String, HttpCookie>();
   }
 
   public String getFileName(){
@@ -50,7 +51,7 @@ public class Session
     builder.append(mUserAgent).append("\n");
     builder.append(mCookies.size()).append("\n");
 
-    for(BasicClientCookie cookie : mCookies.values()){
+    for(HttpCookie cookie : mCookies.values()){
       builder
         .append(cookie.getName()).append( "=" ).append(cookie.getValue())
         .append( "; domain=").append(cookie.getDomain())
@@ -127,9 +128,9 @@ public class Session
         session.mDomain    = decodeLine( reader );
         session.mUserAgent = decodeLine( reader );
 
-        for(int i = 0, ncookies = decodeInteger( reader ); i < ncookies; i++ ){
-          ArrayList<BasicClientCookie> cookies = RequestParser.parseRawCookie(reader.readLine());
-          for(BasicClientCookie cookie : cookies){
+        for( int i = 0, ncookies = decodeInteger( reader ); i < ncookies; i++ ) {
+          ArrayList<HttpCookie> cookies = RequestParser.parseRawCookie(reader.readLine());
+          for (HttpCookie cookie : cookies) {
             session.mCookies.put(cookie.getName(), cookie);
           }
         }
