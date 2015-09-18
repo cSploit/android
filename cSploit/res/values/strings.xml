@@ -494,8 +494,8 @@
     <string name="menu_multiaction">Multi Action</string>
     <string name="menu_focusedscan">focused scan</string>
 
-    <string name="crash_dialog_title">cSploit has crashed</string>
-    <string name="crash_dialog_text">An unexpected error occurred forcing the application or an it\'s component to stop. Please help us fix this by sending us error data, all you have to do is click \'OK\'.</string>
-    <string name="crash_dialog_comment">You might add your comment about the problem below</string>
-    <string name="JNI_crash_detected">JNI library has previously crashed, I hope you sent the report.</string>
+    <string name="crash_dialog_title">cSploit has crashed.</string>
+    <string name="crash_dialog_text">An unexpected error occurred, forcing the application or a component to stop. You can help us identify and fix the issue by sending crash-related runtime data.  To do so, click \'OK\'.</string>
+    <string name="crash_dialog_comment">Please add a comment explaining what lead to the crash below.</string>
+    <string name="JNI_crash_detected">The JNI library has crashed previously.  Reporting the circumstances leading to the crash would be appreciated.</string>
 </resources>

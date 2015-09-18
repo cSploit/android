@@ -120,9 +120,6 @@ public class System
   // registered plugins
   private static ArrayList<Plugin> mPlugins = null;
   private static Plugin mCurrentPlugin = null;
-  // toolbox singleton
-  private static ToolBox mTools = new ToolBox();
-
   private static HTTPSRedirector mRedirector = null;
   private static Proxy mProxy = null;
   private static Server mServer = null;
@@ -145,12 +142,15 @@ public class System
 
   private final static LinkedList<SettingReceiver> mSettingReceivers = new LinkedList<SettingReceiver>();
 
+  // toolbox singleton
+  private static ToolBox mTools = new ToolBox();
+
   public static void init(Context context) throws Exception{
     mContext = context;
     try{
       Logger.debug("initializing System...");
       mStoragePath = getSettings().getString("PREF_SAVE_PATH", Environment.getExternalStorageDirectory().toString());
-      mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
+      mSessionName = "csploit-session-" + java.lang.System.currentTimeMillis();
       mKnownIssues = new KnownIssues();
       mPlugins = new ArrayList<Plugin>();
       mOpenPorts = new SparseIntArray(3);
@@ -509,9 +509,11 @@ public class System
   }
 
   public static void registerSettingListener(SettingReceiver receiver) {
-    synchronized (mSettingReceivers) {
-      if(!mSettingReceivers.contains(receiver)) {
-        mSettingReceivers.add(receiver);
+    if (mSettingReceivers != null) {
+      synchronized (mSettingReceivers) {
+        if (!mSettingReceivers.contains(receiver)) {
+          mSettingReceivers.add(receiver);
+        }
       }
     }
   }
