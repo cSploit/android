@@ -1014,7 +1014,7 @@ public class UpdateService extends IntentService
    * @throws java.util.concurrent.CancellationException if task is cancelled by user
    * @throws java.lang.InterruptedException when the the running thread get cancelled.
    */
-  private void extract() throws CancellationException, RuntimeException, IOException, InterruptedException, ChildManager.ChildNotStartedException {
+  private boolean extract() throws CancellationException, RuntimeException, IOException, InterruptedException, ChildManager.ChildNotStartedException {
     ArchiveInputStream is = null;
     ArchiveEntry entry;
     CountingInputStream counter;
@@ -1033,7 +1033,7 @@ public class UpdateService extends IntentService
     DiffMatchPatch dmp;
 
     if(mCurrentTask.path==null||mCurrentTask.outputDir==null)
-      return;
+      return false;
 
     mBuilder.setContentTitle(getString(R.string.extracting))
             .setContentText("")
@@ -1230,6 +1230,9 @@ public class UpdateService extends IntentService
       mBuilder.setContentInfo("")
               .setProgress(100, 100, true);
       mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+
+      return true;
+
     } finally {
       if(is != null)
         is.close();
@@ -1424,7 +1427,8 @@ public class UpdateService extends IntentService
         if (what_to_do == action.core_update)
           System.shutdownCoreDaemon();
 
-        extract();
+        if (extract())
+          createVersionFile();
 
         if (what_to_do == action.msf_update)
           installGems();
@@ -1434,7 +1438,6 @@ public class UpdateService extends IntentService
           System.initCore();
 
         deleteTemporaryFiles();
-        createVersionFile();
 
         mCurrentTask.errorOccurred = exitForError = false;
       }
