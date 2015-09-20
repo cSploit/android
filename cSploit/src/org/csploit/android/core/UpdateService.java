@@ -60,7 +60,6 @@ import java.net.URL;
 import java.security.KeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.CancellationException;
 
@@ -358,7 +357,7 @@ public class UpdateService extends IntentService
           mMsfInfo.versionString = msfRepo.getLastReleaseVersion();
           mMsfInfo.version = Version.valueOf(mMsfInfo.versionString);
 
-          mMsfInfo.name = "msf.zip";
+          mMsfInfo.name = "msf.tar.xz";
           mMsfInfo.path = String.format("%s/%s", System.getStoragePath(), mMsfInfo.name);
         }
 
@@ -371,7 +370,8 @@ public class UpdateService extends IntentService
 
         mMsfInfo.outputDir = System.getMsfPath();
         mMsfInfo.executableOutputDir = ExecChecker.msf().getRoot();
-        mMsfInfo.archiver = archiveAlgorithm.zip;
+        mMsfInfo.archiver = archiveAlgorithm.tar;
+        mMsfInfo.compression = compressionAlgorithm.xz;
         mMsfInfo.fixShebang = true;
 
         if (!mSettingReceiver.getFilter().contains("MSF_DIR")) {
