@@ -117,6 +117,7 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
     private long mLastBackPressTime = 0;
     private ActionMode mActionMode = null;
     private ListView lv;
+    private boolean isRootMissing = false;
 
     private void createUpdateStatusText() {
         if (mUpdateStatus != null) return;
@@ -243,7 +244,37 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         });
     }
 
+    private boolean startCore() {
+        isRootMissing = false;
+        try {
+            System.initCore();
+
+            return true;
+        } catch (System.SuException e) {
+            onInitializationError(getString(R.string.only_4_root));
+            isRootMissing = true;
+        } catch (System.DaemonException e) {
+            Logger.error(e.getMessage());
+        }
+
+        return false;
+    }
+
+    private void onCoreBeating() {
+        if(Client.hadCrashed()) {
+            Logger.warning("Client has previously crashed, building a crash report.");
+            CrashReporter.notifyNativeLibraryCrash();
+            onInitializationError(getString(R.string.JNI_crash_detected));
+        }
+    }
+
     private void onCoreUpdated() {
+        if(startCore()) {
+            onCoreBeating();
+        } else if ( isRootMissing ) {
+            return;
+        }
+
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -338,21 +369,12 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         boolean coreBeating = System.isCoreInitialized();
 
         if (coreInstalled && !coreBeating) {
-          try {
-            System.initCore();
-            coreBeating = true;
-
-            if(Client.hadCrashed()) {
-              Logger.warning("Client has previously crashed, building a crash report.");
-              CrashReporter.notifyNativeLibraryCrash();
-              onInitializationError(getString(R.string.JNI_crash_detected));
+            coreBeating = startCore();
+            if(coreBeating) {
+                onCoreBeating();
+            } else if ( isRootMissing ) {
+                return;
             }
-          } catch (System.SuException e) {
-            onInitializationError(getString(R.string.only_4_root));
-            return;
-          } catch (System.DaemonException e) {
-            Logger.error(e.getMessage());
-          }
         }
 
         if (!connectivityAvailable) {

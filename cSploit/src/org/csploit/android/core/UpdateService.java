@@ -1430,8 +1430,6 @@ public class UpdateService extends IntentService
           installGems();
         else if (what_to_do == action.gems_update)
           updateGems();
-        else if (what_to_do == action.core_update)
-          System.initCore();
 
         deleteTemporaryFiles();
         createVersionFile();
@@ -1482,11 +1480,6 @@ public class UpdateService extends IntentService
     } catch (ChildManager.ChildDiedException e) {
       sendError(what_to_do, R.string.error_occured);
       System.errorLogging(e);
-    } catch (System.SuException e) {
-      sendError(what_to_do, R.string.only_4_root);
-    } catch (System.DaemonException e) {
-      sendError(what_to_do, R.string.heart_attack);
-      Logger.error(e.getMessage());
     } finally {
       if(exitForError) {
         if(what_to_do == action.msf_update || what_to_do == action.gems_update)
