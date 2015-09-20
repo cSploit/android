@@ -121,7 +121,7 @@ public class System
   private static ArrayList<Plugin> mPlugins = null;
   private static Plugin mCurrentPlugin = null;
   // toolbox singleton
-  private static ToolBox mTools = new ToolBox();
+  private static ToolBox mTools = null;
 
   private static HTTPSRedirector mRedirector = null;
   private static Proxy mProxy = null;
@@ -212,9 +212,7 @@ public class System
   }
 
   public static void reloadTools() {
-    if(mTools == null)
-      mTools = new ToolBox();
-    mTools.reload();
+    getTools().reload();
   }
 
   public static class SuException extends Exception {
@@ -833,7 +831,11 @@ public class System
   }
 
   public static ToolBox getTools() {
-    return mTools;
+    synchronized (System.class) {
+      if(mTools == null)
+        mTools = new ToolBox();
+      return mTools;
+    }
   }
 
   public static RPCClient getMsfRpc() {
@@ -1190,7 +1192,7 @@ public class System
       cmd = "echo " + status + " > " + IPV4_FORWARD_FILEPATH;
 
     try{
-      mTools.shell.run(cmd);
+      getTools().shell.run(cmd);
     }
     catch(Exception e){
       Logger.error(e.getMessage());
