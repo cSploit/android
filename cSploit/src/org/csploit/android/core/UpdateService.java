@@ -29,7 +29,6 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import com.github.zafarkhaja.semver.Version;
-import com.sksamuel.diffpatch.DiffMatchPatch;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
@@ -44,12 +43,8 @@ import org.apache.commons.compress.utils.IOUtils;
 import org.csploit.android.R;
 import org.csploit.android.core.ArchiveMetadata.archiveAlgorithm;
 import org.csploit.android.core.ArchiveMetadata.compressionAlgorithm;
-import org.csploit.android.net.GemParser;
 import org.csploit.android.net.GitHubParser;
-import org.csploit.android.net.RemoteReader;
 import org.csploit.android.tools.Raw;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -65,19 +60,11 @@ import java.net.URL;
 import java.security.KeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.concurrent.CancellationException;
 
 public class UpdateService extends IntentService
 {
-  // Resources defines
-  private static final String REMOTE_GEMS_VERSION_URL = "http://gems.dsploit.net/atom.xml";
-  private static final String REMOTE_GEM_SERVER = "http://gems.dsploit.net/";
-
   // Intent defines
   public static final String START    = "UpdateService.action.START";
   public static final String ERROR    = "UpdateService.action.ERROR";
@@ -96,7 +83,6 @@ public class UpdateService extends IntentService
   private static final ArchiveMetadata  mMsfInfo          = new ArchiveMetadata();
   private static final ArchiveMetadata  mRubyInfo         = new ArchiveMetadata();
   private static final ArchiveMetadata  mCoreInfo         = new ArchiveMetadata();
-  private static final GemParser        mGemUploadParser  = new GemParser(REMOTE_GEMS_VERSION_URL);
 
   private boolean
           mRunning                    = false;
@@ -115,7 +101,6 @@ public class UpdateService extends IntentService
     apk_update,
     core_update,
     ruby_update,
-    gems_update,
     msf_update
   }
 
@@ -355,58 +340,6 @@ public class UpdateService extends IntentService
     return false;
   }
 
-  public static boolean isGemUpdateAvailable() {
-
-    try {
-      synchronized (mGemUploadParser) {
-        GemParser.RemoteGemInfo[] gemInfoArray = mGemUploadParser.parse();
-        ArrayList<GemParser.RemoteGemInfo> gemsToUpdate = new ArrayList<GemParser.RemoteGemInfo>();
-
-        if (gemInfoArray.length == 0)
-          return false;
-
-        String format = String.format("%s/lib/ruby/gems/1.9.1/specifications/%%s-%%s-arm-linux.gemspec", System.getRubyPath());
-
-        for (GemParser.RemoteGemInfo gemInfo : gemInfoArray) {
-          File f = new File(String.format(format, gemInfo.name, gemInfo.version));
-          if (!f.exists() || f.lastModified() < gemInfo.uploaded.getTime()) {
-            Logger.debug(String.format("'%s' %s", f.getAbsolutePath(), (f.exists() ? "is old" : "does not exists")));
-            gemsToUpdate.add(gemInfo);
-          }
-        }
-
-        if(gemsToUpdate.size() == 0)
-          return false;
-
-        mGemUploadParser.setOldGems(gemsToUpdate.toArray(new GemParser.RemoteGemInfo[gemsToUpdate.size()]));
-        return true;
-      }
-    } catch (IOException e) {
-      Logger.warning(e.getClass() + ": " + e.getMessage());
-    } catch (Exception e) {
-      System.errorLogging(e);
-    }
-    return false;
-  }
-
-  private static void parseMsfManifest(String manifestUrl) throws IOException, JSONException {
-    JSONObject manifest, files;
-
-    manifest = new JSONObject(new String(RemoteReader.fetch(manifestUrl)));
-    files = manifest.getJSONObject("files");
-
-    mMsfInfo.url = manifest.getString("url");
-    mMsfInfo.patches = new HashMap<String, LinkedList<DiffMatchPatch.Patch>>();
-
-    Iterator it = files.keys();
-    DiffMatchPatch dmp = new DiffMatchPatch();
-
-    while(it.hasNext()) {
-      String key = (String) it.next();
-      mMsfInfo.patches.put(key, (LinkedList<DiffMatchPatch.Patch>) dmp.patch_fromText(files.getString(key)));
-    }
-  }
-
   /**
    * is a MetaSploitFramework update available?
    * @return true if the framework can be updated, false otherwise
@@ -419,18 +352,12 @@ public class UpdateService extends IntentService
     try {
       synchronized (mMsfInfo) {
         if (mMsfInfo.url == null) {
-          String customManifestUrl = System.getSettings().getString("MSF_MANIFEST_URL", "NONE");
+          mMsfInfo.url = msfRepo.getLastReleaseAssetUrl();
 
-          if(customManifestUrl.equals("NONE")) {
-            parseMsfManifest(msfRepo.getLastReleaseAssetUrl());
-            mMsfInfo.versionString = msfRepo.getLastReleaseVersion();
-            mMsfInfo.version = Version.valueOf(mMsfInfo.versionString);
-          } else {
-            parseMsfManifest(customManifestUrl);
-            mMsfInfo.versionString = "FORCE_UPDATE";
-          }
+          mMsfInfo.versionString = msfRepo.getLastReleaseVersion();
+          mMsfInfo.version = Version.valueOf(mMsfInfo.versionString);
 
-          mMsfInfo.name = "msf.zip";
+          mMsfInfo.name = "msf.tar.xz";
           mMsfInfo.path = String.format("%s/%s", System.getStoragePath(), mMsfInfo.name);
         }
 
@@ -438,13 +365,13 @@ public class UpdateService extends IntentService
 
         if (local.exists() && local.isFile() && local.canRead()) {
           mMsfInfo.url = null;
-          mMsfInfo.versionString = "FORCE_UPDATE";
+          mMsfInfo.versionString = "LOCAL_UPDATE";
         }
 
         mMsfInfo.outputDir = System.getMsfPath();
         mMsfInfo.executableOutputDir = ExecChecker.msf().getRoot();
-        mMsfInfo.archiver = archiveAlgorithm.zip;
-        mMsfInfo.skipRoot = true;
+        mMsfInfo.archiver = archiveAlgorithm.tar;
+        mMsfInfo.compression = compressionAlgorithm.xz;
         mMsfInfo.fixShebang = true;
 
         if (!mSettingReceiver.getFilter().contains("MSF_DIR")) {
@@ -1030,7 +957,6 @@ public class UpdateService extends IntentService
     boolean isTar, r,w,x, isElf, isScript;
     short percentage,old_percentage;
     Child which;
-    DiffMatchPatch dmp;
 
     if(mCurrentTask.path==null||mCurrentTask.outputDir==null)
       return;
@@ -1064,7 +990,6 @@ public class UpdateService extends IntentService
       is = openArchiveStream(counter);
       isTar = mCurrentTask.archiver.equals(archiveAlgorithm.tar);
       old_percentage = -1;
-      dmp = (mCurrentTask.patches != null && mCurrentTask.patches.size() > 0) ? new DiffMatchPatch() : null;
 
       f = new File(mCurrentTask.outputDir);
       if (f.exists() && f.isDirectory() && (list = f.listFiles()) != null && list.length > 2)
@@ -1101,77 +1026,49 @@ public class UpdateService extends IntentService
           byte[] buffer = null;
           byte[] writeMe = null;
 
-          // patch the file
-          if(dmp != null && mCurrentTask.patches.containsKey(name)) {
-            buffer = new byte[(int)entry.getSize()];
-            IOUtils.readFully(is, buffer);
-            writeMe = buffer = ((String)dmp.patch_apply(mCurrentTask.patches.get(name),
-                    new String(buffer))[0]).getBytes();
-          }
-
           outputStream = new FileOutputStream(f);
 
           // check il file is an ELF or a script
           if((!isTar || mCurrentTask.fixShebang) && entry.getSize() > 4) {
-            if (buffer == null) {
-              writeMe = buffer = new byte[4];
+            writeMe = buffer = new byte[4];
 
-              IOUtils.readFully(is, buffer);
+            IOUtils.readFully(is, buffer);
 
-              if (buffer[0] == 0x7F && buffer[1] == 0x45 && buffer[2] == 0x4C && buffer[3] == 0x46) {
-                isElf = true;
-              } else if (buffer[0] == '#' && buffer[1] == '!') {
-                isScript = true;
+            if (buffer[0] == 0x7F && buffer[1] == 0x45 && buffer[2] == 0x4C && buffer[3] == 0x46) {
+              isElf = true;
+            } else if (buffer[0] == '#' && buffer[1] == '!') {
+              isScript = true;
 
-                ByteArrayOutputStream firstLine = new ByteArrayOutputStream();
-                int newline = -1;
+              ByteArrayOutputStream firstLine = new ByteArrayOutputStream();
+              int newline = -1;
 
-                // assume that '\n' is more far then 4 chars.
-                firstLine.write(buffer);
-                buffer = new byte[1024];
-                count = 0;
+              // assume that '\n' is more far then 4 chars.
+              firstLine.write(buffer);
+              buffer = new byte[1024];
+              count = 0;
 
-                while (mRunning && (count = is.read(buffer)) >= 0 &&
-                        (newline = Arrays.binarySearch(buffer, 0, count, (byte) 0x0A)) < 0) {
-                  firstLine.write(buffer, 0, count);
-                }
-
-                if (!mRunning) {
-                  throw new CancellationException("cancelled while searching for newline.");
-                } else if(count < 0) {
-                  newline = count = 0;
-                } else if(newline < 0) {
-                  newline = count;
-                }
-
-                firstLine.write(buffer, 0, newline);
-                firstLine.close();
-
-                byte[] newFirstLine = new String(firstLine.toByteArray()).replace("/usr/bin/env", envPath).getBytes();
-
-                writeMe = new byte[newFirstLine.length + (count - newline)];
-
-                java.lang.System.arraycopy(newFirstLine, 0, writeMe, 0, newFirstLine.length);
-                java.lang.System.arraycopy(buffer, newline, writeMe, newFirstLine.length, count - newline);
+              while (mRunning && (count = is.read(buffer)) >= 0 &&
+                      (newline = Arrays.binarySearch(buffer, 0, count, (byte) 0x0A)) < 0) {
+                firstLine.write(buffer, 0, count);
               }
-            } else {
-              if (buffer[0] == 0x7F && buffer[1] == 0x45 && buffer[2] == 0x4C && buffer[3] == 0x46) {
-                isElf = true;
-              } else if (buffer[0] == '#' && buffer[1] == '!') {
-                isScript = true;
 
-                int newline = Arrays.binarySearch(buffer, (byte) 0x0A);
-
-                if (newline < 0)
-                  newline = buffer.length;
-
-                byte[] newFirstLine = new String(buffer, 0, newline).replace("/usr/bin/env", envPath).getBytes();
-
-                writeMe = new byte[buffer.length + (newFirstLine.length - newline)];
-
-                java.lang.System.arraycopy(newFirstLine, 0, writeMe, 0, newFirstLine.length);
-                java.lang.System.arraycopy(buffer, newline, writeMe, newFirstLine.length, newFirstLine.length - newline);
+              if (!mRunning) {
+                throw new CancellationException("cancelled while searching for newline.");
+              } else if(count < 0) {
+                newline = count = 0;
+              } else if(newline < 0) {
+                newline = count;
               }
+
+              firstLine.write(buffer, 0, newline);
+              firstLine.close();
+
+              byte[] newFirstLine = new String(firstLine.toByteArray()).replace("/usr/bin/env", envPath).getBytes();
+
+              writeMe = new byte[newFirstLine.length + (count - newline)];
+
+              java.lang.System.arraycopy(newFirstLine, 0, writeMe, 0, newFirstLine.length);
+              java.lang.System.arraycopy(buffer, newline, writeMe, newFirstLine.length, count - newline);
             }
           }
 
@@ -1270,7 +1167,7 @@ public class UpdateService extends IntentService
         throw new RuntimeException("cannot install bundle");
 
       bundleInstallTask = System.getTools().ruby.async(
-              String.format("bundle install --verbose --gemfile '%s/Gemfile' --without development test", msfPath),
+              String.format("bundle install --verbose --local --gemfile '%s/Gemfile' --without development test", msfPath),
               mErrorReceiver);
 
       // install gem required by msf using bundle
@@ -1279,59 +1176,6 @@ public class UpdateService extends IntentService
     } finally {
       if(bundleInstallTask != null && bundleInstallTask.running)
         bundleInstallTask.kill(2);
-    }
-  }
-
-  private void updateGems() throws IOException, InterruptedException, CancellationException, RuntimeException, KeyException, NoSuchAlgorithmException, ChildManager.ChildNotStartedException {
-    GemParser.RemoteGemInfo[] gemsToUpdate = mGemUploadParser.getGemsToUpdate();
-
-    if(gemsToUpdate==null||gemsToUpdate.length==0)
-      return;
-
-    String localFormat = String.format("%s/%%s",System.getStoragePath());
-    String remoteFormat = String.format("%s/gems/%%s", REMOTE_GEM_SERVER);
-    mCurrentTask.archiver = archiveAlgorithm.tar;
-
-    Child shell;
-
-    for(GemParser.RemoteGemInfo gemInfo : gemsToUpdate) {
-
-      String gemFilename = String.format("%s-%s-arm-linux.gem", gemInfo.name, gemInfo.version);
-
-      mCurrentTask.url = String.format(remoteFormat, gemFilename);
-      mCurrentTask.path = String.format(localFormat, gemFilename);
-      if(!haveLocalFile())
-        downloadFile();
-
-      mBuilder.setContentTitle(getString(R.string.installing_gems))
-              .setContentText(gemInfo.name)
-              .setContentInfo("")
-              .setSmallIcon(android.R.drawable.ic_popup_sync)
-              .setProgress(100, 0, true);
-      mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-
-      shell = System.getTools().ruby.async(String.format(
-              "gem uninstall --force -x -v '%s' '%s'",
-              gemInfo.version, gemInfo.name), mErrorReceiver);
-
-      String cancelMessage = String.format("cancelled while deleting '%s-%s'",
-              gemInfo.name, gemInfo.version);
-
-      if(execShell(shell,cancelMessage)!=0)
-        throw new RuntimeException(String.format("cannot delete '%s-%s'", gemInfo.name, gemInfo.version));
-
-      shell = System.getTools().ruby.async(
-          String.format("gem install -l '%s'", mCurrentTask.path), mErrorReceiver);
-
-      cancelMessage = String.format("cancelled while installing '%s-%s'",
-          gemInfo.name, gemInfo.version);
-
-      if(execShell(shell,cancelMessage)!=0)
-        throw new RuntimeException(String.format("cannot install '%s-%s'", gemInfo.name, gemInfo.version));
-
-      if(!(new File(mCurrentTask.path).delete()))
-        Logger.warning(String.format("cannot delete downloaded gem '%s'", mCurrentTask.path));
-      mCurrentTask.path = null;
     }
   }
 
@@ -1408,9 +1252,6 @@ public class UpdateService extends IntentService
       case msf_update:
         mCurrentTask = mMsfInfo;
         break;
-      case gems_update:
-        mCurrentTask = new ArchiveMetadata();
-        break;
     }
 
     try {
@@ -1428,8 +1269,6 @@ public class UpdateService extends IntentService
 
         if (what_to_do == action.msf_update)
           installGems();
-        else if (what_to_do == action.gems_update)
-          updateGems();
 
         deleteTemporaryFiles();
         createVersionFile();
@@ -1482,7 +1321,7 @@ public class UpdateService extends IntentService
       System.errorLogging(e);
     } finally {
       if(exitForError) {
-        if(what_to_do == action.msf_update || what_to_do == action.gems_update)
+        if(what_to_do == action.msf_update)
           clearGemsCache();
         if(what_to_do != action.core_update)
           wipe();
