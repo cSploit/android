@@ -420,29 +420,29 @@ public class MITM extends Plugin
     mScriptPicker.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
 
     mActions.add(new Action
-    (
-      getString(R.string.mitm_simple_sniff),
-      getString(R.string.mitm_simple_sniff_desc),
-      R.drawable.action_sniffer,
-      new OnClickListener(){
-        @Override
-        public void onClick(View v){
-          if(System.checkNetworking(MITM.this) == false)
-            return;
-
-          setStoppedState();
-
-          startActivity
             (
-              new Intent
-                (
-                  MITM.this,
-                  Sniffer.class
-                )
-            );
-          overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-        }
-      }));
+                    getString(R.string.mitm_simple_sniff),
+                    getString(R.string.mitm_simple_sniff_desc),
+                    R.drawable.action_sniffer,
+                    new OnClickListener() {
+                      @Override
+                      public void onClick(View v) {
+                        if (System.checkNetworking(MITM.this) == false)
+                          return;
+
+                        setStoppedState();
+
+                        startActivity
+                                (
+                                        new Intent
+                                                (
+                                                        MITM.this,
+                                                        Sniffer.class
+                                                )
+                                );
+                        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+                      }
+                    }));
 
     mActions.add(new Action
     (
@@ -467,6 +467,32 @@ public class MITM extends Plugin
             );
           overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
         }
+      }));
+
+
+      mActions.add(new Action
+              (
+               getString(R.string.mitm_dns_spoofing),
+               getString(R.string.mitm_dns_spoofing_desc),
+               R.drawable.action_redirect,
+               new OnClickListener() {
+               @Override
+               public void onClick(View v) {
+                    if (System.checkNetworking(MITM.this) == false)
+                       return;
+
+               setStoppedState();
+
+               startActivity
+               (
+                  new Intent
+                  (
+                     MITM.this,
+                     DNSSpoofing.class
+                  )
+               );
+               overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+                          }
       }));
 
     mActions.add(new Action
