@@ -33,8 +33,6 @@ public class ArchiveMetadata {
           skipRoot,
           fixShebang,
           errorOccurred;
-  public HashMap<String, LinkedList<DiffMatchPatch.Patch>>
-          patches;
 
   public ArchiveMetadata() {
     reset();
@@ -49,7 +47,6 @@ public class ArchiveMetadata {
       archiver = null;
       contentIntent = null;
       fixShebang = errorOccurred = skipRoot = false;
-      patches = null;
     }
   }
 
