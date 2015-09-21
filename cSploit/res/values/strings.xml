@@ -252,6 +252,7 @@
     <string name="mitm_simple_sniff_desc">Redirect target\'s traffic through this device and show some stats while dumping it to a pcap file.</string>
     <string name="mitm_password_sniff">Password Sniffer</string>
     <string name="mitm_password_sniff_desc">Sniff passwords of many protocols such as http, ftp, imap, imaps, irc, msn, etc from the target.</string>
+    <string name="mitm_password_sniff_menu_fields">Users/pass fields</string>
     <string name="mitm_session_hijack">Session Hijacker</string>
     <string name="mitm_session_hijack_desc">Listen for cookies on the network and hijack sessions.</string>
     <string name="mitm_connection_kill">Kill Connections</string>
@@ -441,6 +442,8 @@
     <string name="run">Run</string>
     <string name="command">Command</string>
     <string name="clear">Clear</string>
+    <string name="save">Save</string>
+    <string name="saved">Saved</string>
     <string name="msfrpc_disconnected">MSF RPC disconnected</string>
     <string name="no_opened_sessions">there is no opened sessions for this target</string>
     <string name="delete">Delete</string>
