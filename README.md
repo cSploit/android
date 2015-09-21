@@ -26,6 +26,7 @@ Requirements
 - An Android device with at least the 2.3 ( Gingerbread ) version of the OS.
 - The device **must be rooted**.
 - The device must have a BusyBox **full install**, this means with **every** utility installed ( not the partial installation ).
+- You must install the SuperSu app.
 
 
 Disclaimer
