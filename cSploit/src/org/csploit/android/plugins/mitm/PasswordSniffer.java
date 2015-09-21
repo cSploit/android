@@ -19,10 +19,13 @@
 package org.csploit.android.plugins.mitm;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -34,6 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import org.csploit.android.gui.FileEdit;
 import org.csploit.android.R;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.System;
@@ -57,6 +61,10 @@ public class PasswordSniffer extends ActionBarActivity {
 	private FileWriter mFileWriter = null;
 	private BufferedWriter mBufferedWriter = null;
 	private SpoofSession mSpoofSession = null;
+	private Menu mMenu = null;
+
+	private final static int OPTIONS_FIELDS = 0;
+	private final static int OPTIONS_FILTERS = 0;
 
 	public class ListViewAdapter extends BaseExpandableListAdapter {
 		private HashMap<String, ArrayList<String>> mGroups = null;
@@ -218,16 +226,38 @@ public class PasswordSniffer extends ActionBarActivity {
 	}
 
 	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.password_sniffer, menu);
+
+        mMenu = menu;
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case android.R.id.home:
+			case R.id.action_fields:
+				if (mSniffToggleButton.isEnabled() == false)
+					Toast.makeText(this, "The changes won't take effect until you stop the current traffic sniffing", Toast.LENGTH_SHORT).show();
 
-			onBackPressed();
+				Intent _fields = new Intent(PasswordSniffer.this, FileEdit.class);
+				_fields.putExtra(FileEdit.KEY_FILEPATH, "/tools/ettercap/share/etter.fields");
+				startActivityForResult(_fields, 0);
 
-			return true;
+				return true;
+			case R.id.action_filters:
+				Toast.makeText(this, "not implemented. yet", Toast.LENGTH_SHORT).show();
+				return true;
+			case android.R.id.home:
 
-		default:
-			return super.onOptionsItemSelected(item);
+				onBackPressed();
+
+				return true;
+
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 
