@@ -365,7 +365,7 @@
     <string-array name="pref_performance_vuln_values">
         <item>OSVDB</item>
         <item>CVE</item>
-        <item>OBOJE</item>
+        <item>BOTH</item>
     </string-array>
     <string name="pref_performance_exploit_desc">Hledání exploitů</string>
     <string-array name="pref_performance_exploit" >
@@ -376,7 +376,7 @@
     <string-array name="pref_performance_exploit_values">
         <item>MSF</item>
         <item>EXDB</item>
-        <item>OBOJE</item>
+        <item>BOTH</item>
     </string-array>
     <string name="pref_performance_widescan">široký sken hostitelů</string>
     <string name="pref_performance_widescan_desc">hledovat hostitele i mimo zvolenou síťovou masku</string>
