@@ -1254,7 +1254,8 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
       switch (target) {
         case ruby_update:
         case msf_update:
-          StartRPCServer();
+          if(!MsfRpcd.isLocal() || MsfRpcd.isInstalled())
+            StartRPCServer();
           break;
         case core_update:
           onCoreUpdated();
