@@ -3,11 +3,14 @@ package org.csploit.android.core;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.csploit.android.core.Child.*;
 import org.csploit.android.events.ChildDied;
 import org.csploit.android.events.ChildEnd;
 import org.csploit.android.events.Event;
+import org.csploit.android.events.Newline;
 import org.csploit.android.events.StderrNewline;
 
 /**
@@ -21,6 +24,8 @@ public class ChildManager {
   private static final List<Child> children = new ArrayList<Child>(25);
 
   public static List<String> handlers = null;
+
+  private static Executor eventExecutor = Executors.newCachedThreadPool();
 
   /**
    * wait for a child termination
@@ -149,6 +154,35 @@ public class ChildManager {
     return found;
   }
 
+  private static void dispatchEvent(Child c, Event event) {
+    boolean crash = false;
+    if(event instanceof ChildEnd) {
+      c.exitValue = ((ChildEnd) event).exit_status;
+      Logger.debug("Child #" + c.id + " exited ( exitValue=" + c.exitValue + " )");
+      if(c.receiver != null)
+        c.receiver.onEnd(c.exitValue);
+      crash = c.exitValue > 126 && c.exitValue != 130 && c.exitValue != 137;
+      if(crash) {
+        c.signal = c.exitValue - 128;
+      }
+    } else  if(event instanceof ChildDied) {
+      c.signal = ((ChildDied) event).signal;
+      Logger.debug("Child #" + c.id + " died ( signal=" + c.signal + " )");
+      if(c.receiver != null)
+        c.receiver.onDeath(c.signal);
+      crash = c.signal != 2 && c.signal != 9;
+    } else if(event instanceof StderrNewline) {
+      if(c.receiver != null)
+        c.receiver.onStderr(((StderrNewline) event).line);
+    } else if(c.receiver != null) {
+      c.receiver.onEvent(event);
+    }
+
+    if(crash) {
+      CrashReporter.notifyChildCrashed(c.id, c.signal);
+    }
+  }
+
   /**
    * handle an incoming event from a child
    * @param childID the child that generated this event
@@ -156,18 +190,15 @@ public class ChildManager {
    *
    * this function is the main entry point for generated events.
    */
-  public static void onEvent(final int childID, Event event) {
+  public static void onEvent(final int childID, final Event event) {
     Child c;
-    boolean end, died, stderr, crash;
+    boolean end, died;
 
-    died = stderr = crash = false;
+    died = false;
 
     end = event instanceof ChildEnd;
     if(!end) {
       died = event instanceof ChildDied;
-      if(!died) {
-        stderr = event instanceof StderrNewline;
-      }
     }
 
     Logger.debug("received an event: " + event);
@@ -184,25 +215,14 @@ public class ChildManager {
       }
     }
 
-    if(end) {
-      c.exitValue = ((ChildEnd) event).exit_status;
-      Logger.debug("Child #" + c.id + " exited ( exitValue=" + c.exitValue + " )");
-      if(c.receiver != null)
-        c.receiver.onEnd(c.exitValue);
-      crash = c.exitValue > 126 && c.exitValue != 130 && c.exitValue != 137;
-    } else  if(died) {
-      c.signal = ((ChildDied) event).signal;
-      Logger.debug("Child #" + c.id + " died ( signal=" + c.signal + " )");
-      if(c.receiver != null)
-        c.receiver.onDeath(c.signal);
-      crash = c.signal != 2 && c.signal != 9;
-    } else if(stderr) {
-      Logger.warning("Child #" + c.id + " sent '" + ((StderrNewline) event).line + "' to stderr");
-      if(c.receiver != null)
-        c.receiver.onStderr(((StderrNewline) event).line);
-    } else if(c.receiver != null) {
-      c.receiver.onEvent(event);
-    }
+    final Child fc = c;
+
+    eventExecutor.execute(new Runnable() {
+      @Override
+      public void run() {
+        dispatchEvent(fc, event);
+      }
+    });
 
     if(end || died) {
       synchronized (children) {
@@ -210,17 +230,6 @@ public class ChildManager {
         children.remove(c);
         children.notifyAll();
       }
-    }
-
-    // starting commands from onEvent is not allowed ( should fix it ? )
-    if(crash) {
-      final int signal = (end ? c.exitValue - 128 : c.signal);
-      new Thread(new Runnable() {
-        @Override
-        public void run() {
-          CrashReporter.notifyChildCrashed(childID, signal);
-        }
-      }).start();
     }
   }
 
