@@ -150,7 +150,7 @@ public class System
     try{
       Logger.debug("initializing System...");
       mStoragePath = getSettings().getString("PREF_SAVE_PATH", Environment.getExternalStorageDirectory().toString());
-      mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
+      mSessionName = "csploit-session-" + java.lang.System.currentTimeMillis();
       mKnownIssues = new KnownIssues();
       mPlugins = new ArrayList<Plugin>();
       mOpenPorts = new SparseIntArray(3);
@@ -507,9 +507,11 @@ public class System
   }
 
   public static void registerSettingListener(SettingReceiver receiver) {
-    synchronized (mSettingReceivers) {
-      if(!mSettingReceivers.contains(receiver)) {
-        mSettingReceivers.add(receiver);
+    if (mSettingReceivers != null) {
+      synchronized (mSettingReceivers) {
+        if (!mSettingReceivers.contains(receiver)) {
+          mSettingReceivers.add(receiver);
+        }
       }
     }
   }
