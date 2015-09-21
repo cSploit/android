@@ -56,6 +56,10 @@ android {
         versionName "1.5.4"
     }
 
+    lintOptions {
+        abortOnError false
+    }
+
     signingConfigs {
         release {
             if (System.getenv("KEYSTORE_FILE") != null) {
