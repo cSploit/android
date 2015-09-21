@@ -597,6 +597,17 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
     }
   }
 
+  private boolean connectToRpcServer(String msfHost, String msfUser, String msfPassword, int msfPort, boolean msfSsl) {
+    try {
+      System.setMsfRpc(new RPCClient(msfHost, msfUser, msfPassword, msfPort, msfSsl));
+      Logger.info("successfully connected to MSF RPC Daemon ");
+      return true;
+    } catch (Exception e) {
+      Logger.error(e.getClass().getName() + ": " + e.getMessage());
+    }
+    return false;
+  }
+
   /**
    * start MSF RPC Daemon
    */
@@ -621,23 +632,23 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
                     new MsfRpcd.MsfRpcdReceiver() {
                       @Override
                       public void onReady() {
-                        try {
-                          System.setMsfRpc(new RPCClient(msfHost, msfUser, msfPassword, msfPort, msfSsl));
-                          Logger.info("successfully connected to MSF RPC Daemon ");
-                          MainActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                              Toast.makeText(MainActivity.this, "connected to MSF RPC Daemon", Toast.LENGTH_SHORT).show();
+                        boolean connected = false;
+
+                        for(int i = 0; i < 3 && !connected; i++) {
+                          connected = connectToRpcServer(msfHost, msfUser, msfPassword, msfPort, msfSsl);
+                          if(!connected) {
+                            try {
+                              Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                              break;
                             }
-                          });
-                        } catch (Exception e) {
-                          Logger.error(e.getClass().getName() + ": " + e.getMessage());
-                          MainActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                              Toast.makeText(MainActivity.this, "connection to MSF RPC Daemon failed", Toast.LENGTH_LONG).show();
-                            }
-                          });
+                          }
+                        }
+
+                        if(connected) {
+                          onMsfRpcConnectionSuccess();
+                        } else {
+                          onMsfRpcConnectionFailed();
                         }
                       }
 
@@ -674,27 +685,32 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
             });
           }
         } else {
-          try {
-            System.setMsfRpc(new RPCClient(msfHost, msfUser, msfPassword, msfPort, msfSsl));
-            Logger.info("successfully connected to MSF RPC Daemon ");
-            MainActivity.this.runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                Toast.makeText(MainActivity.this, "connected to MSF RPC Daemon", Toast.LENGTH_SHORT).show();
-              }
-            });
-          } catch (Exception e) {
-            Logger.error(e.getClass().getName() + ": " + e.getMessage());
-            MainActivity.this.runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                Toast.makeText(MainActivity.this, "connection to MSF RPC Daemon failed", Toast.LENGTH_LONG).show();
-              }
-            });
+          if(connectToRpcServer(msfHost, msfUser, msfPassword, msfPort, msfSsl)) {
+            onMsfRpcConnectionSuccess();
+          } else {
+            onMsfRpcConnectionFailed();
           }
         }
       }
     }).start();
+  }
+
+  private void onMsfRpcConnectionFailed() {
+    MainActivity.this.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        Toast.makeText(MainActivity.this, "connection to MSF RPC Daemon failed", Toast.LENGTH_LONG).show();
+      }
+    });
+  }
+
+  private void onMsfRpcConnectionSuccess() {
+    MainActivity.this.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        Toast.makeText(MainActivity.this, "connected to MSF RPC Daemon", Toast.LENGTH_SHORT).show();
+      }
+    });
   }
 
   /**
