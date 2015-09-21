@@ -175,8 +175,6 @@ public class UpdateService extends IntentService
         if (mApkInfo.version.compareTo(installedVersion) > 0)
           return true;
       }
-    } catch (org.apache.http.ParseException e) {
-      Logger.error(e.getMessage());
     } catch(Exception e){
       System.errorLogging(e);
     } finally {
@@ -250,8 +248,6 @@ public class UpdateService extends IntentService
         if (mCoreInfo.version.compareTo(installedVersion) > 0)
           return true;
       }
-    } catch (org.apache.http.ParseException e) {
-      Logger.error(e.getMessage());
     } catch(Exception e){
       System.errorLogging(e);
     } finally {
