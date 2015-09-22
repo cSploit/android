@@ -262,7 +262,7 @@ public class Target
   private String mHostname = null;
   private Type mType = null;
   private InetAddress mAddress = null;
-  private List<Port> mPorts = new ArrayList<Port>();
+  private ArrayList<Port> mPorts = new ArrayList<>();
   private String mDeviceType = null;
   private String mDeviceOS = null;
   private String mAlias = null;
@@ -398,7 +398,9 @@ public class Target
       builder.append(mHostname).append("\n");
     }
 
-    builder.append(mPorts.size()).append("\n");
+    synchronized (mPorts) {
+      builder.append(mPorts.size()).append("\n");
+    }
   }
 
   public void setAlias(String alias){
@@ -631,18 +633,20 @@ public class Target
   }
 
   public void addOpenPort(Port port){
-    if(port.service!=null) { // update service but preserve different versions
-      for(Port p : mPorts) {
-        if(p.number == port.number && (p.service == null || p.service.isEmpty())) {
-          p.service = port.service;
-          p.version = port.version;
-          return;
+    synchronized (mPorts) {
+      if (port.service != null) { // update service but preserve different versions
+        for (Port p : mPorts) {
+          if (p.number == port.number && (p.service == null || p.service.isEmpty())) {
+            p.service = port.service;
+            p.version = port.version;
+            return;
+          }
         }
-      }
-      mPorts.add(port);
-    } else {
-      if (!mPorts.contains(port))
         mPorts.add(port);
+      } else {
+        if (!mPorts.contains(port))
+          mPorts.add(port);
+      }
     }
   }
 
@@ -655,18 +659,24 @@ public class Target
   }
 
   public List<Port> getOpenPorts(){
-    return mPorts;
+    synchronized (mPorts) {
+      return (List<Port>) mPorts.clone();
+    }
   }
 
   public boolean hasOpenPorts(){
-    return !mPorts.isEmpty();
+    synchronized (mPorts) {
+      return !mPorts.isEmpty();
+    }
   }
 
   public boolean hasOpenPortsWithService(){
-    if(!mPorts.isEmpty()){
-      for(Port p : mPorts){
-        if(p.service != null && !p.service.isEmpty())
-          return true;
+    synchronized (mPorts) {
+      if (!mPorts.isEmpty()) {
+        for (Port p : mPorts) {
+          if (p.service != null && !p.service.isEmpty())
+            return true;
+        }
       }
     }
 
@@ -674,9 +684,11 @@ public class Target
   }
 
   public boolean hasOpenPort(int port){
-    for(Port p : mPorts){
-      if(p.number == port)
-        return true;
+    synchronized (mPorts) {
+      for (Port p : mPorts) {
+        if (p.number == port)
+          return true;
+      }
     }
 
     return false;
