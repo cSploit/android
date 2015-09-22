@@ -5,7 +5,7 @@ import java.net.InetAddress;
 /**
  * an hop has been found
  */
-public class Hop {
+public class Hop implements Event {
   public final int hop;
   public final long usec;
   public final InetAddress node;
