@@ -138,6 +138,7 @@ public class SpoofSession
               @Override
               public void onError(String line) {
                 SpoofSession.this.stop();
+                listener.onError(line);
               }
             });
 

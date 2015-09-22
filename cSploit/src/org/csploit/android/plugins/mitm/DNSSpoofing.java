@@ -33,6 +33,7 @@ import org.csploit.android.R;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Logger;
 import org.csploit.android.core.System;
+import org.csploit.android.gui.dialogs.ErrorDialog;
 import org.csploit.android.tools.Ettercap;
 
 import java.io.BufferedReader;
@@ -71,6 +72,7 @@ public class DNSSpoofing extends ActionBarActivity {
         mCmdSave = (Button) findViewById(R.id.cmd_save);
 		mSniffToggleButton = (ToggleButton) findViewById(R.id.sniffToggleButton);
 		mSniffProgress = (ProgressBar) findViewById(R.id.sniffActivity);
+        mTextDnsList.setHorizontallyScrolling(true);
 
 		mSpoofSession = new SpoofSession(false, false, null, null);
 
@@ -192,6 +194,20 @@ public class DNSSpoofing extends ActionBarActivity {
             }
           });
         }
+
+          @Override
+          public void onError(final String error) {
+              DNSSpoofing.this.runOnUiThread(new Runnable() {
+                  @Override
+                  public void run() {
+                      if (!DNSSpoofing.this.isFinishing()) {
+                          new ErrorDialog(getString(R.string.error), error,
+                                  DNSSpoofing.this).show();
+                          setStoppedState();
+                      }
+                  }
+              });
+          }
 
         @Override
         public void onDeath(final int signal) {
