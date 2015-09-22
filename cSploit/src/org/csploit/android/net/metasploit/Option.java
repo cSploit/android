@@ -1,8 +1,9 @@
 package org.csploit.android.net.metasploit;
 
-import org.apache.http.conn.util.InetAddressUtils;
 import org.csploit.android.core.Logger;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -103,8 +104,12 @@ public class Option {
         mValue = value;
         break;
       case ADDRESS:
-        if(!InetAddressUtils.isIPv4Address(value))
+        try {
+          InetAddress ia = InetAddress.getByAddress(value.getBytes());
+          Logger.debug("Validating inetaddress: " + ia.toString());
+        } catch (UnknownHostException uhe) {
           throw new NumberFormatException("invalid IP address");
+        }
         mValue = value;
         break;
       case PORT:

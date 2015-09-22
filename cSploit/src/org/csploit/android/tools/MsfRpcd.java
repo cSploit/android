@@ -45,4 +45,8 @@ public class MsfRpcd extends Msf {
   public static boolean isLocal() {
     return System.getSettings().getString("MSF_RPC_HOST", "127.0.0.1").equals("127.0.0.1");
   }
+
+  public static boolean isInstalled() {
+    return System.getLocalMsfVersion() != null;
+  }
 }
