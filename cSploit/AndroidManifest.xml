@@ -133,7 +133,7 @@
             android:label="@string/title_activity_main" />
         <activity
             android:name=".gui.FileEdit"
-            android:label="@string/title_activity_file_edit"
+            android:label="@string/title_activity_main"
             android:parentActivityName=".plugins.mitm.PasswordSniffer" >
         </activity>
     </application>
