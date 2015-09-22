@@ -508,4 +508,5 @@
     <string name="msfrpcd_killed">MSF RPC Daemon killed</string>
     <string name="msfrcd_start_failed">MSF RPC Daemon failed to start</string>
     <string name="msf_connection_failed">Connection to the MSF RPC Daemon FAILED!</string>
+    <string name="net_discovery_start_failed">Network discovery FAILED to start!</string>
 </resources>

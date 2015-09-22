@@ -71,9 +71,8 @@ import org.csploit.android.gui.dialogs.MultipleChoiceDialog;
 import org.csploit.android.gui.dialogs.SpinnerDialog;
 import org.csploit.android.gui.dialogs.SpinnerDialog.SpinnerDialogListener;
 import org.csploit.android.net.Network;
-import org.csploit.android.net.NetworkRadar;
+import org.csploit.android.services.NetworkRadar;
 import org.csploit.android.net.Target;
-import org.csploit.android.net.metasploit.RPCClient;
 import org.csploit.android.plugins.ExploitFinder;
 import org.csploit.android.plugins.Inspector;
 import org.csploit.android.plugins.LoginCracker;
@@ -85,8 +84,7 @@ import org.csploit.android.plugins.Traceroute;
 import org.csploit.android.plugins.mitm.MITM;
 import org.csploit.android.services.MsfRpcdService;
 import org.csploit.android.services.receivers.MsfRpcdServiceReceiver;
-import org.csploit.android.tools.MsfRpcd;
-import org.csploit.android.tools.ToolBox;
+import org.csploit.android.services.receivers.NetworkRadarReceiver;
 
 import java.io.IOException;
 import java.net.NoRouteToHostException;
@@ -100,17 +98,16 @@ import static org.csploit.android.core.UpdateChecker.RUBY_AVAILABLE;
 import static org.csploit.android.core.UpdateChecker.UPDATE_AVAILABLE;
 import static org.csploit.android.core.UpdateChecker.UPDATE_CHECKING;
 import static org.csploit.android.core.UpdateChecker.UPDATE_NOT_AVAILABLE;
-import static org.csploit.android.net.NetworkRadar.NRDR_STOPPED;
 
 @SuppressLint("NewApi")
-public class MainActivity extends ActionBarActivity implements NetworkRadar.TargetListener {
+public class MainActivity extends ActionBarActivity {
   private String UPDATE_MESSAGE;
   private static final int WIFI_CONNECTION_REQUEST = 1012;
   private boolean isWifiAvailable = false;
   private TargetAdapter mTargetAdapter = null;
   private NetworkRadar mNetworkRadar = null;
   private MsfRpcdService mMsfRpcdService = null;
-  private RadarReceiver mRadarReceiver = new RadarReceiver();
+  private NetworkRadarReceiver mRadarReceiver = new NetworkRadarReceiver();
   private UpdateReceiver mUpdateReceiver = new UpdateReceiver();
   private WipeReceiver mWipeReceiver = new WipeReceiver();
   private MsfRpcdServiceReceiver mMsfReceiver = new MsfRpcdServiceReceiver();
@@ -204,6 +201,8 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
     mWipeReceiver.register(MainActivity.this);
     mMsfReceiver.register(MainActivity.this);
 
+    mRadarReceiver.setTargetAdapter(mTargetAdapter);
+
     StartRPCServer();
 
     // if called for the second time after wifi connection
@@ -287,7 +286,7 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         System.reloadNetworkMapping();
         createLayout();
         if (System.isInitialized())
-          startNetworkRadar(true);
+          startNetworkRadar();
       }
     });
   }
@@ -405,7 +404,7 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
       startUpdateChecker();
 
     if (coreBeating && isWifiAvailable)
-      startNetworkRadar(true);
+      startNetworkRadar();
 
     createLayout();
   }
@@ -436,19 +435,21 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
     return mMsfRpcdService;
   }
 
+  private NetworkRadar getNetworkRadar() {
+    if(mNetworkRadar == null)
+      mNetworkRadar = new NetworkRadar(this);
+    return mNetworkRadar;
+  }
+
   @Override
   public boolean onPrepareOptionsMenu(Menu menu) {
     MenuItem item = menu.findItem(R.id.ss_monitor);
 
-    if (mNetworkRadar != null && mNetworkRadar.isRunning())
-      item.setTitle(getString(R.string.stop_monitor));
-    else
-      item.setTitle(getString(R.string.start_monitor));
+    getNetworkRadar().buildMenuItem(item);
 
     item = menu.findItem(R.id.ss_msfrpcd);
 
-    item.setTitle(getMsfRpcdService().getMenuTitleResource());
-    item.setEnabled(getMsfRpcdService().isMenuItemEnabled());
+    getMsfRpcdService().buildMenuItem(item);
 
     mMenu = menu;
 
@@ -553,42 +554,22 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
     }
   }
 
-  public void startNetworkRadar(boolean silent) {
-    stopNetworkRadar(silent);
-
-    if (mNetworkRadar == null) {
-      mNetworkRadar = new NetworkRadar(this);
-    }
-
-    try {
-      mNetworkRadar.start(this);
-
-      if (!silent)
-        runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            Toast.makeText(MainActivity.this, getString(R.string.net_discovery_started),
-                    Toast.LENGTH_SHORT).show();
-          }
-        });
-
-    } catch (ChildManager.ChildNotStartedException e) {
-      runOnUiThread(
-              new Runnable() {
-                @Override
-                public void run() {
-                  Toast.makeText(MainActivity.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
-                }
-              }
-
-      );
-    }
+  public void startNetworkRadar() {
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        getNetworkRadar().start();
+      }
+    }).start();
   }
 
-  public void stopNetworkRadar(boolean silent) {
-    if (mNetworkRadar != null && mNetworkRadar.isRunning()) {
-      mNetworkRadar.stop(!silent);
-    }
+  public void stopNetworkRadar() {
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        getNetworkRadar().stop();
+      }
+    }).start();
   }
 
   /**
@@ -648,29 +629,11 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         return true;
 
       case R.id.scan:
-        if (mMenu != null)
-          mMenu.findItem(R.id.scan).setActionView(new ProgressBar(this));
-
-        new Thread(new Runnable() {
-          @Override
-          public void run() {
-            startNetworkRadar(true);
-
-            MainActivity.this.runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                if (mMenu != null)
-                  mMenu.findItem(R.id.scan).setActionView(null);
-              }
-            });
-          }
-        }).start();
-
-        item.setTitle(getString(R.string.stop_monitor));
+        startNetworkRadar();
         return true;
 
       case R.id.wifi_scan:
-        stopNetworkRadar(true);
+        stopNetworkRadar();
 
         mRadarReceiver.unregister();
         mUpdateReceiver.unregister();
@@ -774,28 +737,19 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         return true;
 
       case R.id.ss_monitor:
-        if (mNetworkRadar != null && mNetworkRadar.isRunning()) {
-          stopNetworkRadar(false);
-
-          item.setTitle(getString(R.string.start_monitor));
-        } else {
-          try {
-            startNetworkRadar(false);
-
-            item.setTitle(getString(R.string.stop_monitor));
-          } catch (Exception e) {
-            new ErrorDialog(getString(R.string.error), e.getMessage(), MainActivity.this).show();
+        new Thread(new Runnable() {
+          @Override
+          public void run() {
+            getNetworkRadar().onMenuClick(MainActivity.this, item);
           }
-        }
+        }).start();
         return true;
 
       case R.id.ss_msfrpcd:
         new Thread(new Runnable() {
           @Override
           public void run() {
-            getMsfRpcdService().onMenuClick();
-            item.setTitle(getMsfRpcdService().getMenuTitleResource());
-            item.setEnabled(getMsfRpcdService().isAvailable());
+            getMsfRpcdService().onMenuClick(MainActivity.this, item);
           }
         }).start();
         return true;
@@ -846,7 +800,7 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
 
   @Override
   public void onDestroy() {
-    stopNetworkRadar(true);
+    stopNetworkRadar();
     StopRPCServer();
 
     mRadarReceiver.unregister();
@@ -858,29 +812,6 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
     System.clean(true);
 
     super.onDestroy();
-  }
-
-  @Override
-  public void onTargetFound(final Target t) {
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        if (System.addOrderedTarget(t) && mTargetAdapter != null) {
-          mTargetAdapter.notifyDataSetChanged();
-        }
-      }
-    });
-  }
-
-  @Override
-  public void onTargetChanged(final Target t) {
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        if (mTargetAdapter != null)
-          mTargetAdapter.notifyDataSetChanged();
-      }
-    });
   }
 
   public class TargetAdapter extends ArrayAdapter<Target> {
@@ -989,33 +920,6 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
       ImageView itemImage;
       TextView itemTitle;
       TextView itemDescription;
-    }
-  }
-
-  private class RadarReceiver extends ManagedReceiver {
-    private IntentFilter mFilter = null;
-
-    public RadarReceiver() {
-      mFilter = new IntentFilter();
-
-      mFilter.addAction(NRDR_STOPPED);
-    }
-
-    public IntentFilter getFilter() {
-      return mFilter;
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public void onReceive(Context context, Intent intent) {
-      if (intent.getAction() == null)
-        return;
-
-      if (intent.getAction().equals(NRDR_STOPPED)) {
-
-        Toast.makeText(MainActivity.this, R.string.net_discovery_stopped,
-                Toast.LENGTH_SHORT).show();
-      }
     }
   }
 

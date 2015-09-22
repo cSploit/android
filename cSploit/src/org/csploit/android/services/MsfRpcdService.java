@@ -1,7 +1,9 @@
 package org.csploit.android.services;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.view.MenuItem;
 
 import org.csploit.android.R;
 import org.csploit.android.core.ChildManager;
@@ -15,31 +17,15 @@ import org.csploit.android.tools.MsfRpcd;
  */
 public class MsfRpcdService extends NativeService implements MenuControllableService {
 
-  public static final String STATUS_ACTION = "org.csploit.android.services.msfrpcdservice.status";
-  public static final String STATUS = "STATUS";
+  public static final String STATUS_ACTION = "MsfRpcdService.action.STATUS";
+  public static final String STATUS = "MsfRpcdService.data.STATUS";
 
   final String host, user, password;
   final int port;
   final boolean ssl;
 
   @Override
-  public int getMenuTitleResource() {
-    if(!isLocal()) {
-      return System.getMsfRpc() == null ?
-              R.string.connect_msf :
-              R.string.disconnect_msf;
-    }
-
-    return isRunning() ? R.string.stop_msfrpcd : R.string.start_msfrpcd;
-  }
-
-  @Override
-  public boolean isMenuItemEnabled() {
-    return isAvailable();
-  }
-
-  @Override
-  public void onMenuClick() {
+  public void onMenuClick(Activity activity, final MenuItem item) {
     if(isLocal()) {
       if(isRunning()) {
         stop();
@@ -53,6 +39,22 @@ public class MsfRpcdService extends NativeService implements MenuControllableSer
         connect();
       }
     }
+
+    activity.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        buildMenuItem(item);
+      }
+    });
+  }
+
+  @Override
+  public void buildMenuItem(MenuItem item) {
+    item.setTitle(
+            isLocal() ?
+                    (isRunning() ? R.string.stop_msfrpcd : R.string.start_msfrpcd) :
+                    (isConnected() ? R.string.connect_msf : R.string.disconnect_msf));
+    item.setEnabled(isAvailable());
   }
 
   public enum Status {
