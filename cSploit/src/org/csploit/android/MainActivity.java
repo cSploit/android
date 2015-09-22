@@ -83,6 +83,8 @@ import org.csploit.android.plugins.RouterPwn;
 import org.csploit.android.plugins.Sessions;
 import org.csploit.android.plugins.Traceroute;
 import org.csploit.android.plugins.mitm.MITM;
+import org.csploit.android.services.MsfRpcdService;
+import org.csploit.android.services.receivers.MsfRpcdServiceReceiver;
 import org.csploit.android.tools.MsfRpcd;
 import org.csploit.android.tools.ToolBox;
 
@@ -107,10 +109,11 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
   private boolean isWifiAvailable = false;
   private TargetAdapter mTargetAdapter = null;
   private NetworkRadar mNetworkRadar = null;
-  private Child mMsfRpcd = null;
+  private MsfRpcdService mMsfRpcdService = null;
   private RadarReceiver mRadarReceiver = new RadarReceiver();
   private UpdateReceiver mUpdateReceiver = new UpdateReceiver();
   private WipeReceiver mWipeReceiver = new WipeReceiver();
+  private MsfRpcdServiceReceiver mMsfReceiver = new MsfRpcdServiceReceiver();
   private Menu mMenu = null;
   private TextView mUpdateStatus = null;
   private Toast mToast = null;
@@ -199,6 +202,9 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
     mRadarReceiver.register(MainActivity.this);
     mUpdateReceiver.register(MainActivity.this);
     mWipeReceiver.register(MainActivity.this);
+    mMsfReceiver.register(MainActivity.this);
+
+    StartRPCServer();
 
     // if called for the second time after wifi connection
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
@@ -401,9 +407,6 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
     if (coreBeating && isWifiAvailable)
       startNetworkRadar(true);
 
-    if (!MsfRpcd.isLocal() || System.getLocalMsfVersion() != null)
-      StartRPCServer();
-
     createLayout();
   }
 
@@ -427,6 +430,12 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
     return super.onCreateOptionsMenu(menu);
   }
 
+  private MsfRpcdService getMsfRpcdService() {
+    if(mMsfRpcdService == null)
+      mMsfRpcdService = new MsfRpcdService(this);
+    return mMsfRpcdService;
+  }
+
   @Override
   public boolean onPrepareOptionsMenu(Menu menu) {
     MenuItem item = menu.findItem(R.id.ss_monitor);
@@ -437,24 +446,9 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
       item.setTitle(getString(R.string.start_monitor));
 
     item = menu.findItem(R.id.ss_msfrpcd);
-    ToolBox tools = System.getTools();
 
-    if (MsfRpcd.isLocal()) {
-      if (System.getMsfRpc() != null
-              || (mMsfRpcd != null && mMsfRpcd.running))
-        item.setTitle(getString(R.string.stop_msfrpcd));
-      else
-        item.setTitle(getString(R.string.start_msfrpcd));
-    } else {
-      if (System.getMsfRpc() == null)
-        item.setTitle(getString(R.string.connect_msf));
-      else
-        item.setTitle(getString(R.string.disconnect_msf));
-    }
-
-    item.setEnabled(!MsfRpcd.isLocal() ||
-            (tools != null && tools.msfrpcd.isEnabled() &&
-                    !System.isServiceRunning("org.csploit.android.core.UpdateService")));
+    item.setTitle(getMsfRpcdService().getMenuTitleResource());
+    item.setEnabled(getMsfRpcdService().isMenuItemEnabled());
 
     mMenu = menu;
 
@@ -597,163 +591,33 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
     }
   }
 
-  private boolean connectToRpcServer(String msfHost, String msfUser, String msfPassword, int msfPort, boolean msfSsl) {
-    try {
-      System.setMsfRpc(new RPCClient(msfHost, msfUser, msfPassword, msfPort, msfSsl));
-      Logger.info("successfully connected to MSF RPC Daemon ");
-      return true;
-    } catch (Exception e) {
-      Logger.error(e.getClass().getName() + ": " + e.getMessage());
-    }
-    return false;
-  }
-
   /**
    * start MSF RPC Daemon
    */
   public void StartRPCServer() {
-    StopRPCServer(true);
-
     new Thread(new Runnable() {
       @Override
       public void run() {
-        SharedPreferences prefs = System.getSettings();
-
-        final String msfHost = prefs.getString("MSF_RPC_HOST", "127.0.0.1");
-        final String msfUser = prefs.getString("MSF_RPC_USER", "msf");
-        final String msfPassword = prefs.getString("MSF_RPC_PSWD", "msf");
-        final int msfPort = System.MSF_RPC_PORT;
-        final boolean msfSsl = prefs.getBoolean("MSF_RPC_SSL", false);
-
-        if (msfHost.equals("127.0.0.1")) {
-          try {
-            mMsfRpcd = System.getTools().msfrpcd.async(
-                    msfUser, msfPassword, msfPort, msfSsl,
-                    new MsfRpcd.MsfRpcdReceiver() {
-                      @Override
-                      public void onReady() {
-                        boolean connected = false;
-
-                        for(int i = 0; i < 3 && !connected; i++) {
-                          connected = connectToRpcServer(msfHost, msfUser, msfPassword, msfPort, msfSsl);
-                          if(!connected) {
-                            try {
-                              Thread.sleep(1000);
-                            } catch (InterruptedException e) {
-                              break;
-                            }
-                          }
-                        }
-
-                        if(connected) {
-                          onMsfRpcConnectionSuccess();
-                        } else {
-                          onMsfRpcConnectionFailed();
-                        }
-                      }
-
-                      @Override
-                      public void onEnd(final int exitValue) {
-                        if (exitValue == 0)
-                          return;
-
-                        MainActivity.this.runOnUiThread(new Runnable() {
-                          @Override
-                          public void run() {
-                            Toast.makeText(MainActivity.this, "MSF RPC Daemon returned #" + exitValue, Toast.LENGTH_LONG).show();
-                          }
-                        });
-                      }
-
-                      @Override
-                      public void onDeath(final int signal) {
-                        MainActivity.this.runOnUiThread(new Runnable() {
-                          @Override
-                          public void run() {
-                            Toast.makeText(MainActivity.this, " MSF RPC Daemon killed by signal #" + signal, Toast.LENGTH_LONG).show();
-                          }
-                        });
-                      }
-                    });
-          } catch (ChildManager.ChildNotStartedException e) {
-            Logger.error(e.getMessage());
-            MainActivity.this.runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                Toast.makeText(MainActivity.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
-              }
-            });
-          }
-        } else {
-          if(connectToRpcServer(msfHost, msfUser, msfPassword, msfPort, msfSsl)) {
-            onMsfRpcConnectionSuccess();
-          } else {
-            onMsfRpcConnectionFailed();
-          }
-        }
+        if(getMsfRpcdService().isAvailable())
+          getMsfRpcdService().start();
       }
     }).start();
   }
 
-  private void onMsfRpcConnectionFailed() {
-    MainActivity.this.runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        Toast.makeText(MainActivity.this, "connection to MSF RPC Daemon failed", Toast.LENGTH_LONG).show();
-      }
-    });
-  }
-
-  private void onMsfRpcConnectionSuccess() {
-    MainActivity.this.runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        Toast.makeText(MainActivity.this, "connected to MSF RPC Daemon", Toast.LENGTH_SHORT).show();
-      }
-    });
-  }
-
   /**
    * stop MSF RPC Daemon
-   *
-   * @param silent show an information Toast if {@code false}
    */
-  public void StopRPCServer(final boolean silent) {
-
-    if (System.getMsfRpc() == null && (mMsfRpcd == null || !mMsfRpcd.running))
-      return;
-
-    final Child process = mMsfRpcd;
-    mMsfRpcd = null;
-
+  public void StopRPCServer() {
     new Thread(new Runnable() {
       @Override
       public void run() {
-        try {
-          System.setMsfRpc(null);
-
-          if (process.running) {
-            process.kill(2);
-            process.join();
-          }
-
-          if (!silent) {
-            MainActivity.this.runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                Toast.makeText(MainActivity.this, getString(R.string.rpcd_stopped), Toast.LENGTH_SHORT).show();
-              }
-            });
-          }
-        } catch (InterruptedException e) {
-          Logger.error("interrupted while stopping rpc daemon");
-        }
+        getMsfRpcdService().stop();
       }
     }).start();
   }
 
   @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
+  public boolean onOptionsItemSelected(final MenuItem item) {
     switch (item.getItemId()) {
 
       case R.id.add:
@@ -926,19 +790,14 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         return true;
 
       case R.id.ss_msfrpcd:
-        if (System.getMsfRpc() != null || (mMsfRpcd != null && mMsfRpcd.running)) {
-          StopRPCServer(false);
-          if (MsfRpcd.isLocal())
-            item.setTitle(R.string.start_msfrpcd);
-          else
-            item.setTitle(R.string.connect_msf);
-        } else {
-          StartRPCServer();
-          if (MsfRpcd.isLocal())
-            item.setTitle(R.string.stop_msfrpcd);
-          else
-            item.setTitle(R.string.disconnect_msf);
-        }
+        new Thread(new Runnable() {
+          @Override
+          public void run() {
+            getMsfRpcdService().onMenuClick();
+            item.setTitle(getMsfRpcdService().getMenuTitleResource());
+            item.setEnabled(getMsfRpcdService().isAvailable());
+          }
+        }).start();
         return true;
 
       case R.id.submit_issue:
@@ -988,11 +847,12 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
   @Override
   public void onDestroy() {
     stopNetworkRadar(true);
-    StopRPCServer(true);
+    StopRPCServer();
 
     mRadarReceiver.unregister();
     mUpdateReceiver.unregister();
     mWipeReceiver.unregister();
+    mMsfReceiver.unregister();
 
     // make sure no zombie process is running before destroying the activity
     System.clean(true);
@@ -1185,7 +1045,7 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
             path = System.getRubyPath() + "' '" + System.getMsfPath();
           }
 
-          StopRPCServer(true);
+          StopRPCServer();
           System.getTools().raw.async("rm -rf '" + path + "'", new Child.EventReceiver() {
             @Override
             public void onEnd(int exitCode) {
@@ -1237,7 +1097,7 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
                   desc, MainActivity.this, new ConfirmDialogListener() {
             @Override
             public void onConfirm() {
-              StopRPCServer(true);
+              StopRPCServer();
               Intent i = new Intent(MainActivity.this, UpdateService.class);
               i.setAction(UpdateService.START);
               i.putExtra(UpdateService.ACTION, target);
@@ -1270,8 +1130,7 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
       switch (target) {
         case ruby_update:
         case msf_update:
-          if(!MsfRpcd.isLocal() || MsfRpcd.isInstalled())
-            StartRPCServer();
+          StartRPCServer();
           break;
         case core_update:
           onCoreUpdated();
