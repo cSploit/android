@@ -53,19 +53,19 @@ public class InputDialog extends AlertDialog{
 
     this.setTitle(title);
     this.setMessage(message);
-    this.setView(mEditText);
+
+    this.setView(mEditText, 40, 0, 40, 0);
 
     final InputDialogListener listener = inputDialogListener;
-
-    this.setButton("Ok", new DialogInterface.OnClickListener(){
-      public void onClick(DialogInterface dialog, int id){
+    this.setButton(BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int id) {
         if(listener != null)
           listener.onInputEntered(mEditText.getText() + "");
       }
     });
 
-    this.setButton2(activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener(){
-      public void onClick(DialogInterface dialog, int id){
+    this.setButton(BUTTON_NEGATIVE, activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int id) {
         dialog.dismiss();
       }
     });

@@ -36,7 +36,7 @@ public class RedirectionDialog extends AlertDialog{
     this.setTitle(title);
     this.setView(view);
 
-    this.setButton("Ok", new DialogInterface.OnClickListener(){
+    this.setButton(BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener(){
       public void onClick(DialogInterface dialog, int id){
         assert view != null;
         String address = ((EditText) view.findViewById(R.id.redirAddress)).getText() + "".trim(),
@@ -46,8 +46,8 @@ public class RedirectionDialog extends AlertDialog{
       }
     });
 
-    this.setButton2(activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener(){
-      public void onClick(DialogInterface dialog, int id){
+    this.setButton(BUTTON_NEGATIVE, activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int id) {
         dialog.dismiss();
       }
     });
