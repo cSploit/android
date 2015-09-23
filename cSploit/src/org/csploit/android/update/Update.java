@@ -1,28 +1,22 @@
-package org.csploit.android.core;
+package org.csploit.android.update;
 
 import android.content.Intent;
 
-import com.github.zafarkhaja.semver.Version;
-import com.sksamuel.diffpatch.DiffMatchPatch;
-
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.io.Serializable;
 
 /**
  * just a simple struct to handle archives metadata
  */
-public class ArchiveMetadata {
+public abstract class Update implements Serializable {
   public String
           url,
           name,
           path,
-          versionString,
+          version,
           outputDir,
           executableOutputDir,
           md5,
           sha1;
-  public Version
-          version;
   public compressionAlgorithm
           compression;
   public archiveAlgorithm
@@ -32,21 +26,24 @@ public class ArchiveMetadata {
   public boolean
           skipRoot,
           fixShebang,
-          errorOccurred;
+          errorOccurred,
+          wipeOnFail;
+  public String
+          prompt;
 
-  public ArchiveMetadata() {
+  public Update() {
     reset();
   }
 
   public void reset() {
     synchronized (this) {
-      url = name = md5 = sha1 = versionString = path =
+      url = name = md5 = sha1 = version = path =
               outputDir = executableOutputDir = null;
       version = null;
       compression = null;
       archiver = null;
       contentIntent = null;
-      fixShebang = errorOccurred = skipRoot = false;
+      wipeOnFail = fixShebang = errorOccurred = skipRoot = false;
     }
   }
 
