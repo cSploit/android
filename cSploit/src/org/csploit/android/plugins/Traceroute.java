@@ -20,6 +20,9 @@ package org.csploit.android.plugins;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -41,6 +44,7 @@ public class Traceroute extends Plugin {
 	private boolean mRunning = false;
 	private ArrayAdapter<String> mListAdapter = null;
 	private Receiver mTraceReceiver = null;
+	private boolean resolveNames = false;
 
 	public Traceroute() {
 		super(R.string.trace, R.string.trace_desc,
@@ -65,7 +69,7 @@ public class Traceroute extends Plugin {
 		mListAdapter.clear();
 
     try {
-      System.getTools().nmap.trace(System.getCurrentTarget(), mTraceReceiver);
+      System.getTools().nmap.trace(System.getCurrentTarget(), resolveNames, mTraceReceiver);
 
       mRunning = true;
     } catch (ChildManager.ChildNotStartedException e) {
@@ -104,6 +108,34 @@ public class Traceroute extends Plugin {
 				android.R.layout.simple_list_item_1);
 		mTraceList.setAdapter(mListAdapter);
 	}
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu){
+    MenuInflater inflater = getMenuInflater();
+    inflater.inflate(R.menu.traceroute, menu);
+    return super.onCreateOptionsMenu(menu);
+  }
+
+  @Override
+  public boolean onPrepareOptionsMenu(Menu menu) {
+    MenuItem item = menu.findItem(R.id.resolve_names);
+    if(item != null) {
+      item.setChecked(resolveNames);
+    }
+    return super.onPrepareOptionsMenu(menu);
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item){
+    switch (item.getItemId()) {
+      case R.id.resolve_names:
+        resolveNames=!item.isChecked();
+        item.setChecked(resolveNames);
+        return true;
+      default:
+        return super.onOptionsItemSelected(item);
+    }
+  }
 
 	@Override
 	public void onBackPressed() {
@@ -163,17 +195,25 @@ public class Traceroute extends Plugin {
     }
 
     @Override
-    public void onHop(int hop, final long usec, final String address) {
+    public void onHop(int hop, final long usec, final String address, final String name) {
 
 			Traceroute.this.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
+
+          String addr;
+
+          if (name != null && !name.isEmpty()) {
+            addr = name + " [" + address + "]";
+          } else {
+            addr = address;
+          }
+
 					if (usec > 0)
-						mListAdapter.add(address + " ( " + formatTime(usec) + " )");
+						mListAdapter.add(addr + " ( " + formatTime(usec) + " )");
 
 					else
-						mListAdapter.add(address
-								+ getString(R.string.untraced_hops));
+						mListAdapter.add(addr + getString(R.string.untraced_hops));
 
 					mListAdapter.notifyDataSetChanged();
 				}
