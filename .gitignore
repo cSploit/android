@@ -63,3 +63,4 @@ dSploit/build/
 # PDT-specific
 .buildpath
 /obj
+cSploit/res/values/strings.xml
