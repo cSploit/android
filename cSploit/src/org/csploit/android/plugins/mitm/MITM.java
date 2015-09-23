@@ -551,8 +551,13 @@ public class MITM extends Plugin
 
                   @Override
                   public void onError(String line) {
-                    Toast.makeText(MITM.this, "arpspoof error", Toast.LENGTH_LONG).show();
-                    activity.setVisibility(View.INVISIBLE);
+                    MITM.this.runOnUiThread(new Runnable() {
+                      @Override
+                      public void run() {
+                        Toast.makeText(MITM.this, "arpspoof error", Toast.LENGTH_LONG).show();
+                        activity.setVisibility(View.INVISIBLE);
+                      }
+                    });
                   }
                 });
 
