@@ -87,7 +87,7 @@ public class MsfRpcdService extends NativeService implements MenuControllableSer
     return !isLocal() || (
               System.getLocalMsfVersion() != null &&
               System.getTools().msfrpcd.isEnabled() &&
-              !System.isServiceRunning("org.csploit.android.core.UpdateService"));
+              !System.isServiceRunning("org.csploit.android.services.UpdateService"));
   }
 
   @Override

@@ -42,7 +42,7 @@
 
         <!-- suppress AndroidDomInspection -->
         <service
-            android:name=".core.UpdateService"
+            android:name=".services.UpdateService"
             android:enabled="true" />
 
         <service

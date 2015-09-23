@@ -43,13 +43,11 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.csploit.android.core.Child;
-import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Client;
 import org.csploit.android.core.CrashReporter;
 import org.csploit.android.core.Logger;
@@ -57,8 +55,8 @@ import org.csploit.android.core.ManagedReceiver;
 import org.csploit.android.core.MultiAttackService;
 import org.csploit.android.core.Plugin;
 import org.csploit.android.core.System;
-import org.csploit.android.core.UpdateChecker;
-import org.csploit.android.core.UpdateService;
+import org.csploit.android.services.UpdateChecker;
+import org.csploit.android.services.UpdateService;
 import org.csploit.android.events.Event;
 import org.csploit.android.gui.dialogs.AboutDialog;
 import org.csploit.android.gui.dialogs.ConfirmDialog;
@@ -85,19 +83,18 @@ import org.csploit.android.plugins.mitm.MITM;
 import org.csploit.android.services.MsfRpcdService;
 import org.csploit.android.services.receivers.MsfRpcdServiceReceiver;
 import org.csploit.android.services.receivers.NetworkRadarReceiver;
+import org.csploit.android.update.CoreUpdate;
+import org.csploit.android.update.MsfUpdate;
+import org.csploit.android.update.RubyUpdate;
+import org.csploit.android.update.Update;
 
 import java.io.IOException;
 import java.net.NoRouteToHostException;
 import java.util.ArrayList;
 
-import static org.csploit.android.core.UpdateChecker.AVAILABLE_VERSION;
-import static org.csploit.android.core.UpdateChecker.CORE_AVAILABLE;
-import static org.csploit.android.core.UpdateChecker.GEMS_AVAILABLE;
-import static org.csploit.android.core.UpdateChecker.MSF_AVAILABLE;
-import static org.csploit.android.core.UpdateChecker.RUBY_AVAILABLE;
-import static org.csploit.android.core.UpdateChecker.UPDATE_AVAILABLE;
-import static org.csploit.android.core.UpdateChecker.UPDATE_CHECKING;
-import static org.csploit.android.core.UpdateChecker.UPDATE_NOT_AVAILABLE;
+import static org.csploit.android.services.UpdateChecker.UPDATE_AVAILABLE;
+import static org.csploit.android.services.UpdateChecker.UPDATE_CHECKING;
+import static org.csploit.android.services.UpdateChecker.UPDATE_NOT_AVAILABLE;
 
 @SuppressLint("NewApi")
 public class MainActivity extends ActionBarActivity {
@@ -981,10 +978,6 @@ public class MainActivity extends ActionBarActivity {
       mFilter.addAction(UPDATE_CHECKING);
       mFilter.addAction(UPDATE_AVAILABLE);
       mFilter.addAction(UPDATE_NOT_AVAILABLE);
-      mFilter.addAction(CORE_AVAILABLE);
-      mFilter.addAction(RUBY_AVAILABLE);
-      mFilter.addAction(GEMS_AVAILABLE);
-      mFilter.addAction(MSF_AVAILABLE);
       mFilter.addAction(UpdateService.ERROR);
       mFilter.addAction(UpdateService.DONE);
     }
@@ -993,18 +986,18 @@ public class MainActivity extends ActionBarActivity {
       return mFilter;
     }
 
-    private void onUpdateAvailable(final String desc, final UpdateService.action target, final boolean mandatory) {
+    private void onUpdateAvailable(final Update update, final boolean mandatory) {
       MainActivity.this.runOnUiThread(new Runnable() {
         @Override
         public void run() {
           new ConfirmDialog(getString(R.string.update_available),
-                  desc, MainActivity.this, new ConfirmDialogListener() {
+                  update.prompt, MainActivity.this, new ConfirmDialogListener() {
             @Override
             public void onConfirm() {
               StopRPCServer();
               Intent i = new Intent(MainActivity.this, UpdateService.class);
               i.setAction(UpdateService.START);
-              i.putExtra(UpdateService.ACTION, target);
+              i.putExtra(UpdateService.UPDATE, update);
 
               startService(i);
             }
@@ -1023,31 +1016,29 @@ public class MainActivity extends ActionBarActivity {
       });
     }
 
-    private void onUpdateAvailable(final String desc, final UpdateService.action target) {
-      onUpdateAvailable(desc, target, false);
+    private void onUpdateAvailable(Update update) {
+      onUpdateAvailable(update, (update instanceof CoreUpdate) && !System.isCoreInstalled());
     }
 
-    private void onUpdateDone(UpdateService.action target) {
+    private void onUpdateDone(Update update) {
 
       System.reloadTools();
 
-      switch (target) {
-        case ruby_update:
-        case msf_update:
-          StartRPCServer();
-          break;
-        case core_update:
-          onCoreUpdated();
-          break;
+      if((update instanceof MsfUpdate) || (update instanceof RubyUpdate)) {
+        StartRPCServer();
+      }
+
+      if(update instanceof CoreUpdate) {
+        onCoreUpdated();
       }
 
       // restart update checker after a successful update
       startUpdateChecker();
     }
 
-    private void onUpdateError(UpdateService.action target, final int message) {
+    private void onUpdateError(final Update update, final int message) {
 
-      if (target == UpdateService.action.core_update) {
+      if (update instanceof CoreUpdate) {
         onInitializationError(getString(message));
         return;
       }
@@ -1066,73 +1057,38 @@ public class MainActivity extends ActionBarActivity {
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onReceive(Context context, Intent intent) {
-      if (intent.getAction().equals(UPDATE_CHECKING)) {
+      String action = intent.getAction();
+      Update update = null;
 
-        if (mUpdateStatus != null)
-          mUpdateStatus.setText(UPDATE_MESSAGE.replace(
-                  "#STATUS#", getString(R.string.checking)));
+      if(intent.hasExtra(UpdateService.UPDATE)) {
+        update = (Update) intent.getSerializableExtra(UpdateService.UPDATE);
+      }
 
-      } else if (intent.getAction().equals(UPDATE_NOT_AVAILABLE)) {
+      switch (action) {
+        case UPDATE_CHECKING:
+          if (mUpdateStatus != null)
+            mUpdateStatus.setText(UPDATE_MESSAGE.replace(
+                    "#STATUS#", getString(R.string.checking)));
+          break;
+        case UPDATE_NOT_AVAILABLE:
+          if (mUpdateStatus != null)
+            mUpdateStatus.setText(UPDATE_MESSAGE.replace(
+                    "#STATUS#", getString(R.string.no_updates_available)));
 
-        if (mUpdateStatus != null)
-          mUpdateStatus.setText(UPDATE_MESSAGE.replace(
-                  "#STATUS#", getString(R.string.no_updates_available)));
-
-        if (!System.isCoreInitialized()) {
-          new FatalDialog(getString(R.string.initialization_error),
-                  getString(R.string.no_core_found), MainActivity.this).show();
-        }
-
-      } else if (intent.getAction().equals(RUBY_AVAILABLE)) {
-        final String description = getString(R.string.new_ruby_update_desc) + " " +
-                getString(R.string.new_update_desc2);
-
-        onUpdateAvailable(description, UpdateService.action.ruby_update);
-      } else if (intent.getAction().equals(MSF_AVAILABLE)) {
-        if (mUpdateStatus != null)
-          mUpdateStatus.setText(UPDATE_MESSAGE.replace(
-                  "#STATUS#",
-                  getString(R.string.new_version) + " " +
-                          getString(R.string.new_version2)
-          ));
-
-        final String description = getString(R.string.new_msf_update_desc) + " " +
-                getString(R.string.new_update_desc2);
-
-        onUpdateAvailable(description, UpdateService.action.msf_update);
-      } else if (intent.getAction().equals(UPDATE_AVAILABLE)) {
-        final String remoteVersion = (String) intent.getExtras().get(
-                AVAILABLE_VERSION);
-
-        if (mUpdateStatus != null)
-          mUpdateStatus.setText(UPDATE_MESSAGE.replace(
-                  "#STATUS#", getString(R.string.new_version)
-                          + remoteVersion
-                          + getString(R.string.new_version2)));
-
-        final String description = getString(R.string.new_update_desc)
-                + " " + remoteVersion + " "
-                + getString(R.string.new_update_desc2);
-
-        onUpdateAvailable(description, UpdateService.action.apk_update);
-      } else if (intent.getAction().equals(CORE_AVAILABLE)) {
-
-        final String remoteVersion = (String) intent.getExtras().get(
-                AVAILABLE_VERSION);
-
-        if (mUpdateStatus != null)
-          mUpdateStatus.setText(UPDATE_MESSAGE.replace(
-                  "#STATUS#", getString(R.string.new_version) + " " +
-                          getString(R.string.new_version2)));
-
-        final String description = String.format(getString(R.string.new_core_found), remoteVersion);
-
-        onUpdateAvailable(description, UpdateService.action.core_update, !System.isCoreInstalled());
-      } else if (intent.getAction().equals(UpdateService.ERROR)) {
-        onUpdateError((UpdateService.action) intent.getSerializableExtra(UpdateService.ACTION),
-                intent.getIntExtra(UpdateService.MESSAGE, R.string.error_occured));
-      } else if (intent.getAction().equals(UpdateService.DONE)) {
-        onUpdateDone((UpdateService.action) intent.getSerializableExtra(UpdateService.ACTION));
+          if (!System.isCoreInitialized()) {
+            onInitializationError(getString(R.string.no_core_found));
+          }
+          break;
+        case UPDATE_AVAILABLE:
+          onUpdateAvailable(update);
+          break;
+        case UpdateService.DONE:
+          onUpdateDone(update);
+          break;
+        case UpdateService.ERROR:
+          int message = intent.getIntExtra(UpdateService.MESSAGE, R.string.error_occured);
+          onUpdateError(update, message);
+          break;
       }
     }
   }
