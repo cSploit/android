@@ -161,7 +161,7 @@ public class ChildManager {
       Logger.debug("Child #" + c.id + " exited ( exitValue=" + c.exitValue + " )");
       if(c.receiver != null)
         c.receiver.onEnd(c.exitValue);
-      crash = c.exitValue > 126 && c.exitValue != 130 && c.exitValue != 137;
+      crash = c.exitValue > 126 && c.exitValue != 130 && c.exitValue != 137 && c.exitValue < 150;
       if(crash) {
         c.signal = c.exitValue - 128;
       }
@@ -201,7 +201,9 @@ public class ChildManager {
       died = event instanceof ChildDied;
     }
 
-    Logger.debug("received an event: " + event);
+    if(!(event instanceof Newline)) {
+      Logger.debug("received an event: " + event);
+    }
 
     synchronized (children) {
       while((c = getChildByID(childID)) == null) {
