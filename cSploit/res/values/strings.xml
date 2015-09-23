@@ -498,6 +498,7 @@
     <string name="buildinfo">Build Info</string>
     <string name="menu_multiaction">Multi Action</string>
     <string name="menu_focusedscan">focused scan</string>
+    <string name="menu_resolve_names">resolve hostnames</string>
 
     <string name="crash_dialog_title">cSploit has crashed.</string>
     <string name="crash_dialog_text">An unexpected error occurred, forcing the application or a component to stop. You can help us identify and fix the issue by sending crash-related runtime data.  To do so, click \'OK\'.</string>
