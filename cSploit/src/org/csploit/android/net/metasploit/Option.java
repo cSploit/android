@@ -105,12 +105,10 @@ public class Option {
         break;
       case ADDRESS:
         try {
-          InetAddress ia = InetAddress.getByAddress(value.getBytes());
-          Logger.debug("Validating inetaddress: " + ia.toString());
+          mValue = InetAddress.getByName(value).getHostAddress();
         } catch (UnknownHostException uhe) {
-          throw new NumberFormatException("invalid IP address");
+          throw new NumberFormatException("invalid IP address: " + value);
         }
-        mValue = value;
         break;
       case PORT:
         int i = Integer.parseInt(value);
