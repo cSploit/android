@@ -486,4 +486,6 @@
     <string name="crash_dialog_text">Nastala neočekávaná chyba, nucející aplikaci nebo její část se okamžitě ukončit. Prosím, pomoz se nám to opravit zasláním dat o chybách, vše co musíš udělat je stisknout \'OK\'.</string>
     <string name="crash_dialog_comment">Teoreticky bys mohl přidat komentář k tvému problému do prostoru níže</string>
     <string name="JNI_crash_detected">Knihovna JNI spadla již minule, doufám, že jsi nám již podal hlášení.</string>
+    <string name="update_cancelled">Aktualizace byla zastavena</string>
+    <string name="child_not_started">Nemohu spustit proces</string>
 </resources>
