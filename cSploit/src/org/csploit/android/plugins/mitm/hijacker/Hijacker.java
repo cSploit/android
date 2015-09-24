@@ -523,7 +523,7 @@ public class Hijacker extends ActionBarActivity {
           Hijacker.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-              mHijackToggleButton.setText("Stop");
+              mHijackToggleButton.setText(R.string.stop);
               mHijackProgress.setVisibility(View.VISIBLE);
               mRunning = true;
             }
