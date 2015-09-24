@@ -68,7 +68,7 @@
     <string name="exit">Beenden</string>
     <string name="close_confirm">cSploit wird sich beenden. Wirklich fortfahren?</string>
     <string name="press_back">Nochmal auf Zurück drücken um die Anwendung zu beenden.</string>
-    <string name="selected_">Ausgewählt&#160;</string>
+    <string name="selected_">Ausgewählt &#160;</string>
     <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">Keine Sitzungsdatei auf der SD-Karte gefunden.</string>
     <string name="select_session_file">Wähle eine Sitzungsdatei von der SD-Karte:</string>
@@ -303,7 +303,6 @@
     <string name="crash_dialog_text">Ein unerwarteter Fehler trat beim erzwungenen Beenden der Anwendung oder einer ihrer Komponenten auf. Bitte hilf uns das zu beheben, indem du auf \'OK\' drückst.</string>
     <string name="crash_dialog_comment">Du kannst unten ein Kommentar über das Problem hinzufügen</string>
     <string name="JNI_crash_detected">Die JNI Bibliothek ist zuvor abgestürzt. Ich hoffe du sendest einen Bericht.</string>
-    <string name="about">Über</string>
     <string name="choose_an_option">Wähle eine Option</string>
     <string name="error_rcpd_fatal">Fataler Fehler aufgetreten. Ich suche nach dem Fehler und sende einen Bericht an meine Entwickler.</string>
     <string name="error_rpc">RPC Fehler</string>
