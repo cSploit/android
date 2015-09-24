@@ -150,6 +150,17 @@ public class Sessions extends Plugin {
       return;
 		}
 
+    mResults = System.getCurrentTarget().getSessions();
+
+    mListView = (ListView) findViewById(android.R.id.list);
+    mAdapter  = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mResults);
+
+    mListView.setAdapter(mAdapter);
+
+    mListView.setOnItemClickListener(clickListener);
+
+    mListView.setOnItemLongClickListener(longClickListener);
+
     new Thread(new Runnable() {
       @Override
       public void run() {
@@ -166,17 +177,6 @@ public class Sessions extends Plugin {
         });
       }
     }).start();
-
-    mResults = System.getCurrentTarget().getSessions();
-
-		mListView = (ListView) findViewById(android.R.id.list);
-    mAdapter  = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mResults);
-
-		mListView.setAdapter(mAdapter);
-
-    mListView.setOnItemClickListener(clickListener);
-
-    mListView.setOnItemLongClickListener(longClickListener);
 	}
 
 	@Override
