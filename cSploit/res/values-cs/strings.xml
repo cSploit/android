@@ -463,8 +463,6 @@
     <string name="no_core_found">nemohu nalézt jádro pro vaše zařízení</string>
     <string name="mandatory_update">tato aktualizace je potřebná</string>
     <string name="new_core_found">Je k dispozici jádro cSploitu verze %s, přejete si aktualizovat?</string>
-    <string name="update_cancelled">aktualizace byla zrušena</string>
-    <string name="child_not_started">nemohu spustit proces</string>
     <string name="pref_updates">Aktualizace</string>
     <string name="pref_updates_app">Aplikace</string>
     <string name="pref_updates_app_desc">zkontrolovat aktualizace aplikace</string>
@@ -484,6 +482,8 @@
 
     <string name="crash_dialog_title">cSploit spadl</string>
     <string name="crash_dialog_text">Nastala neočekávaná chyba, nucející aplikaci nebo její část se okamžitě ukončit. Prosím, pomoz se nám to opravit zasláním dat o chybách, vše co musíš udělat je stisknout \'OK\'.</string>
-    <string name="crash_dialog_comment">Teoreticky bys mohl přidat komentář k tvému problému do prostoru níže</string>
+    <string name="crash_dialog_comment">Teoreticky bys mohl přidat komentář k tvému problému do prostoru níže.</string>
     <string name="JNI_crash_detected">Knihovna JNI spadla již minule, doufám, že jsi nám již podal hlášení.</string>
+    <string name="update_cancelled">Aktualizace byla zastavena</string>
+    <string name="child_not_started">Nemohu spustit proces</string>
 </resources>
