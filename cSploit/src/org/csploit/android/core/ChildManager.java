@@ -156,11 +156,14 @@ public class ChildManager {
 
   private static void dispatchEvent(Child c, Event event) {
     boolean crash = false;
+    boolean terminated = false;
+
     if(event instanceof ChildEnd) {
       c.exitValue = ((ChildEnd) event).exit_status;
       Logger.debug("Child #" + c.id + " exited ( exitValue=" + c.exitValue + " )");
       if(c.receiver != null)
         c.receiver.onEnd(c.exitValue);
+      terminated = true;
       crash = c.exitValue > 126 && c.exitValue != 130 && c.exitValue != 137 && c.exitValue < 150;
       if(crash) {
         c.signal = c.exitValue - 128;
@@ -170,12 +173,21 @@ public class ChildManager {
       Logger.debug("Child #" + c.id + " died ( signal=" + c.signal + " )");
       if(c.receiver != null)
         c.receiver.onDeath(c.signal);
+      terminated = true;
       crash = c.signal != 2 && c.signal != 9;
     } else if(event instanceof StderrNewline) {
       if(c.receiver != null)
         c.receiver.onStderr(((StderrNewline) event).line);
     } else if(c.receiver != null) {
       c.receiver.onEvent(event);
+    }
+
+    if(terminated) {
+      synchronized (children) {
+        c.running = false;
+        children.remove(c);
+        children.notifyAll();
+      }
     }
 
     if(crash) {
@@ -192,14 +204,6 @@ public class ChildManager {
    */
   public static void onEvent(final int childID, final Event event) {
     Child c;
-    boolean end, died;
-
-    died = false;
-
-    end = event instanceof ChildEnd;
-    if(!end) {
-      died = event instanceof ChildDied;
-    }
 
     if(!(event instanceof Newline)) {
       Logger.debug("received an event: " + event);
@@ -225,14 +229,6 @@ public class ChildManager {
         dispatchEvent(fc, event);
       }
     });
-
-    if(end || died) {
-      synchronized (children) {
-        c.running = false;
-        children.remove(c);
-        children.notifyAll();
-      }
-    }
   }
 
   public static class ChildDiedException extends Exception {
