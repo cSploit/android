@@ -180,11 +180,12 @@ public class System
         HTTP_PROXY_PORT  = Integer.parseInt(getSettings().getString("PREF_HTTP_PROXY_PORT", "8080"));
         HTTP_SERVER_PORT = Integer.parseInt(getSettings().getString("PREF_HTTP_SERVER_PORT", "8081"));
         HTTPS_REDIR_PORT = Integer.parseInt(getSettings().getString("PREF_HTTPS_REDIRECTOR_PORT", "8082"));
-        MSF_RPC_PORT     = Integer.parseInt(getSettings().getString("MSF_RPC_PORT", "5553"));
+        MSF_RPC_PORT     = Integer.parseInt(getSettings().getString("MSF_RPC_PORT", "55553"));
       } catch(NumberFormatException e){
         HTTP_PROXY_PORT = 8080;
         HTTP_SERVER_PORT = 8081;
         HTTPS_REDIR_PORT = 8082;
+        MSF_RPC_PORT = 55553;
       }
 
       // initialize network data at the end
