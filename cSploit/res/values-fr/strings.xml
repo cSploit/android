@@ -156,23 +156,6 @@
     <string name="invalid_ports">Ports non-valide spécifiés.</string>
     <string name="empty_port_list">Liste de ports vide.</string>
     <string name="about_csploit_v_">À Propos de cSploit</string>
-    <string name="select_target_below">Choisissez une cible ci-dessous en cliquant dessus, ou restez
-        appuyé pour saisir un alias.
-    </string>
-    <string name="load_from_file">Charger depuis un fichier</string>
-    <string name="b">B</string>
-    <string name="f">F</string>
-    <string name="r">R</string>
-    <string name="user_wordlist">Dictionnaire de noms d\'utilisateurs</string>
-    <string name="pwd_wordlist">Dictionnaire de mots de passe</string>
-    <string name="add">Ajouter</string>
-    <string name="scan">Scanner</string>
-    <string name="wifi_scan">Scan Wi-Fi</string>
-    <string name="new_session">Nouvelle Session</string>
-    <string name="restore_session">Restaurer Session</string>
-    <string name="submit_issue">Soumettre un bug/problème</string>
-    <string name="about">À propos</string>
-    <string name="select_custom_ports">Choisir Ports Manuellement</string>
     <string name="select_target">Sélectionnez une cible dans la liste ci-dessous, ou restez appuyé
         pour choisir un alias
     </string>
@@ -230,6 +213,17 @@
     
     <string name="menu_add">Ajouter</string>
     <string name="menu_scan">Scanner</string>
-    <string name="menu_wifi_scan">Scan WiFi</string>
+    <string name="menu_wifi_scan">Scan Wi-Fi</string>
     <string name="menu_stop_msfrpcd">Arrêter le msfrpcd</string>
+
+    <string name="hijacker_load_from_file">Charger depuis un fichier</string>
+    <string name="login_user_wordlist">Dictionnaire de noms d\'utilisateurs</string>
+    <string name="login_pass_wordlist">Dictionnaire de mots de passe</string>
+
+    <string name="menu_new_session">Nouvelle Session</string>
+    <string name="menu_restore_session">Restaurer Session</string>
+    <string name="menu_submit_issue">Soumettre un bug/problème</string>
+    <string name="menu_about">À propos</string>
+
+    <string name="scanner_select_ports">Choisir Ports Manuellement</string>
 </resources>

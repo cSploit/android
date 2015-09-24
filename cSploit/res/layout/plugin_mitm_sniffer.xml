@@ -43,7 +43,7 @@
             android:layout_below="@+id/separator"
             android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
             android:paddingLeft="8dp"
-            android:paddingRight="8dp"></ListView>
+            android:paddingRight="8dp"/>
 
     <Spinner
             android:id="@+id/sortSpinner"
