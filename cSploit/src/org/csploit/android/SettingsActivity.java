@@ -303,25 +303,22 @@ public class SettingsActivity extends PreferenceActivity implements OnSharedPref
       }
 
       if (key.equals("PREF_HTTP_PROXY_PORT")) {
-        if (port == 0)
-          port = 8080;
-        mProxyPort.setText(Integer.toString(port));
         System.HTTP_PROXY_PORT = port;
       } else if (key.equals("PREF_HTTP_SERVER_PORT")) {
-        if (port == 0)
-          port = 8081;
-        mServerPort.setText(Integer.toString(port));
         System.HTTP_SERVER_PORT = port;
       } else if (key.equals("PREF_HTTPS_REDIRECTOR_PORT")) {
-        if (port == 0)
-          port = 8082;
-        mRedirectorPort.setText(Integer.toString(port));
         System.HTTPS_REDIR_PORT = port;
       } else if (key.equals("MSF_RPC_PORT")) {
-        if (port == 0)
-          port = 55553;
-        mMsfPort.setText(Integer.toString(port));
         System.MSF_RPC_PORT = port;
+      }
+
+      if(port == 0) {
+        // reset to default value
+        port = getDefaultPortForKey(key);
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(key, Integer.toString(port));
+        editor.apply();
       }
     } else if (key.equals("PREF_HTTP_MAX_BUFFER_SIZE")) {
       int maxBufferSize;
@@ -362,6 +359,21 @@ public class SettingsActivity extends PreferenceActivity implements OnSharedPref
       Toast.makeText(SettingsActivity.this, message, Toast.LENGTH_SHORT).show();
 
     System.onSettingChanged(key);
+  }
+
+  private int getDefaultPortForKey(String key) {
+    switch(key) {
+      case "PREF_HTTP_PROXY_PORT":
+        return 8080;
+      case "PREF_HTTP_SERVER_PORT":
+        return 8081;
+      case "PREF_HTTPS_REDIRECTOR_PORT":
+        return 8082;
+      case "MSF_RPC_PORT":
+        return 55553;
+      default:
+        return 0;
+    }
   }
 
   private void onMsfEnabled() {
