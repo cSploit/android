@@ -229,6 +229,15 @@ public class RPCClient
     return mRemote;
   }
 
+  public boolean isConnected() {
+    try {
+      exec("core.version", new Object[]{});
+      return true;
+    } catch (MSFException | MsgpackException | IOException e) {
+      return false;
+    }
+  }
+
   // Errors from server
   public static class MSFException extends Exception {
     public MSFException(String message) {
