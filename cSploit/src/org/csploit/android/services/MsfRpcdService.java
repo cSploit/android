@@ -97,10 +97,18 @@ public class MsfRpcdService extends NativeService implements MenuControllableSer
 
   @Override
   public boolean start() {
+    if(isConnected())
+      return true;
+
     stop();
-    if(!isLocal()) {
-      return connect();
+
+    if(connect()) {
+      if(isLocal()) {
+        Logger.warning("connected to a lost instance of the msfrpcd");
+      }
+      return true;
     }
+
     try {
       nativeProcess = System.getTools().msfrpcd.async(user, password, port, ssl, new Receiver());
       return true;
@@ -148,7 +156,7 @@ public class MsfRpcdService extends NativeService implements MenuControllableSer
   }
 
   private boolean isConnected() {
-    return System.getMsfRpc() != null;
+    return System.getMsfRpc() != null && System.getMsfRpc().isConnected();
   }
 
   @Override
@@ -170,13 +178,15 @@ public class MsfRpcdService extends NativeService implements MenuControllableSer
 
     @Override
     public void onDeath(int signal) {
-      disconnect();
+      if(!isConnected())
+        disconnect();
       sendIntent(STATUS_ACTION, STATUS, Status.KILLED);
     }
 
     @Override
     public void onEnd(int exitValue) {
-      disconnect();
+      if(!isConnected())
+        disconnect();
       sendIntent(STATUS_ACTION, STATUS, Status.STOPPED);
     }
   }
