@@ -68,7 +68,7 @@ public class Ettercap extends Tool
           Logger.info("OnDNSSpooferReceiver() message: " + e);
           Message m = (Message)e;
           if (m.severity == Message.Severity.ERROR)
-            onEnd(0);
+            onError(((Message) e).message);
         }
         else if (e instanceof Newline){
           Logger.info("OnDNSSpooferReceiver() Newline: " + e.toString());
@@ -81,6 +81,7 @@ public class Ettercap extends Tool
       public abstract void onEnd(int exitValue);
       public abstract void onSpoofed(String line);
       public abstract void onStderr(String line);
+      public abstract void onError(String error);
       public abstract void onReady();
     }
 
