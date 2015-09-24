@@ -150,17 +150,27 @@ public class Sessions extends Plugin {
       return;
 		}
 
-    System.getMsfRpc().updateSessions();
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        System.getMsfRpc().updateSessions();
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            if(mResults.isEmpty()) {
+              new FinishDialog(getString(R.string.warning),getString(R.string.no_opened_sessions),Sessions.this).show();
+            } else {
+              mAdapter.notifyDataSetChanged();
+            }
+          }
+        });
+      }
+    }).start();
 
     mResults = System.getCurrentTarget().getSessions();
 
-    if(mResults.isEmpty()) {
-      new FinishDialog(getString(R.string.warning),getString(R.string.no_opened_sessions),Sessions.this).show();
-      return;
-    }
-
 		mListView = (ListView) findViewById(android.R.id.list);
-    mAdapter  = new ArrayAdapter<Session>(this, android.R.layout.simple_list_item_1, mResults);
+    mAdapter  = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mResults);
 
 		mListView.setAdapter(mAdapter);
 
