@@ -62,7 +62,7 @@ public class ChoiceDialog extends AlertDialog{
     setView(layout);
 
 
-    this.setButton(activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener(){
+    this.setButton(BUTTON_NEGATIVE, activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener(){
       public void onClick(DialogInterface dialog, int id){
         dialog.dismiss();
       }

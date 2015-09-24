@@ -57,7 +57,7 @@ public class ListChoiceDialog extends AlertDialog{
     setTitle(activity.getString(title));
     setView(mList);
 
-    setButton(activity.getString(R.string.cancel_dialog), new OnClickListener(){
+    setButton(BUTTON_NEGATIVE, activity.getString(R.string.cancel_dialog), new OnClickListener(){
       public void onClick(DialogInterface dialog, int id){
         dialog.dismiss();
       }
@@ -85,7 +85,7 @@ public class ListChoiceDialog extends AlertDialog{
     this.setTitle(title);
     this.setView(mList);
 
-    this.setButton(activity.getString(R.string.cancel_dialog), new OnClickListener(){
+    this.setButton(BUTTON_NEGATIVE, activity.getString(R.string.cancel_dialog), new OnClickListener(){
       public void onClick(DialogInterface dialog, int id){
         dialog.dismiss();
       }
@@ -118,7 +118,7 @@ public class ListChoiceDialog extends AlertDialog{
     this.setTitle(title);
     this.setView(mList);
 
-    this.setButton(activity.getString(R.string.cancel_dialog), new OnClickListener(){
+    this.setButton(BUTTON_NEGATIVE, activity.getString(R.string.cancel_dialog), new OnClickListener(){
       public void onClick(DialogInterface dialog, int id){
         dialog.dismiss();
       }

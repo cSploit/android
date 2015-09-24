@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with cSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.csploit.android.core;
+package org.csploit.android.services;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
@@ -25,10 +25,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
-
-import com.github.zafarkhaja.semver.Version;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
@@ -41,9 +38,12 @@ import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 import org.apache.commons.compress.utils.CountingInputStream;
 import org.apache.commons.compress.utils.IOUtils;
 import org.csploit.android.R;
-import org.csploit.android.core.ArchiveMetadata.archiveAlgorithm;
-import org.csploit.android.core.ArchiveMetadata.compressionAlgorithm;
-import org.csploit.android.net.GitHubParser;
+import org.csploit.android.core.*;
+import org.csploit.android.update.CoreUpdate;
+import org.csploit.android.update.MsfUpdate;
+import org.csploit.android.update.Update;
+import org.csploit.android.update.Update.archiveAlgorithm;
+import org.csploit.android.core.System;
 import org.csploit.android.tools.Raw;
 
 import java.io.BufferedInputStream;
@@ -69,24 +69,18 @@ public class UpdateService extends IntentService
   public static final String START    = "UpdateService.action.START";
   public static final String ERROR    = "UpdateService.action.ERROR";
   public static final String DONE     = "UpdateService.action.DONE";
-  public static final String ACTION   = "UpdateService.data.ACTION";
+  public static final String UPDATE   = "UpdateService.data.UPDATE";
   public static final String MESSAGE  = "UpdateService.data.MESSAGE";
 
   // notification defines
   private static final int NOTIFICATION_ID = 1;
   private static final int DOWNLOAD_COMPLETE_CODE = 1;
   private static final int CANCEL_CODE = 2;
-  private static final String NOTIFICATION_CANCELLED = "org.csploit.android.core.UpdateService.CANCELLED";
-
-  // remote data
-  private static final ArchiveMetadata  mApkInfo          = new ArchiveMetadata();
-  private static final ArchiveMetadata  mMsfInfo          = new ArchiveMetadata();
-  private static final ArchiveMetadata  mRubyInfo         = new ArchiveMetadata();
-  private static final ArchiveMetadata  mCoreInfo         = new ArchiveMetadata();
+  private static final String NOTIFICATION_CANCELLED = "org.csploit.android.services.UpdateService.CANCELLED";
 
   private boolean
           mRunning                    = false;
-  private ArchiveMetadata
+  private Update
           mCurrentTask                = null;
   final private StringBuffer
           mErrorOutput                = new StringBuffer();
@@ -96,13 +90,6 @@ public class UpdateService extends IntentService
   private NotificationManager mNotificationManager = null;
   private NotificationCompat.Builder mBuilder = null;
   private BroadcastReceiver mReceiver = null;
-
-  public enum action {
-    apk_update,
-    core_update,
-    ruby_update,
-    msf_update
-  }
 
   public UpdateService(){
     super("UpdateService");
@@ -136,306 +123,21 @@ public class UpdateService extends IntentService
     };
   }
 
-  public static boolean isUpdateAvailable(){
-    boolean exitForError = true;
-    String localVersion = System.getAppVersionName();
-    String remoteVersion, remoteURL;
-
-    // cannot retrieve installed apk version
-    if(localVersion==null)
-      return false;
-
-    try {
-
-      remoteVersion = GitHubParser.getcSploitRepo().getLastReleaseVersion();
-
-      if(remoteVersion == null)
-        return false;
-
-      remoteURL = GitHubParser.getcSploitRepo().getLastReleaseAssetUrl();
-
-      Logger.debug(String.format("localVersion   = %s", localVersion));
-      Logger.debug(String.format("remoteVersion  = %s", remoteVersion));
-
-      synchronized (mApkInfo) {
-        mApkInfo.url = remoteURL;
-        mApkInfo.versionString = remoteVersion;
-        mApkInfo.version = Version.valueOf(mApkInfo.versionString);
-        mApkInfo.name = String.format("cSploit-%s.apk", mApkInfo.versionString);
-        mApkInfo.path = String.format("%s/%s", System.getStoragePath(), mApkInfo.name);
-        mApkInfo.contentIntent = new Intent(Intent.ACTION_VIEW);
-        mApkInfo.contentIntent.setDataAndType(Uri.fromFile(new File(mApkInfo.path)), "application/vnd.android.package-archive");
-        mApkInfo.contentIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        // Compare versions
-        Version installedVersion = Version.valueOf(localVersion);
-
-        exitForError = false;
-
-        if (mApkInfo.version.compareTo(installedVersion) > 0)
-          return true;
-      }
-    } catch(Exception e){
-      System.errorLogging(e);
-    } finally {
-      if(exitForError)
-        mApkInfo.reset();
-    }
-
-    return false;
-  }
-
-  public static String getRemoteVersion(){
-    return mApkInfo.versionString;
-  }
-
-  /**
-   * check if an update for the core package is available
-   *
-   * @return true if an update is available, false if not.
-   */
-  public static boolean isCoreUpdateAvailable() {
-    boolean exitForError = true;
-    String localVersion = System.getCoreVersion();
-    String platform = System.getPlatform();
-    String remoteVersion, remoteURL;
-
-    try {
-
-      remoteVersion = GitHubParser.getCoreRepo().getLastReleaseVersion();
-
-      if(remoteVersion == null)
-        return false;
-
-      remoteURL = GitHubParser.getCoreRepo().getLastReleaseAssetUrl(platform + ".");
-
-      if(remoteURL == null) {
-        Logger.warning(String.format("unsupported platform ( %s )", platform));
-
-        platform = System.getCompatiblePlatform();
-        Logger.debug(String.format("trying with '%s'", platform));
-
-        remoteURL = GitHubParser.getCoreRepo().getLastReleaseAssetUrl(platform + ".");
-      }
-
-      Logger.debug(String.format("localVersion   = %s", localVersion));
-      Logger.debug(String.format("remoteVersion  = %s", remoteVersion));
-
-      if(remoteURL == null) {
-        Logger.warning(String.format("unsupported platform ( %s )", platform));
-        return false;
-      }
-
-      synchronized (mCoreInfo) {
-        // Read remote version
-        mCoreInfo.url = remoteURL;
-        mCoreInfo.versionString = remoteVersion;
-        mCoreInfo.version = Version.valueOf(mCoreInfo.versionString);
-        mCoreInfo.name = "core.tar.xz";
-        mCoreInfo.path = String.format("%s/%s", System.getStoragePath(), mCoreInfo.name);
-        mCoreInfo.archiver = archiveAlgorithm.tar;
-        mCoreInfo.compression = compressionAlgorithm.xz;
-        mCoreInfo.executableOutputDir = mCoreInfo.outputDir = System.getCorePath();
-
-        exitForError = false;
-
-        if(localVersion == null)
-          return true;
-
-        // Compare versions
-        Version installedVersion = Version.valueOf(localVersion);
-
-        if (mCoreInfo.version.compareTo(installedVersion) > 0)
-          return true;
-      }
-    } catch(Exception e){
-      System.errorLogging(e);
-    } finally {
-      if(exitForError)
-        mCoreInfo.reset();
-    }
-
-    return false;
-  }
-
-  public static String getRemoteCoreVersion() {
-    return mCoreInfo.versionString;
-  }
-
-  /**
-   * is ruby update available?
-   * @return true if ruby can be updated, false otherwise
-   */
-  public static boolean isRubyUpdateAvailable() {
-    boolean exitForError = true;
-    String localVersion = System.getLocalRubyVersion();
-    String platform = System.getPlatform();
-    String remoteVersion, remoteURL;
-
-    try {
-
-      remoteVersion = GitHubParser.getRubyRepo().getLastReleaseVersion();
-
-      if(remoteVersion == null)
-        return false;
-
-      remoteURL = GitHubParser.getRubyRepo().getLastReleaseAssetUrl(platform + ".");
-
-      if(remoteURL == null) {
-        Logger.warning(String.format("unsupported platform ( %s )", platform));
-
-        platform = System.getCompatiblePlatform();
-        Logger.debug(String.format("trying with '%s'", platform));
-
-        remoteURL = GitHubParser.getRubyRepo().getLastReleaseAssetUrl(platform + ".");
-      }
-
-      Logger.debug(String.format("localVersion   = %s", localVersion));
-      Logger.debug(String.format("remoteVersion  = %s", remoteVersion));
-
-      if(remoteURL == null) {
-        Logger.warning(String.format("unsupported platform ( %s )", platform));
-        return false;
-      }
-
-      synchronized (mRubyInfo) {
-        mRubyInfo.url = remoteURL;
-        mRubyInfo.versionString = remoteVersion;
-        mRubyInfo.version = Version.valueOf(mRubyInfo.versionString);
-        mRubyInfo.name = "ruby.tar.xz";
-        mRubyInfo.path = String.format("%s/%s", System.getStoragePath(), mRubyInfo.name);
-        mRubyInfo.archiver = archiveAlgorithm.tar;
-        mRubyInfo.compression = compressionAlgorithm.xz;
-
-        mRubyInfo.outputDir = System.getRubyPath();
-        mRubyInfo.executableOutputDir = ExecChecker.ruby().getRoot();
-        mRubyInfo.fixShebang = true;
-
-        if (!mSettingReceiver.getFilter().contains("RUBY_DIR")) {
-          mSettingReceiver.addFilter("RUBY_DIR");
-          System.registerSettingListener(mSettingReceiver);
-        }
-
-        exitForError = false;
-
-        if(localVersion == null)
-          return true;
-
-        // Compare versions
-        Version installedVersion = Version.valueOf(localVersion);
-
-        if (mRubyInfo.version.compareTo(installedVersion) > 0)
-          return true;
-      }
-    } catch(Exception e){
-      System.errorLogging(e);
-    } finally {
-      if(exitForError)
-        mRubyInfo.reset();
-    }
-    return false;
-  }
-
-  /**
-   * is a MetaSploitFramework update available?
-   * @return true if the framework can be updated, false otherwise
-   */
-  public static boolean isMsfUpdateAvailable() {
-    boolean exitForError = true;
-    String localVersion = System.getLocalMsfVersion();
-    GitHubParser msfRepo = GitHubParser.getMsfRepo();
-
-    try {
-      synchronized (mMsfInfo) {
-        if (mMsfInfo.url == null) {
-          mMsfInfo.url = msfRepo.getLastReleaseAssetUrl();
-
-          mMsfInfo.versionString = msfRepo.getLastReleaseVersion();
-          mMsfInfo.version = Version.valueOf(mMsfInfo.versionString);
-
-          mMsfInfo.name = "msf.tar.xz";
-          mMsfInfo.path = String.format("%s/%s", System.getStoragePath(), mMsfInfo.name);
-        }
-
-        File local = new File(mMsfInfo.path);
-
-        if (local.exists() && local.isFile() && local.canRead()) {
-          mMsfInfo.url = null;
-          mMsfInfo.versionString = "LOCAL_UPDATE";
-        }
-
-        mMsfInfo.outputDir = System.getMsfPath();
-        mMsfInfo.executableOutputDir = ExecChecker.msf().getRoot();
-        mMsfInfo.archiver = archiveAlgorithm.tar;
-        mMsfInfo.compression = compressionAlgorithm.xz;
-        mMsfInfo.fixShebang = true;
-
-        if (!mSettingReceiver.getFilter().contains("MSF_DIR")) {
-          mSettingReceiver.addFilter("MSF_DIR");
-        }
-
-        if(!mSettingReceiver.getFilter().contains("MSF_BRANCH")) {
-          mSettingReceiver.addFilter("MSF_BRANCH");
-        }
-
-        System.registerSettingListener(mSettingReceiver);
-
-        exitForError = false;
-
-        return !mMsfInfo.versionString.equals(localVersion);
-      }
-    } catch (Exception e) {
-      System.errorLogging(e);
-    } finally {
-      if(exitForError)
-        mMsfInfo.reset();
-    }
-    return false;
-  }
-
-  private static SettingReceiver mSettingReceiver = new SettingReceiver() {
-
-    @Override
-    public void onSettingChanged(String key) {
-      if(key.equals("RUBY_DIR")) {
-        synchronized (mRubyInfo) {
-          mRubyInfo.outputDir = System.getRubyPath();
-          mRubyInfo.executableOutputDir = ExecChecker.ruby().getRoot();
-        }
-      } else if(key.equals("MSF_DIR")) {
-        synchronized (mMsfInfo) {
-          mMsfInfo.outputDir = System.getMsfPath();
-          mMsfInfo.executableOutputDir = ExecChecker.msf().getRoot();
-        }
-      } else if(key.equals("MSF_BRANCH")) {
-        try {
-          GitHubParser.getMsfRepo().setBranch(System.getSettings().getString("MSF_BRANCH", "release"));
-        } catch (Exception e) {
-          Logger.error(e.getMessage());
-        }
-      }
-    }
-  };
-
   /**
    * notify activities that some error occurred
-   * @param target the failed action
    * @param message an error message
    */
-  private void sendError(action target, int message) {
+  private void sendError(int message) {
     Intent i = new Intent(ERROR);
-    i.putExtra(ACTION, target);
     i.putExtra(MESSAGE, message);
     sendBroadcast(i);
   }
 
   /**
    * notify activities that we finished our job
-   * @param a the performed action
    */
-  private void sendDone(action a) {
+  private void sendDone() {
     Intent i = new Intent(DONE);
-    i.putExtra(ACTION,a);
     sendBroadcast(i);
   }
 
@@ -570,10 +272,8 @@ public class UpdateService extends IntentService
     boolean errorOccurred;
     Intent contentIntent;
 
-    synchronized (mCurrentTask) {
-      errorOccurred = mCurrentTask.errorOccurred;
-      contentIntent = mCurrentTask.contentIntent;
-    }
+    errorOccurred = mCurrentTask.errorOccurred;
+    contentIntent = mCurrentTask.contentIntent;
 
     if(errorOccurred || contentIntent==null){
       Logger.debug("deleting notifications");
@@ -640,7 +340,8 @@ public class UpdateService extends IntentService
     mBuilder.setContentTitle(getString(R.string.checking))
             .setSmallIcon(android.R.drawable.ic_popup_sync)
             .setContentText("")
-            .setProgress(100, 0, false);
+            .setContentInfo("")
+            .setProgress(100, 0, true);
     mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
 
     f = new File(mCurrentTask.path);
@@ -1201,7 +902,7 @@ public class UpdateService extends IntentService
     if(mCurrentTask.outputDir==null)
       return;
 
-    if(mCurrentTask.versionString == null || mCurrentTask.versionString.isEmpty()) {
+    if(mCurrentTask.version == null || mCurrentTask.version.isEmpty()) {
       Logger.warning("version string not found");
       return;
     }
@@ -1209,7 +910,7 @@ public class UpdateService extends IntentService
     try {
         f = new File(mCurrentTask.outputDir, "VERSION");
         fos = new FileOutputStream(f);
-        fos.write(mCurrentTask.versionString.getBytes());
+        fos.write(mCurrentTask.version.getBytes());
     } catch (Exception e) {
       System.errorLogging(e);
       throw new IOException("cannot create VERSION file");
@@ -1225,101 +926,54 @@ public class UpdateService extends IntentService
 
   @Override
   protected void onHandleIntent(Intent intent) {
-    action what_to_do = (action)intent.getSerializableExtra(ACTION);
+    mCurrentTask = (Update) intent.getSerializableExtra(UPDATE);
     boolean exitForError=true;
 
-    if(what_to_do==null) {
-      Logger.error("received null action");
+    if(mCurrentTask==null) {
+      Logger.error("received null update");
       return;
     }
 
-    mRunning=true;
-
-    switch (what_to_do) {
-      case apk_update:
-        mCurrentTask = mApkInfo;
-        break;
-      case core_update:
-        mCurrentTask = mCoreInfo;
-        break;
-      case ruby_update:
-        mCurrentTask = mRubyInfo;
-        break;
-      case msf_update:
-        mCurrentTask = mMsfInfo;
-        break;
-    }
+    mRunning = true;
 
     try {
       setupNotification();
 
-      synchronized (mCurrentTask) {
-        mCurrentTask.errorOccurred = true;
-        if (!haveLocalFile())
-          downloadFile();
+      mCurrentTask.errorOccurred = true;
+      if (!haveLocalFile())
+        downloadFile();
 
-        if (what_to_do == action.core_update)
-          System.shutdownCoreDaemon();
+      if (mCurrentTask instanceof CoreUpdate)
+        System.shutdownCoreDaemon();
 
-        extract();
+      extract();
 
-        if (what_to_do == action.msf_update)
-          installGems();
+      if (mCurrentTask instanceof MsfUpdate)
+        installGems();
 
-        deleteTemporaryFiles();
-        createVersionFile();
+      deleteTemporaryFiles();
+      createVersionFile();
 
-        mCurrentTask.errorOccurred = exitForError = false;
-      }
+      mCurrentTask.errorOccurred = exitForError = false;
 
-      sendDone(what_to_do);
+      sendDone();
     } catch ( SecurityException e) {
-      sendError(what_to_do, R.string.bad_permissions);
+      sendError(R.string.bad_permissions);
       Logger.warning(e.getClass().getName() + ": " + e.getMessage());
     } catch (KeyException e) {
-      sendError(what_to_do, R.string.checksum_failed);
+      sendError(R.string.checksum_failed);
       Logger.warning(e.getClass().getName() + ": " + e.getMessage());
-    } catch (NoSuchAlgorithmException e) {
-      sendError(what_to_do, R.string.error_occured);
-      System.errorLogging(e);
     } catch (CancellationException e) {
-      sendError(what_to_do, R.string.update_cancelled);
+      sendError(R.string.update_cancelled);
       Logger.warning(e.getClass().getName() + ": " + e.getMessage());
-    } catch (IOException e) {
-      sendError(what_to_do, R.string.error_occured);
-      System.errorLogging(e);
-    } catch (RuntimeException e) {
-      sendError(what_to_do, R.string.error_occured);
-
-      StackTraceElement[] stack = e.getStackTrace();
-      StackTraceElement frame = e.getStackTrace()[0];
-
-      for(StackTraceElement f : stack) {
-        if(f.getClassName().startsWith("org.csploit.android")) {
-          frame = f;
-          break;
-        }
-      }
-
-      Logger.error(
-              String.format("%s: %s [%s:%d]",
-                      e.getClass().getName(), e.getMessage(),
-                      frame.getFileName(), frame.getLineNumber()
-                      ));
-    } catch (InterruptedException e) {
-      sendError(what_to_do, R.string.error_occured);
-      System.errorLogging(e);
-    } catch (ChildManager.ChildNotStartedException e) {
-      sendError(what_to_do, R.string.error_occured);
-      System.errorLogging(e);
-    } catch (ChildManager.ChildDiedException e) {
-      sendError(what_to_do, R.string.error_occured);
+    } catch (NoSuchAlgorithmException | RuntimeException | ChildManager.ChildDiedException | ChildManager.ChildNotStartedException | InterruptedException | IOException e) {
+      sendError(R.string.error_occured);
       System.errorLogging(e);
     } finally {
       if(exitForError) {
-        if(what_to_do == action.msf_update)
+        if(mCurrentTask instanceof MsfUpdate)
           clearGemsCache();
-        if(what_to_do != action.core_update)
+        if(!(mCurrentTask instanceof CoreUpdate))
           wipe();
       }
       stopSelf();
