@@ -127,7 +127,7 @@ public class ActionActivity extends AppCompatActivity {
         LayoutInflater inflater = (LayoutInflater) ActionActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         row = inflater.inflate(R.layout.actions_list_item, parent, false);
         if (getSharedPreferences("THEME", 0).getBoolean("isDark", false))
-          row.setBackground(getResources().getDrawable(R.drawable.card_background_dark));
+          row.setBackgroundResource(R.drawable.card_background_dark);
         holder = new ActionHolder();
 
         holder.icon = (ImageView) (row != null ? row.findViewById(R.id.actionIcon) : null);

@@ -136,7 +136,7 @@ public class MITM extends Plugin
         LayoutInflater inflater = (LayoutInflater) MITM.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         row = inflater.inflate(mLayoutId, parent, false);
         if (getSharedPreferences("THEME", 0).getBoolean("isDark", false))
-            row.setBackground(getResources().getDrawable(R.drawable.card_background_dark));
+            row.setBackgroundResource(R.drawable.card_background_dark);
         holder = new ActionHolder();
         holder.icon = (ImageView) (row != null ? row.findViewById(R.id.actionIcon) : null);
         holder.name = (TextView) (row != null ? row.findViewById(R.id.itemName) : null);

@@ -858,8 +858,7 @@ public class MainActivity extends AppCompatActivity {
       holder.itemTitle.setTextColor(getResources().getColor((target.isConnected() ? R.color.app_color : R.color.gray_text)));
 
       if (row != null && (getSharedPreferences("THEME", 0).getBoolean("isDark", false)))
-          row.setBackground(getResources().getDrawable(R.drawable.card_background_dark));
-
+          row.setBackgroundResource(R.drawable.card_background_dark);
       holder.itemTitle.setTypeface(null, Typeface.NORMAL);
       holder.itemImage.setImageResource(target.getDrawableResourceId());
       holder.itemDescription.setText(target.getDescription());
