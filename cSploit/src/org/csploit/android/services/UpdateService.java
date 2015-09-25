@@ -138,6 +138,7 @@ public class UpdateService extends IntentService
    */
   private void sendDone() {
     Intent i = new Intent(DONE);
+    i.putExtra(UPDATE, mCurrentTask);
     sendBroadcast(i);
   }
 
