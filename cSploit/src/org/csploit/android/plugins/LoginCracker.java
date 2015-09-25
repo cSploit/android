@@ -416,6 +416,11 @@ public class LoginCracker extends Plugin {
     private List<Port> mOpenPorts = null;
     private ArrayList<String> mProtocols = null;
 
+    private class Holder {
+      public TextView textView;
+      public String protocol;
+    }
+
     public ProtocolAdapter() {
       mOpenPorts = System.getCurrentTarget().getOpenPorts();
       mProtocols = new ArrayList<String>(Arrays.asList(PROTOCOLS));
@@ -500,24 +505,36 @@ public class LoginCracker extends Plugin {
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-      LayoutInflater inflater = (LayoutInflater) LoginCracker.this
-              .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+      View spinView = convertView;
+      Holder holder;
 
-      View spinView = inflater.inflate(
-              android.R.layout.simple_spinner_item, null);
-      TextView textView = (TextView) (spinView != null ? spinView
-              .findViewById(android.R.id.text1) : null);
+      if(spinView == null) {
+        LayoutInflater inflater = (LayoutInflater) LoginCracker.this
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-      String sProtocol = mProtocols.get(position);
+        holder = new Holder();
 
-      if (textView != null)
-        textView.setText(sProtocol);
+        spinView = inflater.inflate(
+                android.R.layout.simple_spinner_item, parent, false);
 
-      if (hasProtocolOpenPort(sProtocol)) {
-        if (textView != null) {
-          textView.setTextColor(Color.GREEN);
-          textView.setTypeface(null, Typeface.BOLD);
-        }
+        holder.textView = (TextView) (spinView != null ? spinView
+                .findViewById(android.R.id.text1) : null);
+
+        holder.protocol = mProtocols.get(position);
+
+        if (holder.textView != null)
+          holder.textView.setText(holder.protocol);
+
+        if(spinView != null)
+          spinView.setTag(holder);
+
+      } else {
+        holder = (Holder) spinView.getTag();
+      }
+
+      if (hasProtocolOpenPort(holder.protocol) && holder.textView != null) {
+        holder.textView.setTextColor(Color.GREEN);
+        holder.textView.setTypeface(null, Typeface.BOLD);
       }
 
       return spinView;
