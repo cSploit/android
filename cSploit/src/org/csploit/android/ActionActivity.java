@@ -68,7 +68,7 @@ public class ActionActivity extends AppCompatActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                    if (System.checkNetworking(getParent())) {
+                    if (System.checkNetworking(ActionActivity.this)) {
                         Plugin plugin = mAvailable.get(position);
                         System.setCurrentPlugin(plugin);
 
