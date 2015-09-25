@@ -42,114 +42,114 @@ import org.csploit.android.gui.dialogs.FinishDialog;
 import java.util.ArrayList;
 
 public class ActionActivity extends AppCompatActivity {
-    private ArrayList<Plugin> mAvailable = null;
-    private ListView theList;
+  private ArrayList<Plugin> mAvailable = null;
+  private ListView theList;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-        Boolean isDark = themePrefs.getBoolean("isDark", false);
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+    Boolean isDark = themePrefs.getBoolean("isDark", false);
 
-        if (isDark)
-            setTheme(R.style.DarkTheme);
-        else
-            setTheme(R.style.AppTheme);
-        super.onCreate(savedInstanceState);
+    if (isDark)
+      setTheme(R.style.DarkTheme);
+    else
+      setTheme(R.style.AppTheme);
+    super.onCreate(savedInstanceState);
 
-        if (System.getTargets() != null && System.getTargets().size() > 0 && System.getCurrentTarget() != null) {
-            setTitle("cSploit > " + System.getCurrentTarget());
-            setContentView(R.layout.actions_layout);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            theList = (ListView) findViewById(R.id.android_list);
-            mAvailable = System.getPluginsForTarget();
-            ActionsAdapter mActionsAdapter = new ActionsAdapter();
-            theList.setAdapter(mActionsAdapter);
-            theList.setOnItemClickListener(new ListView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                    if (System.checkNetworking(ActionActivity.this)) {
-                        Plugin plugin = mAvailable.get(position);
-                        System.setCurrentPlugin(plugin);
-
-                        if (plugin.hasLayoutToShow()) {
-                            Toast.makeText(ActionActivity.this, getString(R.string.selected) + getString(plugin.getName()), Toast.LENGTH_SHORT).show();
-
-                            startActivity(new Intent(
-                                    ActionActivity.this,
-                                    plugin.getClass()
-                            ));
-                            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-                        } else
-                            plugin.onActionClick(getApplicationContext());
-                    }
-                }
-            });
-        } else {
-            new FinishDialog(getString(R.string.warning), getString(R.string.something_went_wrong), this).show();
-        }
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-
-                onBackPressed();
-
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-    }
-
-    public class ActionsAdapter extends ArrayAdapter<Plugin> {
-        public ActionsAdapter() {
-            super(ActionActivity.this, R.layout.actions_list_item, mAvailable);
-        }
-
-        @SuppressLint("NewApi")
+    if (System.getTargets() != null && System.getTargets().size() > 0 && System.getCurrentTarget() != null) {
+      setTitle("cSploit > " + System.getCurrentTarget());
+      setContentView(R.layout.actions_layout);
+      getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+      theList = (ListView) findViewById(R.id.android_list);
+      mAvailable = System.getPluginsForTarget();
+      ActionsAdapter mActionsAdapter = new ActionsAdapter();
+      theList.setAdapter(mActionsAdapter);
+      theList.setOnItemClickListener(new ListView.OnItemClickListener() {
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View row = convertView;
-            ActionHolder holder;
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-            if (row == null) {
-                LayoutInflater inflater = (LayoutInflater) ActionActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                row = inflater.inflate(R.layout.actions_list_item, parent, false);
-                if (getSharedPreferences("THEME", 0).getBoolean("isDark", false))
-                    row.setBackground(getResources().getDrawable(R.drawable.card_background_dark));
-                holder = new ActionHolder();
+          if (System.checkNetworking(ActionActivity.this)) {
+            Plugin plugin = mAvailable.get(position);
+            System.setCurrentPlugin(plugin);
 
-                holder.icon = (ImageView) (row != null ? row.findViewById(R.id.actionIcon) : null);
-                holder.name = (TextView) (row != null ? row.findViewById(R.id.actionName) : null);
-                holder.description = (TextView) (row != null ? row.findViewById(R.id.actionDescription) : null);
-                if (row != null) row.setTag(holder);
+            if (plugin.hasLayoutToShow()) {
+              Toast.makeText(ActionActivity.this, getString(R.string.selected) + getString(plugin.getName()), Toast.LENGTH_SHORT).show();
 
-            } else holder = (ActionHolder) row.getTag();
-
-            Plugin action = mAvailable.get(position);
-
-            holder.icon.setImageResource(action.getIconResourceId());
-            holder.name.setText(getString(action.getName()));
-            holder.description.setText(getString(action.getDescription()));
-
-            return row;
+              startActivity(new Intent(
+                      ActionActivity.this,
+                      plugin.getClass()
+              ));
+              overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+            } else
+              plugin.onActionClick(getApplicationContext());
+          }
         }
-
-        public class ActionHolder {
-            ImageView icon;
-            TextView name;
-            TextView description;
-        }
+      });
+    } else {
+      new FinishDialog(getString(R.string.warning), getString(R.string.something_went_wrong), this).show();
     }
+  }
+
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+
+        onBackPressed();
+
+        return true;
+
+      default:
+        return super.onOptionsItemSelected(item);
+    }
+  }
+
+
+  @Override
+  public void onBackPressed() {
+    super.onBackPressed();
+    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+  }
+
+  public class ActionsAdapter extends ArrayAdapter<Plugin> {
+    public ActionsAdapter() {
+      super(ActionActivity.this, R.layout.actions_list_item, mAvailable);
+    }
+
+    @SuppressLint("NewApi")
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+      View row = convertView;
+      ActionHolder holder;
+
+      if (row == null) {
+        LayoutInflater inflater = (LayoutInflater) ActionActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        row = inflater.inflate(R.layout.actions_list_item, parent, false);
+        if (getSharedPreferences("THEME", 0).getBoolean("isDark", false))
+          row.setBackground(getResources().getDrawable(R.drawable.card_background_dark));
+        holder = new ActionHolder();
+
+        holder.icon = (ImageView) (row != null ? row.findViewById(R.id.actionIcon) : null);
+        holder.name = (TextView) (row != null ? row.findViewById(R.id.actionName) : null);
+        holder.description = (TextView) (row != null ? row.findViewById(R.id.actionDescription) : null);
+        if (row != null) row.setTag(holder);
+
+      } else holder = (ActionHolder) row.getTag();
+
+      Plugin action = mAvailable.get(position);
+
+      holder.icon.setImageResource(action.getIconResourceId());
+      holder.name.setText(getString(action.getName()));
+      holder.description.setText(getString(action.getDescription()));
+
+      return row;
+    }
+
+    public class ActionHolder {
+      ImageView icon;
+      TextView name;
+      TextView description;
+    }
+  }
 }
