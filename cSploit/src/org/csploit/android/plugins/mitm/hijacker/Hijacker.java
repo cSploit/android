@@ -26,7 +26,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -73,7 +73,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Hijacker extends ActionBarActivity {
+public class Hijacker extends AppCompatActivity {
 	private ToggleButton mHijackToggleButton = null;
 	private ProgressBar mHijackProgress = null;
 	private SessionListAdapter mAdapter = null;

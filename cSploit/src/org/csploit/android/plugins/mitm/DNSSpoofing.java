@@ -20,7 +20,7 @@ package org.csploit.android.plugins.mitm;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -44,7 +44,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class DNSSpoofing extends ActionBarActivity {
+public class DNSSpoofing extends AppCompatActivity {
     private ToggleButton mSniffToggleButton = null;
 	private ProgressBar mSniffProgress = null;
 	private TextView mTextDnsList = null;
