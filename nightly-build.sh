@@ -17,6 +17,7 @@ LOG_DIR="${DIR}/logs"
 MAX_DAYS="15"
 PREVIOUS_COMMIT=$(cat "${LOG_DIR}last_commit")
 
+export NIGHTLY_BUILD=1
 
 die() {
  echo -n -e "${RED}An error occured while building the nightly apk${RESET}\n"
@@ -52,7 +53,7 @@ find $NIGHTLIES_OUT_DIR -type f -a -mtime +${MAX_DAYS} -a ! -name "${LAST_APK}" 
 find $LOG_DIR -type f -a -mtime +${MAX_DAYS} -exec rm -f "{}" \; >&3 2>&1
 
 echo -n -e "${CYAN}Syncing git repo...${RESET}\n" | tee >(cat - >&3)
-git fetch --all && git reset --hard origin/master && git submodule update --recursive --init >&3 2>&1 || die
+git fetch --all && git reset --hard origin/develop && git submodule update --recursive --init >&3 2>&1 || die
 
 LAST_COMMIT=$(git rev-parse HEAD)
 
@@ -68,7 +69,6 @@ oldpwd=$(pwd)
 cd cSploit/jni >&3 2>&1 || die
 ./build.sh  >&3 2>&1 || jni_die
 cd "$oldpwd" >&3 2>&1 || die
-./gradlew clean >&3 2>&1 || die
 ./gradlew assembleRelease >&3 2>&1 || die
 
 echo -n -e "${GREEN}Copying signed apk to output directory${RESET}\n" | tee >(cat - >&3)

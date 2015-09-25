@@ -50,18 +50,20 @@ public class IPTables extends Tool
     }
   }
 
-  public void portRedirect(int from, int to){
+  public void portRedirect(int from, int to, boolean cleanRules){
     Logger.debug("Redirecting traffic from port " + from + " to port " + to);
 
     try{
-      // clear nat
-      super.run("-t nat -F");
-      // clear
-      super.run("-F");
-      // post route
-      super.run("-t nat -I POSTROUTING -s 0/0 -j MASQUERADE");
-      // accept all
-      super.run("-P FORWARD ACCEPT");
+      if (cleanRules) {
+        // clear nat
+        super.run("-t nat -F");
+        // clear
+        super.run("-F");
+        // post route
+        super.run("-t nat -I POSTROUTING -s 0/0 -j MASQUERADE");
+        // accept all
+        super.run("-P FORWARD ACCEPT");
+      }
       // add rule
       super.run("-t nat -A PREROUTING -j DNAT -p tcp --dport " + from + " --to " + System.getNetwork().getLocalAddressAsString() + ":" + to);
     }

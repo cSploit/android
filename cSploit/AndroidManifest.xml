@@ -42,7 +42,7 @@
 
         <!-- suppress AndroidDomInspection -->
         <service
-            android:name=".core.UpdateService"
+            android:name=".services.UpdateService"
             android:enabled="true" />
 
         <service
@@ -112,6 +112,10 @@
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_main" />
         <activity
+            android:name=".plugins.mitm.DNSSpoofing"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
             android:name=".plugins.mitm.hijacker.Hijacker"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_main" />
@@ -127,6 +131,11 @@
             android:name=".plugins.PacketForger"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_main" />
+        <activity
+            android:name=".gui.FileEdit"
+            android:label="@string/title_activity_main"
+            android:parentActivityName=".plugins.mitm.PasswordSniffer" >
+        </activity>
     </application>
 
 </manifest>

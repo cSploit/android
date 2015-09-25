@@ -20,7 +20,7 @@ package org.csploit.android.plugins.mitm.hijacker;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,11 +32,12 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import org.apache.http.impl.cookie.BasicClientCookie;
 import org.csploit.android.R;
 import org.csploit.android.core.System;
 
-public class HijackerWebView extends ActionBarActivity {
+import java.net.HttpCookie;
+
+public class HijackerWebView extends AppCompatActivity {
 	private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4";
 
 	private WebSettings mSettings = null;
@@ -97,7 +98,7 @@ public class HijackerWebView extends ActionBarActivity {
 		if (session != null) {
 			String domain = null, rawcookie = null;
 
-			for (BasicClientCookie cookie : session.mCookies.values()) {
+			for (HttpCookie cookie : session.mCookies.values()) {
 				domain = cookie.getDomain();
 				rawcookie = cookie.getName() + "=" + cookie.getValue()
 						+ "; domain=" + domain + "; path=/"

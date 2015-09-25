@@ -26,7 +26,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,7 +45,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import org.apache.http.impl.cookie.BasicClientCookie;
 import org.csploit.android.R;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Logger;
@@ -68,12 +67,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpCookie;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Hijacker extends ActionBarActivity {
+public class Hijacker extends AppCompatActivity {
 	private ToggleButton mHijackToggleButton = null;
 	private ProgressBar mHijackProgress = null;
 	private SessionListAdapter mAdapter = null;
@@ -169,7 +169,7 @@ public class Hijacker extends ActionBarActivity {
 			@Override
 			protected Boolean doInBackground(Session... sessions) {
 				Session session = sessions[0];
-				BasicClientCookie user = session.mCookies.get("c_user");
+				HttpCookie user = session.mCookies.get("c_user");
 
 				if (user != null) {
 					String fbUserId = user.getValue(), fbGraphUrl = "https://graph.facebook.com/"
@@ -215,7 +215,7 @@ public class Hijacker extends ActionBarActivity {
 			@Override
 			protected Boolean doInBackground(Session... sessions) {
 				Session session = sessions[0];
-				BasicClientCookie userid = session.mCookies.get("bbuserid"), username = session.mCookies
+				HttpCookie userid = session.mCookies.get("bbuserid"), username = session.mCookies
 						.get("xda_wikiUserName");
 
 				if (userid != null)
@@ -355,7 +355,7 @@ public class Hijacker extends ActionBarActivity {
 		@Override
 		public void onRequest(boolean https, String address, String hostname,
 				ArrayList<String> headers) {
-			ArrayList<BasicClientCookie> cookies = RequestParser
+			ArrayList<HttpCookie> cookies = RequestParser
 					.getCookiesFromHeaders(headers);
 
 			// got any cookie ?
@@ -365,7 +365,7 @@ public class Hijacker extends ActionBarActivity {
 				if (domain == null || domain.isEmpty()) {
 					domain = RequestParser.getBaseDomain(hostname);
 
-					for (BasicClientCookie cooky : cookies)
+					for (HttpCookie cooky : cookies)
 						cooky.setDomain(domain);
 				}
 
@@ -382,7 +382,7 @@ public class Hijacker extends ActionBarActivity {
 				}
 
 				// update/initialize session cookies
-				for (BasicClientCookie cookie : cookies) {
+				for (HttpCookie cookie : cookies) {
 					session.mCookies.put(cookie.getName(), cookie);
 				}
 
@@ -523,7 +523,7 @@ public class Hijacker extends ActionBarActivity {
           Hijacker.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-              mHijackToggleButton.setText("Stop");
+              mHijackToggleButton.setText(R.string.stop);
               mHijackProgress.setVisibility(View.VISIBLE);
               mRunning = true;
             }

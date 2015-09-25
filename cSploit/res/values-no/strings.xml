@@ -163,6 +163,12 @@
     <string name="no_wifi_available">Ingen WiFi-tilkobling tilgjengelig, vil programmet bare sjekke 
          etter oppdateringer. #STATUS#
     </string>
+     <string name="missing_core_update">Kjernen er ikke installert, programmet vil sjekke 
+........ etter oppdateringer. #STATUS#
+    </string>
+    <string name="heart_attack_update">Heart attack har oppstått, programmet vil sjekke
+........ etter oppdateringer. #STATUS#
+    </string>
     <string name="loading_changelog">Loading changelog&#8230;</string>
     <string name="something_went_wrong_changelog">
         <![CDATA[<html><body><p><b>Something went wrong while retrieving the changelog:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
@@ -462,4 +468,34 @@
     <string name="installing_msf_gems">innstallerer gems for MSF</string>
     <string name="installing_bundle">innstallerer bundle</string>
     <string name="new_gems_update_desc">En oppdatering for ruby gems</string>
+    <string name="heart_attack">heart attack</string>
+    <string name="cannot_download_core">kan ikke laste ned kjernen for din enhet</string>
+    <string name="unable_to_start_updateservice">kan ikke starte oppdateringstjeneste</string>
+    <string name="no_core_no_connectivity">kjernen er ikke installert, en nettverkstilkobling kreves ved førstegangsoppstart</string>
+    <string name="no_core_found">kan ikke finne en kjerne for denne enheten</string>
+    <string name="mandatory_update">denne oppdateringen er påkrevd</string>
+    <string name="new_core_found">Kjerne versjon %s er tilgjendelig, vil du oppgradere?</string>
+    <string name="update_cancelled">oppdatering avbrutt</string>
+    <string name="child_not_started">kan ikke starte prosess</string>
+    <string name="pref_updates">Oppdateringer</string>
+    <string name="pref_updates_app">App</string>
+    <string name="pref_updates_app_desc">sjekk etter App oppdateringer</string>
+    <string name="pref_updates_core">Kjerne</string>
+    <string name="pref_updates_core_desc">sjekk etter Kjerne oppdateringer</string>
+    <string name="pref_updates_ruby">Ruby</string>
+    <string name="pref_updates_ruby_desc">Sjekk etter Ruby oppdateringer</string>
+    <string name="pref_updates_msf">MSF</string>
+    <string name="pref_updates_msf_desc">Sjekk etter MSF oppdateringer</string>
+    <string name="pref_updates_gems">RubyGems</string>
+    <string name="pref_updates_gems_desc">Sjekk etter RubyGems oppdateringer</string>
+    <string name="pref_msf_manifest">Egendefinert manifest</string>
+    <string name="pref_msf_manifest_desc">egendefinert MSF manifest URL</string>
+    <string name="buildinfo">Bygg info</string>
+    <string name="menu_multiaction">Multihandling</string>
+    <string name="menu_focusedscan">fokusert skanning</string>
+ 
+    <string name="crash_dialog_title">cSploit har krasjet</string>
+    <string name="crash_dialog_text">En uventet feil har medført at programmet og/eller noen av dets komponenter har krasjet. Vennligst hjelp oss med å fikse problemet ved å sende oss feilmeldingen. Alt du trenger å gjøre er å trykke \'OK\'.</string>
+    <string name="crash_dialog_comment">Du kan legge til en kommentar til problemet nedenfor</string>
+    <string name="JNI_crash_detected">JNI biblioteket har tidligere krasjet, Jeg håper du har sendt i rapporten.</string>
 </resources>

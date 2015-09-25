@@ -43,6 +43,7 @@ import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.csploit.android.R;
 import org.csploit.android.WifiScannerActivity;
+import org.csploit.android.gui.dialogs.FatalDialog;
 import org.csploit.android.net.Endpoint;
 import org.csploit.android.net.Network;
 import org.csploit.android.net.Network.Protocol;
@@ -150,7 +151,7 @@ public class System
     try{
       Logger.debug("initializing System...");
       mStoragePath = getSettings().getString("PREF_SAVE_PATH", Environment.getExternalStorageDirectory().toString());
-      mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
+      mSessionName = "csploit-session-" + java.lang.System.currentTimeMillis();
       mKnownIssues = new KnownIssues();
       mPlugins = new ArrayList<Plugin>();
       mOpenPorts = new SparseIntArray(3);
@@ -180,11 +181,12 @@ public class System
         HTTP_PROXY_PORT  = Integer.parseInt(getSettings().getString("PREF_HTTP_PROXY_PORT", "8080"));
         HTTP_SERVER_PORT = Integer.parseInt(getSettings().getString("PREF_HTTP_SERVER_PORT", "8081"));
         HTTPS_REDIR_PORT = Integer.parseInt(getSettings().getString("PREF_HTTPS_REDIRECTOR_PORT", "8082"));
-        MSF_RPC_PORT     = Integer.parseInt(getSettings().getString("MSF_RPC_PORT", "5553"));
+        MSF_RPC_PORT     = Integer.parseInt(getSettings().getString("MSF_RPC_PORT", "55553"));
       } catch(NumberFormatException e){
         HTTP_PROXY_PORT = 8080;
         HTTP_SERVER_PORT = 8081;
         HTTPS_REDIR_PORT = 8082;
+        MSF_RPC_PORT = 55553;
       }
 
       // initialize network data at the end
@@ -365,29 +367,15 @@ public class System
 
   public static boolean checkNetworking(final Activity current){
     if(!Network.isWifiConnected(mContext)){
-      AlertDialog.Builder builder = new AlertDialog.Builder(current);
 
-      builder.setCancelable(false);
-      builder.setTitle(current.getString(R.string.error));
-      builder.setMessage(current.getString(R.string.wifi_went_down));
-      builder.setPositiveButton("Ok", new DialogInterface.OnClickListener(){
-        @Override
-        public void onClick(DialogInterface dialog, int which){
-          dialog.dismiss();
+      Intent intent = new Intent();
+      intent.putExtra(WifiScannerActivity.CONNECTED, false);
+      current.setResult(Activity.RESULT_OK, intent);
 
-          Bundle bundle = new Bundle();
-          bundle.putBoolean(WifiScannerActivity.CONNECTED, false);
+      String title = current.getString(R.string.error);
+      String message = current.getString(R.string.wifi_went_down);
 
-          Intent intent = new Intent();
-          intent.putExtras(bundle);
-
-          current.setResult(Activity.RESULT_OK, intent);
-          current.finish();
-        }
-      });
-
-      AlertDialog alert = builder.create();
-      alert.show();
+      new FatalDialog(title, message, current).show();
 
       return false;
     }
@@ -507,9 +495,11 @@ public class System
   }
 
   public static void registerSettingListener(SettingReceiver receiver) {
-    synchronized (mSettingReceivers) {
-      if(!mSettingReceivers.contains(receiver)) {
-        mSettingReceivers.add(receiver);
+    if (mSettingReceivers != null) {
+      synchronized (mSettingReceivers) {
+        if (!mSettingReceivers.contains(receiver)) {
+          mSettingReceivers.add(receiver);
+        }
       }
     }
   }

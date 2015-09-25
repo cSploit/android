@@ -18,13 +18,15 @@
  */
 package org.csploit.android.plugins.mitm;
 
+import org.csploit.android.R;
 import org.csploit.android.core.Child;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.System;
 import org.csploit.android.net.Target;
 import org.csploit.android.tools.ArpSpoof;
 import org.csploit.android.tools.Ettercap.OnAccountListener;
-import org.csploit.android.R;
+import org.csploit.android.tools.Ettercap.OnDNSSpoofedReceiver;
+
 
 public class SpoofSession
 {
@@ -97,10 +99,10 @@ public class SpoofSession
     System.setForwarding(true);
 
     if (mWithProxy) {
-      if (System.getSettings().getBoolean("PREF_HTTPS_REDIRECT", true))
-        System.getTools().ipTables.portRedirect(443, System.HTTPS_REDIR_PORT);
+      System.getTools().ipTables.portRedirect(80, System.HTTP_PROXY_PORT, true);
 
-      System.getTools().ipTables.portRedirect(80, System.HTTP_PROXY_PORT);
+      if (System.getSettings().getBoolean("PREF_HTTPS_REDIRECT", true))
+        System.getTools().ipTables.portRedirect(443, System.HTTPS_REDIR_PORT, false);
     }
 
     listener.onSessionReady();
@@ -127,6 +129,28 @@ public class SpoofSession
       this.stop();
       throw e;
     }
+  }
+
+  public void start(final OnDNSSpoofedReceiver listener) throws ChildManager.ChildNotStartedException {
+
+    mArpSpoofProcess =
+            System.getTools().arpSpoof.spoof(System.getCurrentTarget(), new ArpSpoof.ArpSpoofReceiver() {
+              @Override
+              public void onError(String line) {
+                SpoofSession.this.stop();
+                listener.onError(line);
+              }
+            });
+
+
+    try {
+      mEttercapProcess = System.getTools().ettercap.dnsSpoof(System.getCurrentTarget(), listener);
+    } catch (ChildManager.ChildNotStartedException e) {
+      this.stop();
+      throw e;
+    }
+
+    System.setForwarding(true);
   }
 
   public void start(final OnSessionReadyListener listener) throws ChildManager.ChildNotStartedException {

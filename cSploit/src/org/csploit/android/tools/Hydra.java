@@ -59,7 +59,9 @@ public class Hydra extends Tool
           Logger.error("Unknown event: " + e);
         }
       } else if(e instanceof Login) {
-        //TODO
+        Login login = (Login) e;
+
+        onAccountFound(login.login, login.password);
       } else {
         Logger.error("Unknown event: " + e);
       }

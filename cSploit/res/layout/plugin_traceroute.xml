@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
-            android:layout_below="@+id/separator"></ListView>
+            android:layout_below="@+id/separator"/>
 
     <ProgressBar
             android:id="@+id/traceActivity"

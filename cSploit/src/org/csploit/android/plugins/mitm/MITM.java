@@ -136,7 +136,7 @@ public class MITM extends Plugin
         LayoutInflater inflater = (LayoutInflater) MITM.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         row = inflater.inflate(mLayoutId, parent, false);
         if (getSharedPreferences("THEME", 0).getBoolean("isDark", false))
-            row.setBackground(getResources().getDrawable(R.drawable.card_background_dark));
+            row.setBackgroundResource(R.drawable.card_background_dark);
         holder = new ActionHolder();
         holder.icon = (ImageView) (row != null ? row.findViewById(R.id.actionIcon) : null);
         holder.name = (TextView) (row != null ? row.findViewById(R.id.itemName) : null);
@@ -420,29 +420,29 @@ public class MITM extends Plugin
     mScriptPicker.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
 
     mActions.add(new Action
-    (
-      getString(R.string.mitm_simple_sniff),
-      getString(R.string.mitm_simple_sniff_desc),
-      R.drawable.action_sniffer,
-      new OnClickListener(){
-        @Override
-        public void onClick(View v){
-          if(System.checkNetworking(MITM.this) == false)
-            return;
-
-          setStoppedState();
-
-          startActivity
             (
-              new Intent
-                (
-                  MITM.this,
-                  Sniffer.class
-                )
-            );
-          overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-        }
-      }));
+                    getString(R.string.mitm_simple_sniff),
+                    getString(R.string.mitm_simple_sniff_desc),
+                    R.drawable.action_sniffer,
+                    new OnClickListener() {
+                      @Override
+                      public void onClick(View v) {
+                        if (System.checkNetworking(MITM.this) == false)
+                          return;
+
+                        setStoppedState();
+
+                        startActivity
+                                (
+                                        new Intent
+                                                (
+                                                        MITM.this,
+                                                        Sniffer.class
+                                                )
+                                );
+                        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+                      }
+                    }));
 
     mActions.add(new Action
     (
@@ -467,6 +467,32 @@ public class MITM extends Plugin
             );
           overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
         }
+      }));
+
+
+      mActions.add(new Action
+              (
+               getString(R.string.mitm_dns_spoofing),
+               getString(R.string.mitm_dns_spoofing_desc),
+               R.drawable.action_redirect,
+               new OnClickListener() {
+               @Override
+               public void onClick(View v) {
+                    if (System.checkNetworking(MITM.this) == false)
+                       return;
+
+               setStoppedState();
+
+               startActivity
+               (
+                  new Intent
+                  (
+                     MITM.this,
+                     DNSSpoofing.class
+                  )
+               );
+               overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+                          }
       }));
 
     mActions.add(new Action
@@ -525,8 +551,13 @@ public class MITM extends Plugin
 
                   @Override
                   public void onError(String line) {
-                    Toast.makeText(MITM.this, "arpspoof error", Toast.LENGTH_LONG).show();
-                    activity.setVisibility(View.INVISIBLE);
+                    MITM.this.runOnUiThread(new Runnable() {
+                      @Override
+                      public void run() {
+                        Toast.makeText(MITM.this, "arpspoof error", Toast.LENGTH_LONG).show();
+                        activity.setVisibility(View.INVISIBLE);
+                      }
+                    });
                   }
                 });
 

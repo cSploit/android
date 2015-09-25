@@ -27,7 +27,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.text.Html;
 import android.view.Gravity;
@@ -43,13 +43,11 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.csploit.android.core.Child;
-import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Client;
 import org.csploit.android.core.CrashReporter;
 import org.csploit.android.core.Logger;
@@ -57,8 +55,6 @@ import org.csploit.android.core.ManagedReceiver;
 import org.csploit.android.core.MultiAttackService;
 import org.csploit.android.core.Plugin;
 import org.csploit.android.core.System;
-import org.csploit.android.core.UpdateChecker;
-import org.csploit.android.core.UpdateService;
 import org.csploit.android.events.Event;
 import org.csploit.android.gui.dialogs.AboutDialog;
 import org.csploit.android.gui.dialogs.ConfirmDialog;
@@ -71,9 +67,7 @@ import org.csploit.android.gui.dialogs.MultipleChoiceDialog;
 import org.csploit.android.gui.dialogs.SpinnerDialog;
 import org.csploit.android.gui.dialogs.SpinnerDialog.SpinnerDialogListener;
 import org.csploit.android.net.Network;
-import org.csploit.android.net.NetworkRadar;
 import org.csploit.android.net.Target;
-import org.csploit.android.net.metasploit.RPCClient;
 import org.csploit.android.plugins.ExploitFinder;
 import org.csploit.android.plugins.Inspector;
 import org.csploit.android.plugins.LoginCracker;
@@ -83,34 +77,37 @@ import org.csploit.android.plugins.RouterPwn;
 import org.csploit.android.plugins.Sessions;
 import org.csploit.android.plugins.Traceroute;
 import org.csploit.android.plugins.mitm.MITM;
-import org.csploit.android.tools.MsfRpcd;
-import org.csploit.android.tools.ToolBox;
+import org.csploit.android.services.MsfRpcdService;
+import org.csploit.android.services.NetworkRadar;
+import org.csploit.android.services.UpdateChecker;
+import org.csploit.android.services.UpdateService;
+import org.csploit.android.services.receivers.MsfRpcdServiceReceiver;
+import org.csploit.android.services.receivers.NetworkRadarReceiver;
+import org.csploit.android.update.CoreUpdate;
+import org.csploit.android.update.MsfUpdate;
+import org.csploit.android.update.RubyUpdate;
+import org.csploit.android.update.Update;
 
 import java.io.IOException;
 import java.net.NoRouteToHostException;
 import java.util.ArrayList;
 
-import static org.csploit.android.core.UpdateChecker.AVAILABLE_VERSION;
-import static org.csploit.android.core.UpdateChecker.CORE_AVAILABLE;
-import static org.csploit.android.core.UpdateChecker.GEMS_AVAILABLE;
-import static org.csploit.android.core.UpdateChecker.MSF_AVAILABLE;
-import static org.csploit.android.core.UpdateChecker.RUBY_AVAILABLE;
-import static org.csploit.android.core.UpdateChecker.UPDATE_AVAILABLE;
-import static org.csploit.android.core.UpdateChecker.UPDATE_CHECKING;
-import static org.csploit.android.core.UpdateChecker.UPDATE_NOT_AVAILABLE;
-import static org.csploit.android.net.NetworkRadar.NRDR_STOPPED;
+import static org.csploit.android.services.UpdateChecker.UPDATE_AVAILABLE;
+import static org.csploit.android.services.UpdateChecker.UPDATE_CHECKING;
+import static org.csploit.android.services.UpdateChecker.UPDATE_NOT_AVAILABLE;
 
 @SuppressLint("NewApi")
-public class MainActivity extends ActionBarActivity implements NetworkRadar.TargetListener {
+public class MainActivity extends AppCompatActivity {
   private String UPDATE_MESSAGE;
   private static final int WIFI_CONNECTION_REQUEST = 1012;
   private boolean isWifiAvailable = false;
   private TargetAdapter mTargetAdapter = null;
   private NetworkRadar mNetworkRadar = null;
-  private Child mMsfRpcd = null;
-  private RadarReceiver mRadarReceiver = new RadarReceiver();
+  private MsfRpcdService mMsfRpcdService = null;
+  private NetworkRadarReceiver mRadarReceiver = new NetworkRadarReceiver();
   private UpdateReceiver mUpdateReceiver = new UpdateReceiver();
   private WipeReceiver mWipeReceiver = new WipeReceiver();
+  private MsfRpcdServiceReceiver mMsfReceiver = new MsfRpcdServiceReceiver();
   private Menu mMenu = null;
   private TextView mUpdateStatus = null;
   private Toast mToast = null;
@@ -199,6 +196,11 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
     mRadarReceiver.register(MainActivity.this);
     mUpdateReceiver.register(MainActivity.this);
     mWipeReceiver.register(MainActivity.this);
+    mMsfReceiver.register(MainActivity.this);
+
+    mRadarReceiver.setTargetAdapter(mTargetAdapter);
+
+    StartRPCServer();
 
     // if called for the second time after wifi connection
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
@@ -281,14 +283,13 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         System.reloadNetworkMapping();
         createLayout();
         if (System.isInitialized())
-          startNetworkRadar(true);
+          startNetworkRadar();
       }
     });
   }
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
     SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
     Boolean isDark = themePrefs.getBoolean("isDark", false);
     boolean connectivityAvailable;
@@ -297,7 +298,7 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
       setTheme(R.style.DarkTheme);
     else
       setTheme(R.style.AppTheme);
-
+    super.onCreate(savedInstanceState);
     setContentView(R.layout.target_layout);
 
     lv = (ListView) findViewById(R.id.android_list);
@@ -399,10 +400,7 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
       startUpdateChecker();
 
     if (coreBeating && isWifiAvailable)
-      startNetworkRadar(true);
-
-    if (!MsfRpcd.isLocal() || System.getLocalMsfVersion() != null)
-      StartRPCServer();
+      startNetworkRadar();
 
     createLayout();
   }
@@ -427,34 +425,27 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
     return super.onCreateOptionsMenu(menu);
   }
 
+  private MsfRpcdService getMsfRpcdService() {
+    if(mMsfRpcdService == null)
+      mMsfRpcdService = new MsfRpcdService(this);
+    return mMsfRpcdService;
+  }
+
+  private NetworkRadar getNetworkRadar() {
+    if(mNetworkRadar == null)
+      mNetworkRadar = new NetworkRadar(this);
+    return mNetworkRadar;
+  }
+
   @Override
   public boolean onPrepareOptionsMenu(Menu menu) {
     MenuItem item = menu.findItem(R.id.ss_monitor);
 
-    if (mNetworkRadar != null && mNetworkRadar.isRunning())
-      item.setTitle(getString(R.string.stop_monitor));
-    else
-      item.setTitle(getString(R.string.start_monitor));
+    getNetworkRadar().buildMenuItem(item);
 
     item = menu.findItem(R.id.ss_msfrpcd);
-    ToolBox tools = System.getTools();
 
-    if (MsfRpcd.isLocal()) {
-      if (System.getMsfRpc() != null
-              || (mMsfRpcd != null && mMsfRpcd.running))
-        item.setTitle(getString(R.string.stop_msfrpcd));
-      else
-        item.setTitle(getString(R.string.start_msfrpcd));
-    } else {
-      if (System.getMsfRpc() == null)
-        item.setTitle(getString(R.string.connect_msf));
-      else
-        item.setTitle(getString(R.string.disconnect_msf));
-    }
-
-    item.setEnabled(!MsfRpcd.isLocal() ||
-            (tools != null && tools.msfrpcd.isEnabled() &&
-                    !System.isServiceRunning("org.csploit.android.core.UpdateService")));
+    getMsfRpcdService().buildMenuItem(item);
 
     mMenu = menu;
 
@@ -559,185 +550,51 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
     }
   }
 
-  public void startNetworkRadar(boolean silent) {
-    stopNetworkRadar(silent);
-
-    if (mNetworkRadar == null) {
-      mNetworkRadar = new NetworkRadar(this);
-    }
-
-    try {
-      mNetworkRadar.start(this);
-
-      if (!silent)
-        runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            Toast.makeText(MainActivity.this, getString(R.string.net_discovery_started),
-                    Toast.LENGTH_SHORT).show();
-          }
-        });
-
-    } catch (ChildManager.ChildNotStartedException e) {
-      runOnUiThread(
-              new Runnable() {
-                @Override
-                public void run() {
-                  Toast.makeText(MainActivity.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
-                }
-              }
-
-      );
-    }
+  public void startNetworkRadar() {
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        getNetworkRadar().start();
+      }
+    }).start();
   }
 
-  public void stopNetworkRadar(boolean silent) {
-    if (mNetworkRadar != null && mNetworkRadar.isRunning()) {
-      mNetworkRadar.stop(!silent);
-    }
+  public void stopNetworkRadar() {
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        getNetworkRadar().stop();
+      }
+    }).start();
   }
 
   /**
    * start MSF RPC Daemon
    */
   public void StartRPCServer() {
-    StopRPCServer(true);
-
     new Thread(new Runnable() {
       @Override
       public void run() {
-        SharedPreferences prefs = System.getSettings();
-
-        final String msfHost = prefs.getString("MSF_RPC_HOST", "127.0.0.1");
-        final String msfUser = prefs.getString("MSF_RPC_USER", "msf");
-        final String msfPassword = prefs.getString("MSF_RPC_PSWD", "msf");
-        final int msfPort = System.MSF_RPC_PORT;
-        final boolean msfSsl = prefs.getBoolean("MSF_RPC_SSL", false);
-
-        if (msfHost.equals("127.0.0.1")) {
-          try {
-            mMsfRpcd = System.getTools().msfrpcd.async(
-                    msfUser, msfPassword, msfPort, msfSsl,
-                    new MsfRpcd.MsfRpcdReceiver() {
-                      @Override
-                      public void onReady() {
-                        try {
-                          System.setMsfRpc(new RPCClient(msfHost, msfUser, msfPassword, msfPort, msfSsl));
-                          Logger.info("successfully connected to MSF RPC Daemon ");
-                          MainActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                              Toast.makeText(MainActivity.this, "connected to MSF RPC Daemon", Toast.LENGTH_SHORT).show();
-                            }
-                          });
-                        } catch (Exception e) {
-                          Logger.error(e.getClass().getName() + ": " + e.getMessage());
-                          MainActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                              Toast.makeText(MainActivity.this, "connection to MSF RPC Daemon failed", Toast.LENGTH_LONG).show();
-                            }
-                          });
-                        }
-                      }
-
-                      @Override
-                      public void onEnd(final int exitValue) {
-                        if (exitValue == 0)
-                          return;
-
-                        MainActivity.this.runOnUiThread(new Runnable() {
-                          @Override
-                          public void run() {
-                            Toast.makeText(MainActivity.this, "MSF RPC Daemon returned #" + exitValue, Toast.LENGTH_LONG).show();
-                          }
-                        });
-                      }
-
-                      @Override
-                      public void onDeath(final int signal) {
-                        MainActivity.this.runOnUiThread(new Runnable() {
-                          @Override
-                          public void run() {
-                            Toast.makeText(MainActivity.this, " MSF RPC Daemon killed by signal #" + signal, Toast.LENGTH_LONG).show();
-                          }
-                        });
-                      }
-                    });
-          } catch (ChildManager.ChildNotStartedException e) {
-            Logger.error(e.getMessage());
-            MainActivity.this.runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                Toast.makeText(MainActivity.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
-              }
-            });
-          }
-        } else {
-          try {
-            System.setMsfRpc(new RPCClient(msfHost, msfUser, msfPassword, msfPort, msfSsl));
-            Logger.info("successfully connected to MSF RPC Daemon ");
-            MainActivity.this.runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                Toast.makeText(MainActivity.this, "connected to MSF RPC Daemon", Toast.LENGTH_SHORT).show();
-              }
-            });
-          } catch (Exception e) {
-            Logger.error(e.getClass().getName() + ": " + e.getMessage());
-            MainActivity.this.runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                Toast.makeText(MainActivity.this, "connection to MSF RPC Daemon failed", Toast.LENGTH_LONG).show();
-              }
-            });
-          }
-        }
+        if(getMsfRpcdService().isAvailable())
+          getMsfRpcdService().start();
       }
     }).start();
   }
 
   /**
    * stop MSF RPC Daemon
-   *
-   * @param silent show an information Toast if {@code false}
    */
-  public void StopRPCServer(final boolean silent) {
-
-    if (System.getMsfRpc() == null && (mMsfRpcd == null || !mMsfRpcd.running))
-      return;
-
-    final Child process = mMsfRpcd;
-    mMsfRpcd = null;
-
+  public void StopRPCServer() {
     new Thread(new Runnable() {
       @Override
       public void run() {
-        try {
-          System.setMsfRpc(null);
-
-          if (process.running) {
-            process.kill(2);
-            process.join();
-          }
-
-          if (!silent) {
-            MainActivity.this.runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                Toast.makeText(MainActivity.this, getString(R.string.rpcd_stopped), Toast.LENGTH_SHORT).show();
-              }
-            });
-          }
-        } catch (InterruptedException e) {
-          Logger.error("interrupted while stopping rpc daemon");
-        }
+        getMsfRpcdService().stop();
       }
     }).start();
   }
 
   @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
+  public boolean onOptionsItemSelected(final MenuItem item) {
     switch (item.getItemId()) {
 
       case R.id.add:
@@ -768,29 +625,11 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         return true;
 
       case R.id.scan:
-        if (mMenu != null)
-          mMenu.findItem(R.id.scan).setActionView(new ProgressBar(this));
-
-        new Thread(new Runnable() {
-          @Override
-          public void run() {
-            startNetworkRadar(true);
-
-            MainActivity.this.runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                if (mMenu != null)
-                  mMenu.findItem(R.id.scan).setActionView(null);
-              }
-            });
-          }
-        }).start();
-
-        item.setTitle(getString(R.string.stop_monitor));
+        startNetworkRadar();
         return true;
 
       case R.id.wifi_scan:
-        stopNetworkRadar(true);
+        stopNetworkRadar();
 
         mRadarReceiver.unregister();
         mUpdateReceiver.unregister();
@@ -894,35 +733,21 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
         return true;
 
       case R.id.ss_monitor:
-        if (mNetworkRadar != null && mNetworkRadar.isRunning()) {
-          stopNetworkRadar(false);
-
-          item.setTitle(getString(R.string.start_monitor));
-        } else {
-          try {
-            startNetworkRadar(false);
-
-            item.setTitle(getString(R.string.stop_monitor));
-          } catch (Exception e) {
-            new ErrorDialog(getString(R.string.error), e.getMessage(), MainActivity.this).show();
+        new Thread(new Runnable() {
+          @Override
+          public void run() {
+            getNetworkRadar().onMenuClick(MainActivity.this, item);
           }
-        }
+        }).start();
         return true;
 
       case R.id.ss_msfrpcd:
-        if (System.getMsfRpc() != null || (mMsfRpcd != null && mMsfRpcd.running)) {
-          StopRPCServer(false);
-          if (MsfRpcd.isLocal())
-            item.setTitle(R.string.start_msfrpcd);
-          else
-            item.setTitle(R.string.connect_msf);
-        } else {
-          StartRPCServer();
-          if (MsfRpcd.isLocal())
-            item.setTitle(R.string.stop_msfrpcd);
-          else
-            item.setTitle(R.string.disconnect_msf);
-        }
+        new Thread(new Runnable() {
+          @Override
+          public void run() {
+            getMsfRpcdService().onMenuClick(MainActivity.this, item);
+          }
+        }).start();
         return true;
 
       case R.id.submit_issue:
@@ -971,40 +796,18 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
 
   @Override
   public void onDestroy() {
-    stopNetworkRadar(true);
-    StopRPCServer(true);
+    stopNetworkRadar();
+    StopRPCServer();
 
     mRadarReceiver.unregister();
     mUpdateReceiver.unregister();
     mWipeReceiver.unregister();
+    mMsfReceiver.unregister();
 
     // make sure no zombie process is running before destroying the activity
     System.clean(true);
 
     super.onDestroy();
-  }
-
-  @Override
-  public void onTargetFound(final Target t) {
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        if (System.addOrderedTarget(t) && mTargetAdapter != null) {
-          mTargetAdapter.notifyDataSetChanged();
-        }
-      }
-    });
-  }
-
-  @Override
-  public void onTargetChanged(final Target t) {
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        if (mTargetAdapter != null)
-          mTargetAdapter.notifyDataSetChanged();
-      }
-    });
   }
 
   public class TargetAdapter extends ArrayAdapter<Target> {
@@ -1027,7 +830,8 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         row = inflater
                 .inflate(R.layout.target_list_item, parent, false);
-
+        if (getSharedPreferences("THEME", 0).getBoolean("isDark", false))
+          row.setBackgroundResource(R.drawable.card_background_dark);
         holder = new TargetHolder();
         holder.itemImage = (ImageView) (row != null ? row
                 .findViewById(R.id.itemIcon) : null);
@@ -1053,9 +857,8 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
 
       holder.itemTitle.setTextColor(getResources().getColor((target.isConnected() ? R.color.app_color : R.color.gray_text)));
 
-      if (row != null)
-        row.setBackgroundColor(getResources().getColor((target.isSelected() ? R.color.background_material_dark : android.R.color.transparent)));
-
+      if (row != null && (getSharedPreferences("THEME", 0).getBoolean("isDark", false)))
+          row.setBackgroundResource(R.drawable.card_background_dark);
       holder.itemTitle.setTypeface(null, Typeface.NORMAL);
       holder.itemImage.setImageResource(target.getDrawableResourceId());
       holder.itemDescription.setText(target.getDescription());
@@ -1116,33 +919,6 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
     }
   }
 
-  private class RadarReceiver extends ManagedReceiver {
-    private IntentFilter mFilter = null;
-
-    public RadarReceiver() {
-      mFilter = new IntentFilter();
-
-      mFilter.addAction(NRDR_STOPPED);
-    }
-
-    public IntentFilter getFilter() {
-      return mFilter;
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public void onReceive(Context context, Intent intent) {
-      if (intent.getAction() == null)
-        return;
-
-      if (intent.getAction().equals(NRDR_STOPPED)) {
-
-        Toast.makeText(MainActivity.this, R.string.net_discovery_stopped,
-                Toast.LENGTH_SHORT).show();
-      }
-    }
-  }
-
   private class WipeReceiver extends ManagedReceiver {
     private IntentFilter mFilter = null;
 
@@ -1169,7 +945,7 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
             path = System.getRubyPath() + "' '" + System.getMsfPath();
           }
 
-          StopRPCServer(true);
+          StopRPCServer();
           System.getTools().raw.async("rm -rf '" + path + "'", new Child.EventReceiver() {
             @Override
             public void onEnd(int exitCode) {
@@ -1201,10 +977,6 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
       mFilter.addAction(UPDATE_CHECKING);
       mFilter.addAction(UPDATE_AVAILABLE);
       mFilter.addAction(UPDATE_NOT_AVAILABLE);
-      mFilter.addAction(CORE_AVAILABLE);
-      mFilter.addAction(RUBY_AVAILABLE);
-      mFilter.addAction(GEMS_AVAILABLE);
-      mFilter.addAction(MSF_AVAILABLE);
       mFilter.addAction(UpdateService.ERROR);
       mFilter.addAction(UpdateService.DONE);
     }
@@ -1213,18 +985,18 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
       return mFilter;
     }
 
-    private void onUpdateAvailable(final String desc, final UpdateService.action target, final boolean mandatory) {
+    private void onUpdateAvailable(final Update update, final boolean mandatory) {
       MainActivity.this.runOnUiThread(new Runnable() {
         @Override
         public void run() {
           new ConfirmDialog(getString(R.string.update_available),
-                  desc, MainActivity.this, new ConfirmDialogListener() {
+                  update.prompt, MainActivity.this, new ConfirmDialogListener() {
             @Override
             public void onConfirm() {
-              StopRPCServer(true);
+              StopRPCServer();
               Intent i = new Intent(MainActivity.this, UpdateService.class);
               i.setAction(UpdateService.START);
-              i.putExtra(UpdateService.ACTION, target);
+              i.putExtra(UpdateService.UPDATE, update);
 
               startService(i);
             }
@@ -1243,31 +1015,29 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
       });
     }
 
-    private void onUpdateAvailable(final String desc, final UpdateService.action target) {
-      onUpdateAvailable(desc, target, false);
+    private void onUpdateAvailable(Update update) {
+      onUpdateAvailable(update, (update instanceof CoreUpdate) && !System.isCoreInstalled());
     }
 
-    private void onUpdateDone(UpdateService.action target) {
+    private void onUpdateDone(Update update) {
 
       System.reloadTools();
 
-      switch (target) {
-        case ruby_update:
-        case msf_update:
-          StartRPCServer();
-          break;
-        case core_update:
-          onCoreUpdated();
-          break;
+      if((update instanceof MsfUpdate) || (update instanceof RubyUpdate)) {
+        StartRPCServer();
+      }
+
+      if(update instanceof CoreUpdate) {
+        onCoreUpdated();
       }
 
       // restart update checker after a successful update
       startUpdateChecker();
     }
 
-    private void onUpdateError(UpdateService.action target, final int message) {
+    private void onUpdateError(final Update update, final int message) {
 
-      if (target == UpdateService.action.core_update) {
+      if (update instanceof CoreUpdate) {
         onInitializationError(getString(message));
         return;
       }
@@ -1286,73 +1056,38 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onReceive(Context context, Intent intent) {
-      if (intent.getAction().equals(UPDATE_CHECKING)) {
+      String action = intent.getAction();
+      Update update = null;
 
-        if (mUpdateStatus != null)
-          mUpdateStatus.setText(UPDATE_MESSAGE.replace(
-                  "#STATUS#", getString(R.string.checking)));
+      if(intent.hasExtra(UpdateService.UPDATE)) {
+        update = (Update) intent.getSerializableExtra(UpdateService.UPDATE);
+      }
 
-      } else if (intent.getAction().equals(UPDATE_NOT_AVAILABLE)) {
+      switch (action) {
+        case UPDATE_CHECKING:
+          if (mUpdateStatus != null)
+            mUpdateStatus.setText(UPDATE_MESSAGE.replace(
+                    "#STATUS#", getString(R.string.checking)));
+          break;
+        case UPDATE_NOT_AVAILABLE:
+          if (mUpdateStatus != null)
+            mUpdateStatus.setText(UPDATE_MESSAGE.replace(
+                    "#STATUS#", getString(R.string.no_updates_available)));
 
-        if (mUpdateStatus != null)
-          mUpdateStatus.setText(UPDATE_MESSAGE.replace(
-                  "#STATUS#", getString(R.string.no_updates_available)));
-
-        if (!System.isCoreInitialized()) {
-          new FatalDialog(getString(R.string.initialization_error),
-                  getString(R.string.no_core_found), MainActivity.this).show();
-        }
-
-      } else if (intent.getAction().equals(RUBY_AVAILABLE)) {
-        final String description = getString(R.string.new_ruby_update_desc) + " " +
-                getString(R.string.new_update_desc2);
-
-        onUpdateAvailable(description, UpdateService.action.ruby_update);
-      } else if (intent.getAction().equals(MSF_AVAILABLE)) {
-        if (mUpdateStatus != null)
-          mUpdateStatus.setText(UPDATE_MESSAGE.replace(
-                  "#STATUS#",
-                  getString(R.string.new_version) + " " +
-                          getString(R.string.new_version2)
-          ));
-
-        final String description = getString(R.string.new_msf_update_desc) + " " +
-                getString(R.string.new_update_desc2);
-
-        onUpdateAvailable(description, UpdateService.action.msf_update);
-      } else if (intent.getAction().equals(UPDATE_AVAILABLE)) {
-        final String remoteVersion = (String) intent.getExtras().get(
-                AVAILABLE_VERSION);
-
-        if (mUpdateStatus != null)
-          mUpdateStatus.setText(UPDATE_MESSAGE.replace(
-                  "#STATUS#", getString(R.string.new_version)
-                          + remoteVersion
-                          + getString(R.string.new_version2)));
-
-        final String description = getString(R.string.new_update_desc)
-                + " " + remoteVersion + " "
-                + getString(R.string.new_update_desc2);
-
-        onUpdateAvailable(description, UpdateService.action.apk_update);
-      } else if (intent.getAction().equals(CORE_AVAILABLE)) {
-
-        final String remoteVersion = (String) intent.getExtras().get(
-                AVAILABLE_VERSION);
-
-        if (mUpdateStatus != null)
-          mUpdateStatus.setText(UPDATE_MESSAGE.replace(
-                  "#STATUS#", getString(R.string.new_version) + " " +
-                          getString(R.string.new_version2)));
-
-        final String description = String.format(getString(R.string.new_core_found), remoteVersion);
-
-        onUpdateAvailable(description, UpdateService.action.core_update, !System.isCoreInstalled());
-      } else if (intent.getAction().equals(UpdateService.ERROR)) {
-        onUpdateError((UpdateService.action) intent.getSerializableExtra(UpdateService.ACTION),
-                intent.getIntExtra(UpdateService.MESSAGE, R.string.error_occured));
-      } else if (intent.getAction().equals(UpdateService.DONE)) {
-        onUpdateDone((UpdateService.action) intent.getSerializableExtra(UpdateService.ACTION));
+          if (!System.isCoreInitialized()) {
+            onInitializationError(getString(R.string.no_core_found));
+          }
+          break;
+        case UPDATE_AVAILABLE:
+          onUpdateAvailable(update);
+          break;
+        case UpdateService.DONE:
+          onUpdateDone(update);
+          break;
+        case UpdateService.ERROR:
+          int message = intent.getIntExtra(UpdateService.MESSAGE, R.string.error_occured);
+          onUpdateError(update, message);
+          break;
       }
     }
   }
