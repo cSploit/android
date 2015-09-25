@@ -831,7 +831,7 @@ public class MainActivity extends AppCompatActivity {
         row = inflater
                 .inflate(R.layout.target_list_item, parent, false);
         if (getSharedPreferences("THEME", 0).getBoolean("isDark", false))
-          row.setBackground(getResources().getDrawable(R.drawable.card_background_dark));
+          row.setBackgroundResource(R.drawable.card_background_dark);
         holder = new TargetHolder();
         holder.itemImage = (ImageView) (row != null ? row
                 .findViewById(R.id.itemIcon) : null);
