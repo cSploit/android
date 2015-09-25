@@ -43,6 +43,7 @@ import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.csploit.android.R;
 import org.csploit.android.WifiScannerActivity;
+import org.csploit.android.gui.dialogs.FatalDialog;
 import org.csploit.android.net.Endpoint;
 import org.csploit.android.net.Network;
 import org.csploit.android.net.Network.Protocol;
@@ -366,29 +367,15 @@ public class System
 
   public static boolean checkNetworking(final Activity current){
     if(!Network.isWifiConnected(mContext)){
-      AlertDialog.Builder builder = new AlertDialog.Builder(current);
 
-      builder.setCancelable(false);
-      builder.setTitle(current.getString(R.string.error));
-      builder.setMessage(current.getString(R.string.wifi_went_down));
-      builder.setPositiveButton("Ok", new DialogInterface.OnClickListener(){
-        @Override
-        public void onClick(DialogInterface dialog, int which){
-          dialog.dismiss();
+      Intent intent = new Intent();
+      intent.putExtra(WifiScannerActivity.CONNECTED, false);
+      current.setResult(Activity.RESULT_OK, intent);
 
-          Bundle bundle = new Bundle();
-          bundle.putBoolean(WifiScannerActivity.CONNECTED, false);
+      String title = current.getString(R.string.error);
+      String message = current.getString(R.string.wifi_went_down);
 
-          Intent intent = new Intent();
-          intent.putExtras(bundle);
-
-          current.setResult(Activity.RESULT_OK, intent);
-          current.finish();
-        }
-      });
-
-      AlertDialog alert = builder.create();
-      alert.show();
+      new FatalDialog(title, message, current).show();
 
       return false;
     }
