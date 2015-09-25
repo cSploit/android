@@ -55,6 +55,9 @@ android {
     }
 
     lintOptions {
+        if (System.getenv("NIGHTLY_BUILD")) {
+            checkReleaseBuilds false
+        }
         abortOnError false
     }
 

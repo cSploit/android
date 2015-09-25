@@ -17,6 +17,7 @@ LOG_DIR="${DIR}/logs"
 MAX_DAYS="15"
 PREVIOUS_COMMIT=$(cat "${LOG_DIR}last_commit")
 
+export NIGHTLY_BUILD=1
 
 die() {
  echo -n -e "${RED}An error occured while building the nightly apk${RESET}\n"
@@ -68,7 +69,6 @@ oldpwd=$(pwd)
 cd cSploit/jni >&3 2>&1 || die
 ./build.sh  >&3 2>&1 || jni_die
 cd "$oldpwd" >&3 2>&1 || die
-./gradlew clean >&3 2>&1 || die
 ./gradlew assembleRelease >&3 2>&1 || die
 
 echo -n -e "${GREEN}Copying signed apk to output directory${RESET}\n" | tee >(cat - >&3)
