@@ -3,7 +3,8 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="8dp">
+    android:padding="8dp"
+    android:translationZ="8dp">
 
     <ImageView
         android:id="@+id/itemIcon"
@@ -11,8 +12,8 @@
         android:layout_height="fill_parent"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="16dp" />
+        android:layout_centerInParent="true"
+        android:layout_margin="8dp" />
 
     <TextView
         android:id="@+id/itemTitle"

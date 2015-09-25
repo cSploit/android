@@ -290,7 +290,6 @@ public class MainActivity extends ActionBarActivity {
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
     SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
     Boolean isDark = themePrefs.getBoolean("isDark", false);
     boolean connectivityAvailable;
@@ -299,7 +298,7 @@ public class MainActivity extends ActionBarActivity {
       setTheme(R.style.DarkTheme);
     else
       setTheme(R.style.AppTheme);
-
+    super.onCreate(savedInstanceState);
     setContentView(R.layout.target_layout);
 
     lv = (ListView) findViewById(R.id.android_list);
@@ -831,7 +830,8 @@ public class MainActivity extends ActionBarActivity {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         row = inflater
                 .inflate(R.layout.target_list_item, parent, false);
-
+        if (getSharedPreferences("THEME", 0).getBoolean("isDark", false))
+          row.setBackground(getResources().getDrawable(R.drawable.card_background_dark));
         holder = new TargetHolder();
         holder.itemImage = (ImageView) (row != null ? row
                 .findViewById(R.id.itemIcon) : null);
@@ -857,8 +857,8 @@ public class MainActivity extends ActionBarActivity {
 
       holder.itemTitle.setTextColor(getResources().getColor((target.isConnected() ? R.color.app_color : R.color.gray_text)));
 
-      if (row != null)
-        row.setBackgroundColor(getResources().getColor((target.isSelected() ? R.color.background_material_dark : android.R.color.transparent)));
+      if (row != null && (getSharedPreferences("THEME", 0).getBoolean("isDark", false)))
+          row.setBackground(getResources().getDrawable(R.drawable.card_background_dark));
 
       holder.itemTitle.setTypeface(null, Typeface.NORMAL);
       holder.itemImage.setImageResource(target.getDrawableResourceId());
