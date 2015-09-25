@@ -23,7 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,13 +41,12 @@ import org.csploit.android.gui.dialogs.FinishDialog;
 
 import java.util.ArrayList;
 
-public class ActionActivity extends ActionBarActivity {
+public class ActionActivity extends AppCompatActivity {
     private ArrayList<Plugin> mAvailable = null;
     private ListView theList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
         Boolean isDark = themePrefs.getBoolean("isDark", false);
 
@@ -55,6 +54,7 @@ public class ActionActivity extends ActionBarActivity {
             setTheme(R.style.DarkTheme);
         else
             setTheme(R.style.AppTheme);
+        super.onCreate(savedInstanceState);
 
         if (System.getTargets() != null && System.getTargets().size() > 0 && System.getCurrentTarget() != null) {
             setTitle("cSploit > " + System.getCurrentTarget());

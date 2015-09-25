@@ -27,7 +27,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.text.Html;
 import android.view.Gravity;
@@ -55,8 +55,6 @@ import org.csploit.android.core.ManagedReceiver;
 import org.csploit.android.core.MultiAttackService;
 import org.csploit.android.core.Plugin;
 import org.csploit.android.core.System;
-import org.csploit.android.services.UpdateChecker;
-import org.csploit.android.services.UpdateService;
 import org.csploit.android.events.Event;
 import org.csploit.android.gui.dialogs.AboutDialog;
 import org.csploit.android.gui.dialogs.ConfirmDialog;
@@ -69,7 +67,6 @@ import org.csploit.android.gui.dialogs.MultipleChoiceDialog;
 import org.csploit.android.gui.dialogs.SpinnerDialog;
 import org.csploit.android.gui.dialogs.SpinnerDialog.SpinnerDialogListener;
 import org.csploit.android.net.Network;
-import org.csploit.android.services.NetworkRadar;
 import org.csploit.android.net.Target;
 import org.csploit.android.plugins.ExploitFinder;
 import org.csploit.android.plugins.Inspector;
@@ -81,6 +78,9 @@ import org.csploit.android.plugins.Sessions;
 import org.csploit.android.plugins.Traceroute;
 import org.csploit.android.plugins.mitm.MITM;
 import org.csploit.android.services.MsfRpcdService;
+import org.csploit.android.services.NetworkRadar;
+import org.csploit.android.services.UpdateChecker;
+import org.csploit.android.services.UpdateService;
 import org.csploit.android.services.receivers.MsfRpcdServiceReceiver;
 import org.csploit.android.services.receivers.NetworkRadarReceiver;
 import org.csploit.android.update.CoreUpdate;
@@ -97,7 +97,7 @@ import static org.csploit.android.services.UpdateChecker.UPDATE_CHECKING;
 import static org.csploit.android.services.UpdateChecker.UPDATE_NOT_AVAILABLE;
 
 @SuppressLint("NewApi")
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
   private String UPDATE_MESSAGE;
   private static final int WIFI_CONNECTION_REQUEST = 1012;
   private boolean isWifiAvailable = false;
@@ -290,7 +290,6 @@ public class MainActivity extends ActionBarActivity {
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
     SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
     Boolean isDark = themePrefs.getBoolean("isDark", false);
     boolean connectivityAvailable;
@@ -299,7 +298,7 @@ public class MainActivity extends ActionBarActivity {
       setTheme(R.style.DarkTheme);
     else
       setTheme(R.style.AppTheme);
-
+    super.onCreate(savedInstanceState);
     setContentView(R.layout.target_layout);
 
     lv = (ListView) findViewById(R.id.android_list);
@@ -831,7 +830,8 @@ public class MainActivity extends ActionBarActivity {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         row = inflater
                 .inflate(R.layout.target_list_item, parent, false);
-
+        if (getSharedPreferences("THEME", 0).getBoolean("isDark", false))
+          row.setBackground(getResources().getDrawable(R.drawable.card_background_dark));
         holder = new TargetHolder();
         holder.itemImage = (ImageView) (row != null ? row
                 .findViewById(R.id.itemIcon) : null);
@@ -857,8 +857,8 @@ public class MainActivity extends ActionBarActivity {
 
       holder.itemTitle.setTextColor(getResources().getColor((target.isConnected() ? R.color.app_color : R.color.gray_text)));
 
-      if (row != null)
-        row.setBackgroundColor(getResources().getColor((target.isSelected() ? R.color.background_material_dark : android.R.color.transparent)));
+      if (row != null && (getSharedPreferences("THEME", 0).getBoolean("isDark", false)))
+          row.setBackground(getResources().getDrawable(R.drawable.card_background_dark));
 
       holder.itemTitle.setTypeface(null, Typeface.NORMAL);
       holder.itemImage.setImageResource(target.getDrawableResourceId());

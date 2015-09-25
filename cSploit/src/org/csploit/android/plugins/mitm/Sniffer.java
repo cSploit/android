@@ -21,7 +21,7 @@ package org.csploit.android.plugins.mitm;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -54,7 +54,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Sniffer extends ActionBarActivity
+public class Sniffer extends AppCompatActivity
 {
   private static final String[] SORT = {
     "Bandwidth ↓",

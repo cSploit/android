@@ -1,7 +1,7 @@
 package org.csploit.android.gui;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,7 +14,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 
-public class FileEdit extends ActionBarActivity {
+public class FileEdit extends AppCompatActivity {
     private Button mCmdSave = null;
     private EditText mFileEditText = null;
     public final static String KEY_FILEPATH = "FilePath";

@@ -3,7 +3,7 @@ package org.csploit.android.gui;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -24,7 +24,7 @@ import org.csploit.android.net.metasploit.ShellSession;
 /**
  * this Activity allow user to run commands on pwned shells
  */
-public class Console extends ActionBarActivity {
+public class Console extends AppCompatActivity {
 
   private EditText  mInput;
   private EditText  mOutput;

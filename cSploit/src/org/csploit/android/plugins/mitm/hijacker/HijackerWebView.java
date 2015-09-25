@@ -20,7 +20,7 @@ package org.csploit.android.plugins.mitm.hijacker;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -37,7 +37,7 @@ import org.csploit.android.core.System;
 
 import java.net.HttpCookie;
 
-public class HijackerWebView extends ActionBarActivity {
+public class HijackerWebView extends AppCompatActivity {
 	private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4";
 
 	private WebSettings mSettings = null;

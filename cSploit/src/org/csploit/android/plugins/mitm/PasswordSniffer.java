@@ -23,7 +23,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -37,10 +37,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import org.csploit.android.gui.FileEdit;
 import org.csploit.android.R;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.System;
+import org.csploit.android.gui.FileEdit;
 import org.csploit.android.gui.dialogs.FatalDialog;
 import org.csploit.android.tools.Ettercap.OnAccountListener;
 
@@ -51,7 +51,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PasswordSniffer extends ActionBarActivity {
+public class PasswordSniffer extends AppCompatActivity {
 	private ToggleButton mSniffToggleButton = null;
 	private ProgressBar mSniffProgress = null;
 	private ExpandableListView mListView = null;
