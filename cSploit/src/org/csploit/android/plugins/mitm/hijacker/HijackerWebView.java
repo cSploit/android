@@ -21,6 +21,7 @@ package org.csploit.android.plugins.mitm.hijacker;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Patterns;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -113,8 +114,14 @@ public class HijackerWebView extends AppCompatActivity {
               && session.mUserAgent.isEmpty() == false)
         mSettings.setUserAgentString(session.mUserAgent);
 
-      mWebView.loadUrl((session.mHTTPS ? "https" : "http") + "://www."
-              + domain);
+      String url = (session.mHTTPS ? "https" : "http") + "://";
+
+      if(domain != null && !Patterns.IP_ADDRESS.matcher(domain).matches())
+        url += "www.";
+
+      url += domain;
+
+      mWebView.loadUrl(url);
     }
   }
 
