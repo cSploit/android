@@ -163,6 +163,12 @@
             android:title="@string/pref_msf_enable"
             android:summary="@string/pref_msf_enable_desc" />
 
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="MSF_NOTIFICATIONS"
+            android:title="@string/pref_msf_notifications"
+            android:summary="@string/pref_msf_notifications_desc" />
+
         <ListPreference
             android:key="MSF_BRANCH"
             android:summary="@string/pref_msf_branch_desc"
