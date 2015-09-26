@@ -71,7 +71,7 @@
     <string name="error_occured">An error occurred while downloading the update.</string>
     <string name="invalid_target">Invalid target.</string>
     <string name="add_custom_target">Add custom target</string>
-    <string name="enter_url">Enter an URL, host name or ip address below:</string>
+    <string name="enter_url">Enter an URL, host name or IP address below:</string>
     <string name="net_discovery_stopped">Network discovery stopped.</string>
     <string name="net_discovery_started">Network discovery started.</string>
     <string name="start_monitor">Start Network Monitor</string>
@@ -394,7 +394,7 @@
         <item>EXDB</item>
         <item>BOTH</item>
     </string-array>
-    <string name="pref_performance_widescan">wide host scan</string>
+    <string name="pref_performance_widescan">Wide host scan</string>
     <string name="pref_performance_widescan_desc">scan for hosts outside the network mask</string>
     <string name="pref_advanced">Advanced</string>
     <string name="pref_folder">Folder</string>
