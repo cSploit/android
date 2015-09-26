@@ -10,4 +10,9 @@
     <color name="holo_blue_dark">#ff0d222f</color>
     <color name="selectable_blue">#ff36ccff</color>
     <color name="selectable_blue_dark">#ff144d5d</color>
+    <color name="pink">#E91E63</color>
+    <color name="red">#F44336</color>
+    <color name="green">#4CAF50</color>
+    <color name="purple">#3F51B5</color>
+    <color name="orange">#FFC107</color>
 </resources>
