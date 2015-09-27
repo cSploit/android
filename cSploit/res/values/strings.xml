@@ -508,7 +508,7 @@
     <string name="msfrcd_start_failed">MSF RPC Daemon failed to start</string>
     <string name="msf_connection_failed">Connection to the MSF RPC Daemon FAILED!</string>
     <string name="net_discovery_start_failed">Network discovery FAILED to start!</string>
-    <string name="new_apk_found">App verision %s is available, do you want to upgrade ?</string>
+    <string name="new_apk_found">App version %s is available, do you want to upgrade ?</string>
     <string name="new_ruby_found">A new version for ruby is available, do you want to upgrade ?</string>
     <string name="new_msf_found">A new msf version is available, do you want to upgrade ?</string>
     <string name="msf_status">MetaSploit Status</string>
