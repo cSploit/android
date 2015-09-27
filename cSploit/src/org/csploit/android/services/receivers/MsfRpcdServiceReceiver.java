@@ -62,68 +62,17 @@ public class MsfRpcdServiceReceiver extends ManagedReceiver {
   }
 
   private void showToastForStatus(Context context, MsfRpcdService.Status status) {
-    switch (status) {
-      case STARTING:
-        Toast.makeText(context, R.string.rpcd_starting, Toast.LENGTH_SHORT).show();
-        break;
-      case CONNECTED:
-        Toast.makeText(context, R.string.connected_msf, Toast.LENGTH_SHORT).show();
-        break;
-      case DISCONNECTED:
-        Toast.makeText(context, R.string.msfrpc_disconnected, Toast.LENGTH_SHORT).show();
-        break;
-      case STOPPED:
-        Toast.makeText(context, R.string.rpcd_stopped, Toast.LENGTH_SHORT).show();
-        break;
-      case KILLED:
-        Toast.makeText(context, R.string.msfrpcd_killed, Toast.LENGTH_SHORT).show();
-        break;
-      case START_FAILED:
-        Toast.makeText(context, R.string.msfrcd_start_failed, Toast.LENGTH_LONG).show();
-        break;
-      case CONNECTION_FAILED:
-        Toast.makeText(context, R.string.msf_connection_failed, Toast.LENGTH_LONG).show();
-        break;
-    }
+    Toast.makeText(context, status.getText(), (status.isError() ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT)).show();
   }
 
   private void updateNotificationForStatus(Context context, MsfRpcdService.Status status) {
     NotificationCompat.Builder mBuilder =
             new NotificationCompat.Builder(context)
-                    .setSmallIcon(R.drawable.exploit_msf)
-                    .setContentTitle("MetaSploit RPCD Status");
-    mBuilder.setProgress(0, 0, false);
-    switch (status) {
-      case STARTING:
-        mBuilder.setContentText(context.getResources().getText(R.string.rpcd_starting));
-        mBuilder.setProgress(0, 0, true);
-        mBuilder.setColor(ContextCompat.getColor(context, R.color.selectable_blue));
-        break;
-      case CONNECTED:
-        mBuilder.setContentText(context.getResources().getText(R.string.connected_msf));
-        mBuilder.setColor(ContextCompat.getColor(context, R.color.green));
-        break;
-      case DISCONNECTED:
-        mBuilder.setContentText(context.getResources().getText(R.string.msfrpc_disconnected));
-        mBuilder.setColor(ContextCompat.getColor(context, R.color.purple));
-        break;
-      case STOPPED:
-        mBuilder.setContentText(context.getResources().getText(R.string.rpcd_stopped));
-        mBuilder.setColor(ContextCompat.getColor(context, R.color.purple));
-        break;
-      case KILLED:
-        mBuilder.setContentText(context.getResources().getText(R.string.msfrpcd_killed));
-        mBuilder.setColor(ContextCompat.getColor(context, R.color.purple));
-        break;
-      case START_FAILED:
-        mBuilder.setContentText(context.getResources().getText(R.string.msfrcd_start_failed));
-        mBuilder.setColor(ContextCompat.getColor(context, R.color.red));
-        break;
-      case CONNECTION_FAILED:
-        mBuilder.setContentText(context.getResources().getText(R.string.msf_connection_failed));
-        mBuilder.setColor(ContextCompat.getColor(context, R.color.red));
-        break;
-    }
+            .setSmallIcon(R.drawable.exploit_msf)
+            .setContentTitle(context.getString(R.string.msf_status))
+            .setProgress(0, 0, status.inProgress())
+            .setContentText(context.getString(status.getText()))
+            .setColor(ContextCompat.getColor(context, status.getColor()));
 
     NotificationManager mNotificationManager =
             (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
