@@ -2,7 +2,7 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="actionBarStyle">@style/Theme.DSploitActionBarStyle</item>
+        <item name="actionBarStyle">@style/Theme.CSploitActionBarStyle</item>
         <item name="android:windowBackground">@color/background_window</item>
         <item name="colorPrimary">@color/app_color</item>
         <!-- darker variant of colorPrimary (for status bar, contextual app bars) -->
@@ -16,7 +16,7 @@
     <!-- this dark theme needs a lot of help and support in the app overall -->
 
     <style name="DarkTheme" parent="Theme.AppCompat">
-        <item name="actionBarStyle">@style/Theme.DSploitActionBarDarkStyle</item>
+        <item name="actionBarStyle">@style/Theme.CSploitActionBarDarkStyle</item>
         <item name="actionModeBackground">@color/app_color_dark</item>
         <item name="colorPrimary">@color/selectable_blue_dark</item>
         <!-- darker variant of colorPrimary (for status bar, contextual app bars) -->
@@ -29,11 +29,11 @@
     </style>
 
 
-    <style name="Theme.DSploitActionBarStyle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
+    <style name="Theme.CSploitActionBarStyle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
         <item name="android:windowBackground">@color/background_window</item>
     </style>
 
-    <style name="Theme.DSploitActionBarDarkStyle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
+    <style name="Theme.CSploitActionBarDarkStyle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
         <item name="android:windowBackground">@color/background_window_dark</item>
     </style>
 
