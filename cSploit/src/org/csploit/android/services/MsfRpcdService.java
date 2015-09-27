@@ -126,11 +126,15 @@ public class MsfRpcdService extends NativeService implements MenuControllableSer
 
     stop();
 
-    if(connect()) {
+    if(connect(isLocal())) {
       if(isLocal()) {
         Logger.warning("connected to a lost instance of the msfrpcd");
       }
       return true;
+    }
+
+    if(!isLocal()) {
+      return false;
     }
 
     try {
