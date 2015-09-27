@@ -145,9 +145,10 @@ public class MsfRpcdService extends NativeService implements MenuControllableSer
 
   /**
    * connect to this msfrpcd instance
+   * @param silent quietly fail if true
    * @return true if connection succeeded, false otherwise
    */
-  public boolean connect() {
+  private boolean connect(boolean silent) {
     do {
       try {
         System.setMsfRpc(new RPCClient(host, user, password, port, ssl));
@@ -155,7 +156,7 @@ public class MsfRpcdService extends NativeService implements MenuControllableSer
         sendIntent(STATUS_ACTION, STATUS, Status.CONNECTED);
         return true;
       } catch (Exception e) {
-        Logger.error(e.getClass().getName() + ": " + e.getMessage());
+        Logger.warning(e.getClass().getName() + ": " + e.getMessage());
       }
 
       if(isRunning()) {
@@ -167,9 +168,18 @@ public class MsfRpcdService extends NativeService implements MenuControllableSer
       }
     } while(isRunning() && !isConnected());
 
+    if(!silent)
+      sendIntent(STATUS_ACTION, STATUS, Status.CONNECTION_FAILED);
 
-    sendIntent(STATUS_ACTION, STATUS, Status.CONNECTION_FAILED);
     return false;
+  }
+
+  /**
+   * connect to this msfrpcd instance
+   * @return true if connection succeeded, false otherwise
+   */
+  public boolean connect() {
+    return connect(false);
   }
 
   public void disconnect() {
