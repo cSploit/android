@@ -6,9 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
-import android.widget.Toast;
 
 import org.csploit.android.R;
 import org.csploit.android.core.ManagedReceiver;
@@ -62,7 +62,9 @@ public class MsfRpcdServiceReceiver extends ManagedReceiver {
   }
 
   private void showToastForStatus(Context context, MsfRpcdService.Status status) {
-    Toast.makeText(context, status.getText(), (status.isError() ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT)).show();
+    Snackbar
+            .make(((Activity) context).findViewById(android.R.id.content), status.getText(), status.isError() ? Snackbar.LENGTH_LONG : Snackbar.LENGTH_SHORT)
+    .show();
   }
 
   private void updateNotificationForStatus(Context context, MsfRpcdService.Status status) {

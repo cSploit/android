@@ -47,6 +47,7 @@ proguard/
 .loadpath
 actionbarsherlock/build/
 dSploit/build/
+cSploit/build/
 # External tool builders
 .externalToolBuilders/
 
