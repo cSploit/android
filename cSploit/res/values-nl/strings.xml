@@ -48,14 +48,14 @@
     <string name="crash_toast_text">Oeps! Ik ben gecrashed, maar een report is onderweg naar onze ontwikkelaars om dit op te lossen.</string>
     <string name="csploit_catchphrase">cSploit - Een Android netwerk pentesting applicatie</string>
     <string name="csploit_copyleft">Copyleft van Simone Margaritelli AKA evilsocket.</string>
-    <string name="csploit_disclaimer">Deze applicatie mag alleen maar gebruikt worden om zijn functies te tonen, alleen op netwerken waarvan je toestemming heb gekregen om acties met deze applicatie uit te voeren. De ontwikkelaars van deze applicatie zijn voor niks aansprakelijk. Andere woorden: Doe geen domme dingen en stuur geen bozen mensen naar ons </string>
+    <string name="csploit_disclaimer">Deze applicatie mag alleen maar gebruikt worden om zijn functies te tonen, alleen op netwerken waarvan je toestemming heb gekregen om acties met deze applicatie uit te voeren. De ontwikkelaars van deze applicatie zijn voor niks aansprakelijk. Andere woorden: Doe geen domme dingen en stuur geen bozen mensen naar ons</string>
     <string name="enter_key_or_crack">Voeg een WiFi sleutel in of probeer het te kraken</string>
     <string name="enter_ports_list">Voeg de port lijst in</string>
     <string name="csploit_url">http://www.csploit.org/</string>
     <string name="custom_charset">Aangepaste karakterset</string>
     <string name="custom_code">Aangepaste code</string>
     <string name="custom_filter">Aangepaste filter</string>
-    <string name="customize_wol_port">Pas WOL poort aan en druk op Verstuur</string>
+    <string name="customize_wol_port">Pas WOL poort aan en druk op Verstuurt</string>
     <string name="delete">Verwijder</string>
     <string name="delete_previous_location">Verwijder vorige locatie?</string>
     <string name="device_type">Apparaat Type</string>
@@ -123,7 +123,7 @@
     <string name="hijacker_load_from_file">Laad van bestand</string>
     <string name="image">Afbeelding</string>
     <string name="initialization_error">Initialisatie Fout</string>
-    <string name="initializing">Initialisatiestring &#8320;</string>
+    <string name="initializing">Initialisatiestring&#8230;</string>
     <string name="inspector">Service Inspecteur</string>
     <string name="inspector_desc">Voer een besturingssyteem en service inspectie uit op doelwit.(langzamer dan port scanner, maar specifieker)</string>
     <string name="install_error">Fout opgetreden tijdens installatie!</string>
@@ -186,9 +186,9 @@
     <string name="mitm_session_hijack">Sessie Hijacker</string>
     <string name="mitm_session_hijack_desc">Luister voor cookies op het netwerk en hijack sessies.</string>
     <string name="mitm_simple_sniff">Simpele Sniff</string>
-    <string name="mitm_simple_sniff_desc">Herleid doelwit's verkeer door dit apparaat en laat wat statastieken zien terwijl hij dat in een pcap bestand zet.</string>
+    <string name="mitm_simple_sniff_desc">Herleid doelwit\'s verkeer door dit apparaat en laat wat statastieken zien terwijl hij dat in een pcap bestand zet.</string>
     <string name="mitm_video_replace">Vervang Videos</string>
-    <string name="mitm_video_replace_desc">Vervang alle YouTube video's op website with één specifieke.</string>
+    <string name="mitm_video_replace_desc">Vervang alle YouTube video\'s op website with één specifieke.</string>
     <string name="msf_connection_failed">Verbinding met MSF RPC Daemon maken GEFAALD!</string>
     <string name="msf_status">MetaSploit Status</string>
     <string name="msfrcd_start_failed">MSF RPC Daemon heeft gefaald om het te starten</string>
@@ -387,7 +387,7 @@
     <string name="stopped_dots">Gestopt &#8230; </string>
     <string name="tap_again">Klik opniew om te stoppen</string>
     <string name="target">Doelwit</string>
-    <string name="target_alias">Doelwit's bijnaam</string>
+    <string name="target_alias">Doelwit\'s bijnaam</string>
     <string name="target_selected">Doelwit geselecteerd</string>
     <string name="targets_selected">Doelwitten geselecteerd</string>
     <string name="the_port">De port</string>
@@ -408,11 +408,11 @@
     <string name="username">Bebruikersnaam</string>
     <string name="video">Video</string>
     <string name="vulnerability_finder">Exploits vinder</string>
-    <string name="vulnerability_finder_desc">Zoeken voor herkende zwakbaarheden op het doelwit die           servieces draaien in de Nationale Zwakbaarheden Database.</string>
+    <string name="vulnerability_finder_desc">Zoeken voor herkende zwakbaarheden op het doelwit die servieces draaien in de Nationale Zwakbaarheden Database.</string>
     <string name="wait_for_response">Wachten op een antwoord</string>
     <string name="wake_on_lan">Wake on lan</string>
     <string name="warning">Waarschuwing</string>
-    <string name="warning_new_session">Een nieuwe sessie starten zou deze sessie verwijderen,         doorgaan?</string>
+    <string name="warning_new_session">Een nieuwe sessie starten zou deze sessie verwijderen, doorgaan?</string>
     <string name="wifi_activated">WiFi geactiveerd</string>
     <string name="wifi_activating_iface">Activeren WiFi interface &#8230;</string>
     <string name="wifi_attempting_to">Proberen om te verbinden met</string>
@@ -424,4 +424,4 @@
     <string name="wifi_scanning">Aan het scannen &#8230;</string>
     <string name="wifi_went_down">WiFi connectie ging weg.</string>
     <string name="wifi_with_key">Met sleutel</string>
-    </resources>
+</resources>
