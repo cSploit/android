@@ -166,8 +166,7 @@
     <string name="inspector_desc">Определить операционную систему цели и определить запущенные сервисы (медленее, чем сканер портов, но точнее).
     </string>
     <string name="login_cracker">Взломщик авторизации</string>
-     <string name="heart_attack_update">Heart attack occured, приложение только
-     проверит обновления. #STATUS#
+    <string name="heart_attack_update">Heart attack occured, приложение только проверит обновления. #STATUS#</string>
     <string name="login_cracker_desc">Очень быстрый взломщик сетевой авторизации, поддерживающий большое количество сервисов.
     </string>
     <string name="packet_forger">Подделыватель пакетов</string>
