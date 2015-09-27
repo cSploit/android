@@ -52,7 +52,7 @@
     <string name="update_available">Доступна новая вресия</string>
     <string name="new_update_desc">Доступно обновление до версии</string>
     <string name="new_update_desc2">. Выполнить обновление сейчас?</string>
-    <string name="checking">Проверка…ьшы</string>
+    <string name="checking">Проверка…</string>
     <string name="no_updates_available">Обновления не найдены.</string>
     <string name="new_msf_update_desc">Обновление Metasploit Framework</string>
     <string name="new_version">Доступна новая версия</string>
