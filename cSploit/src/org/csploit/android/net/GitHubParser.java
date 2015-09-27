@@ -54,7 +54,7 @@ public class GitHubParser {
   private static GitHubParser coreRepo = new GitHubParser("cSploit", "android.native");
   private static GitHubParser rubyRepo = new GitHubParser("cSploit", "android.native.ruby");
 
-  public static GitHubParser getMsfRepo() {
+  public synchronized static GitHubParser getMsfRepo() {
     String customUsername = System.getSettings().getString("MSF_GITHUB_USERNAME", "cSploit");
     String customProject = System.getSettings().getString("MSF_GITHUB_PROJECT", "android.MSF");
 
@@ -77,6 +77,13 @@ public class GitHubParser {
 
   public static GitHubParser getRubyRepo() {
     return rubyRepo;
+  }
+
+  public static void resetAll() {
+    cSploitRepo.reset();
+    coreRepo.reset();
+    rubyRepo.reset();
+    msfRepo.reset();
   }
 
   public GitHubParser(String username, String project) {

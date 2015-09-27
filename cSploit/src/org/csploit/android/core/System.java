@@ -45,6 +45,7 @@ import org.csploit.android.R;
 import org.csploit.android.WifiScannerActivity;
 import org.csploit.android.gui.dialogs.FatalDialog;
 import org.csploit.android.net.Endpoint;
+import org.csploit.android.net.GitHubParser;
 import org.csploit.android.net.Network;
 import org.csploit.android.net.Network.Protocol;
 import org.csploit.android.net.Target;
@@ -1202,6 +1203,8 @@ public class System
         if(mWakeLock != null && mWakeLock.isHeld())
           mWakeLock.release();
       }
+
+      GitHubParser.resetAll();
 
       synchronized (mTargets) {
 
