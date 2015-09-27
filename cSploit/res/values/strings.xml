@@ -237,15 +237,11 @@
     <string name="error_rpc">RPC error</string>
     <string name="error_rpcd_inval">bad settings</string>
     <string name="error_rpcd_shell">cannot execute shell</string>
-    <string name="rpcd_starting">Starting MetaSploit RPCD&#8230;</string>
+    <string name="rpcd_starting">Starting MetaSploit RPCD.  Standby&#8230;</string>
     <string name="rpcd_started">MetaSploit RPCD started</string>
     <string name="rpcd_stopped">MetaSploit RPCD stopped</string>
     <string name="rpcd_running">MetaSploit RPCD is already running</string>
     <string name="rpcd_timedout">MetaSploit RPCD does not respond</string>
-    <string name="error_rcpd_fatal">fatal error occurred, i\'m searching that bug for send it to my developers.
-        if i won\'t exit please close me from preferences->applications,
-        and ALERT MY DEVELOPERS.
-    </string>
 
     <!-- mitm modules -->
     <string name="mitm_simple_sniff">Simple Sniff</string>
@@ -400,6 +396,8 @@
     <string name="pref_folder">Folder</string>
     <string name="pref_msf_enable">Enable MSF</string>
     <string name="pref_msf_enable_desc">Enable the MetaSploit Framework</string>
+    <string name="pref_msf_notifications">MSF status notifications</string>
+    <string name="pref_msf_notifications_desc">View MSF RPC connection status</string>
     <string name="pref_msf_delete">Delete MSF</string>
     <string name="pref_msf_delete_desc">Delete the MetaSploit Framework from your device</string>
     <string name="pref_msfwipe_message">Do you really want to delete the MetaSploit Framework?</string>
@@ -513,4 +511,5 @@
     <string name="new_apk_found">App verision %s is available, do you want to upgrade ?</string>
     <string name="new_ruby_found">A new version for ruby is available, do you want to upgrade ?</string>
     <string name="new_msf_found">A new msf version is available, do you want to upgrade ?</string>
+    <string name="msf_status">MetaSploit Status</string>
 </resources>

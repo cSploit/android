@@ -58,13 +58,37 @@ public class MsfRpcdService extends NativeService implements MenuControllableSer
   }
 
   public enum Status {
-    STARTING,
-    CONNECTED,
-    DISCONNECTED,
-    STOPPED,
-    KILLED,
-    START_FAILED,
-    CONNECTION_FAILED,
+    STARTING(R.string.rpcd_starting, R.color.selectable_blue),
+    CONNECTED(R.string.connected_msf, R.color.green),
+    DISCONNECTED(R.string.msfrpc_disconnected, R.color.purple),
+    STOPPED(R.string.rpcd_stopped, R.color.purple),
+    KILLED(R.string.msfrpcd_killed, R.color.purple),
+    START_FAILED(R.string.msfrcd_start_failed, R.color.red),
+    CONNECTION_FAILED(R.string.msf_connection_failed, R.color.red);
+
+    private final int text;
+    private final int color;
+
+    Status(int text, int color) {
+      this.text = text;
+      this.color = color;
+    }
+
+    public boolean inProgress() {
+      return text == R.string.rpcd_starting;
+    }
+
+    public boolean isError() {
+      return color == R.color.red;
+    }
+
+    public int getText() {
+      return text;
+    }
+
+    public int getColor() {
+      return color;
+    }
   }
 
   public MsfRpcdService(Context context) {
