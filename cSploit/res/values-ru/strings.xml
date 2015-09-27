@@ -1,4 +1,3 @@
-<?xml version='1.0' encoding='UTF-8'?>
 <resources>
     <string name="app_name">cSploit</string>
     <string name="menu_settings">Настройки</string>
@@ -166,7 +165,7 @@
     <string name="inspector_desc">Определить операционную систему цели и определить запущенные сервисы (медленее, чем сканер портов, но точнее).
     </string>
     <string name="login_cracker">Взломщик авторизации</string>
-     <string name="heart_attack_update">Heart attack occured, приложение только
+     <string name="heart_attack_update">Heart attack occured, приложение только</string>
      проверит обновления. #STATUS#
     <string name="login_cracker_desc">Очень быстрый взломщик сетевой авторизации, поддерживающий большое количество сервисов.
     </string>
@@ -474,7 +473,6 @@
     <string name="menu_multiaction">Множественные действия</string>
     <string name="menu_focusedscan">точное сканирование</string>
     <string name="menu_resolve_names">Разрешать имена хостов</string>
-    
     <string name="child_not_started">Невозможно запустить процесс</string>
     <string name="crash_dialog_title">cSploit неожиданно завершил свою работу</string>
     <string name="crash_dialog_text">Неожиданная ошибка заставила приложение и/или его компоненты завершить работу. Пожалуйста помогите нам исправить эту ошибку отправкой отчета об ошибке, все что вам нужно сделать это нажать. \'OK\'.</string>
