@@ -10,7 +10,7 @@
     <string name="address">Адрес</string>
     <string name="port">Порт</string>
     <string name="target">Цель</string>
-    <string name="unknown">неизвестно</string>
+    <string name="unknown">Неизвестно</string>
     <string name="services">Сервисы</string>
     <string name="os">ОС</string>
     <string name="device_type">Тип устройства</string>
@@ -120,7 +120,7 @@
     <string name="selected">Выбрано</string>
     <string name="nothing_found"><![CDATA[<small><i>Ничего не найдено</i></small>]]></string>
     <string name="no_open_ports">Не найдено окрытых портов у текущей цели, сначала запустите инспектор сервисов.</string>
-    <string name="no_exploits_found">Эксплойтов не найдено.</string>
+    <string name="no_exploits_found">Эксплоиты не найдены.</string>
     <string name="no_open_ports_focused_scan">Не найдено открытых портов, сначала запустите сканер портов, прежде чем запускать целевое сканирование</string>
     <string name="no_open_ports_exploitfinder">Не найдено эксплойтов у данной цели, сначала запустите поиск эксплоитов.</string>
     <string name="no_exploit_started">Эксплойты не запущены.</string>
@@ -137,7 +137,7 @@
     <string name="couldnt_send_wol_packet">Невозможно отправить пакет WOL цели с неизвестным MAC адресом.
     </string>
     <string name="no_activities_for_url">Нет приложений, которые могут открыть данный тип адреса.</string>
-    <string name="select_ports">Выбранные порты</string>
+    <string name="select_ports">Выберите порты</string>
     <string name="enter_ports_list">Введите список портов, разделенных запятыми:</string>
     <string name="invalid_port_">Неправильный порт \'</string>
     <string name="port_must_be_greater">Номер порта должен быть больше 0 и меньше 65535.</string>
@@ -166,6 +166,8 @@
     <string name="inspector_desc">Определить операционную систему цели и определить запущенные сервисы (медленее, чем сканер портов, но точнее).
     </string>
     <string name="login_cracker">Взломщик авторизации</string>
+     <string name="heart_attack_update">Heart attack occured, приложение только
+     проверит обновления. #STATUS#
     <string name="login_cracker_desc">Очень быстрый взломщик сетевой авторизации, поддерживающий большое количество сервисов.
     </string>
     <string name="packet_forger">Подделыватель пакетов</string>
@@ -190,6 +192,8 @@
     <string name="start_hijacking2">Выполнить хищение сессии?</string>
     <string name="set_session_filename">Укажите название файла сессии:</string>
     <string name="session_sniffer">Сниффер сессий</string>
+    
+    
     <string name="untraced_hops">нетрассированные хопы</string>
     <string name="add_username">Добавить имя пользователя</string>
     <string name="enter_username">Введите имя пользователя:</string>
@@ -216,11 +220,12 @@
     <string name="rpcd_stopped">MetaSploit RPCD остановлен</string>
     <string name="rpcd_running">MetaSploit RPCD уже запущен</string>
     <string name="rpcd_timedout">MetaSploit RPCD не отвечает</string>
-    <string name="error_rcpd_fatal">Произошла критическая ошибка, пожалуйста отправьте отчет об ошибке моим разработчикам. Если я не хочу закрываться, пожалуйста, закройте меня через системные настройки (Настройки -&gt; Приложения) и СООБЩИТЕ ОБ ЭТОМ РАЗРАБОТЧИКАМ.
-    </string>
+    <string name="error_rcpd_fatal">Произошла критическая ошибка, пожалуйста отправьте отчет об ошибке моим разработчикам. Если я не хочу закрываться, пожалуйста, закройте меня через системные настройки (Настройки -&gt; Приложения) и СООБЩИТЕ ОБ ЭТОМ РАЗРАБОТЧИКАМ.</string>
+    
     <!-- mitm modules -->
     <string name="mitm_simple_sniff">Простой сниффинг</string>
-    <string name="mitm_simple_sniff_desc">Перенапралвние трафика через данное устройство и сохранение данных в pcap файл с показом статистики.</string>
+    <string name="mitm_simple_sniff_desc">Перенаправление трафика через данное устройство и сохранение данных в pcap файл с показом статистики.</string>
+    <string name="mitm_password_sniff_menu_fields">User/Pass fields</string>
     <string name="mitm_password_sniff">Сниффер паролей</string>
     <string name="mitm_password_sniff_desc">Сниффер паролей для большого количество протоколов, таких как http, ftp, imap, imaps, irc, msn и т.д.</string>
     <string name="mitm_session_hijack">Сниффер сессий</string>
@@ -258,9 +263,10 @@
     <string name="mitm_custom_desc">Замена текста на всех веб-страницах по своей маске на выбранный вами текст.</string>
     <string name="custom_filter">Своя маска</string>
     <string name="error_filter">Неправильное регулярное выражение</string>
-    <string name="file_output">Сохранить трафик в файл</string>
+    <string name="file_output">Сохранить в файл</string>
     <string name="question_save_to_pcap">Вы хотите сохранять весь трафик в pcap файл?</string>
     <string name="dumping_traffic_to">Сохранение трафика в </string>
+    
     <string name="error_mitm_proxy">Невозможно создать прокси, пожалуйста, проверьте ваше соединение и доступность порта.</string>
     <string name="error_mitm_https_redirector">Невозможно создать HTTPS перенаправитель, пожалуйста, проверьте ваше соединение и доступность порта.</string>
     <string name="error_mitm_resource_server">Невозможно создать сервер ресурсов, пожалуйста, проверьте ваше соединение и доступность порта.</string>
@@ -285,6 +291,10 @@
     <string name="wifi_connecting_to">Подключение к</string>
     <string name="wifi_error_keys">Невозможно сгенерировать ключи.</string>
     <string name="wifi_scan_finished">Сканирование завершено.</string>
+    
+    <string name="mitm_dns_spoofing">DNS Spoofing</string>
+    <string name="mitm_dns_spoofing_desc">Перенаправить домены на другой домен/IP</string>
+    <string name="mitm_dns_spoofing_list_saved">Сохранено</string>
 
     <!-- preferences -->
     <string name="pref_general">Основные</string>
@@ -361,6 +371,8 @@
     <string name="pref_folder">Папка</string>
     <string name="pref_msf_enable">Включить MSF</string>
     <string name="pref_msf_enable_desc">Включить MetaSploit Framework</string>
+    <string name="pref_msf_notifications">Уведомления о статусе MSF</string>
+    <string name="pref_msf_notifications_desc">Посмотреть статус соединения с MSF RPC</string>
     <string name="pref_msf_delete">Удалить MSF</string>
     <string name="pref_msf_delete_desc">Удаление MetaSploit Framework с устройства</string>
     <string name="pref_msfwipe_message">Вы действительно хотите удалить MetaSploit Framework?</string>
@@ -408,6 +420,8 @@
     <string name="run">Запустить</string>
     <string name="command">Команда</string>
     <string name="clear">Очистить</string>
+    <string name="save">Сохранить</string>
+    <string name="saved">Сохранено</string>
     <string name="msfrpc_disconnected">MSF RPC отключен</string>
     <string name="no_opened_sessions">Нет открытых сессий для этой цели</string>
     <string name="delete">Удалить</string>
@@ -435,7 +449,7 @@
     <string name="installing_msf_gems">Установка gems для MSF</string>
     <string name="installing_bundle">Установка бандла</string>
     <string name="new_gems_update_desc">Обновление для ruby gems</string>
-    <string name="heart_attack">Heart attack</string>
+    <string name="heart_attack">Heart Attack</string>
     <string name="cannot_download_core">Невозможно скачать ядро cSploit для вашего устройства</string>
     <string name="unable_to_start_updateservice">Невозможно запустить сервис обновлений</string>
     <string name="no_core_no_connectivity">Ядро cSploit не установлено, для первичной инициализации требуется интернет соединение</string>
@@ -443,7 +457,6 @@
     <string name="mandatory_update">требуется это обновление</string>
     <string name="new_core_found">Доступно ядро версии %s , вы хотите обновится?</string>
     <string name="update_cancelled">Обновление отменено</string>
-    <string name="child_not_started">Невозможно запустить процесс</string>
     <string name="pref_updates">Обновления</string>
     <string name="pref_updates_app">Приложение</string>
     <string name="pref_updates_app_desc">Проверять обновления приложения</string>
@@ -460,9 +473,20 @@
     <string name="buildinfo">Информация о сборке</string>
     <string name="menu_multiaction">Множественные действия</string>
     <string name="menu_focusedscan">точное сканирование</string>
+    <string name="menu_resolve_names">Разрешать имена хостов</string>
+    
+    <string name="child_not_started">Невозможно запустить процесс</string>
     <string name="crash_dialog_title">cSploit неожиданно завершил свою работу</string>
     <string name="crash_dialog_text">Неожиданная ошибка заставила приложение и/или его компоненты завершить работу. Пожалуйста помогите нам исправить эту ошибку отправкой отчета об ошибке, все что вам нужно сделать это нажать. \'OK\'.</string>
     <string name="crash_dialog_comment">Вы можете добавить комментарий ниже</string>
     <string name="JNI_crash_detected">Библиотека JNI недавно завершила свою работу падением, я надеюсь ты отправил отчет об ошибке.</string>
     <string name="missing_core_update">Ядро не установлено так, что приложение только проверит обновления. #STATUS#</string>
+    <string name="msfrpcd_killed">Сервис MSF RPC остановлен</string>
+    <string name="msfrcd_start_failed">Невозможно запустить сервис MSF RPC </string>
+    <string name="msf_connection_failed">соединение с сервисом MSF RPC НЕУДАЛОСЬ!</string>
+    <string name="net_discovery_start_failed">НЕВОЗМОЖНО запустить мониторинг сети!</string>
+    <string name="new_apk_found">Доступно приложение версии %s , вы хотите обновиться?</string>
+    <string name="new_ruby_found">Новая версия ruby доступна, вы хотите обновиться?</string>
+    <string name="new_msf_found">Новая версия MSF доступна, вы хотите обновиться?</string>
+    <string name="msf_status">Статус MetaSploit</string>
 </resources>
