@@ -364,6 +364,8 @@ public class MainActivity extends AppCompatActivity {
           return;
         }
       }
+    } else {
+      System.reloadNetworkMapping();
     }
 
     boolean coreInstalled = System.isCoreInstalled();
