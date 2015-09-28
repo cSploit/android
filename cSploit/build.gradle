@@ -53,6 +53,9 @@ android {
         targetSdkVersion 22
         versionCode 1
         versionName "1.6.0-rc.1"
+        if(System.getenv("NIGHTLY_BUILD")) {
+            versionName += "+" + System.getenv("NIGHTLY_BUILD_COMMIT").substring(0, 7)
+        }
     }
 
     lintOptions {
