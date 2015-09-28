@@ -79,6 +79,11 @@ public class SettingsActivity extends PreferenceActivity implements OnSharedPref
   @SuppressWarnings("ConstantConditions")
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+    if (themePrefs.getBoolean("isDark", false))
+      setTheme(R.style.DarkTheme);
+    else
+      setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);
     // no action bar in PreferenceActivity
     // getActionBar().setDisplayHomeAsUpEnabled(true);
