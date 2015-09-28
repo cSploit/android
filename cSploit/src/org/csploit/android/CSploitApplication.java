@@ -41,7 +41,7 @@ import java.net.NoRouteToHostException;
 @ReportsCrashes(
   httpMethod = HttpSender.Method.PUT,
   reportType = HttpSender.Type.JSON,
-  formUri = "http://csploit-bug.iriscouch.com/acra-csploit/_design/acra-storage/_update/report",
+  formUri = "http://csploit.iriscouch.com/acra-csploit/_design/acra-storage/_update/report",
   formUriBasicAuthLogin = "android",
   formUriBasicAuthPassword = "DEADBEEF",
   mode = ReportingInteractionMode.DIALOG,
