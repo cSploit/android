@@ -64,8 +64,8 @@ public class WifiCrackDialog extends AlertDialog{
   }
 
   public interface WifiCrackDialogListener{
-    public void onManualConnect(String key);
+    void onManualConnect(String key);
 
-    public void onCrack();
+    void onCrack();
   }
 }

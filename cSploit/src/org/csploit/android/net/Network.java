@@ -103,7 +103,7 @@ public class Network
           "192.168.0.0/16"
   };
 
-  public Network(Context context) throws NoRouteToHostException, SocketException, UnknownHostException{
+  public Network(Context context) throws SocketException, UnknownHostException{
     mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
     mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     mInfo = mWifiManager.getDhcpInfo();

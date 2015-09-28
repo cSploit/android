@@ -26,7 +26,7 @@ public class Option {
     }
   };
 
-  public static enum types {
+  public enum types {
     STRING,
     BOOLEAN,
     PATH,

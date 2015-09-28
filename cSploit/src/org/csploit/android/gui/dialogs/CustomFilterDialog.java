@@ -31,7 +31,7 @@ import java.util.ArrayList;
 
 public class CustomFilterDialog extends AlertDialog{
   public interface CustomFilterDialogListener{
-    public void onInputEntered(ArrayList<String> from, ArrayList<String> to);
+    void onInputEntered(ArrayList<String> from, ArrayList<String> to);
   }
 
   public CustomFilterDialog(String title, Activity activity, final CustomFilterDialogListener listener){

@@ -43,7 +43,7 @@ public class RPCClient
   private static final Pattern 	GET_FILENAME 	= Pattern.compile("[^/]+$");
   private static final Pattern 	GET_FUNC 		= Pattern.compile("`([^']+)");
 
-  public RPCClient(final String host, final String username, final String password, final int port, final boolean ssl) throws MalformedURLException, IOException, MSFException
+  public RPCClient(final String host, final String username, final String password, final int port, final boolean ssl) throws IOException, MSFException
   {
     u = new URL("http" + (ssl ? "s" : ""), host, port, "/api/");
 
