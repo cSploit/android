@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -329,7 +330,9 @@ public class LoginCracker extends Plugin {
     mWordlistPicker.addCategory(Intent.CATEGORY_OPENABLE);
     mWordlistPicker.setType("text/*");
     mWordlistPicker.setAction(Intent.ACTION_GET_CONTENT);
-    mWordlistPicker.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+
+    if(Build.VERSION.SDK_INT >= 11)
+      mWordlistPicker.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
   }
 
   @Override
