@@ -58,13 +58,37 @@ public class MsfRpcdService extends NativeService implements MenuControllableSer
   }
 
   public enum Status {
-    STARTING,
-    CONNECTED,
-    DISCONNECTED,
-    STOPPED,
-    KILLED,
-    START_FAILED,
-    CONNECTION_FAILED,
+    STARTING(R.string.rpcd_starting, R.color.selectable_blue),
+    CONNECTED(R.string.connected_msf, R.color.green),
+    DISCONNECTED(R.string.msfrpc_disconnected, R.color.purple),
+    STOPPED(R.string.rpcd_stopped, R.color.purple),
+    KILLED(R.string.msfrpcd_killed, R.color.purple),
+    START_FAILED(R.string.msfrcd_start_failed, R.color.red),
+    CONNECTION_FAILED(R.string.msf_connection_failed, R.color.red);
+
+    private final int text;
+    private final int color;
+
+    Status(int text, int color) {
+      this.text = text;
+      this.color = color;
+    }
+
+    public boolean inProgress() {
+      return text == R.string.rpcd_starting;
+    }
+
+    public boolean isError() {
+      return color == R.color.red;
+    }
+
+    public int getText() {
+      return text;
+    }
+
+    public int getColor() {
+      return color;
+    }
   }
 
   public MsfRpcdService(Context context) {
@@ -102,11 +126,15 @@ public class MsfRpcdService extends NativeService implements MenuControllableSer
 
     stop();
 
-    if(connect()) {
+    if(connect(isLocal())) {
       if(isLocal()) {
         Logger.warning("connected to a lost instance of the msfrpcd");
       }
       return true;
+    }
+
+    if(!isLocal()) {
+      return false;
     }
 
     try {
@@ -121,9 +149,10 @@ public class MsfRpcdService extends NativeService implements MenuControllableSer
 
   /**
    * connect to this msfrpcd instance
+   * @param silent quietly fail if true
    * @return true if connection succeeded, false otherwise
    */
-  public boolean connect() {
+  private boolean connect(boolean silent) {
     do {
       try {
         System.setMsfRpc(new RPCClient(host, user, password, port, ssl));
@@ -131,7 +160,7 @@ public class MsfRpcdService extends NativeService implements MenuControllableSer
         sendIntent(STATUS_ACTION, STATUS, Status.CONNECTED);
         return true;
       } catch (Exception e) {
-        Logger.error(e.getClass().getName() + ": " + e.getMessage());
+        Logger.warning(e.getClass().getName() + ": " + e.getMessage());
       }
 
       if(isRunning()) {
@@ -143,9 +172,18 @@ public class MsfRpcdService extends NativeService implements MenuControllableSer
       }
     } while(isRunning() && !isConnected());
 
+    if(!silent)
+      sendIntent(STATUS_ACTION, STATUS, Status.CONNECTION_FAILED);
 
-    sendIntent(STATUS_ACTION, STATUS, Status.CONNECTION_FAILED);
     return false;
+  }
+
+  /**
+   * connect to this msfrpcd instance
+   * @return true if connection succeeded, false otherwise
+   */
+  public boolean connect() {
+    return connect(false);
   }
 
   public void disconnect() {

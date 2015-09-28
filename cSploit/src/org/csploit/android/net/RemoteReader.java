@@ -30,7 +30,7 @@ public class RemoteReader implements Runnable {
   /**
    * receive fetched content
    */
-  public static interface Receiver {
+  public interface Receiver {
     void onContentFetched(byte[] content);
     void onError(byte[] description);
   }
@@ -38,7 +38,7 @@ public class RemoteReader implements Runnable {
   /**
    * receive the job end notification
    */
-  public static interface EndReceiver {
+  public interface EndReceiver {
     void onEnd();
   }
 
@@ -263,7 +263,7 @@ public class RemoteReader implements Runnable {
     return fromHost(new URL(url).getHost());
   }
 
-  public static byte[] fetch(final String url) throws MalformedURLException, IOException {
+  public static byte[] fetch(final String url) throws IOException {
     class BlockingReceiver implements Receiver {
 
       private boolean done = false;

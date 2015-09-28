@@ -1,13 +1,18 @@
 package org.csploit.android.services.receivers;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.widget.Toast;
+import android.content.SharedPreferences;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 
 import org.csploit.android.R;
 import org.csploit.android.core.ManagedReceiver;
+import org.csploit.android.core.System;
 import org.csploit.android.services.MsfRpcdService;
 
 /**
@@ -15,6 +20,7 @@ import org.csploit.android.services.MsfRpcdService;
  */
 public class MsfRpcdServiceReceiver extends ManagedReceiver {
 
+  final int MSF_NOTIFICATION = 1337;
   private final IntentFilter filter;
 
   public MsfRpcdServiceReceiver() {
@@ -47,31 +53,31 @@ public class MsfRpcdServiceReceiver extends ManagedReceiver {
     } else {
       showToastForStatus(context, status);
     }
+
+    SharedPreferences myPrefs = System.getSettings();
+    if (myPrefs.getBoolean("MSF_NOTIFICATIONS", true)) {
+      updateNotificationForStatus(context, status);
+    }
+
   }
 
   private void showToastForStatus(Context context, MsfRpcdService.Status status) {
-    switch (status) {
-      case STARTING:
-        Toast.makeText(context, R.string.rpcd_starting, Toast.LENGTH_SHORT).show();
-        break;
-      case CONNECTED:
-        Toast.makeText(context, R.string.connected_msf, Toast.LENGTH_SHORT).show();
-        break;
-      case DISCONNECTED:
-        Toast.makeText(context, R.string.msfrpc_disconnected, Toast.LENGTH_SHORT).show();
-        break;
-      case STOPPED:
-        Toast.makeText(context, R.string.rpcd_stopped, Toast.LENGTH_SHORT).show();
-        break;
-      case KILLED:
-        Toast.makeText(context, R.string.msfrpcd_killed, Toast.LENGTH_SHORT).show();
-        break;
-      case START_FAILED:
-        Toast.makeText(context, R.string.msfrcd_start_failed, Toast.LENGTH_LONG).show();
-        break;
-      case CONNECTION_FAILED:
-        Toast.makeText(context, R.string.msf_connection_failed, Toast.LENGTH_LONG).show();
-        break;
-    }
+    Snackbar
+            .make(((Activity) context).findViewById(android.R.id.content), status.getText(), status.isError() ? Snackbar.LENGTH_LONG : Snackbar.LENGTH_SHORT)
+    .show();
+  }
+
+  private void updateNotificationForStatus(Context context, MsfRpcdService.Status status) {
+    NotificationCompat.Builder mBuilder =
+            new NotificationCompat.Builder(context)
+            .setSmallIcon(R.drawable.exploit_msf)
+            .setContentTitle(context.getString(R.string.msf_status))
+            .setProgress(0, 0, status.inProgress())
+            .setContentText(context.getString(status.getText()))
+            .setColor(ContextCompat.getColor(context, status.getColor()));
+
+    NotificationManager mNotificationManager =
+            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+    mNotificationManager.notify(MSF_NOTIFICATION, mBuilder.build());
   }
 }

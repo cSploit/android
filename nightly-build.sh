@@ -63,6 +63,8 @@ if [ -n "${PREVIOUS_COMMIT}" -a "${PREVIOUS_COMMIT}" == "${LAST_COMMIT}" ]; then
     exit 0
 fi
 
+export NIGHTLY_BUILD_COMMIT=$LAST_COMMIT
+
 echo -n -e "${CYAN}Building cSploit...${RESET}\n" | tee >(cat - >&3)
 rm -f $(find . -name "cSploit-release.apk" -type f)
 oldpwd=$(pwd)

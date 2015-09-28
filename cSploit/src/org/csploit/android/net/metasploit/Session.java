@@ -72,7 +72,7 @@ public class Session extends Thread {
     // Search my exploit
     if(via_exploit!=null && !via_exploit.isEmpty()) {
       for(Target.Exploit e : mTarget.getExploits()) {
-        if(e instanceof  MsfExploit && ((MsfExploit)e).getName().equals(via_exploit)) {
+        if(e instanceof  MsfExploit && e.getName().equals(via_exploit)) {
           eTmp = (MsfExploit)e;
           break;
         }

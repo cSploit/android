@@ -32,7 +32,7 @@ import org.csploit.android.R;
 public class MultipleChoiceDialog extends AlertDialog{
 
   public interface MultipleChoiceDialogListener{
-    public void onChoice(int[] choices);
+    void onChoice(int[] choices);
   }
 
   private boolean[] checkList = null;

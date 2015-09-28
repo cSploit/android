@@ -54,6 +54,6 @@ public class RedirectionDialog extends AlertDialog{
   }
 
   public interface RedirectionDialogListener{
-    public void onInputEntered(String address, String port);
+    void onInputEntered(String address, String port);
   }
 }

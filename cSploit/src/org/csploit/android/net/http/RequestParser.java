@@ -460,7 +460,7 @@ public class RequestParser
       // remove google and cloudflare cookies
       Iterator<HttpCookie> it = cookies.iterator();
       while(it.hasNext()){
-        HttpCookie cookie = (HttpCookie) it.next();
+        HttpCookie cookie = it.next();
         if(cookie.getName().startsWith("__utm") || cookie.getName().equals("__cfduid"))
           it.remove();
       }

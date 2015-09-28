@@ -42,12 +42,12 @@ public class Proxy implements Runnable{
   private String mHostRedirect = null;
   private int mPortRedirect = 80;
 
-  public static interface ProxyFilter{
-    public String onDataReceived(String headers, String data);
+  public interface ProxyFilter{
+    String onDataReceived(String headers, String data);
   }
 
-  public static interface OnRequestListener{
-    public void onRequest(boolean https, String address, String hostname, ArrayList<String> headers);
+  public interface OnRequestListener{
+    void onRequest(boolean https, String address, String hostname, ArrayList<String> headers);
   }
 
   public Proxy(InetAddress address, int port) throws IOException{

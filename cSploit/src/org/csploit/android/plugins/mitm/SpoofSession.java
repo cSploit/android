@@ -37,9 +37,9 @@ public class SpoofSession
   private Child mArpSpoofProcess = null;
   private Child mEttercapProcess = null;
 
-  public static abstract interface OnSessionReadyListener{
-    public void onSessionReady();
-    public void onError(String errorString, int errorStringId);
+  public interface OnSessionReadyListener{
+    void onSessionReady();
+    void onError(String errorString, int errorStringId);
   }
 
   public SpoofSession(boolean withProxy, boolean withServer, String serverFileName, String serverMimeType){

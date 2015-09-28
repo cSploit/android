@@ -4,7 +4,7 @@ package org.csploit.android.events;
  * a child generated a message
  */
 public class Message implements Event {
-  public static enum Severity {
+  public enum Severity {
     VERBOSE,
     INFO,
     WARNING,

@@ -37,7 +37,8 @@
         without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
         See the GNU General Public License for more details.
         You should have received a copy of the GNU General Public License along with this program.
-        If not, see http://www.gnu.org/licenses/.
+        If not, see http://www.gnu.org/licenses/.\n\nAdditionally, some icons have been distributed under the CC-BY 4.0 license and are copyrighted by Google, Inc.
+        The full icon set is available at https://www.google.com/design/icons .
     </string>
     <string name="service">Service</string>
     <string name="stopped">Stopped&#8230;</string>
@@ -71,7 +72,7 @@
     <string name="error_occured">An error occurred while downloading the update.</string>
     <string name="invalid_target">Invalid target.</string>
     <string name="add_custom_target">Add custom target</string>
-    <string name="enter_url">Enter an URL, host name or ip address below:</string>
+    <string name="enter_url">Enter an URL, host name or IP address below:</string>
     <string name="net_discovery_stopped">Network discovery stopped.</string>
     <string name="net_discovery_started">Network discovery started.</string>
     <string name="start_monitor">Start Network Monitor</string>
@@ -237,15 +238,11 @@
     <string name="error_rpc">RPC error</string>
     <string name="error_rpcd_inval">bad settings</string>
     <string name="error_rpcd_shell">cannot execute shell</string>
-    <string name="rpcd_starting">Starting MetaSploit RPCD&#8230;</string>
+    <string name="rpcd_starting">Starting MetaSploit RPCD.  Standby&#8230;</string>
     <string name="rpcd_started">MetaSploit RPCD started</string>
     <string name="rpcd_stopped">MetaSploit RPCD stopped</string>
     <string name="rpcd_running">MetaSploit RPCD is already running</string>
     <string name="rpcd_timedout">MetaSploit RPCD does not respond</string>
-    <string name="error_rcpd_fatal">fatal error occurred, i\'m searching that bug for send it to my developers.
-        if i won\'t exit please close me from preferences->applications,
-        and ALERT MY DEVELOPERS.
-    </string>
 
     <!-- mitm modules -->
     <string name="mitm_simple_sniff">Simple Sniff</string>
@@ -394,12 +391,14 @@
         <item>EXDB</item>
         <item>BOTH</item>
     </string-array>
-    <string name="pref_performance_widescan">wide host scan</string>
+    <string name="pref_performance_widescan">Wide host scan</string>
     <string name="pref_performance_widescan_desc">scan for hosts outside the network mask</string>
     <string name="pref_advanced">Advanced</string>
     <string name="pref_folder">Folder</string>
     <string name="pref_msf_enable">Enable MSF</string>
     <string name="pref_msf_enable_desc">Enable the MetaSploit Framework</string>
+    <string name="pref_msf_notifications">MSF status notifications</string>
+    <string name="pref_msf_notifications_desc">View MSF RPC connection status</string>
     <string name="pref_msf_delete">Delete MSF</string>
     <string name="pref_msf_delete_desc">Delete the MetaSploit Framework from your device</string>
     <string name="pref_msfwipe_message">Do you really want to delete the MetaSploit Framework?</string>
@@ -443,7 +442,7 @@
     <string name="sessions_title">Open a shell by clicking on a session, or see more options by long press on it.</string>
     <string name="open_shell">Open shell</string>
     <string name="clear_event_log">Clear event log</string>
-    <string name="run">Run</string>
+    <string name="run">&#9166;</string>
     <string name="command">Command</string>
     <string name="clear">Clear</string>
     <string name="save">Save</string>
@@ -510,7 +509,8 @@
     <string name="msfrcd_start_failed">MSF RPC Daemon failed to start</string>
     <string name="msf_connection_failed">Connection to the MSF RPC Daemon FAILED!</string>
     <string name="net_discovery_start_failed">Network discovery FAILED to start!</string>
-    <string name="new_apk_found">App verision %s is available, do you want to upgrade ?</string>
+    <string name="new_apk_found">App version %s is available, do you want to upgrade ?</string>
     <string name="new_ruby_found">A new version for ruby is available, do you want to upgrade ?</string>
     <string name="new_msf_found">A new msf version is available, do you want to upgrade ?</string>
+    <string name="msf_status">MetaSploit Status</string>
 </resources>
