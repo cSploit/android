@@ -164,7 +164,7 @@ public class ChildManager {
       if(c.receiver != null)
         c.receiver.onEnd(c.exitValue);
       terminated = true;
-      crash = c.exitValue > 126 && c.exitValue != 130 && c.exitValue != 137 && c.exitValue < 150;
+      crash = c.exitValue > 128 && c.exitValue != 130 && c.exitValue != 137 && c.exitValue < 150;
       if(crash) {
         c.signal = c.exitValue - 128;
       }
