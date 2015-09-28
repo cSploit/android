@@ -14,7 +14,7 @@ public class Search {
   private static final Rapid7 RAPID7 = new Rapid7();
   private static final ExploitDb EXPLOIT_DB = new ExploitDb();
 
-  public static interface Receiver<T> extends RemoteReader.EndReceiver {
+  public interface Receiver<T> extends RemoteReader.EndReceiver {
     void onItemFound(T item);
     /* TODO make (target|exploit|reference) extends Observable class.
      * so we can drop this method and UI get updated when we call notify() on updated objects.

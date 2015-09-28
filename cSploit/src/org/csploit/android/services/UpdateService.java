@@ -639,7 +639,7 @@ public class UpdateService extends IntentService
    * @throws java.util.concurrent.CancellationException if task is cancelled by user
    * @throws java.lang.InterruptedException when the the running thread get cancelled.
    */
-  private void extract() throws CancellationException, RuntimeException, IOException, InterruptedException, ChildManager.ChildNotStartedException {
+  private void extract() throws RuntimeException, IOException, InterruptedException, ChildManager.ChildNotStartedException {
     ArchiveInputStream is = null;
     ArchiveEntry entry;
     CountingInputStream counter;
@@ -836,7 +836,7 @@ public class UpdateService extends IntentService
   /**
    * install gems required by the MSF
    */
-  private void installGems() throws CancellationException, RuntimeException, IOException, InterruptedException, ChildManager.ChildNotStartedException, ChildManager.ChildDiedException {
+  private void installGems() throws RuntimeException, IOException, InterruptedException, ChildManager.ChildNotStartedException, ChildManager.ChildDiedException {
     String msfPath = System.getMsfPath();
 
     mBuilder.setContentTitle(getString(R.string.installing_gems))

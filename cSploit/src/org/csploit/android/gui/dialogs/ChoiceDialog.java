@@ -30,7 +30,7 @@ import org.csploit.android.R;
 
 public class ChoiceDialog extends AlertDialog{
   public interface ChoiceDialogListener{
-    public void onChoice(int choice);
+    void onChoice(int choice);
   }
 
   public ChoiceDialog(final Activity activity, String title, String[] choices, final ChoiceDialogListener listener){

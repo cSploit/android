@@ -30,7 +30,7 @@ public class InputDialog extends AlertDialog{
   private EditText mEditText = null;
 
   public interface InputDialogListener{
-    public void onInputEntered(String input);
+    void onInputEntered(String input);
   }
 
   public InputDialog(String title, String message, Activity activity, InputDialogListener inputDialogListener){

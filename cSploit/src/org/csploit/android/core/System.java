@@ -907,7 +907,7 @@ public class System
     return type;
   }
 
-  public static void reset() throws NoRouteToHostException, SocketException{
+  public static void reset() throws SocketException{
     mTargets.clear();
 
     // local network

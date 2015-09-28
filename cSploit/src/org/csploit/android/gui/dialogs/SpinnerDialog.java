@@ -71,6 +71,6 @@ public class SpinnerDialog extends AlertDialog{
   }
 
   public interface SpinnerDialogListener{
-    public void onItemSelected(int index);
+    void onItemSelected(int index);
   }
 }

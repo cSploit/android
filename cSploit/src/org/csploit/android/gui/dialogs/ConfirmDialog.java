@@ -26,9 +26,9 @@ import org.csploit.android.R;
 
 public class ConfirmDialog extends AlertDialog{
   public interface ConfirmDialogListener{
-    public void onConfirm();
+    void onConfirm();
 
-    public void onCancel();
+    void onCancel();
   }
 
   public ConfirmDialog(String title, CharSequence message, Activity activity, ConfirmDialogListener confirmDialogListener){

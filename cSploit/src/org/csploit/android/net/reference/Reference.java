@@ -6,6 +6,6 @@ package org.csploit.android.net.reference;
  * TODO: getDrawableResourceId
  */
 public interface Reference {
-  public String getName();
-  public String getSummary();
+  String getName();
+  String getSummary();
 }
