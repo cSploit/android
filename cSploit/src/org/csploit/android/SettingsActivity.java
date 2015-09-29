@@ -102,10 +102,6 @@ public class SettingsActivity extends AppCompatActivity {
         getActivity().setTheme(R.style.PrefsTheme);
       super.onCreate(savedInstanceState);
 
-      // Load the preferences from an XML resource
-      addPreferencesFromResource(R.xml.preferences);
-
-
       mSavePath = getPreferenceScreen().findPreference("PREF_SAVE_PATH");
       mWipeMSF = getPreferenceScreen().findPreference("PREF_MSF_WIPE");
       mRubyDir = getPreferenceScreen().findPreference("RUBY_DIR");
