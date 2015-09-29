@@ -25,9 +25,16 @@
         <item name="colorAccent">@color/selectable_blue_dark</item>
         <item name="colorControlHighlight">@color/selectable_blue_dark</item>
         <item name="android:windowBackground">@color/background_window_dark</item>
-        <item name="android:colorBackground">@color/material_blue_grey_950</item>
+        <item name="android:colorBackground">#ff21272b</item>
     </style>
 
+    <style name="PrefsTheme" parent="AppTheme">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+    </style>
+
+    <style name="PrefsThemeDark" parent="DarkTheme">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+    </style>
 
     <style name="Theme.CSploitActionBarStyle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
         <item name="android:windowBackground">@color/background_window</item>
