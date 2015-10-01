@@ -142,6 +142,19 @@ public class NMap extends Tool {
     return super.async( command, receiver );
   }
 
+  public Child customScan( Target target, SynScanReceiver receiver, String custom ) throws ChildManager.ChildNotStartedException {
+    String command = "-vvv ";
+
+    if( custom != null )
+      command += custom + " ";
+
+    command += target.getCommandLineRepresentation();
+
+    Logger.debug( "customScan - " + command );
+
+    return super.async( command, receiver );
+  }
+
   public Child inpsect( Target target, InspectionReceiver receiver, boolean focusedScan ) throws ChildManager.ChildNotStartedException {
     String cmd;
     LinkedList<Integer> tcp,udp;
