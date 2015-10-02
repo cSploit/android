@@ -1,7 +1,10 @@
+<<<<<<< HEAD
 .DS_Store
 *.DS_Store
 *.o
 
+=======
+>>>>>>> bluemutedwisdom/master
 # built application files
 *.apk
 *.ap_
@@ -15,6 +18,7 @@
 # generated files
 bin/
 gen/
+<<<<<<< HEAD
 build/
 gen/
 
@@ -24,14 +28,20 @@ gen/
 .gradle/
 *.log
 us.stackdump*
+=======
+>>>>>>> bluemutedwisdom/master
 
 # Local configuration file (sdk path, etc)
 local.properties
 
 *.pydevproject
 .project
+<<<<<<< HEAD
 .metadata/
 target/
+=======
+.metadata
+>>>>>>> bluemutedwisdom/master
 bin/**
 tmp/**
 tmp/**/*
@@ -39,6 +49,7 @@ tmp/**/*
 *.bak
 *.swp
 *~.nib
+<<<<<<< HEAD
 *~
 project.properties
 proguard/
@@ -48,6 +59,13 @@ proguard/
 actionbarsherlock/build/
 dSploit/build/
 cSploit/build/
+=======
+local.properties
+.classpath
+.settings/
+.loadpath
+
+>>>>>>> bluemutedwisdom/master
 # External tool builders
 .externalToolBuilders/
 
@@ -59,4 +77,7 @@ cSploit/build/
 
 # PDT-specific
 .buildpath
+<<<<<<< HEAD
 /obj
+=======
+>>>>>>> bluemutedwisdom/master

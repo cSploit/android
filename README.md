@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 cSploit - An Android network penetration suite.
 ==============================
 
@@ -37,3 +38,9 @@ License
 -------------
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+=======
+dSploit - An Android tool to perform network analysis, port scanning, mitm attacks, etc. 
+
+by Simone Margaritelli aka evilsocket
+<evilsocket@gmail.com - http://www.evilsocket.net>
+>>>>>>> bluemutedwisdom/master
