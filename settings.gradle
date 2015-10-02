@@ -1,1 +1,1 @@
-include ':cSploit'
+include ':cSploit', ':msf'
