@@ -27,6 +27,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.text.Html;
@@ -42,6 +43,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -134,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
     layout.addView(mUpdateStatus);
   }
+
 
   private void createUpdateLayout() {
 
@@ -860,30 +863,40 @@ public class MainActivity extends AppCompatActivity {
           row.setBackgroundResource(R.drawable.card_background_dark);
 
         holder = new TargetHolder();
-        holder.itemImage = (ImageView) row.findViewById(R.id.itemIcon);
-        holder.itemTitle = (TextView) row.findViewById(R.id.itemTitle);
-        holder.itemDescription = (TextView) row.findViewById(R.id.itemDescription);
-
-        row.setTag(holder);
+        holder.itemImage = (ImageView) (row != null ? row
+                .findViewById(R.id.itemIcon) : null);
+        holder.itemTitle = (TextView) (row != null ? row
+                .findViewById(R.id.itemTitle) : null);
+        holder.itemDescription = (TextView) (row != null ? row
+                .findViewById(R.id.itemDescription) : null);
+        holder.portCount = (TextView) (row != null ? row
+                .findViewById(R.id.portCount) : null);
+        holder.portCountLayout = (LinearLayout) (row != null ? row
+                .findViewById(R.id.portCountLayout) : null);
+        if (row != null)
+          row.setTag(holder);
       } else
         holder = (TargetHolder) row.getTag();
 
-      Target target = list.get(position);
+      final Target target = list.get(position);
 
-      if (target.hasAlias())
+      if (target.hasAlias()){
         holder.itemTitle.setText(Html.fromHtml("<b>"
                 + target.getAlias() + "</b> <small>( "
                 + target.getDisplayAddress() + " )</small>"));
-
-      else
+      } else {
         holder.itemTitle.setText(target.toString());
-
-      holder.itemTitle.setTextColor(getResources().getColor((target.isConnected() ? R.color.app_color : R.color.gray_text)));
+      }
+      holder.itemTitle.setTextColor(ContextCompat.getColor(getApplicationContext(), (target.isConnected() ? R.color.app_color : R.color.gray_text)));
 
       holder.itemTitle.setTypeface(null, Typeface.NORMAL);
       holder.itemImage.setImageResource(target.getDrawableResourceId());
       holder.itemDescription.setText(target.getDescription());
 
+      int openedPorts = target.getOpenPorts().size();
+
+      holder.portCount.setText(String.format("%d", openedPorts));
+      holder.portCountLayout.setVisibility(openedPorts < 1 ? View.GONE : View.VISIBLE);
       return row;
     }
 
@@ -948,6 +961,8 @@ public class MainActivity extends AppCompatActivity {
       ImageView itemImage;
       TextView itemTitle;
       TextView itemDescription;
+      TextView portCount;
+      LinearLayout portCountLayout;
     }
   }
 

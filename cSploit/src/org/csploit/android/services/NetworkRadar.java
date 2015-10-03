@@ -8,7 +8,11 @@ import org.csploit.android.R;
 import org.csploit.android.core.Logger;
 import org.csploit.android.core.System;
 import org.csploit.android.core.ChildManager;
+import org.csploit.android.net.Endpoint;
+import org.csploit.android.net.Network;
 import org.csploit.android.net.Target;
+import org.csploit.android.tools.NMap;
+import org.csploit.android.tools.NetworkRadar.HostReceiver;
 
 import java.net.InetAddress;
 
@@ -64,35 +68,56 @@ public class NetworkRadar extends NativeService implements MenuControllableServi
     item.setEnabled(System.getTools().networkRadar.isEnabled());
   }
 
-  private class Receiver extends org.csploit.android.tools.NetworkRadar.HostReceiver {
+  private void onNewHostFound(Target target) {
+    try {
+      System.getTools().nmap.synScan(target, new ScanReceiver(target));
+    } catch (ChildManager.ChildNotStartedException e) {
+      System.errorLogging(e);
+    }
+  }
+
+  private class Receiver extends HostReceiver {
 
     @Override
     public void onHostFound(byte[] macAddress, InetAddress ipAddress, String name) {
       Target t;
       boolean notify = false;
+      boolean justFound;
 
       t = System.getTargetByAddress(ipAddress);
+      justFound = t == null;
 
-      if(t==null) {
+      if(justFound) {
         t = new Target(ipAddress, macAddress);
-
-        System.addOrderedTarget(t);
-
-        notify = true;
-      }
-
-      if( !t.isConnected() ) {
-        t.setConneced(true);
-        notify = true;
-      }
-
-      if (name != null && !name.equals(t.getAlias())) {
         t.setAlias(name);
+        System.addOrderedTarget(t);
         notify = true;
+      } else {
+        if (!t.isConnected()) {
+          t.setConneced(true);
+          notify = true;
+        }
+
+        if (name != null && !name.equals(t.getAlias())) {
+          t.setAlias(name);
+          notify = true;
+        }
+
+        //TODO: remove me ( and imports )
+        Endpoint e = new Endpoint(ipAddress, macAddress);
+        if(!e.equals(t.getEndpoint())) {
+          Logger.warning(
+                  String.format("target '%s' changed it's mac address from '%s' to '%s'",
+                          t.toString(), t.getEndpoint().getHardwareAsString(), e.getHardwareAsString()));
+        }
       }
 
       if(notify) {
         sendIntent(NRDR_CHANGED);
+      }
+
+      if(justFound) {
+        onNewHostFound(t);
       }
     }
 
@@ -118,6 +143,21 @@ public class NetworkRadar extends NativeService implements MenuControllableServi
     public void onDeath(int signal) {
       Logger.error("network-radar has been killed by signal #" + signal);
       sendIntent(NRDR_STOPPED);
+    }
+  }
+
+  private class ScanReceiver extends NMap.SynScanReceiver {
+
+    private final Target target;
+
+    public ScanReceiver(Target target) {
+      this.target = target;
+    }
+
+    @Override
+    public void onPortFound(int port, String protocol) {
+      target.addOpenPort(port, Network.Protocol.fromString(protocol));
+      sendIntent(NRDR_CHANGED);
     }
   }
 }

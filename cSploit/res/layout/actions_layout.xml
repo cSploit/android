@@ -29,5 +29,6 @@
         android:divider="#00ffffff"
         android:dividerHeight="6dp"
         android:showDividers="none" />
+        android:divider="#00ffffff" />
 
 </LinearLayout>
