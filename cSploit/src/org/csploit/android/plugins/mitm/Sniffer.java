@@ -19,6 +19,7 @@
 package org.csploit.android.plugins.mitm;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -26,7 +27,6 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -38,12 +38,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import org.csploit.android.ActionActivity;
 import org.csploit.android.R;
 import org.csploit.android.core.Child;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.System;
 import org.csploit.android.gui.dialogs.ConfirmDialog;
-import org.csploit.android.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
 import org.csploit.android.gui.dialogs.ErrorDialog;
 import org.csploit.android.net.Target;
 import org.csploit.android.plugins.mitm.SpoofSession.OnSessionReadyListener;
@@ -307,7 +307,43 @@ public class Sniffer extends AppCompatActivity
 
     mListView.setAdapter(mAdapter);
 
-    mSniffToggleButton.setOnClickListener(new OnClickListener(){
+    mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+      @Override
+      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        final Target t = System.getTargetByAddress(mAdapter.getByPosition(position).mAddress);
+
+        new ConfirmDialog("Select target", "Select " + t.getAddress().getHostAddress() + "?", Sniffer.this, new ConfirmDialog.ConfirmDialogListener() {
+          @Override
+          public void onConfirm() {
+            new Thread(new Runnable() {
+              @Override
+              public void run() {
+                setStoppedState();
+
+                startActivity(new Intent(Sniffer.this,
+                        ActionActivity.class));
+
+                overridePendingTransition(R.anim.slide_in_left,
+                        R.anim.slide_out_left);
+              }
+            }).start();
+
+            System.setCurrentTarget(System.getTargetPosition(t));
+            Toast.makeText(Sniffer.this,
+                    getString(R.string.selected_) + System.getCurrentTarget(),
+                    Toast.LENGTH_SHORT).show();
+          }
+
+          @Override
+          public void onCancel() {
+          }
+        }).show();
+
+
+      }
+     });
+
+    mSniffToggleButton.setOnClickListener(new View.OnClickListener(){
       @Override
       public void onClick(View v){
         if(mRunning){
@@ -319,7 +355,7 @@ public class Sniffer extends AppCompatActivity
     }
     );
 
-    new ConfirmDialog( getString(R.string.file_output), getString(R.string.question_save_to_pcap), this, new ConfirmDialogListener(){
+    new ConfirmDialog( getString(R.string.file_output), getString(R.string.question_save_to_pcap), this, new ConfirmDialog.ConfirmDialogListener(){
       @Override
       public void onConfirm(){
         mDumpToFile = true;
@@ -357,15 +393,20 @@ public class Sniffer extends AppCompatActivity
       mTcpdumpProcess.kill();
       mTcpdumpProcess = null;
     }
-    mSpoofSession.stop();
+    Sniffer.this.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        mSpoofSession.stop();
 
-    mSniffProgress.setVisibility(View.INVISIBLE);
+        mSniffProgress.setVisibility(View.INVISIBLE);
 
-    mRunning = false;
-    mSniffToggleButton.setChecked(false);
-  }
+        mRunning = false;
+        mSniffToggleButton.setChecked(false);
+      }
+    });
+    }
 
-  private void setSpoofErrorState(final String error){
+    private void setSpoofErrorState(final String error){
     Sniffer.this.runOnUiThread(new Runnable(){
       @Override
       public void run(){

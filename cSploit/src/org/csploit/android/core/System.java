@@ -21,9 +21,7 @@ package org.csploit.android.core;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -32,7 +30,6 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -1030,6 +1027,10 @@ public class System
 
   public static Target getTarget(int index){
     return mTargets.get(index);
+  }
+
+  public static int getTargetPosition (Target t) {
+    return mTargets.indexOf(t);
   }
 
   public static boolean hasTarget(Target target){
