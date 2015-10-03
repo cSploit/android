@@ -634,19 +634,22 @@ public class Target
 
   public void addOpenPort(Port port){
     synchronized (mPorts) {
-      if (port.service != null) { // update service but preserve different versions
-        for (Port p : mPorts) {
-          if (p.number == port.number && (p.service == null || p.service.isEmpty())) {
+      // we cannot just check if mPorts already has the new port (contains(port)), because if the new port has new fields,
+      // it won't be the same and we'll add duplicated ports.
+      for (Port p : mPorts){
+        // port considered added: same port + same protocol -> 22:tcp, 53:udp
+        if (p.number == port.number && p.protocol == port.protocol){
+          if ((port.service != null && !port.service.isEmpty()) && (p.service == null || p.service.isEmpty())) {
             p.service = port.service;
-            p.version = port.version;
-            return;
           }
+          if ((port.version != null && !port.version.isEmpty()) && (p.version == null || p.version.isEmpty())) {
+            p.version = port.version;
+          }
+          return;
         }
-        mPorts.add(port);
-      } else {
-        if (!mPorts.contains(port))
-          mPorts.add(port);
       }
+
+      mPorts.add(port);
     }
   }
 
