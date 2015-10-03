@@ -27,6 +27,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.text.Html;
@@ -48,6 +49,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.csploit.android.core.Child;
+import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Client;
 import org.csploit.android.core.CrashReporter;
 import org.csploit.android.core.Logger;
@@ -83,6 +85,7 @@ import org.csploit.android.services.UpdateChecker;
 import org.csploit.android.services.UpdateService;
 import org.csploit.android.services.receivers.MsfRpcdServiceReceiver;
 import org.csploit.android.services.receivers.NetworkRadarReceiver;
+import org.csploit.android.tools.NMap;
 import org.csploit.android.update.CoreUpdate;
 import org.csploit.android.update.MsfUpdate;
 import org.csploit.android.update.RubyUpdate;
@@ -131,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
 
     layout.addView(mUpdateStatus);
   }
+
 
   private void createUpdateLayout() {
 
@@ -841,13 +845,14 @@ public class MainActivity extends AppCompatActivity {
                 .findViewById(R.id.itemTitle) : null);
         holder.itemDescription = (TextView) (row != null ? row
                 .findViewById(R.id.itemDescription) : null);
-
+                holder.portCount = (TextView) (row != null ? row
+                        .findViewById(R.id.portCount) : null);
         if (row != null)
           row.setTag(holder);
       } else
         holder = (TargetHolder) row.getTag();
 
-      Target target = System.getTarget(position);
+      final Target target = System.getTarget(position);
 
       if (target.hasAlias())
         holder.itemTitle.setText(Html.fromHtml("<b>"
@@ -856,14 +861,30 @@ public class MainActivity extends AppCompatActivity {
 
       else
         holder.itemTitle.setText(target.toString());
-
-      holder.itemTitle.setTextColor(getResources().getColor((target.isConnected() ? R.color.app_color : R.color.gray_text)));
+      holder.itemTitle.setTextColor(ContextCompat.getColor(getContext(), (target.isConnected() ? R.color.app_color : R.color.gray_text)));
 
       if (row != null && (getSharedPreferences("THEME", 0).getBoolean("isDark", false)))
           row.setBackgroundResource(R.drawable.card_background_dark);
       holder.itemTitle.setTypeface(null, Typeface.NORMAL);
       holder.itemImage.setImageResource(target.getDrawableResourceId());
       holder.itemDescription.setText(target.getDescription());
+
+            // only do a portscan if/when target rolls into view and ports haven't been found...
+            if (target.getType() != Target.Type.NETWORK && target.getOpenPorts().size() == 0) {
+                final Receiver r = new Receiver(position, convertView);
+                Thread thread = new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            System.getTools().nmap
+                                    .synScan(target, r, null);
+                        } catch (ChildManager.ChildNotStartedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                thread.run();
+            }
 
       return row;
     }
@@ -918,6 +939,7 @@ public class MainActivity extends AppCompatActivity {
       ImageView itemImage;
       TextView itemTitle;
       TextView itemDescription;
+      TextView portCount;
     }
   }
 
@@ -1093,4 +1115,41 @@ public class MainActivity extends AppCompatActivity {
       }
     }
   }
+
+    private class Receiver extends NMap.SynScanReceiver {
+        int position;
+        final View cv;
+
+        public Receiver(int position, View cv) {
+            this.position = position;
+            this.cv = cv;
+        }
+
+        @Override
+        public void onEnd(int exitCode) {
+            MainActivity.this.runOnUiThread(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            System.setCurrentTarget(position);
+                            // new items may have snuck in so the order can change.  Double check this
+                            if (cv != null) {
+                                TextView tv = (TextView) cv.findViewById(R.id.portCount);
+                                if (tv != null) {
+                                    tv.setText(String.format("%d", System.getCurrentTarget().getOpenPorts().size()));
+                                    tv.setVisibility(System.getCurrentTarget().getOpenPorts().size() < 1 ? View.GONE : View.VISIBLE);
+                                }
+                            }
+                        }
+                    }
+            );
+            super.onEnd(exitCode);
+        }
+
+        @Override
+        public void onPortFound(int port, String protocol) {
+            System.setCurrentTarget(position);
+            System.addOpenPort(port, null);
+        }
+    }
 }
