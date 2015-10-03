@@ -43,13 +43,13 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.csploit.android.core.Child;
-import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Client;
 import org.csploit.android.core.CrashReporter;
 import org.csploit.android.core.Logger;
@@ -85,7 +85,6 @@ import org.csploit.android.services.UpdateChecker;
 import org.csploit.android.services.UpdateService;
 import org.csploit.android.services.receivers.MsfRpcdServiceReceiver;
 import org.csploit.android.services.receivers.NetworkRadarReceiver;
-import org.csploit.android.tools.NMap;
 import org.csploit.android.update.CoreUpdate;
 import org.csploit.android.update.MsfUpdate;
 import org.csploit.android.update.RubyUpdate;
@@ -845,8 +844,10 @@ public class MainActivity extends AppCompatActivity {
                 .findViewById(R.id.itemTitle) : null);
         holder.itemDescription = (TextView) (row != null ? row
                 .findViewById(R.id.itemDescription) : null);
-                holder.portCount = (TextView) (row != null ? row
-                        .findViewById(R.id.portCount) : null);
+        holder.portCount = (TextView) (row != null ? row
+               .findViewById(R.id.portCount) : null);
+        holder.portCountLayout = (LinearLayout) (row != null ? row
+                .findViewById(R.id.portCountLayout) : null);
         if (row != null)
           row.setTag(holder);
       } else
@@ -872,7 +873,7 @@ public class MainActivity extends AppCompatActivity {
       int openedPorts = target.getOpenPorts().size();
 
       holder.portCount.setText(String.format("%d", openedPorts));
-      holder.portCount.setVisibility(openedPorts < 1 ? View.GONE : View.VISIBLE);
+      holder.portCountLayout.setVisibility(openedPorts < 1 ? View.GONE : View.VISIBLE);
       return row;
     }
 
@@ -927,6 +928,7 @@ public class MainActivity extends AppCompatActivity {
       TextView itemTitle;
       TextView itemDescription;
       TextView portCount;
+      LinearLayout portCountLayout;
     }
   }
 

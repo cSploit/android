@@ -24,8 +24,8 @@
         android:textColor="@color/app_color"
         android:fontFamily="sans-serif-light"
         android:textSize="16sp"
-        android:layout_toLeftOf="@+id/portCount"
-        android:layout_toStartOf="@+id/portCount" />
+        android:layout_toLeftOf="@+id/portCountLayout"
+        android:layout_toStartOf="@+id/portCountLayout" />
 
     <TextView
         android:id="@+id/itemDescription"
@@ -34,22 +34,48 @@
         android:textColor="@color/gray_text"
         android:fontFamily="sans-serif-condensed"
         android:textSize="14sp"
-        android:layout_toRightOf="@+id/itemIcon"
-        android:layout_toLeftOf="@+id/portCount"
-        android:layout_toStartOf="@+id/portCount"
-        android:layout_below="@+id/itemTitle" />
-
-    <TextView
-        android:id="@+id/portCount"
+        android:layout_toLeftOf="@+id/portCountLayout"
+        android:layout_below="@+id/itemTitle"
+        android:layout_alignLeft="@+id/itemTitle"
+        android:layout_alignStart="@+id/itemTitle" />
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/selectable_blue"
-        android:fontFamily="sans-serif-condensed"
-        android:textSize="20sp"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:padding="6dp"
-        android:gravity="center"
-        android:layout_alignBottom="@+id/itemDescription" />
+        android:id="@+id/portCountLayout"
+        android:orientation="vertical"
+        android:layout_centerInParent="true"
+        android:background="@drawable/card_background"
+        android:translationZ="8dp"
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp"
+        android:paddingBottom="10dp"
+        android:paddingTop="4dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/ports"
+            android:id="@+id/textView10"
+            android:gravity="top|center_horizontal"
+            android:layout_row="0"
+            android:layout_column="0"
+            android:textSize="12dp"
+            android:textColor="@color/holo_blue_dark" />
+
+        <TextView
+        android:id="@+id/portCount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/selectable_blue"
+        android:textSize="16dp"
+            android:gravity="top|center_horizontal"
+            android:layout_row="0"
+            android:layout_column="0" />
+
+
+    </LinearLayout>
 </RelativeLayout>
