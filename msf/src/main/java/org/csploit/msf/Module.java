@@ -10,7 +10,7 @@ import java.util.Collection;
 /**
  * Represent a module of the MSF
  */
-public abstract class Module implements Offspring, DataHolder {
+public abstract class Module implements Offspring, DataHolder, Customizable {
   protected Author[] authors;
   protected ArchSet arch;
   protected PlatformList platform;
@@ -87,8 +87,24 @@ public abstract class Module implements Offspring, DataHolder {
     options.addOption(name, option, advanced, evasion);
   }
 
-  public Collection<String> getinvalidOptions() {
+  @Override
+  public void setOption(String key, String value) {
+    getDataStore().put(key, value);
+  }
+
+  @Override
+  public Collection<Option> getOptions() {
+    return options.values();
+  }
+
+  @Override
+  public Collection<String> getInvalidOptions() {
     return options.getInvalidOptions(getDataStore());
+  }
+
+  @Override
+  public <T> T getOptionValue(Option<T> option) {
+    return option.normalize(getDataStore().get(option.getName()));
   }
 
   @Override

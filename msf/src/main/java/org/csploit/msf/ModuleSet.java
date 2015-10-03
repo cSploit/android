@@ -9,7 +9,7 @@ import java.util.HashMap;
  * A module set contains zero or more named module classes of an arbitrary
  * type.
  */
-public class ModuleSet extends HashMap<String, Module> implements Offspring {
+class ModuleSet extends HashMap<String, Module> implements Offspring {
   protected String type;
   private Framework framework;
 

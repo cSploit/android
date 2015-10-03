@@ -168,15 +168,15 @@ public class RpcSampleTest {
 
     // exploit settings should not be valid without the required RHOST options
 
-    assertThat(exploit.getinvalidOptions().isEmpty(), is(false));
+    assertThat(exploit.getInvalidOptions().isEmpty(), is(false));
 
     framework.getDataStore().put("RHOST", "invalid address");
 
-    assertThat(exploit.getinvalidOptions().isEmpty(), is(false));
+    assertThat(exploit.getInvalidOptions().isEmpty(), is(false));
 
     framework.getDataStore().put("RHOST", "127.0.0.1");
 
-    assertThat(exploit.getinvalidOptions().isEmpty(), is(true));
+    assertThat(exploit.getInvalidOptions().isEmpty(), is(true));
   }
 
   private static Option getOptionForInfo(String name, ModuleOptionInfo info) {

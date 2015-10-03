@@ -8,5 +8,5 @@ import java.util.HashMap;
  * keeping track of arbitrary contexts that may or may not require a dedicated
  * thread.
  */
-public class JobContainer extends HashMap<Integer, Job> {
+class JobContainer extends HashMap<Integer, Job> {
 }

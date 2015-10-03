@@ -13,7 +13,7 @@ import java.util.HashMap;
  * applicable to the way that the command interpreter is communicated
  * with.
  */
-public class SessionManager extends HashMap<Integer, Session> implements Offspring {
+class SessionManager extends HashMap<Integer, Session> implements Offspring {
   private Framework framework;
 
   public SessionManager(Framework framework) {
