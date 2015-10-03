@@ -869,23 +869,10 @@ public class MainActivity extends AppCompatActivity {
       holder.itemImage.setImageResource(target.getDrawableResourceId());
       holder.itemDescription.setText(target.getDescription());
 
-            // only do a portscan if/when target rolls into view and ports haven't been found...
-            if (target.getType() != Target.Type.NETWORK && target.getOpenPorts().size() == 0) {
-                final Receiver r = new Receiver(position, convertView);
-                Thread thread = new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            System.getTools().nmap
-                                    .synScan(target, r, null);
-                        } catch (ChildManager.ChildNotStartedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                };
-                thread.run();
-            }
+      int openedPorts = target.getOpenPorts().size();
 
+      holder.portCount.setText(String.format("%d", openedPorts));
+      holder.portCount.setVisibility(openedPorts < 1 ? View.GONE : View.VISIBLE);
       return row;
     }
 
@@ -1115,41 +1102,4 @@ public class MainActivity extends AppCompatActivity {
       }
     }
   }
-
-    private class Receiver extends NMap.SynScanReceiver {
-        int position;
-        final View cv;
-
-        public Receiver(int position, View cv) {
-            this.position = position;
-            this.cv = cv;
-        }
-
-        @Override
-        public void onEnd(int exitCode) {
-            MainActivity.this.runOnUiThread(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            System.setCurrentTarget(position);
-                            // new items may have snuck in so the order can change.  Double check this
-                            if (cv != null) {
-                                TextView tv = (TextView) cv.findViewById(R.id.portCount);
-                                if (tv != null) {
-                                    tv.setText(String.format("%d", System.getCurrentTarget().getOpenPorts().size()));
-                                    tv.setVisibility(System.getCurrentTarget().getOpenPorts().size() < 1 ? View.GONE : View.VISIBLE);
-                                }
-                            }
-                        }
-                    }
-            );
-            super.onEnd(exitCode);
-        }
-
-        @Override
-        public void onPortFound(int port, String protocol) {
-            System.setCurrentTarget(position);
-            System.addOpenPort(port, null);
-        }
-    }
 }
