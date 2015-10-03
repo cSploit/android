@@ -21,9 +21,7 @@ package org.csploit.android.core;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -32,7 +30,6 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -156,6 +153,8 @@ public class System
       mKnownIssues = new KnownIssues();
       mPlugins = new ArrayList<Plugin>();
       mOpenPorts = new SparseIntArray(3);
+      mServices = new HashMap<String, String>();
+      mPorts = new HashMap<String, String>();
 
       // if we are here, network initialization didn't throw any error, lock wifi
       WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
@@ -520,38 +519,46 @@ public class System
     }
   }
 
-  private static void preloadServices(){
-    if(mServices == null || mPorts == null){
-      try{
-        // preload network service map and mac vendors
-        mServices = new HashMap<String, String>();
-        mPorts = new HashMap<String, String>();
+  public static void preloadServices(){
+    if (mServices.size() > 0 && mPorts.size() > 0)
+      return;
 
-        @SuppressWarnings("ConstantConditions")
-        FileInputStream fstream = new FileInputStream(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-services");
+    FileReader fr = null;
+    BufferedReader reader = null;
+    try{
+      // preload network service and ports map
 
-        DataInputStream in = new DataInputStream(fstream);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        String line;
-        Matcher matcher;
+      //@SuppressWarnings("ConstantConditions")
+      fr = new FileReader(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-services");
+      reader = new BufferedReader(fr);
+      String line;
+      Matcher matcher;
+      String port, proto;
 
-        while((line = reader.readLine()) != null){
-          line = line.trim();
+      while ((line = reader.readLine()) != null) {
+        if ((matcher = SERVICE_PARSER.matcher(line)) != null && matcher.find()) {
+          proto = matcher.group(1);
+          port = matcher.group(2);
 
-          if((matcher = SERVICE_PARSER.matcher(line)) != null && matcher.find()){
-            String proto = matcher.group(1),
-              port = matcher.group(2);
-
-            mServices.put(proto, port);
-            mPorts.put(port, proto);
-          }
+          mServices.put(proto, port);
+          mPorts.put(port, proto);
         }
+      }
 
-        in.close();
+    } catch (Exception e) {
+      mServices.clear();
+      mPorts.clear();
+
+      errorLogging(e);
+    }
+    finally {
+      try {
+        if (fr != null)
+          fr.close();
+        if (reader != null)
+          reader.close();
       }
-      catch(Exception e){
-        errorLogging(e);
-      }
+      catch (Exception e){}
     }
   }
 
@@ -946,7 +953,6 @@ public class System
   }
 
   public static String getProtocolByPort(String port){
-    preloadServices();
 
     return mPorts.containsKey(port) ? mPorts.get(port) : null;
   }
@@ -956,7 +962,6 @@ public class System
   }
 
   public static int getPortByProtocol(String protocol){
-    preloadServices();
 
     return mServices.containsKey(protocol) ? Integer.parseInt(mServices.get(protocol)) : 0;
   }

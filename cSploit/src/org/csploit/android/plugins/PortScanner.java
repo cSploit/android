@@ -23,7 +23,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -70,6 +69,7 @@ public class PortScanner extends Plugin {
 	private static final String CUSTOM_PARAMETERS = "PortScanner.Prefs.CustomParameters";
 	private static final String CUSTOM_PARAMETERS_TEXT = "PortScanner.Prefs.CustomParameters.Text";
 	private SharedPreferences mPreferences = null;
+	private boolean unresolvedPorts = false;
 
 	public PortScanner() {
 		super(R.string.port_scanner, R.string.port_scanner_desc,
@@ -186,6 +186,13 @@ public class PortScanner extends Plugin {
 		mTextParameters = (EditText) findViewById(R.id.scanParameters);
 		mScanToggleButton = (ToggleButton) findViewById(R.id.scanToggleButton);
 		mScanProgress = (ProgressBar) findViewById(R.id.scanActivity);
+
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				System.preloadServices();
+			}
+		}).start();
 
 		if (mPreferences.getBoolean(CUSTOM_PARAMETERS, false))
 			displayParametersField();
@@ -383,6 +390,29 @@ public class PortScanner extends Plugin {
 		public void onEnd(int exitCode) {
 			super.onEnd(exitCode);
 
+			// last chance to resolve ports protocols
+			if (unresolvedPorts) {
+				String temp_port, port, protocol;
+				for (int i = 0; i < mPortList.size(); i++) {
+					if (mPortList.get(i).startsWith("tcp : ") || mPortList.get(i).startsWith("udp : ")) {
+						temp_port = mPortList.get(i);
+						port = temp_port.split("\\s")[2];
+						protocol = System.getProtocolByPort(port);
+
+						if (protocol != null)
+							mPortList.set(i, port + " ( " + protocol + " )");
+
+						Logger.debug("unresolved port: " + port + ":" + protocol);
+					}
+				}
+				PortScanner.this.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						mListAdapter.notifyDataSetChanged();
+					}
+				});
+			}
+
 			PortScanner.this.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
@@ -406,8 +436,10 @@ public class PortScanner extends Plugin {
 					if (resolvedProtocol != null)
 						entry = port + " ( " + resolvedProtocol + " )";
 
-					else
+					else {
+						unresolvedPorts = true;
 						entry = portProtocol + " : " + port;
+					}
 
 					// add open port to the listview and notify the environment
 					// about the event
