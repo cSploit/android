@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -31,8 +32,10 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -54,6 +57,8 @@ import org.csploit.android.tools.NMap;
 import java.util.ArrayList;
 
 public class PortScanner extends Plugin {
+	private TextView mTextDoc = null;
+	private EditText mTextParameters = null;
 	private ToggleButton mScanToggleButton = null;
 	private ProgressBar mScanProgress = null;
 	private boolean mRunning = false;
@@ -61,6 +66,10 @@ public class PortScanner extends Plugin {
 	private ArrayAdapter<String> mListAdapter = null;
 	private Receiver mScanReceiver = null;
 	private String mCustomPorts = null;
+	private Menu mMenu = null;
+	private static final String CUSTOM_PARAMETERS = "PortScanner.Prefs.CustomParameters";
+	private static final String CUSTOM_PARAMETERS_TEXT = "PortScanner.Prefs.CustomParameters.Text";
+	private SharedPreferences mPreferences = null;
 
 	public PortScanner() {
 		super(R.string.port_scanner, R.string.port_scanner_desc,
@@ -72,11 +81,46 @@ public class PortScanner extends Plugin {
 		mScanReceiver = new Receiver();
 	}
 
+	/**
+	 * Sets visible the custom parameters text field, and loads the saved parameters
+	 */
+	private void displayParametersField (){
+		mTextDoc.setVisibility(View.VISIBLE);
+		mTextParameters.setVisibility(View.VISIBLE);
+		mTextParameters.setText(mPreferences.getString(CUSTOM_PARAMETERS_TEXT, ""));
+
+		saveCustomParameters(true);
+	}
+
+	/**
+	 * Hides the custom parameters text field, saving the typed parameters
+	 */
+	private void hideParametersField (){
+		saveCustomParameters(false);
+
+		mTextDoc.setVisibility(View.GONE);
+		mTextParameters.setVisibility(View.GONE);
+	}
+
+	/**
+	 * Saves customs parameters entered by the user
+	 *
+	 * @param displayed Sets if the custom parameters text field must be displayed or not
+	 */
+	private void saveCustomParameters (boolean displayed){
+		SharedPreferences.Editor edit = mPreferences.edit();
+		edit.putBoolean(CUSTOM_PARAMETERS, displayed);
+		edit.putString(CUSTOM_PARAMETERS_TEXT, mTextParameters.getText().toString());
+		edit.commit();
+	}
+
 	private void setStoppedState() {
 		if(mProcess!=null) {
       mProcess.kill();
       mProcess = null;
     }
+		saveCustomParameters(mTextParameters.isShown());
+
 		mScanProgress.setVisibility(View.INVISIBLE);
 		mRunning = false;
 		mScanToggleButton.setChecked(false);
@@ -90,13 +134,21 @@ public class PortScanner extends Plugin {
 		createPortList();
 
     try {
-      mProcess = System.getTools().nmap
-              .synScan(System.getCurrentTarget(), mScanReceiver, mCustomPorts);
+		if (mTextParameters.isShown()) {
+			mListAdapter.clear();
+			mListAdapter.notifyDataSetChanged();
+			mProcess = System.getTools().nmap
+					.customScan(System.getCurrentTarget(), mScanReceiver, mTextParameters.getText().toString());
+		}
+		else {
+			mProcess = System.getTools().nmap
+					.synScan(System.getCurrentTarget(), mScanReceiver, mCustomPorts);
+		}
 
       mRunning = true;
     } catch (ChildManager.ChildNotStartedException e) {
       System.errorLogging(e);
-      Toast.makeText(PortScanner.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
+      Toast.makeText(PortScanner.this, getString(R.string.child_not_started) + "\n" + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
     }
   }
 
@@ -129,8 +181,14 @@ public class PortScanner extends Plugin {
 			setTheme(R.style.AppTheme);
 		super.onCreate(savedInstanceState);
 
+		mPreferences = System.getSettings();
+		mTextDoc = (TextView) findViewById(R.id.scanDoc);
+		mTextParameters = (EditText) findViewById(R.id.scanParameters);
 		mScanToggleButton = (ToggleButton) findViewById(R.id.scanToggleButton);
 		mScanProgress = (ProgressBar) findViewById(R.id.scanActivity);
+
+		if (mPreferences.getBoolean(CUSTOM_PARAMETERS, false))
+			displayParametersField();
 
 		mScanToggleButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -220,12 +278,24 @@ public class PortScanner extends Plugin {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.port_scanner, menu);
+		mMenu = menu;
+		mMenu.findItem(R.id.scanner_custom_parameters).
+				setChecked(mPreferences.getBoolean(CUSTOM_PARAMETERS, false));
+
 		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+			case R.id.scanner_custom_parameters:
+				if (item.isChecked())
+					hideParametersField();
+				else
+					displayParametersField();
+
+				item.setChecked(!item.isChecked());
+			return true;
 		case R.id.select_ports:
 
 			new InputDialog(getString(R.string.select_ports),
@@ -270,6 +340,9 @@ public class PortScanner extends Plugin {
 											getString(R.string.invalid_ports),
 											PortScanner.this).show();
 								}
+
+								hideParametersField();
+								mMenu.findItem(R.id.scanner_custom_parameters).setChecked(false);
 
 								Logger.debug("mCustomPorts = " + mCustomPorts);
 							} else

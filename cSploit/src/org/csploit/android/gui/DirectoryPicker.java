@@ -33,11 +33,11 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.csploit.android.R;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-
-import org.csploit.android.R;
 
 public class DirectoryPicker extends ListActivity{
   public static final String START_DIR = "startDir";
@@ -45,7 +45,7 @@ public class DirectoryPicker extends ListActivity{
   public static final String SHOW_HIDDEN = "showHidden";
   public static final String CHOSEN_DIRECTORY = "chosenDir";
   public static final String AFFECTED_PREF = "prefKey";
-  public static final int PICK_DIRECTORY = 43522432;
+  public static final int PICK_DIRECTORY = 1212;
   private File dir;
   private boolean showHidden = false;
   private boolean onlyDirs = true;

@@ -5,7 +5,7 @@
 
     <PreferenceCategory android:title="@string/pref_general" >
 
-        <CheckBoxPreference
+        <SwitchPreferenceCompat
             android:defaultValue="true"
             android:key="PREF_WAKE_LOCK"
             android:summary="@string/pref_wake_lock_desc"
@@ -16,19 +16,19 @@
             android:summary="@string/pref_save_path_desc"
             android:title="@string/pref_save_path" />
 
-        <CheckBoxPreference
+        <SwitchPreferenceCompat
             android:defaultValue="false"
             android:key="PREF_DEBUG_ERROR_LOGGING"
             android:summary="@string/pref_debug_error_logging_desc"
             android:title="@string/pref_debug_error_logging" />
 
-        <CheckBoxPreference
+        <SwitchPreferenceCompat
             android:defaultValue="false"
             android:key="PREF_ENABLE_PROFILER"
             android:summary="@string/pref_enable_profiler_desc"
             android:title="@string/pref_enable_profiler" />
 
-        <CheckBoxPreference
+        <SwitchPreferenceCompat
             android:defaultValue="false"
             android:key="PREF_DARK_THEME"
             android:summary="@string/pref_choose_theme"
@@ -36,41 +36,41 @@
     </PreferenceCategory>
 
     <PreferenceCategory  android:title="@string/pref_updates" >
-        <CheckBoxPreference
+        <SwitchPreferenceCompat
             android:defaultValue="true"
             android:key="PREF_CHECK_UPDATES"
             android:summary="@string/pref_check_updates_desc"
             android:title="@string/pref_check_updates" />
 
-        <CheckBoxPreference
+        <SwitchPreferenceCompat
             android:defaultValue="true"
             android:key="PREF_UPDATES_APP"
             android:dependency="PREF_CHECK_UPDATES"
             android:summary="@string/pref_updates_app_desc"
             android:title="@string/pref_updates_app" />
 
-        <CheckBoxPreference
+        <SwitchPreferenceCompat
             android:defaultValue="true"
             android:key="PREF_UPDATES_CORE"
             android:dependency="PREF_CHECK_UPDATES"
             android:summary="@string/pref_updates_core_desc"
             android:title="@string/pref_updates_core" />
 
-        <CheckBoxPreference
+        <SwitchPreferenceCompat
             android:defaultValue="true"
             android:key="PREF_UPDATES_RUBY"
             android:dependency="PREF_CHECK_UPDATES"
             android:summary="@string/pref_updates_ruby_desc"
             android:title="@string/pref_updates_ruby" />
 
-        <CheckBoxPreference
+        <SwitchPreferenceCompat
             android:defaultValue="true"
             android:key="PREF_UPDATES_GEMS"
             android:dependency="PREF_CHECK_UPDATES"
             android:summary="@string/pref_updates_gems_desc"
             android:title="@string/pref_updates_gems" />
 
-        <CheckBoxPreference
+        <SwitchPreferenceCompat
             android:defaultValue="true"
             android:key="PREF_UPDATES_MSF"
             android:dependency="PREF_CHECK_UPDATES"
@@ -102,7 +102,7 @@
             android:summary="@string/pref_http_server_port_desc"
             android:title="@string/pref_http_server_port" />
 
-        <CheckBoxPreference
+        <SwitchPreferenceCompat
             android:defaultValue="true"
             android:key="PREF_HTTPS_REDIRECT"
             android:summary="@string/pref_https_redirect_desc"
@@ -147,7 +147,7 @@
             android:summary="@string/choose_method"
             android:title="@string/pref_performance_exploit_desc" />
 
-        <CheckBoxPreference
+        <SwitchPreferenceCompat
             android:defaultValue="false"
             android:key="WIDE_SCAN"
             android:summary="@string/pref_performance_widescan_desc"
@@ -157,13 +157,13 @@
 
     <PreferenceCategory android:title="@string/pref_msf" >
 
-        <CheckBoxPreference
+        <SwitchPreferenceCompat
             android:defaultValue="true"
             android:key="MSF_ENABLED"
             android:title="@string/pref_msf_enable"
             android:summary="@string/pref_msf_enable_desc" />
 
-        <CheckBoxPreference
+        <SwitchPreferenceCompat
             android:defaultValue="true"
             android:key="MSF_NOTIFICATIONS"
             android:title="@string/pref_msf_notifications"
@@ -203,7 +203,7 @@
             android:summary="@string/pref_rpc_host_desc"
             android:title="@string/pref_rpc_host" />
 
-        <CheckBoxPreference
+        <SwitchPreferenceCompat
             android:defaultValue="false"
             android:key="MSF_RPC_SSL"
             android:summary="@string/pref_rpc_ssl_desc"
