@@ -404,7 +404,7 @@ public class Target
   }
 
   public void setAlias(String alias){
-    mAlias = alias.trim();
+    mAlias = alias == null ? null : alias.trim();
   }
 
   public String getAlias(){
