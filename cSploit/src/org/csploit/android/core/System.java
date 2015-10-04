@@ -314,7 +314,7 @@ public class System
     Client.Shutdown();
     Client.Disconnect();
 
-    mInitialized = mCoreInitialized = false;
+    mCoreInitialized = false;
   }
 
   public static void initCore() throws DaemonException, SuException {
