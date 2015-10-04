@@ -116,6 +116,9 @@ If not, see http://www.gnu.org/licenses/.
     <string name="invalid_filename">无效的文件名称。</string>
 <string name="something_went_wrong">发生了未知的错误，请尝试选择一个新的目标。
 </string>
+    <string name="mitm_dns_spoofing">DNS欺骗</string> 
+    <string name="mitm_dns_spoofing_desc">重定向连接到指定的web/IP</string> 
+    <string name="mitm_dns_spoofing_list_saved">储存</string> 
     <string name="selected">已经选择</string>
     <string name="nothing_found"><![CDATA[<small><i>未找到</i></small>]]></string>
     <string name="no_open_ports">没有在当前目标找到任何开放的端口，请先运行服务检查工具。</string>
@@ -452,6 +455,8 @@ If not, see http://www.gnu.org/licenses/.
     <string name="pref_advanced">高级</string>
     <string name="pref_msf_enable">启用 MSF</string>
     <string name="pref_msf_enable_desc">启用 MetaSploit 框架</string>
+    <string name="pref_msf_notifications">MSF 状态通知</string> 
+    <string name="pref_msf_notifications_desc">显示MSF RPC连接状态</string> 
     <string name="pref_msf_delete">删除 MSF</string>
     <string name="pref_msf_delete_desc">从您的设备删除 MetaSploit 框架</string>
     <string name="pref_msfdir_desc">包含 MetaSploit 框架的文件夹。</string>
