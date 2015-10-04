@@ -16,5 +16,12 @@
     <color name="purple">#3F51B5</color>
     <color name="orange">#FFC107</color>
     <color name="black">#000000</color>
-
+    <color name="blue">#0000FF</color>
+    <color name="msf_rank_manual">@color/red</color>
+    <color name="msf_rank_low">#FF7F50</color>
+    <color name="msf_rank_average">@color/gray_text</color>
+    <color name="msf_rank_normal">@color/gray_text</color>
+    <color name="msf_rank_good">@color/blue</color>
+    <color name="msf_rank_great">@color/green</color>
+    <color name="msf_rank_excellent">@color/green</color>
 </resources>

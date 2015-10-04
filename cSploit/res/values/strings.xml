@@ -514,4 +514,12 @@
     <string name="new_ruby_found">A new version for ruby is available, do you want to upgrade ?</string>
     <string name="new_msf_found">A new msf version is available, do you want to upgrade ?</string>
     <string name="msf_status">MetaSploit Status</string>
+    <string name="msf_exploit_ranking">Ranking: %s</string>
+    <string name="msf_rank_manual">Manual</string>
+    <string name="msf_rank_low">Low</string>
+    <string name="msf_rank_average">Average</string>
+    <string name="msf_rank_normal">Normal</string>
+    <string name="msf_rank_good">Good</string>
+    <string name="msf_rank_great">Great</string>
+    <string name="msf_rank_excellent">Excellent</string>
 </resources>
