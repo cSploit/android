@@ -23,7 +23,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -111,7 +110,7 @@ public class PortScanner extends Plugin {
 		SharedPreferences.Editor edit = mPreferences.edit();
 		edit.putBoolean(CUSTOM_PARAMETERS, displayed);
 		edit.putString(CUSTOM_PARAMETERS_TEXT, mTextParameters.getText().toString());
-		edit.commit();
+		edit.apply();
 	}
 
 	private void setStoppedState() {
@@ -186,6 +185,13 @@ public class PortScanner extends Plugin {
 		mTextParameters = (EditText) findViewById(R.id.scanParameters);
 		mScanToggleButton = (ToggleButton) findViewById(R.id.scanToggleButton);
 		mScanProgress = (ProgressBar) findViewById(R.id.scanActivity);
+
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				System.preloadServices();
+			}
+		}).start();
 
 		if (mPreferences.getBoolean(CUSTOM_PARAMETERS, false))
 			displayParametersField();
@@ -403,11 +409,11 @@ public class PortScanner extends Plugin {
 				public void run() {
           String entry;
 
-					if (resolvedProtocol != null)
+					if (resolvedProtocol != null) {
 						entry = port + " ( " + resolvedProtocol + " )";
-
-					else
+					} else {
 						entry = portProtocol + " : " + port;
+					}
 
 					// add open port to the listview and notify the environment
 					// about the event
