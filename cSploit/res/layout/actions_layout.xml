@@ -27,6 +27,7 @@
         android:layout_height="wrap_content"
         android:showDividers="none"
         android:dividerHeight="6dp"
-        android:divider="#00ffffff"/>
+        android:divider="#00ffffff"
+        android:animateLayoutChanges="true" />
 
 </LinearLayout>
