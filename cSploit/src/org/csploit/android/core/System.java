@@ -21,9 +21,7 @@ package org.csploit.android.core;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -32,7 +30,6 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -47,10 +44,8 @@ import org.csploit.android.gui.dialogs.FatalDialog;
 import org.csploit.android.net.Endpoint;
 import org.csploit.android.net.GitHubParser;
 import org.csploit.android.net.Network;
-import org.csploit.android.net.Network.Protocol;
 import org.csploit.android.net.Target;
 import org.csploit.android.net.Target.Exploit;
-import org.csploit.android.net.Target.Port;
 import org.csploit.android.net.Target.Type;
 import org.csploit.android.net.http.proxy.HTTPSRedirector;
 import org.csploit.android.net.http.proxy.Proxy;
@@ -1128,24 +1123,6 @@ public class System
 
   public static Session getCurrentSession() {
     return mMsfSession;
-  }
-
-  public static void addOpenPort( int port, Protocol protocol ) {
-    addOpenPort( port, protocol, null, null );
-  }
-
-  public static void addOpenPort( int port, Protocol protocol, String service ) {
-    addOpenPort(port, protocol, service, null);
-  }
-
-  public static void addOpenPort( int port, Protocol protocol, String service, String version ) {
-    Port p = new Port( port, protocol, service, version );
-
-    getCurrentTarget().addOpenPort( p );
-
-    for( Plugin plugin : getPluginsForTarget() ) {
-      plugin.onTargetNewOpenPort( getCurrentTarget(), p );
-    }
   }
 
   public static Collection<Exploit> getCurrentExploits() {
