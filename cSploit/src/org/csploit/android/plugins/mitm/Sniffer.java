@@ -463,6 +463,6 @@ public class Sniffer extends AppCompatActivity
   public void onBackPressed(){
     setStoppedState();
     super.onBackPressed();
-    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
   }
 }

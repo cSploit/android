@@ -289,7 +289,7 @@ public class PacketForger extends Plugin implements OnClickListener {
 	@Override
 	public void onBackPressed() {
 		setStoppedState(null);
-
 		super.onBackPressed();
+		overridePendingTransition(R.anim.fadeout, R.anim.fadein);
 	}
 }

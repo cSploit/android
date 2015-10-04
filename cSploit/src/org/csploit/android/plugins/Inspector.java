@@ -171,6 +171,7 @@ public class Inspector extends Plugin{
   public void onBackPressed(){
     setStoppedState();
     super.onBackPressed();
+    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
   }
 
   @Override

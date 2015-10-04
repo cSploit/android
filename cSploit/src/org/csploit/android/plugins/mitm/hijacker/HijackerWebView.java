@@ -190,8 +190,7 @@ public class HijackerWebView extends AppCompatActivity {
         mWebView.stopLoading();
 
       super.onBackPressed();
-      overridePendingTransition(R.anim.slide_in_left,
-              R.anim.slide_out_left);
+      overridePendingTransition(R.anim.fadeout, R.anim.fadein);
     }
   }
 }
