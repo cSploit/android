@@ -44,6 +44,7 @@ import org.acra.ACRAConfiguration;
 import org.csploit.android.R;
 import org.csploit.android.WifiScannerActivity;
 import org.csploit.android.gui.dialogs.FatalDialog;
+import org.csploit.android.helpers.NetworkHelper;
 import org.csploit.android.net.Endpoint;
 import org.csploit.android.net.GitHubParser;
 import org.csploit.android.net.Network;
@@ -116,7 +117,7 @@ public class System
   private static int mCurrentTarget = 0;
   private static Map<String, String> mServices = null;
   private static Map<String, String> mPorts = null;
-  private static Map<String, String> mVendors = null;
+  private static Map<Integer, String> mVendors = null;
   private static SparseIntArray mOpenPorts = null;
 
   // registered plugins
@@ -558,7 +559,7 @@ public class System
   private static void preloadVendors(){
     if(mVendors == null){
       try{
-        mVendors = new HashMap<String, String>();
+        mVendors = new HashMap<>();
         @SuppressWarnings("ConstantConditions")
         FileInputStream fstream = new FileInputStream(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-mac-prefixes");
 
@@ -572,7 +573,7 @@ public class System
             String[] tokens = line.split(" ", 2);
 
             if(tokens.length == 2)
-              mVendors.put(tokens[0], tokens[1]);
+              mVendors.put(NetworkHelper.getOUICode(tokens[0]), tokens[1]);
           }
         }
 
@@ -940,7 +941,7 @@ public class System
     preloadVendors();
 
     if(mac != null && mac.length >= 3)
-      return mVendors.get(String.format("%02X%02X%02X", mac[0], mac[1], mac[2]));
+      return mVendors.get(NetworkHelper.getOUICode(mac));
     else
       return null;
   }
