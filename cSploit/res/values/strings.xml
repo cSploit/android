@@ -77,8 +77,8 @@
     <string name="net_discovery_started">Network discovery started.</string>
     <string name="start_monitor">Start Network Monitor</string>
     <string name="stop_monitor">Stop Network Monitor</string>
-    <string name="start_msfrpcd">Start MetaSploit RPCD</string>
-    <string name="stop_msfrpcd">Stop MetaSploit RPCD</string>
+    <string name="start_msfrpcd">Start Metasploit RPCD</string>
+    <string name="stop_msfrpcd">Stop Metasploit RPCD</string>
     <string name="exit">Exit</string>
     <string name="close_confirm">This will close cSploit, are you sure you want to continue?
     </string>
@@ -238,11 +238,11 @@
     <string name="error_rpc">RPC error</string>
     <string name="error_rpcd_inval">bad settings</string>
     <string name="error_rpcd_shell">cannot execute shell</string>
-    <string name="rpcd_starting">Starting MetaSploit RPCD.  Standby&#8230;</string>
-    <string name="rpcd_started">MetaSploit RPCD started</string>
-    <string name="rpcd_stopped">MetaSploit RPCD stopped</string>
-    <string name="rpcd_running">MetaSploit RPCD is already running</string>
-    <string name="rpcd_timedout">MetaSploit RPCD does not respond</string>
+    <string name="rpcd_starting">Starting Metasploit RPCD.  Standby&#8230;</string>
+    <string name="rpcd_started">Metasploit RPCD started</string>
+    <string name="rpcd_stopped">Metasploit RPCD stopped</string>
+    <string name="rpcd_running">Metasploit RPCD is already running</string>
+    <string name="rpcd_timedout">Metasploit RPCD does not respond</string>
 
     <!-- mitm modules -->
     <string name="mitm_simple_sniff">Simple Sniff</string>
@@ -325,7 +325,7 @@
     <!-- preferences -->
     <string name="pref_general">General</string>
     <string name="pref_modules">Modules</string>
-    <string name="pref_msf">MetaSploit Framework</string>
+    <string name="pref_msf">Metasploit Framework</string>
     <string name="pref_performance">Performance</string>
     <string name="pref_check_updates">Check for Updates</string>
     <string name="pref_wake_lock">Wake Lock</string>
@@ -354,20 +354,20 @@
     <string name="pref_msf_check_updates">Check for MSF updates</string>
     <string name="pref_msf_check_updates_desc">Check for MSF updates every time the application is started.</string>
     <string name="pref_rpc_user">RPC username</string>
-    <string name="pref_rpc_user_desc">Username for connect to MetaSploit RPCD.</string>
+    <string name="pref_rpc_user_desc">Username for connect to Metasploit RPCD.</string>
     <string name="pref_rpc_pswd">RPC password</string>
-    <string name="pref_rpc_pswd_desc">Password for connect to MetaSploit RPCD.</string>
+    <string name="pref_rpc_pswd_desc">Password for connect to Metasploit RPCD.</string>
     <string name="pref_rpc_host">RPC host</string>
-    <string name="pref_rpc_host_desc">host where the MetaSploit RPC server is on</string>
+    <string name="pref_rpc_host_desc">host where the Metasploit RPC server is on</string>
     <string name="pref_rpc_port">RPC port</string>
-    <string name="pref_rpc_port_desc">Port for connect to MetaSploit RPCD.</string>
+    <string name="pref_rpc_port_desc">Port for connect to Metasploit RPCD.</string>
     <string name="pref_rpc_ssl">RPC use SSL</string>
-    <string name="pref_rpc_ssl_desc">Specify if MetaSploit RPC use SSL</string>
+    <string name="pref_rpc_ssl_desc">Specify if Metasploit RPC use SSL</string>
     <string name="pref_msfdir">MSF directory</string>
-    <string name="pref_msfdir_desc">Directory containing the MetaSploit Framework.</string>
+    <string name="pref_msfdir_desc">Directory containing the Metasploit Framework.</string>
     <string name="pref_rubydir">Ruby directory</string>
     <string name="pref_rubydir_desc">Directory containing the Ruby interpreter.</string>
-    <string name="pref_msf_branch_desc">The MetaSploit Framework branch to use</string>
+    <string name="pref_msf_branch_desc">The Metasploit Framework branch to use</string>
     <string name="pref_msf_branch_title">MSF branch</string>
     <string name="pref_performance_vuln_title">Search preferences</string>
     <string name="pref_performance_vuln_desc">Search for vulnerability using</string>
@@ -397,12 +397,12 @@
     <string name="pref_advanced">Advanced</string>
     <string name="pref_folder">Folder</string>
     <string name="pref_msf_enable">Enable MSF</string>
-    <string name="pref_msf_enable_desc">Enable the MetaSploit Framework</string>
+    <string name="pref_msf_enable_desc">Enable the Metasploit Framework</string>
     <string name="pref_msf_notifications">MSF status notifications</string>
     <string name="pref_msf_notifications_desc">View MSF RPC connection status</string>
     <string name="pref_msf_delete">Delete MSF</string>
-    <string name="pref_msf_delete_desc">Delete the MetaSploit Framework from your device</string>
-    <string name="pref_msfwipe_message">Do you really want to delete the MetaSploit Framework?</string>
+    <string name="pref_msf_delete_desc">Delete the Metasploit Framework from your device</string>
+    <string name="pref_msfwipe_message">Do you really want to delete the Metasploit Framework?</string>
     <string name="pref_msfwipe_size">About %d MB will be freed.</string>
     <string name="pref_err_exists">does not exists.</string>
     <string name="pref_err_writable">is not writable.</string>
@@ -462,9 +462,9 @@
     <string name="target_selected">Target selected</string>
     <string name="targets_selected">Targets selected</string>
     <string name="multiple_attack">Multiple attack</string>
-    <string name="connect_msf">Connect to MetaSploit</string>
-    <string name="disconnect_msf">Disconnect from MetaSploit</string>
-    <string name="connected_msf">Connected to MetaSploit</string>
+    <string name="connect_msf">Connect to Metasploit</string>
+    <string name="disconnect_msf">Disconnect from Metasploit</string>
+    <string name="connected_msf">Connected to Metasploit</string>
     <string name="connection_failed">Connection FAILED!</string>
     <string name="new_ruby_update_desc">An update for ruby is available</string>
     <string name="delete_previous_location">Delete previous location?</string>
@@ -513,5 +513,5 @@
     <string name="new_apk_found">App version %s is available, do you want to upgrade ?</string>
     <string name="new_ruby_found">A new version for ruby is available, do you want to upgrade ?</string>
     <string name="new_msf_found">A new msf version is available, do you want to upgrade ?</string>
-    <string name="msf_status">MetaSploit Status</string>
+    <string name="msf_status">Metasploit Status</string>
 </resources>

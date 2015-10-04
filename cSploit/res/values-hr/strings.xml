@@ -76,8 +76,8 @@
     <string name="net_discovery_started">Pretraga mreže pokrenuta.</string>
     <string name="start_monitor">Pokreni Pretragu Mreže</string>
     <string name="stop_monitor">Zaustavi Pretragu Mreže</string>
-    <string name="start_msfrpcd">Pokreni MetaSploit RPCD</string>
-    <string name="stop_msfrpcd">Zaustavi MetaSploit RPCD</string>
+    <string name="start_msfrpcd">Pokreni Metasploit RPCD</string>
+    <string name="stop_msfrpcd">Zaustavi Metasploit RPCD</string>
     <string name="exit">Zaustavi</string>
     <string name="close_confirm">Ovo će zatvoriti cSploit, jeste li sigurni da želite nastaviti?
     </string>
@@ -231,11 +231,11 @@
     <string name="error_rpc">RPC greška</string>
     <string name="error_rpcd_inval">Loše postavke</string>
     <string name="error_rpcd_shell">nemoguće pokrenuti ljusku</string>
-    <string name="rpcd_starting">Pokretanje MetaSploit RPCD&#8230;</string>
-    <string name="rpcd_started">MetaSploit RPCD pokrenut</string>
-    <string name="rpcd_stopped">MetaSploit RPCD zaustavljen</string>
-    <string name="rpcd_running">MetaSploit RPCD je već pokrenut</string>
-    <string name="rpcd_timedout">MetaSploit RPCD ne reagira</string>
+    <string name="rpcd_starting">Pokretanje Metasploit RPCD&#8230;</string>
+    <string name="rpcd_started">Metasploit RPCD pokrenut</string>
+    <string name="rpcd_stopped">Metasploit RPCD zaustavljen</string>
+    <string name="rpcd_running">Metasploit RPCD je već pokrenut</string>
+    <string name="rpcd_timedout">Metasploit RPCD ne reagira</string>
     <string name="error_rcpd_fatal">Fatalna greška se pojavila, upravo pretražujem grešku da je pošaljem mojem razvijatelju,
         ako se ne ugasim ugasi me preko postavke->aplikacije,
         i UPOZORI MOJE RAZVIJATELJE.
@@ -315,7 +315,7 @@
     <!-- preferences -->
     <string name="pref_general">Osnovno</string>
     <string name="pref_modules">Moduli</string>
-    <string name="pref_msf">MetaSploit Framework</string>
+    <string name="pref_msf">Metasploit Framework</string>
     <string name="pref_performance">Performanse</string>
     <string name="pref_check_updates">Provjeri Ažuriranja</string>
     <string name="pref_wake_lock">Ostani Budan</string>
@@ -342,15 +342,15 @@
     <string name="pref_http_max_buffer_size_desc">Maksimalna veličina međuspremnika HTTP zahtjeva kojom će upravljati prozirni proxy.</string>
     <string name="pref_password_filename_desc">Ime datoteke za zapisivanje lozinki i kolačića.</string>
     <string name="pref_rpc_user">RPC korisničko ime</string>
-    <string name="pref_rpc_user_desc">Korisničko ime za spajanje na MetaSploit RPCD.</string>
+    <string name="pref_rpc_user_desc">Korisničko ime za spajanje na Metasploit RPCD.</string>
     <string name="pref_rpc_pswd">RPC lozinka</string>
-    <string name="pref_rpc_pswd_desc">Lozinka za spajanje na MetaSploit RPCD.</string>
+    <string name="pref_rpc_pswd_desc">Lozinka za spajanje na Metasploit RPCD.</string>
     <string name="pref_rpc_host">RPC izvor</string>
-    <string name="pref_rpc_host_desc">izvor na kojemu se MetaSploit RPC server nalazi</string>
+    <string name="pref_rpc_host_desc">izvor na kojemu se Metasploit RPC server nalazi</string>
     <string name="pref_rpc_port">RPC port</string>
-    <string name="pref_rpc_port_desc">Port za spajanje na MetaSploit RPCD.</string>
+    <string name="pref_rpc_port_desc">Port za spajanje na Metasploit RPCD.</string>
     <string name="pref_rpc_ssl">RPC koristi SSL</string>
-    <string name="pref_rpc_ssl_desc">Opcija da MetaSploit RPC koristi SSL</string>
+    <string name="pref_rpc_ssl_desc">Opcija da Metasploit RPC koristi SSL</string>
     <string name="pref_performance_vuln_desc">Traži ranjivosti koristeći</string>
     <string-array name="pref_performance_vuln" >
         <item>OSVDB</item>
@@ -378,10 +378,10 @@
     <string name="pref_advanced">Napredno</string>
     <string name="pref_folder">Mapa</string>
     <string name="pref_msf_enable">Omogući MSF</string>
-    <string name="pref_msf_enable_desc">Uključuje MetaSploit Framework</string>
+    <string name="pref_msf_enable_desc">Uključuje Metasploit Framework</string>
     <string name="pref_msf_delete">Izbriši MSF</string>
-    <string name="pref_msf_delete_desc">Izbriši MetaSploit Framework sa uređaja</string>
-    <string name="pref_msfwipe_message">Jeste li sigurni da hoćete izbrisata MetaSploit Framework?</string>
+    <string name="pref_msf_delete_desc">Izbriši Metasploit Framework sa uređaja</string>
+    <string name="pref_msfwipe_message">Jeste li sigurni da hoćete izbrisata Metasploit Framework?</string>
     <string name="pref_msfwipe_size">Oko %d MB će biti oslobođeno.</string>
     <string name="pref_err_exists">ne postoji.</string>
     <string name="pref_err_writable">ne dopušta zapisivanje.</string>
@@ -437,8 +437,8 @@
     <string name="target_selected">meta odabrana</string>
     <string name="targets_selected">mete odabrane</string>
     <string name="multiple_attack">višestruki napad</string>
-    <string name="connect_msf">spoji se na MetaSploit</string>
-    <string name="disconnect_msf">odspoji se sa MetaSploita</string>
-    <string name="connected_msf">spojen na MetaSploit</string>
+    <string name="connect_msf">spoji se na Metasploit</string>
+    <string name="disconnect_msf">odspoji se sa Metasploita</string>
+    <string name="connected_msf">spojen na Metasploit</string>
     <string name="connection_failed">veza NIJE USPJELA!</string>
 </resources>

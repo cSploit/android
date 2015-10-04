@@ -76,8 +76,8 @@
     <string name="net_discovery_started">nettverks oppdaging startet.</string>
     <string name="start_monitor">Start nettverks Monitor</string>
     <string name="stop_monitor">Stopp nettverks Monitor</string>
-    <string name="start_msfrpcd">Start MetaSploit RPCD</string>
-    <string name="stop_msfrpcd">Stopp MetaSploit RPCD</string>
+    <string name="start_msfrpcd">Start Metasploit RPCD</string>
+    <string name="stop_msfrpcd">Stopp Metasploit RPCD</string>
     <string name="exit">Avslutt</string>
     <string name="close_confirm">Dette vil lukke dSpolit, fortsette?
     </string>
@@ -237,11 +237,11 @@
     <string name="error_rpc">RPC Feil</string>
     <string name="error_rpcd_inval">dårlige innstillinger</string>
     <string name="error_rpcd_shell">kan ikke utføre shell</string>
-    <string name="rpcd_starting">Starter MetaSploit RPCD&#8230;</string>
-    <string name="rpcd_started">MetaSploit RPCD startet</string>
-    <string name="rpcd_stopped">MetaSploit RPCD stoppet</string>
-    <string name="rpcd_running">MetaSploit RPCD kjører allerede</string>
-    <string name="rpcd_timedout">MetaSploit RPCD svarer ikke</string>
+    <string name="rpcd_starting">Starter Metasploit RPCD&#8230;</string>
+    <string name="rpcd_started">Metasploit RPCD startet</string>
+    <string name="rpcd_stopped">Metasploit RPCD stoppet</string>
+    <string name="rpcd_running">Metasploit RPCD kjører allerede</string>
+    <string name="rpcd_timedout">Metasploit RPCD svarer ikke</string>
     <string name="error_rcpd_fatal">fatal error occurred, i\'m searching that bug for send it to my developers.
         if i won\'t exit please close me from preferences->applications,
         and ALERT MY DEVELOPERS.
@@ -322,7 +322,7 @@
     <!-- preferences -->
     <string name="pref_general">Generelt</string>
     <string name="pref_modules">Moduler</string>
-    <string name="pref_msf">MetaSploit Framework</string>
+    <string name="pref_msf">Metasploit Framework</string>
     <string name="pref_performance">ytelse</string>
     <string name="pref_check_updates">Søk etter oppdatering</string>
     <string name="pref_wake_lock">Våkne lås</string>
@@ -351,20 +351,20 @@
     <string name="pref_msf_check_updates">Check for MSF updates</string>
     <string name="pref_msf_check_updates_desc">Check for MSF updates every time the application is started.</string>
     <string name="pref_rpc_user">RPC Brukernavn</string>
-    <string name="pref_rpc_user_desc">Brukernavn for tilkobling til MetaSploit RPCD.</string>
+    <string name="pref_rpc_user_desc">Brukernavn for tilkobling til Metasploit RPCD.</string>
     <string name="pref_rpc_pswd">RPC passord</string>
-    <string name="pref_rpc_pswd_desc">Passord for tilkobling til MetaSploit RPCD.</string>
+    <string name="pref_rpc_pswd_desc">Passord for tilkobling til Metasploit RPCD.</string>
     <string name="pref_rpc_host">RPC host</string>
-    <string name="pref_rpc_host_desc">host where the MetaSploit RPC server is on</string>
+    <string name="pref_rpc_host_desc">host where the Metasploit RPC server is on</string>
     <string name="pref_rpc_port">RPC port</string>
-    <string name="pref_rpc_port_desc">Port for connect to MetaSploit RPCD.</string>
+    <string name="pref_rpc_port_desc">Port for connect to Metasploit RPCD.</string>
     <string name="pref_rpc_ssl">RPC use SSL</string>
-    <string name="pref_rpc_ssl_desc">Specify if MetaSploit RPC use SSL</string>
+    <string name="pref_rpc_ssl_desc">Specify if Metasploit RPC use SSL</string>
     <string name="pref_msfdir">MSF directory</string>
-    <string name="pref_msfdir_desc">Directory containing the MetaSploit Framework.</string>
+    <string name="pref_msfdir_desc">Directory containing the Metasploit Framework.</string>
     <string name="pref_rubydir">Ruby directory</string>
     <string name="pref_rubydir_desc">Directory containing the Ruby interpreter.</string>
-    <string name="pref_msf_branch_desc">The MetaSploit Framework branch to use</string>
+    <string name="pref_msf_branch_desc">The Metasploit Framework branch to use</string>
     <string name="pref_msf_branch_title">MSF branch</string>
     <string name="pref_performance_vuln_title">Search preferences</string>
     <string name="pref_performance_vuln_desc">Search for vulnerability using</string>
@@ -394,10 +394,10 @@
     <string name="pref_advanced">Avansert</string>
     <string name="pref_folder">Mappe</string>
     <string name="pref_msf_enable">Aktiver MSF</string>
-    <string name="pref_msf_enable_desc">Aktiver MetaSploit Framework</string>
+    <string name="pref_msf_enable_desc">Aktiver Metasploit Framework</string>
     <string name="pref_msf_delete">Slett MSF</string>
-    <string name="pref_msf_delete_desc">Sletter MetaSploit Framework fra enheten din</string>
-    <string name="pref_msfwipe_message">Vil du slette MetaSploit Framework?</string>
+    <string name="pref_msf_delete_desc">Sletter Metasploit Framework fra enheten din</string>
+    <string name="pref_msfwipe_message">Vil du slette Metasploit Framework?</string>
     <string name="pref_msfwipe_size">Rundt %d MB vil be frigjort.</string>
     <string name="pref_err_exists">eksisterer ikke.</string>
     <string name="pref_err_writable">er ikke skrivbar.</string>
@@ -455,9 +455,9 @@
     <string name="target_selected">Mål valgt</string>
     <string name="targets_selected">Målene valgt</string>
     <string name="multiple_attack">flere angrep</string>
-    <string name="connect_msf">Koble til MetaSploit</string>
-    <string name="disconnect_msf">Koble fra MetaSploit</string>
-    <string name="connected_msf">Koblet til MetaSploit</string>
+    <string name="connect_msf">Koble til Metasploit</string>
+    <string name="disconnect_msf">Koble fra Metasploit</string>
+    <string name="connected_msf">Koblet til Metasploit</string>
     <string name="connection_failed">tilkobling feilet!</string>
     <string name="new_ruby_update_desc">En oppdatering for ruby er tilgjengelig</string>
     <string name="delete_previous_location">Slett forrige destionasjon?</string>
