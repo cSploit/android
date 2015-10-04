@@ -1,44 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:orientation="vertical"
-                android:padding="8dp">
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:padding="8dp">
 
     <ToggleButton
-            android:id="@+id/traceToggleButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/toggle_button"
-            android:textOff="Start"
-            android:textOn="Stop"
-            android:paddingLeft="24dp"
-            android:paddingRight="24dp"
-            android:textAllCaps="true"
-            android:fontFamily="sans-serif-condensed"/>
+        android:id="@+id/traceToggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-condensed"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:text="@string/toggle_button"
+        android:textAllCaps="true"
+        android:textOff="Start"
+        android:textOn="Stop" />
 
     <View
-            android:id="@+id/separator"
-            android:layout_width="fill_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_below="@+id/traceToggleButton"
-            android:background="@android:color/darker_gray"/>
+        android:id="@+id/separator"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/traceToggleButton"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/darker_gray" />
 
     <ListView
-            android:id="@+id/traceListView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/separator"/>
+        android:id="@+id/traceListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/separator"
+        android:animateLayoutChanges="true" />
 
     <ProgressBar
-            android:id="@+id/traceActivity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignRight="@+id/traceListView"
-            android:visibility="invisible"/>
+        android:id="@+id/traceActivity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/traceListView"
+        android:visibility="invisible" />
 
 </RelativeLayout>

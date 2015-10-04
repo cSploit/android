@@ -77,7 +77,7 @@ public class Sessions extends Plugin {
             case R.string.open_shell:
               System.setCurrentSession(s);
               startActivity(new Intent(Sessions.this, Console.class));
-              overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+              overridePendingTransition(R.anim.fadeout, R.anim.fadein);
               break;
             case R.string.show_full_description:
               String message = s.getDescription();
@@ -126,7 +126,7 @@ public class Sessions extends Plugin {
       if(s.haveShell()) {
         System.setCurrentSession(s);
         startActivity(new Intent(Sessions.this,Console.class));
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+        overridePendingTransition(R.anim.fadeout, R.anim.fadein);
       } else {
         longClickListener.onItemLongClick(parent, view, position, id);
       }
@@ -179,7 +179,7 @@ public class Sessions extends Plugin {
     }).start();
 	}
 
-	@Override
+  @Override
   public void onRpcChange(RPCClient currentValue) {
     if(UIThread==null)
       return;
@@ -188,4 +188,10 @@ public class Sessions extends Plugin {
     else if(currentValue == null)
       new FinishDialog(getString(R.string.error),getString(R.string.msfrpc_disconnected),Sessions.this).show();
 	}
+
+  @Override
+  public void onBackPressed() {
+    super.onBackPressed();
+    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+  }
 }

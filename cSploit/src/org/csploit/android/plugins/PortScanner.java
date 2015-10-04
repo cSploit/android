@@ -352,6 +352,7 @@ public class PortScanner extends Plugin {
   public void onBackPressed() {
     setStoppedState();
     super.onBackPressed();
+    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
   }
 
   private class Receiver extends NMap.SynScanReceiver {

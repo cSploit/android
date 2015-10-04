@@ -575,6 +575,11 @@ public class SettingsActivity extends AppCompatActivity {
       }
       super.onDestroy();
     }
+  }
 
+  @Override
+  public void onBackPressed() {
+    super.onBackPressed();
+    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
   }
 }

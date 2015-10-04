@@ -415,7 +415,6 @@ public class WifiScannerActivity extends ListActivity
     }
     if(item.getItemId() == android.R.id.home){
       onBackPressed();
-
       return true;
     } else
       return super.onOptionsItemSelected(item);
@@ -435,7 +434,7 @@ public class WifiScannerActivity extends ListActivity
     setResult(RESULT_OK, intent);
 
     super.onBackPressed();
-    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
   }
 
   public class ScanAdapter extends ArrayAdapter<ScanResult>{

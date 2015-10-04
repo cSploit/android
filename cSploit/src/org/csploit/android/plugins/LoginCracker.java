@@ -413,6 +413,7 @@ public class LoginCracker extends Plugin {
   public void onBackPressed() {
     setStoppedState();
     super.onBackPressed();
+    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
   }
 
   public class ProtocolAdapter extends BaseAdapter implements SpinnerAdapter {

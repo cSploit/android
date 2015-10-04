@@ -330,8 +330,8 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(new Intent(MainActivity.this,
                     ActionActivity.class), WIFI_CONNECTION_REQUEST);
 
-            overridePendingTransition(R.anim.slide_in_left,
-                    R.anim.slide_out_left);
+            overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+
           }
         }).start();
 
@@ -650,6 +650,7 @@ public class MainActivity extends AppCompatActivity {
 
         startActivityForResult(new Intent(MainActivity.this,
                 WifiScannerActivity.class), WIFI_CONNECTION_REQUEST);
+        overridePendingTransition(R.anim.fadeout, R.anim.fadein);
         return true;
 
       case R.id.new_session:
@@ -744,6 +745,7 @@ public class MainActivity extends AppCompatActivity {
 
       case R.id.settings:
         startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+        overridePendingTransition(R.anim.fadeout, R.anim.fadein);
         return true;
 
       case R.id.ss_monitor:

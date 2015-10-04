@@ -83,7 +83,7 @@ public class ActionActivity extends AppCompatActivity {
                       ActionActivity.this,
                       plugin.getClass()
               ));
-              overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+              overridePendingTransition(R.anim.fadeout, R.anim.fadein);
             } else
               plugin.onActionClick(getApplicationContext());
           }
@@ -113,7 +113,7 @@ public class ActionActivity extends AppCompatActivity {
   @Override
   public void onBackPressed() {
     super.onBackPressed();
-    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
   }
 
   public class ActionsAdapter extends ArrayAdapter<Plugin> {
