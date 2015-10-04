@@ -38,6 +38,7 @@ import android.util.SparseIntArray;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
+import org.apache.commons.compress.utils.IOUtils;
 import org.csploit.android.R;
 import org.csploit.android.WifiScannerActivity;
 import org.csploit.android.gui.dialogs.FatalDialog;
@@ -151,10 +152,10 @@ public class System
       mStoragePath = getSettings().getString("PREF_SAVE_PATH", Environment.getExternalStorageDirectory().toString());
       mSessionName = "csploit-session-" + java.lang.System.currentTimeMillis();
       mKnownIssues = new KnownIssues();
-      mPlugins = new ArrayList<Plugin>();
+      mPlugins = new ArrayList<>();
       mOpenPorts = new SparseIntArray(3);
-      mServices = new HashMap<String, String>();
-      mPorts = new HashMap<String, String>();
+      mServices = new HashMap<>();
+      mPorts = new HashMap<>();
 
       // if we are here, network initialization didn't throw any error, lock wifi
       WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
@@ -520,7 +521,7 @@ public class System
   }
 
   public static void preloadServices(){
-    if (mServices.size() > 0 && mPorts.size() > 0)
+    if (!mServices.isEmpty())
       return;
 
     FileReader fr = null;
@@ -528,7 +529,6 @@ public class System
     try{
       // preload network service and ports map
 
-      //@SuppressWarnings("ConstantConditions")
       fr = new FileReader(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-services");
       reader = new BufferedReader(fr);
       String line;
@@ -550,15 +550,9 @@ public class System
       mPorts.clear();
 
       errorLogging(e);
-    }
-    finally {
-      try {
-        if (fr != null)
-          fr.close();
-        if (reader != null)
-          reader.close();
-      }
-      catch (Exception e){}
+    } finally {
+      IOUtils.closeQuietly(reader);
+      IOUtils.closeQuietly(fr);
     }
   }
 
