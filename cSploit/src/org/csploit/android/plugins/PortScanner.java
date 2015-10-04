@@ -69,7 +69,6 @@ public class PortScanner extends Plugin {
 	private static final String CUSTOM_PARAMETERS = "PortScanner.Prefs.CustomParameters";
 	private static final String CUSTOM_PARAMETERS_TEXT = "PortScanner.Prefs.CustomParameters.Text";
 	private SharedPreferences mPreferences = null;
-	private boolean unresolvedPorts = false;
 
 	public PortScanner() {
 		super(R.string.port_scanner, R.string.port_scanner_desc,
@@ -111,7 +110,7 @@ public class PortScanner extends Plugin {
 		SharedPreferences.Editor edit = mPreferences.edit();
 		edit.putBoolean(CUSTOM_PARAMETERS, displayed);
 		edit.putString(CUSTOM_PARAMETERS_TEXT, mTextParameters.getText().toString());
-		edit.commit();
+		edit.apply();
 	}
 
 	private void setStoppedState() {
@@ -390,29 +389,6 @@ public class PortScanner extends Plugin {
 		public void onEnd(int exitCode) {
 			super.onEnd(exitCode);
 
-			// last chance to resolve ports protocols
-			if (unresolvedPorts) {
-				String temp_port, port, protocol;
-				for (int i = 0; i < mPortList.size(); i++) {
-					if (mPortList.get(i).startsWith("tcp : ") || mPortList.get(i).startsWith("udp : ")) {
-						temp_port = mPortList.get(i);
-						port = temp_port.split("\\s")[2];
-						protocol = System.getProtocolByPort(port);
-
-						if (protocol != null)
-							mPortList.set(i, port + " ( " + protocol + " )");
-
-						Logger.debug("unresolved port: " + port + ":" + protocol);
-					}
-				}
-				PortScanner.this.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						mListAdapter.notifyDataSetChanged();
-					}
-				});
-			}
-
 			PortScanner.this.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
@@ -433,11 +409,9 @@ public class PortScanner extends Plugin {
 				public void run() {
           String entry;
 
-					if (resolvedProtocol != null)
+					if (resolvedProtocol != null) {
 						entry = port + " ( " + resolvedProtocol + " )";
-
-					else {
-						unresolvedPorts = true;
+					} else {
 						entry = portProtocol + " : " + port;
 					}
 
