@@ -42,6 +42,7 @@ import org.apache.commons.compress.utils.IOUtils;
 import org.csploit.android.R;
 import org.csploit.android.WifiScannerActivity;
 import org.csploit.android.gui.dialogs.FatalDialog;
+import org.csploit.android.helpers.ThreadHelper;
 import org.csploit.android.net.Endpoint;
 import org.csploit.android.net.GitHubParser;
 import org.csploit.android.net.Network;
@@ -203,6 +204,14 @@ public class System
       mTargets.add(device);
 
       mInitialized = true;
+
+      ThreadHelper.getSharedExecutor().execute(new Runnable() {
+        @Override
+        public void run() {
+          preloadServices();
+          preloadVendors();
+        }
+      });
     }
     catch(Exception e){
       if(!(e instanceof NoRouteToHostException))
@@ -936,8 +945,6 @@ public class System
   }
 
   public static String getMacVendor(byte[] mac){
-    preloadVendors();
-
     if(mac != null && mac.length >= 3)
       return mVendors.get(String.format("%02X%02X%02X", mac[0], mac[1], mac[2]));
     else

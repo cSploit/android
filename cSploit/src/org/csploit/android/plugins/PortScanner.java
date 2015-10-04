@@ -54,6 +54,8 @@ import org.csploit.android.net.Target.Port;
 import org.csploit.android.tools.NMap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PortScanner extends Plugin {
   private TextView mTextDoc = null;
@@ -61,7 +63,7 @@ public class PortScanner extends Plugin {
   private ToggleButton mScanToggleButton = null;
   private ProgressBar mScanProgress = null;
   private boolean mRunning = false;
-  private ArrayList<String> mPortList = null;
+  private ArrayList<String> mPortList = new ArrayList<>();
   private ArrayAdapter<String> mListAdapter = null;
   private Receiver mScanReceiver = null;
   private String mCustomPorts = null;
@@ -69,15 +71,19 @@ public class PortScanner extends Plugin {
   private static final String CUSTOM_PARAMETERS = "PortScanner.Prefs.CustomParameters";
   private static final String CUSTOM_PARAMETERS_TEXT = "PortScanner.Prefs.CustomParameters.Text";
   private SharedPreferences mPreferences = null;
+  private Map<Integer, String> urlFormats = new HashMap<>();
 
   public PortScanner() {
     super(R.string.port_scanner, R.string.port_scanner_desc,
 
             new Target.Type[]{Target.Type.ENDPOINT, Target.Type.REMOTE},
             R.layout.plugin_portscanner, R.drawable.action_scanner);
-
-    mPortList = new ArrayList<String>();
-    mScanReceiver = new Receiver();
+    urlFormats.put(80, "http://%s/");
+    urlFormats.put(443, "https://%s/");
+    urlFormats.put(21, "ftp://%s");
+    urlFormats.put(22, "ssh://%s");
+    urlFormats.put(23, "telnet://%s/");
+    urlFormats.put(0, "telnet://%s:%d/"); ///< default
   }
 
   /**
@@ -185,13 +191,6 @@ public class PortScanner extends Plugin {
     mScanToggleButton = (ToggleButton) findViewById(R.id.scanToggleButton);
     mScanProgress = (ProgressBar) findViewById(R.id.scanActivity);
 
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        System.preloadServices();
-      }
-    }).start();
-
     if (mPreferences.getBoolean(CUSTOM_PARAMETERS, false))
       displayParametersField();
 
@@ -210,44 +209,24 @@ public class PortScanner extends Plugin {
 
     createPortList();
 
-    mListAdapter = new ArrayAdapter<String>(this,
+    final Target target = System.getCurrentTarget();
+    final String cmdlineRep = target.getCommandLineRepresentation();
+
+    mListAdapter = new ArrayAdapter<>(this,
             android.R.layout.simple_list_item_1, mPortList);
     mScanList.setAdapter(mListAdapter);
     mScanList.setOnItemLongClickListener(new OnItemLongClickListener() {
       @Override
       public boolean onItemLongClick(AdapterView<?> parent, View view,
                                      int position, long id) {
-        int portNumber = System.getCurrentTarget().getOpenPorts()
-                .get(position).getNumber();
-        String url;
+        int portNumber = target.getOpenPorts().get(position).getNumber();
 
-        if (portNumber == 80)
-          url = "http://"
-                  + System.getCurrentTarget()
-                  .getCommandLineRepresentation() + "/";
+        if(!urlFormats.containsKey(portNumber)) {
+          portNumber = 0;
+        }
 
-        else if (portNumber == 443)
-          url = "https://"
-                  + System.getCurrentTarget()
-                  .getCommandLineRepresentation() + "/";
-
-        else if (portNumber == 21)
-          url = "ftp://"
-                  + System.getCurrentTarget()
-                  .getCommandLineRepresentation();
-
-        else if (portNumber == 22)
-          url = "ssh://"
-                  + System.getCurrentTarget()
-                  .getCommandLineRepresentation();
-
-        else
-          url = "telnet://"
-                  + System.getCurrentTarget()
-                  .getCommandLineRepresentation() + ":"
-                  + portNumber;
-
-        final String furl = url;
+        final String url = String.format(urlFormats.get(portNumber),
+                cmdlineRep, portNumber);
 
         new ConfirmDialog("Open", "Open " + url + " ?",
                 PortScanner.this, new ConfirmDialogListener() {
@@ -255,7 +234,7 @@ public class PortScanner extends Plugin {
           public void onConfirm() {
             try {
               Intent browser = new Intent(
-                      Intent.ACTION_VIEW, Uri.parse(furl));
+                      Intent.ACTION_VIEW, Uri.parse(url));
 
               PortScanner.this.startActivity(browser);
             } catch (ActivityNotFoundException e) {
@@ -372,6 +351,12 @@ public class PortScanner extends Plugin {
 
   private class Receiver extends NMap.SynScanReceiver {
 
+    private final Target target;
+
+    public Receiver(Target target) {
+      this.target = target;
+    }
+
     @Override
     public void onStart(String commandLine) {
       super.onStart(commandLine);
@@ -399,30 +384,24 @@ public class PortScanner extends Plugin {
 
     @Override
     public void onPortFound(final int port, String protocol) {
-      final String portProtocol = protocol;
-      final String resolvedProtocol = System.getProtocolByPort(port);
+      String resolvedProtocol = System.getProtocolByPort(port);
 
-      System.addOpenPort(port, Network.Protocol.fromString(protocol));
+      target.addOpenPort(port, Network.Protocol.fromString(protocol));
 
-      PortScanner.this.runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          String entry;
+      final String entry = (resolvedProtocol !=null ?
+              port + " ( " + resolvedProtocol + " )" :
+              protocol + " : " + port
+      );
 
-          if (resolvedProtocol != null) {
-            entry = port + " ( " + resolvedProtocol + " )";
-          } else {
-            entry = portProtocol + " : " + port;
-          }
-
-          // add open port to the listview and notify the environment
-          // about the event
-          if (!mPortList.contains(entry)) {
+      if(!mPortList.contains(entry)) {
+        PortScanner.this.runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
             mPortList.add(entry);
             mListAdapter.notifyDataSetChanged();
           }
-        }
-      });
+        });
+      }
     }
   }
 }
