@@ -641,6 +641,7 @@ public class MainActivity extends AppCompatActivity {
 
         startActivityForResult(new Intent(MainActivity.this,
                 WifiScannerActivity.class), WIFI_CONNECTION_REQUEST);
+        overridePendingTransition(R.anim.fadeout, R.anim.fadein);
         return true;
 
       case R.id.new_session:
