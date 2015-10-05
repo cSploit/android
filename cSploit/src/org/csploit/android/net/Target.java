@@ -128,21 +128,20 @@ public class Target
       if(o == null || o.getClass() != this.getClass())
         return false;
       Port p = (Port)o;
-      if(p.number != this.number || p.protocol != this.protocol)
-        return false;
-      if(this.version!=null) {
-        if(!this.version.equals(p.version))
-          return false;
-      } else if (p.version != null) {
-        return false;
+      return (p.number == this.number && p.protocol == this.protocol);
+    }
+
+    /**
+     * merge data from this port to another
+     * @param other
+     */
+    public void mergeTo(Port other) {
+      if(service != null && !service.equals(other.service)) {
+        other.service = service;
       }
-      if(this.service!=null) {
-        if(!this.service.equals(p.service))
-          return false;
-      } else if (p.service!=null) {
-        return false;
+      if(version != null && !version.equals(other.version)) {
+        other.version = version;
       }
-      return true;
     }
   }
 
@@ -657,18 +656,18 @@ public class Target
 
   public void addOpenPort(Port port){
     synchronized (mPorts) {
-      if (port.service != null) { // update service but preserve different versions
-        for (Port p : mPorts) {
-          if (p.number == port.number && (p.service == null || p.service.isEmpty())) {
-            p.service = port.service;
-            p.version = port.version;
-            return;
-          }
+      Port existing = null;
+      for(Port p : mPorts) {
+        if(p.equals(port)) {
+          existing = p;
+          break;
         }
-        mPorts.add(port);
+      }
+
+      if(existing != null) {
+        port.mergeTo(existing);
       } else {
-        if (!mPorts.contains(port))
-          mPorts.add(port);
+        mPorts.add(port);
       }
     }
   }
