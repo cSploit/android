@@ -118,21 +118,20 @@ public class Target
       if(o == null || o.getClass() != this.getClass())
         return false;
       Port p = (Port)o;
-      if(p.number != this.number || p.protocol != this.protocol)
-        return false;
-      if(this.version!=null) {
-        if(!this.version.equals(p.version))
-          return false;
-      } else if (p.version != null) {
-        return false;
+      return (p.number == this.number && p.protocol == this.protocol);
+    }
+
+    /**
+     * merge data from this port to another
+     * @param other
+     */
+    public void mergeTo(Port other) {
+      if(service != null && !service.equals(other.service)) {
+        other.service = service;
       }
-      if(this.service!=null) {
-        if(!this.service.equals(p.service))
-          return false;
-      } else if (p.service!=null) {
-        return false;
+      if(version != null && !version.equals(other.version)) {
+        other.version = version;
       }
-      return true;
     }
   }
 
@@ -634,22 +633,19 @@ public class Target
 
   public void addOpenPort(Port port){
     synchronized (mPorts) {
-      // we cannot just check if mPorts already has the new port (contains(port)), because if the new port has new fields,
-      // it won't be the same and we'll add duplicated ports.
-      for (Port p : mPorts){
-        // port considered added: same port + same protocol -> 22:tcp, 53:udp
-        if (p.number == port.number && p.protocol == port.protocol){
-          if ((port.service != null && !port.service.isEmpty()) && (p.service == null || p.service.isEmpty())) {
-            p.service = port.service;
-          }
-          if ((port.version != null && !port.version.isEmpty()) && (p.version == null || p.version.isEmpty())) {
-            p.version = port.version;
-          }
-          return;
+      Port existing = null;
+      for(Port p : mPorts) {
+        if(p.equals(port)) {
+          existing = p;
+          break;
         }
       }
 
-      mPorts.add(port);
+      if(existing != null) {
+        port.mergeTo(existing);
+      } else {
+        mPorts.add(port);
+      }
     }
   }
 
