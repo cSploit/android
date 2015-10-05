@@ -1029,16 +1029,20 @@ public class System
     return mTargets.get(index);
   }
 
-  public static int getTargetPosition (Target t) {
-    return mTargets.indexOf(t);
-  }
-
   public static boolean hasTarget(Target target){
     return mTargets.contains(target);
   }
 
   public static void setCurrentTarget(int index){
     mCurrentTarget = index;
+  }
+
+  public static void setCurrentTarget(Target target) {
+    int index = mTargets.indexOf(target);
+    if(index != -1)
+      setCurrentTarget(index);
+    else
+      Logger.error("target '" + target + "' not found");
   }
 
   public static Target getCurrentTarget(){

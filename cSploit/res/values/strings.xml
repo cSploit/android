@@ -514,4 +514,6 @@
     <string name="new_ruby_found">A new version for ruby is available, do you want to upgrade ?</string>
     <string name="new_msf_found">A new msf version is available, do you want to upgrade ?</string>
     <string name="msf_status">MetaSploit Status</string>
+    <string name="mitm_ss_select_target_title">Select target</string>
+    <string name="mitm_ss_select_target_prompt">Select %s ?</string>
 </resources>

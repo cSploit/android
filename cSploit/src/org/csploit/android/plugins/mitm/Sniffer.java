@@ -54,7 +54,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Sniffer extends AppCompatActivity
+public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClickListener
 {
   private static final String[] SORT = {
     "Bandwidth ↓",
@@ -296,52 +296,18 @@ public class Sniffer extends AppCompatActivity
     mSpoofSession = new SpoofSession(false, false, null, null);
 
     mSortSpinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, SORT));
-    mSortSpinner.setOnItemSelectedListener(new OnItemSelectedListener(){
-      public void onItemSelected(AdapterView<?> adapter, View view, int position, long id){
+    mSortSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+      public void onItemSelected(AdapterView<?> adapter, View view, int position, long id) {
         mSortType = position;
       }
 
-      public void onNothingSelected(AdapterView<?> arg0){
+      public void onNothingSelected(AdapterView<?> arg0) {
       }
     });
 
     mListView.setAdapter(mAdapter);
 
-    mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-      @Override
-      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        final Target t = System.getTargetByAddress(mAdapter.getByPosition(position).mAddress);
-
-        new ConfirmDialog("Select target", "Select " + t.getAddress().getHostAddress() + "?", Sniffer.this, new ConfirmDialog.ConfirmDialogListener() {
-          @Override
-          public void onConfirm() {
-            new Thread(new Runnable() {
-              @Override
-              public void run() {
-                setStoppedState();
-
-                startActivity(new Intent(Sniffer.this,
-                        ActionActivity.class));
-
-                overridePendingTransition(R.anim.slide_in_left,
-                        R.anim.slide_out_left);
-              }
-            }).start();
-
-            System.setCurrentTarget(System.getTargetPosition(t));
-            Toast.makeText(Sniffer.this,
-                    getString(R.string.selected_) + System.getCurrentTarget(),
-                    Toast.LENGTH_SHORT).show();
-          }
-
-          @Override
-          public void onCancel() {
-          }
-        }).show();
-
-
-      }
-     });
+    mListView.setOnItemClickListener(this);
 
     mSniffToggleButton.setOnClickListener(new View.OnClickListener(){
       @Override
@@ -366,6 +332,40 @@ public class Sniffer extends AppCompatActivity
       public void onCancel(){
         mDumpToFile = false;
         mPcapFileName = null;
+      }
+    }).show();
+  }
+
+  @Override
+  public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    String address = mAdapter.getByPosition(position).mAddress;
+    final Target t = System.getTargetByAddress(address);
+
+    if (t == null)
+      return;
+
+    new ConfirmDialog(getString(R.string.mitm_ss_select_target_title),
+            String.format(getString(R.string.mitm_ss_select_target_prompt), address),
+            Sniffer.this, new ConfirmDialog.ConfirmDialogListener() {
+      @Override
+      public void onConfirm() {
+        System.setCurrentTarget(t);
+
+        setStoppedState();
+
+        Toast.makeText(Sniffer.this,
+                getString(R.string.selected_) + System.getCurrentTarget(),
+                Toast.LENGTH_SHORT).show();
+
+        startActivity(new Intent(Sniffer.this,
+                ActionActivity.class));
+
+        overridePendingTransition(R.anim.slide_in_left,
+                R.anim.slide_out_left);
+      }
+
+      @Override
+      public void onCancel() {
       }
     }).show();
   }
@@ -404,9 +404,9 @@ public class Sniffer extends AppCompatActivity
         mSniffToggleButton.setChecked(false);
       }
     });
-    }
+  }
 
-    private void setSpoofErrorState(final String error){
+  private void setSpoofErrorState(final String error){
     Sniffer.this.runOnUiThread(new Runnable(){
       @Override
       public void run(){
