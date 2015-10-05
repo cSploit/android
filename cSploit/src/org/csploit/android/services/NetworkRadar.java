@@ -1,8 +1,8 @@
 package org.csploit.android.services;
 
 import android.app.Activity;
+import android.content.Context;
 import android.view.MenuItem;
-import android.widget.BaseAdapter;
 
 import org.csploit.android.R;
 import org.csploit.android.core.Logger;
@@ -11,27 +11,18 @@ import org.csploit.android.core.ChildManager;
 import org.csploit.android.net.Target;
 
 import java.net.InetAddress;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * network-radar process manager
  */
 public class NetworkRadar extends NativeService implements MenuControllableService {
+  public static final String NRDR_CHANGED = "NetworkRadar.action.TARGET_CHANGED";
   public static final String NRDR_STOPPED = "NetworkRadar.action.STOPPED";
   public static final String NRDR_STARTED = "NetworkRadar.action.STARTED";
   public static final String NRDR_START_FAILED = "NetworkRadar.action.START_FAILED";
 
-  private final List<TargetTask> taskList = new LinkedList<>();
-  private final TargetSubmitter submitter = new TargetSubmitter();
-  private BaseAdapter adapter;
-
-  public NetworkRadar(Activity context) {
+  public NetworkRadar(Context context) {
     this.context = context;
-  }
-
-  public void setAdapter(BaseAdapter adapter) {
-    this.adapter = adapter;
   }
 
   public boolean start() {
@@ -78,48 +69,41 @@ public class NetworkRadar extends NativeService implements MenuControllableServi
     @Override
     public void onHostFound(byte[] macAddress, InetAddress ipAddress, String name) {
       Target t;
-      TargetTask task = null;
+      boolean notify = false;
 
       t = System.getTargetByAddress(ipAddress);
 
       if(t==null) {
         t = new Target(ipAddress, macAddress);
+
+        System.addOrderedTarget(t);
+
+        notify = true;
+      }
+
+      if( !t.isConnected() ) {
+        t.setConneced(true);
+        notify = true;
+      }
+
+      if (name != null && !name.equals(t.getAlias())) {
         t.setAlias(name);
-
-        task = new TargetTask(t, true, null, true);
-      } else {
-        boolean aliasChanged = name != null && !name.equals(t.getAlias());
-
-        if(aliasChanged || !t.isConnected()) {
-          task = new TargetTask(t, false, (aliasChanged ? name : t.getAlias()), true);
-        }
+        notify = true;
       }
 
-      if(task == null)
-        return;
-
-      synchronized (taskList) {
-        taskList.add(task);
+      if(notify) {
+        sendIntent(NRDR_CHANGED);
       }
-
-      ((Activity)context).runOnUiThread(submitter);
     }
 
     @Override
     public void onHostLost(InetAddress ipAddress) {
       Target t = System.getTargetByAddress(ipAddress);
 
-      if(t == null) {
-        return;
+      if(t != null) {
+        t.setConneced(false);
+        sendIntent(NRDR_CHANGED);
       }
-
-      synchronized (taskList) {
-        taskList.add(
-                new TargetTask(t, false, t.getAlias(), false)
-        );
-      }
-
-      ((Activity)context).runOnUiThread(submitter);
     }
 
     @Override
@@ -136,45 +120,4 @@ public class NetworkRadar extends NativeService implements MenuControllableServi
       sendIntent(NRDR_STOPPED);
     }
   }
-
-  private class TargetTask {
-    final Target target;
-    final boolean add;
-    final String name;
-    final boolean connected;
-
-    public TargetTask(Target target, boolean add, String name, boolean connected) {
-      this.target = target;
-      this.add = add;
-      this.name = name;
-      this.connected = connected;
-    }
-  }
-
-  private class TargetSubmitter implements Runnable {
-    @Override
-    public void run() {
-      synchronized (taskList) {
-        if(!taskList.isEmpty()) {
-          for (TargetTask task : taskList) {
-            processTask(task);
-          }
-          if(adapter != null)
-            adapter.notifyDataSetChanged();
-        }
-      }
-    }
-
-    private void processTask(final TargetTask task) {
-      if(task.add) {
-        System.addOrderedTarget(task.target);
-      } else {
-        task.target.setConneced(task.connected);
-        task.target.setAlias(task.name);
-      }
-    }
-
-  }
-
-
 }

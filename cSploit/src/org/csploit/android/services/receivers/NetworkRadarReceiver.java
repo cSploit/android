@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.widget.BaseAdapter;
 import android.widget.Toast;
 
 import org.csploit.android.R;
@@ -16,6 +17,7 @@ import org.csploit.android.services.NetworkRadar;
 public class NetworkRadarReceiver extends ManagedReceiver {
 
   private final IntentFilter filter;
+  private BaseAdapter targetAdapter;
 
   public NetworkRadarReceiver() {
     filter = new IntentFilter();
@@ -23,6 +25,11 @@ public class NetworkRadarReceiver extends ManagedReceiver {
     filter.addAction(NetworkRadar.NRDR_STARTED);
     filter.addAction(NetworkRadar.NRDR_START_FAILED);
     filter.addAction(NetworkRadar.NRDR_STOPPED);
+    filter.addAction(NetworkRadar.NRDR_CHANGED);
+  }
+
+  public void setTargetAdapter(BaseAdapter targetAdapter) {
+    this.targetAdapter = targetAdapter;
   }
 
   @Override
@@ -56,6 +63,10 @@ public class NetworkRadarReceiver extends ManagedReceiver {
         break;
       case NetworkRadar.NRDR_START_FAILED:
         Toast.makeText(context, R.string.net_discovery_start_failed, Toast.LENGTH_LONG).show();
+        break;
+      case NetworkRadar.NRDR_CHANGED:
+        if(targetAdapter != null)
+          targetAdapter.notifyDataSetChanged();
         break;
     }
   }

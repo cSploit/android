@@ -200,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
     mWipeReceiver.register(MainActivity.this);
     mMsfReceiver.register(MainActivity.this);
 
-    getNetworkRadar().setAdapter(mTargetAdapter);
+    mRadarReceiver.setTargetAdapter(mTargetAdapter);
 
     StartRPCServer();
 
