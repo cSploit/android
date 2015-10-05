@@ -486,4 +486,20 @@
     <string name="JNI_crash_detected">Knihovna JNI spadla již minule, doufám, že jsi nám již podal hlášení.</string>
     <string name="update_cancelled">Aktualizace byla zastavena</string>
     <string name="child_not_started">Nemohu spustit proces</string>
+    <string name="msfrpcd_killed">MSF RPC Daemon byl terminován</string>
+    <string name="msfrcd_start_failed">Nepodařilo se spustit MSF RPC Daemon</string>
+    <string name="msf_connection_failed">Připojení k MSF RPC Daemon SELHALO!</string>
+    <string name="net_discovery_start_failed">Průzkum sítě SELHAL!</string>
+    <string name="new_apk_found">Je k dispozici verze aplikace %s , přejete si aktualizovat?</string>
+    <string name="new_ruby_found">Je k dispozici nová verze Ruby, přejete si aktualizovat?</string>
+    <string name="new_msf_found">Je k dispozici nová verze MSF, přejete si aktualizovat?</string>
+    <string name="msf_status">Metasploit Status</string>
+    <string name="msf_exploit_ranking">Hodnocení: %s</string>
+    <string name="msf_rank_manual">Ruční</string>
+    <string name="msf_rank_low">Nízký</string>
+    <string name="msf_rank_average">Průměrný</string>
+    <string name="msf_rank_normal">Normalní</string>
+    <string name="msf_rank_good">Dobrý</string>
+    <string name="msf_rank_great">Skvělý</string>
+    <string name="msf_rank_excellent">Excellentní</string>
 </resources>
