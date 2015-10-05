@@ -40,7 +40,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -91,6 +91,9 @@ import org.csploit.android.update.Update;
 import java.io.IOException;
 import java.net.NoRouteToHostException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import static org.csploit.android.services.UpdateChecker.UPDATE_AVAILABLE;
 import static org.csploit.android.services.UpdateChecker.UPDATE_CHECKING;
@@ -180,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
     lv.setOnItemLongClickListener(new OnItemLongClickListener() {
       @Override
       public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        Target t = System.getTarget(position);
+        Target t = (Target) mTargetAdapter.getItem(position);
         if (t.getType() == Target.Type.NETWORK) {
           if (mActionMode == null)
             targetAliasPrompt(t);
@@ -200,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
     mWipeReceiver.register(MainActivity.this);
     mMsfReceiver.register(MainActivity.this);
 
-    mRadarReceiver.setTargetAdapter(mTargetAdapter);
+    mRadarReceiver.setObserver(mTargetAdapter);
 
     StartRPCServer();
 
@@ -317,6 +320,9 @@ public class MainActivity extends AppCompatActivity {
           return;
         }
 
+        Target target = (Target) mTargetAdapter.getItem(position);
+        System.setCurrentTarget(target);
+
         new Thread(new Runnable() {
           @Override
           public void run() {
@@ -329,7 +335,6 @@ public class MainActivity extends AppCompatActivity {
           }
         }).start();
 
-        System.setCurrentTarget(position);
         Toast.makeText(MainActivity.this,
                 getString(R.string.selected_) + System.getCurrentTarget(),
                 Toast.LENGTH_SHORT).show();
@@ -497,9 +502,11 @@ public class MainActivity extends AppCompatActivity {
         case R.id.multi_action:
           final int[] selected = mTargetAdapter.getSelectedPositions();
           if (selected.length > 1) {
-            commonPlugins = System.getPluginsForTarget(System.getTarget(selected[0]));
+            Target target = (Target) mTargetAdapter.getItem(selected[0]);
+            commonPlugins = System.getPluginsForTarget(target);
             for (int i = 1; i < selected.length; i++) {
-              ArrayList<Plugin> targetPlugins = System.getPluginsForTarget(System.getTarget(selected[i]));
+              target = (Target) mTargetAdapter.getItem(selected[i]);
+              ArrayList<Plugin> targetPlugins = System.getPluginsForTarget(target);
               ArrayList<Plugin> removeThem = new ArrayList<Plugin>();
               for (Plugin p : commonPlugins) {
                 if (!targetPlugins.contains(p))
@@ -533,7 +540,7 @@ public class MainActivity extends AppCompatActivity {
               (new ErrorDialog(getString(R.string.error), "no common actions found", MainActivity.this)).show();
             }
           } else {
-            targetAliasPrompt(System.getTarget(selected[0]));
+            targetAliasPrompt((Target) mTargetAdapter.getItem(selected[0]));
           }
           mode.finish(); // Action picked, so close the CAB
           return true;
@@ -817,14 +824,24 @@ public class MainActivity extends AppCompatActivity {
     super.onDestroy();
   }
 
-  public class TargetAdapter extends ArrayAdapter<Target> {
-    public TargetAdapter() {
-      super(MainActivity.this, R.layout.target_list_item);
-    }
+  public class TargetAdapter extends BaseAdapter implements Runnable, Observer {
+
+    private List<Target> list = System.getTargets();
+    private boolean isDark = getSharedPreferences("THEME", 0).getBoolean("isDark", false);
 
     @Override
     public int getCount() {
-      return System.getTargets().size();
+      return list.size();
+    }
+
+    @Override
+    public Object getItem(int position) {
+      return list.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+      return R.layout.target_list_item;
     }
 
     @Override
@@ -835,24 +852,21 @@ public class MainActivity extends AppCompatActivity {
       if (row == null) {
         LayoutInflater inflater = (LayoutInflater) MainActivity.this
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        row = inflater
-                .inflate(R.layout.target_list_item, parent, false);
-        if (getSharedPreferences("THEME", 0).getBoolean("isDark", false))
-          row.setBackgroundResource(R.drawable.card_background_dark);
-        holder = new TargetHolder();
-        holder.itemImage = (ImageView) (row != null ? row
-                .findViewById(R.id.itemIcon) : null);
-        holder.itemTitle = (TextView) (row != null ? row
-                .findViewById(R.id.itemTitle) : null);
-        holder.itemDescription = (TextView) (row != null ? row
-                .findViewById(R.id.itemDescription) : null);
+        row = inflater.inflate(R.layout.target_list_item, parent, false);
 
-        if (row != null)
-          row.setTag(holder);
+        if (isDark)
+          row.setBackgroundResource(R.drawable.card_background_dark);
+
+        holder = new TargetHolder();
+        holder.itemImage = (ImageView) row.findViewById(R.id.itemIcon);
+        holder.itemTitle = (TextView) row.findViewById(R.id.itemTitle);
+        holder.itemDescription = (TextView) row.findViewById(R.id.itemDescription);
+
+        row.setTag(holder);
       } else
         holder = (TargetHolder) row.getTag();
 
-      Target target = System.getTarget(position);
+      Target target = list.get(position);
 
       if (target.hasAlias())
         holder.itemTitle.setText(Html.fromHtml("<b>"
@@ -864,8 +878,6 @@ public class MainActivity extends AppCompatActivity {
 
       holder.itemTitle.setTextColor(getResources().getColor((target.isConnected() ? R.color.app_color : R.color.gray_text)));
 
-      if (row != null && (getSharedPreferences("THEME", 0).getBoolean("isDark", false)))
-          row.setBackgroundResource(R.drawable.card_background_dark);
       holder.itemTitle.setTypeface(null, Typeface.NORMAL);
       holder.itemImage.setImageResource(target.getDrawableResourceId());
       holder.itemDescription.setText(target.getDescription());
@@ -874,7 +886,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void clearSelection() {
-      for (Target t : System.getTargets())
+      for (Target t : list)
         t.setSelected(false);
       notifyDataSetChanged();
       if (mActionMode != null)
@@ -882,7 +894,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void toggleSelection(int position) {
-      Target t = System.getTarget(position);
+      Target t = list.get(position);
       t.setSelected(!t.isSelected());
       notifyDataSetChanged();
       if (mActionMode != null) {
@@ -895,7 +907,7 @@ public class MainActivity extends AppCompatActivity {
 
     public int getSelectedCount() {
       int i = 0;
-      for (Target t : System.getTargets())
+      for (Target t : list)
         if (t.isSelected())
           i++;
       return i;
@@ -903,7 +915,7 @@ public class MainActivity extends AppCompatActivity {
 
     public ArrayList<Target> getSelected() {
       ArrayList<Target> result = new ArrayList<Target>();
-      for (Target t : System.getTargets())
+      for (Target t : list)
         if (t.isSelected())
           result.add(t);
       return result;
@@ -913,10 +925,21 @@ public class MainActivity extends AppCompatActivity {
       int[] res = new int[getSelectedCount()];
       int j = 0;
 
-      for (int i = 0; i < System.getTargets().size(); i++)
-        if (System.getTarget(i).isSelected())
+      for (int i = 0; i < list.size(); i++)
+        if (list.get(i).isSelected())
           res[j++] = i;
       return res;
+    }
+
+    @Override
+    public void update(Observable observable, Object data) {
+      MainActivity.this.runOnUiThread(this);
+    }
+
+    @Override
+    public void run() {
+      list = System.getTargets();
+      notifyDataSetChanged();
     }
 
     class TargetHolder {

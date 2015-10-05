@@ -38,12 +38,14 @@ import android.widget.Toast;
 import org.csploit.android.core.Plugin;
 import org.csploit.android.core.System;
 import org.csploit.android.gui.dialogs.FinishDialog;
+import org.csploit.android.net.Target;
 
 import java.util.ArrayList;
 
 public class ActionActivity extends AppCompatActivity {
   private ArrayList<Plugin> mAvailable = null;
   private ListView theList;
+  private Target mTarget;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -56,8 +58,10 @@ public class ActionActivity extends AppCompatActivity {
       setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);
 
-    if (System.getTargets() != null && System.getTargets().size() > 0 && System.getCurrentTarget() != null) {
-      setTitle("cSploit > " + System.getCurrentTarget());
+    mTarget = System.getCurrentTarget();
+
+    if (mTarget != null) {
+      setTitle("cSploit > " + mTarget);
       setContentView(R.layout.actions_layout);
       getSupportActionBar().setDisplayHomeAsUpEnabled(true);
       theList = (ListView) findViewById(R.id.android_list);

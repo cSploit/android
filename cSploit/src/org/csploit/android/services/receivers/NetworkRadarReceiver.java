@@ -4,12 +4,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.widget.BaseAdapter;
+import android.os.Build;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import org.csploit.android.MainActivity;
 import org.csploit.android.R;
-import org.csploit.android.core.ManagedReceiver;
+import org.csploit.android.core.*;
 import org.csploit.android.services.NetworkRadar;
+
+import java.util.Observer;
 
 /**
  * receive notifications from NetworkRadar
@@ -17,7 +21,7 @@ import org.csploit.android.services.NetworkRadar;
 public class NetworkRadarReceiver extends ManagedReceiver {
 
   private final IntentFilter filter;
-  private BaseAdapter targetAdapter;
+  private Observer changeObserver;
 
   public NetworkRadarReceiver() {
     filter = new IntentFilter();
@@ -28,8 +32,8 @@ public class NetworkRadarReceiver extends ManagedReceiver {
     filter.addAction(NetworkRadar.NRDR_CHANGED);
   }
 
-  public void setTargetAdapter(BaseAdapter targetAdapter) {
-    this.targetAdapter = targetAdapter;
+  public void setObserver(Observer changeObserver) {
+    this.changeObserver = changeObserver;
   }
 
   @Override
@@ -65,8 +69,9 @@ public class NetworkRadarReceiver extends ManagedReceiver {
         Toast.makeText(context, R.string.net_discovery_start_failed, Toast.LENGTH_LONG).show();
         break;
       case NetworkRadar.NRDR_CHANGED:
-        if(targetAdapter != null)
-          targetAdapter.notifyDataSetChanged();
+        if(changeObserver != null) {
+          changeObserver.update(null, null);
+        }
         break;
     }
   }

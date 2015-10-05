@@ -85,6 +85,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -111,8 +112,8 @@ public class System
   private static WifiLock mWifiLock = null;
   private static WakeLock mWakeLock = null;
   private static Network mNetwork = null;
-  private static final Vector<Target> mTargets = new Vector<Target>();
-  private static int mCurrentTarget = 0;
+  private static final List<Target> mTargets = new ArrayList<>();
+  private static Target mCurrentTarget = null;
   private static Map<String, String> mServices = null;
   private static Map<String, String> mPorts = null;
   private static Map<Integer, String> mVendors = null;
@@ -360,10 +361,12 @@ public class System
       gateway.setAlias(mNetwork.getSSID());
       device.setAlias(android.os.Build.MODEL);
 
-      mTargets.clear();
-      mTargets.add(network);
-      mTargets.add(gateway);
-      mTargets.add(device);
+      synchronized (mTargets) {
+        mTargets.clear();
+        mTargets.add(network);
+        mTargets.add(gateway);
+        mTargets.add(device);
+      }
 
       mInitialized = true;
     }
@@ -748,12 +751,13 @@ public class System
     builder.append(SESSION_MAGIC + "\n");
 
     // skip the network target
-    builder.append(mTargets.size() - 1).append("\n");
-    for(Target target : mTargets){
-      if(target.getType() != Target.Type.NETWORK)
-        target.serialize(builder);
+    synchronized (mTargets) {
+      builder.append(mTargets.size() - 1).append("\n");
+      for (Target target : mTargets) {
+        if (target.getType() != Target.Type.NETWORK)
+          target.serialize(builder);
+      }
     }
-    builder.append(mCurrentTarget).append("\n");
 
     session = builder.toString();
 
@@ -810,16 +814,17 @@ public class System
           if(!hasTarget(target)){
             System.addOrderedTarget(target);
           } else{
-            for(int j = 0; j < mTargets.size(); j++){
-              if(mTargets.get(j) != null && mTargets.get(j).equals(target)){
-                mTargets.set(j, target);
-                break;
+            synchronized (mTargets) {
+              for (int j = 0; j < mTargets.size(); j++) {
+                if (mTargets.get(j) != null && mTargets.get(j).equals(target)) {
+                  mTargets.set(j, target);
+                  break;
+                }
               }
             }
           }
         }
 
-        mCurrentTarget = Integer.parseInt(reader.readLine());
         reader.close();
 
       } catch(Exception e){
@@ -849,10 +854,10 @@ public class System
     mMsfRpc = value;
     // refresh all exploits
     // NOTE: this method is usually called by the RPCServer Thread, which will not block the UI
-    for( Target t : getTargets()) {
-      for( Exploit e : t.getExploits()) {
-        if(e instanceof MsfExploit) {
-          ((MsfExploit)e).refresh();
+    for (Target t : getTargets()) { // use a copy of the targets to avoid deadlocks.
+      for (Exploit e : t.getExploits()) {
+        if (e instanceof MsfExploit) {
+          ((MsfExploit) e).refresh();
         }
       }
     }
@@ -918,16 +923,18 @@ public class System
   }
 
   public static void reset() throws SocketException{
-    mTargets.clear();
+    mCurrentTarget = null;
 
-    // local network
-    mTargets.add(new Target(System.getNetwork()));
-    // network gateway
-    mTargets.add(new Target(System.getNetwork().getGatewayAddress(), System.getNetwork().getGatewayHardware()));
-    // device network address
-    mTargets.add(new Target(System.getNetwork().getLocalAddress(), System.getNetwork().getLocalHardware()));
+    synchronized (mTargets) {
+      mTargets.clear();
 
-    mCurrentTarget = 0;
+      // local network
+      mTargets.add(new Target(System.getNetwork()));
+      // network gateway
+      mTargets.add(new Target(System.getNetwork().getGatewayAddress(), System.getNetwork().getGatewayHardware()));
+      // device network address
+      mTargets.add(new Target(System.getNetwork().getLocalAddress(), System.getNetwork().getLocalHardware()));
+    }
   }
 
   public static boolean isInitialized(){
@@ -975,41 +982,14 @@ public class System
     return mNetwork;
   }
 
-  public static Vector<Target> getTargets(){
-    return mTargets;
-  }
-
-  public static ArrayList<Target> getTargetsByType(Target.Type type){
-    ArrayList<Target> filtered = new ArrayList<Target>();
-
-    for(Target target : mTargets){
-      if(target.getType() == type)
-        filtered.add(target);
+  /**
+   * get a copy of the current targets
+   * @return a copy of the target list
+   */
+  public static List<Target> getTargets(){
+    synchronized (mTargets) {
+      return new ArrayList<>(mTargets);
     }
-
-    return filtered;
-  }
-
-  public static ArrayList<Endpoint> getNetworkEndpoints(){
-    ArrayList<Endpoint> filtered = new ArrayList<Endpoint>();
-
-    for(Target target : mTargets){
-      if(target.getType() == Type.ENDPOINT)
-        filtered.add(target.getEndpoint());
-    }
-
-    return filtered;
-  }
-
-  public static void addTarget(int index, Target target){
-    mTargets.add(index, target);
-    // update current target index
-    if(mCurrentTarget >= index)
-      mCurrentTarget++;
-  }
-
-  public static void addTarget(Target target){
-    mTargets.add(target);
   }
 
   /**
@@ -1018,44 +998,39 @@ public class System
    * @return true if target is added, false if already present
    */
   public static boolean addOrderedTarget(Target target){
-    if(target != null && !hasTarget(target)){
-      for(int i = 0; i < getTargets().size(); i++){
-        if(getTarget(i).comesAfter(target)){
-          addTarget(i, target);
+    if(target == null)
+      return false;
+
+    synchronized (mTargets) {
+      if(mTargets.contains(target)) {
+        return false;
+      }
+
+      for (int i = 0; i < mTargets.size(); i++) {
+        if (mTargets.get(i).comesAfter(target)) {
+          mTargets.add(i, target);
           return true;
         }
       }
 
-      addTarget(target);
+      mTargets.add(target);
 
       return true;
     }
-
-    return false;
-  }
-
-  public static Target getTarget(int index){
-    return mTargets.get(index);
   }
 
   public static boolean hasTarget(Target target){
-    return mTargets.contains(target);
-  }
-
-  public static void setCurrentTarget(int index){
-    mCurrentTarget = index;
+    synchronized (mTargets) {
+      return mTargets.contains(target);
+    }
   }
 
   public static void setCurrentTarget(Target target) {
-    int index = mTargets.indexOf(target);
-    if(index != -1)
-      setCurrentTarget(index);
-    else
-      Logger.error("target '" + target + "' not found");
+    mCurrentTarget = target;
   }
 
   public static Target getCurrentTarget(){
-    return getTarget(mCurrentTarget);
+    return mCurrentTarget;
   }
 
   public static Target getTargetByAddress(String address){
