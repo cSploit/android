@@ -75,8 +75,8 @@
     <string name="net_discovery_started">Průzkum sítě aktivován</string>
     <string name="start_monitor">Spustit průzkum sítě</string>
     <string name="stop_monitor">Ukončit průzkum sítě</string>
-    <string name="start_msfrpcd">Spustit MetaSploit RPCD</string>
-    <string name="stop_msfrpcd">Ukončit MetaSploit RPCD</string>
+    <string name="start_msfrpcd">Spustit Metasploit RPCD</string>
+    <string name="stop_msfrpcd">Ukončit Metasploit RPCD</string>
     <string name="exit">Exit</string>
     <string name="close_confirm">Opravdu zavřít?
     </string>
@@ -226,11 +226,11 @@
     <string name="error_rpc">Chyba RPC</string>
     <string name="error_rpcd_inval">špatné nastavení</string>
     <string name="error_rpcd_shell">nemohu spustit shell</string>
-    <string name="rpcd_starting">Spouštím MetaSploit RPCD&#8230;</string>
-    <string name="rpcd_started">MetaSploit RPCD spuštěn</string>
-    <string name="rpcd_stopped">MetaSploit RPCD vypnut</string>
-    <string name="rpcd_running">MetaSploit RPCD již běží</string>
-    <string name="rpcd_timedout">MetaSploit RPCD neodpovídá</string>
+    <string name="rpcd_starting">Spouštím Metasploit RPCD&#8230;</string>
+    <string name="rpcd_started">Metasploit RPCD spuštěn</string>
+    <string name="rpcd_stopped">Metasploit RPCD vypnut</string>
+    <string name="rpcd_running">Metasploit RPCD již běží</string>
+    <string name="rpcd_timedout">Metasploit RPCD neodpovídá</string>
     <string name="error_rcpd_fatal">fatální chyba, hledám chybu pro poslání logu vývojářovi
         pokud se nevypnu, vypněte mě z Nastavení->Aplikace,
         a DEJTE VĚDĚT MÉMU VÝVOJÁŘI.
@@ -311,7 +311,7 @@
     <!-- nastaveni -->
     <string name="pref_general">Hlavní</string>
     <string name="pref_modules">Moduly</string>
-    <string name="pref_msf">MetaSploitFramework</string>
+    <string name="pref_msf">MetasploitFramework</string>
     <string name="pref_performance">Výkon</string>
     <string name="pref_check_updates">Zkontrolovat aktualizace</string>
     <string name="pref_wake_lock">Zabránit uspání</string>
@@ -340,20 +340,20 @@
     <string name="pref_msf_check_updates">Aktualizovat MSF</string>
     <string name="pref_msf_check_updates_desc">Zkontrolovat dostupnost aktualizací pro MSF při každém spuštění aplikace</string>
     <string name="pref_rpc_user">RPC uživatelské jméno</string>
-    <string name="pref_rpc_user_desc">Uživatelské jméno pro připojení k MetaSploit RPCD.</string>
+    <string name="pref_rpc_user_desc">Uživatelské jméno pro připojení k Metasploit RPCD.</string>
     <string name="pref_rpc_pswd">RPC heslo</string>
-    <string name="pref_rpc_pswd_desc">Heslo pro připojení k MetaSploit RPCD.</string>
+    <string name="pref_rpc_pswd_desc">Heslo pro připojení k Metasploit RPCD.</string>
     <string name="pref_rpc_host">RPC hostitel</string>
     <string name="pref_rpc_host_desc">hostitel, na kterém běží Metasploit RPC server</string>
     <string name="pref_rpc_port">RPC port</string>
-    <string name="pref_rpc_port_desc">Port pro připojení k MetaSploit RPCD.</string>
+    <string name="pref_rpc_port_desc">Port pro připojení k Metasploit RPCD.</string>
     <string name="pref_rpc_ssl">RPC používá SSL</string>
     <string name="pref_rpc_ssl_desc">Určit, zda bude Metasploit RPC používat SSL</string>
     <string name="pref_msfdir">Složka s MSF</string>
-    <string name="pref_msfdir_desc">Adresář s uloženým MetaSploit Framework.</string>
+    <string name="pref_msfdir_desc">Adresář s uloženým Metasploit Framework.</string>
     <string name="pref_rubydir">Složka s Ruby</string>
     <string name="pref_rubydir_desc">Adresář s uloženým Ruby interpreter.</string>
-    <string name="pref_msf_branch_desc">Používané odvětví MetaSploit Framework</string>
+    <string name="pref_msf_branch_desc">Používané odvětví Metasploit Framework</string>
     <string name="pref_msf_branch_title">MSF větev</string>
     <string name="pref_performance_vuln_title">Preference vyhledávání</string>
     <string name="pref_performance_vuln_desc">Hledání využití zranitelnosti</string>
@@ -383,10 +383,10 @@
     <string name="pref_advanced">Advanced</string>
     <string name="pref_folder">Složka</string>
     <string name="pref_msf_enable">Povolit MSF</string>
-    <string name="pref_msf_enable_desc">Povolit the MetaSploit Framework</string>
+    <string name="pref_msf_enable_desc">Povolit the Metasploit Framework</string>
     <string name="pref_msf_delete">Odtranit MSF</string>
-    <string name="pref_msf_delete_desc">Odstranit MetaSploit Framework z vašeho zařízení</string>
-    <string name="pref_msfwipe_message">Přejete si skutečně odstranit MetaSploit Framework?</string>
+    <string name="pref_msf_delete_desc">Odstranit Metasploit Framework z vašeho zařízení</string>
+    <string name="pref_msfwipe_message">Přejete si skutečně odstranit Metasploit Framework?</string>
     <string name="pref_msfwipe_size">Bude uvolněno asi %d MB.</string>
     <string name="pref_err_exists">neexistuje.</string>
     <string name="pref_err_writable">nelze zapisovat</string>
@@ -443,9 +443,9 @@
     <string name="target_selected">cíl byl zvolen</string>
     <string name="targets_selected">cíle byly vybrány</string>
     <string name="multiple_attack">kombinovaný útok</string>
-    <string name="connect_msf">připojit k MetaSploitu</string>
-    <string name="disconnect_msf">odpojit se od MetaSploitu</string>
-    <string name="connected_msf">připojeno MetaSploitu</string>
+    <string name="connect_msf">připojit k Metasploitu</string>
+    <string name="disconnect_msf">odpojit se od Metasploitu</string>
+    <string name="connected_msf">připojeno Metasploitu</string>
     <string name="connection_failed">připojení SELHALO!</string>
     <string name="new_ruby_update_desc">Je dostupná aktualizace pro Ruby</string>
     <string name="delete_previous_location">Vyčistit minulou polohu?</string>

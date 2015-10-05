@@ -21,9 +21,7 @@ package org.csploit.android.core;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -32,7 +30,6 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -41,17 +38,17 @@ import android.util.SparseIntArray;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
+import org.apache.commons.compress.utils.IOUtils;
 import org.csploit.android.R;
 import org.csploit.android.WifiScannerActivity;
 import org.csploit.android.gui.dialogs.FatalDialog;
 import org.csploit.android.helpers.NetworkHelper;
+import org.csploit.android.helpers.ThreadHelper;
 import org.csploit.android.net.Endpoint;
 import org.csploit.android.net.GitHubParser;
 import org.csploit.android.net.Network;
-import org.csploit.android.net.Network.Protocol;
 import org.csploit.android.net.Target;
 import org.csploit.android.net.Target.Exploit;
-import org.csploit.android.net.Target.Port;
 import org.csploit.android.net.Target.Type;
 import org.csploit.android.net.http.proxy.HTTPSRedirector;
 import org.csploit.android.net.http.proxy.Proxy;
@@ -155,8 +152,10 @@ public class System
       mStoragePath = getSettings().getString("PREF_SAVE_PATH", Environment.getExternalStorageDirectory().toString());
       mSessionName = "csploit-session-" + java.lang.System.currentTimeMillis();
       mKnownIssues = new KnownIssues();
-      mPlugins = new ArrayList<Plugin>();
+      mPlugins = new ArrayList<>();
       mOpenPorts = new SparseIntArray(3);
+      mServices = new HashMap<>();
+      mPorts = new HashMap<>();
 
       // if we are here, network initialization didn't throw any error, lock wifi
       WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
@@ -206,6 +205,14 @@ public class System
       mTargets.add(device);
 
       mInitialized = true;
+
+      ThreadHelper.getSharedExecutor().execute(new Runnable() {
+        @Override
+        public void run() {
+          preloadServices();
+          preloadVendors();
+        }
+      });
     }
     catch(Exception e){
       if(!(e instanceof NoRouteToHostException))
@@ -308,7 +315,7 @@ public class System
     Client.Shutdown();
     Client.Disconnect();
 
-    mInitialized = false;
+    mCoreInitialized = false;
   }
 
   public static void initCore() throws DaemonException, SuException {
@@ -521,38 +528,39 @@ public class System
     }
   }
 
-  private static void preloadServices(){
-    if(mServices == null || mPorts == null){
-      try{
-        // preload network service map and mac vendors
-        mServices = new HashMap<String, String>();
-        mPorts = new HashMap<String, String>();
+  public static void preloadServices(){
+    if (!mServices.isEmpty())
+      return;
 
-        @SuppressWarnings("ConstantConditions")
-        FileInputStream fstream = new FileInputStream(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-services");
+    FileReader fr = null;
+    BufferedReader reader = null;
+    try{
+      // preload network service and ports map
 
-        DataInputStream in = new DataInputStream(fstream);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        String line;
-        Matcher matcher;
+      fr = new FileReader(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-services");
+      reader = new BufferedReader(fr);
+      String line;
+      Matcher matcher;
+      String port, proto;
 
-        while((line = reader.readLine()) != null){
-          line = line.trim();
+      while ((line = reader.readLine()) != null) {
+        if ((matcher = SERVICE_PARSER.matcher(line)) != null && matcher.find()) {
+          proto = matcher.group(1);
+          port = matcher.group(2);
 
-          if((matcher = SERVICE_PARSER.matcher(line)) != null && matcher.find()){
-            String proto = matcher.group(1),
-              port = matcher.group(2);
-
-            mServices.put(proto, port);
-            mPorts.put(port, proto);
-          }
+          mServices.put(proto, port);
+          mPorts.put(port, proto);
         }
+      }
 
-        in.close();
-      }
-      catch(Exception e){
-        errorLogging(e);
-      }
+    } catch (Exception e) {
+      mServices.clear();
+      mPorts.clear();
+
+      errorLogging(e);
+    } finally {
+      IOUtils.closeQuietly(reader);
+      IOUtils.closeQuietly(fr);
     }
   }
 
@@ -938,16 +946,13 @@ public class System
   }
 
   public static String getMacVendor(byte[] mac){
-    preloadVendors();
-
-    if(mac != null && mac.length >= 3)
+    if(mac != null && mVendors != null && mac.length >= 3)
       return mVendors.get(NetworkHelper.getOUICode(mac));
     else
       return null;
   }
 
   public static String getProtocolByPort(String port){
-    preloadServices();
 
     return mPorts.containsKey(port) ? mPorts.get(port) : null;
   }
@@ -957,7 +962,6 @@ public class System
   }
 
   public static int getPortByProtocol(String protocol){
-    preloadServices();
 
     return mServices.containsKey(protocol) ? Integer.parseInt(mServices.get(protocol)) : 0;
   }
@@ -1129,24 +1133,6 @@ public class System
 
   public static Session getCurrentSession() {
     return mMsfSession;
-  }
-
-  public static void addOpenPort( int port, Protocol protocol ) {
-    addOpenPort( port, protocol, null, null );
-  }
-
-  public static void addOpenPort( int port, Protocol protocol, String service ) {
-    addOpenPort(port, protocol, service, null);
-  }
-
-  public static void addOpenPort( int port, Protocol protocol, String service, String version ) {
-    Port p = new Port( port, protocol, service, version );
-
-    getCurrentTarget().addOpenPort( p );
-
-    for( Plugin plugin : getPluginsForTarget() ) {
-      plugin.onTargetNewOpenPort( getCurrentTarget(), p );
-    }
   }
 
   public static Collection<Exploit> getCurrentExploits() {

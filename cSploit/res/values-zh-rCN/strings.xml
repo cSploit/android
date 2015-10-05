@@ -70,8 +70,8 @@ If not, see http://www.gnu.org/licenses/.
     <string name="net_discovery_started">网络发现开始。</string>
     <string name="start_monitor">启动网络监视器</string>
     <string name="stop_monitor">停止网络监视器</string>
-    <string name="start_msfrpcd">启动 MetaSploit RPCD</string>
-    <string name="stop_msfrpcd">停止 MetaSploit RPCD</string>
+    <string name="start_msfrpcd">启动 Metasploit RPCD</string>
+    <string name="stop_msfrpcd">停止 Metasploit RPCD</string>
     <string name="exit">退出</string>
     <string name="close_confirm">将关闭 cSploit，您确定继续么？</string>
     <string name="press_back">再摁一次返回退出。</string>
@@ -211,11 +211,11 @@ If not, see http://www.gnu.org/licenses/.
     <string name="error_rpc">远程过程调用失败</string>
     <string name="error_rpcd_inval">无效的设置</string>
     <string name="error_rpcd_shell">无法执行终端命令</string>
-    <string name="rpcd_starting">正在启动 MetaSploit 远程过程调用守护程序&#8230;</string>
-    <string name="rpcd_started">MetaSploit 远程过程调用守护程序已经启动</string>
-    <string name="rpcd_stopped">MetaSploit 远程过程调用守护程序已经停止</string>
-    <string name="rpcd_running">MetaSploit 远程过程调用守护程序已经运行中</string>
-    <string name="rpcd_timedout">MetaSploit 远程过程调用守护程序没有响应</string>
+    <string name="rpcd_starting">正在启动 Metasploit 远程过程调用守护程序&#8230;</string>
+    <string name="rpcd_started">Metasploit 远程过程调用守护程序已经启动</string>
+    <string name="rpcd_stopped">Metasploit 远程过程调用守护程序已经停止</string>
+    <string name="rpcd_running">Metasploit 远程过程调用守护程序已经运行中</string>
+    <string name="rpcd_timedout">Metasploit 远程过程调用守护程序没有响应</string>
 <string name="error_rcpd_fatal">发生致命错误，正在准备发送错误报告给我的开发者。
 如果应用程序没有自己关闭，请通过选项->应用关闭，
 并通知我的开发者。
@@ -295,7 +295,7 @@ If not, see http://www.gnu.org/licenses/.
     <!-- preferences -->
     <string name="pref_general">通用</string>
     <string name="pref_modules">模块</string>
-    <string name="pref_msf">MetaSploit框架</string>
+    <string name="pref_msf">Metasploit框架</string>
     <string name="pref_performance">性能</string>
     <string name="pref_check_updates">检查更新</string>
     <string name="pref_wake_lock">阻止休眠</string>
@@ -322,11 +322,11 @@ If not, see http://www.gnu.org/licenses/.
     <string name="pref_http_max_buffer_size_desc">透明代理使用的最大HTTP请求缓冲区。</string>
     <string name="pref_password_filename_desc">记录密码和cookie的文件名。</string>
     <string name="pref_rpc_user">远程过程调用用户名</string>
-    <string name="pref_rpc_user_desc">在MetaSploit远程过程调用守护程序中使用的用户名。</string>
+    <string name="pref_rpc_user_desc">在Metasploit远程过程调用守护程序中使用的用户名。</string>
     <string name="pref_rpc_pswd">远程过程调用密码</string>
-    <string name="pref_rpc_pswd_desc">在MetaSploit远程过程调用守护程序中使用的密码。</string>
+    <string name="pref_rpc_pswd_desc">在Metasploit远程过程调用守护程序中使用的密码。</string>
     <string name="pref_rpc_port">远程过程调用端口</string>
-    <string name="pref_rpc_port_desc">在MetaSploit远程过程调用守护程序中使用的端口。</string>
+    <string name="pref_rpc_port_desc">在Metasploit远程过程调用守护程序中使用的端口。</string>
     <string name="pref_performance_vuln_desc">搜索漏洞的方式</string>
     <string-array name="pref_performance_vuln" >
         <item>OSVDB</item>
@@ -366,7 +366,7 @@ If not, see http://www.gnu.org/licenses/.
     <string name="menu_add">添加</string>
     <string name="menu_scan">扫描</string>
     <string name="menu_wifi_scan">WiFi 扫描</string>
-    <string name="menu_stop_msfrpcd">停止MetaSploit远程过程调用守护程序</string>
+    <string name="menu_stop_msfrpcd">停止Metasploit远程过程调用守护程序</string>
 
     <string name="pref_theme">暗色主题</string>
     <string name="pref_choose_theme">启用暗色主题，更加护眼</string>
@@ -393,9 +393,9 @@ If not, see http://www.gnu.org/licenses/.
     <string name="target_selected">目标已选择</string>
     <string name="targets_selected">目标已选择</string>
     <string name="multiple_attack">攻击多个项目</string>
-    <string name="connect_msf">连接到 MetaSploit</string>
-    <string name="disconnect_msf">从 MetaSploit 断开连接</string>
-    <string name="connected_msf">已连接到 MetaSploit</string>
+    <string name="connect_msf">连接到 Metasploit</string>
+    <string name="disconnect_msf">从 Metasploit 断开连接</string>
+    <string name="connected_msf">已连接到 Metasploit</string>
     <string name="connection_failed">连接失败!</string>
     <string name="new_ruby_update_desc">ruby 有更新可用</string>
     <string name="delete_previous_location">删除上次的位置?</string>
@@ -454,18 +454,18 @@ If not, see http://www.gnu.org/licenses/.
     <string name="pref_performance_widescan_desc">扫描子网外的主机</string>
     <string name="pref_advanced">高级</string>
     <string name="pref_msf_enable">启用 MSF</string>
-    <string name="pref_msf_enable_desc">启用 MetaSploit 框架</string>
+    <string name="pref_msf_enable_desc">启用 Metasploit 框架</string>
     <string name="pref_msf_notifications">MSF 状态通知</string> 
-    <string name="pref_msf_notifications_desc">显示MSF RPC连接状态</string> 
+    <string name="pref_msf_notifications_desc">显示MSF RPC连接状态</string>
     <string name="pref_msf_delete">删除 MSF</string>
-    <string name="pref_msf_delete_desc">从您的设备删除 MetaSploit 框架</string>
-    <string name="pref_msfdir_desc">包含 MetaSploit 框架的文件夹。</string>
+    <string name="pref_msf_delete_desc">从您的设备删除 Metasploit 框架</string>
+    <string name="pref_msfdir_desc">包含 Metasploit 框架的文件夹。</string>
     <string name="pref_rubydir">Ruby 文件夹</string>
     <string name="pref_rubydir_desc">包含 Ruby 解释器的文件夹。</string>
-    <string name="pref_msf_branch_desc">要使用的 MetaSploit 框架分支</string>
+    <string name="pref_msf_branch_desc">要使用的 Metasploit 框架分支</string>
     <string name="pref_msf_branch_title">MSF 分支</string>
     <string name="pref_performance_vuln_title">Search 偏好</string>
-    <string name="pref_msfwipe_message">您确定要删除 MetaSploit 框架吗？</string>
+    <string name="pref_msfwipe_message">您确定要删除 Metasploit 框架吗？</string>
     <string name="pref_msfwipe_size">将大约释放 %d MB 的空间。</string>
     <string name="pref_err_executable">不允许创建可执行内容。</string>
     <string name="pref_persistent_network_monitor">持续网络监控</string>
