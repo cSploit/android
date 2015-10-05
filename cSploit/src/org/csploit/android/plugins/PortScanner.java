@@ -72,6 +72,7 @@ public class PortScanner extends Plugin {
   private static final String CUSTOM_PARAMETERS_TEXT = "PortScanner.Prefs.CustomParameters.Text";
   private SharedPreferences mPreferences = null;
   private Map<Integer, String> urlFormats = new HashMap<>();
+  private boolean mShowCustomParameters = false;
 
   public PortScanner() {
     super(R.string.port_scanner, R.string.port_scanner_desc,
@@ -94,14 +95,16 @@ public class PortScanner extends Plugin {
     mTextParameters.setVisibility(View.VISIBLE);
     mTextParameters.setText(mPreferences.getString(CUSTOM_PARAMETERS_TEXT, ""));
 
-    saveCustomParameters(true);
+    mShowCustomParameters = true;
+    saveCustomParameters();
   }
 
   /**
    * Hides the custom parameters text field, saving the typed parameters
    */
   private void hideParametersField() {
-    saveCustomParameters(false);
+    mShowCustomParameters = false;
+    saveCustomParameters();
 
     mTextDoc.setVisibility(View.GONE);
     mTextParameters.setVisibility(View.GONE);
@@ -109,12 +112,10 @@ public class PortScanner extends Plugin {
 
   /**
    * Saves customs parameters entered by the user
-   *
-   * @param displayed Sets if the custom parameters text field must be displayed or not
    */
-  private void saveCustomParameters(boolean displayed) {
+  private void saveCustomParameters() {
     SharedPreferences.Editor edit = mPreferences.edit();
-    edit.putBoolean(CUSTOM_PARAMETERS, displayed);
+    edit.putBoolean(CUSTOM_PARAMETERS, mShowCustomParameters);
     edit.putString(CUSTOM_PARAMETERS_TEXT, mTextParameters.getText().toString());
     edit.commit();
   }
@@ -124,7 +125,7 @@ public class PortScanner extends Plugin {
       mProcess.kill();
       mProcess = null;
     }
-    saveCustomParameters(mTextParameters.isShown());
+    saveCustomParameters();
 
     mScanProgress.setVisibility(View.INVISIBLE);
     mRunning = false;
@@ -139,9 +140,7 @@ public class PortScanner extends Plugin {
     createPortList();
 
     try {
-      if (mTextParameters.isShown()) {
-        mListAdapter.clear();
-        mListAdapter.notifyDataSetChanged();
+      if (mShowCustomParameters) {
         mProcess = System.getTools().nmap
                 .customScan(System.getCurrentTarget(), mScanReceiver, mTextParameters.getText().toString());
       } else {
@@ -191,8 +190,12 @@ public class PortScanner extends Plugin {
     mScanToggleButton = (ToggleButton) findViewById(R.id.scanToggleButton);
     mScanProgress = (ProgressBar) findViewById(R.id.scanActivity);
 
-    if (mPreferences.getBoolean(CUSTOM_PARAMETERS, false))
+    mShowCustomParameters = mPreferences.getBoolean(CUSTOM_PARAMETERS, false);
+
+    if (mShowCustomParameters)
       displayParametersField();
+    else
+      hideParametersField();
 
     mScanToggleButton.setOnClickListener(new OnClickListener() {
       @Override
@@ -211,6 +214,8 @@ public class PortScanner extends Plugin {
 
     final Target target = System.getCurrentTarget();
     final String cmdlineRep = target.getCommandLineRepresentation();
+
+    mScanReceiver = new Receiver(target);
 
     mListAdapter = new ArrayAdapter<>(this,
             android.R.layout.simple_list_item_1, mPortList);
