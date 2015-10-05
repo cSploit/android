@@ -522,4 +522,6 @@
     <string name="msf_rank_good">Good</string>
     <string name="msf_rank_great">Great</string>
     <string name="msf_rank_excellent">Excellent</string>
+    <string name="mitm_ss_select_target_title">Select target</string>
+    <string name="mitm_ss_select_target_prompt">Select %s ?</string>
 </resources>

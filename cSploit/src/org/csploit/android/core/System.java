@@ -1045,6 +1045,14 @@ public class System
     mCurrentTarget = index;
   }
 
+  public static void setCurrentTarget(Target target) {
+    int index = mTargets.indexOf(target);
+    if(index != -1)
+      setCurrentTarget(index);
+    else
+      Logger.error("target '" + target + "' not found");
+  }
+
   public static Target getCurrentTarget(){
     return getTarget(mCurrentTarget);
   }
