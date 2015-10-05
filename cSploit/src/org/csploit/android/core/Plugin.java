@@ -122,13 +122,5 @@ public abstract class Plugin extends AppCompatActivity {
     overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
   }
 
-  public void onTargetNewOpenPort(Target target, Port port){
-
-  }
-
-  public void onTargetNewExploit( Target target, Exploit ex ) {
-
-  }
-
   public void onRpcChange(RPCClient currentValue) { }
 }

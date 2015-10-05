@@ -85,9 +85,11 @@ public class Target
       this( port, proto, "", "" );
     }
 
-    // needed for vulnerabilities hashmap
     public String toString(){
-      return protocol.toString() + "|" + number + "|" + service + "|" + version;
+      return String.format("Port: { proto: '%s', number: %d, service: '%s', version: '%s' }",
+              protocol.toString(), number,
+              (service == null ? "(null)" : service),
+              (version == null ? "(null)" : version));
     }
 
     public int getNumber() {
@@ -106,12 +108,20 @@ public class Target
       return service;
     }
 
+    public boolean haveService() {
+      return service != null && !service.isEmpty();
+    }
+
     public void setVersion(String version) {
       this.version = version;
     }
 
     public String getVersion() {
       return version;
+    }
+
+    public boolean haveVersion() {
+      return version != null && !version.isEmpty();
     }
 
     public boolean equals(Object o) {
@@ -262,7 +272,7 @@ public class Target
   private String mHostname = null;
   private Type mType = null;
   private InetAddress mAddress = null;
-  private ArrayList<Port> mPorts = new ArrayList<>();
+  private final ArrayList<Port> mPorts = new ArrayList<>();
   private String mDeviceType = null;
   private String mDeviceOS = null;
   private String mAlias = null;
@@ -400,11 +410,24 @@ public class Target
 
     synchronized (mPorts) {
       builder.append(mPorts.size()).append("\n");
+
+      for(Port p : mPorts) {
+        builder.append(p.getProtocol().toString());
+        builder.append("|");
+        builder.append(p.getNumber());
+        builder.append("|");
+        if(p.haveService())
+          builder.append(p.getService());
+        builder.append("|");
+        if(p.haveVersion())
+          builder.append(p.getVersion());
+        builder.append("\n");
+      }
     }
   }
 
   public void setAlias(String alias){
-    mAlias = alias.trim();
+    mAlias = alias != null ? alias.trim() : null;
   }
 
   public String getAlias(){

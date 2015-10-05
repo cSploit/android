@@ -21,10 +21,12 @@
             android:id="@+id/separator"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_below="@+id/scanToggleButton"
-            android:background="@android:color/darker_gray"/>
+        android:background="@android:color/darker_gray"
+        android:layout_below="@+id/scanDoc"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <ListView
             android:id="@+id/scanListView"
@@ -40,5 +42,38 @@
             android:layout_height="wrap_content"
             android:layout_alignRight="@+id/scanListView"
             android:visibility="invisible"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/scanParameters"
+        android:layout_below="@+id/scanToggleButton"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:visibility="gone"
+        android:hint="-sS -P0 --privileged --send-ip --system-dns" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="doc: https://nmap.org/book/man.html"
+        android:id="@+id/scanDoc"
+        android:layout_below="@+id/scanParameters"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/separator"
+        android:layout_alignEnd="@+id/separator"
+        android:linksClickable="true"
+        android:autoLink="web"
+        android:layout_alignParentRight="false"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentBottom="false"
+        android:textAlignment="center"
+        android:gravity="center_horizontal"
+        android:visibility="gone" />
 
 </RelativeLayout>

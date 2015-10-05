@@ -24,6 +24,7 @@ dependencies {
     compile 'com.android.support:support-v4:23.0.1'
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.android.support:design:23.0.1'
+    compile 'com.android.support:preference-v7:23.0.1'
     compile 'org.apache.commons:commons-compress:1.10'
     compile 'commons-net:commons-net:3.3'
     compile 'com.github.zafarkhaja:java-semver:0.9.0'
@@ -51,8 +52,8 @@ android {
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 22
-        versionCode 1
-        versionName "1.6.0-rc.2"
+        versionCode 2
+        versionName "1.6.0"
         if(System.getenv("NIGHTLY_BUILD")) {
             versionName += "+" + System.getenv("NIGHTLY_BUILD_COMMIT").substring(0, 7)
         }

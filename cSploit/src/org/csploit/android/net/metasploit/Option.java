@@ -42,21 +42,21 @@ public class Option {
   private boolean mAdvanced,mRequired,mEvasion;
   private String[] enums;
 
-  public Option(String name, Map<String,Object> attrs) throws RuntimeException {
+  public Option(String name, Map<String,Object> attrs) throws IllegalArgumentException {
     mName = name;
     mAttributes = attrs;
     // check for required data
     for(String field : requiredFields)
       if(!mAttributes.containsKey(field))
-        throw new RuntimeException("missing "+field+" field");
+        throw new IllegalArgumentException("missing "+field+" field");
     // get type
     String type = (String) mAttributes.get("type");
     if(!typesMap.containsKey(type))
-      throw new RuntimeException("unknown option type: "+type);
+      throw new IllegalArgumentException("unknown option type: "+type);
     mType = typesMap.get(type);
     if(mType == types.ENUM) {
       if(!mAttributes.containsKey("enums"))
-        throw new RuntimeException("missing enums field");
+        throw new IllegalArgumentException("missing enums field");
       //TODO: search if exists not string enums
       enums = new String[((ArrayList<String>)mAttributes.get("enums")).size()];
       enums = ((ArrayList<String>) mAttributes.get("enums")).toArray(enums);

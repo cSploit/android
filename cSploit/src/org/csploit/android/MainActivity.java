@@ -168,8 +168,10 @@ public class MainActivity extends AppCompatActivity {
     if (mUpdateStatus != null)
       mUpdateStatus.setVisibility(View.GONE);
 
-    if (mTargetAdapter != null)
+    if (mTargetAdapter != null) {
+      mTargetAdapter.notifyDataSetChanged();
       return;
+    }
 
     mTargetAdapter = new TargetAdapter();
 
@@ -198,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
     mWipeReceiver.register(MainActivity.this);
     mMsfReceiver.register(MainActivity.this);
 
-    mRadarReceiver.setTargetAdapter(mTargetAdapter);
+    getNetworkRadar().setAdapter(mTargetAdapter);
 
     StartRPCServer();
 
@@ -213,6 +215,9 @@ public class MainActivity extends AppCompatActivity {
     if (requestCode == WIFI_CONNECTION_REQUEST && resultCode == RESULT_OK
             && intent.hasExtra(WifiScannerActivity.CONNECTED)) {
       System.reloadNetworkMapping();
+      if(mTargetAdapter != null) {
+        mTargetAdapter.notifyDataSetChanged();
+      }
       try {
         onCreate(null);
       } catch (IllegalStateException e) {
