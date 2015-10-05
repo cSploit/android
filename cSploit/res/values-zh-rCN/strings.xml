@@ -281,6 +281,7 @@ If not, see http://www.gnu.org/licenses/.
     <string name="menu_about">关于</string>
 
     <string name="scanner_select_ports">选择自定义端口</string>
+     <string name="scanner_custom_parameters">自定义参数</string>
 
     <string name="wifi_initializing">正在初始化 &#8230;</string>
     <string name="wifi_activating_iface">正在激活 WiFi 接口 &#8230;</string>
@@ -431,6 +432,7 @@ If not, see http://www.gnu.org/licenses/.
     <string name="buildinfo">版本信息</string>
     <string name="menu_multiaction">多操作</string>
     <string name="menu_focusedscan">重点扫描</string>
+    <string name="menu_resolve_names">解析主机名</string>
 
     <string name="crash_dialog_title">cSploit 已崩溃</string>
     <string name="crash_dialog_text">发生了一个预料之外的错误，致使应用或其组件强制停止。请发送错误数据来帮助我们修复这个错误。</string>
