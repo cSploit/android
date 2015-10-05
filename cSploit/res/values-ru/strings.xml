@@ -488,4 +488,12 @@
     <string name="new_ruby_found">Новая версия ruby доступна, вы хотите обновиться?</string>
     <string name="new_msf_found">Новая версия MSF доступна, вы хотите обновиться?</string>
     <string name="msf_status">Статус MetaSploit</string>
+    <string name="msf_exploit_ranking">Рейтинг: %s</string>
+    <string name="msf_rank_manual">Вручную</string>
+    <string name="msf_rank_low">Низкий</string>
+    <string name="msf_rank_average">Средний</string>
+    <string name="msf_rank_normal">Нормальный</string>
+    <string name="msf_rank_good">Хороший</string>
+    <string name="msf_rank_great">Отличный</string>
+    <string name="msf_rank_excellent">Превосходный</string>
 </resources>
