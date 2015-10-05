@@ -323,6 +323,14 @@ public class RemoteReader implements Runnable {
     return res;
   }
 
+  public static void terminateAll() {
+    synchronized (readers) {
+      for(RemoteReader r : readers) {
+        r.terminate();
+      }
+    }
+  }
+
   private void addFirst(Task task) {
     synchronized (tasks) {
       ((Deque<Task>) tasks).addFirst(task);

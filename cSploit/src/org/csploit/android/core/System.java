@@ -47,6 +47,7 @@ import org.csploit.android.helpers.ThreadHelper;
 import org.csploit.android.net.Endpoint;
 import org.csploit.android.net.GitHubParser;
 import org.csploit.android.net.Network;
+import org.csploit.android.net.RemoteReader;
 import org.csploit.android.net.Target;
 import org.csploit.android.net.Target.Exploit;
 import org.csploit.android.net.Target.Type;
@@ -1198,6 +1199,8 @@ public class System
         if(mWakeLock != null && mWakeLock.isHeld())
           mWakeLock.release();
       }
+
+      RemoteReader.terminateAll();
 
       GitHubParser.resetAll();
 
