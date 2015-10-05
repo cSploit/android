@@ -1,39 +1,73 @@
-cSploit - An Android network penetration suite.
-==============================
+# cSploit: Android network pentesting suite
 
-Copyleft Margaritelli of Simone aka evilsocket and then fused with zANTI2 continued by tux-mind.
+<img src="http://i.imgur.com/cFll5P9.jpg" width="250">
 
-- <http://www.csploit.org/>
+[cSploit](http://www.csploit.org) is an open source (GPLed) Android network analysis and penetration suite which aims to be
+**the most complete and advanced professional toolkit** for IT security experts/geeks to perform network security assessments on a mobile device.
+
+See more at [www.cSploit.org](http://www.csploit.org).
+
+## Features:
+
+* Map your local network
+* Fingerprint hosts' operating systems and open ports
+* Add your own hosts outside the local network
+* Integrated traceroute
+* **Integrated [Metasploit](https://www.metasploit.com/) framework RPCd**
+  * Search hosts for **known vulnerabilities** via integrated Metasploit daemon
+  * Adjust exploit settings, launch, and create shell consoles on exploited systems
+  * More coming
+* Forge tcp/udp packets
+* Perform man in the middle attacks (MITM) including:
+  * Image, text, and video replacement-- replace your own content on unencrypted web pages
+  * javascript injection-- add your own javascript to unencrypted web pages.
+  * **password sniffing** ( with common protocols dissection )
+  * Capture pcap network traffic files
+  * Real time **traffic manipulation** to replace images/text/inject into web pages
+  * DNS spoofing to redirect traffic to different domain
+  * Break existing connections
+  * Redirect traffic to another address
+  * Session Hijacking-- listen for unencrypted cookies and clone them to take Web session
+
+## Tutorials:
+
+<img src="http://i.imgur.com/c0dxvXv.jpg" width=250>
+
+* [Use cSploit to get root shell on Metasploitable2](https://github.com/cSploit/android/wiki/%5BTutorial%5D-Use-cSploit-to-get-root-shell-on-Metasploitable2)
+* [Use cSploit for simple Man-in-the-Middle (MITM security demos](https://github.com/cSploit/android/wiki/%5BTutorial%5D-Use-cSploit-for-simple-Man-In-The-Middle-(MITM)-security-demos)
+
+
+Also see the [wiki](https://github.com/cSploit/android/wiki) for instructions on building, [reporting issues](https://github.com/cSploit/android/wiki/How-to-open-an-issue), and more.
+
+## Requirements
+
+* A **ROOTED** device running Android 2.3 (Gingerbread) or newer
+* The device must have a BusyBox **full install**, this means with **every** utility installed ( not the partial installation ).  If you do not have busybox already, you can get it [here](https://play.google.com/store/apps/details?id=stericson.busybox) or [here](https://play.google.com/store/apps/details?id=com.jrummy.busybox.installer) (note cSploit does not endorse any busybox installer.  These are just two we found).
+
+## Downloads
+
+The latest release and pre-release versions are available on github:
+
+https://github.com/cSploit/android/releases
+
+Or to save a click, [this link](https://github.com/cSploit/android/releases/latest) should always point to the most recent release.
+
+Additionally, you can get a fresh-from-the-source nightly at [www.cSploit.org/downloads](http://www.csploit.org/downloads).  These nightly builds are generated more frequently than the releases.  And while they may have the very latest features, they may also have the latest bugs, so be careful running them!
+
+## How to contribute
+
+All contributions are welcome, from code to documentation to graphics to design suggestions to bug reports.  Please use github to its fullest-- contribute Pull Requests, contribute tutorials or other wiki content-- whatever you have to offer, we can use it!
+
+## License
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+## Copyright
+
+Copyleft Margaritelli of Simone aka evilsocket and then fused with zANTI2 continued by @tux-mind and additional contributors.
 
 [![Click here to lend your support to: cSploit and make a donation at www.paypal.com](https://www.paypalobjects.com/en_GB/i/btn/btn_donate_LG.gif?skin_name=chrome)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=FTKXDCBEDMW9G&lc=GB&item_name=cSploit&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted)
 
--------------
+## Disclaimer
 
-cSploit is an Android network analysis and penetration suite which aims to offer to IT security experts/geeks
-**the most complete and advanced professional toolkit** to perform network security assesments on a mobile device.
-
-Once cSploit is started, you will be able to easily map your network, fingerprint alive hosts operating systems
-and running services, search for **known vulnerabilities**, crack logon procedures of many tcp protocols, perform
-man in the middle attacks such as **password sniffing** ( with common protocols dissection ), real time **traffic
-manipulation**, etc, etc .
-
-This application is still in **beta stage**, a stable release will be available as soon as possible, but expect
-some crash or strange behaviour until then, in any case, feel free to submit an issue here on GitHub.
-
-Requirements
--------------
-
-- An Android device with at least the 2.3 ( Gingerbread ) version of the OS.
-- The device **must be rooted**.
-- The device must have a BusyBox **full install**, this means with **every** utility installed ( not the partial installation ).
-
-
-Disclaimer
--------------
-
-This application is not to be used for any purposes other than to demonstrate its functions, and must only be used on networks for which you have permission to do so. Any other use is not the responsibility of the developer.In other words, don't be stupid, and don't direct angry people towards me.
-
-License
--------------
-
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+***Note: cSploit is intended to be used for legal security purposes only, and you should only use it to protect networks/hosts you own or have permission to test. Any other use is not the responsibility of the developer(s).  Be sure that you understand and are complying with the cSploit licenses and laws in your area.  In other words, don't be stupid, don't be an asshole, and use this tool responsibly and legally.***
