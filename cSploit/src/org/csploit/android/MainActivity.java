@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
     mWipeReceiver.register(MainActivity.this);
     mMsfReceiver.register(MainActivity.this);
 
-    mRadarReceiver.setObserver(mTargetAdapter);
+    System.setTargetListObserver(mTargetAdapter);
 
     StartRPCServer();
 
@@ -930,7 +930,30 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void update(Observable observable, Object data) {
-      MainActivity.this.runOnUiThread(this);
+      final Target target = (Target) data;
+
+      if(target == null) {
+        // update the whole list
+        MainActivity.this.runOnUiThread(this);
+        return;
+      }
+
+      // update only a row, if it's displayed
+      MainActivity.this.runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          if(lv == null)
+            return;
+          int start = lv.getFirstVisiblePosition();
+          for(int i=start, j=lv.getLastVisiblePosition();i<=j;i++)
+            if(target==list.get(i)){
+              View view = lv.getChildAt(i-start);
+              getView(i, view, lv);
+              break;
+            }
+        }
+      });
+
     }
 
     @Override

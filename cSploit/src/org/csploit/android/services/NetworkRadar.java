@@ -21,7 +21,6 @@ import java.net.InetAddress;
  * network-radar process manager
  */
 public class NetworkRadar extends NativeService implements MenuControllableService {
-  public static final String NRDR_CHANGED = "NetworkRadar.action.TARGET_CHANGED";
   public static final String NRDR_STOPPED = "NetworkRadar.action.STOPPED";
   public static final String NRDR_STARTED = "NetworkRadar.action.STARTED";
   public static final String NRDR_START_FAILED = "NetworkRadar.action.START_FAILED";
@@ -121,8 +120,13 @@ public class NetworkRadar extends NativeService implements MenuControllableServi
         }
       }
 
-      if(notify) {
-        sendIntent(NRDR_CHANGED);
+      if(!notify)
+        return;
+
+      if(justFound) {
+        System.notifyTargetListChanged();
+      } else {
+        System.notifyTargetListChanged(t);
       }
     }
 
@@ -130,9 +134,9 @@ public class NetworkRadar extends NativeService implements MenuControllableServi
     public void onHostLost(InetAddress ipAddress) {
       Target t = System.getTargetByAddress(ipAddress);
 
-      if(t != null) {
+      if(t != null && t.isConnected()) {
         t.setConneced(false);
-        sendIntent(NRDR_CHANGED);
+        System.notifyTargetListChanged(t);
       }
     }
 
@@ -162,7 +166,6 @@ public class NetworkRadar extends NativeService implements MenuControllableServi
     @Override
     public void onPortFound(int port, String protocol) {
       target.addOpenPort(port, Network.Protocol.fromString(protocol));
-      sendIntent(NRDR_CHANGED);
     }
   }
 }

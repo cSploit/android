@@ -86,6 +86,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Observer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -142,6 +143,8 @@ public class System
   private static boolean mCoreInitialized = false;
 
   private static KnownIssues mKnownIssues = null;
+
+  private static Observer targetListObserver = null;
 
   private final static LinkedList<SettingReceiver> mSettingReceivers = new LinkedList<SettingReceiver>();
 
@@ -370,6 +373,33 @@ public class System
     }
 
     return true;
+  }
+
+  public synchronized static void setTargetListObserver(Observer targetListObserver) {
+    System.targetListObserver = targetListObserver;
+  }
+
+  /**
+   * notify that a specific target of the list has been changed
+   * @param target  the changed target
+   */
+  public static void notifyTargetListChanged(Target target) {
+    Observer o;
+    synchronized (System.class) {
+      o = targetListObserver;
+    }
+
+    if(o==null)
+      return;
+
+    o.update(null, target);
+  }
+
+  /**
+   * notify that the targets list has been changed
+   */
+  public static void notifyTargetListChanged() {
+    notifyTargetListChanged(null);
   }
 
   public static void setLastError(String error){
