@@ -44,13 +44,11 @@ import org.csploit.android.WifiScannerActivity;
 import org.csploit.android.gui.dialogs.FatalDialog;
 import org.csploit.android.helpers.NetworkHelper;
 import org.csploit.android.helpers.ThreadHelper;
-import org.csploit.android.net.Endpoint;
 import org.csploit.android.net.GitHubParser;
 import org.csploit.android.net.Network;
 import org.csploit.android.net.RemoteReader;
 import org.csploit.android.net.Target;
 import org.csploit.android.net.Target.Exploit;
-import org.csploit.android.net.Target.Type;
 import org.csploit.android.net.http.proxy.HTTPSRedirector;
 import org.csploit.android.net.http.proxy.Proxy;
 import org.csploit.android.net.http.server.Server;
@@ -87,7 +85,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -836,12 +833,10 @@ public class System
       throw new Exception(filename + " does not exists or is empty.");
   }
 
-  public static ToolBox getTools() {
-    synchronized (System.class) {
-      if(mTools == null)
-        mTools = new ToolBox();
-      return mTools;
-    }
+  public synchronized static ToolBox getTools() {
+    if(mTools == null)
+      mTools = new ToolBox();
+    return mTools;
   }
 
   public static RPCClient getMsfRpc() {
