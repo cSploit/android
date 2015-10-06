@@ -18,20 +18,29 @@
  */
 package org.csploit.android.plugins.mitm.hijacker;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Patterns;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import org.csploit.android.R;
 import org.csploit.android.core.System;
@@ -43,6 +52,8 @@ public class HijackerWebView extends AppCompatActivity {
 
   private WebSettings mSettings = null;
   private WebView mWebView = null;
+  private ProgressBar mProgressBar = null;
+  private EditText mURLet = null;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -58,42 +69,88 @@ public class HijackerWebView extends AppCompatActivity {
     setTitle(System.getCurrentTarget() + " > MITM > Session Hijacker");
     setContentView(R.layout.plugin_mitm_hijacker_webview);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    setSupportProgressBarIndeterminateVisibility(false);
 
     mWebView = (WebView) findViewById(R.id.webView);
+    mWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+    mProgressBar = (ProgressBar) findViewById(R.id.webprogress);
+    mURLet = (EditText) findViewById(R.id.url);
+    mProgressBar.setVisibility(View.GONE);
+    mProgressBar.setMax(100);
     mSettings = mWebView.getSettings();
 
     mSettings.setJavaScriptEnabled(true);
+    mSettings.setJavaScriptCanOpenWindowsAutomatically(true);
     mSettings.setBuiltInZoomControls(true);
     mSettings.setAppCacheEnabled(false);
     mSettings.setUserAgentString(DEFAULT_USER_AGENT);
+    mSettings.setUseWideViewPort(true);
+
+    mURLet.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+      @Override
+      public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
+          mWebView.loadUrl(mURLet.getText().toString());
+          InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+          imm.hideSoftInputFromWindow(mWebView.getWindowToken(), 0);
+          mWebView.requestFocus();
+          return true;
+        }
+        return false;
+      }
+    });
+
+    mURLet.setOnKeyListener(new EditText.OnKeyListener() {
+      @Override
+      public boolean onKey(View v, int keyCode, KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN
+                && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+          mWebView.loadUrl(mURLet.getText().toString());
+          InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+          imm.hideSoftInputFromWindow(mWebView.getWindowToken(), 0);
+          mWebView.requestFocus();
+          return true;
+        }
+        return false;
+      }
+    });
 
     mWebView.setWebViewClient(new WebViewClient() {
       @Override
       public boolean shouldOverrideUrlLoading(WebView view, String url) {
         view.loadUrl(url);
+        mURLet.setText(url);
         return true;
       }
     });
 
     mWebView.setWebChromeClient(new WebChromeClient() {
+
       public void onProgressChanged(WebView view, int progress) {
-        if (mWebView != null)
+        if ((mWebView != null) && (mURLet != null) && (progress == 0)); {
           getSupportActionBar().setSubtitle(mWebView.getUrl());
+          mURLet.setText(mWebView.getUrl());
+        }
 
-        setSupportProgressBarIndeterminateVisibility(true);
-        // Normalize our progress along the progress bar's scale
-        int mmprogress = (Window.PROGRESS_END - Window.PROGRESS_START)
-                / 100 * progress;
-        setProgress(mmprogress);
+        if (mProgressBar != null) {
+          mProgressBar.setVisibility(View.VISIBLE);
+          // Normalize our progress along the progress bar's scale
 
-        if (progress == 100)
-          setSupportProgressBarIndeterminateVisibility(false);
+          mProgressBar.setProgress(progress);
+
+          if (progress == 100) {
+            mProgressBar.setVisibility(View.GONE);
+          }
+        }
       }
     });
 
-    CookieSyncManager.createInstance(this);
-    CookieManager.getInstance().removeAllCookie();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      CookieManager cm = CookieManager.getInstance();
+      cm.flush();
+    } else {
+      CookieSyncManager.createInstance(this);
+      CookieManager.getInstance().removeAllCookie();
+    }
 
     Session session = (Session) System.getCustomData();
     if (session != null) {
@@ -108,7 +165,12 @@ public class HijackerWebView extends AppCompatActivity {
         CookieManager.getInstance().setCookie(domain, rawcookie);
       }
 
-      CookieSyncManager.getInstance().sync();
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        CookieManager cm = CookieManager.getInstance();
+        cm.flush();
+      } else {
+        CookieSyncManager.getInstance().startSync();
+      }
 
       if (session.mUserAgent != null
               && session.mUserAgent.isEmpty() == false)
@@ -122,6 +184,7 @@ public class HijackerWebView extends AppCompatActivity {
       url += domain;
 
       mWebView.loadUrl(url);
+      mWebView.requestFocus();
     }
   }
 
@@ -129,14 +192,24 @@ public class HijackerWebView extends AppCompatActivity {
   protected void onResume() {
     super.onResume();
 
-    CookieSyncManager.getInstance().startSync();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      CookieManager cm = CookieManager.getInstance();
+      cm.flush();
+    } else {
+      CookieSyncManager.getInstance().startSync();
+    }
   }
 
   @Override
   protected void onPause() {
     super.onPause();
 
-    CookieSyncManager.getInstance().stopSync();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      CookieManager cm = CookieManager.getInstance();
+      cm.flush();
+    } else {
+      CookieSyncManager.getInstance().startSync();
+    }
   }
 
   @Override
