@@ -79,8 +79,7 @@ import org.csploit.android.plugins.RouterPwn;
 import org.csploit.android.plugins.Sessions;
 import org.csploit.android.plugins.Traceroute;
 import org.csploit.android.plugins.mitm.MITM;
-import org.csploit.android.services.MsfRpcdService;
-import org.csploit.android.services.NetworkRadar;
+import org.csploit.android.services.Services;
 import org.csploit.android.services.UpdateChecker;
 import org.csploit.android.services.UpdateService;
 import org.csploit.android.services.receivers.MsfRpcdServiceReceiver;
@@ -107,8 +106,6 @@ public class MainActivity extends AppCompatActivity {
   private static final int WIFI_CONNECTION_REQUEST = 1012;
   private boolean isWifiAvailable = false;
   private TargetAdapter mTargetAdapter = null;
-  private NetworkRadar mNetworkRadar = null;
-  private MsfRpcdService mMsfRpcdService = null;
   private NetworkRadarReceiver mRadarReceiver = new NetworkRadarReceiver();
   private UpdateReceiver mUpdateReceiver = new UpdateReceiver();
   private WipeReceiver mWipeReceiver = new WipeReceiver();
@@ -440,27 +437,15 @@ public class MainActivity extends AppCompatActivity {
     return super.onCreateOptionsMenu(menu);
   }
 
-  private MsfRpcdService getMsfRpcdService() {
-    if(mMsfRpcdService == null)
-      mMsfRpcdService = new MsfRpcdService(this);
-    return mMsfRpcdService;
-  }
-
-  private NetworkRadar getNetworkRadar() {
-    if(mNetworkRadar == null)
-      mNetworkRadar = new NetworkRadar(this);
-    return mNetworkRadar;
-  }
-
   @Override
   public boolean onPrepareOptionsMenu(Menu menu) {
     MenuItem item = menu.findItem(R.id.ss_monitor);
 
-    getNetworkRadar().buildMenuItem(item);
+    Services.getNetworkRadar().buildMenuItem(item);
 
     item = menu.findItem(R.id.ss_msfrpcd);
 
-    getMsfRpcdService().buildMenuItem(item);
+    Services.getMsfRpcdService().buildMenuItem(item);
 
     mMenu = menu;
 
@@ -571,7 +556,7 @@ public class MainActivity extends AppCompatActivity {
     new Thread(new Runnable() {
       @Override
       public void run() {
-        getNetworkRadar().start();
+        Services.getNetworkRadar().start();
       }
     }).start();
   }
@@ -580,7 +565,7 @@ public class MainActivity extends AppCompatActivity {
     new Thread(new Runnable() {
       @Override
       public void run() {
-        getNetworkRadar().stop();
+        Services.getNetworkRadar().stop();
       }
     }).start();
   }
@@ -592,8 +577,8 @@ public class MainActivity extends AppCompatActivity {
     new Thread(new Runnable() {
       @Override
       public void run() {
-        if(getMsfRpcdService().isAvailable())
-          getMsfRpcdService().start();
+        if(Services.getMsfRpcdService().isAvailable())
+          Services.getMsfRpcdService().start();
       }
     }).start();
   }
@@ -605,7 +590,7 @@ public class MainActivity extends AppCompatActivity {
     new Thread(new Runnable() {
       @Override
       public void run() {
-        getMsfRpcdService().stop();
+        Services.getMsfRpcdService().stop();
       }
     }).start();
   }
@@ -755,7 +740,7 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
           @Override
           public void run() {
-            getNetworkRadar().onMenuClick(MainActivity.this, item);
+            Services.getNetworkRadar().onMenuClick(MainActivity.this, item);
           }
         }).start();
         return true;
@@ -764,7 +749,7 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
           @Override
           public void run() {
-            getMsfRpcdService().onMenuClick(MainActivity.this, item);
+            Services.getMsfRpcdService().onMenuClick(MainActivity.this, item);
           }
         }).start();
         return true;
