@@ -8,6 +8,7 @@ import org.csploit.android.R;
 import org.csploit.android.core.Logger;
 import org.csploit.android.core.System;
 import org.csploit.android.core.ChildManager;
+import org.csploit.android.helpers.ThreadHelper;
 import org.csploit.android.net.Endpoint;
 import org.csploit.android.net.Network;
 import org.csploit.android.net.Target;
@@ -68,12 +69,20 @@ public class NetworkRadar extends NativeService implements MenuControllableServi
     item.setEnabled(System.getTools().networkRadar.isEnabled());
   }
 
-  private void onNewHostFound(Target target) {
-    try {
-      System.getTools().nmap.synScan(target, new ScanReceiver(target));
-    } catch (ChildManager.ChildNotStartedException e) {
-      System.errorLogging(e);
-    }
+  public void onNewTargetFound(final Target target) {
+    if(target.getType() == Target.Type.NETWORK)
+      return;
+
+    ThreadHelper.getSharedExecutor().execute(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          System.getTools().nmap.synScan(target, new ScanReceiver(target));
+        } catch (ChildManager.ChildNotStartedException e) {
+          System.errorLogging(e);
+        }
+      }
+    });
   }
 
   private class Receiver extends HostReceiver {
@@ -114,10 +123,6 @@ public class NetworkRadar extends NativeService implements MenuControllableServi
 
       if(notify) {
         sendIntent(NRDR_CHANGED);
-      }
-
-      if(justFound) {
-        onNewHostFound(t);
       }
     }
 

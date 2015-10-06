@@ -56,6 +56,7 @@ import org.csploit.android.net.metasploit.MsfExploit;
 import org.csploit.android.net.metasploit.Payload;
 import org.csploit.android.net.metasploit.RPCClient;
 import org.csploit.android.net.metasploit.Session;
+import org.csploit.android.services.Services;
 import org.csploit.android.tools.ToolBox;
 
 import java.io.BufferedReader;
@@ -189,21 +190,7 @@ public class System
         MSF_RPC_PORT = 55553;
       }
 
-      // initialize network data at the end
-      mNetwork = new Network(mContext);
-
-      Target network = new Target(mNetwork),
-        gateway = new Target(mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware()),
-        device = new Target(mNetwork.getLocalAddress(), mNetwork.getLocalHardware());
-
-      gateway.setAlias(mNetwork.getSSID());
-      device.setAlias(android.os.Build.MODEL);
-
-      mTargets.add(network);
-      mTargets.add(gateway);
-      mTargets.add(device);
-
-      mInitialized = true;
+      uncaughtReloadNetworkMapping();
 
       ThreadHelper.getSharedExecutor().execute(new Runnable() {
         @Override
@@ -349,23 +336,7 @@ public class System
 
   public static void reloadNetworkMapping(){
     try{
-      mNetwork = new Network(mContext);
-
-      Target network = new Target(mNetwork),
-        gateway = new Target(mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware()),
-        device = new Target(mNetwork.getLocalAddress(), mNetwork.getLocalHardware());
-
-      gateway.setAlias(mNetwork.getSSID());
-      device.setAlias(android.os.Build.MODEL);
-
-      synchronized (mTargets) {
-        mTargets.clear();
-        mTargets.add(network);
-        mTargets.add(gateway);
-        mTargets.add(device);
-      }
-
-      mInitialized = true;
+      uncaughtReloadNetworkMapping();
     }
     catch(NoRouteToHostException nrthe){
       // swallow bitch
@@ -373,6 +344,14 @@ public class System
     catch(Exception e){
       errorLogging(e);
     }
+  }
+
+  private static void uncaughtReloadNetworkMapping() throws UnknownHostException, SocketException {
+    mNetwork = new Network(mContext);
+
+    reset();
+
+    mInitialized = true;
   }
 
   public static boolean checkNetworking(final Activity current){
@@ -917,18 +896,26 @@ public class System
     return type;
   }
 
-  public static void reset() throws SocketException{
+  public static void reset() {
     mCurrentTarget = null;
 
     synchronized (mTargets) {
       mTargets.clear();
 
-      // local network
-      mTargets.add(new Target(System.getNetwork()));
-      // network gateway
-      mTargets.add(new Target(System.getNetwork().getGatewayAddress(), System.getNetwork().getGatewayHardware()));
-      // device network address
-      mTargets.add(new Target(System.getNetwork().getLocalAddress(), System.getNetwork().getLocalHardware()));
+      Target network = new Target(mNetwork),
+              gateway = new Target(mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware()),
+              device = new Target(mNetwork.getLocalAddress(), mNetwork.getLocalHardware());
+
+      gateway.setAlias(mNetwork.getSSID());
+      device.setAlias(android.os.Build.MODEL);
+
+      mTargets.add(network);
+      mTargets.add(gateway);
+      mTargets.add(device);
+
+      for(Target t : mTargets) {
+        Services.getNetworkRadar().onNewTargetFound(t);
+      }
     }
   }
 
@@ -1004,12 +991,13 @@ public class System
       for (int i = 0; i < mTargets.size(); i++) {
         if (mTargets.get(i).comesAfter(target)) {
           mTargets.add(i, target);
+          Services.getNetworkRadar().onNewTargetFound(target);
           return true;
         }
       }
 
       mTargets.add(target);
-
+      Services.getNetworkRadar().onNewTargetFound(target);
       return true;
     }
   }
