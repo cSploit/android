@@ -68,6 +68,7 @@ import org.csploit.android.gui.dialogs.InputDialog.InputDialogListener;
 import org.csploit.android.gui.dialogs.MultipleChoiceDialog;
 import org.csploit.android.gui.dialogs.SpinnerDialog;
 import org.csploit.android.gui.dialogs.SpinnerDialog.SpinnerDialogListener;
+import org.csploit.android.helpers.ThreadHelper;
 import org.csploit.android.net.Network;
 import org.csploit.android.net.Target;
 import org.csploit.android.plugins.ExploitFinder;
@@ -607,15 +608,11 @@ public class MainActivity extends AppCompatActivity {
                   public void onInputEntered(String input) {
                     final Target target = Target.getFromString(input);
                     if (target != null) {
-                      // refresh the target listview
-                      MainActivity.this.runOnUiThread(new Runnable() {
+                      ThreadHelper.getSharedExecutor().execute(new Runnable() {
                         @Override
                         public void run() {
-                          if (System.addOrderedTarget(target)
-                                  && mTargetAdapter != null) {
-                            mTargetAdapter
-                                    .notifyDataSetChanged();
-                          }
+                          System.addOrderedTarget(target);
+                          mTargetAdapter.update(null, null);
                         }
                       });
                     } else
