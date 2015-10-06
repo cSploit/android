@@ -72,6 +72,10 @@ public class NetworkRadar extends NativeService implements MenuControllableServi
     if(target.getType() == Target.Type.NETWORK)
       return;
 
+    if(!System.isCoreInitialized()) {
+      return;
+    }
+
     ThreadHelper.getSharedExecutor().execute(new Runnable() {
       @Override
       public void run() {
@@ -143,6 +147,7 @@ public class NetworkRadar extends NativeService implements MenuControllableServi
     @Override
     public void onStart(String cmd) {
       sendIntent(NRDR_STARTED);
+      System.scanThemAll();
     }
 
     public void onEnd(int exitValue) {

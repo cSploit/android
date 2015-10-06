@@ -943,6 +943,15 @@ public class System
       mTargets.add(gateway);
       mTargets.add(device);
 
+      scanThemAll();
+    }
+  }
+
+  public static void scanThemAll() {
+    if(!mCoreInitialized) {
+      return;
+    }
+    synchronized (mTargets) {
       for(Target t : mTargets) {
         Services.getNetworkRadar().onNewTargetFound(t);
       }
