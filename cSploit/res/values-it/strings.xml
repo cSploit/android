@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">cSploit</string>
     <string name="menu_settings">Impostazioni</string>
     <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Ooooops! Sono crashato, ma un report verrà inviato al mio
@@ -28,7 +27,6 @@
     <string name="csploit_catchphrase">cSploit - An Android network penetration suite.</string>
     <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.
     </string>
-    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">Disclaimer</string>
     <string name="csploit_disclaimer">
         <![CDATA[Questa applicazione non è concepita per alcuno scopo se non come dimostrazione delle sue funzionalità e deve essere utilizzata solamente su reti
@@ -88,7 +86,6 @@
     </string>
     <string name="press_back">Premi nuovamente il tasto indietro per chiudere l\'app.</string>
     <string name="selected_">Selezionato&#160;</string>
-    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">Nessun file di sessione trovato sulla sd card.</string>
     <string name="select_session_file">Seleziona un file di sessione dalla sd card :</string>
     <string name="select_session">Seleziona Sessione</string>

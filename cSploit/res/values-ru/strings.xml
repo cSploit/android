@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-    <string name="app_name">cSploit</string>
     <string name="menu_settings">Настройки</string>
     <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Ой! Я вынужден завершить работу, но отправка отчета об ошибке моему разработчику поможет исправить проблему :)
@@ -25,7 +24,6 @@
     <string name="protocol">Протокол</string>
     <string name="csploit_catchphrase">cSploit - набор инструментов для проникновения в сеть под Android.</string>
     <string name="csploit_copyleft">Копилефт Simone Margaritelli aka evilsocket.</string>
-    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">Предупреждение</string>
     <string name="csploit_disclaimer">
         <![CDATA[Данное приложение предназначено только для демонстрации его функционала и может использоваться только в сетях, где вы имеете право выполнять данный функционал. За любое другое использование, разработчик приложения ответственности не несет. Другими словами, не будьте дураками и не направляйте ко мне злых людей.]]></string>
@@ -76,7 +74,6 @@
     </string>
     <string name="press_back">Нажмите назад ещё раз, чтобы закрыть приложение.</string>
     <string name="selected_">Выбрано </string>
-    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">Не найдено файлов сессии на карте памяти.</string>
     <string name="select_session_file">Выберите файл сессии с карты памяти:</string>
     <string name="select_session">Выбор сессии</string>
@@ -348,21 +345,11 @@
         <item>CVE</item>
         <item>CVE и OSVDB</item>
     </string-array>
-    <string-array name="pref_performance_vuln_values">
-        <item>OSVDB</item>
-        <item>CVE</item>
-        <item>BOTH</item>
-    </string-array>
     <string name="pref_performance_exploit_desc">Поиск эксплойтов</string>
     <string-array name="pref_performance_exploit" >
         <item>Только совместимые с MSF</item>
         <item>Толко на exploitdb</item>
         <item>Использовать exploitdb и MSF</item>
-    </string-array>
-    <string-array name="pref_performance_exploit_values">
-        <item>MSF</item>
-        <item>EXDB</item>
-        <item>BOTH</item>
     </string-array>
     <string name="pref_performance_widescan">Широкий поиск хостов</string>
     <string name="pref_performance_widescan_desc">Поиск хостов вне текущей маски сети</string>

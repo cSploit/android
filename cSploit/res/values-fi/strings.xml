@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">cSploit</string>
     <string name="menu_settings">Asetukset</string>
     <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">No hupsista. Kaaduin, mutta raportti lähetetään kehittäjälleni
@@ -26,7 +25,6 @@
     <string name="protocol">Protokolla</string>
     <string name="csploit_catchphrase">cSploit - Verkkotestaus sovellus Androidille.</string>
     <string name="csploit_copyleft">Copyleft: Simone Margaritelli, eli evilsocket.</string>
-    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">Käyttöehdot</string>
     <string name="csploit_disclaimer">
         <![CDATA[Tätä sovellusta tulee käyttää vain demonstroimaan sen toimintoja, ja saa käyttää vain verkoissa joissa sinulla on oikeus tehdä niin. Mikään muu käyttötarkoitus ei ole kehittäjän vastuulla. Toisin sanoen, älä ole tyhmä ja lähetä vihaisia ihmisiä minulle]]></string>
@@ -83,7 +81,6 @@
     </string>
     <string name="press_back">Paina takaisin-näppäintä vielä kerran poistuaksesi.</string>
     <string name="selected_">Valittu&#160;</string>
-    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">Tilanteita ei löydetty SD-kortilta.</string>
     <string name="select_session_file">Valitse Tilanne-tiedosto SD-kortilta :</string>
     <string name="select_session">Valitse Tilanne</string>

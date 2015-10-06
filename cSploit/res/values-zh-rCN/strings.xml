@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">cSploit</string>
     <string name="menu_settings">设置</string>
     <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">额！崩溃了...不过我将给我的开发者发送报告来帮助解决这个问题。</string>
@@ -22,7 +21,6 @@
     <string name="protocol">协议</string>
     <string name="csploit_catchphrase">cSploit - 安卓上的网络渗透套装。</string>
     <string name="csploit_copyleft">非版权保护 来自 Simone Margaritelli 又名 evilsocket。</string>
-    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">免责声明</string>
 <string name="csploit_disclaimer">
 <![CDATA[这个程序仅仅用于演示它的功能, 必须运行在您有明确的权利来使用的网络上. 任何的其他用法与开发者无关。换句话说, 别干傻事, 不要把别人的愤怒转移到我身上。]]></string>
@@ -76,7 +74,6 @@ If not, see http://www.gnu.org/licenses/.
     <string name="close_confirm">将关闭 cSploit，您确定继续么？</string>
     <string name="press_back">再摁一次返回退出。</string>
     <string name="selected_">已选择&#160;</string>
-    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">没在在SD卡上找到会话文件。</string>
     <string name="select_session_file">请从SD卡中选择会话文件：</string>
     <string name="select_session">选择会话</string>
@@ -334,21 +331,11 @@ If not, see http://www.gnu.org/licenses/.
         <item>CVE</item>
         <item>CVE 和 OSVDB 同时</item>
     </string-array>
-    <string-array name="pref_performance_vuln_values">
-        <item>OSVDB</item>
-        <item>CVE</item>
-        <item>BOTH</item>
-    </string-array>
     <string name="pref_performance_exploit_desc">搜索攻击方案</string>
     <string-array name="pref_performance_exploit" >
         <item>仅MSF兼容</item>
         <item>仅exploitdb</item>
         <item>同时来自exploitdb 与 MSF</item>
-    </string-array>
-    <string-array name="pref_performance_exploit_values">
-        <item>MSF</item>
-        <item>EXDB</item>
-        <item>BOTH</item>
     </string-array>
     <string name="pref_folder">文件夹</string>
     <string name="pref_err_exists">并不存在。</string>

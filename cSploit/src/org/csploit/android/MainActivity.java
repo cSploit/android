@@ -765,9 +765,11 @@ public class MainActivity extends AppCompatActivity {
         return true;
 
       case R.id.submit_issue:
-        String uri = getString(R.string.github_issues);
+        String uri = getString(R.string.github_new_issue_url);
         Intent browser = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
         startActivity(browser);
+        // for fat-tire:
+        //   String.format(getString(R.string.issue_message), getString(R.string.github_issues_url), getString(R.string.github_new_issue_url));
         return true;
 
       case R.id.about:

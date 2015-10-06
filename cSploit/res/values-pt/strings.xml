@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-    <string name="app_name">cSploit</string>
     <string name="menu_settings">Configurações</string>
     <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Oooops! houve um erro , mas um relatório será enviado para o meu desenvolvedor para ajudar a corrigir o problema :)</string>
@@ -23,7 +22,6 @@
     <string name="protocol">Protocolo</string>
     <string name="csploit_catchphrase">cSploit - Uma suíte android de penetração de rede.</string>
     <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
-    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">Termo de responsabilidade</string>
     <string name="csploit_disclaimer">
         <![CDATA[Esta aplicação não é para ser usada para quaisquer fins que não para demonstrar suas funções, e só deve ser utilizado em redes para as quais você tem permissão para fazer isso. Qualquer outro uso não é de responsabilidade do desenvolvedor. Em outras palavras, Não seja estúpido, e não direcione as pessoas com raiva para mim.]]></string>
@@ -71,7 +69,6 @@
     </string>
     <string name="press_back">Pressione voltar novamente para fechar este aplicativo.</string>
     <string name="selected_">Selecionado </string>
-    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">Nenhum arquivo de sessão encontrado no cartão SD.</string>
     <string name="select_session_file">Selecione um arquivo de sessão a partir do cartão SD :</string>
     <string name="select_session">Selecionar Sessão</string>
@@ -342,20 +339,10 @@
         <item>CVE</item>
         <item>Ambos</item>
     </string-array>
-    <string-array name="pref_performance_vuln_values">
-        <item>OSVDB</item>
-        <item>CVE</item>
-        <item>Ambos</item>
-    </string-array>
     <string name="pref_performance_exploit_desc">Busca de exploits</string>
     <string-array name="pref_performance_exploit">
         <item>MSF compatível apenas</item>
         <item>apenas exploitdb</item>
-        <item>Ambos</item>
-    </string-array>
-    <string-array name="pref_performance_exploit_values">
-        <item>MSF</item>
-        <item>EXDB</item>
         <item>Ambos</item>
     </string-array>
 

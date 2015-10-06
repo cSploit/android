@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">cSploit</string>
     <string name="Charset">Karaterset</string>
     <string name="JNI_crash_detected">De JNI bibliotheek is eerder gecrashed, De omstandigheden rapporteren om de oorzaak te achterhalen zou gewaardeerd worden.</string>
     <string name="about_csploit_v_">Over cSploit</string>
@@ -51,7 +50,6 @@
     <string name="csploit_disclaimer">Deze applicatie mag alleen maar gebruikt worden om zijn functies te tonen, alleen op netwerken waarvan je toestemming heb gekregen om acties met deze applicatie uit te voeren. De ontwikkelaars van deze applicatie zijn voor niks aansprakelijk. Andere woorden: Doe geen domme dingen en stuur geen bozen mensen naar ons</string>
     <string name="enter_key_or_crack">Voeg een WiFi sleutel in of probeer het te kraken</string>
     <string name="enter_ports_list">Voeg de port lijst in</string>
-    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="custom_charset">Aangepaste karakterset</string>
     <string name="custom_code">Java code</string>
     <string name="custom_filter">Aangepaste filter</string>
@@ -115,7 +113,6 @@
     <string name="from">Van</string>
     <string name="gateway_router">(Jouw netwerk router)</string>
     <string name="generating_keys">Sleutels aan het genereren&#8230;</string>
-    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="gpl_license">Dit programma is vrije software: je kunt het herdistribueren en / of onder de voorwaarden van de GNU General Public License zoals gepubliceerd door de Free Software Foundation, ofwel versie 3 van de Licentie, of (naar keuze) een latere versie. Dit programma wordt verspreid in de hoop dat het nuttig zal zijn, maar ZONDER ENIGE GARANTIE; zonder zelfs de impliciete garantie van verkoopbaarheid of geschiktheid voor een bepaald doel. Zie de GNU General Public License voor meer details. U moet een kopie van de GNU General Public License hebben ontvangen samen met dit programma. Zo niet, zie http://www.gnu.org/licenses/.</string>
     <string name="heart_attack">Heart aanval</string>
     <string name="heart_attack_update">Heart aanval is opgedoken, de applicatie zou nu gaan kijken voor updates.#STATUS#</string>
