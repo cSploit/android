@@ -61,7 +61,7 @@ public class NetworkRadar extends NativeService implements MenuControllableServi
   @Override
   public void buildMenuItem(MenuItem item) {
     item.setTitle(isRunning() ? R.string.stop_monitor : R.string.start_monitor);
-    item.setEnabled(System.getTools().networkRadar.isEnabled());
+    item.setEnabled(System.getTools().networkRadar.isEnabled() && System.getNetwork() != null);
   }
 
   private class Receiver extends org.csploit.android.tools.NetworkRadar.HostReceiver {

@@ -56,6 +56,10 @@ public class NetworkRadar extends Tool {
   public Child start(HostReceiver receiver) throws ChildManager.ChildNotStartedException {
     String ifName;
 
+    if(System.getNetwork() == null) {
+      throw new ChildManager.ChildNotStartedException();
+    }
+
     ifName = System.getNetwork().getInterface().getDisplayName();
 
     return async(ifName, receiver);
