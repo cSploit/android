@@ -277,6 +277,7 @@
     <string name="menu_about">О программе</string>
 
     <string name="scanner_select_ports">Выбрать свои порты</string>
+    <string name="scanner_custom_parameters">Свои параметры</string>
 
     <string name="wifi_initializing">Инициализация &#8230;</string>
     <string name="wifi_activating_iface">Активация WiFi интерфейса …</string>
@@ -483,4 +484,6 @@
     <string name="msf_rank_good">Хороший</string>
     <string name="msf_rank_great">Отличный</string>
     <string name="msf_rank_excellent">Превосходный</string>
+    <string name="mitm_ss_select_target_title">Выбрать цель</string>
+    <string name="mitm_ss_select_target_prompt">Выбрать %s ?</string>
 </resources>
