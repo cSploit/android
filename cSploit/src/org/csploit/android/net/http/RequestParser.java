@@ -20,6 +20,7 @@ package org.csploit.android.net.http;
 
 import android.util.Patterns;
 
+import org.csploit.android.core.Logger;
 import org.csploit.android.net.ByteBuffer;
 
 import java.net.HttpCookie;
@@ -356,7 +357,14 @@ public class RequestParser
 
       String cookieName = rawCookieNameAndValue[0].trim();
       String cookieValue = rawCookieNameAndValue[1].trim();
-      HttpCookie cookie = new HttpCookie(cookieName, cookieValue);
+      HttpCookie cookie;
+
+      try {
+        cookie = new HttpCookie(cookieName, cookieValue);
+       } catch (IllegalArgumentException e){
+         Logger.error("Invalid cookie. name=" + cookieName + ":" + cookieValue);
+         continue;
+       }
 
       for(int i = 1; i < rawCookieParams.length; i++){
         String rawCookieParamNameAndValue[] = rawCookieParams[i].trim().split("=");
