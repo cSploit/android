@@ -10,7 +10,7 @@ public final class NetworkHelper {
    * @return the OUI integer
    */
   public static int getOUICode(byte[] macAddress) {
-    return (macAddress[2] << 16) & (macAddress[1] << 8) & macAddress[0];
+    return (macAddress[0] << 16) | (macAddress[1] << 8) | macAddress[2];
   }
 
   /**
