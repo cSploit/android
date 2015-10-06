@@ -19,9 +19,19 @@ public class ApkUpdate extends Update {
     this.version = version;
     name = String.format("cSploit-%s.apk", version);
     path = String.format("%s/%s", System.getStoragePath(), name);
-    contentIntent = new Intent(Intent.ACTION_VIEW);
-    contentIntent.setDataAndType(Uri.fromFile(new File(path)), "application/vnd.android.package-archive");
-    contentIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     prompt = String.format(context.getString(R.string.new_apk_found), version);
+  }
+
+  @Override
+  public boolean haveIntent() {
+    return true;
+  }
+
+  @Override
+  public Intent buildIntent() {
+    Intent intent = new Intent(Intent.ACTION_VIEW);
+    intent.setDataAndType(Uri.fromFile(new File(path)), "application/vnd.android.package-archive");
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    return intent;
   }
 }

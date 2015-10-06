@@ -274,7 +274,7 @@ public class UpdateService extends IntentService
     Intent contentIntent;
 
     errorOccurred = mCurrentTask.errorOccurred;
-    contentIntent = mCurrentTask.contentIntent;
+    contentIntent = mCurrentTask.haveIntent() ? mCurrentTask.buildIntent() : null;
 
     if(errorOccurred || contentIntent==null){
       Logger.debug("deleting notifications");
