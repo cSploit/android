@@ -27,6 +27,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.text.Html;
@@ -42,6 +43,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -66,6 +68,7 @@ import org.csploit.android.gui.dialogs.InputDialog.InputDialogListener;
 import org.csploit.android.gui.dialogs.MultipleChoiceDialog;
 import org.csploit.android.gui.dialogs.SpinnerDialog;
 import org.csploit.android.gui.dialogs.SpinnerDialog.SpinnerDialogListener;
+import org.csploit.android.helpers.ThreadHelper;
 import org.csploit.android.net.Network;
 import org.csploit.android.net.Target;
 import org.csploit.android.plugins.ExploitFinder;
@@ -77,8 +80,7 @@ import org.csploit.android.plugins.RouterPwn;
 import org.csploit.android.plugins.Sessions;
 import org.csploit.android.plugins.Traceroute;
 import org.csploit.android.plugins.mitm.MITM;
-import org.csploit.android.services.MsfRpcdService;
-import org.csploit.android.services.NetworkRadar;
+import org.csploit.android.services.Services;
 import org.csploit.android.services.UpdateChecker;
 import org.csploit.android.services.UpdateService;
 import org.csploit.android.services.receivers.MsfRpcdServiceReceiver;
@@ -105,8 +107,6 @@ public class MainActivity extends AppCompatActivity {
   private static final int WIFI_CONNECTION_REQUEST = 1012;
   private boolean isWifiAvailable = false;
   private TargetAdapter mTargetAdapter = null;
-  private NetworkRadar mNetworkRadar = null;
-  private MsfRpcdService mMsfRpcdService = null;
   private NetworkRadarReceiver mRadarReceiver = new NetworkRadarReceiver();
   private UpdateReceiver mUpdateReceiver = new UpdateReceiver();
   private WipeReceiver mWipeReceiver = new WipeReceiver();
@@ -134,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
 
     layout.addView(mUpdateStatus);
   }
+
 
   private void createUpdateLayout() {
 
@@ -203,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
     mWipeReceiver.register(MainActivity.this);
     mMsfReceiver.register(MainActivity.this);
 
-    mRadarReceiver.setObserver(mTargetAdapter);
+    System.setTargetListObserver(mTargetAdapter);
 
     StartRPCServer();
 
@@ -330,8 +331,8 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(new Intent(MainActivity.this,
                     ActionActivity.class), WIFI_CONNECTION_REQUEST);
 
-            overridePendingTransition(R.anim.slide_in_left,
-                    R.anim.slide_out_left);
+            overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+
           }
         }).start();
 
@@ -437,27 +438,15 @@ public class MainActivity extends AppCompatActivity {
     return super.onCreateOptionsMenu(menu);
   }
 
-  private MsfRpcdService getMsfRpcdService() {
-    if(mMsfRpcdService == null)
-      mMsfRpcdService = new MsfRpcdService(this);
-    return mMsfRpcdService;
-  }
-
-  private NetworkRadar getNetworkRadar() {
-    if(mNetworkRadar == null)
-      mNetworkRadar = new NetworkRadar(this);
-    return mNetworkRadar;
-  }
-
   @Override
   public boolean onPrepareOptionsMenu(Menu menu) {
     MenuItem item = menu.findItem(R.id.ss_monitor);
 
-    getNetworkRadar().buildMenuItem(item);
+    Services.getNetworkRadar().buildMenuItem(item);
 
     item = menu.findItem(R.id.ss_msfrpcd);
 
-    getMsfRpcdService().buildMenuItem(item);
+    Services.getMsfRpcdService().buildMenuItem(item);
 
     mMenu = menu;
 
@@ -568,7 +557,7 @@ public class MainActivity extends AppCompatActivity {
     new Thread(new Runnable() {
       @Override
       public void run() {
-        getNetworkRadar().start();
+        Services.getNetworkRadar().start();
       }
     }).start();
   }
@@ -577,7 +566,7 @@ public class MainActivity extends AppCompatActivity {
     new Thread(new Runnable() {
       @Override
       public void run() {
-        getNetworkRadar().stop();
+        Services.getNetworkRadar().stop();
       }
     }).start();
   }
@@ -589,8 +578,8 @@ public class MainActivity extends AppCompatActivity {
     new Thread(new Runnable() {
       @Override
       public void run() {
-        if(getMsfRpcdService().isAvailable())
-          getMsfRpcdService().start();
+        if(Services.getMsfRpcdService().isAvailable())
+          Services.getMsfRpcdService().start();
       }
     }).start();
   }
@@ -602,7 +591,7 @@ public class MainActivity extends AppCompatActivity {
     new Thread(new Runnable() {
       @Override
       public void run() {
-        getMsfRpcdService().stop();
+        Services.getMsfRpcdService().stop();
       }
     }).start();
   }
@@ -619,15 +608,11 @@ public class MainActivity extends AppCompatActivity {
                   public void onInputEntered(String input) {
                     final Target target = Target.getFromString(input);
                     if (target != null) {
-                      // refresh the target listview
-                      MainActivity.this.runOnUiThread(new Runnable() {
+                      ThreadHelper.getSharedExecutor().execute(new Runnable() {
                         @Override
                         public void run() {
-                          if (System.addOrderedTarget(target)
-                                  && mTargetAdapter != null) {
-                            mTargetAdapter
-                                    .notifyDataSetChanged();
-                          }
+                          System.addOrderedTarget(target);
+                          mTargetAdapter.update(null, null);
                         }
                       });
                     } else
@@ -650,6 +635,7 @@ public class MainActivity extends AppCompatActivity {
 
         startActivityForResult(new Intent(MainActivity.this,
                 WifiScannerActivity.class), WIFI_CONNECTION_REQUEST);
+        overridePendingTransition(R.anim.fadeout, R.anim.fadein);
         return true;
 
       case R.id.new_session:
@@ -744,13 +730,14 @@ public class MainActivity extends AppCompatActivity {
 
       case R.id.settings:
         startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+        overridePendingTransition(R.anim.fadeout, R.anim.fadein);
         return true;
 
       case R.id.ss_monitor:
         new Thread(new Runnable() {
           @Override
           public void run() {
-            getNetworkRadar().onMenuClick(MainActivity.this, item);
+            Services.getNetworkRadar().onMenuClick(MainActivity.this, item);
           }
         }).start();
         return true;
@@ -759,7 +746,7 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
           @Override
           public void run() {
-            getMsfRpcdService().onMenuClick(MainActivity.this, item);
+            Services.getMsfRpcdService().onMenuClick(MainActivity.this, item);
           }
         }).start();
         return true;
@@ -860,30 +847,40 @@ public class MainActivity extends AppCompatActivity {
           row.setBackgroundResource(R.drawable.card_background_dark);
 
         holder = new TargetHolder();
-        holder.itemImage = (ImageView) row.findViewById(R.id.itemIcon);
-        holder.itemTitle = (TextView) row.findViewById(R.id.itemTitle);
-        holder.itemDescription = (TextView) row.findViewById(R.id.itemDescription);
-
-        row.setTag(holder);
+        holder.itemImage = (ImageView) (row != null ? row
+                .findViewById(R.id.itemIcon) : null);
+        holder.itemTitle = (TextView) (row != null ? row
+                .findViewById(R.id.itemTitle) : null);
+        holder.itemDescription = (TextView) (row != null ? row
+                .findViewById(R.id.itemDescription) : null);
+        holder.portCount = (TextView) (row != null ? row
+                .findViewById(R.id.portCount) : null);
+        holder.portCountLayout = (LinearLayout) (row != null ? row
+                .findViewById(R.id.portCountLayout) : null);
+        if (row != null)
+          row.setTag(holder);
       } else
         holder = (TargetHolder) row.getTag();
 
-      Target target = list.get(position);
+      final Target target = list.get(position);
 
-      if (target.hasAlias())
+      if (target.hasAlias()){
         holder.itemTitle.setText(Html.fromHtml("<b>"
                 + target.getAlias() + "</b> <small>( "
                 + target.getDisplayAddress() + " )</small>"));
-
-      else
+      } else {
         holder.itemTitle.setText(target.toString());
-
-      holder.itemTitle.setTextColor(getResources().getColor((target.isConnected() ? R.color.app_color : R.color.gray_text)));
+      }
+      holder.itemTitle.setTextColor(ContextCompat.getColor(getApplicationContext(), (target.isConnected() ? R.color.app_color : R.color.gray_text)));
 
       holder.itemTitle.setTypeface(null, Typeface.NORMAL);
       holder.itemImage.setImageResource(target.getDrawableResourceId());
       holder.itemDescription.setText(target.getDescription());
 
+      int openedPorts = target.getOpenPorts().size();
+
+      holder.portCount.setText(String.format("%d", openedPorts));
+      holder.portCountLayout.setVisibility(openedPorts < 1 ? View.GONE : View.VISIBLE);
       return row;
     }
 
@@ -935,7 +932,30 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void update(Observable observable, Object data) {
-      MainActivity.this.runOnUiThread(this);
+      final Target target = (Target) data;
+
+      if(target == null) {
+        // update the whole list
+        MainActivity.this.runOnUiThread(this);
+        return;
+      }
+
+      // update only a row, if it's displayed
+      MainActivity.this.runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          if(lv == null)
+            return;
+          int start = lv.getFirstVisiblePosition();
+          for(int i=start, j=lv.getLastVisiblePosition();i<=j;i++)
+            if(target==list.get(i)){
+              View view = lv.getChildAt(i-start);
+              getView(i, view, lv);
+              break;
+            }
+        }
+      });
+
     }
 
     @Override
@@ -948,6 +968,8 @@ public class MainActivity extends AppCompatActivity {
       ImageView itemImage;
       TextView itemTitle;
       TextView itemDescription;
+      TextView portCount;
+      LinearLayout portCountLayout;
     }
   }
 

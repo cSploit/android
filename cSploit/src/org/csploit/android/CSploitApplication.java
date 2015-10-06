@@ -35,6 +35,7 @@ import org.csploit.android.plugins.RouterPwn;
 import org.csploit.android.plugins.Sessions;
 import org.csploit.android.plugins.Traceroute;
 import org.csploit.android.plugins.mitm.MITM;
+import org.csploit.android.services.Services;
 
 import java.net.NoRouteToHostException;
 
@@ -63,6 +64,7 @@ public class CSploitApplication extends Application {
     super.onCreate();
 
     ACRA.init(this);
+    Services.init(this);
 
     // initialize the system
     try {

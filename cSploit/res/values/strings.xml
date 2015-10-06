@@ -9,6 +9,7 @@
     <string name="enter_redirection_details">Enter redirection details below:</string>
     <string name="address">Address</string>
     <string name="port">Port</string>
+    <string name="ports">Ports</string>
     <string name="target">Target</string>
     <string name="unknown">No information</string>
     <string name="services">Services</string>

@@ -655,6 +655,7 @@ public class Target
   }
 
   public void addOpenPort(Port port){
+    boolean notifyList = false;
     synchronized (mPorts) {
       Port existing = null;
       for(Port p : mPorts) {
@@ -668,8 +669,11 @@ public class Target
         port.mergeTo(existing);
       } else {
         mPorts.add(port);
+        notifyList = true;
       }
     }
+    if(notifyList)
+      System.notifyTargetListChanged(this);
   }
 
   public void addOpenPort(int port, Protocol protocol){
