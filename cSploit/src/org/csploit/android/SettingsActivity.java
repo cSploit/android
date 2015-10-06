@@ -50,7 +50,7 @@ import java.io.IOException;
 public class SettingsActivity extends AppCompatActivity {
 
 
-  public static final int SETTINGS_DONE = 101285;
+  public static final int SETTINGS_DONE = 1285;
   public static final String SETTINGS_WIPE_START = "SettingsActivity.WIPE_START";
   public static final String SETTINGS_WIPE_DIR = "SettingsActivity.data.WIPE_DIR";
   public static final String SETTINGS_WIPE_DONE = "SettingsActivity.WIPE_DONE";
