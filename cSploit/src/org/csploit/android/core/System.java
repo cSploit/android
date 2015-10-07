@@ -305,6 +305,7 @@ public class System
     Client.Disconnect();
 
     mCoreInitialized = false;
+    Services.getNetworkRadar().onAutoScanChanged();
   }
 
   public static void initCore() throws DaemonException, SuException {
@@ -335,6 +336,7 @@ public class System
     reloadTools();
 
     mCoreInitialized = true;
+    Services.getNetworkRadar().onAutoScanChanged();
   }
 
   public static void reloadNetworkMapping(){
@@ -948,7 +950,7 @@ public class System
   }
 
   public static void scanThemAll() {
-    if(!mCoreInitialized) {
+    if(!Services.getNetworkRadar().isAutoScanEnabled()) {
       return;
     }
     synchronized (mTargets) {
@@ -1212,6 +1214,7 @@ public class System
 
       Client.Disconnect();
       mCoreInitialized = false;
+      Services.getNetworkRadar().onAutoScanChanged();
     }
     catch(Exception e){
       errorLogging(e);

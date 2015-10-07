@@ -41,6 +41,7 @@ import org.csploit.android.gui.DirectoryPicker;
 import org.csploit.android.gui.dialogs.ChoiceDialog;
 import org.csploit.android.gui.dialogs.ConfirmDialog;
 import org.csploit.android.net.GitHubParser;
+import org.csploit.android.services.Services;
 import org.csploit.android.tools.Raw;
 import org.json.JSONException;
 
@@ -376,6 +377,8 @@ public class SettingsActivity extends AppCompatActivity {
       } else if (key.equals("MSF_ENABLED")) {
         if (mMsfEnabled.isChecked())
           onMsfEnabled();
+      } else if (key.equals("PREF_AUTO_PORTSCAN")) {
+        Services.getNetworkRadar().onAutoScanChanged();
       }
 
       if (message != null)

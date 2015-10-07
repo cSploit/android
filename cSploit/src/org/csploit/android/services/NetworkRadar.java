@@ -26,6 +26,8 @@ public class NetworkRadar extends NativeService implements MenuControllableServi
   public static final String NRDR_STARTED = "NetworkRadar.action.STARTED";
   public static final String NRDR_START_FAILED = "NetworkRadar.action.START_FAILED";
 
+  private boolean autoScan = true;
+
   public NetworkRadar(Context context) {
     this.context = context;
   }
@@ -69,26 +71,28 @@ public class NetworkRadar extends NativeService implements MenuControllableServi
     item.setEnabled(System.getTools().networkRadar.isEnabled() && System.getNetwork() != null);
   }
 
-  public void onNewTargetFound(final Target target) {
-    if (target.getType() == Target.Type.NETWORK)
-      return;
+  public void onAutoScanChanged() {
+    autoScan = System.isCoreInitialized() && System.getSettings().getBoolean("PREF_AUTO_PORTSCAN", true);
+    Logger.info("autoScan has been set to " + autoScan);
+  }
 
-    if (!System.isCoreInitialized()) {
+  public boolean isAutoScanEnabled() {
+    return autoScan;
+  }
+
+  public void onNewTargetFound(final Target target) {
+    if(!autoScan || target.getType() == Target.Type.NETWORK)
       return;
-    }
-    SharedPreferences prefs = System.getSettings();
-    if (prefs.getBoolean("PREF_AUTO_PORTSCAN", true)) {
-      ThreadHelper.getSharedExecutor().execute(new Runnable() {
-        @Override
-        public void run() {
-          try {
-            System.getTools().nmap.synScan(target, new ScanReceiver(target));
-          } catch (ChildManager.ChildNotStartedException e) {
-            System.errorLogging(e);
-          }
+    ThreadHelper.getSharedExecutor().execute(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          System.getTools().nmap.synScan(target, new ScanReceiver(target));
+        } catch (ChildManager.ChildNotStartedException e) {
+          System.errorLogging(e);
         }
-      });
-    }
+      }
+    });
   }
 
   private class Receiver extends HostReceiver {
