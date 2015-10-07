@@ -415,6 +415,8 @@
     <string name="pref_err_buffer_size">Buffer size must be between 1024 and 104857600.</string>
     <string name="pref_persistent_network_monitor">persistent network monitor</string>
     <string name="pref_persistent_network_monitor_desc">keep network monitor watching the network</string>
+    <string name="pref_auto_portscan">Auto port-scan</string>
+    <string name="pref_auto_portscan_desc">Always SYN scan for open ports when new host is discovered</string>
 
     <string name="exploit_finder">Exploit Finder</string>
     <string name="exploit_finder_desc">Search for exploit that matches found vulnerabilities.</string>

@@ -2,12 +2,13 @@ package org.csploit.android.services;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.MenuItem;
 
 import org.csploit.android.R;
+import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Logger;
 import org.csploit.android.core.System;
-import org.csploit.android.core.ChildManager;
 import org.csploit.android.helpers.ThreadHelper;
 import org.csploit.android.net.Endpoint;
 import org.csploit.android.net.Network;
@@ -69,23 +70,25 @@ public class NetworkRadar extends NativeService implements MenuControllableServi
   }
 
   public void onNewTargetFound(final Target target) {
-    if(target.getType() == Target.Type.NETWORK)
+    if (target.getType() == Target.Type.NETWORK)
       return;
 
-    if(!System.isCoreInitialized()) {
+    if (!System.isCoreInitialized()) {
       return;
     }
-
-    ThreadHelper.getSharedExecutor().execute(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          System.getTools().nmap.synScan(target, new ScanReceiver(target));
-        } catch (ChildManager.ChildNotStartedException e) {
-          System.errorLogging(e);
+    SharedPreferences prefs = System.getSettings();
+    if (prefs.getBoolean("PREF_AUTO_PORTSCAN", true)) {
+      ThreadHelper.getSharedExecutor().execute(new Runnable() {
+        @Override
+        public void run() {
+          try {
+            System.getTools().nmap.synScan(target, new ScanReceiver(target));
+          } catch (ChildManager.ChildNotStartedException e) {
+            System.errorLogging(e);
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   private class Receiver extends HostReceiver {
