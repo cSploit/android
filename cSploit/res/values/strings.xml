@@ -9,6 +9,7 @@
     <string name="enter_redirection_details">Enter redirection details below:</string>
     <string name="address">Address</string>
     <string name="port">Port</string>
+    <string name="ports">Ports</string>
     <string name="target">Target</string>
     <string name="unknown">No information</string>
     <string name="services">Services</string>
@@ -75,8 +76,8 @@
     <string name="enter_url">Enter an URL, host name or IP address below:</string>
     <string name="net_discovery_stopped">Network discovery stopped.</string>
     <string name="net_discovery_started">Network discovery started.</string>
-    <string name="start_monitor">Start Network Monitor</string>
-    <string name="stop_monitor">Stop Network Monitor</string>
+    <string name="start_monitor">Start network monitor</string>
+    <string name="stop_monitor">Stop network monitor</string>
     <string name="start_msfrpcd">Start Metasploit RPCD</string>
     <string name="stop_msfrpcd">Stop Metasploit RPCD</string>
     <string name="exit">Exit</string>
@@ -87,10 +88,10 @@
     <string name="github_new_issue_url" translatable="false">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">No session file found on sd card.</string>
     <string name="select_session_file">Select a session file from the sd card :</string>
-    <string name="select_session">Select Session</string>
+    <string name="select_session">Select session</string>
     <string name="invalid_session">Invalid session name.</string>
     <string name="session_saved_to">Session saved to &#160;</string>
-    <string name="save_session">Save Session</string>
+    <string name="save_session">Save session</string>
     <string name="enter_session_name">Enter the name of the session file :</string>
     <string name="new_session_started">New session started</string>
     <string name="warning">Warning</string>
@@ -184,18 +185,18 @@
     <string name="vulnerability_finder_desc">Search for known vulnerabilities for target running
         services upon National Vulnerability Database.
     </string>
-    <string name="inspector">Service Inspector</string>
+    <string name="inspector">Service inspector</string>
     <string name="inspector_desc">Perform target operating system and services deep detection
         (slower than port scanner, but more accurate).
     </string>
-    <string name="login_cracker">Login Cracker</string>
+    <string name="login_cracker">Login cracker</string>
     <string name="login_cracker_desc">A very fast network logon cracker which support many different
         services.
     </string>
-    <string name="packet_forger">Packet Forger</string>
+    <string name="packet_forger">Packet forger</string>
     <string name="packet_forger_desc">Craft and send a custom TCP or UDP packet to the target.
     </string>
-    <string name="port_scanner">Port Scanner</string>
+    <string name="port_scanner">Port scanner</string>
     <string name="port_scanner_desc">Perform a SYN port scanning on target.</string>
     <string name="router_pwn">Router PWN</string>
     <string name="router_pwn_desc">Launch the http://routerpwn.com/ service to pwn your router.
@@ -245,14 +246,14 @@
     <string name="rpcd_timedout">Metasploit RPCD does not respond</string>
 
     <!-- mitm modules -->
-    <string name="mitm_simple_sniff">Simple Sniff</string>
+    <string name="mitm_simple_sniff">Simple sniff</string>
     <string name="mitm_simple_sniff_desc">Redirect target\'s traffic through this device and show some stats while dumping it to a pcap file.</string>
-    <string name="mitm_password_sniff">Password Sniffer</string>
+    <string name="mitm_password_sniff">Password sniffer</string>
     <string name="mitm_password_sniff_desc">Sniff passwords of many protocols such as http, ftp, imap, imaps, irc, msn, etc from the target.</string>
     <string name="mitm_password_sniff_menu_fields">Users/pass fields</string>
-    <string name="mitm_session_hijack">Session Hijacker</string>
+    <string name="mitm_session_hijack">Session hijacker</string>
     <string name="mitm_session_hijack_desc">Listen for cookies on the network and hijack sessions.</string>
-    <string name="mitm_connection_kill">Kill Connections</string>
+    <string name="mitm_connection_kill">Kill connections</string>
     <string name="mitm_connection_kill_desc">Kill connections preventing the target to reach any website or server.</string>
     <string name="mitm_connection_kill_error">Connection killer can be used only against single endpoints.</string>
     <string name="mitm_redirect">Redirect</string>
@@ -260,7 +261,7 @@
     <string name="mitm_redirection">Redirection</string>
     <string name="error_port_outofrange">Port out of range.</string>
     <string name="error_invalid_address_or_port">Invalid address and/or port specified.</string>
-    <string name="mitm_image_replace">Replace Images</string>
+    <string name="mitm_image_replace">Replace images</string>
     <string name="mitm_image_replace_desc">Replace all images on webpages with the specified one.</string>
     <string name="choose_source">Choose a source:</string>
     <string name="local_images">Local Images</string>
@@ -268,42 +269,42 @@
     <string name="image">Image</string>
     <string name="enter_image_url">Enter the url of the image :</string>
     <string name="error_image_url">Invalid image url.</string>
-    <string name="mitm_video_replace">Replace Videos</string>
+    <string name="mitm_video_replace">Replace videos</string>
     <string name="mitm_video_replace_desc">Replace all youtube videos on webpages with the specified one.</string>
     <string name="video">Video</string>
     <string name="enter_video_url">Enter the url of the video :</string>
     <string name="error_video_url">Invalid youtube video.</string>
-    <string name="mitm_script_injection">Script Injection</string>
-    <string name="mitm_script_injection_desc">Inject a javascript in every visited webpage.</string>
+    <string name="mitm_script_injection">Script injection</string>
+    <string name="mitm_script_injection_desc">Inject a Javascript in every visited web page.</string>
     <string name="choose_method">Choose a method:</string>
     <string name="choose_branch">Choose a branch:</string>
     <string name="local_files">Local files</string>
-    <string name="custom_code">Custom Code</string>
-    <string name="error_file_intent">Seems like you have no file manager capable of browsing files, please install one.</string>
-    <string name="enter_js_code">Enter the js code to inject :</string>
+    <string name="custom_code">Custom code</string>
+    <string name="error_file_intent">Seems like you have no file manager capable of browsing files.  Please install one.</string>
+    <string name="enter_js_code">Enter the Javascript code to inject :</string>
     <string name="error_js_code"><![CDATA[Invalid javascript code, remember to use <script></script> enclosing tags.]]></string>
-    <string name="mitm_custom">Custom Filter</string>
+    <string name="mitm_custom">Custom filter</string>
     <string name="mitm_custom_desc">Replace custom text on webpages with the specified one.</string>
-    <string name="custom_filter">Custom Filter</string>
+    <string name="custom_filter">Custom filter</string>
     <string name="error_filter">Invalid regular expression</string>
-    <string name="file_output">File Output</string>
-    <string name="question_save_to_pcap">Do you want to save sniffed traffic to a pcap file?</string>
+    <string name="file_output">File output</string>
+    <string name="question_save_to_pcap">Do you want to save sniffed traffic to a PCAP file?</string>
     <string name="dumping_traffic_to">Dumping traffic to </string>
 
     <string name="error_mitm_proxy">Unable to create the proxy, please check your connection and port availability.</string>
     <string name="error_mitm_https_redirector">Unable to create the HTTPS redirector, please check your connection and port availability.</string>
     <string name="error_mitm_resource_server">Unable to create the resource server, please check your connection and port availability.</string>
 
-    <string name="hijacker_load_from_file">Load From File</string>
-    <string name="login_user_wordlist">User Wordlist</string>
-    <string name="login_pass_wordlist">Password Wordlist</string>
+    <string name="hijacker_load_from_file">Load from file</string>
+    <string name="login_user_wordlist">User word list</string>
+    <string name="login_pass_wordlist">Password word list</string>
 
-    <string name="menu_new_session">New Session</string>
-    <string name="menu_save_session">Save Session</string>
-    <string name="menu_restore_session">Restore Session</string>
-    <string name="menu_stop_monitor">Stop Network Monitor</string>
-    <string name="menu_submit_issue">Submit Issue</string>
-    <string name="menu_about">About</string>
+    <string name="menu_new_session">New session</string>
+    <string name="menu_save_session">Save session</string>
+    <string name="menu_restore_session">Restore session</string>
+    <string name="menu_stop_monitor">Stop network monitor</string>
+    <string name="menu_submit_issue">Submit issue</string>
+    <string name="menu_about">About cSploit</string>
 
     <string name="scanner_select_ports">Select Custom Ports</string>
     <string name="scanner_custom_parameters">Custom parameters</string>
@@ -318,27 +319,27 @@
     <string name="wifi_error_keys">Could not generate keys.</string>
     <string name="wifi_scan_finished">Scanning finished.</string>
 
-    <string name="mitm_dns_spoofing">DNS Spoofing</string>
+    <string name="mitm_dns_spoofing">DNS spoofing</string>
     <string name="mitm_dns_spoofing_desc">Redirect domains to a different web/IP</string>
     <string name="mitm_dns_spoofing_list_saved">Saved</string>
 
     <!-- preferences -->
     <string name="pref_general">General</string>
     <string name="pref_modules">Modules</string>
-    <string name="pref_msf">Metasploit Framework</string>
+    <string name="pref_msf">Metasploit framework</string>
     <string name="pref_performance">Performance</string>
-    <string name="pref_check_updates">Check for Updates</string>
-    <string name="pref_wake_lock">Wake Lock</string>
-    <string name="pref_save_path">Save Path</string>
-    <string name="pref_debug_error_logging">Debug Error Logging</string>
-    <string name="pref_enable_profiler">Code Profiler</string>
-    <string name="pref_sniffer_sample_time">Sniffer Sample Time</string>
-    <string name="pref_http_proxy_port">HTTP Proxy Port</string>
-    <string name="pref_http_server_port">HTTP Server Port</string>
-    <string name="pref_https_redirect">SSL Stripping</string>
-    <string name="pref_https_redirector_port">HTTPS Redirector Port</string>
-    <string name="pref_http_max_buffer_size">HTTP Max Buffer Size</string>
-    <string name="pref_password_filename">Password Sniffer File</string>
+    <string name="pref_check_updates">Check for updates</string>
+    <string name="pref_wake_lock">Wake lock</string>
+    <string name="pref_save_path">Save path</string>
+    <string name="pref_debug_error_logging">Debug error logging</string>
+    <string name="pref_enable_profiler">Code profiler</string>
+    <string name="pref_sniffer_sample_time">Sniffer sample time</string>
+    <string name="pref_http_proxy_port">HTTP proxy port</string>
+    <string name="pref_http_server_port">HTTP server port</string>
+    <string name="pref_https_redirect">SSL stripping</string>
+    <string name="pref_https_redirector_port">HTTPS redirector port</string>
+    <string name="pref_http_max_buffer_size">HTTP max buffer size</string>
+    <string name="pref_password_filename">Password sniffer file</string>
     <string name="pref_check_updates_desc">Check for updates every time the application is started.</string>
     <string name="pref_wake_lock_desc">Prevents the device going in sleep mode while the application is running.</string>
     <string name="pref_save_path_desc">Global save path to put every log file.</string>
@@ -414,8 +415,10 @@
     <string name="pref_err_buffer_size">Buffer size must be between 1024 and 104857600.</string>
     <string name="pref_persistent_network_monitor">persistent network monitor</string>
     <string name="pref_persistent_network_monitor_desc">keep network monitor watching the network</string>
+    <string name="pref_auto_portscan">Auto port-scan</string>
+    <string name="pref_auto_portscan_desc">Always SYN scan for open ports when new host is discovered</string>
 
-    <string name="exploit_finder">Exploit Finder</string>
+    <string name="exploit_finder">Exploit finder</string>
     <string name="exploit_finder_desc">Search for exploit that matches found vulnerabilities.</string>
     <string name="exploit_launch_all">Launch all</string>
     <string name="sessions">Sessions</string>
@@ -432,10 +435,10 @@
     
     <string name="menu_add">Add</string>
     <string name="menu_scan">Scan</string>
-    <string name="menu_wifi_scan">WiFi Scan</string>
+    <string name="menu_wifi_scan">WiFi scan</string>
     <string name="menu_stop_msfrpcd">Stop MSFRPCD</string>
     
-    <string name="pref_theme">Dark Theme</string>
+    <string name="pref_theme">Dark theme</string>
     <string name="pref_choose_theme">Enable the dark theme, which is easier on the eyes</string>
     <string name="please_restart">The new theme will not be applied until you restart the app</string>
     <string name="evasion">Evasion</string>
@@ -484,19 +487,19 @@
     <string name="new_core_found">Core version %s is available, do you want to upgrade ?</string>
     <string name="pref_updates">Updates</string>
     <string name="pref_updates_app">App</string>
-    <string name="pref_updates_app_desc">check for App updates</string>
+    <string name="pref_updates_app_desc">Check for app updates</string>
     <string name="pref_updates_core">Core</string>
-    <string name="pref_updates_core_desc">check for Core updates</string>
+    <string name="pref_updates_core_desc">Check for core updates</string>
     <string name="pref_updates_ruby">Ruby</string>
-    <string name="pref_updates_ruby_desc">check for Ruby updates</string>
+    <string name="pref_updates_ruby_desc">Check for Ruby updates</string>
     <string name="pref_updates_msf">MSF</string>
-    <string name="pref_updates_msf_desc">check for MSF updates</string>
+    <string name="pref_updates_msf_desc">Check for MSF updates</string>
     <string name="pref_updates_gems">RubyGems</string>
-    <string name="pref_updates_gems_desc">check for RubyGems updates</string>
+    <string name="pref_updates_gems_desc">Check for RubyGems updates</string>
     <string name="pref_msf_manifest">Custom manifest</string>
-    <string name="pref_msf_manifest_desc">custom MSF manifest URL</string>
-    <string name="buildinfo">Build Info</string>
-    <string name="menu_multiaction">Multi Action</string>
+    <string name="pref_msf_manifest_desc">Custom MSF manifest URL</string>
+    <string name="buildinfo">Build info</string>
+    <string name="menu_multiaction">Multi action</string>
     <string name="menu_focusedscan">focused scan</string>
     <string name="menu_resolve_names">resolve hostnames</string>
 
@@ -506,13 +509,13 @@
     <string name="JNI_crash_detected">The JNI library has crashed previously.  Reporting the circumstances leading to the crash would be appreciated.</string>
     <string name="update_cancelled">Update cancelled</string>
     <string name="child_not_started">Cannot start process</string>
-    <string name="msfrpcd_killed">MSF RPC Daemon killed</string>
-    <string name="msfrcd_start_failed">MSF RPC Daemon failed to start</string>
-    <string name="msf_connection_failed">Connection to the MSF RPC Daemon FAILED!</string>
+    <string name="msfrpcd_killed">MSF RPC daemon killed</string>
+    <string name="msfrcd_start_failed">MSF RPC daemon failed to start</string>
+    <string name="msf_connection_failed">Connection to the MSF RPC daemon FAILED!</string>
     <string name="net_discovery_start_failed">Network discovery FAILED to start!</string>
     <string name="new_apk_found">App version %s is available, do you want to upgrade ?</string>
-    <string name="new_ruby_found">A new version for ruby is available, do you want to upgrade ?</string>
-    <string name="new_msf_found">A new msf version is available, do you want to upgrade ?</string>
+    <string name="new_ruby_found">A new version of Ruby is available, do you want to upgrade ?</string>
+    <string name="new_msf_found">A new MSF version is available, do you want to upgrade ?</string>
     <string name="msf_status">Metasploit Status</string>
     <string name="msf_exploit_ranking">Ranking: %s</string>
     <string name="msf_rank_manual">Manual</string>
