@@ -64,7 +64,7 @@
             android:layout_row="0"
             android:gravity="top|center_horizontal"
             android:text="@string/ports"
-            android:textColor="@color/selectable_blue"
+            android:textColor="@color/primary_material_light"
             android:textSize="12dp"
             android:textStyle="bold" />
 
