@@ -8,6 +8,7 @@
     <string name="enter_redirection_details">Введите параметры переадресации ниже:</string>
     <string name="address">Адрес</string>
     <string name="port">Порт</string>
+    <string name="ports">Порты</string>
     <string name="target">Цель</string>
     <string name="unknown">Неизвестно</string>
     <string name="services">Сервисы</string>
@@ -73,7 +74,7 @@
     <string name="close_confirm">Приложение cSploit будет закрыто, вы уверены, что хотите продолжить?
     </string>
     <string name="press_back">Нажмите назад ещё раз, чтобы закрыть приложение.</string>
-    <string name="selected_">Выбрано </string>
+    <string name="selected_">Выбрано </string>
     <string name="no_session_found">Не найдено файлов сессии на карте памяти.</string>
     <string name="select_session_file">Выберите файл сессии с карты памяти:</string>
     <string name="select_session">Выбор сессии</string>
@@ -373,6 +374,8 @@
     <string name="pref_err_buffer_size">Размер буфера может быть от 1024 до 104857600.</string>
     <string name="pref_persistent_network_monitor">Постоянный мониторинг сети</string>
     <string name="pref_persistent_network_monitor_desc">Постоянно продолжать мониторинг сети</string>
+    <string name="pref_auto_portscan">Автоматическое сканирование портов</string>
+    <string name="pref_auto_portscan_desc">Всегда проводить SYN сканирование портов когда найден новый хост</string>
     <string name="choose_branch">Выберите ветку:</string>
     <string name="pref_performance_vuln_title">Настройки поиска</string>
     <string name="pref_err_executable">Недопустимо создание исполняемого контента</string>
@@ -486,4 +489,5 @@
     <string name="msf_rank_excellent">Превосходный</string>
     <string name="mitm_ss_select_target_title">Выбрать цель</string>
     <string name="mitm_ss_select_target_prompt">Выбрать %s ?</string>
+    <string name="issue_message"><![CDATA[<p>Перед открытием новой проблемы поищите посмотрите список в <a href="%1$s">открытых проблем</a>, возможно она уже открыта. Если нету сообщения о проблеме нам нужны как можно больше данных, так что пожайлуста прочитайте <a href="%2$s">это руководство</a>, чтобы знать как правильно сообщить о баге.</p>]]></string>
 </resources>
