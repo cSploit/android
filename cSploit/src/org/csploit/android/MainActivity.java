@@ -857,6 +857,8 @@ public class MainActivity extends AppCompatActivity {
                 .findViewById(R.id.portCount) : null);
         holder.portCountLayout = (LinearLayout) (row != null ? row
                 .findViewById(R.id.portCountLayout) : null);
+        if (isDark)
+            holder.portCountLayout.setBackgroundResource(R.drawable.rounded_square_grey);
         if (row != null)
           row.setTag(holder);
       } else
