@@ -230,7 +230,10 @@ public class Target
     }
 
     public boolean equals(Object o) {
-      return !(o == null || o.getClass() != this.getClass()) && ((Exploit) o).getId().equals(getId());
+      if(o == null || o.getClass() != this.getClass())
+        return false;
+      Exploit other = (Exploit) o;
+      return id == null ? other.id == null : id.equals(other.id);
     }
 
     public void addReference(Reference ref) {
