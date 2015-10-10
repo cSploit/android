@@ -25,13 +25,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
-import java.util.ArrayList;
-
 import org.csploit.android.R;
+
+import java.util.ArrayList;
 
 public class CustomFilterDialog extends AlertDialog{
   public interface CustomFilterDialogListener{
-    public void onInputEntered(ArrayList<String> from, ArrayList<String> to);
+    void onInputEntered(ArrayList<String> from, ArrayList<String> to);
   }
 
   public CustomFilterDialog(String title, Activity activity, final CustomFilterDialogListener listener){
@@ -42,7 +42,7 @@ public class CustomFilterDialog extends AlertDialog{
     this.setTitle(title);
     this.setView(view);
 
-    this.setButton("Ok", new DialogInterface.OnClickListener(){
+    this.setButton(BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener(){
       public void onClick(DialogInterface dialog, int id){
         assert view != null;
         String f0 = ((EditText) view.findViewById(R.id.fromText0)).getText() + "".trim(),
@@ -88,7 +88,7 @@ public class CustomFilterDialog extends AlertDialog{
       }
     });
 
-    this.setButton2(activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener(){
+    this.setButton(BUTTON_NEGATIVE, activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener(){
       public void onClick(DialogInterface dialog, int id){
         dialog.dismiss();
       }

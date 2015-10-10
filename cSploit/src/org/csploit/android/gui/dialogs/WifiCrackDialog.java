@@ -42,30 +42,30 @@ public class WifiCrackDialog extends AlertDialog{
 
     final WifiCrackDialogListener listener = wifiCrackDialogListener;
 
-    this.setButton(activity.getString(R.string.connect), new DialogInterface.OnClickListener(){
+    this.setButton(BUTTON_POSITIVE, activity.getString(R.string.connect), new DialogInterface.OnClickListener(){
       public void onClick(DialogInterface dialog, int id){
         if(listener != null)
           listener.onManualConnect(mEditText.getText() + "");
       }
     });
 
-    this.setButton2(activity.getString(R.string.crack), new DialogInterface.OnClickListener(){
-      public void onClick(DialogInterface dialog, int id){
-        if(listener != null)
+    this.setButton(BUTTON_NEUTRAL, activity.getString(R.string.crack), new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int id) {
+        if (listener != null)
           listener.onCrack();
       }
     });
 
-    this.setButton3(activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener(){
-      public void onClick(DialogInterface dialog, int id){
+    this.setButton(BUTTON_NEGATIVE, activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int id) {
         dialog.dismiss();
       }
     });
   }
 
   public interface WifiCrackDialogListener{
-    public void onManualConnect(String key);
+    void onManualConnect(String key);
 
-    public void onCrack();
+    void onCrack();
   }
 }

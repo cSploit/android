@@ -21,9 +21,7 @@ package org.csploit.android.core;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -32,25 +30,25 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.util.SparseIntArray;
-import android.widget.Toast;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
+import org.apache.commons.compress.utils.IOUtils;
 import org.csploit.android.R;
 import org.csploit.android.WifiScannerActivity;
-import org.csploit.android.net.Endpoint;
+import org.csploit.android.gui.dialogs.FatalDialog;
+import org.csploit.android.helpers.NetworkHelper;
+import org.csploit.android.helpers.ThreadHelper;
+import org.csploit.android.net.GitHubParser;
 import org.csploit.android.net.Network;
-import org.csploit.android.net.Network.Protocol;
+import org.csploit.android.net.RemoteReader;
 import org.csploit.android.net.Target;
 import org.csploit.android.net.Target.Exploit;
-import org.csploit.android.net.Target.Port;
-import org.csploit.android.net.Target.Type;
 import org.csploit.android.net.http.proxy.HTTPSRedirector;
 import org.csploit.android.net.http.proxy.Proxy;
 import org.csploit.android.net.http.server.Server;
@@ -58,6 +56,7 @@ import org.csploit.android.net.metasploit.MsfExploit;
 import org.csploit.android.net.metasploit.Payload;
 import org.csploit.android.net.metasploit.RPCClient;
 import org.csploit.android.net.metasploit.Session;
+import org.csploit.android.services.Services;
 import org.csploit.android.tools.ToolBox;
 
 import java.io.BufferedReader;
@@ -85,8 +84,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.Vector;
+import java.util.Observer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -111,23 +111,24 @@ public class System
   private static WifiLock mWifiLock = null;
   private static WakeLock mWakeLock = null;
   private static Network mNetwork = null;
-  private static final Vector<Target> mTargets = new Vector<Target>();
-  private static int mCurrentTarget = 0;
+  private static final List<Target> mTargets = new ArrayList<>();
+  private static Target mCurrentTarget = null;
   private static Map<String, String> mServices = null;
   private static Map<String, String> mPorts = null;
-  private static Map<String, String> mVendors = null;
+  private static Map<Integer, String> mVendors = null;
   private static SparseIntArray mOpenPorts = null;
 
   // registered plugins
   private static ArrayList<Plugin> mPlugins = null;
   private static Plugin mCurrentPlugin = null;
   // toolbox singleton
-  private static ToolBox mTools = new ToolBox();
+  private static ToolBox mTools = null;
 
   private static HTTPSRedirector mRedirector = null;
   private static Proxy mProxy = null;
   private static Server mServer = null;
 
+  private static String mIfname = null;
   private static String mStoragePath = null;
   private static String mSessionName = null;
 
@@ -144,17 +145,21 @@ public class System
 
   private static KnownIssues mKnownIssues = null;
 
+  private static Observer targetListObserver = null;
+
   private final static LinkedList<SettingReceiver> mSettingReceivers = new LinkedList<SettingReceiver>();
 
-  public static void init(Context context, String iface) throws Exception{
+  public static void init(Context context) throws Exception{
     mContext = context;
     try{
-      Logger.debug("initializing System...iface: " + ((iface == null) ? "" : iface));
+      Logger.debug("initializing System...");
       mStoragePath = getSettings().getString("PREF_SAVE_PATH", Environment.getExternalStorageDirectory().toString());
-      mSessionName = "dsploit-session-" + java.lang.System.currentTimeMillis();
+      mSessionName = "csploit-session-" + java.lang.System.currentTimeMillis();
       mKnownIssues = new KnownIssues();
-      mPlugins = new ArrayList<Plugin>();
+      mPlugins = new ArrayList<>();
       mOpenPorts = new SparseIntArray(3);
+      mServices = new HashMap<>();
+      mPorts = new HashMap<>();
 
       // if we are here, network initialization didn't throw any error, lock wifi
       WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
@@ -181,20 +186,24 @@ public class System
         HTTP_PROXY_PORT  = Integer.parseInt(getSettings().getString("PREF_HTTP_PROXY_PORT", "8080"));
         HTTP_SERVER_PORT = Integer.parseInt(getSettings().getString("PREF_HTTP_SERVER_PORT", "8081"));
         HTTPS_REDIR_PORT = Integer.parseInt(getSettings().getString("PREF_HTTPS_REDIRECTOR_PORT", "8082"));
-        MSF_RPC_PORT     = Integer.parseInt(getSettings().getString("MSF_RPC_PORT", "5553"));
+        MSF_RPC_PORT     = Integer.parseInt(getSettings().getString("MSF_RPC_PORT", "55553"));
       } catch(NumberFormatException e){
         HTTP_PROXY_PORT = 8080;
         HTTP_SERVER_PORT = 8081;
         HTTPS_REDIR_PORT = 8082;
+        MSF_RPC_PORT = 55553;
       }
 
-      if (iface == null){
-        Logger.warning("network interface null, not initiating");
-        mInitialized = false;
-        return;
-      }
+      // initialize network data at the end
+      uncaughtReloadNetworkMapping();
 
-      mInitialized = true;
+      ThreadHelper.getSharedExecutor().execute(new Runnable() {
+        @Override
+        public void run() {
+          preloadVendors();
+          preloadServices();
+        }
+      });
     }
     catch(Exception e){
       if(!(e instanceof NoRouteToHostException))
@@ -205,9 +214,7 @@ public class System
   }
 
   public static void reloadTools() {
-    if(mTools == null)
-      mTools = new ToolBox();
-    mTools.reload();
+    getTools().reload();
   }
 
   public static class SuException extends Exception {
@@ -299,7 +306,8 @@ public class System
     Client.Shutdown();
     Client.Disconnect();
 
-    mCoreInitialized = mInitialized = false;
+    mCoreInitialized = false;
+    Services.getNetworkRadar().onAutoScanChanged();
   }
 
   public static void initCore() throws DaemonException, SuException {
@@ -312,20 +320,16 @@ public class System
     if(!Client.isConnected()) {
       if(!Client.Connect(socket_path)) {
         startCoreDaemon();
-        if (!Client.Connect(socket_path)) {
-          mCoreInitialized = false;
+        if (!Client.Connect(socket_path))
           throw new DaemonException("cannot connect to core daemon");
-        }
       }
     }
 
     if (!Client.isAuthenticated() && !Client.Login("android", "DEADBEEF")) {
-      mCoreInitialized = false;
       throw new DaemonException("cannot login to core daemon");
     }
 
     if (!Client.LoadHandlers()) {
-      mCoreInitialized = false;
       throw new DaemonException("cannot load handlers");
     }
 
@@ -334,28 +338,20 @@ public class System
     reloadTools();
 
     mCoreInitialized = true;
+    Services.getNetworkRadar().onAutoScanChanged();
   }
 
-  public static boolean reloadNetworkMapping(String iface){
+  public static void setIfname(String ifname) {
+    mIfname = ifname;
+  }
+
+  public static String getIfname() {
+    return mIfname;
+  }
+
+  public static void reloadNetworkMapping(){
     try{
-      mNetwork = new Network(mContext, iface);
-      if (mNetwork.getInterface() == null)
-        return false;
-
-      Target network = new Target(mNetwork),
-        gateway = new Target(mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware()),
-        device = new Target(mNetwork.getLocalAddress(), mNetwork.getLocalHardware());
-
-      gateway.setAlias(mNetwork.getSSID());
-      device.setAlias(android.os.Build.MODEL);
-
-      mTargets.clear();
-      mTargets.add(network);
-      mTargets.add(gateway);
-      mTargets.add(device);
-
-      mInitialized = true;
-      return mInitialized;
+      uncaughtReloadNetworkMapping();
     }
     catch(NoRouteToHostException nrthe){
       // swallow bitch
@@ -363,45 +359,60 @@ public class System
     catch(Exception e){
       errorLogging(e);
     }
+  }
 
-    mInitialized = false;
-    return mInitialized;
+  private static void uncaughtReloadNetworkMapping() throws UnknownHostException, SocketException {
+    mNetwork = new Network(mContext, mIfname);
+    mIfname = mNetwork.getInterface().getName();
+
+    reset();
+
+    mInitialized = true;
   }
 
   public static boolean checkNetworking(final Activity current){
-    if(!Network.isWifiConnected(mContext) && !mNetwork.isConnectivityAvailable(mContext)){
-      if (current == null){
-        Toast.makeText(mContext, "Error accesing The Net", Toast.LENGTH_SHORT).show();
-        return false;
-      }
-      AlertDialog.Builder builder = new AlertDialog.Builder(current);
+    if(!mNetwork.isConnected()){
 
-      builder.setCancelable(false);
-      builder.setTitle(current.getString(R.string.error));
-      builder.setMessage(current.getString(R.string.wifi_went_down));
-      builder.setPositiveButton("Ok", new DialogInterface.OnClickListener(){
-        @Override
-        public void onClick(DialogInterface dialog, int which){
-          dialog.dismiss();
+      Intent intent = new Intent();
+      intent.putExtra(WifiScannerActivity.CONNECTED, false);
+      current.setResult(Activity.RESULT_OK, intent);
 
-          Bundle bundle = new Bundle();
-          bundle.putBoolean(WifiScannerActivity.CONNECTED, false);
+      String title = current.getString(R.string.error);
+      String message = current.getString(R.string.wifi_went_down);
 
-          Intent intent = new Intent();
-          intent.putExtras(bundle);
-
-          current.setResult(Activity.RESULT_OK, intent);
-          current.finish();
-        }
-      });
-
-      AlertDialog alert = builder.create();
-      alert.show();
+      new FatalDialog(title, message, current).show();
 
       return false;
     }
 
     return true;
+  }
+
+  public synchronized static void setTargetListObserver(Observer targetListObserver) {
+    System.targetListObserver = targetListObserver;
+  }
+
+  /**
+   * notify that a specific target of the list has been changed
+   * @param target  the changed target
+   */
+  public static void notifyTargetListChanged(Target target) {
+    Observer o;
+    synchronized (System.class) {
+      o = targetListObserver;
+    }
+
+    if(o==null)
+      return;
+
+    o.update(null, target);
+  }
+
+  /**
+   * notify that the targets list has been changed
+   */
+  public static void notifyTargetListChanged() {
+    notifyTargetListChanged(null);
   }
 
   public static void setLastError(String error){
@@ -516,9 +527,11 @@ public class System
   }
 
   public static void registerSettingListener(SettingReceiver receiver) {
-    synchronized (mSettingReceivers) {
-      if(!mSettingReceivers.contains(receiver)) {
-        mSettingReceivers.add(receiver);
+    if (mSettingReceivers != null) {
+      synchronized (mSettingReceivers) {
+        if (!mSettingReceivers.contains(receiver)) {
+          mSettingReceivers.add(receiver);
+        }
       }
     }
   }
@@ -538,45 +551,46 @@ public class System
     }
   }
 
-  private static void preloadServices(){
-    if(mServices == null || mPorts == null){
-      try{
-        // preload network service map and mac vendors
-        mServices = new HashMap<String, String>();
-        mPorts = new HashMap<String, String>();
+  public static void preloadServices(){
+    if (!mServices.isEmpty())
+      return;
 
-        @SuppressWarnings("ConstantConditions")
-        FileInputStream fstream = new FileInputStream(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-services");
+    FileReader fr = null;
+    BufferedReader reader = null;
+    try{
+      // preload network service and ports map
 
-        DataInputStream in = new DataInputStream(fstream);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        String line;
-        Matcher matcher;
+      fr = new FileReader(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-services");
+      reader = new BufferedReader(fr);
+      String line;
+      Matcher matcher;
+      String port, proto;
 
-        while((line = reader.readLine()) != null){
-          line = line.trim();
+      while ((line = reader.readLine()) != null) {
+        if ((matcher = SERVICE_PARSER.matcher(line)) != null && matcher.find()) {
+          proto = matcher.group(1);
+          port = matcher.group(2);
 
-          if((matcher = SERVICE_PARSER.matcher(line)) != null && matcher.find()){
-            String proto = matcher.group(1),
-              port = matcher.group(2);
-
-            mServices.put(proto, port);
-            mPorts.put(port, proto);
-          }
+          mServices.put(proto, port);
+          mPorts.put(port, proto);
         }
+      }
 
-        in.close();
-      }
-      catch(Exception e){
-        errorLogging(e);
-      }
+    } catch (Exception e) {
+      mServices.clear();
+      mPorts.clear();
+
+      errorLogging(e);
+    } finally {
+      IOUtils.closeQuietly(reader);
+      IOUtils.closeQuietly(fr);
     }
   }
 
   private static void preloadVendors(){
     if(mVendors == null){
       try{
-        mVendors = new HashMap<String, String>();
+        mVendors = new HashMap<>();
         @SuppressWarnings("ConstantConditions")
         FileInputStream fstream = new FileInputStream(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-mac-prefixes");
 
@@ -590,7 +604,7 @@ public class System
             String[] tokens = line.split(" ", 2);
 
             if(tokens.length == 2)
-              mVendors.put(tokens[0], tokens[1]);
+              mVendors.put(NetworkHelper.getOUICode(tokens[0]), tokens[1]);
           }
         }
 
@@ -756,12 +770,13 @@ public class System
     builder.append(SESSION_MAGIC + "\n");
 
     // skip the network target
-    builder.append(mTargets.size() - 1).append("\n");
-    for(Target target : mTargets){
-      if(target.getType() != Target.Type.NETWORK)
-        target.serialize(builder);
+    synchronized (mTargets) {
+      builder.append(mTargets.size() - 1).append("\n");
+      for (Target target : mTargets) {
+        if (target.getType() != Target.Type.NETWORK)
+          target.serialize(builder);
+      }
     }
-    builder.append(mCurrentTarget).append("\n");
 
     session = builder.toString();
 
@@ -803,31 +818,28 @@ public class System
       String line;
 
       // begin decoding procedure
-      try{
+      try {
         line = reader.readLine();
-        if(line == null || !line.equals(SESSION_MAGIC))
+        if (line == null || !line.equals(SESSION_MAGIC))
           throw new Exception("Not a cSploit session file.");
 
         reset();
 
         // read targets
         int targets = Integer.parseInt(reader.readLine());
-        for(int i = 0; i < targets; i++){
-          Target target = new Target(reader);
 
-          if(!hasTarget(target)){
-            System.addOrderedTarget(target);
-          } else{
-            for(int j = 0; j < mTargets.size(); j++){
-              if(mTargets.get(j) != null && mTargets.get(j).equals(target)){
-                mTargets.set(j, target);
-                break;
-              }
+        synchronized (mTargets) {
+          for (int i = 0; i < targets; i++) {
+            Target target = new Target(reader);
+            int index = mTargets.indexOf(target);
+            if (index == -1) {
+              System.addOrderedTarget(target);
+            } else {
+              mTargets.set(index, target);
             }
           }
         }
 
-        mCurrentTarget = Integer.parseInt(reader.readLine());
         reader.close();
 
       } catch(Exception e){
@@ -839,7 +851,9 @@ public class System
       throw new Exception(filename + " does not exists or is empty.");
   }
 
-  public static ToolBox getTools() {
+  public synchronized static ToolBox getTools() {
+    if(mTools == null)
+      mTools = new ToolBox();
     return mTools;
   }
 
@@ -853,10 +867,10 @@ public class System
     mMsfRpc = value;
     // refresh all exploits
     // NOTE: this method is usually called by the RPCServer Thread, which will not block the UI
-    for( Target t : getTargets()) {
-      for( Exploit e : t.getExploits()) {
-        if(e instanceof MsfExploit) {
-          ((MsfExploit)e).refresh();
+    for (Target t : getTargets()) { // use a copy of the targets to avoid deadlocks.
+      for (Exploit e : t.getExploits()) {
+        if (e instanceof MsfExploit) {
+          ((MsfExploit) e).refresh();
         }
       }
     }
@@ -921,23 +935,39 @@ public class System
     return type;
   }
 
-  public static void reset() throws NoRouteToHostException, SocketException{
-    mTargets.clear();
+  public static void reset() {
+    mCurrentTarget = null;
 
-    // local network
-    mTargets.add(new Target(System.getNetwork()));
-    // network gateway
-    mTargets.add(new Target(System.getNetwork().getGatewayAddress(), System.getNetwork().getGatewayHardware()));
-    // device network address
-    mTargets.add(new Target(System.getNetwork().getLocalAddress(), System.getNetwork().getLocalHardware()));
+    synchronized (mTargets) {
+      mTargets.clear();
 
-    mCurrentTarget = 0;
+      Target network = new Target(mNetwork),
+              gateway = new Target(mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware()),
+              device = new Target(mNetwork.getLocalAddress(), mNetwork.getLocalHardware());
+
+      gateway.setAlias(mNetwork.getSSID());
+      device.setAlias(android.os.Build.MODEL);
+
+      mTargets.add(network);
+      mTargets.add(gateway);
+      mTargets.add(device);
+
+      scanThemAll();
+    }
+  }
+
+  public static void scanThemAll() {
+    if(!Services.getNetworkRadar().isAutoScanEnabled()) {
+      return;
+    }
+    synchronized (mTargets) {
+      for(Target t : mTargets) {
+        Services.getNetworkRadar().onNewTargetFound(t);
+      }
+    }
   }
 
   public static boolean isInitialized(){
-    if (mNetwork == null || mNetwork.isConnected() == false || mNetwork.getInterface() == null && mCoreInitialized)
-      return false;
-
     return mInitialized;
   }
 
@@ -954,16 +984,13 @@ public class System
   }
 
   public static String getMacVendor(byte[] mac){
-    preloadVendors();
-
-    if(mac != null && mac.length >= 3)
-      return mVendors.get(String.format("%02X%02X%02X", mac[0], mac[1], mac[2]));
+    if(mac != null && mVendors != null && mac.length >= 3)
+      return mVendors.get(NetworkHelper.getOUICode(mac));
     else
       return null;
   }
 
   public static String getProtocolByPort(String port){
-    preloadServices();
 
     return mPorts.containsKey(port) ? mPorts.get(port) : null;
   }
@@ -973,7 +1000,6 @@ public class System
   }
 
   public static int getPortByProtocol(String protocol){
-    preloadServices();
 
     return mServices.containsKey(protocol) ? Integer.parseInt(mServices.get(protocol)) : 0;
   }
@@ -986,41 +1012,14 @@ public class System
     return mNetwork;
   }
 
-  public static Vector<Target> getTargets(){
-    return mTargets;
-  }
-
-  public static ArrayList<Target> getTargetsByType(Target.Type type){
-    ArrayList<Target> filtered = new ArrayList<Target>();
-
-    for(Target target : mTargets){
-      if(target.getType() == type)
-        filtered.add(target);
+  /**
+   * get a copy of the current targets
+   * @return a copy of the target list
+   */
+  public static List<Target> getTargets(){
+    synchronized (mTargets) {
+      return new ArrayList<>(mTargets);
     }
-
-    return filtered;
-  }
-
-  public static ArrayList<Endpoint> getNetworkEndpoints(){
-    ArrayList<Endpoint> filtered = new ArrayList<Endpoint>();
-
-    for(Target target : mTargets){
-      if(target.getType() == Type.ENDPOINT)
-        filtered.add(target.getEndpoint());
-    }
-
-    return filtered;
-  }
-
-  public static void addTarget(int index, Target target){
-    mTargets.add(index, target);
-    // update current target index
-    if(mCurrentTarget >= index)
-      mCurrentTarget++;
-  }
-
-  public static void addTarget(Target target){
-    mTargets.add(target);
   }
 
   /**
@@ -1029,36 +1028,40 @@ public class System
    * @return true if target is added, false if already present
    */
   public static boolean addOrderedTarget(Target target){
-    if(target != null && !hasTarget(target)){
-      for(int i = 0; i < getTargets().size(); i++){
-        if(getTarget(i).comesAfter(target)){
-          addTarget(i, target);
+    if(target == null)
+      return false;
+
+    synchronized (mTargets) {
+      if(mTargets.contains(target)) {
+        return false;
+      }
+
+      for (int i = 0; i < mTargets.size(); i++) {
+        if (mTargets.get(i).comesAfter(target)) {
+          mTargets.add(i, target);
+          Services.getNetworkRadar().onNewTargetFound(target);
           return true;
         }
       }
 
-      addTarget(target);
-
+      mTargets.add(target);
+      Services.getNetworkRadar().onNewTargetFound(target);
       return true;
     }
-
-    return false;
-  }
-
-  public static Target getTarget(int index){
-    return mTargets.get(index);
   }
 
   public static boolean hasTarget(Target target){
-    return mTargets.contains(target);
+    synchronized (mTargets) {
+      return mTargets.contains(target);
+    }
   }
 
-  public static void setCurrentTarget(int index){
-    mCurrentTarget = index;
+  public static void setCurrentTarget(Target target) {
+    mCurrentTarget = target;
   }
 
   public static Target getCurrentTarget(){
-    return getTarget(mCurrentTarget);
+    return mCurrentTarget;
   }
 
   public static Target getTargetByAddress(String address){
@@ -1151,24 +1154,6 @@ public class System
     return mMsfSession;
   }
 
-  public static void addOpenPort( int port, Protocol protocol ) {
-    addOpenPort( port, protocol, null, null );
-  }
-
-  public static void addOpenPort( int port, Protocol protocol, String service ) {
-    addOpenPort(port, protocol, service, null);
-  }
-
-  public static void addOpenPort( int port, Protocol protocol, String service, String version ) {
-    Port p = new Port( port, protocol, service, version );
-
-    getCurrentTarget().addOpenPort( p );
-
-    for( Plugin plugin : getPluginsForTarget() ) {
-      plugin.onTargetNewOpenPort( getCurrentTarget(), p );
-    }
-  }
-
   public static Collection<Exploit> getCurrentExploits() {
     return getCurrentTarget().getExploits();
   }
@@ -1204,7 +1189,7 @@ public class System
       cmd = "echo " + status + " > " + IPV4_FORWARD_FILEPATH;
 
     try{
-      mTools.shell.run(cmd);
+      getTools().shell.run(cmd);
     }
     catch(Exception e){
       Logger.error(e.getMessage());
@@ -1225,6 +1210,10 @@ public class System
           mWakeLock.release();
       }
 
+      RemoteReader.terminateAll();
+
+      GitHubParser.resetAll();
+
       synchronized (mTargets) {
 
         for (Target t : mTargets)
@@ -1236,6 +1225,7 @@ public class System
 
       Client.Disconnect();
       mCoreInitialized = false;
+      Services.getNetworkRadar().onAutoScanChanged();
     }
     catch(Exception e){
       errorLogging(e);

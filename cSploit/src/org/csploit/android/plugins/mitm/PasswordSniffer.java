@@ -19,10 +19,13 @@
 package org.csploit.android.plugins.mitm;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,6 +40,7 @@ import android.widget.ToggleButton;
 import org.csploit.android.R;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.System;
+import org.csploit.android.gui.FileEdit;
 import org.csploit.android.gui.dialogs.FatalDialog;
 import org.csploit.android.tools.Ettercap.OnAccountListener;
 
@@ -47,7 +51,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PasswordSniffer extends ActionBarActivity {
+public class PasswordSniffer extends AppCompatActivity {
 	private ToggleButton mSniffToggleButton = null;
 	private ProgressBar mSniffProgress = null;
 	private ExpandableListView mListView = null;
@@ -57,6 +61,10 @@ public class PasswordSniffer extends ActionBarActivity {
 	private FileWriter mFileWriter = null;
 	private BufferedWriter mBufferedWriter = null;
 	private SpoofSession mSpoofSession = null;
+	private Menu mMenu = null;
+
+	private final static int OPTIONS_FIELDS = 0;
+	private final static int OPTIONS_FILTERS = 0;
 
 	public class ListViewAdapter extends BaseExpandableListAdapter {
 		private HashMap<String, ArrayList<String>> mGroups = null;
@@ -218,8 +226,27 @@ public class PasswordSniffer extends ActionBarActivity {
 	}
 
 	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.password_sniffer, menu);
+
+        mMenu = menu;
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+			case R.id.action_fields:
+				if (mSniffToggleButton.isEnabled() == false)
+					Toast.makeText(this, "The changes won't take effect until you stop the current traffic sniffing", Toast.LENGTH_SHORT).show();
+
+				Intent _fields = new Intent(PasswordSniffer.this, FileEdit.class);
+				_fields.putExtra(FileEdit.KEY_FILEPATH, "/tools/ettercap/share/etter.fields");
+				startActivityForResult(_fields, 0);
+
+				return true;
 		case android.R.id.home:
 
 			onBackPressed();
@@ -325,6 +352,6 @@ public class PasswordSniffer extends ActionBarActivity {
 	public void onBackPressed() {
 		setStoppedState();
 		super.onBackPressed();
-		overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+		overridePendingTransition(R.anim.fadeout, R.anim.fadein);
 	}
 }

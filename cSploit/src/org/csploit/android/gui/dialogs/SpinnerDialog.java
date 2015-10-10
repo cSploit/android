@@ -53,14 +53,14 @@ public class SpinnerDialog extends AlertDialog{
     this.setMessage(message);
     this.setView(mSpinner);
 
-    this.setButton("Ok", new DialogInterface.OnClickListener(){
+    this.setButton(BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener(){
       public void onClick(DialogInterface dialog, int id){
         listener.onItemSelected(mSelected);
       }
     });
 
-    this.setButton2(activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener(){
-      public void onClick(DialogInterface dialog, int id){
+    this.setButton(BUTTON_NEGATIVE, activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int id) {
         dialog.dismiss();
       }
     });
@@ -71,6 +71,6 @@ public class SpinnerDialog extends AlertDialog{
   }
 
   public interface SpinnerDialogListener{
-    public void onItemSelected(int index);
+    void onItemSelected(int index);
   }
 }

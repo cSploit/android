@@ -20,6 +20,10 @@ package org.csploit.android.net.http.proxy;
 
 import android.content.Context;
 
+import org.csploit.android.core.Logger;
+import org.csploit.android.core.System;
+import org.csploit.android.net.http.RequestParser;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -41,16 +45,12 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 
-import org.csploit.android.core.System;
-import org.csploit.android.net.http.RequestParser;
-import org.csploit.android.core.Logger;
-
 public class HTTPSRedirector implements Runnable
 {
   private static final int BACKLOG = 255;
 
-  private static final String KEYSTORE_FILE = "dsploit.keystore";
-  private static final String KEYSTORE_PASS = "dsploit";
+  private static final String KEYSTORE_FILE = "csploit.p12";
+  private static final String KEYSTORE_PASS = "1234";
 
   private Context mContext = null;
   private InetAddress mAddress = null;

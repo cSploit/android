@@ -6,7 +6,8 @@
     android:orientation="horizontal"
     android:background="@drawable/card_background"
     android:showDividers="none"
-    android:layout_marginBottom="8dp">
+    android:layout_marginBottom="8dp"
+    android:translationZ="8dp">
 
     <LinearLayout
         android:layout_height="wrap_content"
@@ -20,9 +21,10 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="10"
-            android:layout_marginRight="8dp"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_margin="8dp"
+            android:gravity="center">
 
             <ImageView
                 android:id="@+id/actionIcon"

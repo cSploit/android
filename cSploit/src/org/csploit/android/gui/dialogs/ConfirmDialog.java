@@ -26,9 +26,9 @@ import org.csploit.android.R;
 
 public class ConfirmDialog extends AlertDialog{
   public interface ConfirmDialogListener{
-    public void onConfirm();
+    void onConfirm();
 
-    public void onCancel();
+    void onCancel();
   }
 
   public ConfirmDialog(String title, CharSequence message, Activity activity, ConfirmDialogListener confirmDialogListener){
@@ -39,13 +39,13 @@ public class ConfirmDialog extends AlertDialog{
 
     final ConfirmDialogListener listener = confirmDialogListener;
 
-    this.setButton(activity.getString(R.string.yes), new DialogInterface.OnClickListener(){
+    this.setButton(BUTTON_POSITIVE, activity.getString(R.string.yes), new DialogInterface.OnClickListener(){
       public void onClick(DialogInterface dialog, int id){
         listener.onConfirm();
       }
     });
 
-    this.setButton2(activity.getString(R.string.no), new DialogInterface.OnClickListener(){
+    this.setButton(BUTTON_NEGATIVE, activity.getString(R.string.no), new DialogInterface.OnClickListener(){
       public void onClick(DialogInterface dialog, int id){
         dialog.dismiss();
         listener.onCancel();

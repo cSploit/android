@@ -16,6 +16,7 @@ import org.csploit.android.net.datasource.Search;
 import org.csploit.android.net.metasploit.MsfExploit;
 import org.csploit.android.tools.NMap;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -264,10 +265,12 @@ public class MultiAttackService extends IntentService {
     mRunning = true;
 
     //fetch targets
+    // TODO: rewrite this service since target index may change
+    List<Target> list = System.getTargets();
     Target[] targets = new Target[targetsIndex.length];
 
     for(i =0; i< targetsIndex.length;i++)
-      targets[i] = System.getTarget(targetsIndex[i]);
+      targets[i] = list.get(targetsIndex[i]);
 
     //fetch tasks
     for(int stringId : actions) {

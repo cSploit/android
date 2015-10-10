@@ -46,7 +46,14 @@ public class Payload {
 
     for(Map.Entry<String, Map<String, Object>> entry :
             ((Map<String,Map<String, Object>>)res).entrySet()) {
-      Option o = new Option(entry.getKey(), entry.getValue());
+      Option o;
+
+      try {
+        o = new Option(entry.getKey(), entry.getValue());
+      } catch (IllegalArgumentException e) {
+        System.errorLogging(e);
+        continue;
+      }
 
       if(entry.getKey().equals("LHOST")) {
         o.setValue(System.getNetwork().getLocalAddress().getHostAddress());

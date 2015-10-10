@@ -1,8 +1,9 @@
 package org.csploit.android.net.metasploit;
 
-import org.apache.http.conn.util.InetAddressUtils;
 import org.csploit.android.core.Logger;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -25,7 +26,7 @@ public class Option {
     }
   };
 
-  public static enum types {
+  public enum types {
     STRING,
     BOOLEAN,
     PATH,
@@ -41,21 +42,21 @@ public class Option {
   private boolean mAdvanced,mRequired,mEvasion;
   private String[] enums;
 
-  public Option(String name, Map<String,Object> attrs) throws RuntimeException {
+  public Option(String name, Map<String,Object> attrs) throws IllegalArgumentException {
     mName = name;
     mAttributes = attrs;
     // check for required data
     for(String field : requiredFields)
       if(!mAttributes.containsKey(field))
-        throw new RuntimeException("missing "+field+" field");
+        throw new IllegalArgumentException("missing "+field+" field");
     // get type
     String type = (String) mAttributes.get("type");
     if(!typesMap.containsKey(type))
-      throw new RuntimeException("unknown option type: "+type);
+      throw new IllegalArgumentException("unknown option type: "+type);
     mType = typesMap.get(type);
     if(mType == types.ENUM) {
       if(!mAttributes.containsKey("enums"))
-        throw new RuntimeException("missing enums field");
+        throw new IllegalArgumentException("missing enums field");
       //TODO: search if exists not string enums
       enums = new String[((ArrayList<String>)mAttributes.get("enums")).size()];
       enums = ((ArrayList<String>) mAttributes.get("enums")).toArray(enums);
@@ -103,9 +104,11 @@ public class Option {
         mValue = value;
         break;
       case ADDRESS:
-        if(!InetAddressUtils.isIPv4Address(value))
-          throw new NumberFormatException("invalid IP address");
-        mValue = value;
+        try {
+          mValue = InetAddress.getByName(value).getHostAddress();
+        } catch (UnknownHostException uhe) {
+          throw new NumberFormatException("invalid IP address: " + value);
+        }
         break;
       case PORT:
         int i = Integer.parseInt(value);

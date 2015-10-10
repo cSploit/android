@@ -48,13 +48,13 @@ public class NMap extends Tool {
     public void onEvent(Event e) {
       if(e instanceof Hop) {
         Hop hop = (Hop)e;
-        onHop(hop.hop, hop.usec, hop.node.getHostAddress());
+        onHop(hop.hop, hop.usec, hop.node.getHostAddress(), hop.name);
       } else {
         Logger.error("unknown event: " + e);
       }
     }
 
-    public abstract void onHop( int hop, long usec, String address );
+    public abstract void onHop( int hop, long usec, String address, String name );
   }
 
   public static abstract class SynScanReceiver extends Child.EventReceiver
@@ -121,8 +121,12 @@ public class NMap extends Tool {
     mCmdPrefix = null;
   }
 
-  public Child trace( Target target, TraceReceiver receiver ) throws ChildManager.ChildNotStartedException {
-    return super.async("-sn --traceroute --privileged --send-ip --system-dns " + target.getCommandLineRepresentation(), receiver );
+  public Child trace( Target target, boolean resolve, TraceReceiver receiver ) throws ChildManager.ChildNotStartedException {
+
+    String cmd = String.format("-sn --traceroute --privileged --send-ip --system-dns -%c %s",
+            (resolve ? 'R' : 'n'), target.getCommandLineRepresentation());
+
+    return super.async(cmd, receiver );
   }
 
   public Child synScan( Target target, SynScanReceiver receiver, String custom ) throws ChildManager.ChildNotStartedException {
@@ -134,6 +138,23 @@ public class NMap extends Tool {
     command += target.getCommandLineRepresentation();
 
     Logger.debug( "synScan - " + command );
+
+    return super.async( command, receiver );
+  }
+
+  public Child synScan( Target target, SynScanReceiver receiver) throws ChildManager.ChildNotStartedException {
+    return synScan(target, receiver, null);
+  }
+
+  public Child customScan( Target target, SynScanReceiver receiver, String custom ) throws ChildManager.ChildNotStartedException {
+    String command = "-vvv ";
+
+    if( custom != null )
+      command += custom + " ";
+
+    command += target.getCommandLineRepresentation();
+
+    Logger.debug( "customScan - " + command );
 
     return super.async( command, receiver );
   }

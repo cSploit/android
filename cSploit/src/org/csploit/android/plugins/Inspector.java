@@ -33,6 +33,7 @@ import org.csploit.android.R;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Plugin;
 import org.csploit.android.core.System;
+import org.csploit.android.helpers.ThreadHelper;
 import org.csploit.android.net.Network;
 import org.csploit.android.net.Target;
 import org.csploit.android.net.Target.Port;
@@ -52,12 +53,12 @@ public class Inspector extends Plugin{
 
   public Inspector(){
     super(
-      R.string.inspector,
-      R.string.inspector_desc,
+            R.string.inspector,
+            R.string.inspector_desc,
 
-      new Target.Type[]{Target.Type.ENDPOINT, Target.Type.REMOTE},
-      R.layout.plugin_inspector,
-      R.drawable.action_inspect
+            new Target.Type[]{Target.Type.ENDPOINT, Target.Type.REMOTE},
+            R.layout.plugin_inspector,
+            R.drawable.action_inspect
     );
   }
 
@@ -74,33 +75,44 @@ public class Inspector extends Plugin{
 
   private void write_services()
   {
-    synchronized (mDeviceServices) {
-      StringBuilder sb = new StringBuilder();
-      String service;
-      String version;
+    StringBuilder sb = new StringBuilder();
+    String service;
+    String version;
 
-      for (Port port : System.getCurrentTarget().getOpenPorts()) {
-        service = port.getService();
-        version = port.getVersion();
+    for (Port port : System.getCurrentTarget().getOpenPorts()) {
+      service = port.getService();
+      version = port.getVersion();
 
-        if (service != null && !service.isEmpty()) {
-          sb.append(port.getNumber());
-          sb.append(" ( ");
-          sb.append(port.getProtocol().toString());
-          sb.append(" ) : ");
-          sb.append(service);
+      if (service != null && !service.isEmpty()) {
+        sb.append(port.getNumber());
+        sb.append(" ( ");
+        sb.append(port.getProtocol().toString());
+        sb.append(" ) : ");
+        sb.append(service);
 
-          if (version != null && !version.isEmpty()) {
-            sb.append(" - ");
-            sb.append(version);
-          }
-          sb.append("\n");
+        if (version != null && !version.isEmpty()) {
+          sb.append(" - ");
+          sb.append(version);
         }
+        sb.append("\n");
       }
-      if (sb.length() > 0)
-        mDeviceServices.setText(sb.toString());
-      else
-        mDeviceServices.setText(empty);
+    }
+    if (sb.length() > 0)
+      mDeviceServices.setText(sb.toString());
+    else
+      mDeviceServices.setText(empty);
+  }
+
+  private void updateView() {
+    if(ThreadHelper.isOnMainThread()) {
+      write_services();
+    } else {
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          write_services();
+        }
+      });
     }
   }
 
@@ -109,7 +121,7 @@ public class Inspector extends Plugin{
     try {
       Target target = System.getCurrentTarget();
 
-      write_services();
+      updateView();
 
       mProcess = System.getTools().nmap.inpsect( target, mReceiver, mFocusedScan);
 
@@ -150,6 +162,7 @@ public class Inspector extends Plugin{
 
     empty = getText(R.string.unknown).toString();
 
+    // yep, we're on main thread here
     write_services();
 
     mStartButton.setOnClickListener(new OnClickListener(){
@@ -164,13 +177,14 @@ public class Inspector extends Plugin{
     }
     );
 
-    mReceiver = new Receiver();
+    mReceiver = new Receiver(System.getCurrentTarget());
   }
 
   @Override
   public void onBackPressed(){
     setStoppedState();
     super.onBackPressed();
+    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
   }
 
   @Override
@@ -208,38 +222,39 @@ public class Inspector extends Plugin{
   }
 
   private class Receiver extends InspectionReceiver{
+
+    private final Target target;
+
+    public Receiver(Target target) {
+      this.target = target;
+    }
+
     @Override
-    public void onServiceFound( final int port, final String protocol, final String service, final String version ){
-      boolean hasServiceDescription = !service.trim().isEmpty();
-      final boolean hasVersion = (version != null && !version.isEmpty());
+    public void onServiceFound(int port, String protocol, String service, String version ){
+      Port p = new Port(port, Network.Protocol.fromString(protocol));
 
-      if(hasServiceDescription){
-        if(hasVersion) {
-          System.addOpenPort( port, Network.Protocol.fromString(protocol), service, version );
-        }
-        else
-          System.addOpenPort( port, Network.Protocol.fromString(protocol), service );
-      }
-      else
-        System.addOpenPort(port, Network.Protocol.fromString(protocol));
+      service = service.trim();
+      service = service.isEmpty() ? null : service;
 
-      Inspector.this.runOnUiThread(new Runnable(){
+      version = version != null ? version.trim() : null;
+      version = version != null && !version.isEmpty() ? version : null;
 
-        @Override
-        public void run(){
-          write_services();
-        }
-      });
+      p.setService(service);
+      p.setVersion(version);
+
+      target.addOpenPort(p);
+
+      updateView();
     }
 
     @Override
     public void onOpenPortFound(int port, String protocol){
-      System.addOpenPort(port, Network.Protocol.fromString(protocol));
+      target.addOpenPort(port, Network.Protocol.fromString(protocol));
     }
 
     @Override
     public void onOsFound(final String os){
-      System.getCurrentTarget().setDeviceOS(os);
+      target.setDeviceOS(os);
 
       Inspector.this.runOnUiThread(new Runnable(){
         @Override
@@ -251,7 +266,7 @@ public class Inspector extends Plugin{
 
     @Override
     public void onDeviceFound(final String device){
-      System.getCurrentTarget().setDeviceType(device);
+      target.setDeviceType(device);
 
       Inspector.this.runOnUiThread(new Runnable(){
         @Override

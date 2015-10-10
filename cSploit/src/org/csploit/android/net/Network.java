@@ -25,11 +25,11 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.net.util.SubnetUtils;
-import org.csploit.android.core.Logger;
-import org.csploit.android.core.System;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
@@ -39,8 +39,15 @@ import java.net.NoRouteToHostException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.csploit.android.core.Logger;
+import org.csploit.android.core.System;
 
 public class Network
 {
@@ -109,7 +116,7 @@ public class Network
           "192.168.0.0/16"
   };
 
-  public Network(Context context, String iface) throws NoRouteToHostException, SocketException, UnknownHostException{
+  public Network(Context context, String iface) throws SocketException, UnknownHostException{
     mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
     mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     mInfo = mWifiManager.getDhcpInfo();
@@ -120,54 +127,33 @@ public class Network
     mBase = new IP4Address(mInfo.netmask & mInfo.gateway);
 
     if(iface != null){
-      if (initNetworkInterface(iface) == false) {
-        try {
-          throw new Exception("Invalid network interface or not initialized yet");
-        } catch (Exception e) {
-          e.printStackTrace();
+      if(initNetworkInterface(iface))
+        return;
+    } else {
+      for(String ifname : getAvailableInterfaces()) {
+        if (initNetworkInterface(ifname)) {
+          return;
         }
-        mInterface = null;
       }
     }
-    else if (iface == null || isConnected()){
-      try{
-        mInterface = NetworkInterface.getByInetAddress(getLocalAddress());
-        if(mInterface == null)
-          throw new IllegalStateException("Error retrieving network interface.");
-      }
-      catch(SocketException e){
-        System.errorLogging(e);
-        /*
-         * Issue #26: Initialization error in ColdFusionX ROM
-				 * 
-				 * It seems it's a ROM issue which doesn't correctly populate device descriptors.
-				 * This rom maps the default wifi interface to a generic usb device 
-				 * ( maybe it's missing the specific interface driver ), which is obviously not, and
-				 * it all goes shit, use an alternative method to obtain the interface object.
-				 */
-        mInterface = NetworkInterface.getByName(java.lang.System.getProperty("wifi.interface", "wlan0"));
 
-        if(mInterface == null)
-          throw e;
-      }
-    }
+    throw new NoRouteToHostException("Not connected to any network.");
   }
 
-  public boolean initNetworkInterface (String _iface)  throws NoRouteToHostException {
+  public boolean initNetworkInterface (String iface) {
 
     try {
-      if (_iface == null)
-        _iface = getAvailableInterfaces().get(0);
+      if (iface == null)
+        iface = getAvailableInterfaces().get(0);
 
-      mInterface = NetworkInterface.getByName(_iface);
+      mInterface = NetworkInterface.getByName(iface);
       InterfaceAddress ifaceAddress;
 
-      if (mInterface.getInterfaceAddresses().size() == 0) {
+      if (mInterface.getInterfaceAddresses().isEmpty()) {
         return false;
       }
-      else {
-        ifaceAddress = mInterface.getInterfaceAddresses().get(1);
-      }
+
+      ifaceAddress = mInterface.getInterfaceAddresses().get(1);
 
       SubnetUtils su = new SubnetUtils(
               // get(1) == ipv4
@@ -184,8 +170,9 @@ public class Network
     }
     catch (Exception e) {
       Logger.error("Error: " + e.getLocalizedMessage());
-      throw new NoRouteToHostException("Not connected to any network.");
     }
+
+    return false;
   }
 
   private IP4Address getNetmask() throws UnknownHostException {
@@ -250,20 +237,12 @@ public class Network
   }
 
   public boolean isConnected(){
-    return mConnectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
+    return isIfaceUsable(mInterface);
   }
 
   public String getSSID(){
-    try {
-      if (isConnected() == false)
-        return "";
-
-      return mWifiInfo.getSSID();
-    }
-    catch (Exception e){
-      Logger.error("get SSID error: " + e.getLocalizedMessage());
-      return "";
-    }
+    String res = mWifiInfo.getSSID();
+    return res.equals("<unknown ssid>") ? "" : res;
   }
 
   public int getNumberOfAddresses(){
@@ -277,7 +256,6 @@ public class Network
   public String getNetworkMasked(){
     SubnetUtils sub = new SubnetUtils(mLocal.toString(), mNetmask.toString());
     return sub.getInfo().getNetworkAddress();
-    //return (network & 0xFF) + "." + ((network >> 8) & 0xFF) + "." + ((network >> 16) & 0xFF) + "." + ((network >> 24) & 0xFF);
   }
 
   public String getNetworkRepresentation(){
@@ -319,58 +297,79 @@ public class Network
     return mLocal.toInetAddress();
   }
 
+  private static boolean isIfaceUsable(NetworkInterface networkInterface) {
+    try {
+      return networkInterface.isUp() && !networkInterface.isLoopback() &&
+              !networkInterface.getInterfaceAddresses().isEmpty();
+    } catch (SocketException e) {
+      return false;
+    }
+  }
+
   /**
    * Retrieves a list of ready to use network interfaces.
    *
    * @return list of ready to use network interfaces
    */
-  public static List<String> getAvailableInterfaces()
-  {
-    List<String> iface_list = new ArrayList<String>();
-    int numAddresses = 0;
-    try {
-      for (Enumeration<NetworkInterface> inet = NetworkInterface.getNetworkInterfaces(); inet.hasMoreElements();) {
-        NetworkInterface iface = inet.nextElement();
-        // 0 = no ip / 0.0.0.0
-        numAddresses = iface.getInterfaceAddresses().size();
+  public static List<String> getAvailableInterfaces() {
+    List<String> result;
+    Enumeration<NetworkInterface> interfaces = null;
 
-        if (iface == null){
-          Logger.error("ooops, iface null");
-        }
-        // exclude ifaces with no IP assigned.
-        else if (iface.isUp() && !iface.isLoopback() && numAddresses > 0) {
-          iface_list.add(iface.getDisplayName());
-        }
-      }
-    }catch(SocketException e){
-      Logger.warning("get network interfaces exception: " + e.getLocalizedMessage());
+    try {
+      interfaces = NetworkInterface.getNetworkInterfaces();
+    } catch (SocketException e) {
+      System.errorLogging(e);
     }
 
-    return iface_list;
+    if(interfaces == null)
+      return Collections.emptyList();
+
+    result = new ArrayList<>();
+
+    while(interfaces.hasMoreElements()) {
+      NetworkInterface iface = interfaces.nextElement();
+      if (isIfaceUsable(iface)) {
+        result.add(iface.getDisplayName());
+      }
+    }
+
+    return result;
   }
 
   public NetworkInterface getInterface(){
     return mInterface;
   }
 
-  public String getSystemGateway (String _iface){
+  public String getSystemGateway (String iface) {
+    Pattern pattern = Pattern.compile(String.format("^%s\\t+00000000\\t+([0-9A-F]{8})", iface), Pattern.CASE_INSENSITIVE);
+    BufferedReader reader = null;
+    String line;
+
     try {
-      String line;
-      Process p = Runtime.getRuntime().exec("ip r");
+      reader = new BufferedReader(new InputStreamReader(new FileInputStream("/proc/net/route")));
 
-      BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-      while ((line = input.readLine()) != null) {
-
-        // TODO: check if the default gw is inside the selected iface network
-        if (line.startsWith("default") && line.contains(_iface)) {
-          String _str_gw = line.split(" ")[2];
-          return _str_gw;
+      while((line = reader.readLine()) != null) {
+        Matcher matcher = pattern.matcher(line);
+        if(!matcher.find()) {
+          continue;
         }
+        String rawAddress = matcher.group(1);
+        StringBuilder sb = new StringBuilder();
+        for(int i = 6;; i-=2) {
+          String part = rawAddress.substring(i, i+2);
+          sb.append(Integer.parseInt(part,16));
+          if(i>0) {
+            sb.append('.');
+          } else {
+            break;
+          }
+        }
+        return sb.toString();
       }
-
-      input.close();
     } catch (IOException e) {
-      e.printStackTrace();
+      System.errorLogging(e);
+    } finally {
+      IOUtils.closeQuietly(reader);
     }
 
     return null;

@@ -36,13 +36,14 @@ import org.csploit.android.plugins.RouterPwn;
 import org.csploit.android.plugins.Sessions;
 import org.csploit.android.plugins.Traceroute;
 import org.csploit.android.plugins.mitm.MITM;
+import org.csploit.android.services.Services;
 
 import java.net.NoRouteToHostException;
 
 @ReportsCrashes(
   httpMethod = HttpSender.Method.PUT,
   reportType = HttpSender.Type.JSON,
-  formUri = "http://csploit-bug.iriscouch.com/acra-csploit/_design/acra-storage/_update/report",
+  formUri = "http://csploit.iriscouch.com/acra-csploit/_design/acra-storage/_update/report",
   formUriBasicAuthLogin = "android",
   formUriBasicAuthPassword = "DEADBEEF",
   mode = ReportingInteractionMode.DIALOG,
@@ -64,10 +65,11 @@ public class CSploitApplication extends Application {
     super.onCreate();
 
     ACRA.init(this);
+    Services.init(this);
 
     // initialize the system
     try {
-      System.init(this, null);
+      System.init(this);
     } catch (Exception e) {
       // ignore exception when the user has wifi off
       if (!(e instanceof NoRouteToHostException))

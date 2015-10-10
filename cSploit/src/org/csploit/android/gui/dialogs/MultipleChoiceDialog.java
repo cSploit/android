@@ -32,7 +32,7 @@ import org.csploit.android.R;
 public class MultipleChoiceDialog extends AlertDialog{
 
   public interface MultipleChoiceDialogListener{
-    public void onChoice(int[] choices);
+    void onChoice(int[] choices);
   }
 
   private boolean[] checkList = null;
@@ -95,12 +95,12 @@ public class MultipleChoiceDialog extends AlertDialog{
     this.setTitle(title);
     this.setView(mList);
 
-    setButton(activity.getString(R.string.cancel_dialog), new OnClickListener(){
+    setButton(BUTTON_NEGATIVE, activity.getString(R.string.cancel_dialog), new OnClickListener(){
       public void onClick(DialogInterface dialog, int id){
         dialog.dismiss();
       }
     });
-    setButton2(activity.getString(R.string.choose), new OnClickListener() {
+    setButton(BUTTON_POSITIVE, activity.getString(R.string.choose), new OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
         int count = 0;

@@ -20,7 +20,7 @@ package org.csploit.android.core;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import org.csploit.android.R;
@@ -29,7 +29,7 @@ import org.csploit.android.net.Target.Exploit;
 import org.csploit.android.net.Target.Port;
 import org.csploit.android.net.metasploit.RPCClient;
 
-public abstract class Plugin extends ActionBarActivity {
+public abstract class Plugin extends AppCompatActivity {
   public static final int NO_LAYOUT = -1;
 
   private int mNameStringId = -1;
@@ -120,14 +120,6 @@ public abstract class Plugin extends ActionBarActivity {
   public void onBackPressed(){
     super.onBackPressed();
     overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-  }
-
-  public void onTargetNewOpenPort(Target target, Port port){
-
-  }
-
-  public void onTargetNewExploit( Target target, Exploit ex ) {
-
   }
 
   public void onRpcChange(RPCClient currentValue) { }

@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">cSploit</string>
     <string name="menu_settings">Ρυθμίσεις</string>
     <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Όπα, πρόβλημα, θα σταλεί email στον προγραματιστή για να
@@ -27,7 +26,6 @@
     <string name="csploit_catchphrase">cSploit - Μία σουίτα δικτυακής διείσδυσης για Android.
     </string>
     <string name="csploit_copyleft">Copyleft του Simone Margaritelli άλλος evilsocket.</string>
-    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">Αποποίηση ευθύνης</string>
     <string name="csploit_disclaimer">
         <![CDATA[Η εφαρμογή αυτή δεν πρέπει να χρησιμοποιηθεί για σκοπούς άλλους από το να αποδείξει τις λειτουργίες της, και πρέπει να χρησιμοποιείται μόνο σε δίκτυα για τα οποία έχετε το δικαίωμα. Οποιαδήποτε άλλη χρήση δεν είναι η ευθύνη των developer. Με άλλα λόγια, μην είστε ηλίθιοι, και μην κατευθύνετε θυμωμένους ανθρώπους απέναντί μου.]]></string>
@@ -79,7 +77,6 @@
     <string name="close_confirm">Κλείσιμο του cSploit, είσαστε σίγουροι;</string>
     <string name="press_back">Πατήστε ξανά το κουμπί επιστροφής για να κλείσετε το app.</string>
     <string name="selected_">Επιλογή&#160;</string>
-    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">Δεν βρέθηκε αρχείο συνεδρίας στο sd card.</string>
     <string name="select_session_file">Επιλέξτε αρχείο συνεδρίας απο το sd card :</string>
     <string name="select_session">Επιλέξτε συνεδρία</string>

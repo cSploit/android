@@ -28,7 +28,6 @@ import android.graphics.Typeface;
 import android.net.wifi.ScanResult;
 import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
@@ -54,7 +53,6 @@ import org.csploit.android.gui.dialogs.InputDialog;
 import org.csploit.android.gui.dialogs.InputDialog.InputDialogListener;
 import org.csploit.android.gui.dialogs.WifiCrackDialog;
 import org.csploit.android.gui.dialogs.WifiCrackDialog.WifiCrackDialogListener;
-import org.csploit.android.net.Network;
 import org.csploit.android.wifi.Keygen;
 import org.csploit.android.wifi.NetworkManager;
 import org.csploit.android.wifi.WirelessMatcher;
@@ -87,15 +85,40 @@ public class WifiScannerActivity extends ListActivity
   private String mCurrentKey = null;
   private int mCurrentNetworkId = -1;
   private ClipboardManager mClipboard = null;
+  private WifiConfiguration mPreviousConfig = null;
 
-  public void onSuccessfulConnection(){
+  private void onEnd() {
     List<WifiConfiguration> configurations = mWifiManager.getConfiguredNetworks();
-    if(configurations != null){
+    boolean restore = false;
+
+    if(configurations != null) {
       for(WifiConfiguration config : configurations){
         mWifiManager.enableNetwork(config.networkId, false);
+        restore = restore || (mPreviousConfig != null && mPreviousConfig.SSID.equals(config.SSID) &&
+                ( mCurrentKey == null || !mCurrentKey.equals(mPreviousConfig.preSharedKey) ) );
       }
     }
 
+    if(restore && !mConnected) {
+      restorePreviousConfig();
+    }
+  }
+
+  private void restorePreviousConfig() {
+    WifiConfiguration config = NetworkManager.getWifiConfiguration(mWifiManager, mPreviousConfig);
+
+    if(config != null) {
+      mWifiManager.removeNetwork(config.networkId);
+    }
+
+    if(mWifiManager.addNetwork(mPreviousConfig) != -1) {
+      mWifiManager.saveConfiguration();
+    }
+
+    mPreviousConfig = null;
+  }
+
+  public void onSuccessfulConnection(){
     if(mCurrentKey != null){
       mStatusText.setText(Html.fromHtml(getString(R.string.connected_to) + mCurrentAp.SSID + getString(R.string.connected_to2) + mCurrentKey + getString(R.string.connected_to3)));
       Toast.makeText(this, getString(R.string.wifi_key_copied), Toast.LENGTH_SHORT).show();
@@ -105,23 +128,29 @@ public class WifiScannerActivity extends ListActivity
 
     mConnectionReceiver.unregister();
     mConnected = true;
+
+    onEnd();
   }
 
   public void onFailedConnection(){
     mWifiManager.removeNetwork(mCurrentNetworkId);
-    if(mKeyList.size() == 0){
-      mStatusText.setText(Html.fromHtml(getString(R.string.connection_to) + mCurrentAp.SSID + getString(R.string.connection_to2)));
 
-      List<WifiConfiguration> configurations = mWifiManager.getConfiguredNetworks();
-      if(configurations != null){
-        for(WifiConfiguration config : configurations){
-          mWifiManager.enableNetwork(config.networkId, false);
-        }
-      }
-
-      mConnectionReceiver.unregister();
-    } else
+    if(!mKeyList.isEmpty()) {
       nextConnectionAttempt();
+      return;
+    }
+
+    mStatusText.setText(Html.fromHtml(getString(R.string.connection_to) + mCurrentAp.SSID + getString(R.string.connection_to2)));
+
+    List<WifiConfiguration> configurations = mWifiManager.getConfiguredNetworks();
+    if(configurations != null){
+      for(WifiConfiguration config : configurations){
+        mWifiManager.enableNetwork(config.networkId, false);
+      }
+    }
+
+    mConnectionReceiver.unregister();
+    onEnd();
   }
 
   @Override
@@ -134,7 +163,6 @@ public class WifiScannerActivity extends ListActivity
 	else
 		setTheme(R.style.AppTheme);
     setContentView(R.layout.wifi_scanner);
-    //getActionBar().setDisplayHomeAsUpEnabled(true);
 
     mWifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
     mClipboard = (ClipboardManager) this.getSystemService(Context.CLIPBOARD_SERVICE);
@@ -143,7 +171,7 @@ public class WifiScannerActivity extends ListActivity
     mConnectionReceiver = new ConnectionReceiver();
     mStatusText = (TextView) findViewById(R.id.scanStatusText);
     mAdapter = new ScanAdapter();
-    mKeyList = new ArrayList<String>();
+    mKeyList = new ArrayList<>();
 
     getListView().setAdapter(mAdapter);
 
@@ -153,11 +181,6 @@ public class WifiScannerActivity extends ListActivity
       mStatusText.setText( getString(R.string.wifi_activating_iface) );
       mWifiManager.setWifiEnabled(true);
       mStatusText.setText(getString(R.string.wifi_activated));
-    }
-
-    if(Network.isWifiConnected(this)){
-      WifiInfo info = mWifiManager.getConnectionInfo();
-      NetworkManager.cleanPreviousConfiguration(mWifiManager, info);
     }
 
     mScanReceiver.register(this);
@@ -314,6 +337,12 @@ public class WifiScannerActivity extends ListActivity
     if(result != null){
       final Keygen keygen = mWifiMatcher.getKeygen(result);
 
+      mPreviousConfig = NetworkManager.getWifiConfiguration(mWifiManager, result);
+
+      if(mPreviousConfig != null ) {
+        mWifiManager.removeNetwork(mPreviousConfig.networkId);
+      }
+
       if(keygen != null && (result.capabilities.contains("WEP") || result.capabilities.contains("WPA"))){
         mKeyList.clear();
         new WifiCrackDialog
@@ -386,7 +415,6 @@ public class WifiScannerActivity extends ListActivity
     }
     if(item.getItemId() == android.R.id.home){
       onBackPressed();
-
       return true;
     } else
       return super.onOptionsItemSelected(item);
@@ -406,7 +434,7 @@ public class WifiScannerActivity extends ListActivity
     setResult(RESULT_OK, intent);
 
     super.onBackPressed();
-    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
   }
 
   public class ScanAdapter extends ArrayAdapter<ScanResult>{

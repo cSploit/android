@@ -40,7 +40,6 @@ tmp/**/*
 *.swp
 *~.nib
 *~
-local.properties
 project.properties
 proguard/
 .classpath
@@ -48,9 +47,7 @@ proguard/
 .loadpath
 actionbarsherlock/build/
 dSploit/build/
-.gradle/
-.idea/workspace.xml
-
+cSploit/build/
 # External tool builders
 .externalToolBuilders/
 

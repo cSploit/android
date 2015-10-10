@@ -77,7 +77,7 @@ public class Sessions extends Plugin {
             case R.string.open_shell:
               System.setCurrentSession(s);
               startActivity(new Intent(Sessions.this, Console.class));
-              overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+              overridePendingTransition(R.anim.fadeout, R.anim.fadein);
               break;
             case R.string.show_full_description:
               String message = s.getDescription();
@@ -126,7 +126,7 @@ public class Sessions extends Plugin {
       if(s.haveShell()) {
         System.setCurrentSession(s);
         startActivity(new Intent(Sessions.this,Console.class));
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+        overridePendingTransition(R.anim.fadeout, R.anim.fadein);
       } else {
         longClickListener.onItemLongClick(parent, view, position, id);
       }
@@ -150,26 +150,36 @@ public class Sessions extends Plugin {
       return;
 		}
 
-    System.getMsfRpc().updateSessions();
-
     mResults = System.getCurrentTarget().getSessions();
 
-    if(mResults.isEmpty()) {
-      new FinishDialog(getString(R.string.warning),getString(R.string.no_opened_sessions),Sessions.this).show();
-      return;
-    }
+    mListView = (ListView) findViewById(android.R.id.list);
+    mAdapter  = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mResults);
 
-		mListView = (ListView) findViewById(android.R.id.list);
-    mAdapter  = new ArrayAdapter<Session>(this, android.R.layout.simple_list_item_1, mResults);
-
-		mListView.setAdapter(mAdapter);
+    mListView.setAdapter(mAdapter);
 
     mListView.setOnItemClickListener(clickListener);
 
     mListView.setOnItemLongClickListener(longClickListener);
+
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        System.getMsfRpc().updateSessions();
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            if(mResults.isEmpty()) {
+              new FinishDialog(getString(R.string.warning),getString(R.string.no_opened_sessions),Sessions.this).show();
+            } else {
+              mAdapter.notifyDataSetChanged();
+            }
+          }
+        });
+      }
+    }).start();
 	}
 
-	@Override
+  @Override
   public void onRpcChange(RPCClient currentValue) {
     if(UIThread==null)
       return;
@@ -178,4 +188,10 @@ public class Sessions extends Plugin {
     else if(currentValue == null)
       new FinishDialog(getString(R.string.error),getString(R.string.msfrpc_disconnected),Sessions.this).show();
 	}
+
+  @Override
+  public void onBackPressed() {
+    super.onBackPressed();
+    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+  }
 }

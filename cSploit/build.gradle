@@ -1,9 +1,10 @@
 buildscript {
     repositories {
+        jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.2.0-beta1'
+        classpath 'com.android.tools.build:gradle:1.4.0-beta3'
     }
 }
 
@@ -13,31 +14,30 @@ def getDate() {
 
 allprojects {
     repositories {
+        jcenter()
         mavenCentral()
     }
 }
 apply plugin:  'com.android.application'
 
 dependencies {
-    compile 'com.android.support:support-v4:22.0.0'
-    compile 'com.android.support:appcompat-v7:22.0.0'
-    compile 'org.apache.commons:commons-compress:1.9'
-    compile 'org.apache.commons:commons-compress:1.9:sources'
+    compile 'com.android.support:support-v4:23.0.1'
+    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.android.support:design:23.0.1'
+    compile 'com.android.support:preference-v7:23.0.1'
+    compile 'org.apache.commons:commons-compress:1.10'
     compile 'commons-net:commons-net:3.3'
-    compile 'junit:junit:4.12'
-    compile 'joda-time:joda-time:2.7'
-    compile 'com.github.zafarkhaja:java-semver:0.8.0'
-    compile 'com.sksamuel.diff:diff:1.1.11'
-    compile 'org.unbescape:unbescape:1.1.0.RELEASE'
-    compile 'org.msgpack:msgpack:0.6.11'
+    compile 'com.github.zafarkhaja:java-semver:0.9.0'
+    compile 'org.unbescape:unbescape:1.1.1.RELEASE'
+    compile 'org.msgpack:msgpack:0.6.12'
     compile 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
-    compile 'org.tukaani:xz:1.0'
-    compile 'ch.acra:acra:4.6.1'
+    compile 'org.tukaani:xz:1.5'
+    compile 'ch.acra:acra:4.6.2'
 }
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    compileSdkVersion 23
+    buildToolsVersion '23.0.1'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
@@ -52,8 +52,18 @@ android {
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 22
-        versionCode 1
-        versionName "1.5.3"
+        versionCode 2
+        versionName "1.6.0"
+        if(System.getenv("NIGHTLY_BUILD")) {
+            versionName += "+" + System.getenv("NIGHTLY_BUILD_COMMIT").substring(0, 7)
+        }
+    }
+
+    lintOptions {
+        if (System.getenv("NIGHTLY_BUILD")) {
+            checkReleaseBuilds false
+        }
+        abortOnError false
     }
 
     signingConfigs {
@@ -64,6 +74,7 @@ android {
                 keyAlias = System.getenv("KEYSTORE_ALIAS")
                 keyPassword = System.getenv("KEYSTORE_ALIAS_PWD")
             }
+            return true
         }
     }
 
@@ -83,6 +94,7 @@ android {
             if (System.getenv("KEYSTORE_FILE") != null) {
                 signingConfig signingConfigs.release
             }
+            return true
         }
     }
 

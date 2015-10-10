@@ -85,9 +85,11 @@ public class Target
       this( port, proto, "", "" );
     }
 
-    // needed for vulnerabilities hashmap
     public String toString(){
-      return protocol.toString() + "|" + number + "|" + service + "|" + version;
+      return String.format("Port: { proto: '%s', number: %d, service: '%s', version: '%s' }",
+              protocol.toString(), number,
+              (service == null ? "(null)" : service),
+              (version == null ? "(null)" : version));
     }
 
     public int getNumber() {
@@ -106,6 +108,10 @@ public class Target
       return service;
     }
 
+    public boolean haveService() {
+      return service != null && !service.isEmpty();
+    }
+
     public void setVersion(String version) {
       this.version = version;
     }
@@ -114,25 +120,28 @@ public class Target
       return version;
     }
 
+    public boolean haveVersion() {
+      return version != null && !version.isEmpty();
+    }
+
     public boolean equals(Object o) {
       if(o == null || o.getClass() != this.getClass())
         return false;
       Port p = (Port)o;
-      if(p.number != this.number || p.protocol != this.protocol)
-        return false;
-      if(this.version!=null) {
-        if(!this.version.equals(p.version))
-          return false;
-      } else if (p.version != null) {
-        return false;
+      return (p.number == this.number && p.protocol == this.protocol);
+    }
+
+    /**
+     * merge data from this port to another
+     * @param other
+     */
+    public void mergeTo(Port other) {
+      if(service != null && !service.equals(other.service)) {
+        other.service = service;
       }
-      if(this.service!=null) {
-        if(!this.service.equals(p.service))
-          return false;
-      } else if (p.service!=null) {
-        return false;
+      if(version != null && !version.equals(other.version)) {
+        other.version = version;
       }
-      return true;
     }
   }
 
@@ -221,7 +230,10 @@ public class Target
     }
 
     public boolean equals(Object o) {
-      return !(o == null || o.getClass() != this.getClass()) && ((Exploit) o).getId().equals(getId());
+      if(o == null || o.getClass() != this.getClass())
+        return false;
+      Exploit other = (Exploit) o;
+      return id == null ? other.id == null : id.equals(other.id);
     }
 
     public void addReference(Reference ref) {
@@ -262,7 +274,7 @@ public class Target
   private String mHostname = null;
   private Type mType = null;
   private InetAddress mAddress = null;
-  private List<Port> mPorts = new ArrayList<Port>();
+  private final ArrayList<Port> mPorts = new ArrayList<>();
   private String mDeviceType = null;
   private String mDeviceOS = null;
   private String mAlias = null;
@@ -398,11 +410,26 @@ public class Target
       builder.append(mHostname).append("\n");
     }
 
-    builder.append(mPorts.size()).append("\n");
+    synchronized (mPorts) {
+      builder.append(mPorts.size()).append("\n");
+
+      for(Port p : mPorts) {
+        builder.append(p.getProtocol().toString());
+        builder.append("|");
+        builder.append(p.getNumber());
+        builder.append("|");
+        if(p.haveService())
+          builder.append(p.getService());
+        builder.append("|");
+        if(p.haveVersion())
+          builder.append(p.getVersion());
+        builder.append("\n");
+      }
+    }
   }
 
   public void setAlias(String alias){
-    mAlias = alias.trim();
+    mAlias = alias != null ? alias.trim() : null;
   }
 
   public String getAlias(){
@@ -631,19 +658,25 @@ public class Target
   }
 
   public void addOpenPort(Port port){
-    if(port.service!=null) { // update service but preserve different versions
+    boolean notifyList = false;
+    synchronized (mPorts) {
+      Port existing = null;
       for(Port p : mPorts) {
-        if(p.number == port.number && (p.service == null || p.service.isEmpty())) {
-          p.service = port.service;
-          p.version = port.version;
-          return;
+        if(p.equals(port)) {
+          existing = p;
+          break;
         }
       }
-      mPorts.add(port);
-    } else {
-      if (!mPorts.contains(port))
+
+      if(existing != null) {
+        port.mergeTo(existing);
+      } else {
         mPorts.add(port);
+        notifyList = true;
+      }
     }
+    if(notifyList)
+      System.notifyTargetListChanged(this);
   }
 
   public void addOpenPort(int port, Protocol protocol){
@@ -655,18 +688,24 @@ public class Target
   }
 
   public List<Port> getOpenPorts(){
-    return mPorts;
+    synchronized (mPorts) {
+      return (List<Port>) mPorts.clone();
+    }
   }
 
   public boolean hasOpenPorts(){
-    return !mPorts.isEmpty();
+    synchronized (mPorts) {
+      return !mPorts.isEmpty();
+    }
   }
 
   public boolean hasOpenPortsWithService(){
-    if(!mPorts.isEmpty()){
-      for(Port p : mPorts){
-        if(p.service != null && !p.service.isEmpty())
-          return true;
+    synchronized (mPorts) {
+      if (!mPorts.isEmpty()) {
+        for (Port p : mPorts) {
+          if (p.service != null && !p.service.isEmpty())
+            return true;
+        }
       }
     }
 
@@ -674,9 +713,11 @@ public class Target
   }
 
   public boolean hasOpenPort(int port){
-    for(Port p : mPorts){
-      if(p.number == port)
-        return true;
+    synchronized (mPorts) {
+      for (Port p : mPorts) {
+        if (p.number == port)
+          return true;
+      }
     }
 
     return false;

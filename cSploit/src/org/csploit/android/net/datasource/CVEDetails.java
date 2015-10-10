@@ -58,7 +58,7 @@ class CVEDetails {
 
       target = exploit.getParent();
 
-      if(!target.hasOpenPorts()) {
+      if(target == null || !target.hasOpenPorts()) {
         return;
       }
 

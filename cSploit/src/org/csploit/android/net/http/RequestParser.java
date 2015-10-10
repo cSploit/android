@@ -20,14 +20,13 @@ package org.csploit.android.net.http;
 
 import android.util.Patterns;
 
-import org.apache.http.impl.cookie.BasicClientCookie;
+import org.csploit.android.core.Logger;
+import org.csploit.android.net.ByteBuffer;
 
-import java.sql.Date;
+import java.net.HttpCookie;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-
-import org.csploit.android.net.ByteBuffer;
 
 public class RequestParser
 {
@@ -346,9 +345,9 @@ public class RequestParser
     return null;
   }
 
-  public static ArrayList<BasicClientCookie> parseRawCookie(String rawCookie){
+  public static ArrayList<HttpCookie> parseRawCookie(String rawCookie){
     String[] rawCookieParams = rawCookie.split(";");
-    ArrayList<BasicClientCookie> cookies = new ArrayList<BasicClientCookie>();
+    ArrayList<HttpCookie> cookies = new ArrayList<HttpCookie>();
 
     for(String rawCookieParam : rawCookieParams){
       String[] rawCookieNameAndValue = rawCookieParam.split("=");
@@ -358,7 +357,14 @@ public class RequestParser
 
       String cookieName = rawCookieNameAndValue[0].trim();
       String cookieValue = rawCookieNameAndValue[1].trim();
-      BasicClientCookie cookie = new BasicClientCookie(cookieName, cookieValue);
+      HttpCookie cookie;
+
+      try {
+        cookie = new HttpCookie(cookieName, cookieValue);
+       } catch (IllegalArgumentException e){
+         Logger.error("Invalid cookie. name=" + cookieName + ":" + cookieValue);
+         continue;
+       }
 
       for(int i = 1; i < rawCookieParams.length; i++){
         String rawCookieParamNameAndValue[] = rawCookieParams[i].trim().split("=");
@@ -374,8 +380,7 @@ public class RequestParser
 
             if(paramName.equalsIgnoreCase("max-age")){
               long maxAge = Long.parseLong(paramValue);
-              Date expiryDate = new Date(java.lang.System.currentTimeMillis() + maxAge);
-              cookie.setExpiryDate(expiryDate);
+              cookie.setMaxAge(maxAge);
             } else if(paramName.equalsIgnoreCase("domain"))
               cookie.setDomain(paramValue);
 
@@ -448,22 +453,22 @@ public class RequestParser
     return values;
   }
 
-  public static ArrayList<BasicClientCookie> getCookiesFromHeaders(ArrayList<String> headers){
+  public static ArrayList<HttpCookie> getCookiesFromHeaders(ArrayList<String> headers){
     ArrayList<String> values = getHeaderValues("Cookie", headers);
 
     if(values != null && values.size() > 0){
-      ArrayList<BasicClientCookie> cookies = new ArrayList<BasicClientCookie>();
+      ArrayList<HttpCookie> cookies = new ArrayList<HttpCookie>();
       for(String value : values){
-        ArrayList<BasicClientCookie> lineCookies = parseRawCookie(value);
+        ArrayList<HttpCookie> lineCookies = parseRawCookie(value);
         if(lineCookies != null && lineCookies.size() > 0){
           cookies.addAll(lineCookies);
         }
       }
 
       // remove google and cloudflare cookies
-      Iterator<BasicClientCookie> it = cookies.iterator();
+      Iterator<HttpCookie> it = cookies.iterator();
       while(it.hasNext()){
-        BasicClientCookie cookie = (BasicClientCookie) it.next();
+        HttpCookie cookie = it.next();
         if(cookie.getName().startsWith("__utm") || cookie.getName().equals("__cfduid"))
           it.remove();
       }

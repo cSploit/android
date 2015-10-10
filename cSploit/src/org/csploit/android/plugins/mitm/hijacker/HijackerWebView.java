@@ -18,172 +18,252 @@
  */
 package org.csploit.android.plugins.mitm.hijacker;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Patterns;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
-import org.apache.http.impl.cookie.BasicClientCookie;
 import org.csploit.android.R;
 import org.csploit.android.core.System;
 
-public class HijackerWebView extends ActionBarActivity {
-	private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4";
+import java.net.HttpCookie;
 
-	private WebSettings mSettings = null;
-	private WebView mWebView = null;
+public class HijackerWebView extends AppCompatActivity {
+  private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4";
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-		Boolean isDark = themePrefs.getBoolean("isDark", false);
-		if (isDark)
-			setTheme(R.style.DarkTheme);
-		else
-			setTheme(R.style.AppTheme);
-		super.onCreate(savedInstanceState);
-		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		supportRequestWindowFeature(Window.FEATURE_PROGRESS);
-		setTitle(System.getCurrentTarget() + " > MITM > Session Hijacker");
-		setContentView(R.layout.plugin_mitm_hijacker_webview);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		setSupportProgressBarIndeterminateVisibility(false);
+  private WebSettings mSettings = null;
+  private WebView mWebView = null;
+  private ProgressBar mProgressBar = null;
+  private EditText mURLet = null;
 
-		mWebView = (WebView) findViewById(R.id.webView);
-		mSettings = mWebView.getSettings();
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+    Boolean isDark = themePrefs.getBoolean("isDark", false);
+    if (isDark)
+      setTheme(R.style.DarkTheme);
+    else
+      setTheme(R.style.AppTheme);
+    super.onCreate(savedInstanceState);
+    supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+    supportRequestWindowFeature(Window.FEATURE_PROGRESS);
+    setTitle(System.getCurrentTarget() + " > MITM > Session Hijacker");
+    setContentView(R.layout.plugin_mitm_hijacker_webview);
+    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-		mSettings.setJavaScriptEnabled(true);
-		mSettings.setBuiltInZoomControls(true);
-		mSettings.setAppCacheEnabled(false);
-		mSettings.setUserAgentString(DEFAULT_USER_AGENT);
+    mWebView = (WebView) findViewById(R.id.webView);
+    mWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+    mProgressBar = (ProgressBar) findViewById(R.id.webprogress);
+    mURLet = (EditText) findViewById(R.id.url);
+    mProgressBar.setVisibility(View.GONE);
+    mProgressBar.setMax(100);
+    mSettings = mWebView.getSettings();
 
-		mWebView.setWebViewClient(new WebViewClient() {
-			@Override
-			public boolean shouldOverrideUrlLoading(WebView view, String url) {
-				view.loadUrl(url);
-				return true;
-			}
-		});
+    mSettings.setJavaScriptEnabled(true);
+    mSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+    mSettings.setBuiltInZoomControls(true);
+    mSettings.setAppCacheEnabled(false);
+    mSettings.setUserAgentString(DEFAULT_USER_AGENT);
+    mSettings.setUseWideViewPort(true);
 
-		mWebView.setWebChromeClient(new WebChromeClient() {
-			public void onProgressChanged(WebView view, int progress) {
-				if (mWebView != null)
-					getSupportActionBar().setSubtitle(mWebView.getUrl());
+    mURLet.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+      @Override
+      public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
+          mWebView.loadUrl(mURLet.getText().toString());
+          InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+          imm.hideSoftInputFromWindow(mWebView.getWindowToken(), 0);
+          mWebView.requestFocus();
+          return true;
+        }
+        return false;
+      }
+    });
 
-				setSupportProgressBarIndeterminateVisibility(true);
-				// Normalize our progress along the progress bar's scale
-				int mmprogress = (Window.PROGRESS_END - Window.PROGRESS_START)
-						/ 100 * progress;
-				setProgress(mmprogress);
+    mURLet.setOnKeyListener(new EditText.OnKeyListener() {
+      @Override
+      public boolean onKey(View v, int keyCode, KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN
+                && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+          mWebView.loadUrl(mURLet.getText().toString());
+          InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+          imm.hideSoftInputFromWindow(mWebView.getWindowToken(), 0);
+          mWebView.requestFocus();
+          return true;
+        }
+        return false;
+      }
+    });
 
-				if (progress == 100)
-					setSupportProgressBarIndeterminateVisibility(false);
-			}
-		});
+    mWebView.setWebViewClient(new WebViewClient() {
+      @Override
+      public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        view.loadUrl(url);
+        mURLet.setText(url);
+        return true;
+      }
+    });
 
-		CookieSyncManager.createInstance(this);
-		CookieManager.getInstance().removeAllCookie();
+    mWebView.setWebChromeClient(new WebChromeClient() {
 
-		Session session = (Session) System.getCustomData();
-		if (session != null) {
-			String domain = null, rawcookie = null;
+      public void onProgressChanged(WebView view, int progress) {
+        if ((mWebView != null) && (mURLet != null) && (progress == 0)); {
+          getSupportActionBar().setSubtitle(mWebView.getUrl());
+          mURLet.setText(mWebView.getUrl());
+        }
 
-			for (BasicClientCookie cookie : session.mCookies.values()) {
-				domain = cookie.getDomain();
-				rawcookie = cookie.getName() + "=" + cookie.getValue()
-						+ "; domain=" + domain + "; path=/"
-						+ (session.mHTTPS ? ";secure" : "");
+        if (mProgressBar != null) {
+          mProgressBar.setVisibility(View.VISIBLE);
+          // Normalize our progress along the progress bar's scale
 
-				CookieManager.getInstance().setCookie(domain, rawcookie);
-			}
+          mProgressBar.setProgress(progress);
 
-			CookieSyncManager.getInstance().sync();
+          if (progress == 100) {
+            mProgressBar.setVisibility(View.GONE);
+          }
+        }
+      }
+    });
 
-			if (session.mUserAgent != null
-					&& session.mUserAgent.isEmpty() == false)
-				mSettings.setUserAgentString(session.mUserAgent);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      CookieManager cm = CookieManager.getInstance();
+      cm.flush();
+    } else {
+      CookieSyncManager.createInstance(this);
+      CookieManager.getInstance().removeAllCookie();
+    }
 
-			mWebView.loadUrl((session.mHTTPS ? "https" : "http") + "://www."
-					+ domain);
-		}
-	}
+    Session session = (Session) System.getCustomData();
+    if (session != null) {
+      String domain = null, rawcookie = null;
 
-	@Override
-	protected void onResume() {
-		super.onResume();
+      for (HttpCookie cookie : session.mCookies.values()) {
+        domain = cookie.getDomain();
+        rawcookie = cookie.getName() + "=" + cookie.getValue()
+                + "; domain=" + domain + "; path=/"
+                + (session.mHTTPS ? ";secure" : "");
 
-		CookieSyncManager.getInstance().startSync();
-	}
+        CookieManager.getInstance().setCookie(domain, rawcookie);
+      }
 
-	@Override
-	protected void onPause() {
-		super.onPause();
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        CookieManager cm = CookieManager.getInstance();
+        cm.flush();
+      } else {
+        CookieSyncManager.getInstance().startSync();
+      }
 
-		CookieSyncManager.getInstance().stopSync();
-	}
+      if (session.mUserAgent != null
+              && session.mUserAgent.isEmpty() == false)
+        mSettings.setUserAgentString(session.mUserAgent);
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.browser, menu);
-		return super.onCreateOptionsMenu(menu);
-	}
+      String url = (session.mHTTPS ? "https" : "http") + "://";
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case android.R.id.home:
+      if(domain != null && !Patterns.IP_ADDRESS.matcher(domain).matches())
+        url += "www.";
 
-			mWebView = null;
-			onBackPressed();
+      url += domain;
 
-			return true;
+      mWebView.loadUrl(url);
+      mWebView.requestFocus();
+    }
+  }
 
-		case R.id.back:
+  @Override
+  protected void onResume() {
+    super.onResume();
 
-			if (mWebView.canGoBack())
-				mWebView.goBack();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      CookieManager cm = CookieManager.getInstance();
+      cm.flush();
+    } else {
+      CookieSyncManager.getInstance().startSync();
+    }
+  }
 
-			return true;
+  @Override
+  protected void onPause() {
+    super.onPause();
 
-		case R.id.forward:
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      CookieManager cm = CookieManager.getInstance();
+      cm.flush();
+    } else {
+      CookieSyncManager.getInstance().startSync();
+    }
+  }
 
-			if (mWebView.canGoForward())
-				mWebView.goForward();
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    MenuInflater inflater = getMenuInflater();
+    inflater.inflate(R.menu.browser, menu);
+    return super.onCreateOptionsMenu(menu);
+  }
 
-			return true;
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
 
-		case R.id.reload:
+        mWebView = null;
+        onBackPressed();
 
-			mWebView.reload();
+        return true;
 
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-	}
+      case R.id.back:
 
-	@Override
-	public void onBackPressed() {
+        if (mWebView.canGoBack())
+          mWebView.goBack();
 
-		if (mWebView != null && mWebView.canGoBack())
-			mWebView.goBack();
+        return true;
 
-		else {
-			if (mWebView != null)
-				mWebView.stopLoading();
+      case R.id.forward:
 
-			super.onBackPressed();
-			overridePendingTransition(R.anim.slide_in_left,
-					R.anim.slide_out_left);
-		}
-	}
+        if (mWebView.canGoForward())
+          mWebView.goForward();
+
+        return true;
+
+      case R.id.reload:
+
+        mWebView.reload();
+
+      default:
+        return super.onOptionsItemSelected(item);
+    }
+  }
+
+  @Override
+  public void onBackPressed() {
+
+    if (mWebView != null && mWebView.canGoBack())
+      mWebView.goBack();
+
+    else {
+      if (mWebView != null)
+        mWebView.stopLoading();
+
+      super.onBackPressed();
+      overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+    }
+  }
 }

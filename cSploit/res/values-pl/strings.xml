@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">cSploit</string>
     <string name="menu_settings">Ustawienia</string>
     <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Ooooops! Wywaliłem się, ale zamierzam wysłać raport do mojego twórcy
@@ -25,7 +24,6 @@
     <string name="protocol">Protokół</string>
     <string name="csploit_catchphrase">cSploit - Zestaw penetracyjny dla systemu Android.</string>
     <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
-    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">Wyłączenie odpowiedzialności</string>
     <string name="csploit_disclaimer">
         <![CDATA[Ta aplikacja nie powinna być używana w innym celu niż prezentacja jej funkcji. Może być tylko używana w sieciach, w kótrych masz pozwolenie na takie zabawy. Za żaden inny przypadek użycia, twórca nie ponosi odpowiedzialności. Innymi słowy, nie bądź głupi, nie napuszczać wkurzonych ludzi na mnie.]]></string>
@@ -75,14 +73,13 @@
 	<string name="net_discovery_started">Wyszukiwanie sieci rozpoczęte.</string>
     <string name="start_monitor">Rozpocznij Network Monitor</string>
     <string name="stop_monitor">Zatrzymaj Network Monitor</string>
-    <string name="start_msfrpcd">Rozpocznij MetaSploit RPCD</string>
-    <string name="stop_msfrpcd">Zatrzymaj MetaSploit RPCD</string>
+    <string name="start_msfrpcd">Rozpocznij Metasploit RPCD</string>
+    <string name="stop_msfrpcd">Zatrzymaj Metasploit RPCD</string>
     <string name="exit">Wyjdź</string>
     <string name="close_confirm">To zamknie cSploit, jesteś pewien, że chcesz kontynuować?
     </string>
     <string name="press_back">Naciśnij wstecz jeszcze raz by opuścić aplikację.</string>
     <string name="selected_">Wybrano&#160;</string>
-    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">Nie znaleziono pliku sesji na karcie sd.</string>
     <string name="select_session_file">Wybierz plik sesji ze swojej karty sd :</string>
     <string name="select_session">Wybierz sesję</string>
@@ -220,11 +217,11 @@
     <string name="error_rpc">błąd RPC</string>
     <string name="error_rpcd_inval">złe ustawienia</string>
     <string name="error_rpcd_shell">nie mogę uruchomić shella</string>
-    <string name="rpcd_starting">Uruchamianie MetaSploit RPCD&#8230;</string>
-    <string name="rpcd_started">MetaSploit RPCD uruchomiony</string>
-    <string name="rpcd_stopped">MetaSploit RPCD zatrzymany</string>
-    <string name="rpcd_running">MetaSploit RPCD już działa</string>
-    <string name="rpcd_timedout">MetaSploit RPCD nie odpowiada</string>
+    <string name="rpcd_starting">Uruchamianie Metasploit RPCD&#8230;</string>
+    <string name="rpcd_started">Metasploit RPCD uruchomiony</string>
+    <string name="rpcd_stopped">Metasploit RPCD zatrzymany</string>
+    <string name="rpcd_running">Metasploit RPCD już działa</string>
+    <string name="rpcd_timedout">Metasploit RPCD nie odpowiada</string>
     <string name="error_rcpd_fatal">wystąpił fatalny błąd, szukam tego buga, żeby wysłać go do moich twórców.
         jeśli nie wyjdę, proszę zamknij mnie przez ustawienia->aplikacje
         i POWIADOM MOICH TWÓRCÓW.
@@ -297,7 +294,7 @@
     <!-- preferences -->
     <string name="pref_general">Ogólne</string>
     <string name="pref_modules">Moduły</string>
-    <string name="pref_msf">MetaSploitFramework</string>
+    <string name="pref_msf">MetasploitFramework</string>
     <string name="pref_performance">Wydajność</string>
     <string name="pref_check_updates">Sprawdź aktualizacje</string>
     <string name="pref_wake_lock">Wake Lock</string>
@@ -324,13 +321,13 @@
     <string name="pref_http_max_buffer_size_desc">Max buffer size of HTTP requests handled by the transparent proxy.</string>
     <string name="pref_password_filename_desc">Name of the file to use to log passwords and cookies.</string>
     <string name="pref_rpc_user">Login RPC</string>
-    <string name="pref_rpc_user_desc">Login do połączenia MetaSploit RPCD.</string>
+    <string name="pref_rpc_user_desc">Login do połączenia Metasploit RPCD.</string>
     <string name="pref_rpc_pswd">Hasło RPC</string>
-    <string name="pref_rpc_pswd_desc">Hasło do połączenia z MetaSploit RPCD.</string>
+    <string name="pref_rpc_pswd_desc">Hasło do połączenia z Metasploit RPCD.</string>
 	<string name="pref_rpc_host">RPC host</string>
-    <string name="pref_rpc_host_desc">host where the MetaSploit RPC server is on.</string>
+    <string name="pref_rpc_host_desc">host where the Metasploit RPC server is on.</string>
     <string name="pref_rpc_port">Port RPC</string>
-    <string name="pref_rpc_port_desc">Port połączenia dla z MetaSploit RPCD.</string>
+    <string name="pref_rpc_port_desc">Port połączenia dla z Metasploit RPCD.</string>
 	<string name="pref_rpc_ssl">RPC SSL</string>
     <string name="pref_rpc_ssl_desc">Zaznacz, jeżeli MFS ma używać SSL.</string>
     <string name="pref_performance_vuln_desc">Search for vulnerability using</string>
@@ -339,31 +336,21 @@
         <item>CVE</item>
         <item>both CVE and OSVDB</item>
     </string-array>
-    <string-array name="pref_performance_vuln_values">
-        <item>OSVDB</item>
-        <item>CVE</item>
-        <item>BOTH</item>
-    </string-array>
     <string name="pref_performance_exploit_desc">Wyszukiwanie exploitów</string>
     <string-array name="pref_performance_exploit" >
         <item>Tylko z MSF</item>
         <item>Tylko z exploit-db</item>
         <item>Z exploit-db i MSF</item>
     </string-array>
-    <string-array name="pref_performance_exploit_values">
-        <item>MSF</item>
-        <item>EXDB</item>
-        <item>BOTH</item>
-    </string-array>
 	<string name="pref_performance_widescan">wide host scan</string>
     <string name="pref_performance_widescan_desc">scan for hosts outside the network mask.</string>
     <string name="pref_advanced">Advanced</string>
     <string name="pref_folder">Folder</string>
 	<string name="pref_msf_enable">Włącz MSF</string>
-    <string name="pref_msf_enable_desc">Aktywuje MetaSploit Framework.</string>
+    <string name="pref_msf_enable_desc">Aktywuje Metasploit Framework.</string>
     <string name="pref_msf_delete">Usuń MSF</string>
-    <string name="pref_msf_delete_desc">Usuwa MetaSploit Framework z urządzenia.</string>
-    <string name="pref_msfwipe_message">Do you really want to delete the MetaSploit Framework?</string>
+    <string name="pref_msf_delete_desc">Usuwa Metasploit Framework z urządzenia.</string>
+    <string name="pref_msfwipe_message">Do you really want to delete the Metasploit Framework?</string>
     <string name="pref_msfwipe_size">About %d MB will be freed.</string>
     <string name="pref_err_exists">nie istnieje.</string>
     <string name="pref_err_writable">nie ma praw zapisu.</string>
@@ -416,9 +403,9 @@
     <string name="target_selected">cel wybrany</string>
     <string name="targets_selected">cele wybrane</string>
     <string name="multiple_attack">multiple attack</string>
-    <string name="connect_msf">connect to MetaSploit</string>
-    <string name="disconnect_msf">disconnect from MetaSploit</string>
-    <string name="connected_msf">connected to MetaSploit</string>
+    <string name="connect_msf">connect to Metasploit</string>
+    <string name="disconnect_msf">disconnect from Metasploit</string>
+    <string name="connected_msf">connected to Metasploit</string>
     <string name="connection_failed">connection FAILED!</string>
     <string name="please_restart">Nowy motyw zostanie zatwierdzony po ponownym uruchomieniu aplikacji</string>
 </resources>

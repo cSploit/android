@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">cSploit</string>
     <string name="menu_settings">Paramètres</string>
     <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Ooooops ! Un crash est survenu, mais le bug va être signalé au
@@ -28,7 +27,6 @@
     <string name="csploit_catchphrase">cSploit - Une suite de pénétration réseau pour Android.
     </string>
     <string name="csploit_copyleft">Copyleft de Simone Margaritelli aka evilsocket.</string>
-    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">Conditions d\'utilisation</string>
     <string name="csploit_disclaimer">
         <![CDATA[Cette application ne doit être utilisée pour aucun autre but que celui de démontrer ses possibilités, et uniquement sur des réseau pour lesquels vous avez la permission d\'en faire ainsi. N\'importe quel autre usage n\'est en aucun cas la responsabilité du développeur. En d\'autres mots, ne soyez pas stupide, et ne redirigez pas les personnes en colère vers moi.]]></string>
@@ -82,7 +80,6 @@
     <string name="close_confirm">Ceci arrêtera cSploit, voulez-vous vraiment continuer ?</string>
     <string name="press_back">Appuyez sur retour à nouveau pour quitter l\'application.</string>
     <string name="selected_">Selectionné&#160;</string>
-    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">Aucune session trouvée sur la carte SD.</string>
     <string name="select_session_file">Choisir un fichier de session depuis la carte SD:</string>
     <string name="select_session">Choisir Session</string>
@@ -156,23 +153,6 @@
     <string name="invalid_ports">Ports non-valide spécifiés.</string>
     <string name="empty_port_list">Liste de ports vide.</string>
     <string name="about_csploit_v_">À Propos de cSploit</string>
-    <string name="select_target_below">Choisissez une cible ci-dessous en cliquant dessus, ou restez
-        appuyé pour saisir un alias.
-    </string>
-    <string name="load_from_file">Charger depuis un fichier</string>
-    <string name="b">B</string>
-    <string name="f">F</string>
-    <string name="r">R</string>
-    <string name="user_wordlist">Dictionnaire de noms d\'utilisateurs</string>
-    <string name="pwd_wordlist">Dictionnaire de mots de passe</string>
-    <string name="add">Ajouter</string>
-    <string name="scan">Scanner</string>
-    <string name="wifi_scan">Scan Wi-Fi</string>
-    <string name="new_session">Nouvelle Session</string>
-    <string name="restore_session">Restaurer Session</string>
-    <string name="submit_issue">Soumettre un bug/problème</string>
-    <string name="about">À propos</string>
-    <string name="select_custom_ports">Choisir Ports Manuellement</string>
     <string name="select_target">Sélectionnez une cible dans la liste ci-dessous, ou restez appuyé
         pour choisir un alias
     </string>
@@ -230,6 +210,17 @@
     
     <string name="menu_add">Ajouter</string>
     <string name="menu_scan">Scanner</string>
-    <string name="menu_wifi_scan">Scan WiFi</string>
+    <string name="menu_wifi_scan">Scan Wi-Fi</string>
     <string name="menu_stop_msfrpcd">Arrêter le msfrpcd</string>
+
+    <string name="hijacker_load_from_file">Charger depuis un fichier</string>
+    <string name="login_user_wordlist">Dictionnaire de noms d\'utilisateurs</string>
+    <string name="login_pass_wordlist">Dictionnaire de mots de passe</string>
+
+    <string name="menu_new_session">Nouvelle Session</string>
+    <string name="menu_restore_session">Restaurer Session</string>
+    <string name="menu_submit_issue">Soumettre un bug/problème</string>
+    <string name="menu_about">À propos</string>
+
+    <string name="scanner_select_ports">Choisir Ports Manuellement</string>
 </resources>

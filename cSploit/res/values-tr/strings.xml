@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">cSploit</string>
     <string name="menu_settings">Ayarlar</string>
     <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Ooooops! Bir hata oluştu. Üzülmeyin bunu geliştiricime haber ettim :)</string>
@@ -23,7 +22,6 @@
     <string name="protocol">Protokol</string>
     <string name="csploit_catchphrase">cSploit - An Android network penetration suite.</string>
     <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
-    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">Yasal Uyarı</string>
     <string name="csploit_disclaimer">
         <![CDATA[Bu uygulama gösteriş amaçlı kullanmak için değildir. Sadece izniniz olan ağlarda bunu kullanabilirsiniz. Aksi durumlarda sorumluluk geliştiricinin değildir. Aptal ve öfkeli insalar lütfen kullanmasın.]]></string>
@@ -74,14 +72,13 @@
     <string name="net_discovery_started">Ağ keşfetme başlatıldı.</string>
     <string name="start_monitor">Ağ İzlemeyi Başlat</string>
     <string name="stop_monitor">Ağ İzlemeyi Durdur</string>
-    <string name="start_msfrpcd">MetaSploit RPCD Başlat</string>
-    <string name="stop_msfrpcd">MetaSploit RPCD Durdur</string>
+    <string name="start_msfrpcd">Metasploit RPCD Başlat</string>
+    <string name="stop_msfrpcd">Metasploit RPCD Durdur</string>
     <string name="exit">Çıkış</string>
     <string name="close_confirm">cSploit i kapatmak istediğinize emin misiniz?
     </string>
     <string name="press_back">Tekrar geri tuşuna basın ve uygulamayı kapatın.</string>
     <string name="selected_">Seçildi&#160;</string>
-    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">SD Kartınız da oturum dosyası bulunamadı.</string>
     <string name="select_session_file">SD Kartınızdan oturum dosyası seçin :</string>
     <string name="select_session">Oturum Seç</string>
@@ -219,11 +216,11 @@
     <string name="error_rpc">RPC hatası</string>
     <string name="error_rpcd_inval">ayarlar bozuk</string>
     <string name="error_rpcd_shell">kabuk başlatılamadı</string>
-    <string name="rpcd_starting">MetaSploit başlatılıyor&#8230;</string>
-    <string name="rpcd_started">MetaSploit başlatıldı</string>
-    <string name="rpcd_stopped">MetaSploit durduruldu</string>
-    <string name="rpcd_running">MetaSploit zaten çalışır durumda</string>
-    <string name="rpcd_timedout">MetaSploit yanıt vermiyor</string>
+    <string name="rpcd_starting">Metasploit başlatılıyor&#8230;</string>
+    <string name="rpcd_started">Metasploit başlatıldı</string>
+    <string name="rpcd_stopped">Metasploit durduruldu</string>
+    <string name="rpcd_running">Metasploit zaten çalışır durumda</string>
+    <string name="rpcd_timedout">Metasploit yanıt vermiyor</string>
     <string name="error_rcpd_fatal">hata oluştu, tespit edilip geliştirice yollamak için tarıyorum.
         Eğer ben kapanmıyorsam beni Sistem Tercihleri>Uygulamalar dan zorla kapatabilirsin.
         ve Lütfen geliştiricimi uyar.
@@ -304,7 +301,7 @@
     <!-- preferences -->
     <string name="pref_general">Genel</string>
     <string name="pref_modules">Modüller</string>
-    <string name="pref_msf">MetaSploit</string>
+    <string name="pref_msf">Metasploit</string>
     <string name="pref_performance">Performans</string>
     <string name="pref_check_updates">Güncellemeler</string>
     <string name="pref_wake_lock">Uyku Kilidi</string>
@@ -333,20 +330,20 @@
     <string name="pref_msf_check_updates">MSF güncellemesi kontrol et</string>
     <string name="pref_msf_check_updates_desc">Bu uygulama her başladığında MSF güncellemesi kontrol et.</string>
     <string name="pref_rpc_user">RPC kullanıcı adı</string>
-    <string name="pref_rpc_user_desc">MetaSploit için kullanıcı adı.</string>
+    <string name="pref_rpc_user_desc">Metasploit için kullanıcı adı.</string>
     <string name="pref_rpc_pswd">RPC şifre</string>
-    <string name="pref_rpc_pswd_desc">MetaSploit için şifre.</string>
+    <string name="pref_rpc_pswd_desc">Metasploit için şifre.</string>
     <string name="pref_rpc_host">RPC sunucu</string>
-    <string name="pref_rpc_host_desc">MetaSploit sunucusu.</string>
+    <string name="pref_rpc_host_desc">Metasploit sunucusu.</string>
     <string name="pref_rpc_port">RPC port</string>
-    <string name="pref_rpc_port_desc">MetaSploit sunucusu portu.</string>
+    <string name="pref_rpc_port_desc">Metasploit sunucusu portu.</string>
     <string name="pref_rpc_ssl">RPC ssl</string>
-    <string name="pref_rpc_ssl_desc">MetaSploit için SSL kullan</string>
+    <string name="pref_rpc_ssl_desc">Metasploit için SSL kullan</string>
     <string name="pref_msfdir">MSF klasörü</string>
-    <string name="pref_msfdir_desc">MetaSploit ün yüklü olduğu klasör.</string>
+    <string name="pref_msfdir_desc">Metasploit ün yüklü olduğu klasör.</string>
     <string name="pref_rubydir">Ruby klasörü</string>
     <string name="pref_rubydir_desc">Ruby arayüzünün yüklü olduğu klasör.</string>
-    <string name="pref_msf_branch_desc">MetaSploit in kullandığı dal</string>
+    <string name="pref_msf_branch_desc">Metasploit in kullandığı dal</string>
     <string name="pref_msf_branch_title">MSF dalı</string>
     <string name="pref_performance_vuln_title">Arama tercihleri</string>
     <string name="pref_performance_vuln_desc">Zaafiyet arama tercihleri</string>
@@ -355,31 +352,21 @@
         <item>CVE</item>
         <item>both CVE and OSVDB</item>
     </string-array>
-    <string-array name="pref_performance_vuln_values">
-        <item>OSVDB</item>
-        <item>CVE</item>
-        <item>BOTH</item>
-    </string-array>
     <string name="pref_performance_exploit_desc">Exploit arama</string>
     <string-array name="pref_performance_exploit" >
         <item>MSF compatible only</item>
         <item>on exploitdb only</item>
         <item>from both exploitdb and MSF</item>
     </string-array>
-    <string-array name="pref_performance_exploit_values">
-        <item>MSF</item>
-        <item>EXDB</item>
-        <item>BOTH</item>
-    </string-array>
     <string name="pref_performance_widescan">yatay sunucu arama</string>
     <string name="pref_performance_widescan_desc">ağ maskesi dışında sunucu arama</string>
     <string name="pref_advanced">Gelişmiş</string>
     <string name="pref_folder">Klasör</string>
     <string name="pref_msf_enable">MSF Aç</string>
-    <string name="pref_msf_enable_desc">MetaSploit i aç.</string>
+    <string name="pref_msf_enable_desc">Metasploit i aç.</string>
     <string name="pref_msf_delete">MSF Sil</string>
-    <string name="pref_msf_delete_desc">MetaSploit i cihazdan sil.</string>
-    <string name="pref_msfwipe_message">MetaSploit i silmek istediğinize emin misiniz?</string>
+    <string name="pref_msf_delete_desc">Metasploit i cihazdan sil.</string>
+    <string name="pref_msfwipe_message">Metasploit i silmek istediğinize emin misiniz?</string>
     <string name="pref_msfwipe_size">%d MB alan açıldı.</string>
     <string name="pref_err_exists">mevcut değil.</string>
     <string name="pref_err_writable">yazılamaz.</string>
@@ -437,9 +424,9 @@
     <string name="target_selected">hedef seçildi</string>
     <string name="targets_selected">hedefler seçildi</string>
     <string name="multiple_attack">çoklu saldırı</string>
-    <string name="connect_msf">MetaSploit e bağlan</string>
-    <string name="disconnect_msf">MetaSploit den kop</string>
-    <string name="connected_msf">MetaSploit e bağlantıldı</string>
+    <string name="connect_msf">Metasploit e bağlan</string>
+    <string name="disconnect_msf">Metasploit den kop</string>
+    <string name="connected_msf">Metasploit e bağlantıldı</string>
     <string name="connection_failed">Bağlantı Başarısız!</string>
     <string name="new_ruby_update_desc">ruby için güncelleme mevcut</string>
     <string name="delete_previous_location">Önceki yerini silmek ister misiniz?</string>

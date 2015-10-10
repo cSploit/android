@@ -20,7 +20,8 @@
 
 package org.csploit.android.net;
 
-import org.csploit.android.core.Logger;
+import org.csploit.android.core.*;
+import org.csploit.android.core.System;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,12 +47,23 @@ public class GitHubParser {
   private JSONObject mLastCommit = null;
   private JSONObject mLastRelease = null;
 
+  private String mTagFilter = null;
+
   private static GitHubParser msfRepo = new GitHubParser("cSploit", "android.MSF");
   private static GitHubParser cSploitRepo = new GitHubParser("cSploit", "android");
   private static GitHubParser coreRepo = new GitHubParser("cSploit", "android.native");
   private static GitHubParser rubyRepo = new GitHubParser("cSploit", "android.native.ruby");
 
-  public static GitHubParser getMsfRepo() {
+  public synchronized static GitHubParser getMsfRepo() {
+    String customUsername = System.getSettings().getString("MSF_GITHUB_USERNAME", "cSploit");
+    String customProject = System.getSettings().getString("MSF_GITHUB_PROJECT", "android.MSF");
+
+    if(!customUsername.equals(msfRepo.username) || !customProject.equals(msfRepo.project)) {
+      msfRepo = new GitHubParser(customUsername, customProject);
+    }
+
+    msfRepo.mTagFilter = ".*csploit.*";
+
     return msfRepo;
   }
 
@@ -65,6 +77,13 @@ public class GitHubParser {
 
   public static GitHubParser getRubyRepo() {
     return rubyRepo;
+  }
+
+  public static void resetAll() {
+    cSploitRepo.reset();
+    coreRepo.reset();
+    rubyRepo.reset();
+    msfRepo.reset();
   }
 
   public GitHubParser(String username, String project) {
@@ -89,13 +108,21 @@ public class GitHubParser {
     for(int i=0;i<releases.length();i++) {
       release = releases.getJSONObject(i);
 
-      if(!release.getBoolean("draft") && !release.getBoolean("prerelease")) {
-        if(!found) {
-          mLastRelease = release;
-          found = true;
-        }
-        mReleases.put(release);
+      if(release.getBoolean("draft") || release.getBoolean("prerelease"))
+        continue;
+
+      if(mTagFilter != null) {
+        String tag = release.getString("tag_name");
+
+        if(!tag.matches(mTagFilter))
+          continue;
       }
+
+      if(!found) {
+        mLastRelease = release;
+        found = true;
+      }
+      mReleases.put(release);
     }
   }
 
@@ -151,7 +178,9 @@ public class GitHubParser {
     if(mLastRelease==null)
       return null;
 
-    return mLastRelease.getString("tag_name").substring(1);
+    String name = mLastRelease.getString("tag_name");
+
+    return name.startsWith("v") ? name.substring(1) : name;
   }
 
   public synchronized String getLastReleaseAssetUrl() throws JSONException, IOException {
