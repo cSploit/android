@@ -385,6 +385,7 @@ public class MainActivity extends AppCompatActivity {
       return;
     mMenu.findItem(R.id.add).setVisible(mIsOnlineLayout);
     mMenu.findItem(R.id.scan).setVisible(mHaveAnyWifiInterface);
+    mMenu.findItem(R.id.wifi_ifaces).setEnabled(mIfaces.length > 1);
     mMenu.findItem(R.id.new_session).setEnabled(mIsOnlineLayout);
     mMenu.findItem(R.id.save_session).setEnabled(mIsOnlineLayout);
     mMenu.findItem(R.id.restore_session).setEnabled(mIsOnlineLayout);
