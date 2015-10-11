@@ -410,11 +410,14 @@ public class MainActivity extends AppCompatActivity {
     try {
       System.init(getApplicationContext());
     } catch (Exception e) {
-      if (!(e instanceof NoRouteToHostException))
-        System.errorLogging(e);
+      boolean isFatal = !(e instanceof NoRouteToHostException);
 
-      onInitializationError(System.getLastError());
-      return false;
+      if (isFatal) {
+        System.errorLogging(e);
+        onInitializationError(System.getLastError());
+      }
+
+      return !isFatal;
     }
 
     registerPlugins();
