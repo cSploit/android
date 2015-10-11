@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -112,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
   private UpdateReceiver mUpdateReceiver = new UpdateReceiver();
   private WipeReceiver mWipeReceiver = new WipeReceiver();
   private MsfRpcdServiceReceiver mMsfReceiver = new MsfRpcdServiceReceiver();
+  private ConnectivityReceiver mConnectivityReceiver = new ConnectivityReceiver();
   private Menu mMenu = null;
   private TextView mUpdateStatus = null;
   private Toast mToast = null;
@@ -298,6 +300,7 @@ public class MainActivity extends AppCompatActivity {
     mUpdateReceiver.register(this);
     mWipeReceiver.register(this);
     mMsfReceiver.register(this);
+    mConnectivityReceiver.register(this);
 
     init();
     createLayout();
@@ -448,8 +451,7 @@ public class MainActivity extends AppCompatActivity {
   }
 
   private void onNetworkInerfaceChanged() {
-    System.reloadNetworkMapping();
-    if (!System.isInitialized()) {
+    if (!System.reloadNetworkMapping()) {
       final String msg;
       String ifname = System.getIfname();
 
@@ -707,7 +709,6 @@ public class MainActivity extends AppCompatActivity {
                   public void onConfirm() {
                     try {
                       System.reset();
-                      mTargetAdapter.notifyDataSetChanged();
 
                       Toast.makeText(
                               MainActivity.this,
@@ -774,7 +775,6 @@ public class MainActivity extends AppCompatActivity {
 
               try {
                 System.loadSession(session);
-                mTargetAdapter.notifyDataSetChanged();
               } catch (Exception e) {
                 e.printStackTrace();
                 new ErrorDialog(getString(R.string.error),
@@ -866,6 +866,7 @@ public class MainActivity extends AppCompatActivity {
     mUpdateReceiver.unregister();
     mWipeReceiver.unregister();
     mMsfReceiver.unregister();
+    mConnectivityReceiver.unregister();
 
     // make sure no zombie process is running before destroying the activity
     System.clean(true);
@@ -1209,6 +1210,35 @@ public class MainActivity extends AppCompatActivity {
           onUpdateError(update, message);
           break;
       }
+    }
+  }
+
+  private class ConnectivityReceiver extends ManagedReceiver {
+    private final IntentFilter mFilter;
+
+    public ConnectivityReceiver() {
+      mFilter = new IntentFilter();
+      mFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+    }
+
+    @Override
+    public IntentFilter getFilter() {
+      return mFilter;
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      loadInterfaces();
+      configureMenu();
+      String current = System.getIfname();
+      for(String ifname : mIfaces) {
+        if(ifname.equals(current)) {
+          return;
+        }
+      }
+      System.setIfname(null);
+      onNetworkInerfaceChanged();
+      createLayout();
     }
   }
 }

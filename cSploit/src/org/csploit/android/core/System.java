@@ -349,9 +349,10 @@ public class System
     return mIfname;
   }
 
-  public static void reloadNetworkMapping(){
+  public static boolean reloadNetworkMapping(){
     try{
       uncaughtReloadNetworkMapping();
+      return true;
     }
     catch(NoRouteToHostException nrthe){
       // swallow bitch
@@ -359,6 +360,7 @@ public class System
     catch(Exception e){
       errorLogging(e);
     }
+    return false;
   }
 
   private static void uncaughtReloadNetworkMapping() throws UnknownHostException, SocketException {
@@ -846,6 +848,8 @@ public class System
         reset();
         reader.close();
         throw e;
+      } finally {
+        notifyTargetListChanged();
       }
     } else
       throw new Exception(filename + " does not exists or is empty.");
@@ -954,6 +958,8 @@ public class System
 
       scanThemAll();
     }
+
+    notifyTargetListChanged();
   }
 
   public static void scanThemAll() {
