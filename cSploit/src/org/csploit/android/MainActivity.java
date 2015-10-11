@@ -450,7 +450,7 @@ public class MainActivity extends AppCompatActivity {
     isAnyNetInterfaceAvailable = mIfaces.length > 0;
   }
 
-  private void onNetworkInerfaceChanged() {
+  private void onNetworkInterfaceChanged() {
     if (!System.reloadNetworkMapping()) {
       final String msg;
       String ifname = System.getIfname();
@@ -484,7 +484,7 @@ public class MainActivity extends AppCompatActivity {
 
     if (autoload) {
       System.setIfname(mIfaces[0]);
-      onNetworkInerfaceChanged();
+      onNetworkInterfaceChanged();
     } else if (isAnyNetInterfaceAvailable) {
       String title = getString(R.string.iface_dialog_title);
 
@@ -492,7 +492,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onChoice(int index) {
           System.setIfname(mIfaces[index]);
-          onNetworkInerfaceChanged();
+          onNetworkInterfaceChanged();
         }
       }).show();
     } else {
@@ -1237,7 +1237,7 @@ public class MainActivity extends AppCompatActivity {
         }
       }
       System.setIfname(null);
-      onNetworkInerfaceChanged();
+      onNetworkInterfaceChanged();
       createLayout();
     }
   }
