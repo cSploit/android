@@ -19,6 +19,7 @@
 package org.csploit.android;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -129,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
   private boolean mIsConnectivityAvailable = false;
   private boolean mIsUpdateDownloading = false;
   private boolean mHaveAnyWifiInterface = true; // TODO: check is device have a wifi interface
+  private boolean mOfflineMode = false;
 
   private void createUpdateLayout() {
 
@@ -388,7 +390,7 @@ public class MainActivity extends AppCompatActivity {
       return;
     mMenu.findItem(R.id.add).setVisible(mIsOnlineLayout);
     mMenu.findItem(R.id.scan).setVisible(mHaveAnyWifiInterface);
-    mMenu.findItem(R.id.wifi_ifaces).setEnabled(mIfaces.length > 1);
+    mMenu.findItem(R.id.wifi_ifaces).setEnabled(canChangeInterface());
     mMenu.findItem(R.id.new_session).setEnabled(mIsOnlineLayout);
     mMenu.findItem(R.id.save_session).setEnabled(mIsOnlineLayout);
     mMenu.findItem(R.id.restore_session).setEnabled(mIsOnlineLayout);
@@ -450,26 +452,75 @@ public class MainActivity extends AppCompatActivity {
     isAnyNetInterfaceAvailable = mIfaces.length > 0;
   }
 
+  private boolean canChangeInterface() {
+    return mIfaces.length > 1 || ( mOfflineMode && isAnyNetInterfaceAvailable);
+  }
+
+  private boolean haveInterface(String ifname) {
+    for(String s : mIfaces) {
+      if(s.equals(ifname))
+        return true;
+    }
+    return false;
+  }
+
   private void onNetworkInterfaceChanged() {
+    String toastMessage = null;
+
+    stopNetworkRadar();
+
     if (!System.reloadNetworkMapping()) {
-      final String msg;
       String ifname = System.getIfname();
 
       ifname = ifname == null ? "default interface" : ifname;
 
-      msg = String.format("Error initializing %s", ifname);
-
-      runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
-          createLayout();
-        }
-      });
+      toastMessage = String.format("Error initializing %s", ifname);
     } else {
       startNetworkRadar();
       registerPlugins();
     }
+
+    final String msg = toastMessage;
+
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        if(msg != null) {
+          Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+        }
+        createLayout();
+      }
+    });
+  }
+
+  private void onConnectionLost() {
+    if(mOfflineMode)
+      return;
+
+    mOfflineMode = true;
+
+    stopNetworkRadar();
+    System.disconnectAllTargets();
+
+    final Dialog dialog = new ConfirmDialog("connection lost",
+            "delete current session and start another?", MainActivity.this,
+            new ConfirmDialogListener() {
+              @Override
+              public void onConfirm() {
+                mOfflineMode = false;
+                System.setIfname(null);
+                onNetworkInterfaceChanged();
+              }
+
+              @Override
+              public void onCancel() { }
+            });
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        dialog.show();
+      }
+    });
   }
 
   /**
@@ -1231,14 +1282,11 @@ public class MainActivity extends AppCompatActivity {
       loadInterfaces();
       configureMenu();
       String current = System.getIfname();
-      for(String ifname : mIfaces) {
-        if(ifname.equals(current)) {
-          return;
-        }
+      if(haveInterface(current)) {
+        mOfflineMode = false;
+      } else {
+        onConnectionLost();
       }
-      System.setIfname(null);
-      onNetworkInterfaceChanged();
-      createLayout();
     }
   }
 }

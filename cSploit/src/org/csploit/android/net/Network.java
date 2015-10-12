@@ -21,6 +21,7 @@ package org.csploit.android.net;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
+import android.net.LinkProperties;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -299,6 +300,14 @@ public class Network
 
   private static boolean isIfaceUsable(NetworkInterface networkInterface) {
     try {
+      // FIXME
+      // When I disconnect the WiFi, the interface still configured properly,
+      // even if not connected. It holds the old IP addresses adn it still up
+      // because permanent scan is active.
+      // As now I didn't found a way to get Android framework's NetworkInfo
+      // from a given NetworkInterface.
+      // Probably a solution is to use only Android framework stuff,
+      // but many useful API has been added from API level 21.
       return networkInterface.isUp() && !networkInterface.isLoopback() &&
               !networkInterface.getInterfaceAddresses().isEmpty();
     } catch (SocketException e) {

@@ -973,6 +973,15 @@ public class System
     }
   }
 
+  public static void disconnectAllTargets() {
+    synchronized (mTargets) {
+      for(Target t : mTargets) {
+        t.setConneced(false);
+      }
+    }
+    notifyTargetListChanged();
+  }
+
   public static boolean isInitialized(){
     return mInitialized;
   }
