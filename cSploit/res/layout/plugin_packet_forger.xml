@@ -72,8 +72,7 @@
             android:layout_below="@+id/linearLayout2"
             android:layout_toLeftOf="@+id/sendWOL"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"
-            android:text="@string/wait_for_response"/>
+            android:layout_marginBottom="8dp"/>
 
     <LinearLayout
             android:id="@+id/linearLayout3"
@@ -147,13 +146,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
             android:textOff="@string/send"
             android:textOn="@string/stop"
             android:textAllCaps="true"
             android:paddingLeft="24dp"
             android:paddingRight="24dp"
-            android:fontFamily="sans-serif-condensed"/>
+            android:fontFamily="sans-serif-condensed"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@color/app_color"
+        />
 
     <Button
             android:id="@+id/sendWOL"
@@ -164,6 +166,8 @@
             android:layout_alignTop="@+id/responseCheckBox"
             android:textAllCaps="true"
             android:fontFamily="sans-serif-condensed"
+        android:backgroundTint="@color/app_color"
+        android:textColor="@android:color/white"
             android:text="@string/wake_on_lan"/>
 
 </RelativeLayout>

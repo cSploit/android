@@ -3,38 +3,30 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingLeft="16sp"
-    android:paddingRight="16sp"
     android:paddingTop="16sp"
     android:id="@+id/whatever">
 
-    <ToggleButton
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/inspectToggleButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/toggle_button"
-        android:textOff="Start"
-        android:textOn="Stop"
-        android:paddingLeft="24dp"
-        android:paddingRight="24dp"
-        android:textAllCaps="true"
-        android:fontFamily="sans-serif-condensed" />
+        android:padding="20dp"
+        android:src="@drawable/ic_play_arrow_24dp"
+        android:checked="false"
+        android:translationZ="8dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="20dp"
+        android:focusableInTouchMode="true" />
 
     <ProgressBar
         android:id="@+id/inspectActivity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/inspectToggleButton"
-        android:visibility="invisible" />
-
-    <View
-        android:id="@+id/separator"
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_below="@+id/inspectToggleButton"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="@android:color/darker_gray" />
+        android:layout_alignParentTop="false"
+        android:visibility="invisible"
+        android:layout_margin="20dp" />
 
     <TextView
         android:id="@+id/deviceTypeLabel"
@@ -78,7 +70,8 @@
         android:layout_above="@+id/textView2"
         android:layout_alignRight="@+id/inspectActivity"
         android:layout_alignTop="@+id/deviceTypeLabel"
-        android:layout_toRightOf="@+id/deviceTypeLabel">
+        android:layout_toRightOf="@+id/deviceTypeLabel"
+        android:layout_marginRight="16dp">
 
         <TextView
             android:id="@+id/deviceType"
@@ -97,7 +90,8 @@
         android:layout_alignBottom="@+id/textView2"
         android:layout_alignLeft="@+id/ScrollView03"
         android:layout_alignRight="@+id/ScrollView03"
-        android:layout_below="@+id/ScrollView03">
+        android:layout_below="@+id/ScrollView03"
+        android:layout_marginRight="16dp">
 
         <TextView
             android:id="@+id/deviceOS"
@@ -110,14 +104,19 @@
     </ScrollView>
 
     <ScrollView
+        android:descendantFocusability="afterDescendants"
+        android:focusableInTouchMode="false"
         android:id="@+id/ScrollView01"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_alignLeft="@+id/textView3"
         android:layout_alignParentBottom="true"
-        android:layout_below="@+id/textView3">
+        android:layout_below="@+id/textView3"
+        android:layout_marginRight="16dp">
 
         <TextView
+            android:fillViewport="true"
+            android:focusableInTouchMode="true"
             android:id="@+id/deviceServices"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -131,25 +130,30 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/deviceTypeLabel"
-        android:layout_toLeftOf="@+id/deviceName"
+        android:layout_toLeftOf="@+id/scrollview4"
         android:fontFamily="sans-serif-condensed"
         android:text="@string/target"
         android:textColor="@color/app_color"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_below="@+id/separator" />
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/deviceName"
-        android:layout_width="wrap_content"
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/ScrollView03"
         android:layout_alignLeft="@+id/ScrollView03"
         android:layout_alignRight="@+id/ScrollView03"
         android:layout_alignTop="@+id/textView1"
         android:paddingLeft="16dp"
+        android:id="@+id/scrollview4"
+        android:layout_marginRight="16dp" >
+    <TextView
+        android:id="@+id/deviceName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
         android:text="@string/target"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:layout_below="@+id/separator"
-        android:gravity="center_vertical" />
-
+        android:gravity="center_vertical"
+        />
+    </ScrollView>
 </RelativeLayout>

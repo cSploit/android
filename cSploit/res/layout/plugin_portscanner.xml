@@ -2,31 +2,19 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:padding="8dp">
+    android:orientation="vertical">
 
-    <ToggleButton
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/scanToggleButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-condensed"
-        android:paddingLeft="24dp"
-        android:paddingRight="24dp"
-        android:text="@string/toggle_button"
-        android:textAllCaps="true"
-        android:textOff="@string/start"
-        android:textOn="Stop" />
-
-    <View
-        android:id="@+id/separator"
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/scanDoc"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@android:color/darker_gray" />
+        android:layout_margin="16dp"
+        android:checked="false"
+        android:src="@drawable/ic_play_arrow_24dp"
+        android:translationZ="8dp" />
+
 
     <ListView
         android:id="@+id/scanListView"
@@ -34,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/separator"
+        android:layout_below="@+id/scanDoc"
         android:animateLayoutChanges="true" />
 
     <ProgressBar
@@ -42,6 +30,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/scanListView"
+        android:layout_below="@+id/scanDoc"
+        android:layout_margin="16dp"
         android:visibility="invisible" />
 
     <EditText
@@ -52,7 +42,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/scanToggleButton"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
         android:hint="-sS -P0 --privileged --send-ip --system-dns"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:visibility="gone" />
@@ -61,7 +52,7 @@
         android:id="@+id/scanDoc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/separator"
+        android:layout_alignEnd="@+id/scanParameters"
         android:layout_alignParentBottom="false"
         android:layout_alignParentLeft="false"
         android:layout_alignParentRight="false"
@@ -69,6 +60,8 @@
         android:layout_alignParentTop="false"
         android:layout_alignRight="@+id/separator"
         android:layout_below="@+id/scanParameters"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
         android:autoLink="web"
         android:gravity="center_horizontal"
         android:linksClickable="true"
