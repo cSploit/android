@@ -5,26 +5,17 @@
     android:orientation="vertical"
     android:padding="8dp">
 
-    <ToggleButton
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/traceToggleButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-condensed"
-        android:paddingLeft="24dp"
-        android:paddingRight="24dp"
-        android:text="@string/toggle_button"
-        android:textAllCaps="true"
-        android:textOff="Start"
-        android:textOn="Stop" />
-
-    <View
-        android:id="@+id/separator"
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_below="@+id/traceToggleButton"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@android:color/darker_gray" />
+        android:padding="20dp"
+        android:src="@drawable/ic_play_arrow_24dp"
+        android:checked="false"
+        android:translationZ="8dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="20dp" />
 
     <ListView
         android:id="@+id/traceListView"
@@ -32,7 +23,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/separator"
         android:animateLayoutChanges="true" />
 
     <ProgressBar

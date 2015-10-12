@@ -20,6 +20,8 @@ package org.csploit.android.plugins;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,7 +30,7 @@ import android.view.View.OnClickListener;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
+
 import org.csploit.android.R;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Plugin;
@@ -41,7 +43,7 @@ import org.csploit.android.tools.NMap.InspectionReceiver;
 
 public class Inspector extends Plugin{
 
-  private ToggleButton mStartButton = null;
+  private FloatingActionButton mStartButton = null;
   private ProgressBar mActivity = null;
   private TextView mDeviceType = null;
   private TextView mDeviceOS = null;
@@ -70,7 +72,7 @@ public class Inspector extends Plugin{
 
     mActivity.setVisibility(View.INVISIBLE);
     mRunning = false;
-    mStartButton.setChecked(false);
+    mStartButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_play_arrow_24dp));
   }
 
   private void write_services()
@@ -124,6 +126,7 @@ public class Inspector extends Plugin{
       updateView();
 
       mProcess = System.getTools().nmap.inpsect( target, mReceiver, mFocusedScan);
+      mStartButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_stop_24dp));
 
       mActivity.setVisibility(View.VISIBLE);
       mRunning = true;
@@ -143,7 +146,7 @@ public class Inspector extends Plugin{
 			setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);
 
-    mStartButton = (ToggleButton) findViewById(R.id.inspectToggleButton);
+    mStartButton = (FloatingActionButton) findViewById(R.id.inspectToggleButton);
     mActivity = (ProgressBar) findViewById(R.id.inspectActivity);
     TextView mDeviceName = (TextView) findViewById(R.id.deviceName);
     mDeviceType = (TextView) findViewById(R.id.deviceType);

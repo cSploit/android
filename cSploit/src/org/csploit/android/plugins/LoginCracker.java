@@ -25,6 +25,8 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,7 +42,6 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import org.csploit.android.R;
 import org.csploit.android.core.ChildManager;
@@ -88,7 +89,7 @@ public class LoginCracker extends Plugin {
   private Spinner mUserSpinner = null;
   private Spinner mMinSpinner = null;
   private Spinner mMaxSpinner = null;
-  private ToggleButton mStartButton = null;
+  private FloatingActionButton mStartButton = null;
   private TextView mStatusText = null;
   private ProgressBar mActivity = null;
   private ProgressBar mProgressBar = null;
@@ -120,7 +121,7 @@ public class LoginCracker extends Plugin {
       public void run() {
         mActivity.setVisibility(View.INVISIBLE);
         mProgressBar.setProgress(0);
-        mStartButton.setChecked(false);
+        mStartButton.setImageDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_play_arrow_24dp));
         mStatusText.setTextColor(Color.GREEN);
         mStatusText.setText("USERNAME = " + user + " - PASSWORD = "
                 + pass);
@@ -140,7 +141,7 @@ public class LoginCracker extends Plugin {
       public void run() {
         mActivity.setVisibility(View.INVISIBLE);
         mProgressBar.setProgress(0);
-        mStartButton.setChecked(false);
+        mStartButton.setImageDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_play_arrow_24dp));
         if (!mAccountFound) {
           mStatusText.setTextColor(Color.DKGRAY);
           mStatusText.setText(getString(R.string.stopped_dots));
@@ -159,6 +160,7 @@ public class LoginCracker extends Plugin {
     mAccountFound = false;
 
     try {
+      mStartButton.setImageDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_stop_24dp));
       mProcess =
               System.getTools().hydra
                       .crack(System.getCurrentTarget(),
@@ -306,7 +308,7 @@ public class LoginCracker extends Plugin {
     mMinSpinner.setAdapter(new ArrayAdapter<String>(this,
             android.R.layout.simple_spinner_item, LENGTHS));
 
-    mStartButton = (ToggleButton) findViewById(R.id.startButton);
+    mStartButton = (FloatingActionButton) findViewById(R.id.startFAB);
     mStatusText = (TextView) findViewById(R.id.statusText);
     mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
     mActivity = (ProgressBar) findViewById(R.id.activity);

@@ -171,16 +171,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignRight="@+id/linearLayout6">
 
-        <ToggleButton
-                android:id="@+id/startButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textOff="@string/start"
-                android:textOn="@string/stop"
-                android:paddingLeft="24dp"
-                android:paddingRight="24dp"
-                android:textAllCaps="true"
-                android:fontFamily="sans-serif-condensed"/>
+
 
         <RelativeLayout
                 android:layout_width="fill_parent"
@@ -216,6 +207,17 @@
 
         </RelativeLayout>
     </LinearLayout>
-
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/startFAB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:src="@drawable/ic_play_arrow_24dp"
+        android:translationZ="8dp"
+        android:layout_margin="20dp"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentRight="true" />
 </RelativeLayout>
 

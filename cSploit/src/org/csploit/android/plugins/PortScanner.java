@@ -23,6 +23,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -36,7 +38,6 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import org.csploit.android.R;
 import org.csploit.android.core.ChildManager;
@@ -60,7 +61,7 @@ import java.util.Map;
 public class PortScanner extends Plugin {
   private TextView mTextDoc = null;
   private EditText mTextParameters = null;
-  private ToggleButton mScanToggleButton = null;
+  private FloatingActionButton mScanFloatingActionButton = null;
   private ProgressBar mScanProgress = null;
   private boolean mRunning = false;
   private ArrayList<String> mPortList = new ArrayList<>();
@@ -129,7 +130,7 @@ public class PortScanner extends Plugin {
 
     mScanProgress.setVisibility(View.INVISIBLE);
     mRunning = false;
-    mScanToggleButton.setChecked(false);
+    mScanFloatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_play_arrow_24dp));
 
     if (mPortList.size() == 0)
       Toast.makeText(this, getString(R.string.no_open_ports),
@@ -153,6 +154,7 @@ public class PortScanner extends Plugin {
       System.errorLogging(e);
       Toast.makeText(PortScanner.this, getString(R.string.child_not_started) + "\n" + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
     }
+    mScanFloatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_stop_24dp));
   }
 
   private void createPortList() {
@@ -187,7 +189,7 @@ public class PortScanner extends Plugin {
     mPreferences = System.getSettings();
     mTextDoc = (TextView) findViewById(R.id.scanDoc);
     mTextParameters = (EditText) findViewById(R.id.scanParameters);
-    mScanToggleButton = (ToggleButton) findViewById(R.id.scanToggleButton);
+    mScanFloatingActionButton = (FloatingActionButton) findViewById(R.id.scanToggleButton);
     mScanProgress = (ProgressBar) findViewById(R.id.scanActivity);
 
     mShowCustomParameters = mPreferences.getBoolean(CUSTOM_PARAMETERS, false);
@@ -197,7 +199,7 @@ public class PortScanner extends Plugin {
     else
       hideParametersField();
 
-    mScanToggleButton.setOnClickListener(new OnClickListener() {
+    mScanFloatingActionButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
         if (mRunning) {
