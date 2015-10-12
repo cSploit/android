@@ -145,59 +145,68 @@ public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClic
     }
   }
 
-  public class StatListAdapter extends ArrayAdapter<AddressStats>{
+  public class StatListAdapter extends ArrayAdapter<AddressStats> {
     private int mLayoutId = 0;
-    private ArrayList<AddressStats> mStats = null;
+    private final ArrayList<AddressStats> mStats;
 
-    public class StatsHolder{
+    public class StatsHolder {
       TextView address;
       TextView description;
     }
 
-    public StatListAdapter(int layoutId){
+    public StatListAdapter(int layoutId) {
       super(Sniffer.this, layoutId);
 
       mLayoutId = layoutId;
-      mStats = new ArrayList<AddressStats>();
+      mStats = new ArrayList<>();
     }
 
-    public AddressStats getStats(String address){
-      for(AddressStats stats : mStats){
-        if(stats.mAddress.equals(address))
-          return stats;
+    public AddressStats getStats(String address) {
+      synchronized (mStats) {
+        for (AddressStats stats : mStats) {
+          if (stats.mAddress.equals(address))
+            return stats;
+        }
       }
 
       return null;
     }
 
-    public synchronized void addStats(AddressStats stats){
+    public synchronized void addStats(AddressStats stats) {
       boolean found = false;
 
-      for(AddressStats sstats : mStats){
-        if(sstats.mAddress.equals(stats.mAddress)){
-          sstats.mBytes = stats.mBytes;
-          sstats.mBandwidth = stats.mBandwidth;
-          sstats.mSampledTime = stats.mSampledTime;
-          sstats.mSampledBytes = stats.mSampledBytes;
+      synchronized (mStats) {
 
-          found = true;
-          break;
+        for (AddressStats sstats : mStats) {
+          if (sstats.mAddress.equals(stats.mAddress)) {
+            sstats.mBytes = stats.mBytes;
+            sstats.mBandwidth = stats.mBandwidth;
+            sstats.mSampledTime = stats.mSampledTime;
+            sstats.mSampledBytes = stats.mSampledBytes;
+
+            found = true;
+            break;
+          }
         }
+
+        if (!found)
+          mStats.add(stats);
+
+        Collections.sort(mStats);
       }
-
-      if(!found)
-        mStats.add(stats);
-
-      Collections.sort(mStats);
     }
 
-    private synchronized AddressStats getByPosition(int position){
-      return mStats.get(position);
+    private synchronized AddressStats getByPosition(int position) {
+      synchronized (mStats) {
+        return mStats.get(position);
+      }
     }
 
     @Override
     public int getCount(){
-      return mStats.size();
+      synchronized (mStats) {
+        return mStats.size();
+      }
     }
 
     private String formatSize(long size){
