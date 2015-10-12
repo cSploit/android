@@ -472,9 +472,9 @@ public class MainActivity extends AppCompatActivity {
     if (!System.reloadNetworkMapping()) {
       String ifname = System.getIfname();
 
-      ifname = ifname == null ? "default interface" : ifname;
+      ifname = ifname == null ? getString(R.string.any_interface) : ifname;
 
-      toastMessage = String.format("Error initializing %s", ifname);
+      toastMessage = String.format(getString(R.string.error_initializing_interface), ifname);
     } else {
       startNetworkRadar();
       registerPlugins();
@@ -502,8 +502,8 @@ public class MainActivity extends AppCompatActivity {
     stopNetworkRadar();
     System.disconnectAllTargets();
 
-    final Dialog dialog = new ConfirmDialog("connection lost",
-            "delete current session and start another?", MainActivity.this,
+    final Dialog dialog = new ConfirmDialog(getString(R.string.connection_lost),
+            getString(R.string.connection_lost_prompt), MainActivity.this,
             new ConfirmDialogListener() {
               @Override
               public void onConfirm() {
