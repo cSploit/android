@@ -41,6 +41,7 @@ import org.csploit.android.gui.DirectoryPicker;
 import org.csploit.android.gui.dialogs.ChoiceDialog;
 import org.csploit.android.gui.dialogs.ConfirmDialog;
 import org.csploit.android.net.GitHubParser;
+import org.csploit.android.services.Services;
 import org.csploit.android.tools.Raw;
 import org.json.JSONException;
 
@@ -50,7 +51,7 @@ import java.io.IOException;
 public class SettingsActivity extends AppCompatActivity {
 
 
-  public static final int SETTINGS_DONE = 101285;
+  public static final int SETTINGS_DONE = 1285;
   public static final String SETTINGS_WIPE_START = "SettingsActivity.WIPE_START";
   public static final String SETTINGS_WIPE_DIR = "SettingsActivity.data.WIPE_DIR";
   public static final String SETTINGS_WIPE_DONE = "SettingsActivity.WIPE_DONE";
@@ -376,6 +377,8 @@ public class SettingsActivity extends AppCompatActivity {
       } else if (key.equals("MSF_ENABLED")) {
         if (mMsfEnabled.isChecked())
           onMsfEnabled();
+      } else if (key.equals("PREF_AUTO_PORTSCAN")) {
+        Services.getNetworkRadar().onAutoScanChanged();
       }
 
       if (message != null)
@@ -575,6 +578,11 @@ public class SettingsActivity extends AppCompatActivity {
       }
       super.onDestroy();
     }
+  }
 
+  @Override
+  public void onBackPressed() {
+    super.onBackPressed();
+    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
   }
 }

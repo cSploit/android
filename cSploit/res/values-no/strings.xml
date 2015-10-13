@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">cSploit</string>
     <string name="menu_settings">Innstillinger</string>
     <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Ooooops! Jeg krasjet, men en rapport kommer til å bli sendt til min 
@@ -25,7 +24,6 @@
     <string name="protocol">Protokoll</string>
     <string name="csploit_catchphrase">cSploit - An Android network penetration suite.</string>
     <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
-    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">ansvarsfraskrivelse</string>
     <string name="csploit_disclaimer">
         <![CDATA[This application is not to be used for any purposes other than to demonstrate its functions, and must only be used on networks for which you have permission to do so. Any other use is not the responsibility of the developer.In other words, don&apos;t be stupid, and don&apos;t direct angry people towards me.]]></string>
@@ -83,7 +81,6 @@
     </string>
     <string name="press_back">trykk igjen for å avslutte.</string>
     <string name="selected_">Valgt&#160;</string>
-    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">Ingen økt funnet på SD kort.</string>
     <string name="select_session_file">Velg en økt fil fra SD kortet :</string>
     <string name="select_session">Velg økt</string>
@@ -373,21 +370,11 @@
         <item>CVE</item>
         <item>both CVE and OSVDB</item>
     </string-array>
-    <string-array name="pref_performance_vuln_values">
-        <item>OSVDB</item>
-        <item>CVE</item>
-        <item>BOTH</item>
-    </string-array>
     <string name="pref_performance_exploit_desc">Search exploits</string>
     <string-array name="pref_performance_exploit" >
         <item>MSF compatible only</item>
         <item>on exploitdb only</item>
         <item>from both exploitdb and MSF</item>
-    </string-array>
-    <string-array name="pref_performance_exploit_values">
-        <item>MSF</item>
-        <item>EXDB</item>
-        <item>BOTH</item>
     </string-array>
     <string name="pref_performance_widescan">bred host søk</string>
     <string name="pref_performance_widescan_desc">søk for hosts utenfor network mask</string>

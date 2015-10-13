@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">cSploit</string>
     <string name="menu_settings">Nastavení</string>
     <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Ooooops! Něco je špatně, ale zpráva bude odeslána mému vývojáři pro opravu chyby:)
@@ -24,7 +23,6 @@
     <string name="protocol">Protokol</string>
     <string name="csploit_catchphrase">cSploit - An Android network penetration suite.</string>
     <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
-    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">Záruka</string>
     <string name="csploit_disclaimer">
         <![CDATA[Tato aplikace byla vytvořena pouze za účelem demonstrace jejích funkcí a může být použita pouze na sítích do kterých máte právo zasahovat. Za jiné použití vývojář nezodpovídá. Jinými slovy, nebuďte hloupí a neštvěte zlé lidi proti mě.]]></string>
@@ -82,7 +80,6 @@
     </string>
     <string name="press_back">Pro ukončení aplikace stiskněte znovu ZPĚT</string>
     <string name="selected_">Vybráno&#160;</string>
-    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">Na SD kartě nebyl nalezen žádný spoubor ze sezení</string>
     <string name="select_session_file">Vyberte soubor ze sezení na SD kartě :</string>
     <string name="select_session">Vyberte sezení</string>
@@ -362,21 +359,11 @@
         <item>CVE</item>
         <item>oboje - CVE i OSVDB</item>
     </string-array>
-    <string-array name="pref_performance_vuln_values">
-        <item>OSVDB</item>
-        <item>CVE</item>
-        <item>BOTH</item>
-    </string-array>
     <string name="pref_performance_exploit_desc">Hledání exploitů</string>
     <string-array name="pref_performance_exploit" >
         <item>MSF jenom kompatibilní </item>
         <item>jen na exploitdb </item>
         <item>z obou exploitdb i MSF</item>
-    </string-array>
-    <string-array name="pref_performance_exploit_values">
-        <item>MSF</item>
-        <item>EXDB</item>
-        <item>BOTH</item>
     </string-array>
     <string name="pref_performance_widescan">široký sken hostitelů</string>
     <string name="pref_performance_widescan_desc">hledovat hostitele i mimo zvolenou síťovou masku</string>
@@ -486,4 +473,20 @@
     <string name="JNI_crash_detected">Knihovna JNI spadla již minule, doufám, že jsi nám již podal hlášení.</string>
     <string name="update_cancelled">Aktualizace byla zastavena</string>
     <string name="child_not_started">Nemohu spustit proces</string>
+    <string name="msfrpcd_killed">MSF RPC Daemon byl terminován</string>
+    <string name="msfrcd_start_failed">Nepodařilo se spustit MSF RPC Daemon</string>
+    <string name="msf_connection_failed">Připojení k MSF RPC Daemon SELHALO!</string>
+    <string name="net_discovery_start_failed">Průzkum sítě SELHAL!</string>
+    <string name="new_apk_found">Je k dispozici verze aplikace %s , přejete si aktualizovat?</string>
+    <string name="new_ruby_found">Je k dispozici nová verze Ruby, přejete si aktualizovat?</string>
+    <string name="new_msf_found">Je k dispozici nová verze MSF, přejete si aktualizovat?</string>
+    <string name="msf_status">Metasploit Status</string>
+    <string name="msf_exploit_ranking">Hodnocení: %s</string>
+    <string name="msf_rank_manual">Ruční</string>
+    <string name="msf_rank_low">Nízký</string>
+    <string name="msf_rank_average">Průměrný</string>
+    <string name="msf_rank_normal">Normalní</string>
+    <string name="msf_rank_good">Dobrý</string>
+    <string name="msf_rank_great">Skvělý</string>
+    <string name="msf_rank_excellent">Excellentní</string>
 </resources>

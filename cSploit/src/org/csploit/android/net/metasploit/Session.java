@@ -58,13 +58,7 @@ public class Session extends Thread {
     mUuid = (String)map.get("uuid");
 
     // Search my Target
-    for(Target t : System.getTargets()) {
-      InetAddress addr = t.getAddress();
-      if(addr!=null && addr.getHostAddress().equals(mTargetHost)) {
-        tTmp = t;
-        break;
-      }
-    }
+    tTmp = System.getTargetByAddress(mTargetHost);
     if(tTmp == null)
       throw new UnknownHostException("no target matches `"+mTargetHost+"'");
     mTarget = tTmp;

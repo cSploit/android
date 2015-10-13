@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">cSploit</string>
     <string name="menu_settings">إعدادات</string>
     <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">وهناك مشكلة حدثت، بإرسال السجل لمطور التطبيق</string>
@@ -22,7 +21,6 @@
     <string name="protocol">بروتوكول</string>
     <string name="csploit_catchphrase">cSploit - جناح اختراق شبكة الروبوت.</string>
     <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
-    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">Disclaimer</string>
     <string name="csploit_disclaimer">
         <![CDATA[This application is not to be used for any purposes other than to demonstrate its functions, and must only be used on networks for which you have permission to do so. Any other use is not the responsibility of the developer.In other words, don&apos;t be stupid, and don&apos;t direct angry people towards me.]]></string>
@@ -80,7 +78,6 @@
     </string>
     <string name="press_back">اضغط مرة أخرى لإغلاق هذا التطبيق.</string>
     <string name="selected_">Selected&#160;</string>
-    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">أي ملف الجلسة الاطلاع على بطاقة الذاكرة الرقمية المؤمنة.</string>
     <string name="select_session_file">تحديد ملف الجلسة من بطاقة الذاكرة الرقمية المؤمنة:</string>
     <string name="select_session">حدد الدورة</string>
@@ -364,21 +361,11 @@
         <item>CVE</item>
         <item>both CVE and OSVDB</item>
     </string-array>
-    <string-array name="pref_performance_vuln_values">
-        <item>OSVDB</item>
-        <item>CVE</item>
-        <item>BOTH</item>
-    </string-array>
     <string name="pref_performance_exploit_desc">Search exploits</string>
     <string-array name="pref_performance_exploit" >
         <item>MSF compatible only</item>
         <item>on exploitdb only</item>
         <item>from both exploitdb and MSF</item>
-    </string-array>
-    <string-array name="pref_performance_exploit_values">
-        <item>MSF</item>
-        <item>EXDB</item>
-        <item>BOTH</item>
     </string-array>
     <string name="pref_performance_widescan">wide host scan</string>
     <string name="pref_performance_widescan_desc">scan for hosts outside the network mask</string>

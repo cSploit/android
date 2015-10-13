@@ -57,7 +57,6 @@ public class ToolBox {
   public void reload() {
     raw.setEnabled();
     shell.setEnabled();
-    ruby.setEnabled();
     nmap.setEnabled();
     hydra.setEnabled();
     arpSpoof.setEnabled();
@@ -65,18 +64,11 @@ public class ToolBox {
     fusemounts.setEnabled();
     ipTables.setEnabled();
     tcpDump.setEnabled();
-    msf.setEnabled();
     networkRadar.setEnabled();
-    msfrpcd.setEnabled();
     logcat.setEnabled();
 
-    if(ruby.isEnabled())
-      ruby.setupEnvironment();
-
-    if(msf.isEnabled())
-      msf.setupEnvironment();
-
-    if(msfrpcd.isEnabled())
-      msfrpcd.setupEnvironment();
+    ruby.init();
+    msf.init();
+    msfrpcd.init();
   }
 }

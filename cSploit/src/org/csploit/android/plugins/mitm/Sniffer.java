@@ -19,6 +19,7 @@
 package org.csploit.android.plugins.mitm;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -26,7 +27,6 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -38,12 +38,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import org.csploit.android.ActionActivity;
 import org.csploit.android.R;
 import org.csploit.android.core.Child;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.System;
 import org.csploit.android.gui.dialogs.ConfirmDialog;
-import org.csploit.android.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
 import org.csploit.android.gui.dialogs.ErrorDialog;
 import org.csploit.android.net.Target;
 import org.csploit.android.plugins.mitm.SpoofSession.OnSessionReadyListener;
@@ -54,7 +54,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Sniffer extends AppCompatActivity
+public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClickListener
 {
   private static final String[] SORT = {
     "Bandwidth ↓",
@@ -145,59 +145,68 @@ public class Sniffer extends AppCompatActivity
     }
   }
 
-  public class StatListAdapter extends ArrayAdapter<AddressStats>{
+  public class StatListAdapter extends ArrayAdapter<AddressStats> {
     private int mLayoutId = 0;
-    private ArrayList<AddressStats> mStats = null;
+    private final ArrayList<AddressStats> mStats;
 
-    public class StatsHolder{
+    public class StatsHolder {
       TextView address;
       TextView description;
     }
 
-    public StatListAdapter(int layoutId){
+    public StatListAdapter(int layoutId) {
       super(Sniffer.this, layoutId);
 
       mLayoutId = layoutId;
-      mStats = new ArrayList<AddressStats>();
+      mStats = new ArrayList<>();
     }
 
-    public AddressStats getStats(String address){
-      for(AddressStats stats : mStats){
-        if(stats.mAddress.equals(address))
-          return stats;
+    public AddressStats getStats(String address) {
+      synchronized (mStats) {
+        for (AddressStats stats : mStats) {
+          if (stats.mAddress.equals(address))
+            return stats;
+        }
       }
 
       return null;
     }
 
-    public synchronized void addStats(AddressStats stats){
+    public synchronized void addStats(AddressStats stats) {
       boolean found = false;
 
-      for(AddressStats sstats : mStats){
-        if(sstats.mAddress.equals(stats.mAddress)){
-          sstats.mBytes = stats.mBytes;
-          sstats.mBandwidth = stats.mBandwidth;
-          sstats.mSampledTime = stats.mSampledTime;
-          sstats.mSampledBytes = stats.mSampledBytes;
+      synchronized (mStats) {
 
-          found = true;
-          break;
+        for (AddressStats sstats : mStats) {
+          if (sstats.mAddress.equals(stats.mAddress)) {
+            sstats.mBytes = stats.mBytes;
+            sstats.mBandwidth = stats.mBandwidth;
+            sstats.mSampledTime = stats.mSampledTime;
+            sstats.mSampledBytes = stats.mSampledBytes;
+
+            found = true;
+            break;
+          }
         }
+
+        if (!found)
+          mStats.add(stats);
+
+        Collections.sort(mStats);
       }
-
-      if(!found)
-        mStats.add(stats);
-
-      Collections.sort(mStats);
     }
 
-    private synchronized AddressStats getByPosition(int position){
-      return mStats.get(position);
+    private synchronized AddressStats getByPosition(int position) {
+      synchronized (mStats) {
+        return mStats.get(position);
+      }
     }
 
     @Override
     public int getCount(){
-      return mStats.size();
+      synchronized (mStats) {
+        return mStats.size();
+      }
     }
 
     private String formatSize(long size){
@@ -296,18 +305,20 @@ public class Sniffer extends AppCompatActivity
     mSpoofSession = new SpoofSession(false, false, null, null);
 
     mSortSpinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, SORT));
-    mSortSpinner.setOnItemSelectedListener(new OnItemSelectedListener(){
-      public void onItemSelected(AdapterView<?> adapter, View view, int position, long id){
+    mSortSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+      public void onItemSelected(AdapterView<?> adapter, View view, int position, long id) {
         mSortType = position;
       }
 
-      public void onNothingSelected(AdapterView<?> arg0){
+      public void onNothingSelected(AdapterView<?> arg0) {
       }
     });
 
     mListView.setAdapter(mAdapter);
 
-    mSniffToggleButton.setOnClickListener(new OnClickListener(){
+    mListView.setOnItemClickListener(this);
+
+    mSniffToggleButton.setOnClickListener(new View.OnClickListener(){
       @Override
       public void onClick(View v){
         if(mRunning){
@@ -319,7 +330,7 @@ public class Sniffer extends AppCompatActivity
     }
     );
 
-    new ConfirmDialog( getString(R.string.file_output), getString(R.string.question_save_to_pcap), this, new ConfirmDialogListener(){
+    new ConfirmDialog( getString(R.string.file_output), getString(R.string.question_save_to_pcap), this, new ConfirmDialog.ConfirmDialogListener(){
       @Override
       public void onConfirm(){
         mDumpToFile = true;
@@ -330,6 +341,40 @@ public class Sniffer extends AppCompatActivity
       public void onCancel(){
         mDumpToFile = false;
         mPcapFileName = null;
+      }
+    }).show();
+  }
+
+  @Override
+  public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    String address = mAdapter.getByPosition(position).mAddress;
+    final Target t = System.getTargetByAddress(address);
+
+    if (t == null)
+      return;
+
+    new ConfirmDialog(getString(R.string.mitm_ss_select_target_title),
+            String.format(getString(R.string.mitm_ss_select_target_prompt), address),
+            Sniffer.this, new ConfirmDialog.ConfirmDialogListener() {
+      @Override
+      public void onConfirm() {
+        System.setCurrentTarget(t);
+
+        setStoppedState();
+
+        Toast.makeText(Sniffer.this,
+                getString(R.string.selected_) + System.getCurrentTarget(),
+                Toast.LENGTH_SHORT).show();
+
+        startActivity(new Intent(Sniffer.this,
+                ActionActivity.class));
+
+        overridePendingTransition(R.anim.slide_in_left,
+                R.anim.slide_out_left);
+      }
+
+      @Override
+      public void onCancel() {
       }
     }).show();
   }
@@ -357,12 +402,17 @@ public class Sniffer extends AppCompatActivity
       mTcpdumpProcess.kill();
       mTcpdumpProcess = null;
     }
-    mSpoofSession.stop();
+    Sniffer.this.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        mSpoofSession.stop();
 
-    mSniffProgress.setVisibility(View.INVISIBLE);
+        mSniffProgress.setVisibility(View.INVISIBLE);
 
-    mRunning = false;
-    mSniffToggleButton.setChecked(false);
+        mRunning = false;
+        mSniffToggleButton.setChecked(false);
+      }
+    });
   }
 
   private void setSpoofErrorState(final String error){
@@ -463,6 +513,6 @@ public class Sniffer extends AppCompatActivity
   public void onBackPressed(){
     setStoppedState();
     super.onBackPressed();
-    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
   }
 }

@@ -42,13 +42,13 @@ import org.apache.commons.compress.utils.IOUtils;
 import org.csploit.android.R;
 import org.csploit.android.WifiScannerActivity;
 import org.csploit.android.gui.dialogs.FatalDialog;
+import org.csploit.android.helpers.NetworkHelper;
 import org.csploit.android.helpers.ThreadHelper;
-import org.csploit.android.net.Endpoint;
 import org.csploit.android.net.GitHubParser;
 import org.csploit.android.net.Network;
+import org.csploit.android.net.RemoteReader;
 import org.csploit.android.net.Target;
 import org.csploit.android.net.Target.Exploit;
-import org.csploit.android.net.Target.Type;
 import org.csploit.android.net.http.proxy.HTTPSRedirector;
 import org.csploit.android.net.http.proxy.Proxy;
 import org.csploit.android.net.http.server.Server;
@@ -56,6 +56,7 @@ import org.csploit.android.net.metasploit.MsfExploit;
 import org.csploit.android.net.metasploit.Payload;
 import org.csploit.android.net.metasploit.RPCClient;
 import org.csploit.android.net.metasploit.Session;
+import org.csploit.android.services.Services;
 import org.csploit.android.tools.ToolBox;
 
 import java.io.BufferedReader;
@@ -83,8 +84,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.Vector;
+import java.util.Observer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -109,11 +111,11 @@ public class System
   private static WifiLock mWifiLock = null;
   private static WakeLock mWakeLock = null;
   private static Network mNetwork = null;
-  private static final Vector<Target> mTargets = new Vector<Target>();
-  private static int mCurrentTarget = 0;
+  private static final List<Target> mTargets = new ArrayList<>();
+  private static Target mCurrentTarget = null;
   private static Map<String, String> mServices = null;
   private static Map<String, String> mPorts = null;
-  private static Map<String, String> mVendors = null;
+  private static Map<Integer, String> mVendors = null;
   private static SparseIntArray mOpenPorts = null;
 
   // registered plugins
@@ -141,6 +143,8 @@ public class System
   private static boolean mCoreInitialized = false;
 
   private static KnownIssues mKnownIssues = null;
+
+  private static Observer targetListObserver = null;
 
   private final static LinkedList<SettingReceiver> mSettingReceivers = new LinkedList<SettingReceiver>();
 
@@ -189,21 +193,7 @@ public class System
         MSF_RPC_PORT = 55553;
       }
 
-      // initialize network data at the end
-      mNetwork = new Network(mContext);
-
-      Target network = new Target(mNetwork),
-        gateway = new Target(mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware()),
-        device = new Target(mNetwork.getLocalAddress(), mNetwork.getLocalHardware());
-
-      gateway.setAlias(mNetwork.getSSID());
-      device.setAlias(android.os.Build.MODEL);
-
-      mTargets.add(network);
-      mTargets.add(gateway);
-      mTargets.add(device);
-
-      mInitialized = true;
+      uncaughtReloadNetworkMapping();
 
       ThreadHelper.getSharedExecutor().execute(new Runnable() {
         @Override
@@ -315,6 +305,7 @@ public class System
     Client.Disconnect();
 
     mCoreInitialized = false;
+    Services.getNetworkRadar().onAutoScanChanged();
   }
 
   public static void initCore() throws DaemonException, SuException {
@@ -345,25 +336,12 @@ public class System
     reloadTools();
 
     mCoreInitialized = true;
+    Services.getNetworkRadar().onAutoScanChanged();
   }
 
   public static void reloadNetworkMapping(){
     try{
-      mNetwork = new Network(mContext);
-
-      Target network = new Target(mNetwork),
-        gateway = new Target(mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware()),
-        device = new Target(mNetwork.getLocalAddress(), mNetwork.getLocalHardware());
-
-      gateway.setAlias(mNetwork.getSSID());
-      device.setAlias(android.os.Build.MODEL);
-
-      mTargets.clear();
-      mTargets.add(network);
-      mTargets.add(gateway);
-      mTargets.add(device);
-
-      mInitialized = true;
+      uncaughtReloadNetworkMapping();
     }
     catch(NoRouteToHostException nrthe){
       // swallow bitch
@@ -371,6 +349,14 @@ public class System
     catch(Exception e){
       errorLogging(e);
     }
+  }
+
+  private static void uncaughtReloadNetworkMapping() throws UnknownHostException, SocketException {
+    mNetwork = new Network(mContext);
+
+    reset();
+
+    mInitialized = true;
   }
 
   public static boolean checkNetworking(final Activity current){
@@ -389,6 +375,33 @@ public class System
     }
 
     return true;
+  }
+
+  public synchronized static void setTargetListObserver(Observer targetListObserver) {
+    System.targetListObserver = targetListObserver;
+  }
+
+  /**
+   * notify that a specific target of the list has been changed
+   * @param target  the changed target
+   */
+  public static void notifyTargetListChanged(Target target) {
+    Observer o;
+    synchronized (System.class) {
+      o = targetListObserver;
+    }
+
+    if(o==null)
+      return;
+
+    o.update(null, target);
+  }
+
+  /**
+   * notify that the targets list has been changed
+   */
+  public static void notifyTargetListChanged() {
+    notifyTargetListChanged(null);
   }
 
   public static void setLastError(String error){
@@ -566,7 +579,7 @@ public class System
   private static void preloadVendors(){
     if(mVendors == null){
       try{
-        mVendors = new HashMap<String, String>();
+        mVendors = new HashMap<>();
         @SuppressWarnings("ConstantConditions")
         FileInputStream fstream = new FileInputStream(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-mac-prefixes");
 
@@ -580,7 +593,7 @@ public class System
             String[] tokens = line.split(" ", 2);
 
             if(tokens.length == 2)
-              mVendors.put(tokens[0], tokens[1]);
+              mVendors.put(NetworkHelper.getOUICode(tokens[0]), tokens[1]);
           }
         }
 
@@ -746,12 +759,13 @@ public class System
     builder.append(SESSION_MAGIC + "\n");
 
     // skip the network target
-    builder.append(mTargets.size() - 1).append("\n");
-    for(Target target : mTargets){
-      if(target.getType() != Target.Type.NETWORK)
-        target.serialize(builder);
+    synchronized (mTargets) {
+      builder.append(mTargets.size() - 1).append("\n");
+      for (Target target : mTargets) {
+        if (target.getType() != Target.Type.NETWORK)
+          target.serialize(builder);
+      }
     }
-    builder.append(mCurrentTarget).append("\n");
 
     session = builder.toString();
 
@@ -808,16 +822,17 @@ public class System
           if(!hasTarget(target)){
             System.addOrderedTarget(target);
           } else{
-            for(int j = 0; j < mTargets.size(); j++){
-              if(mTargets.get(j) != null && mTargets.get(j).equals(target)){
-                mTargets.set(j, target);
-                break;
+            synchronized (mTargets) {
+              for (int j = 0; j < mTargets.size(); j++) {
+                if (mTargets.get(j) != null && mTargets.get(j).equals(target)) {
+                  mTargets.set(j, target);
+                  break;
+                }
               }
             }
           }
         }
 
-        mCurrentTarget = Integer.parseInt(reader.readLine());
         reader.close();
 
       } catch(Exception e){
@@ -829,12 +844,12 @@ public class System
       throw new Exception(filename + " does not exists or is empty.");
   }
 
-  public static ToolBox getTools() {
-    synchronized (System.class) {
-      if(mTools == null)
-        mTools = new ToolBox();
-      return mTools;
+  public synchronized static ToolBox getTools() {
+    if(mTools == null) {
+      mTools = new ToolBox();
+      mTools.reload();
     }
+    return mTools;
   }
 
   public static RPCClient getMsfRpc() {
@@ -847,10 +862,10 @@ public class System
     mMsfRpc = value;
     // refresh all exploits
     // NOTE: this method is usually called by the RPCServer Thread, which will not block the UI
-    for( Target t : getTargets()) {
-      for( Exploit e : t.getExploits()) {
-        if(e instanceof MsfExploit) {
-          ((MsfExploit)e).refresh();
+    for (Target t : getTargets()) { // use a copy of the targets to avoid deadlocks.
+      for (Exploit e : t.getExploits()) {
+        if (e instanceof MsfExploit) {
+          ((MsfExploit) e).refresh();
         }
       }
     }
@@ -915,17 +930,36 @@ public class System
     return type;
   }
 
-  public static void reset() throws SocketException{
-    mTargets.clear();
+  public static void reset() {
+    mCurrentTarget = null;
 
-    // local network
-    mTargets.add(new Target(System.getNetwork()));
-    // network gateway
-    mTargets.add(new Target(System.getNetwork().getGatewayAddress(), System.getNetwork().getGatewayHardware()));
-    // device network address
-    mTargets.add(new Target(System.getNetwork().getLocalAddress(), System.getNetwork().getLocalHardware()));
+    synchronized (mTargets) {
+      mTargets.clear();
 
-    mCurrentTarget = 0;
+      Target network = new Target(mNetwork),
+              gateway = new Target(mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware()),
+              device = new Target(mNetwork.getLocalAddress(), mNetwork.getLocalHardware());
+
+      gateway.setAlias(mNetwork.getSSID());
+      device.setAlias(android.os.Build.MODEL);
+
+      mTargets.add(network);
+      mTargets.add(gateway);
+      mTargets.add(device);
+
+      scanThemAll();
+    }
+  }
+
+  public static void scanThemAll() {
+    if(!Services.getNetworkRadar().isAutoScanEnabled()) {
+      return;
+    }
+    synchronized (mTargets) {
+      for(Target t : mTargets) {
+        Services.getNetworkRadar().onNewTargetFound(t);
+      }
+    }
   }
 
   public static boolean isInitialized(){
@@ -946,7 +980,7 @@ public class System
 
   public static String getMacVendor(byte[] mac){
     if(mac != null && mVendors != null && mac.length >= 3)
-      return mVendors.get(String.format("%02X%02X%02X", mac[0], mac[1], mac[2]));
+      return mVendors.get(NetworkHelper.getOUICode(mac));
     else
       return null;
   }
@@ -973,41 +1007,14 @@ public class System
     return mNetwork;
   }
 
-  public static Vector<Target> getTargets(){
-    return mTargets;
-  }
-
-  public static ArrayList<Target> getTargetsByType(Target.Type type){
-    ArrayList<Target> filtered = new ArrayList<Target>();
-
-    for(Target target : mTargets){
-      if(target.getType() == type)
-        filtered.add(target);
+  /**
+   * get a copy of the current targets
+   * @return a copy of the target list
+   */
+  public static List<Target> getTargets(){
+    synchronized (mTargets) {
+      return new ArrayList<>(mTargets);
     }
-
-    return filtered;
-  }
-
-  public static ArrayList<Endpoint> getNetworkEndpoints(){
-    ArrayList<Endpoint> filtered = new ArrayList<Endpoint>();
-
-    for(Target target : mTargets){
-      if(target.getType() == Type.ENDPOINT)
-        filtered.add(target.getEndpoint());
-    }
-
-    return filtered;
-  }
-
-  public static void addTarget(int index, Target target){
-    mTargets.add(index, target);
-    // update current target index
-    if(mCurrentTarget >= index)
-      mCurrentTarget++;
-  }
-
-  public static void addTarget(Target target){
-    mTargets.add(target);
   }
 
   /**
@@ -1016,36 +1023,40 @@ public class System
    * @return true if target is added, false if already present
    */
   public static boolean addOrderedTarget(Target target){
-    if(target != null && !hasTarget(target)){
-      for(int i = 0; i < getTargets().size(); i++){
-        if(getTarget(i).comesAfter(target)){
-          addTarget(i, target);
+    if(target == null)
+      return false;
+
+    synchronized (mTargets) {
+      if(mTargets.contains(target)) {
+        return false;
+      }
+
+      for (int i = 0; i < mTargets.size(); i++) {
+        if (mTargets.get(i).comesAfter(target)) {
+          mTargets.add(i, target);
+          Services.getNetworkRadar().onNewTargetFound(target);
           return true;
         }
       }
 
-      addTarget(target);
-
+      mTargets.add(target);
+      Services.getNetworkRadar().onNewTargetFound(target);
       return true;
     }
-
-    return false;
-  }
-
-  public static Target getTarget(int index){
-    return mTargets.get(index);
   }
 
   public static boolean hasTarget(Target target){
-    return mTargets.contains(target);
+    synchronized (mTargets) {
+      return mTargets.contains(target);
+    }
   }
 
-  public static void setCurrentTarget(int index){
-    mCurrentTarget = index;
+  public static void setCurrentTarget(Target target) {
+    mCurrentTarget = target;
   }
 
   public static Target getCurrentTarget(){
-    return getTarget(mCurrentTarget);
+    return mCurrentTarget;
   }
 
   public static Target getTargetByAddress(String address){
@@ -1190,6 +1201,8 @@ public class System
           mWakeLock.release();
       }
 
+      RemoteReader.terminateAll();
+
       GitHubParser.resetAll();
 
       synchronized (mTargets) {
@@ -1203,6 +1216,7 @@ public class System
 
       Client.Disconnect();
       mCoreInitialized = false;
+      Services.getNetworkRadar().onAutoScanChanged();
     }
     catch(Exception e){
       errorLogging(e);

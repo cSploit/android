@@ -7,7 +7,7 @@ import android.content.IntentFilter;
 import android.widget.Toast;
 
 import org.csploit.android.R;
-import org.csploit.android.core.ManagedReceiver;
+import org.csploit.android.core.*;
 import org.csploit.android.services.NetworkRadar;
 
 /**

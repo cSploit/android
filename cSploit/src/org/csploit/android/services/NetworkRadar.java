@@ -1,18 +1,22 @@
 package org.csploit.android.services;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.MenuItem;
-import android.widget.BaseAdapter;
 
 import org.csploit.android.R;
+import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Logger;
 import org.csploit.android.core.System;
-import org.csploit.android.core.ChildManager;
+import org.csploit.android.helpers.ThreadHelper;
+import org.csploit.android.net.Endpoint;
+import org.csploit.android.net.Network;
 import org.csploit.android.net.Target;
+import org.csploit.android.tools.NMap;
+import org.csploit.android.tools.NetworkRadar.HostReceiver;
 
 import java.net.InetAddress;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * network-radar process manager
@@ -22,16 +26,10 @@ public class NetworkRadar extends NativeService implements MenuControllableServi
   public static final String NRDR_STARTED = "NetworkRadar.action.STARTED";
   public static final String NRDR_START_FAILED = "NetworkRadar.action.START_FAILED";
 
-  private final List<TargetTask> taskList = new LinkedList<>();
-  private final TargetSubmitter submitter = new TargetSubmitter();
-  private BaseAdapter adapter;
+  private boolean autoScan = true;
 
-  public NetworkRadar(Activity context) {
+  public NetworkRadar(Context context) {
     this.context = context;
-  }
-
-  public void setAdapter(BaseAdapter adapter) {
-    this.adapter = adapter;
   }
 
   public boolean start() {
@@ -70,61 +68,93 @@ public class NetworkRadar extends NativeService implements MenuControllableServi
   @Override
   public void buildMenuItem(MenuItem item) {
     item.setTitle(isRunning() ? R.string.stop_monitor : R.string.start_monitor);
-    item.setEnabled(System.getTools().networkRadar.isEnabled());
+    item.setEnabled(System.getTools().networkRadar.isEnabled() && System.getNetwork() != null);
   }
 
-  private class Receiver extends org.csploit.android.tools.NetworkRadar.HostReceiver {
+  public void onAutoScanChanged() {
+    autoScan = System.isCoreInitialized() && System.getSettings().getBoolean("PREF_AUTO_PORTSCAN", true);
+    Logger.info("autoScan has been set to " + autoScan);
+  }
+
+  public boolean isAutoScanEnabled() {
+    return autoScan;
+  }
+
+  public void onNewTargetFound(final Target target) {
+    if(!autoScan || target.getType() == Target.Type.NETWORK)
+      return;
+    ThreadHelper.getSharedExecutor().execute(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          System.getTools().nmap.synScan(target, new ScanReceiver(target));
+        } catch (ChildManager.ChildNotStartedException e) {
+          System.errorLogging(e);
+        }
+      }
+    });
+  }
+
+  private class Receiver extends HostReceiver {
 
     @Override
     public void onHostFound(byte[] macAddress, InetAddress ipAddress, String name) {
       Target t;
-      TargetTask task = null;
+      boolean notify = false;
+      boolean justFound;
 
       t = System.getTargetByAddress(ipAddress);
+      justFound = t == null;
 
-      if(t==null) {
+      if(justFound) {
         t = new Target(ipAddress, macAddress);
         t.setAlias(name);
-
-        task = new TargetTask(t, true, null, true);
+        System.addOrderedTarget(t);
+        notify = true;
       } else {
-        boolean aliasChanged = name != null && !name.equals(t.getAlias());
+        if (!t.isConnected()) {
+          t.setConneced(true);
+          notify = true;
+        }
 
-        if(aliasChanged || !t.isConnected()) {
-          task = new TargetTask(t, false, (aliasChanged ? name : t.getAlias()), true);
+        if (name != null && !name.equals(t.getAlias())) {
+          t.setAlias(name);
+          notify = true;
+        }
+
+        //TODO: remove me ( and imports )
+        Endpoint e = new Endpoint(ipAddress, macAddress);
+        if(!e.equals(t.getEndpoint())) {
+          Logger.warning(
+                  String.format("target '%s' changed it's mac address from '%s' to '%s'",
+                          t.toString(), t.getEndpoint().getHardwareAsString(), e.getHardwareAsString()));
         }
       }
 
-      if(task == null)
+      if(!notify)
         return;
 
-      synchronized (taskList) {
-        taskList.add(task);
+      if(justFound) {
+        System.notifyTargetListChanged();
+      } else {
+        System.notifyTargetListChanged(t);
       }
-
-      ((Activity)context).runOnUiThread(submitter);
     }
 
     @Override
     public void onHostLost(InetAddress ipAddress) {
       Target t = System.getTargetByAddress(ipAddress);
 
-      if(t == null) {
-        return;
+      if(t != null && t.isConnected()) {
+        t.setConneced(false);
+        System.notifyTargetListChanged(t);
       }
-
-      synchronized (taskList) {
-        taskList.add(
-                new TargetTask(t, false, t.getAlias(), false)
-        );
-      }
-
-      ((Activity)context).runOnUiThread(submitter);
     }
 
     @Override
     public void onStart(String cmd) {
       sendIntent(NRDR_STARTED);
+      System.scanThemAll();
     }
 
     public void onEnd(int exitValue) {
@@ -137,44 +167,17 @@ public class NetworkRadar extends NativeService implements MenuControllableServi
     }
   }
 
-  private class TargetTask {
-    final Target target;
-    final boolean add;
-    final String name;
-    final boolean connected;
+  private class ScanReceiver extends NMap.SynScanReceiver {
 
-    public TargetTask(Target target, boolean add, String name, boolean connected) {
+    private final Target target;
+
+    public ScanReceiver(Target target) {
       this.target = target;
-      this.add = add;
-      this.name = name;
-      this.connected = connected;
     }
-  }
 
-  private class TargetSubmitter implements Runnable {
     @Override
-    public void run() {
-      synchronized (taskList) {
-        if(!taskList.isEmpty()) {
-          for (TargetTask task : taskList) {
-            processTask(task);
-          }
-          if(adapter != null)
-            adapter.notifyDataSetChanged();
-        }
-      }
+    public void onPortFound(int port, String protocol) {
+      target.addOpenPort(port, Network.Protocol.fromString(protocol));
     }
-
-    private void processTask(final TargetTask task) {
-      if(task.add) {
-        System.addOrderedTarget(task.target);
-      } else {
-        task.target.setConneced(task.connected);
-        task.target.setAlias(task.name);
-      }
-    }
-
   }
-
-
 }

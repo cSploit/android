@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">cSploit</string>
     <string name="menu_settings">Paramètres</string>
     <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Ooooops ! Un crash est survenu, mais le bug va être signalé au
@@ -28,7 +27,6 @@
     <string name="csploit_catchphrase">cSploit - Une suite de pénétration réseau pour Android.
     </string>
     <string name="csploit_copyleft">Copyleft de Simone Margaritelli aka evilsocket.</string>
-    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">Conditions d\'utilisation</string>
     <string name="csploit_disclaimer">
         <![CDATA[Cette application ne doit être utilisée pour aucun autre but que celui de démontrer ses possibilités, et uniquement sur des réseau pour lesquels vous avez la permission d\'en faire ainsi. N\'importe quel autre usage n\'est en aucun cas la responsabilité du développeur. En d\'autres mots, ne soyez pas stupide, et ne redirigez pas les personnes en colère vers moi.]]></string>
@@ -82,7 +80,6 @@
     <string name="close_confirm">Ceci arrêtera cSploit, voulez-vous vraiment continuer ?</string>
     <string name="press_back">Appuyez sur retour à nouveau pour quitter l\'application.</string>
     <string name="selected_">Selectionné&#160;</string>
-    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">Aucune session trouvée sur la carte SD.</string>
     <string name="select_session_file">Choisir un fichier de session depuis la carte SD:</string>
     <string name="select_session">Choisir Session</string>

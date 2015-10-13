@@ -20,6 +20,8 @@ package org.csploit.android.plugins;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -29,7 +31,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import org.csploit.android.R;
 import org.csploit.android.core.ChildManager;
@@ -39,7 +40,7 @@ import org.csploit.android.net.Target;
 import org.csploit.android.tools.NMap;
 
 public class Traceroute extends Plugin {
-	private ToggleButton mTraceToggleButton = null;
+	private FloatingActionButton mTraceFloatingActionButton = null;
 	private ProgressBar mTraceProgress = null;
 	private boolean mRunning = false;
 	private ArrayAdapter<String> mListAdapter = null;
@@ -62,11 +63,12 @@ public class Traceroute extends Plugin {
     }
 		mTraceProgress.setVisibility(View.INVISIBLE);
 		mRunning = false;
-		mTraceToggleButton.setChecked(false);
+		mTraceFloatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_play_arrow_24dp));
 	}
 
 	private void setStartedState() {
 		mListAdapter.clear();
+		mTraceFloatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_stop_24dp));
 
     try {
       System.getTools().nmap.trace(System.getCurrentTarget(), resolveNames, mTraceReceiver);
@@ -88,10 +90,10 @@ public class Traceroute extends Plugin {
 			setTheme(R.style.AppTheme);
 		super.onCreate(savedInstanceState);
 
-		mTraceToggleButton = (ToggleButton) findViewById(R.id.traceToggleButton);
+		mTraceFloatingActionButton = (FloatingActionButton) findViewById(R.id.traceToggleButton);
 		mTraceProgress = (ProgressBar) findViewById(R.id.traceActivity);
 
-		mTraceToggleButton.setOnClickListener(new OnClickListener() {
+		mTraceFloatingActionButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if (mRunning) {
@@ -141,6 +143,7 @@ public class Traceroute extends Plugin {
 	public void onBackPressed() {
 		setStoppedState();
 		super.onBackPressed();
+		overridePendingTransition(R.anim.fadeout, R.anim.fadein);
 	}
 
 	private class Receiver extends NMap.TraceReceiver {

@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">cSploit</string>
     <string name="menu_settings">Ayarlar</string>
     <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Ooooops! Bir hata oluştu. Üzülmeyin bunu geliştiricime haber ettim :)</string>
@@ -23,7 +22,6 @@
     <string name="protocol">Protokol</string>
     <string name="csploit_catchphrase">cSploit - An Android network penetration suite.</string>
     <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
-    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">Yasal Uyarı</string>
     <string name="csploit_disclaimer">
         <![CDATA[Bu uygulama gösteriş amaçlı kullanmak için değildir. Sadece izniniz olan ağlarda bunu kullanabilirsiniz. Aksi durumlarda sorumluluk geliştiricinin değildir. Aptal ve öfkeli insalar lütfen kullanmasın.]]></string>
@@ -81,7 +79,6 @@
     </string>
     <string name="press_back">Tekrar geri tuşuna basın ve uygulamayı kapatın.</string>
     <string name="selected_">Seçildi&#160;</string>
-    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">SD Kartınız da oturum dosyası bulunamadı.</string>
     <string name="select_session_file">SD Kartınızdan oturum dosyası seçin :</string>
     <string name="select_session">Oturum Seç</string>
@@ -355,21 +352,11 @@
         <item>CVE</item>
         <item>both CVE and OSVDB</item>
     </string-array>
-    <string-array name="pref_performance_vuln_values">
-        <item>OSVDB</item>
-        <item>CVE</item>
-        <item>BOTH</item>
-    </string-array>
     <string name="pref_performance_exploit_desc">Exploit arama</string>
     <string-array name="pref_performance_exploit" >
         <item>MSF compatible only</item>
         <item>on exploitdb only</item>
         <item>from both exploitdb and MSF</item>
-    </string-array>
-    <string-array name="pref_performance_exploit_values">
-        <item>MSF</item>
-        <item>EXDB</item>
-        <item>BOTH</item>
     </string-array>
     <string name="pref_performance_widescan">yatay sunucu arama</string>
     <string name="pref_performance_widescan_desc">ağ maskesi dışında sunucu arama</string>

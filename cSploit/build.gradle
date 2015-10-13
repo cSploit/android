@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.4.0-beta3'
+        classpath 'com.android.tools.build:gradle:1.4.0-beta6'
     }
 }
 
@@ -52,8 +52,8 @@ android {
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 22
-        versionCode 2
-        versionName "1.6.0"
+        versionCode 3
+        versionName "1.6.1"
         if(System.getenv("NIGHTLY_BUILD")) {
             versionName += "+" + System.getenv("NIGHTLY_BUILD_COMMIT").substring(0, 7)
         }
@@ -87,6 +87,7 @@ android {
             debuggable true
             jniDebuggable true
             zipAlignEnabled true
+            multiDexEnabled true
         }
         release {
             buildConfigField "java.util.Date", "BUILD_TIME", "new java.util.Date(" + getDate() + "L)"
@@ -94,6 +95,7 @@ android {
             if (System.getenv("KEYSTORE_FILE") != null) {
                 signingConfig signingConfigs.release
             }
+            multiDexEnabled true
             return true
         }
     }
@@ -102,7 +104,6 @@ android {
         main {
             manifest.srcFile 'AndroidManifest.xml'
             java.srcDirs = ['src']
-            resources.srcDirs = ['src']
             aidl.srcDirs = ['src']
             renderscript.srcDirs = ['src']
             res.srcDirs = ['res']

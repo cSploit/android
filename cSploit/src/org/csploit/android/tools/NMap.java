@@ -142,6 +142,10 @@ public class NMap extends Tool {
     return super.async( command, receiver );
   }
 
+  public Child synScan( Target target, SynScanReceiver receiver) throws ChildManager.ChildNotStartedException {
+    return synScan(target, receiver, null);
+  }
+
   public Child customScan( Target target, SynScanReceiver receiver, String custom ) throws ChildManager.ChildNotStartedException {
     String command = "-vvv ";
 

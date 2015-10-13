@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">cSploit</string>
     <string name="Charset">Karaterset</string>
     <string name="JNI_crash_detected">De JNI bibliotheek is eerder gecrashed, De omstandigheden rapporteren om de oorzaak te achterhalen zou gewaardeerd worden.</string>
     <string name="about_csploit_v_">Over cSploit</string>
@@ -30,8 +29,8 @@
     <string name="close_confirm">Dit zal cSploit afsluiten, weet je het zeker?</string>
     <string name="command">Opdracht</string>
     <string name="connect">Verbind</string>
-    <string name="connect_msf">Verbinden met MetaSploit</string>
-    <string name="connected_msf">Verbonden met MetaSploit</string>
+    <string name="connect_msf">Verbinden met Metasploit</string>
+    <string name="connected_msf">Verbonden met Metasploit</string>
     <string name="connected_to"><![CDATA[Verbonden met <b>]]></string>
     <string name="connected_to2"><![CDATA[</b> met sleutel <b><font color=\"green\">]]></string>
     <string name="connected_to3"><![CDATA[</font></b>!]]></string>
@@ -51,7 +50,6 @@
     <string name="csploit_disclaimer">Deze applicatie mag alleen maar gebruikt worden om zijn functies te tonen, alleen op netwerken waarvan je toestemming heb gekregen om acties met deze applicatie uit te voeren. De ontwikkelaars van deze applicatie zijn voor niks aansprakelijk. Andere woorden: Doe geen domme dingen en stuur geen bozen mensen naar ons</string>
     <string name="enter_key_or_crack">Voeg een WiFi sleutel in of probeer het te kraken</string>
     <string name="enter_ports_list">Voeg de port lijst in</string>
-    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="custom_charset">Aangepaste karakterset</string>
     <string name="custom_code">Java code</string>
     <string name="custom_filter">Aangepaste filter</string>
@@ -60,7 +58,7 @@
     <string name="delete_previous_location">Verwijder vorige locatie?</string>
     <string name="device_type">Apparaat Type:</string>
     <string name="disclaimer">Vrijwaring</string>
-    <string name="disconnect_msf">Verbinding met MetaSploit verbroken</string>
+    <string name="disconnect_msf">Verbinding met Metasploit verbroken</string>
     <string name="downloading_update">Update aan het downloaden&#8230;</string>
     <string name="dumping_traffic_to">Dump verkeer naar</string>
     <string name="empty_port_list">Legen port lijst</string>
@@ -115,7 +113,6 @@
     <string name="from">Van</string>
     <string name="gateway_router">(Jouw netwerk router)</string>
     <string name="generating_keys">Sleutels aan het genereren&#8230;</string>
-    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="gpl_license">Dit programma is vrije software: je kunt het herdistribueren en / of onder de voorwaarden van de GNU General Public License zoals gepubliceerd door de Free Software Foundation, ofwel versie 3 van de Licentie, of (naar keuze) een latere versie. Dit programma wordt verspreid in de hoop dat het nuttig zal zijn, maar ZONDER ENIGE GARANTIE; zonder zelfs de impliciete garantie van verkoopbaarheid of geschiktheid voor een bepaald doel. Zie de GNU General Public License voor meer details. U moet een kopie van de GNU General Public License hebben ontvangen samen met dit programma. Zo niet, zie http://www.gnu.org/licenses/.</string>
     <string name="heart_attack">Heart aanval</string>
     <string name="heart_attack_update">Heart aanval is opgedoken, de applicatie zou nu gaan kijken voor updates.#STATUS#</string>
@@ -162,7 +159,7 @@
     <string name="menu_submit_issue">Raporteer een fout</string>
     <string name="menu_wifi_scan">WiFi Scan</string>
     <string name="min_length">Minimale lengte</string>
-    <string name="missing_core_update">de Core is niet geinstalleerd, de applicatie zal nu kijken voor updates #STATUS#</string>
+    <string name="missing_core_update">de Core is niet geinstalleerd, de applicatie zal nu kijken voor updates. #STATUS#</string>
     <string name="mitm">MITM</string>
     <string name="mitm_connection_kill">Verbreek Connecties</string>
     <string name="mitm_connection_kill_desc">Dit zal het doelwit weerhouden om alle sites te bereiken.</string>
@@ -190,7 +187,7 @@
     <string name="mitm_video_replace">Vervang Videos</string>
     <string name="mitm_video_replace_desc">Vervang alle YouTube video\'s op een website met één specifieke video.</string>
     <string name="msf_connection_failed">Verbinding met MSF RPC Daemon maken GEFAALD!</string>
-    <string name="msf_status">MetaSploit Status</string>
+    <string name="msf_status">Metasploit Status</string>
     <string name="msfrcd_start_failed">MSF RPC Daemon heeft gefaald om het te starten</string>
     <string name="msfrpc_disconnected">MSF RPC heeft de verbinding verbroken</string>
     <string name="msfrpcd_killed">MSF RPC Daemon afgesloten</string>
@@ -203,7 +200,7 @@
     <string name="new_core_found">Core versie %s is beschikbaar, wil je updaten?</string>
     <string name="new_gems_update_desc">Een update voor ruby gems</string>
     <string name="new_msf_found">Een nieuwe MSF versie is beschikbaar, wil je updaten?</string>
-    <string name="new_msf_update_desc">Een MetaSploitFramework update</string>
+    <string name="new_msf_update_desc">Een MetasploitFramework update</string>
     <string name="new_ruby_found">Een nieuwe versie van Ruby is beschikbaar, wil je updaten?</string>
     <string name="new_ruby_update_desc">Een update voor Ruby is beschikbaar</string>
     <string name="new_session_started">Nieuwe sessie is gestart</string>
@@ -270,22 +267,22 @@
     <string name="pref_https_redirector_port">HTTPS herleider Port</string>
     <string name="pref_https_redirector_port_desc">MITM https herleidings server port om naar te luisteren</string>
     <string name="pref_modules">Modules</string>
-    <string name="pref_msf">MetaSploit Framework</string>
-    <string name="pref_msf_branch_desc">De MetaSploit Framework branch om te gebruiken</string>
+    <string name="pref_msf">Metasploit Framework</string>
+    <string name="pref_msf_branch_desc">De Metasploit Framework branch om te gebruiken</string>
     <string name="pref_msf_branch_title">MSF Branch</string>
     <string name="pref_msf_check_updates">Kijk voor MSF updates</string>
     <string name="pref_msf_check_updates_desc">Check voor MSF updates elke keer als de applicatie opstart</string>
     <string name="pref_msf_delete">Verwijder MSF</string>
-    <string name="pref_msf_delete_desc">Verwijder de MetaSploit Framework van je apparaat</string>
+    <string name="pref_msf_delete_desc">Verwijder de Metasploit Framework van je apparaat</string>
     <string name="pref_msf_enable">Activeer MSF</string>
-    <string name="pref_msf_enable_desc">Activeer de MetaSploit Framework</string>
+    <string name="pref_msf_enable_desc">Activeer de Metasploit Framework</string>
     <string name="pref_msf_manifest">Aangepaste manifest</string>
     <string name="pref_msf_manifest_desc">aangepaste MSF manifest URL</string>
     <string name="pref_msf_notifications">MSF status notificaties</string>
     <string name="pref_msf_notifications_desc">Kijk naar de MSF RPC connectie status</string>
     <string name="pref_msfdir">MSF map</string>
-    <string name="pref_msfdir_desc">In deze map zit de MetaSploit Framework.</string>
-    <string name="pref_msfwipe_message">Wil je echt de MetaSploit Framework verwijderen?</string>
+    <string name="pref_msfdir_desc">In deze map zit de Metasploit Framework.</string>
+    <string name="pref_msfwipe_message">Wil je echt de Metasploit Framework verwijderen?</string>
     <string name="pref_msfwipe_size">Ongeveer %d MB zal verwijderd worden</string>
     <string name="pref_password_filename">Wachtwoord Sniffer Bestand</string>
     <string name="pref_password_filename_desc">Naam van het bestand om de wachtwoord en cookies te loggen.</string>
@@ -298,15 +295,15 @@
     <string name="pref_persistent_network_monitor">persistent network monitor</string>
     <string name="pref_persistent_network_monitor_desc">Zorgt ervoor de de netwerk monitor het netwerk blijft monitoren</string>
     <string name="pref_rpc_host">RPC host</string>
-    <string name="pref_rpc_host_desc">Host waar de MetaSploit RPC server is in</string>
+    <string name="pref_rpc_host_desc">Host waar de Metasploit RPC server is in</string>
     <string name="pref_rpc_port">RPC port</string>
-    <string name="pref_rpc_port_desc">Port waarmee je verbind met MetaSploit RPCD</string>
+    <string name="pref_rpc_port_desc">Port waarmee je verbind met Metasploit RPCD</string>
     <string name="pref_rpc_pswd">RPC wachtwoord</string>
-    <string name="pref_rpc_pswd_desc">Wachtwoord om te verbinden met MetaSploit RPCD</string>
+    <string name="pref_rpc_pswd_desc">Wachtwoord om te verbinden met Metasploit RPCD</string>
     <string name="pref_rpc_ssl">RPC gebruikt SSL</string>
-    <string name="pref_rpc_ssl_desc">Specifikeer of MetaSploit RPC SLL gebruikt</string>
+    <string name="pref_rpc_ssl_desc">Specifikeer of Metasploit RPC SLL gebruikt</string>
     <string name="pref_rpc_user">RPC gebruikersnaam</string>
-    <string name="pref_rpc_user_desc">Gebruikersnaam om te verbinden met MetaSploit RPCD.</string>
+    <string name="pref_rpc_user_desc">Gebruikersnaam om te verbinden met Metasploit RPCD.</string>
     <string name="pref_rubydir">Ruby map</string>
     <string name="pref_rubydir_desc">Map waarin de ruby interpreters inzitten.</string>
     <string name="pref_save_path">Sla pad op</string>
@@ -338,11 +335,11 @@
     <string name="restore_default_path">Herstel het orginele pad</string>
     <string name="router_pwn">Router PWN</string>
     <string name="router_pwn_desc">Activeer de http://routerpwn.com/ service op je router.</string>
-    <string name="rpcd_running">MetaSploit RPCD is al gestart</string>
-    <string name="rpcd_started">MetaSploit RPCD gestart</string>
-    <string name="rpcd_starting">MetaSploit RPCD wordt gestart.  Geduld&#8230;</string>
-    <string name="rpcd_stopped">MetaSploit RPCD is gestopt</string>
-    <string name="rpcd_timedout">MetaSploit RPCD reageert niet</string>
+    <string name="rpcd_running">Metasploit RPCD is al gestart</string>
+    <string name="rpcd_started">Metasploit RPCD gestart</string>
+    <string name="rpcd_starting">Metasploit RPCD wordt gestart.  Geduld&#8230;</string>
+    <string name="rpcd_stopped">Metasploit RPCD is gestopt</string>
+    <string name="rpcd_timedout">Metasploit RPCD reageert niet</string>
     <string name="run">Uitvoeren</string>
     <string name="save">Opslaan</string>
     <string name="save_session">Sla Sessie op</string>
@@ -378,11 +375,11 @@
     <string name="start_hijacking">Stoppen met sniffen en beginnen met sessie hijacking?</string>
     <string name="start_hijacking2">Beginnen met sessie hijacken?</string>
     <string name="start_monitor">Start Netwerk Monitor</string>
-    <string name="start_msfrpcd">Start MetaSploit RPCD</string>
+    <string name="start_msfrpcd">Start Metasploit RPCD</string>
     <string name="starting_dots">Opstarten &#8230;</string>
     <string name="stop">Stop</string>
     <string name="stop_monitor">Stop Netwerk Monitor</string>
-    <string name="stop_msfrpcd">Stop MetaSploit RPCD</string>
+    <string name="stop_msfrpcd">Stop Metasploit RPCD</string>
     <string name="stopped">Gestopt&#8230;</string>
     <string name="stopped_dots">Gestopt &#8230; </string>
     <string name="tap_again">Klik opniew om te stoppen</string>
@@ -425,4 +422,19 @@
     <string name="wifi_went_down">WiFi connectie ging weg.</string>
     <string name="wifi_with_key">Met sleutel</string>
     <string name="yes">Ja</string>
+    <string name="issue_message"><![CDATA[<p>Voordat je een problem reporteerd, lees alstublieft <a href="%1$s">Raporteerd een probleem</a>, Waarschijnlijk is het probleem al raporteerd, als dat niet zo is reporteer het dan met zo veel mogelijk informatie. Lees<a href="%2$s">dit artikel</a> Om te weten hoe je een probleem zo goed mogelijk te raporteren.</p>]]></string>
+    <string name="mitm_ss_select_target_prompt">Selecteer %s ?</string>
+    <string name="mitm_ss_select_target_title">Selecteer doelwit</string>
+    <string name="msf_exploit_ranking">Beoordeling: %s</string>
+    <string name="msf_rank_average">Normaal</string>
+    <string name="msf_rank_excellent">Uitstekend</string>
+    <string name="msf_rank_good">Goed</string>
+    <string name="msf_rank_great">Erg Goed</string>
+    <string name="msf_rank_low">Slecht</string>
+    <string name="msf_rank_manual">Handmatig</string>
+    <string name="msf_rank_normal">Normaal</string>
+    <string name="ports">Ports</string>
+    <string name="pref_auto_portscan">Automatische poort-scan</string>
+    <string name="pref_auto_portscan_desc">Scan altijd een doelwit met SYNC scanner als een doelwit gevonden word</string>
+    <string name="scanner_custom_parameters">Aangepaste parameters</string>
 </resources>

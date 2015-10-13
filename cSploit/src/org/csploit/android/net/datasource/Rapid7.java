@@ -179,6 +179,10 @@ class Rapid7
         }
       }
 
+      // name is a required field
+      if(name == null)
+        return null;
+
       return new MsfExploit(name, summary, description, ranking, targets, authors, platforms, architectures, references);
     }
 

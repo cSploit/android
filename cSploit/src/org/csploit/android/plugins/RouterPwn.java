@@ -47,6 +47,13 @@ public class RouterPwn extends Plugin{
     return target.isRouter();
   }
 
+
+  @Override
+  public void onBackPressed() {
+    super.onBackPressed();
+    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+  }
+
   @Override
   public void onActionClick(Context context){
     try{

@@ -21,8 +21,6 @@ public abstract class Update implements Serializable {
           compression;
   public archiveAlgorithm
           archiver;
-  public Intent
-          contentIntent;
   public boolean
           skipRoot,
           fixShebang,
@@ -42,9 +40,16 @@ public abstract class Update implements Serializable {
       version = null;
       compression = null;
       archiver = null;
-      contentIntent = null;
       wipeOnFail = fixShebang = errorOccurred = skipRoot = false;
     }
+  }
+
+  public boolean haveIntent() {
+    return false;
+  }
+
+  public Intent buildIntent() {
+    return null;
   }
 
   public enum compressionAlgorithm {

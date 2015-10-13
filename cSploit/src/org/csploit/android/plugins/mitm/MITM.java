@@ -440,7 +440,7 @@ public class MITM extends Plugin
                                                         Sniffer.class
                                                 )
                                 );
-                        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+                        overridePendingTransition(R.anim.fadeout, R.anim.fadein);
                       }
                     }));
 
@@ -465,7 +465,7 @@ public class MITM extends Plugin
                   PasswordSniffer.class
                 )
             );
-          overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+          overridePendingTransition(R.anim.fadeout, R.anim.fadein);
         }
       }));
 
@@ -491,7 +491,7 @@ public class MITM extends Plugin
                      DNSSpoofing.class
                   )
                );
-               overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+                 overridePendingTransition(R.anim.fadeout, R.anim.fadein);
                           }
       }));
 
@@ -516,7 +516,7 @@ public class MITM extends Plugin
                   Hijacker.class
                 )
             );
-          overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+          overridePendingTransition(R.anim.fadeout, R.anim.fadein);
         }
       }));
 
@@ -987,5 +987,6 @@ public class MITM extends Plugin
   public void onBackPressed(){
     setStoppedState();
     super.onBackPressed();
+    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
   }
 }

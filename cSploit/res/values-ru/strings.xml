@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-    <string name="app_name">cSploit</string>
     <string name="menu_settings">Настройки</string>
     <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Ой! Я вынужден завершить работу, но отправка отчета об ошибке моему разработчику поможет исправить проблему :)
@@ -9,6 +8,7 @@
     <string name="enter_redirection_details">Введите параметры переадресации ниже:</string>
     <string name="address">Адрес</string>
     <string name="port">Порт</string>
+    <string name="ports">Порты</string>
     <string name="target">Цель</string>
     <string name="unknown">Неизвестно</string>
     <string name="services">Сервисы</string>
@@ -25,7 +25,6 @@
     <string name="protocol">Протокол</string>
     <string name="csploit_catchphrase">cSploit - набор инструментов для проникновения в сеть под Android.</string>
     <string name="csploit_copyleft">Копилефт Simone Margaritelli aka evilsocket.</string>
-    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">Предупреждение</string>
     <string name="csploit_disclaimer">
         <![CDATA[Данное приложение предназначено только для демонстрации его функционала и может использоваться только в сетях, где вы имеете право выполнять данный функционал. За любое другое использование, разработчик приложения ответственности не несет. Другими словами, не будьте дураками и не направляйте ко мне злых людей.]]></string>
@@ -75,8 +74,7 @@
     <string name="close_confirm">Приложение cSploit будет закрыто, вы уверены, что хотите продолжить?
     </string>
     <string name="press_back">Нажмите назад ещё раз, чтобы закрыть приложение.</string>
-    <string name="selected_">Выбрано </string>
-    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
+    <string name="selected_">Выбрано </string>
     <string name="no_session_found">Не найдено файлов сессии на карте памяти.</string>
     <string name="select_session_file">Выберите файл сессии с карты памяти:</string>
     <string name="select_session">Выбор сессии</string>
@@ -280,6 +278,7 @@
     <string name="menu_about">О программе</string>
 
     <string name="scanner_select_ports">Выбрать свои порты</string>
+    <string name="scanner_custom_parameters">Свои параметры</string>
 
     <string name="wifi_initializing">Инициализация &#8230;</string>
     <string name="wifi_activating_iface">Активация WiFi интерфейса …</string>
@@ -348,21 +347,11 @@
         <item>CVE</item>
         <item>CVE и OSVDB</item>
     </string-array>
-    <string-array name="pref_performance_vuln_values">
-        <item>OSVDB</item>
-        <item>CVE</item>
-        <item>BOTH</item>
-    </string-array>
     <string name="pref_performance_exploit_desc">Поиск эксплойтов</string>
     <string-array name="pref_performance_exploit" >
         <item>Только совместимые с MSF</item>
         <item>Толко на exploitdb</item>
         <item>Использовать exploitdb и MSF</item>
-    </string-array>
-    <string-array name="pref_performance_exploit_values">
-        <item>MSF</item>
-        <item>EXDB</item>
-        <item>BOTH</item>
     </string-array>
     <string name="pref_performance_widescan">Широкий поиск хостов</string>
     <string name="pref_performance_widescan_desc">Поиск хостов вне текущей маски сети</string>
@@ -385,6 +374,8 @@
     <string name="pref_err_buffer_size">Размер буфера может быть от 1024 до 104857600.</string>
     <string name="pref_persistent_network_monitor">Постоянный мониторинг сети</string>
     <string name="pref_persistent_network_monitor_desc">Постоянно продолжать мониторинг сети</string>
+    <string name="pref_auto_portscan">Автоматическое сканирование портов</string>
+    <string name="pref_auto_portscan_desc">Всегда проводить SYN сканирование портов когда найден новый хост</string>
     <string name="choose_branch">Выберите ветку:</string>
     <string name="pref_performance_vuln_title">Настройки поиска</string>
     <string name="pref_err_executable">Недопустимо создание исполняемого контента</string>
@@ -488,4 +479,15 @@
     <string name="new_ruby_found">Новая версия ruby доступна, вы хотите обновиться?</string>
     <string name="new_msf_found">Новая версия MSF доступна, вы хотите обновиться?</string>
     <string name="msf_status">Статус Metasploit</string>
+    <string name="msf_exploit_ranking">Рейтинг: %s</string>
+    <string name="msf_rank_manual">Вручную</string>
+    <string name="msf_rank_low">Низкий</string>
+    <string name="msf_rank_average">Средний</string>
+    <string name="msf_rank_normal">Нормальный</string>
+    <string name="msf_rank_good">Хороший</string>
+    <string name="msf_rank_great">Отличный</string>
+    <string name="msf_rank_excellent">Превосходный</string>
+    <string name="mitm_ss_select_target_title">Выбрать цель</string>
+    <string name="mitm_ss_select_target_prompt">Выбрать %s ?</string>
+    <string name="issue_message"><![CDATA[<p>Перед открытием новой проблемы поищите посмотрите список в <a href="%1$s">открытых проблем</a>, возможно она уже открыта. Если нету сообщения о проблеме нам нужны как можно больше данных, так что пожайлуста прочитайте <a href="%2$s">это руководство</a>, чтобы знать как правильно сообщить о баге.</p>]]></string>
 </resources>

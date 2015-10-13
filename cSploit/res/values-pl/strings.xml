@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">cSploit</string>
     <string name="menu_settings">Ustawienia</string>
     <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Ooooops! Wywaliłem się, ale zamierzam wysłać raport do mojego twórcy
@@ -25,7 +24,6 @@
     <string name="protocol">Protokół</string>
     <string name="csploit_catchphrase">cSploit - Zestaw penetracyjny dla systemu Android.</string>
     <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
-    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">Wyłączenie odpowiedzialności</string>
     <string name="csploit_disclaimer">
         <![CDATA[Ta aplikacja nie powinna być używana w innym celu niż prezentacja jej funkcji. Może być tylko używana w sieciach, w kótrych masz pozwolenie na takie zabawy. Za żaden inny przypadek użycia, twórca nie ponosi odpowiedzialności. Innymi słowy, nie bądź głupi, nie napuszczać wkurzonych ludzi na mnie.]]></string>
@@ -82,7 +80,6 @@
     </string>
     <string name="press_back">Naciśnij wstecz jeszcze raz by opuścić aplikację.</string>
     <string name="selected_">Wybrano&#160;</string>
-    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">Nie znaleziono pliku sesji na karcie sd.</string>
     <string name="select_session_file">Wybierz plik sesji ze swojej karty sd :</string>
     <string name="select_session">Wybierz sesję</string>
@@ -339,21 +336,11 @@
         <item>CVE</item>
         <item>both CVE and OSVDB</item>
     </string-array>
-    <string-array name="pref_performance_vuln_values">
-        <item>OSVDB</item>
-        <item>CVE</item>
-        <item>BOTH</item>
-    </string-array>
     <string name="pref_performance_exploit_desc">Wyszukiwanie exploitów</string>
     <string-array name="pref_performance_exploit" >
         <item>Tylko z MSF</item>
         <item>Tylko z exploit-db</item>
         <item>Z exploit-db i MSF</item>
-    </string-array>
-    <string-array name="pref_performance_exploit_values">
-        <item>MSF</item>
-        <item>EXDB</item>
-        <item>BOTH</item>
     </string-array>
 	<string name="pref_performance_widescan">wide host scan</string>
     <string name="pref_performance_widescan_desc">scan for hosts outside the network mask.</string>

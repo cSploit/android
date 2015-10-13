@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">cSploit</string>
     <string name="menu_settings">设置</string>
     <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">额！崩溃了...不过我将给我的开发者发送报告来帮助解决这个问题。</string>
@@ -22,7 +21,6 @@
     <string name="protocol">协议</string>
     <string name="csploit_catchphrase">cSploit - 安卓上的网络渗透套装。</string>
     <string name="csploit_copyleft">非版权保护 来自 Simone Margaritelli 又名 evilsocket。</string>
-    <string name="csploit_url">http://www.csploit.org/</string>
     <string name="disclaimer">免责声明</string>
 <string name="csploit_disclaimer">
 <![CDATA[这个程序仅仅用于演示它的功能, 必须运行在您有明确的权利来使用的网络上. 任何的其他用法与开发者无关。换句话说, 别干傻事, 不要把别人的愤怒转移到我身上。]]></string>
@@ -76,7 +74,6 @@ If not, see http://www.gnu.org/licenses/.
     <string name="close_confirm">将关闭 cSploit，您确定继续么？</string>
     <string name="press_back">再摁一次返回退出。</string>
     <string name="selected_">已选择&#160;</string>
-    <string name="github_issues">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">没在在SD卡上找到会话文件。</string>
     <string name="select_session_file">请从SD卡中选择会话文件：</string>
     <string name="select_session">选择会话</string>
@@ -116,6 +113,9 @@ If not, see http://www.gnu.org/licenses/.
     <string name="invalid_filename">无效的文件名称。</string>
 <string name="something_went_wrong">发生了未知的错误，请尝试选择一个新的目标。
 </string>
+    <string name="mitm_dns_spoofing">DNS欺骗</string> 
+    <string name="mitm_dns_spoofing_desc">重定向连接到指定的web/IP</string> 
+    <string name="mitm_dns_spoofing_list_saved">储存</string> 
     <string name="selected">已经选择</string>
     <string name="nothing_found"><![CDATA[<small><i>未找到</i></small>]]></string>
     <string name="no_open_ports">没有在当前目标找到任何开放的端口，请先运行服务检查工具。</string>
@@ -278,6 +278,7 @@ If not, see http://www.gnu.org/licenses/.
     <string name="menu_about">关于</string>
 
     <string name="scanner_select_ports">选择自定义端口</string>
+     <string name="scanner_custom_parameters">自定义参数</string>
 
     <string name="wifi_initializing">正在初始化 &#8230;</string>
     <string name="wifi_activating_iface">正在激活 WiFi 接口 &#8230;</string>
@@ -330,21 +331,11 @@ If not, see http://www.gnu.org/licenses/.
         <item>CVE</item>
         <item>CVE 和 OSVDB 同时</item>
     </string-array>
-    <string-array name="pref_performance_vuln_values">
-        <item>OSVDB</item>
-        <item>CVE</item>
-        <item>BOTH</item>
-    </string-array>
     <string name="pref_performance_exploit_desc">搜索攻击方案</string>
     <string-array name="pref_performance_exploit" >
         <item>仅MSF兼容</item>
         <item>仅exploitdb</item>
         <item>同时来自exploitdb 与 MSF</item>
-    </string-array>
-    <string-array name="pref_performance_exploit_values">
-        <item>MSF</item>
-        <item>EXDB</item>
-        <item>BOTH</item>
     </string-array>
     <string name="pref_folder">文件夹</string>
     <string name="pref_err_exists">并不存在。</string>
@@ -428,6 +419,7 @@ If not, see http://www.gnu.org/licenses/.
     <string name="buildinfo">版本信息</string>
     <string name="menu_multiaction">多操作</string>
     <string name="menu_focusedscan">重点扫描</string>
+    <string name="menu_resolve_names">解析主机名</string>
 
     <string name="crash_dialog_title">cSploit 已崩溃</string>
     <string name="crash_dialog_text">发生了一个预料之外的错误，致使应用或其组件强制停止。请发送错误数据来帮助我们修复这个错误。</string>
@@ -452,6 +444,8 @@ If not, see http://www.gnu.org/licenses/.
     <string name="pref_advanced">高级</string>
     <string name="pref_msf_enable">启用 MSF</string>
     <string name="pref_msf_enable_desc">启用 Metasploit 框架</string>
+    <string name="pref_msf_notifications">MSF 状态通知</string> 
+    <string name="pref_msf_notifications_desc">显示MSF RPC连接状态</string>
     <string name="pref_msf_delete">删除 MSF</string>
     <string name="pref_msf_delete_desc">从您的设备删除 Metasploit 框架</string>
     <string name="pref_msfdir_desc">包含 Metasploit 框架的文件夹。</string>
