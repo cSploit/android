@@ -973,10 +973,43 @@ public class System
     }
   }
 
-  public static void disconnectAllTargets() {
+  public static void markNetworkAsDisconnected() {
     synchronized (mTargets) {
       for(Target t : mTargets) {
-        t.setConneced(false);
+        switch (t.getType()) {
+          case NETWORK:
+            if(t.getNetwork() == mNetwork) {
+              t.setConneced(false);
+            }
+            break;
+          case ENDPOINT:
+            if(mNetwork.isInternal(t.getAddress())) {
+              t.setConneced(false);
+            }
+            break;
+        }
+      }
+    }
+    notifyTargetListChanged();
+  }
+
+  public static void markInitialNetworkTargetsAsConnected() {
+    InetAddress localAddress = mNetwork.getLocalAddress();
+    InetAddress gatewayAddress = mNetwork.getGatewayAddress();
+    synchronized (mTargets) {
+      for(Target t : mTargets) {
+        switch (t.getType()) {
+          case NETWORK:
+            if(t.getNetwork() == mNetwork) {
+              t.setConneced(true);
+            }
+          default:
+            if(localAddress.equals(t.getAddress()) ||
+                    gatewayAddress.equals(t.getAddress())) {
+              t.setConneced(true);
+            }
+            break;
+        }
       }
     }
     notifyTargetListChanged();

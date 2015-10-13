@@ -21,7 +21,6 @@ package org.csploit.android.net;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
-import android.net.LinkProperties;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -42,7 +41,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -238,7 +236,7 @@ public class Network
   }
 
   public boolean isConnected(){
-    return isIfaceUsable(mInterface);
+    return isIfaceConnected(mInterface);
   }
 
   public String getSSID(){
@@ -298,16 +296,8 @@ public class Network
     return mLocal.toInetAddress();
   }
 
-  private static boolean isIfaceUsable(NetworkInterface networkInterface) {
+  private static boolean isIfaceConnected(NetworkInterface networkInterface) {
     try {
-      // FIXME
-      // When I disconnect the WiFi, the interface still configured properly,
-      // even if not connected. It holds the old IP addresses adn it still up
-      // because permanent scan is active.
-      // As now I didn't found a way to get Android framework's NetworkInfo
-      // from a given NetworkInterface.
-      // Probably a solution is to use only Android framework stuff,
-      // but many useful API has been added from API level 21.
       return networkInterface.isUp() && !networkInterface.isLoopback() &&
               !networkInterface.getInterfaceAddresses().isEmpty();
     } catch (SocketException e) {
@@ -337,7 +327,7 @@ public class Network
 
     while(interfaces.hasMoreElements()) {
       NetworkInterface iface = interfaces.nextElement();
-      if (isIfaceUsable(iface)) {
+      if (isIfaceConnected(iface)) {
         result.add(iface.getDisplayName());
       }
     }

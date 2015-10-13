@@ -33,20 +33,17 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.text.Html;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -88,6 +85,7 @@ import org.csploit.android.services.UpdateChecker;
 import org.csploit.android.services.UpdateService;
 import org.csploit.android.services.receivers.MsfRpcdServiceReceiver;
 import org.csploit.android.services.receivers.NetworkRadarReceiver;
+import org.csploit.android.tools.Raw;
 import org.csploit.android.update.CoreUpdate;
 import org.csploit.android.update.MsfUpdate;
 import org.csploit.android.update.RubyUpdate;
@@ -99,6 +97,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static org.csploit.android.services.UpdateChecker.UPDATE_AVAILABLE;
 import static org.csploit.android.services.UpdateChecker.UPDATE_CHECKING;
@@ -106,7 +106,7 @@ import static org.csploit.android.services.UpdateChecker.UPDATE_NOT_AVAILABLE;
 
 @SuppressLint("NewApi")
 public class MainActivity extends AppCompatActivity {
-  private String UPDATE_MESSAGE = "";
+  private String EMPTY_LIST_MESSAGE = "";
   private static final int WIFI_CONNECTION_REQUEST = 1012;
   private boolean isAnyNetInterfaceAvailable = false;
   private TargetAdapter mTargetAdapter = null;
@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
   private MsfRpcdServiceReceiver mMsfReceiver = new MsfRpcdServiceReceiver();
   private ConnectivityReceiver mConnectivityReceiver = new ConnectivityReceiver();
   private Menu mMenu = null;
-  private TextView mUpdateStatus = null;
+  private TextView mEmptyTextView = null;
   private Toast mToast = null;
   private TextView mTextView = null;
   private long mLastBackPressTime = 0;
@@ -124,61 +124,12 @@ public class MainActivity extends AppCompatActivity {
   private ListView lv;
   private boolean isRootMissing = false;
   private String[] mIfaces = null;
-  private boolean mIsOnlineLayout = false;
   private boolean mIsCoreInstalled = false;
   private boolean mIsDaemonBeating = false;
   private boolean mIsConnectivityAvailable = false;
   private boolean mIsUpdateDownloading = false;
   private boolean mHaveAnyWifiInterface = true; // TODO: check is device have a wifi interface
   private boolean mOfflineMode = false;
-
-  private void createUpdateLayout() {
-
-    lv.setVisibility(View.GONE);
-    findViewById(R.id.textView).setVisibility(View.GONE);
-
-    mUpdateStatus.setVisibility(View.VISIBLE);
-
-    mUpdateStatus.setText(UPDATE_MESSAGE.replace("#STATUS#", "..."));
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-      invalidateOptionsMenu();
-  }
-
-  private void createOfflineLayout() {
-
-    lv.setVisibility(View.GONE);
-    mTextView.setVisibility(View.GONE);
-
-    mUpdateStatus.setVisibility(View.VISIBLE);
-
-    mUpdateStatus.setText(getString(R.string.no_connectivity));
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-      invalidateOptionsMenu();
-
-    mIsOnlineLayout = false;
-  }
-
-  public void createOnlineLayout() {
-    mTextView.setVisibility(View.VISIBLE);
-    lv.setVisibility(View.VISIBLE);
-
-    mUpdateStatus.setVisibility(View.GONE);
-
-    if (mTargetAdapter == null) {
-      mTargetAdapter = new TargetAdapter();
-
-      lv.setAdapter(mTargetAdapter);
-
-      System.setTargetListObserver(mTargetAdapter);
-    }
-
-    mIsOnlineLayout = true;
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-      invalidateOptionsMenu();
-  }
 
   @Override
   protected void onActivityResult(int requestCode, int resultCode,
@@ -187,18 +138,6 @@ public class MainActivity extends AppCompatActivity {
             && intent.hasExtra(WifiScannerActivity.CONNECTED)) {
       init();
     }
-  }
-
-  private void createLayout() {
-    if (mIsDaemonBeating && System.isInitialized()) {
-      createOnlineLayout();
-    } else if (mIsConnectivityAvailable) {
-      createUpdateLayout();
-    } else {
-      createOfflineLayout();
-    }
-
-    configureMenu();
   }
 
   private void onInitializationError(final String message) {
@@ -218,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
       public void run() {
         init();
         startAllServices();
-        createLayout();
+        notifyMenuChanged();
       }
     });
   }
@@ -236,18 +175,10 @@ public class MainActivity extends AppCompatActivity {
 
     setContentView(R.layout.target_layout);
 
-    if (mUpdateStatus == null) {
-      mUpdateStatus = new TextView(this);
-      RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
-      LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT,
-              LayoutParams.MATCH_PARENT);
-      mUpdateStatus.setGravity(Gravity.CENTER);
-      mUpdateStatus.setLayoutParams(params);
-      layout.addView(mUpdateStatus);
-      mUpdateStatus.setVisibility(View.GONE);
-    }
-
+    mEmptyTextView = (TextView) findViewById(R.id.emptyTextView);
     lv = (ListView) findViewById(R.id.android_list);
+    mTextView = (TextView) findViewById(R.id.textView);
+
     lv.setOnItemClickListener(new ListView.OnItemClickListener() {
 
       @Override
@@ -295,8 +226,12 @@ public class MainActivity extends AppCompatActivity {
         return true;
       }
     });
+    mTargetAdapter = new TargetAdapter();
 
-    mTextView = (TextView) findViewById(R.id.textView);
+    lv.setEmptyView(findViewById(android.R.id.empty));
+    lv.setAdapter(mTargetAdapter);
+
+    System.setTargetListObserver(mTargetAdapter);
 
     mRadarReceiver.register(this);
     mUpdateReceiver.register(this);
@@ -305,7 +240,6 @@ public class MainActivity extends AppCompatActivity {
     mConnectivityReceiver.register(this);
 
     init();
-    createLayout();
     startAllServices();
   }
 
@@ -315,6 +249,12 @@ public class MainActivity extends AppCompatActivity {
     startRPCServer();
   }
 
+  private void notifyMenuChanged() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+      invalidateOptionsMenu();
+    else
+      configureMenu();
+  }
 
   /**
    * Performs the firsts actions when the app starts.
@@ -331,7 +271,7 @@ public class MainActivity extends AppCompatActivity {
     // check minimum requirements for system initialization
 
     if (!mIsCoreInstalled) {
-      UPDATE_MESSAGE = mIsConnectivityAvailable ?
+      EMPTY_LIST_MESSAGE = mIsConnectivityAvailable ?
               getString(R.string.missing_core_update) :
               getString(R.string.no_connectivity);
       return;
@@ -358,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
 
       if (!mIsDaemonBeating) {
         if (mIsConnectivityAvailable) {
-          UPDATE_MESSAGE = getString(R.string.heart_attack_update);
+          EMPTY_LIST_MESSAGE = getString(R.string.heart_attack_update);
         } else {
           onInitializationError(getString(R.string.heart_attack));
         }
@@ -388,12 +328,12 @@ public class MainActivity extends AppCompatActivity {
   public void configureMenu() {
     if (mMenu == null)
       return;
-    mMenu.findItem(R.id.add).setVisible(mIsOnlineLayout);
+    mMenu.findItem(R.id.add).setVisible(isAnyNetInterfaceAvailable);
     mMenu.findItem(R.id.scan).setVisible(mHaveAnyWifiInterface);
     mMenu.findItem(R.id.wifi_ifaces).setEnabled(canChangeInterface());
-    mMenu.findItem(R.id.new_session).setEnabled(mIsOnlineLayout);
-    mMenu.findItem(R.id.save_session).setEnabled(mIsOnlineLayout);
-    mMenu.findItem(R.id.restore_session).setEnabled(mIsOnlineLayout);
+    mMenu.findItem(R.id.new_session).setEnabled(isAnyNetInterfaceAvailable);
+    mMenu.findItem(R.id.save_session).setEnabled(isAnyNetInterfaceAvailable);
+    mMenu.findItem(R.id.restore_session).setEnabled(isAnyNetInterfaceAvailable);
   }
 
   @Override
@@ -446,10 +386,29 @@ public class MainActivity extends AppCompatActivity {
   }
 
   private void loadInterfaces() {
+    boolean menuChanged;
     List<String> interfaces = Network.getAvailableInterfaces();
-    mIfaces = new String[interfaces.size()];
+    int size = interfaces.size();
+
+    if(mIfaces != null) {
+      menuChanged = mIfaces.length != size;
+      menuChanged &= mIfaces.length <= 1 || size <= 1;
+    } else {
+      menuChanged = true;
+    }
+
+    mIfaces = new String[size];
     interfaces.toArray(mIfaces);
     isAnyNetInterfaceAvailable = mIfaces.length > 0;
+
+    if(menuChanged) {
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          notifyMenuChanged();
+        }
+      });
+    }
   }
 
   private boolean canChangeInterface() {
@@ -485,10 +444,10 @@ public class MainActivity extends AppCompatActivity {
     runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        if(msg != null) {
+        if (msg != null) {
           Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
         }
-        createLayout();
+        notifyMenuChanged();
       }
     });
   }
@@ -500,27 +459,34 @@ public class MainActivity extends AppCompatActivity {
     mOfflineMode = true;
 
     stopNetworkRadar();
-    System.disconnectAllTargets();
+    System.markNetworkAsDisconnected();
 
-    final Dialog dialog = new ConfirmDialog(getString(R.string.connection_lost),
-            getString(R.string.connection_lost_prompt), MainActivity.this,
-            new ConfirmDialogListener() {
-              @Override
-              public void onConfirm() {
-                mOfflineMode = false;
-                System.setIfname(null);
-                onNetworkInterfaceChanged();
-              }
-
-              @Override
-              public void onCancel() { }
-            });
     runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        dialog.show();
+        new ConfirmDialog(getString(R.string.connection_lost),
+                getString(R.string.connection_lost_prompt), MainActivity.this,
+                new ConfirmDialogListener() {
+                  @Override
+                  public void onConfirm() {
+                    mOfflineMode = false;
+                    System.setIfname(null);
+                    onNetworkInterfaceChanged();
+                  }
+
+                  @Override
+                  public void onCancel() { }
+                }).show();
       }
     });
+  }
+
+  private void onConnectionResumed() {
+    if(!mOfflineMode)
+      return;
+    mOfflineMode = false;
+    System.markInitialNetworkTargetsAsConnected();
+    startNetworkRadar();
   }
 
   /**
@@ -1237,13 +1203,13 @@ public class MainActivity extends AppCompatActivity {
 
       switch (action) {
         case UPDATE_CHECKING:
-          if (mUpdateStatus != null)
-            mUpdateStatus.setText(UPDATE_MESSAGE.replace(
+          if (mEmptyTextView != null)
+            mEmptyTextView.setText(EMPTY_LIST_MESSAGE.replace(
                     "#STATUS#", getString(R.string.checking)));
           break;
         case UPDATE_NOT_AVAILABLE:
-          if (mUpdateStatus != null)
-            mUpdateStatus.setText(UPDATE_MESSAGE.replace(
+          if (mEmptyTextView != null)
+            mEmptyTextView.setText(EMPTY_LIST_MESSAGE.replace(
                     "#STATUS#", getString(R.string.no_updates_available)));
 
           if (!System.isCoreInitialized()) {
@@ -1265,7 +1231,10 @@ public class MainActivity extends AppCompatActivity {
   }
 
   private class ConnectivityReceiver extends ManagedReceiver {
+    private static final int CHECK_DELAY = 2000;
+
     private final IntentFilter mFilter;
+    private TimerTask mTask = null;
 
     public ConnectivityReceiver() {
       mFilter = new IntentFilter();
@@ -1277,15 +1246,61 @@ public class MainActivity extends AppCompatActivity {
       return mFilter;
     }
 
+    private String ifacesToString() {
+      StringBuilder sb = new StringBuilder();
+      for(String iface : mIfaces) {
+        if(sb.length() > 0) {
+          sb.append(", ");
+        }
+        sb.append(iface);
+      }
+      return sb.toString();
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
+      synchronized (this) {
+        if (mTask != null) {
+          mTask.cancel();
+        }
+        mTask = new TimerTask() {
+          @Override
+          public void run() {
+            check();
+          }
+        };
+        new Timer().schedule(mTask, CHECK_DELAY);
+      }
+    }
+
+    @Override
+    public void unregister() {
+      super.unregister();
+      synchronized (this) {
+        if(mTask != null) {
+          mTask.cancel();
+        }
+      }
+    }
+
+    private void check() {
       loadInterfaces();
-      configureMenu();
       String current = System.getIfname();
+
+      Logger.debug(String.format("current='%s', ifaces=[%s], haveInterface=%s, isAnyNetInterfaceAvailable=%s",
+              current != null ? current : "(null)",
+              ifacesToString(), haveInterface(current), isAnyNetInterfaceAvailable));
+
       if(haveInterface(current)) {
-        mOfflineMode = false;
-      } else {
+        onConnectionResumed();
+      } else if(current != null) {
         onConnectionLost();
+      } else if(isAnyNetInterfaceAvailable) {
+        onNetworkInterfaceChanged();
+      }
+
+      synchronized (this) {
+        mTask = null;
       }
     }
   }
