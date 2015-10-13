@@ -22,13 +22,6 @@ public class MsfRpcd extends Msf {
 
   public MsfRpcd() {
     mHandler = "msfrpcd";
-
-    setEnabled();
-
-    if(mEnabled)
-      setupEnvironment();
-
-    registerSettingReceiver();
   }
 
   /**
