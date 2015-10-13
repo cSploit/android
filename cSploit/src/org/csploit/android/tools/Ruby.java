@@ -30,10 +30,11 @@ public class Ruby extends Tool {
 
   private final static String rubyLib = "%1$s/site_ruby/1.9.1:%1$s/site_ruby/1.9.1/arm-linux-androideabi:%1$s/site_ruby:%1$s/vendor_ruby/1.9.1:%1$s/vendor_ruby/1.9.1/arm-linux-androideabi:%1$s/vendor_ruby:%1$s/1.9.1:%1$s/1.9.1/arm-linux-androideabi";
 
-
   public Ruby() {
     mHandler = "raw";
+  }
 
+  public void init() {
     setEnabled();
 
     if(mEnabled)

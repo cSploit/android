@@ -122,11 +122,9 @@ public class ExecChecker {
       updateFuseBinds();
 
     synchronized (mFuseBinds) {
-      if(mFuseBinds.size()>0) {
-        for(FuseBind b : mFuseBinds) {
-          if(file.startsWith(b.mountpoint)) {
-            return b.source + file.substring(b.mountpoint.length());
-          }
+      for(FuseBind b : mFuseBinds) {
+        if(file.startsWith(b.mountpoint)) {
+          return b.source + file.substring(b.mountpoint.length());
         }
       }
       return null;

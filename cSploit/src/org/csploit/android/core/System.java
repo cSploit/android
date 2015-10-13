@@ -845,8 +845,10 @@ public class System
   }
 
   public synchronized static ToolBox getTools() {
-    if(mTools == null)
+    if(mTools == null) {
       mTools = new ToolBox();
+      mTools.reload();
+    }
     return mTools;
   }
 
