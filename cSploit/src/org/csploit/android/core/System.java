@@ -1031,16 +1031,21 @@ public class System
         return false;
       }
 
+      boolean inserted = false;
+
       for (int i = 0; i < mTargets.size(); i++) {
         if (mTargets.get(i).comesAfter(target)) {
           mTargets.add(i, target);
-          Services.getNetworkRadar().onNewTargetFound(target);
-          return true;
+          inserted = true;
+          break;
         }
       }
 
-      mTargets.add(target);
+      if(!inserted)
+        mTargets.add(target);
+
       Services.getNetworkRadar().onNewTargetFound(target);
+      notifyTargetListChanged();
       return true;
     }
   }
