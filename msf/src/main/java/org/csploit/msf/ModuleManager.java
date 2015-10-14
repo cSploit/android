@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Manage all framework modules
  */
-class ModuleManager implements Offspring {
+public class ModuleManager implements Offspring {
 
   private final static String[] validModuleTypes = {
           "encoder",

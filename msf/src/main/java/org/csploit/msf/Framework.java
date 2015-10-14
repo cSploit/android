@@ -31,4 +31,32 @@ public class Framework implements DataHolder {
   public void setGlobalOption(String key, String value) {
     getDataStore().put(key, value);
   }
+
+  public Collection<Session> getSessions() {
+    return sessions.values();
+  }
+
+  public Session getSession(int id) {
+    return sessions.get(id);
+  }
+
+  public void registerSession(Session session) {
+    sessions.put(session.getId(), session);
+  }
+
+  public Collection<Job> getJobs() {
+    return jobs.values();
+  }
+
+  public Job getJob(int id) {
+    return jobs.get(id);
+  }
+
+  public void registerJob(Job job) {
+    jobs.put(job.getId(), job);
+  }
+
+  public void deleteJob(int id) {
+    jobs.remove(id);
+  }
 }
