@@ -1130,7 +1130,7 @@ public class MainActivity extends AppCompatActivity {
             mUpdateStatus.setText(UPDATE_MESSAGE.replace(
                     "#STATUS#", getString(R.string.no_updates_available)));
 
-          if (!System.isCoreInitialized()) {
+          if (!System.isCoreInstalled()) {
             onInitializationError(getString(R.string.no_core_found));
           }
           break;
