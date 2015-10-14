@@ -1,0 +1,449 @@
+<resources>
+    <string name="menu_settings">إعدادات</string>
+    <string name="title_activity_main">cSploit</string>
+    <string name="crash_toast_text">وهناك مشكلة حدثت، بإرسال السجل لمطور التطبيق</string>
+    <string name="toggle_button">زر تبديل</string>
+    <string name="enter_redirection_details">Enter redirection details below:</string>
+    <string name="address">عنوان</string>
+    <string name="port">ميناء</string>
+    <string name="target">الهدف</string>
+    <string name="unknown">غير معروف</string>
+    <string name="services">الخدمات</string>
+    <string name="os">نظام التشغيل</string>
+    <string name="device_type">نوع الجهاز</string>
+    <string name="start_hijack">اضغط على جلسة لبدء اختطاف، اضغط طويلا لحفظه إلى ملف. </string>
+    <string name="sort">ترتيب:</string>
+    <string name="select_module">Select a module to run</string>
+    <string name="choose">اختيار</string>
+    <string name="response">استجابة</string>
+    <string name="request">طلب</string>
+    <string name="wait_for_response">انتظر رد</string>
+    <string name="protocol">بروتوكول</string>
+    <string name="csploit_catchphrase">cSploit - جناح اختراق شبكة الروبوت.</string>
+    <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
+    <string name="disclaimer">Disclaimer</string>
+    <string name="csploit_disclaimer">
+        <![CDATA[This application is not to be used for any purposes other than to demonstrate its functions, and must only be used on networks for which you have permission to do so. Any other use is not the responsibility of the developer.In other words, don&apos;t be stupid, and don&apos;t direct angry people towards me.]]></string>
+    <string name="license">License</string>
+    <string name="gpl_license">This program is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by the Free Software
+        Foundation, either version 3 of the License, or (at your option) any later version.
+        This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+        without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+        See the GNU General Public License for more details.
+        You should have received a copy of the GNU General Public License along with this program.
+        If not, see http://www.gnu.org/licenses/.
+    </string>
+    <string name="service">الخدمة</string>
+    <string name="stopped">Stopped&#8230;</string>
+    <string name="start">بداية</string>
+    <string name="stop">وقف</string>
+    <string name="stopped_dots">Stopped &#8230;</string>
+    <string name="starting_dots">Starting &#8230;</string>
+    <string name="max_length">Max Length</string>
+    <string name="min_length">Min Length</string>
+    <string name="username">اسم المستخدم</string>
+    <string name="Charset">Charset</string>
+    <string name="filter_desc">Enter a custom replace filter, including simple string replacement or
+        regular expressions.
+    </string>
+    <string name="from">من</string>
+    <string name="to">إلى</string>
+    <string name="wake_on_lan">Wake On Lan</string>
+    <string name="send">إرسال</string>
+    <string name="update_available">تحديث متاح</string>
+    <string name="new_update_desc">عملية تحديث إلى الإصدار الجديد</string>
+    <string name="new_update_desc2">غير متاح، هل تريد لتحميل البرنامج؟</string>
+    <string name="checking">Checking&#8230;</string>
+    <string name="no_updates_available">أية تحديثات متوفرة.</string>
+    <string name="new_msf_update_desc">A MetasploitFramework update</string>
+    <string name="new_version">New version</string>
+    <string name="new_version2">found!</string>
+    <string name="downloading_update">Downloading update&#8230;</string>
+    <string name="connecting">Connecting&#8230;</string>
+    <string name="cancel">إلغاء</string>
+    <string name="error">خطأ</string>
+    <string name="error_occured">An error occurred while downloading the update.</string>
+    <string name="invalid_target">Invalid target.</string>
+    <string name="add_custom_target">Add custom target</string>
+    <string name="enter_url">Enter an URL, host name or ip address below:</string>
+    <string name="net_discovery_stopped">Network discovery stopped.</string>
+    <string name="net_discovery_started">Network discovery started.</string>
+    <string name="start_monitor">Start Network Monitor</string>
+    <string name="stop_monitor">Stop Network Monitor</string>
+    <string name="start_msfrpcd">Start Metasploit RPCD</string>
+    <string name="stop_msfrpcd">Stop Metasploit RPCD</string>
+    <string name="exit">خروج</string>
+    <string name="close_confirm">هذا وسوف يغلق cSploit، هل أنت متأكد من أنك تريد المتابعة؟
+    </string>
+    <string name="press_back">اضغط مرة أخرى لإغلاق هذا التطبيق.</string>
+    <string name="selected_">Selected&#160;</string>
+    <string name="no_session_found">أي ملف الجلسة الاطلاع على بطاقة الذاكرة الرقمية المؤمنة.</string>
+    <string name="select_session_file">تحديد ملف الجلسة من بطاقة الذاكرة الرقمية المؤمنة:</string>
+    <string name="select_session">حدد الدورة</string>
+    <string name="invalid_session">الدورة اسم غير صالح</string>
+    <string name="session_saved_to">Session saved to &#160;</string>
+    <string name="save_session">حفظ الاتصال</string>
+    <string name="enter_session_name">Enter the name of the session file :</string>
+    <string name="new_session_started">New session started</string>
+    <string name="warning">تحذير</string>
+    <string name="warning_new_session">Starting a new session would delete the current one,
+        continue?
+    </string>
+    <string name="fatal_error_html">
+        <![CDATA[<p>It seems like your ROM has the <b>LD_LIBRARY_PATH bug</b>, i\'m sorry but it\'s not compatible with cSploit.</p>]]></string>
+    <string name="fatal_error_html2">
+        <![CDATA[<p>For more info read the <a href=\"http://csploit.net/#faq\">FAQ</a>.</p>]]></string>
+    <string name="install_error">Error during files installation!</string>
+    <string name="arm_error">
+        <![CDATA[<p>It seems like your device processor is not an ARM, i\'m sorry but it\'s not compatible with cSploit.</p>]]></string>
+    <string name="arm_error2">
+        <![CDATA[<p>For more info read the <a href=\"http://csploit.net/#requirements\">requirements</a> section.</p>]]></string>
+    <string name="busybox_required">Full BusyBox installation required, killall binary not
+        found(maybe you have an old busybox version).
+    </string>
+    <string name="only_4_root">This application can run only on rooted devices.</string>
+    <string name="initializing">Initializing&#8230;</string>
+    <string name="initialization_error">Initialization Error</string>
+    <string name="target_alias">Target Alias</string>
+    <string name="set_alias">Set an alias for this target:</string>
+    <string name="no_connectivity">No connectivity available.</string>
+    <string name="wifi_key_copied">WiFi key copied to clipboard.</string>
+    <string name="connected_to"><![CDATA[Connected to <b>]]></string>
+    <string name="connected_to2"><![CDATA[</b> with key <b><font color=\"green\">]]></string>
+    <string name="connected_to3"><![CDATA[</font></b>!]]></string>
+    <string name="connection_to"><![CDATA[Connection to <b>]]></string>
+    <string name="connection_to2">
+        <![CDATA[</b> <b><font color=\"red\">FAILED</font></b>.]]></string>
+    <string name="enter_key_or_crack">Enter WiFi Key or attempt cracking:</string>
+    <string name="enter_wifi_key">Enter WiFi Key:</string>
+    <string name="scanning">Scanning&#8230;</string>
+    <string name="invalid_filename">Invalid file name.</string>
+    <string name="something_went_wrong">Something went wrong, please select again a valid target.
+    </string>
+    <string name="selected">اختيار</string>
+    <string name="nothing_found"><![CDATA[<small><i>Nothing Found</i></small>]]></string>
+    <string name="no_open_ports">No open ports detected on current target, run the service inspector first.</string>
+    <string name="no_exploits_found">No exploits found.</string>
+    <string name="no_open_ports_focused_scan">No open ports found, run the port scanner before selecting a focused scan.</string>
+    <string name="no_open_ports_exploitfinder">No exploits found on this target, run the ExploitFinder first.</string>
+    <string name="no_exploit_started">No exploit has been started.</string>
+    <string name="no_vulnerabilities_found">No vulnerabilities found about this target. run the Vulnerability Finder first.</string>
+    <string name="no_infos_on_target">No specific informations about services running on target
+        machine, run the service inspector first.
+    </string>
+    <string name="custom_charset">Custom Charset</string>
+    <string name="enter_chars_wanted">Enter the chars you want to use in the custom charset:
+    </string>
+    <string name="invalid_port">Invalid port specified.</string>
+    <string name="request_empty">The request can not be empty.</string>
+    <string name="request_sent">Request sent.</string>
+    <string name="customize_wol_port">Customize WOL port and press Send.</string>
+    <string name="couldnt_send_wol_packet">Could not send a WOL packet to a target without a known
+        MAC address.
+    </string>
+    <string name="no_activities_for_url">No activities to handle this type of url.</string>
+    <string name="select_ports">Select Ports</string>
+    <string name="enter_ports_list">Enter a comma separated list of ports:</string>
+    <string name="invalid_port_">Invalid port \'</string>
+    <string name="port_must_be_greater">Port must be greater than 0 and smaller than 65535.</string>
+    <string name="invalid_ports">Invalid ports specified.</string>
+    <string name="empty_port_list">Empty port list.</string>
+    <string name="about_csploit_v_">About cSploit v</string>
+    <string name="select_target">Select a target below by clicking on a row, or long click on it to
+        enter an alias or start a multiple attack.
+    </string>
+    <string name="generating_keys">Generating keys&#8230;</string>
+    <string name="no_wifi_available">No WiFi connection available, the application will just check
+        for updates. #STATUS#
+    </string>
+    <string name="loading_changelog">Loading changelog&#8230;</string>
+    <string name="something_went_wrong_changelog">
+        <![CDATA[<html><body><p><b>Something went wrong while retrieving the changelog:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
+    <string name="cancel_dialog">Cancel</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="connect">Connect</string>
+    <string name="crack">Crack</string>
+    <string name="could_not_read_folder">Could not read folder contents.</string>
+    <string name="choose_dir">Choose&#160;</string>
+    <string name="vulnerability_finder">Vulnerability Finder</string>
+    <string name="vulnerability_finder_desc">Search for known vulnerabilities for target running
+        services upon National Vulnerability Database.
+    </string>
+    <string name="inspector">Inspector</string>
+    <string name="inspector_desc">Perform target operating system and services deep detection
+        (slower than port scanner, but more accurate).
+    </string>
+    <string name="login_cracker">تسجيل الدخول المفرقع</string>
+    <string name="login_cracker_desc">A very fast network logon cracker which support many different
+        services.
+    </string>
+    <string name="packet_forger">Packet Forger</string>
+    <string name="packet_forger_desc">Craft and send a custom TCP or UDP packet to the target.
+    </string>
+    <string name="port_scanner">Port Scanner</string>
+    <string name="port_scanner_desc">Perform a SYN port scanning on target.</string>
+    <string name="router_pwn">Router PWN</string>
+    <string name="router_pwn_desc">Launch the http://routerpwn.com/ service to pwn your router.
+    </string>
+    <string name="trace">Trace</string>
+    <string name="trace_desc">Perform a traceroute on target.</string>
+    <string name="mitm">MITM</string>
+    <string name="mitm_desc">Perform various man-in-the-middle attacks, such as network sniffing,
+        traffic manipulation, etc&#8230;
+    </string>
+    <string name="network_subnet_mask">This is your network subnet mask</string>
+    <string name="gateway_router">(Your network gateway / router)</string>
+    <string name="this_device">&#160;(This device)</string>
+    <string name="wifi_went_down">WiFi connectivity went down.</string>
+    <string name="hijack_session">Hijack Session</string>
+    <string name="start_hijacking">Stop sniffing and start session hijacking?</string>
+    <string name="start_hijacking2">Start session hijacking?</string>
+    <string name="set_session_filename">Set the session file name:</string>
+    <string name="session_sniffer">Session Sniffer</string>
+
+    <string name="untraced_hops">untraced hops</string>
+    <string name="add_username">Add username</string>
+    <string name="enter_username">Enter the username you want to use:</string>
+    <string name="select_wordlist">Select Wordlist</string>
+    <string name="error_filepath">Could not determine file path, please use a different file
+        manager.
+    </string>
+    <string name="trying">Trying</string>
+    <string name="left">left</string>
+    <string name="error_filepath2">Could not determine file path.</string>
+    <string name="tap_again">Tap again to stop.</string>
+    <string name="unexpected_file_error">Unexpected error while reading the file : </string>
+    <string name="the_port">The port</string>
+    <string name="error_proxy_port"> which is needed by the transparent proxy is taken from another process, open application settings?</string>
+    <string name="error_mitm_port"> which is needed by the mitm server is taken from another process, open application settings?</string>
+    <string name="error_https_port"> which is needed by the mitm https redirector is taken from another process, open application settings?</string>
+    <string name="error_mitm_ports">MITM modules need all ports available.</string>
+
+    <!-- rpc stuff -->
+    <string name="error_rpc">RPC error</string>
+    <string name="error_rpcd_inval">bad settings</string>
+    <string name="error_rpcd_shell">cannot execute shell</string>
+    <string name="rpcd_starting">Starting Metasploit RPCD&#8230;</string>
+    <string name="rpcd_started">Metasploit RPCD started</string>
+    <string name="rpcd_stopped">Metasploit RPCD stopped</string>
+    <string name="rpcd_running">Metasploit RPCD is already running</string>
+    <string name="rpcd_timedout">Metasploit RPCD does not respond</string>
+    <string name="error_rcpd_fatal">fatal error occurred, i\'m searching that bug for send it to my developers.
+        if i won\'t exit please close me from preferences->applications,
+        and ALERT MY DEVELOPERS.
+    </string>
+
+    <!-- mitm modules -->
+    <string name="mitm_simple_sniff">Simple Sniff</string>
+    <string name="mitm_simple_sniff_desc">Redirect target\'s traffic through this device and show some stats while dumping it to a pcap file.</string>
+    <string name="mitm_password_sniff">Password Sniffer</string>
+    <string name="mitm_password_sniff_desc">Sniff passwords of many protocols such as http, ftp, imap, imaps, irc, msn, etc from the target.</string>
+    <string name="mitm_session_hijack">Session Hijacker</string>
+    <string name="mitm_session_hijack_desc">Listen for cookies on the network and hijack sessions.</string>
+    <string name="mitm_connection_kill">Kill Connections</string>
+    <string name="mitm_connection_kill_desc">Kill connections preventing the target to reach any website or server.</string>
+    <string name="mitm_connection_kill_error">Connection killer can be used only against single endpoints.</string>
+    <string name="mitm_redirect">Redirect</string>
+    <string name="mitm_redirect_desc">Redirect all the http traffic to another address.</string>
+    <string name="mitm_redirection">Redirection</string>
+    <string name="error_port_outofrange">Port out of range.</string>
+    <string name="error_invalid_address_or_port">Invalid address and/or port specified.</string>
+    <string name="mitm_image_replace">Replace Images</string>
+    <string name="mitm_image_replace_desc">Replace all images on webpages with the specified one.</string>
+    <string name="choose_source">Choose a source:</string>
+    <string name="local_images">Local Images</string>
+    <string name="error_image_intent">This is weird, seems like you have no application to handle image browsing.</string>
+    <string name="image">Image</string>
+    <string name="enter_image_url">Enter the url of the image :</string>
+    <string name="error_image_url">Invalid image url.</string>
+    <string name="mitm_video_replace">Replace Videos</string>
+    <string name="mitm_video_replace_desc">Replace all youtube videos on webpages with the specified one.</string>
+    <string name="video">Video</string>
+    <string name="enter_video_url">Enter the url of the video :</string>
+    <string name="error_video_url">Invalid youtube video.</string>
+    <string name="mitm_script_injection">Script Injection</string>
+    <string name="mitm_script_injection_desc">Inject a javascript in every visited webpage.</string>
+    <string name="choose_method">Choose a method:</string>
+    <string name="choose_branch">Choose a branch:</string>
+    <string name="local_files">Local files</string>
+    <string name="custom_code">Custom Code</string>
+    <string name="error_file_intent">Seems like you have no file manager capable of browsing files, please install one.</string>
+    <string name="enter_js_code">Enter the js code to inject :</string>
+    <string name="error_js_code"><![CDATA[Invalid javascript code, remember to use <script></script> enclosing tags.]]></string>
+    <string name="mitm_custom">Custom Filter</string>
+    <string name="mitm_custom_desc">Replace custom text on webpages with the specified one.</string>
+    <string name="custom_filter">Custom Filter</string>
+    <string name="error_filter">Invalid regular expression</string>
+    <string name="file_output">ملف الإخراج</string>
+    <string name="question_save_to_pcap">Do you want to save sniffed traffic to a pcap file?</string>
+    <string name="dumping_traffic_to">Dumping traffic to </string>
+
+    <string name="error_mitm_proxy">Unable to create the proxy, please check your connection and port availability.</string>
+    <string name="error_mitm_https_redirector">Unable to create the HTTPS redirector, please check your connection and port availability.</string>
+    <string name="error_mitm_resource_server">Unable to create the resource server, please check your connection and port availability.</string>
+
+    <string name="hijacker_load_from_file">Load From File</string>
+    <string name="login_user_wordlist">User Wordlist</string>
+    <string name="login_pass_wordlist">Password Wordlist</string>
+
+    <string name="menu_new_session">New Session</string>
+    <string name="menu_save_session">Save Session</string>
+    <string name="menu_restore_session">Restore Session</string>
+    <string name="menu_stop_monitor">Stop Network Monitor</string>
+    <string name="menu_submit_issue">Submit Issue</string>
+    <string name="menu_about">About</string>
+
+    <string name="scanner_select_ports">Select Custom Ports</string>
+
+    <string name="wifi_initializing">Initializing &#8230;</string>
+    <string name="wifi_activating_iface">Activating WiFi interface &#8230;</string>
+    <string name="wifi_activated">WiFi activated.</string>
+    <string name="wifi_scanning">Scanning &#8230;</string>
+    <string name="wifi_attempting_to">Attempting connection to</string>
+    <string name="wifi_with_key">with key</string>
+    <string name="wifi_connecting_to">Connecting to</string>
+    <string name="wifi_error_keys">Could not generate keys.</string>
+    <string name="wifi_scan_finished">Scanning finished.</string>
+
+    <!-- preferences -->
+    <string name="pref_general">General</string>
+    <string name="pref_modules">Modules</string>
+    <string name="pref_msf">Metasploit Framework</string>
+    <string name="pref_performance">Performance</string>
+    <string name="pref_check_updates">Check for Updates</string>
+    <string name="pref_wake_lock">Wake Lock</string>
+    <string name="pref_save_path">Save Path</string>
+    <string name="pref_debug_error_logging">Debug Error Logging</string>
+    <string name="pref_enable_profiler">Code Profiler</string>
+    <string name="pref_sniffer_sample_time">Sniffer Sample Time</string>
+    <string name="pref_http_proxy_port">HTTP Proxy Port</string>
+    <string name="pref_http_server_port">HTTP Server Port</string>
+    <string name="pref_https_redirect">SSL Stripping</string>
+    <string name="pref_https_redirector_port">HTTPS Redirector Port</string>
+    <string name="pref_http_max_buffer_size">HTTP Max Buffer Size</string>
+    <string name="pref_password_filename">Password Sniffer File</string>
+    <string name="pref_check_updates_desc">Check for updates every time the application is started.</string>
+    <string name="pref_wake_lock_desc">Prevents the device going in sleep mode while the application is running.</string>
+    <string name="pref_save_path_desc">Global save path to put every log file.</string>
+    <string name="pref_debug_error_logging_desc">Enable or disable error logging on a debug file.</string>
+    <string name="pref_enable_profiler_desc">Enable or disable network code profiler logging.</string>
+    <string name="pref_sniffer_sample_time_desc">Sample time in seconds of the sniffer module network statistics.</string>
+    <string name="pref_http_proxy_port_desc">MITM transparent proxy port to listen on, change this if you have problems starting the proxy.</string>
+    <string name="pref_http_server_port_desc">MITM http server port to listen on, change this if you have problems starting the server.</string>
+    <string name="pref_https_redirect_desc">Redirect traffic from HTTPS to HTTP.</string>
+    <string name="pref_https_redirector_port_desc">MITM https redirection server port to listen on.</string>
+    <string name="pref_http_max_buffer_size_desc">Max buffer size of HTTP requests handled by the transparent proxy.</string>
+    <string name="pref_password_filename_desc">Name of the file to use to log passwords and cookies.</string>
+    <string name="pref_msf_check_updates">Check for MSF updates</string>
+    <string name="pref_msf_check_updates_desc">Check for MSF updates every time the application is started.</string>
+    <string name="pref_rpc_user">RPC username</string>
+    <string name="pref_rpc_user_desc">Username for connect to Metasploit RPCD.</string>
+    <string name="pref_rpc_pswd">RPC password</string>
+    <string name="pref_rpc_pswd_desc">Password for connect to Metasploit RPCD.</string>
+    <string name="pref_rpc_host">RPC host</string>
+    <string name="pref_rpc_host_desc">host where the Metasploit RPC server is on</string>
+    <string name="pref_rpc_port">RPC port</string>
+    <string name="pref_rpc_port_desc">Port for connect to Metasploit RPCD.</string>
+    <string name="pref_rpc_ssl">RPC use SSL</string>
+    <string name="pref_rpc_ssl_desc">Specify if Metasploit RPC use SSL</string>
+    <string name="pref_msfdir">MSF directory</string>
+    <string name="pref_msfdir_desc">Directory containing the Metasploit Framework.</string>
+    <string name="pref_rubydir">Ruby directory</string>
+    <string name="pref_rubydir_desc">Directory containing the Ruby interpreter.</string>
+    <string name="pref_msf_branch_desc">The Metasploit Framework branch to use</string>
+    <string name="pref_msf_branch_title">MSF branch</string>
+    <string name="pref_performance_vuln_title">Search preferences</string>
+    <string name="pref_performance_vuln_desc">Search for vulnerability using</string>
+    <string-array name="pref_performance_vuln" >
+        <item>OSVDB</item>
+        <item>CVE</item>
+        <item>both CVE and OSVDB</item>
+    </string-array>
+    <string name="pref_performance_exploit_desc">Search exploits</string>
+    <string-array name="pref_performance_exploit" >
+        <item>MSF compatible only</item>
+        <item>on exploitdb only</item>
+        <item>from both exploitdb and MSF</item>
+    </string-array>
+    <string name="pref_performance_widescan">wide host scan</string>
+    <string name="pref_performance_widescan_desc">scan for hosts outside the network mask</string>
+    <string name="pref_advanced">Advanced</string>
+    <string name="pref_folder">Folder</string>
+    <string name="pref_msf_enable">Enable MSF</string>
+    <string name="pref_msf_enable_desc">Enable the Metasploit Framework</string>
+    <string name="pref_msf_delete">Delete MSF</string>
+    <string name="pref_msf_delete_desc">Delete the Metasploit Framework from your device</string>
+    <string name="pref_msfwipe_message">Do you really want to delete the Metasploit Framework?</string>
+    <string name="pref_msfwipe_size">About %d MB will be freed.</string>
+    <string name="pref_err_exists">does not exists.</string>
+    <string name="pref_err_writable">is not writable.</string>
+    <string name="pref_err_executable">does not allow creation of executable contents.</string>
+    <string name="pref_err_sample_time">Sample time must be between 0.4 and 1.0.</string>
+    <string name="pref_err_invalid_number">Invalid number.</string>
+    <string name="pref_err_port_range">Port must be between 1024 and 65535.</string>
+    <string name="pref_err_busy_port">Another process is listening on this port, please use another one.</string>
+    <string name="pref_err_buffer_size">Buffer size must be between 1024 and 104857600.</string>
+    <string name="pref_persistent_network_monitor">persistent network monitor</string>
+    <string name="pref_persistent_network_monitor_desc">keep network monitor watching the network</string>
+
+    <string name="exploit_finder">Exploit Finder</string>
+    <string name="exploit_finder_desc">Search for exploit that matches found vulnerabilities.</string>
+    <string name="exploit_launch_all">Launch all</string>
+    <string name="sessions">Sessions</string>
+    <string name="sessions_desc">Sessions on pwned target.</string>
+    <string name="exploit_launch">Launch</string>
+    <string name="exploit_edit_options">Edit options</string>
+    <string name="payload_edit_settings">Edit payload settings</string>
+    <string name="exploit_choose_payload">Choose payload</string>
+    <string name="exploit_choose_target">Choose target</string>
+    <string name="open_url">Open URL</string>
+    <string name="show_full_description">Show full description</string>
+    <string name="choose_an_option">choose an option</string>
+    <string name="required">Required</string>
+    
+    <string name="menu_add">إضافة</string>
+    <string name="menu_scan">مسح</string>
+    <string name="menu_wifi_scan">WiFi Scan</string>
+    <string name="menu_stop_msfrpcd">Stop msfrpcd</string>
+    
+    <string name="pref_theme">موضوع الظلام</string>
+    <string name="pref_choose_theme">Enable the dark theme, which is easier on the eyes</string>
+    <string name="please_restart">The new theme will not be applied until you restart the app</string>
+    <string name="evasion">التهرب</string>
+    <string name="search_exact_version">Exact version matching</string>
+    <string name="sessions_title">Open a shell by clicking on a session, or see more options by long press on it.</string>
+    <string name="open_shell">Open shell</string>
+    <string name="clear_event_log">سجل الأحداث واضح</string>
+    <string name="run">تبدأ</string>
+    <string name="command">Command</string>
+    <string name="clear">واضح</string>
+    <string name="msfrpc_disconnected">MSF RPC disconnected</string>
+    <string name="no_opened_sessions">there is no opened sessions for this target</string>
+    <string name="delete">حذف</string>
+    <string name="checksum_failed">File is corrupted</string>
+    <string name="extraction_failed">Extraction failed</string>
+    <string name="extracting">Extracting&#8230;</string>
+    <string name="click_here_to_upgrade">Click here to upgrade</string>
+    <string name="bad_permissions">The local file that you put on your storage have bad permissions, i can not read and/or write it!</string>
+    <string name="restore_default_path">restore default path</string>
+    <string name="choose_a_custom_path">choose a custom path</string>
+    <string name="error_symlink">destination device does not support symlinks, please select a decent filesystem.</string>
+    <string name="target_selected">target selected</string>
+    <string name="targets_selected">targets selected</string>
+    <string name="multiple_attack">multiple attack</string>
+    <string name="connect_msf">connect to Metasploit</string>
+    <string name="disconnect_msf">disconnect from Metasploit</string>
+    <string name="connected_msf">connected to Metasploit</string>
+    <string name="connection_failed">connection FAILED!</string>
+    <string name="new_ruby_update_desc">An update for ruby is available</string>
+    <string name="delete_previous_location">Delete previous location?</string>
+    <string name="setting_file_modes">setting file permissions…</string>
+    <string name="updating_rubygem">updating RubyGems</string>
+    <string name="installing_gems">installing gems…</string>
+    <string name="patching_shebang">patching shebang</string>
+    <string name="installing_msf_gems">installing gems for MSF</string>
+    <string name="installing_bundle">installing bundle</string>
+    <string name="new_gems_update_desc">An update for ruby gems</string>
+</resources>

@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.4.0-beta3'
+        classpath 'com.android.tools.build:gradle:1.4.0-beta6'
     }
 }
 
@@ -24,6 +24,7 @@ dependencies {
     compile 'com.android.support:support-v4:23.0.1'
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.android.support:design:23.0.1'
+    compile 'com.android.support:preference-v7:23.0.1'
     compile 'org.apache.commons:commons-compress:1.10'
     compile 'commons-net:commons-net:3.3'
     compile 'com.github.zafarkhaja:java-semver:0.9.0'
@@ -32,6 +33,7 @@ dependencies {
     compile 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
     compile 'org.tukaani:xz:1.5'
     compile 'ch.acra:acra:4.6.2'
+    testCompile 'junit:junit:4.12'
 }
 
 android {
@@ -51,8 +53,8 @@ android {
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 22
-        versionCode 1
-        versionName "1.6.0-rc.2"
+        versionCode 4
+        versionName "1.7.0-unstable"
         if(System.getenv("NIGHTLY_BUILD")) {
             versionName += "+" + System.getenv("NIGHTLY_BUILD_COMMIT").substring(0, 7)
         }
@@ -86,6 +88,7 @@ android {
             debuggable true
             jniDebuggable true
             zipAlignEnabled true
+            multiDexEnabled true
         }
         release {
             buildConfigField "java.util.Date", "BUILD_TIME", "new java.util.Date(" + getDate() + "L)"
@@ -93,22 +96,8 @@ android {
             if (System.getenv("KEYSTORE_FILE") != null) {
                 signingConfig signingConfigs.release
             }
+            multiDexEnabled true
             return true
         }
-    }
-
-    sourceSets {
-        main {
-            manifest.srcFile 'AndroidManifest.xml'
-            java.srcDirs = ['src']
-            resources.srcDirs = ['src']
-            aidl.srcDirs = ['src']
-            renderscript.srcDirs = ['src']
-            res.srcDirs = ['res']
-            assets.srcDirs = ['assets']
-            jniLibs.srcDir 'src/org/csploit/android/jniLibs'
-        }
-
-        instrumentTest.setRoot('tests')
     }
 }

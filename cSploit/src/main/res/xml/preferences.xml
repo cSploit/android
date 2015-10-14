@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <PreferenceCategory android:title="@string/pref_general">
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="PREF_WAKE_LOCK"
+            android:summary="@string/pref_wake_lock_desc"
+            android:title="@string/pref_wake_lock" />
+
+        <Preference
+            android:key="PREF_SAVE_PATH"
+            android:summary="@string/pref_save_path_desc"
+            android:title="@string/pref_save_path" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="PREF_DEBUG_ERROR_LOGGING"
+            android:summary="@string/pref_debug_error_logging_desc"
+            android:title="@string/pref_debug_error_logging" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="PREF_ENABLE_PROFILER"
+            android:summary="@string/pref_enable_profiler_desc"
+            android:title="@string/pref_enable_profiler" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="PREF_DARK_THEME"
+            android:summary="@string/pref_choose_theme"
+            android:title="@string/pref_theme" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="PREF_AUTO_PORTSCAN"
+            android:summary="@string/pref_auto_portscan_desc"
+            android:title="@string/pref_auto_portscan" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_updates">
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="PREF_CHECK_UPDATES"
+            android:summary="@string/pref_check_updates_desc"
+            android:title="@string/pref_check_updates" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:dependency="PREF_CHECK_UPDATES"
+            android:key="PREF_UPDATES_APP"
+            android:summary="@string/pref_updates_app_desc"
+            android:title="@string/pref_updates_app" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:dependency="PREF_CHECK_UPDATES"
+            android:key="PREF_UPDATES_CORE"
+            android:summary="@string/pref_updates_core_desc"
+            android:title="@string/pref_updates_core" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:dependency="PREF_CHECK_UPDATES"
+            android:key="PREF_UPDATES_RUBY"
+            android:summary="@string/pref_updates_ruby_desc"
+            android:title="@string/pref_updates_ruby" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:dependency="PREF_CHECK_UPDATES"
+            android:key="PREF_UPDATES_GEMS"
+            android:summary="@string/pref_updates_gems_desc"
+            android:title="@string/pref_updates_gems" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:dependency="PREF_CHECK_UPDATES"
+            android:key="PREF_UPDATES_MSF"
+            android:summary="@string/pref_updates_msf_desc"
+            android:title="@string/pref_updates_msf" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_modules">
+
+        <EditTextPreference
+            android:defaultValue="1.0"
+            android:inputType="numberDecimal"
+            android:key="PREF_SNIFFER_SAMPLE_TIME"
+            android:summary="@string/pref_sniffer_sample_time_desc"
+            android:title="@string/pref_sniffer_sample_time" />
+
+        <EditTextPreference
+            android:defaultValue="8080"
+            android:inputType="number"
+            android:key="PREF_HTTP_PROXY_PORT"
+            android:summary="@string/pref_http_proxy_port_desc"
+            android:title="@string/pref_http_proxy_port" />
+
+        <EditTextPreference
+            android:defaultValue="8081"
+            android:inputType="number"
+            android:key="PREF_HTTP_SERVER_PORT"
+            android:summary="@string/pref_http_server_port_desc"
+            android:title="@string/pref_http_server_port" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="PREF_HTTPS_REDIRECT"
+            android:summary="@string/pref_https_redirect_desc"
+            android:title="@string/pref_https_redirect" />
+
+        <EditTextPreference
+            android:defaultValue="8082"
+            android:inputType="number"
+            android:key="PREF_HTTPS_REDIRECTOR_PORT"
+            android:summary="@string/pref_https_redirector_port_desc"
+            android:title="@string/pref_https_redirector_port" />
+
+        <EditTextPreference
+            android:defaultValue="10485760"
+            android:inputType="number"
+            android:key="PREF_HTTP_MAX_BUFFER_SIZE"
+            android:summary="@string/pref_http_max_buffer_size_desc"
+            android:title="@string/pref_http_max_buffer_size" />
+
+        <EditTextPreference
+            android:defaultValue="csploit-password-sniff.log"
+            android:key="PREF_PASSWORD_FILENAME"
+            android:summary="@string/pref_password_filename_desc"
+            android:title="@string/pref_password_filename" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_performance">
+
+        <ListPreference
+            android:defaultValue="BOTH"
+            android:entries="@array/pref_performance_vuln"
+            android:entryValues="@array/pref_performance_vuln_values"
+            android:key="SEARCH_OSVDB"
+            android:summary="@string/choose_method"
+            android:title="@string/pref_performance_vuln_desc" />
+
+        <ListPreference
+            android:defaultValue="BOTH"
+            android:entries="@array/pref_performance_exploit"
+            android:entryValues="@array/pref_performance_exploit_values"
+            android:key="SEARCH_EXDB"
+            android:summary="@string/choose_method"
+            android:title="@string/pref_performance_exploit_desc" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="WIDE_SCAN"
+            android:summary="@string/pref_performance_widescan_desc"
+            android:title="@string/pref_performance_widescan" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_msf">
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="MSF_ENABLED"
+            android:summary="@string/pref_msf_enable_desc"
+            android:title="@string/pref_msf_enable" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="MSF_NOTIFICATIONS"
+            android:summary="@string/pref_msf_notifications_desc"
+            android:title="@string/pref_msf_notifications" />
+
+        <ListPreference
+            android:dialogTitle="@string/choose_branch"
+            android:key="MSF_BRANCH"
+            android:summary="@string/pref_msf_branch_desc"
+            android:title="@string/pref_msf_branch_title" />
+
+        <Preference
+            android:key="MSF_DIR"
+            android:summary="@string/pref_msfdir_desc"
+            android:title="@string/pref_msfdir" />
+
+        <Preference
+            android:key="RUBY_DIR"
+            android:summary="@string/pref_rubydir_desc"
+            android:title="@string/pref_rubydir" />
+
+        <EditTextPreference
+            android:defaultValue="msf"
+            android:key="MSF_RPC_USER"
+            android:summary="@string/pref_rpc_user_desc"
+            android:title="@string/pref_rpc_user" />
+
+        <EditTextPreference
+            android:defaultValue="msf"
+            android:key="MSF_RPC_PSWD"
+            android:summary="@string/pref_rpc_pswd_desc"
+            android:title="@string/pref_rpc_pswd" />
+
+        <EditTextPreference
+            android:defaultValue="127.0.0.1"
+            android:key="MSF_RPC_HOST"
+            android:summary="@string/pref_rpc_host_desc"
+            android:title="@string/pref_rpc_host" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="MSF_RPC_SSL"
+            android:summary="@string/pref_rpc_ssl_desc"
+            android:title="@string/pref_rpc_ssl" />
+
+        <EditTextPreference
+            android:defaultValue="55553"
+            android:inputType="number"
+            android:key="MSF_RPC_PORT"
+            android:summary="@string/pref_rpc_port_desc"
+            android:title="@string/pref_rpc_port" />
+
+        <EditTextPreference
+            android:defaultValue="NONE"
+            android:key="MSF_MANIFEST_URL"
+            android:summary="@string/pref_msf_manifest_desc"
+            android:title="@string/pref_msf_manifest" />
+
+        <Preference
+            android:key="PREF_MSF_WIPE"
+            android:summary="@string/pref_msf_delete_desc"
+            android:title="@string/pref_msf_delete" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
