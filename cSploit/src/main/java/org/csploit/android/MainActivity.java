@@ -687,7 +687,6 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                           System.addOrderedTarget(target);
-                          mTargetAdapter.update(null, null);
                         }
                       });
                     } else
