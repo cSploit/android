@@ -128,6 +128,7 @@ public class System
   private static Proxy mProxy = null;
   private static Server mServer = null;
 
+  private static String mIfname = null;
   private static String mStoragePath = null;
   private static String mSessionName = null;
 
@@ -193,13 +194,14 @@ public class System
         MSF_RPC_PORT = 55553;
       }
 
+      // initialize network data at the end
       uncaughtReloadNetworkMapping();
 
       ThreadHelper.getSharedExecutor().execute(new Runnable() {
         @Override
         public void run() {
-          preloadServices();
           preloadVendors();
+          preloadServices();
         }
       });
     }
@@ -339,9 +341,18 @@ public class System
     Services.getNetworkRadar().onAutoScanChanged();
   }
 
-  public static void reloadNetworkMapping(){
+  public static void setIfname(String ifname) {
+    mIfname = ifname;
+  }
+
+  public static String getIfname() {
+    return mIfname;
+  }
+
+  public static boolean reloadNetworkMapping(){
     try{
       uncaughtReloadNetworkMapping();
+      return true;
     }
     catch(NoRouteToHostException nrthe){
       // swallow bitch
@@ -349,10 +360,12 @@ public class System
     catch(Exception e){
       errorLogging(e);
     }
+    return false;
   }
 
   private static void uncaughtReloadNetworkMapping() throws UnknownHostException, SocketException {
-    mNetwork = new Network(mContext);
+    mNetwork = new Network(mContext, mIfname);
+    mIfname = mNetwork.getInterface().getName();
 
     reset();
 
@@ -360,7 +373,7 @@ public class System
   }
 
   public static boolean checkNetworking(final Activity current){
-    if(!Network.isWifiConnected(mContext)){
+    if(!mNetwork.isConnected()){
 
       Intent intent = new Intent();
       intent.putExtra(WifiScannerActivity.CONNECTED, false);
@@ -807,28 +820,24 @@ public class System
       String line;
 
       // begin decoding procedure
-      try{
+      try {
         line = reader.readLine();
-        if(line == null || !line.equals(SESSION_MAGIC))
+        if (line == null || !line.equals(SESSION_MAGIC))
           throw new Exception("Not a cSploit session file.");
 
         reset();
 
         // read targets
         int targets = Integer.parseInt(reader.readLine());
-        for(int i = 0; i < targets; i++){
-          Target target = new Target(reader);
 
-          if(!hasTarget(target)){
-            System.addOrderedTarget(target);
-          } else{
-            synchronized (mTargets) {
-              for (int j = 0; j < mTargets.size(); j++) {
-                if (mTargets.get(j) != null && mTargets.get(j).equals(target)) {
-                  mTargets.set(j, target);
-                  break;
-                }
-              }
+        synchronized (mTargets) {
+          for (int i = 0; i < targets; i++) {
+            Target target = new Target(reader);
+            int index = mTargets.indexOf(target);
+            if (index == -1) {
+              System.addOrderedTarget(target);
+            } else {
+              mTargets.set(index, target);
             }
           }
         }
@@ -839,6 +848,8 @@ public class System
         reset();
         reader.close();
         throw e;
+      } finally {
+        notifyTargetListChanged();
       }
     } else
       throw new Exception(filename + " does not exists or is empty.");
@@ -949,6 +960,8 @@ public class System
 
       scanThemAll();
     }
+
+    notifyTargetListChanged();
   }
 
   public static void scanThemAll() {
@@ -960,6 +973,48 @@ public class System
         Services.getNetworkRadar().onNewTargetFound(t);
       }
     }
+  }
+
+  public static void markNetworkAsDisconnected() {
+    synchronized (mTargets) {
+      for(Target t : mTargets) {
+        switch (t.getType()) {
+          case NETWORK:
+            if(t.getNetwork() == mNetwork) {
+              t.setConneced(false);
+            }
+            break;
+          case ENDPOINT:
+            if(mNetwork.isInternal(t.getAddress())) {
+              t.setConneced(false);
+            }
+            break;
+        }
+      }
+    }
+    notifyTargetListChanged();
+  }
+
+  public static void markInitialNetworkTargetsAsConnected() {
+    InetAddress localAddress = mNetwork.getLocalAddress();
+    InetAddress gatewayAddress = mNetwork.getGatewayAddress();
+    synchronized (mTargets) {
+      for(Target t : mTargets) {
+        switch (t.getType()) {
+          case NETWORK:
+            if(t.getNetwork() == mNetwork) {
+              t.setConneced(true);
+            }
+          default:
+            if(localAddress.equals(t.getAddress()) ||
+                    gatewayAddress.equals(t.getAddress())) {
+              t.setConneced(true);
+            }
+            break;
+        }
+      }
+    }
+    notifyTargetListChanged();
   }
 
   public static boolean isInitialized(){
@@ -1088,7 +1143,11 @@ public class System
   }
 
   public static void registerPlugin(Plugin plugin){
-    mPlugins.add(plugin);
+    if (mPlugins.contains(plugin)){
+      Logger.warning("registerPlugin() plugin " + plugin.getName() + " already added");
+    }
+    else
+      mPlugins.add(plugin);
   }
 
   public static ArrayList<Plugin> getPlugins(){

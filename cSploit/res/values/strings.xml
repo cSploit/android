@@ -306,6 +306,9 @@
     <string name="menu_submit_issue">Submit issue</string>
     <string name="menu_about">About cSploit</string>
 
+    <string name="iface_dialog_title">Choose a network interface</string>
+    <string name="iface_error_no_available">There\'re no network interfaces available</string>
+
     <string name="scanner_select_ports">Select Custom Ports</string>
     <string name="scanner_custom_parameters">Custom parameters</string>
 
@@ -435,6 +438,7 @@
     
     <string name="menu_add">Add</string>
     <string name="menu_scan">Scan</string>
+    <string name="menu_ifaces">Net interfaces</string>
     <string name="menu_wifi_scan">WiFi scan</string>
     <string name="menu_stop_msfrpcd">Stop MSFRPCD</string>
     
@@ -529,4 +533,8 @@
     <string name="mitm_ss_select_target_prompt">Select %s ?</string>
     <string name="github_issues_url" translatable="false">https://github.com/cSploit/android/issues</string>
     <string name="issue_message"><![CDATA[<p>Before opening a new issue, please, take the time to read the already <a href="%1$s">open issues</a>, probably it\' s already open. If it\' s not open we\'ll need as much information as you can get, so please, read <a href="%2$s">this guide</a> in order to know how to report a bug properly.</p>]]></string>
+    <string name="connection_lost">connection lost</string>
+    <string name="connection_lost_prompt">delete current session and start another?</string>
+    <string name="any_interface">any interface</string>
+    <string name="error_initializing_interface">Error initializing %s</string>
 </resources>

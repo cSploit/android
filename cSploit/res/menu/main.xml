@@ -19,6 +19,12 @@
         csploit:showAsAction="ifRoom"
         android:title="@string/menu_wifi_scan" />
 
+    <item
+        android:id="@+id/wifi_ifaces"
+        android:icon="@drawable/ic_refresh"
+        csploit:showAsAction="ifRoom"
+        android:title="@string/menu_ifaces" />
+
     <group android:id="@+id/session_group">
         <item
             android:id="@+id/new_session"
