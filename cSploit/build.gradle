@@ -53,7 +53,7 @@ android {
         minSdkVersion 9
         targetSdkVersion 22
         versionCode 4
-        versionName "1.6.3-unstable"
+        versionName "1.7.0-unstable"
         if(System.getenv("NIGHTLY_BUILD")) {
             versionName += "+" + System.getenv("NIGHTLY_BUILD_COMMIT").substring(0, 7)
         }
