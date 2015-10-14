@@ -19,11 +19,13 @@
 package org.csploit.android;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,21 +33,17 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.text.Html;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,12 +57,14 @@ import org.csploit.android.core.Plugin;
 import org.csploit.android.core.System;
 import org.csploit.android.events.Event;
 import org.csploit.android.gui.dialogs.AboutDialog;
+import org.csploit.android.gui.dialogs.ChoiceDialog;
 import org.csploit.android.gui.dialogs.ConfirmDialog;
 import org.csploit.android.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
 import org.csploit.android.gui.dialogs.ErrorDialog;
 import org.csploit.android.gui.dialogs.FatalDialog;
 import org.csploit.android.gui.dialogs.InputDialog;
 import org.csploit.android.gui.dialogs.InputDialog.InputDialogListener;
+import org.csploit.android.gui.dialogs.ListChoiceDialog;
 import org.csploit.android.gui.dialogs.MultipleChoiceDialog;
 import org.csploit.android.gui.dialogs.SpinnerDialog;
 import org.csploit.android.gui.dialogs.SpinnerDialog.SpinnerDialogListener;
@@ -85,6 +85,7 @@ import org.csploit.android.services.UpdateChecker;
 import org.csploit.android.services.UpdateService;
 import org.csploit.android.services.receivers.MsfRpcdServiceReceiver;
 import org.csploit.android.services.receivers.NetworkRadarReceiver;
+import org.csploit.android.tools.Raw;
 import org.csploit.android.update.CoreUpdate;
 import org.csploit.android.update.MsfUpdate;
 import org.csploit.android.update.RubyUpdate;
@@ -96,6 +97,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static org.csploit.android.services.UpdateChecker.UPDATE_AVAILABLE;
 import static org.csploit.android.services.UpdateChecker.UPDATE_CHECKING;
@@ -103,85 +106,110 @@ import static org.csploit.android.services.UpdateChecker.UPDATE_NOT_AVAILABLE;
 
 @SuppressLint("NewApi")
 public class MainActivity extends AppCompatActivity {
-  private String UPDATE_MESSAGE;
+  private String EMPTY_LIST_MESSAGE = "";
   private static final int WIFI_CONNECTION_REQUEST = 1012;
-  private boolean isWifiAvailable = false;
+  private boolean isAnyNetInterfaceAvailable = false;
   private TargetAdapter mTargetAdapter = null;
   private NetworkRadarReceiver mRadarReceiver = new NetworkRadarReceiver();
   private UpdateReceiver mUpdateReceiver = new UpdateReceiver();
   private WipeReceiver mWipeReceiver = new WipeReceiver();
   private MsfRpcdServiceReceiver mMsfReceiver = new MsfRpcdServiceReceiver();
+  private ConnectivityReceiver mConnectivityReceiver = new ConnectivityReceiver();
   private Menu mMenu = null;
-  private TextView mUpdateStatus = null;
+  private TextView mEmptyTextView = null;
   private Toast mToast = null;
+  private TextView mTextView = null;
   private long mLastBackPressTime = 0;
   private ActionMode mActionMode = null;
   private ListView lv;
   private boolean isRootMissing = false;
+  private String[] mIfaces = null;
+  private boolean mIsCoreInstalled = false;
+  private boolean mIsDaemonBeating = false;
+  private boolean mIsConnectivityAvailable = false;
+  private boolean mIsUpdateDownloading = false;
+  private boolean mHaveAnyWifiInterface = true; // TODO: check is device have a wifi interface
+  private boolean mOfflineMode = false;
 
-  private void createUpdateStatusText() {
-    if (mUpdateStatus != null) return;
-
-    RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
-
-    mUpdateStatus = new TextView(this);
-
-    LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT,
-            LayoutParams.MATCH_PARENT);
-
-    mUpdateStatus.setGravity(Gravity.CENTER);
-    mUpdateStatus.setLayoutParams(params);
-
-    layout.addView(mUpdateStatus);
-  }
-
-
-  private void createUpdateLayout() {
-
-    lv.setVisibility(View.GONE);
-    findViewById(R.id.textView).setVisibility(View.GONE);
-
-    createUpdateStatusText();
-
-    mUpdateStatus
-            .setText(UPDATE_MESSAGE.replace("#STATUS#", "..."));
-
-    mUpdateReceiver.register(MainActivity.this);
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-      invalidateOptionsMenu();
-  }
-
-  private void createOfflineLayout() {
-
-    lv.setVisibility(View.GONE);
-    findViewById(R.id.textView).setVisibility(View.GONE);
-
-    createUpdateStatusText();
-
-    mUpdateStatus.setText(getString(R.string.no_connectivity));
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-      invalidateOptionsMenu();
-  }
-
-  public void createOnlineLayout() {
-    findViewById(R.id.textView).setVisibility(View.VISIBLE);
-    lv.setVisibility(View.VISIBLE);
-
-    if (mUpdateStatus != null)
-      mUpdateStatus.setVisibility(View.GONE);
-
-    if (mTargetAdapter != null) {
-      mTargetAdapter.notifyDataSetChanged();
-      return;
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode,
+                                  Intent intent) {
+    if (requestCode == WIFI_CONNECTION_REQUEST && resultCode == RESULT_OK
+            && intent.hasExtra(WifiScannerActivity.CONNECTED)) {
+      init();
     }
+  }
 
-    mTargetAdapter = new TargetAdapter();
+  private void onInitializationError(final String message) {
+    MainActivity.this.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        new FatalDialog(getString(R.string.initialization_error),
+                message, message.contains(">"),
+                MainActivity.this).show();
+      }
+    });
+  }
 
-    lv.setAdapter(mTargetAdapter);
+  private void onCoreUpdated() {
+    MainActivity.this.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        init();
+        startAllServices();
+        notifyMenuChanged();
+      }
+    });
+  }
 
-    lv.setOnItemLongClickListener(new OnItemLongClickListener() {
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+    Boolean isDark = themePrefs.getBoolean("isDark", false);
+
+    if (isDark)
+      setTheme(R.style.DarkTheme);
+    else
+      setTheme(R.style.AppTheme);
+
+    setContentView(R.layout.target_layout);
+
+    mEmptyTextView = (TextView) findViewById(R.id.emptyTextView);
+    lv = (ListView) findViewById(R.id.android_list);
+    mTextView = (TextView) findViewById(R.id.textView);
+
+    lv.setOnItemClickListener(new ListView.OnItemClickListener() {
+
+      @Override
+      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+        if (mActionMode != null) {
+          mTargetAdapter.toggleSelection(position);
+          return;
+        }
+
+        Target target = (Target) mTargetAdapter.getItem(position);
+        System.setCurrentTarget(target);
+
+        ThreadHelper.getSharedExecutor().execute(new Runnable() {
+          @Override
+          public void run() {
+
+            startActivityForResult(new Intent(MainActivity.this,
+                    ActionActivity.class), WIFI_CONNECTION_REQUEST);
+
+            overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+          }
+        });
+
+        Toast.makeText(MainActivity.this,
+                getString(R.string.selected_) + System.getCurrentTarget(),
+                Toast.LENGTH_SHORT).show();
+
+      }
+    });
+    lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
       @Override
       public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         Target t = (Target) mTargetAdapter.getItem(position);
@@ -198,224 +226,88 @@ public class MainActivity extends AppCompatActivity {
         return true;
       }
     });
+    mTargetAdapter = new TargetAdapter();
 
-    mRadarReceiver.register(MainActivity.this);
-    mUpdateReceiver.register(MainActivity.this);
-    mWipeReceiver.register(MainActivity.this);
-    mMsfReceiver.register(MainActivity.this);
+    lv.setEmptyView(findViewById(android.R.id.empty));
+    lv.setAdapter(mTargetAdapter);
 
     System.setTargetListObserver(mTargetAdapter);
 
-    StartRPCServer();
+    mRadarReceiver.register(this);
+    mUpdateReceiver.register(this);
+    mWipeReceiver.register(this);
+    mMsfReceiver.register(this);
+    mConnectivityReceiver.register(this);
 
-    // if called for the second time after wifi connection
+    init();
+    startAllServices();
+  }
+
+  private void startAllServices() {
+    startNetworkRadar();
+    startUpdateChecker();
+    startRPCServer();
+  }
+
+  private void notifyMenuChanged() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
       invalidateOptionsMenu();
-  }
-
-  @Override
-  protected void onActivityResult(int requestCode, int resultCode,
-                                  Intent intent) {
-    if (requestCode == WIFI_CONNECTION_REQUEST && resultCode == RESULT_OK
-            && intent.hasExtra(WifiScannerActivity.CONNECTED)) {
-      System.reloadNetworkMapping();
-      if(mTargetAdapter != null) {
-        mTargetAdapter.notifyDataSetChanged();
-      }
-      try {
-        onCreate(null);
-      } catch (IllegalStateException e) {
-        // already attached.  don't reattach.
-      }
-    }
-  }
-
-  private void createLayout() {
-    boolean wifiAvailable = Network.isWifiConnected(this);
-    boolean connectivityAvailable = wifiAvailable || Network.isConnectivityAvailable(this);
-    boolean coreBeating = System.isCoreInitialized();
-
-    if (coreBeating && wifiAvailable) {
-      createOnlineLayout();
-    } else if (connectivityAvailable) {
-      createUpdateLayout();
-    } else {
-      createOfflineLayout();
-    }
-  }
-
-  private void onInitializationError(final String message) {
-    MainActivity.this.runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        new FatalDialog(getString(R.string.initialization_error),
-                message, message.contains(">"),
-                MainActivity.this).show();
-      }
-    });
-  }
-
-  private boolean startCore() {
-    isRootMissing = false;
-    try {
-      System.initCore();
-
-      return true;
-    } catch (System.SuException e) {
-      onInitializationError(getString(R.string.only_4_root));
-      isRootMissing = true;
-    } catch (System.DaemonException e) {
-      Logger.error(e.getMessage());
-    }
-
-    return false;
-  }
-
-  private void onCoreBeating() {
-    if (Client.hadCrashed()) {
-      Logger.warning("Client has previously crashed, building a crash report.");
-      CrashReporter.notifyNativeLibraryCrash();
-      onInitializationError(getString(R.string.JNI_crash_detected));
-    }
-  }
-
-  private void onCoreUpdated() {
-    if (startCore()) {
-      onCoreBeating();
-    } else if (isRootMissing) {
-      return;
-    }
-
-    MainActivity.this.runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        System.reloadNetworkMapping();
-        createLayout();
-        if (System.isInitialized())
-          startNetworkRadar();
-      }
-    });
-  }
-
-  @Override
-  public void onCreate(Bundle savedInstanceState) {
-    SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-    Boolean isDark = themePrefs.getBoolean("isDark", false);
-    boolean connectivityAvailable;
-
-    if (isDark)
-      setTheme(R.style.DarkTheme);
     else
-      setTheme(R.style.AppTheme);
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.target_layout);
+      configureMenu();
+  }
 
-    lv = (ListView) findViewById(R.id.android_list);
-    lv.setOnItemClickListener(new ListView.OnItemClickListener() {
+  /**
+   * Performs the firsts actions when the app starts.
+   * called also when the user connects to a wifi from the app, and when the core is updated.
+   */
+  public void init() {
+    loadInterfaces();
+    isAnyNetInterfaceAvailable = (mIfaces.length > 0);
+    mIsConnectivityAvailable = isConnectivityAvailable();
 
-      @Override
-      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    mIsCoreInstalled = System.isCoreInstalled();
+    mIsDaemonBeating = System.isCoreInitialized();
 
-        if (mActionMode != null) {
-          ((TargetAdapter) lv.getAdapter()).toggleSelection(position);
+    // check minimum requirements for system initialization
+
+    if (!mIsCoreInstalled) {
+      EMPTY_LIST_MESSAGE = mIsConnectivityAvailable ?
+              getString(R.string.missing_core_update) :
+              getString(R.string.no_connectivity);
+      return;
+    } else if (!mIsDaemonBeating) {
+      try {
+        System.initCore();
+        mIsDaemonBeating = true;
+
+        if (Client.hadCrashed()) {
+          Logger.warning("Client has previously crashed, building a crash report.");
+          CrashReporter.notifyNativeLibraryCrash();
+          onInitializationError(getString(R.string.JNI_crash_detected));
           return;
         }
-
-        Target target = (Target) mTargetAdapter.getItem(position);
-        System.setCurrentTarget(target);
-
-        new Thread(new Runnable() {
-          @Override
-          public void run() {
-
-            startActivityForResult(new Intent(MainActivity.this,
-                    ActionActivity.class), WIFI_CONNECTION_REQUEST);
-
-            overridePendingTransition(R.anim.fadeout, R.anim.fadein);
-
-          }
-        }).start();
-
-        Toast.makeText(MainActivity.this,
-                getString(R.string.selected_) + System.getCurrentTarget(),
-                Toast.LENGTH_SHORT).show();
-
+      } catch (UnsatisfiedLinkError e) {
+        onInitializationError("hi developer, you missed to build JNI stuff, thanks for playing with me :)");
+        return;
+      } catch (System.SuException e) {
+        onInitializationError(getString(R.string.only_4_root));
+        return;
+      } catch (System.DaemonException e) {
+        Logger.error(e.getMessage());
       }
-    });
 
-    isWifiAvailable = Network.isWifiConnected(this);
-    connectivityAvailable = isWifiAvailable || Network.isConnectivityAvailable(this);
-
-    // make sure system object was correctly initialized during application
-    // startup
-    if (!System.isInitialized()) {
-      // wifi available but system failed to initialize, this is a fatal
-      // :(
-      if (isWifiAvailable) {
-
-        // retry
-        try {
-          System.init(MainActivity.this.getApplicationContext());
-
-          System.registerPlugin(new RouterPwn());
-          System.registerPlugin(new Traceroute());
-          System.registerPlugin(new PortScanner());
-          System.registerPlugin(new Inspector());
-          System.registerPlugin(new ExploitFinder());
-          System.registerPlugin(new LoginCracker());
-          System.registerPlugin(new Sessions());
-          System.registerPlugin(new MITM());
-          System.registerPlugin(new PacketForger());
-        } catch (Exception e) {
-          if (!(e instanceof NoRouteToHostException))
-            System.errorLogging(e);
-
-          onInitializationError(System.getLastError());
-
-          return;
+      if (!mIsDaemonBeating) {
+        if (mIsConnectivityAvailable) {
+          EMPTY_LIST_MESSAGE = getString(R.string.heart_attack_update);
+        } else {
+          onInitializationError(getString(R.string.heart_attack));
         }
-      }
-    } else {
-      System.reloadNetworkMapping();
-    }
-
-    boolean coreInstalled = System.isCoreInstalled();
-    boolean coreBeating = System.isCoreInitialized();
-
-    if (coreInstalled && !coreBeating) {
-      coreBeating = startCore();
-      if (coreBeating) {
-        onCoreBeating();
-      } else if (isRootMissing) {
         return;
       }
     }
 
-    if (!connectivityAvailable) {
-      if (!coreInstalled) {
-        onInitializationError(getString(R.string.no_core_no_connectivity));
-        return;
-      } else if (!coreBeating) {
-        onInitializationError(getString(R.string.heart_attack));
-        return;
-      }
-    }
-
-    if (!coreInstalled) {
-      UPDATE_MESSAGE = getString(R.string.missing_core_update);
-    } else if (!coreBeating) {
-      UPDATE_MESSAGE = getString(R.string.heart_attack_update);
-    } else if (!isWifiAvailable) {
-      UPDATE_MESSAGE = getString(R.string.no_wifi_available);
-    }
-
-    if (connectivityAvailable)
-      startUpdateChecker();
-
-    if (coreBeating && isWifiAvailable)
-      startNetworkRadar();
-
-    createLayout();
+    // if all is initialized, configure the network
+    initSystem();
   }
 
   @Override
@@ -423,19 +315,25 @@ public class MainActivity extends AppCompatActivity {
     MenuInflater inflater = getMenuInflater();
     inflater.inflate(R.menu.main, menu);
 
-    if (!isWifiAvailable) {
-      menu.findItem(R.id.add).setVisible(false);
-      menu.findItem(R.id.scan).setVisible(false);
-      menu.findItem(R.id.new_session).setEnabled(false);
-      menu.findItem(R.id.save_session).setEnabled(false);
-      menu.findItem(R.id.restore_session).setEnabled(false);
-      menu.findItem(R.id.ss_monitor).setEnabled(false);
-      menu.findItem(R.id.ss_msfrpcd).setEnabled(false);
-    }
-
     mMenu = menu;
+    configureMenu();
 
     return super.onCreateOptionsMenu(menu);
+  }
+
+  private boolean isConnectivityAvailable() {
+    return Network.isConnectivityAvailable(this) || Network.isWifiConnected(this);
+  }
+
+  public void configureMenu() {
+    if (mMenu == null)
+      return;
+    mMenu.findItem(R.id.add).setVisible(isAnyNetInterfaceAvailable);
+    mMenu.findItem(R.id.scan).setVisible(mHaveAnyWifiInterface);
+    mMenu.findItem(R.id.wifi_ifaces).setEnabled(canChangeInterface());
+    mMenu.findItem(R.id.new_session).setEnabled(isAnyNetInterfaceAvailable);
+    mMenu.findItem(R.id.save_session).setEnabled(isAnyNetInterfaceAvailable);
+    mMenu.findItem(R.id.restore_session).setEnabled(isAnyNetInterfaceAvailable);
   }
 
   @Override
@@ -451,6 +349,177 @@ public class MainActivity extends AppCompatActivity {
     mMenu = menu;
 
     return super.onPrepareOptionsMenu(menu);
+  }
+
+  private boolean initSystem() {
+    // retry
+    try {
+      System.init(getApplicationContext());
+    } catch (Exception e) {
+      boolean isFatal = !(e instanceof NoRouteToHostException);
+
+      if (isFatal) {
+        System.errorLogging(e);
+        onInitializationError(System.getLastError());
+      }
+
+      return !isFatal;
+    }
+
+    registerPlugins();
+    return true;
+  }
+
+  private void registerPlugins() {
+    if (!System.getPlugins().isEmpty())
+      return;
+
+    System.registerPlugin(new RouterPwn());
+    System.registerPlugin(new Traceroute());
+    System.registerPlugin(new PortScanner());
+    System.registerPlugin(new Inspector());
+    System.registerPlugin(new ExploitFinder());
+    System.registerPlugin(new LoginCracker());
+    System.registerPlugin(new Sessions());
+    System.registerPlugin(new MITM());
+    System.registerPlugin(new PacketForger());
+  }
+
+  private void loadInterfaces() {
+    boolean menuChanged;
+    List<String> interfaces = Network.getAvailableInterfaces();
+    int size = interfaces.size();
+
+    if(mIfaces != null) {
+      menuChanged = mIfaces.length != size;
+      menuChanged &= mIfaces.length <= 1 || size <= 1;
+    } else {
+      menuChanged = true;
+    }
+
+    mIfaces = new String[size];
+    interfaces.toArray(mIfaces);
+    isAnyNetInterfaceAvailable = mIfaces.length > 0;
+
+    if(menuChanged) {
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          notifyMenuChanged();
+        }
+      });
+    }
+  }
+
+  private boolean canChangeInterface() {
+    return mIfaces.length > 1 || ( mOfflineMode && isAnyNetInterfaceAvailable);
+  }
+
+  private boolean haveInterface(String ifname) {
+    for(String s : mIfaces) {
+      if(s.equals(ifname))
+        return true;
+    }
+    return false;
+  }
+
+  private void onNetworkInterfaceChanged() {
+    String toastMessage = null;
+
+    stopNetworkRadar();
+
+    if (!System.reloadNetworkMapping()) {
+      String ifname = System.getIfname();
+
+      ifname = ifname == null ? getString(R.string.any_interface) : ifname;
+
+      toastMessage = String.format(getString(R.string.error_initializing_interface), ifname);
+    } else {
+      startNetworkRadar();
+      registerPlugins();
+    }
+
+    final String msg = toastMessage;
+
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        if (msg != null) {
+          Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+        }
+        notifyMenuChanged();
+      }
+    });
+  }
+
+  private void onConnectionLost() {
+    if(mOfflineMode)
+      return;
+
+    mOfflineMode = true;
+
+    stopNetworkRadar();
+    System.markNetworkAsDisconnected();
+
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        new ConfirmDialog(getString(R.string.connection_lost),
+                getString(R.string.connection_lost_prompt), MainActivity.this,
+                new ConfirmDialogListener() {
+                  @Override
+                  public void onConfirm() {
+                    mOfflineMode = false;
+                    System.setIfname(null);
+                    onNetworkInterfaceChanged();
+                  }
+
+                  @Override
+                  public void onCancel() { }
+                }).show();
+      }
+    });
+  }
+
+  private void onConnectionResumed() {
+    if(!mOfflineMode)
+      return;
+    mOfflineMode = false;
+    System.markInitialNetworkTargetsAsConnected();
+    startNetworkRadar();
+  }
+
+  /**
+   * Displays a dialog for choose a network interface
+   *
+   * @param forceDialog forces to show the dialog even if there's only one interface
+   */
+  private void displayNetworkInterfaces(final boolean forceDialog) {
+    // reload the interfaces list if we've invoked the dialog from the menu
+    loadInterfaces();
+    boolean autoload = !forceDialog && mIfaces.length == 1;
+
+    if (autoload) {
+      System.setIfname(mIfaces[0]);
+      onNetworkInterfaceChanged();
+    } else if (isAnyNetInterfaceAvailable) {
+      String title = getString(R.string.iface_dialog_title);
+
+      new ListChoiceDialog(title, mIfaces, this, new ChoiceDialog.ChoiceDialogListener() {
+        @Override
+        public void onChoice(int index) {
+          System.setIfname(mIfaces[index]);
+          onNetworkInterfaceChanged();
+        }
+      }).show();
+    } else {
+      new ErrorDialog(getString(android.R.string.dialog_alert_title),
+              getString(R.string.iface_error_no_available), this).show();
+    }
+  }
+
+  private void displayNetworkInterfaces() {
+    displayNetworkInterfaces(false);
   }
 
   private void targetAliasPrompt(final Target target) {
@@ -546,54 +615,61 @@ public class MainActivity extends AppCompatActivity {
   };
 
   public void startUpdateChecker() {
+    if (!isConnectivityAvailable() || mIsUpdateDownloading)
+      return;
     if (System.getSettings().getBoolean("PREF_CHECK_UPDATES", true)) {
       new UpdateChecker(this).start();
+      mIsUpdateDownloading = true;
     } else {
       MainActivity.this.sendBroadcast(new Intent(UPDATE_NOT_AVAILABLE));
+      mIsUpdateDownloading = false;
     }
   }
 
   public void startNetworkRadar() {
-    new Thread(new Runnable() {
+    if (!isAnyNetInterfaceAvailable || !mIsDaemonBeating) {
+      return;
+    }
+    ThreadHelper.getSharedExecutor().execute(new Runnable() {
       @Override
       public void run() {
         Services.getNetworkRadar().start();
       }
-    }).start();
+    });
   }
 
   public void stopNetworkRadar() {
-    new Thread(new Runnable() {
+    ThreadHelper.getSharedExecutor().execute(new Runnable() {
       @Override
       public void run() {
         Services.getNetworkRadar().stop();
       }
-    }).start();
+    });
   }
 
   /**
    * start MSF RPC Daemon
    */
-  public void StartRPCServer() {
-    new Thread(new Runnable() {
+  public void startRPCServer() {
+    ThreadHelper.getSharedExecutor().execute(new Runnable() {
       @Override
       public void run() {
-        if(Services.getMsfRpcdService().isAvailable())
+        if (Services.getMsfRpcdService().isAvailable())
           Services.getMsfRpcdService().start();
       }
-    }).start();
+    });
   }
 
   /**
    * stop MSF RPC Daemon
    */
   public void StopRPCServer() {
-    new Thread(new Runnable() {
+    ThreadHelper.getSharedExecutor().execute(new Runnable() {
       @Override
       public void run() {
         Services.getMsfRpcdService().stop();
       }
-    }).start();
+    });
   }
 
   @Override
@@ -627,6 +703,10 @@ public class MainActivity extends AppCompatActivity {
         startNetworkRadar();
         return true;
 
+      case R.id.wifi_ifaces:
+        displayNetworkInterfaces(true);
+        return true;
+
       case R.id.wifi_scan:
         stopNetworkRadar();
 
@@ -646,7 +726,6 @@ public class MainActivity extends AppCompatActivity {
                   public void onConfirm() {
                     try {
                       System.reset();
-                      mTargetAdapter.notifyDataSetChanged();
 
                       Toast.makeText(
                               MainActivity.this,
@@ -713,7 +792,6 @@ public class MainActivity extends AppCompatActivity {
 
               try {
                 System.loadSession(session);
-                mTargetAdapter.notifyDataSetChanged();
               } catch (Exception e) {
                 e.printStackTrace();
                 new ErrorDialog(getString(R.string.error),
@@ -768,7 +846,6 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
-
   @Override
   public void onBackPressed() {
     if (mLastBackPressTime < java.lang.System.currentTimeMillis() - 4000) {
@@ -806,6 +883,7 @@ public class MainActivity extends AppCompatActivity {
     mUpdateReceiver.unregister();
     mWipeReceiver.unregister();
     mMsfReceiver.unregister();
+    mConnectivityReceiver.unregister();
 
     // make sure no zombie process is running before destroying the activity
     System.clean(true);
@@ -866,7 +944,7 @@ public class MainActivity extends AppCompatActivity {
 
       final Target target = list.get(position);
 
-      if (target.hasAlias()){
+      if (target.hasAlias()) {
         holder.itemTitle.setText(Html.fromHtml("<b>"
                 + target.getAlias() + "</b> <small>( "
                 + target.getDisplayAddress() + " )</small>"));
@@ -936,7 +1014,7 @@ public class MainActivity extends AppCompatActivity {
     public void update(Observable observable, Object data) {
       final Target target = (Target) data;
 
-      if(target == null) {
+      if (target == null) {
         // update the whole list
         MainActivity.this.runOnUiThread(this);
         return;
@@ -946,12 +1024,12 @@ public class MainActivity extends AppCompatActivity {
       MainActivity.this.runOnUiThread(new Runnable() {
         @Override
         public void run() {
-          if(lv == null)
+          if (lv == null)
             return;
           int start = lv.getFirstVisiblePosition();
-          for(int i=start, j=lv.getLastVisiblePosition();i<=j;i++)
-            if(target==list.get(i)){
-              View view = lv.getChildAt(i-start);
+          for (int i = start, j = lv.getLastVisiblePosition(); i <= j; i++)
+            if (target == list.get(i)) {
+              View view = lv.getChildAt(i - start);
               getView(i, view, lv);
               break;
             }
@@ -1055,10 +1133,12 @@ public class MainActivity extends AppCompatActivity {
               i.putExtra(UpdateService.UPDATE, update);
 
               startService(i);
+              mIsUpdateDownloading = true;
             }
 
             @Override
             public void onCancel() {
+              mIsUpdateDownloading = false;
               if (!mandatory) {
                 return;
               }
@@ -1077,13 +1157,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void onUpdateDone(Update update) {
 
+      mIsUpdateDownloading = false;
+
       System.reloadTools();
 
-      if((update instanceof MsfUpdate) || (update instanceof RubyUpdate)) {
-        StartRPCServer();
+      if ((update instanceof MsfUpdate) || (update instanceof RubyUpdate)) {
+        startRPCServer();
       }
 
-      if(update instanceof CoreUpdate) {
+      if (update instanceof CoreUpdate) {
         onCoreUpdated();
       }
 
@@ -1092,6 +1174,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onUpdateError(final Update update, final int message) {
+
+      mIsUpdateDownloading = false;
 
       if (update instanceof CoreUpdate) {
         onInitializationError(getString(message));
@@ -1115,19 +1199,19 @@ public class MainActivity extends AppCompatActivity {
       String action = intent.getAction();
       Update update = null;
 
-      if(intent.hasExtra(UpdateService.UPDATE)) {
+      if (intent.hasExtra(UpdateService.UPDATE)) {
         update = (Update) intent.getSerializableExtra(UpdateService.UPDATE);
       }
 
       switch (action) {
         case UPDATE_CHECKING:
-          if (mUpdateStatus != null)
-            mUpdateStatus.setText(UPDATE_MESSAGE.replace(
+          if (mEmptyTextView != null)
+            mEmptyTextView.setText(EMPTY_LIST_MESSAGE.replace(
                     "#STATUS#", getString(R.string.checking)));
           break;
         case UPDATE_NOT_AVAILABLE:
-          if (mUpdateStatus != null)
-            mUpdateStatus.setText(UPDATE_MESSAGE.replace(
+          if (mEmptyTextView != null)
+            mEmptyTextView.setText(EMPTY_LIST_MESSAGE.replace(
                     "#STATUS#", getString(R.string.no_updates_available)));
 
           if (!System.isCoreInstalled()) {
@@ -1144,6 +1228,81 @@ public class MainActivity extends AppCompatActivity {
           int message = intent.getIntExtra(UpdateService.MESSAGE, R.string.error_occured);
           onUpdateError(update, message);
           break;
+      }
+    }
+  }
+
+  private class ConnectivityReceiver extends ManagedReceiver {
+    private static final int CHECK_DELAY = 2000;
+
+    private final IntentFilter mFilter;
+    private TimerTask mTask = null;
+
+    public ConnectivityReceiver() {
+      mFilter = new IntentFilter();
+      mFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+    }
+
+    @Override
+    public IntentFilter getFilter() {
+      return mFilter;
+    }
+
+    private String ifacesToString() {
+      StringBuilder sb = new StringBuilder();
+      for(String iface : mIfaces) {
+        if(sb.length() > 0) {
+          sb.append(", ");
+        }
+        sb.append(iface);
+      }
+      return sb.toString();
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      synchronized (this) {
+        if (mTask != null) {
+          mTask.cancel();
+        }
+        mTask = new TimerTask() {
+          @Override
+          public void run() {
+            check();
+          }
+        };
+        new Timer().schedule(mTask, CHECK_DELAY);
+      }
+    }
+
+    @Override
+    public void unregister() {
+      super.unregister();
+      synchronized (this) {
+        if(mTask != null) {
+          mTask.cancel();
+        }
+      }
+    }
+
+    private void check() {
+      loadInterfaces();
+      String current = System.getIfname();
+
+      Logger.debug(String.format("current='%s', ifaces=[%s], haveInterface=%s, isAnyNetInterfaceAvailable=%s",
+              current != null ? current : "(null)",
+              ifacesToString(), haveInterface(current), isAnyNetInterfaceAvailable));
+
+      if(haveInterface(current)) {
+        onConnectionResumed();
+      } else if(current != null) {
+        onConnectionLost();
+      } else if(isAnyNetInterfaceAvailable) {
+        onNetworkInterfaceChanged();
+      }
+
+      synchronized (this) {
+        mTask = null;
       }
     }
   }

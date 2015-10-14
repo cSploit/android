@@ -15,6 +15,16 @@
         android:layout_below="@+id/textView"
         android:animateLayoutChanges="true" />
 
+    <ViewStub
+        android:id="@android:id/empty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/textView"
+        android:animateLayoutChanges="true"
+        android:layout="@layout/target_empty" />
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"

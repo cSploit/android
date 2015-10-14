@@ -25,6 +25,7 @@ import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 import org.acra.sender.HttpSender;
+import org.csploit.android.core.Logger;
 import org.csploit.android.core.System;
 import org.csploit.android.plugins.ExploitFinder;
 import org.csploit.android.plugins.Inspector;
