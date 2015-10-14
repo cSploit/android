@@ -19,7 +19,6 @@
 package org.csploit.android;
 
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -85,7 +84,6 @@ import org.csploit.android.services.UpdateChecker;
 import org.csploit.android.services.UpdateService;
 import org.csploit.android.services.receivers.MsfRpcdServiceReceiver;
 import org.csploit.android.services.receivers.NetworkRadarReceiver;
-import org.csploit.android.tools.Raw;
 import org.csploit.android.update.CoreUpdate;
 import org.csploit.android.update.MsfUpdate;
 import org.csploit.android.update.RubyUpdate;
@@ -390,7 +388,7 @@ public class MainActivity extends AppCompatActivity {
     List<String> interfaces = Network.getAvailableInterfaces();
     int size = interfaces.size();
 
-    if(mIfaces != null) {
+    if (mIfaces != null) {
       menuChanged = mIfaces.length != size;
       menuChanged &= mIfaces.length <= 1 || size <= 1;
     } else {
@@ -401,7 +399,7 @@ public class MainActivity extends AppCompatActivity {
     interfaces.toArray(mIfaces);
     isAnyNetInterfaceAvailable = mIfaces.length > 0;
 
-    if(menuChanged) {
+    if (menuChanged) {
       runOnUiThread(new Runnable() {
         @Override
         public void run() {
@@ -412,12 +410,12 @@ public class MainActivity extends AppCompatActivity {
   }
 
   private boolean canChangeInterface() {
-    return mIfaces.length > 1 || ( mOfflineMode && isAnyNetInterfaceAvailable);
+    return mIfaces.length > 1 || (mOfflineMode && isAnyNetInterfaceAvailable);
   }
 
   private boolean haveInterface(String ifname) {
-    for(String s : mIfaces) {
-      if(s.equals(ifname))
+    for (String s : mIfaces) {
+      if (s.equals(ifname))
         return true;
     }
     return false;
@@ -453,7 +451,7 @@ public class MainActivity extends AppCompatActivity {
   }
 
   private void onConnectionLost() {
-    if(mOfflineMode)
+    if (mOfflineMode)
       return;
 
     mOfflineMode = true;
@@ -475,14 +473,15 @@ public class MainActivity extends AppCompatActivity {
                   }
 
                   @Override
-                  public void onCancel() { }
+                  public void onCancel() {
+                  }
                 }).show();
       }
     });
   }
 
   private void onConnectionResumed() {
-    if(!mOfflineMode)
+    if (!mOfflineMode)
       return;
     mOfflineMode = false;
     System.markInitialNetworkTargetsAsConnected();
@@ -936,7 +935,7 @@ public class MainActivity extends AppCompatActivity {
         holder.portCountLayout = (LinearLayout) (row != null ? row
                 .findViewById(R.id.portCountLayout) : null);
         if (isDark)
-            holder.portCountLayout.setBackgroundResource(R.drawable.rounded_square_grey);
+          holder.portCountLayout.setBackgroundResource(R.drawable.rounded_square_grey);
         if (row != null)
           row.setTag(holder);
       } else
@@ -1250,8 +1249,8 @@ public class MainActivity extends AppCompatActivity {
 
     private String ifacesToString() {
       StringBuilder sb = new StringBuilder();
-      for(String iface : mIfaces) {
-        if(sb.length() > 0) {
+      for (String iface : mIfaces) {
+        if (sb.length() > 0) {
           sb.append(", ");
         }
         sb.append(iface);
@@ -1279,7 +1278,7 @@ public class MainActivity extends AppCompatActivity {
     public void unregister() {
       super.unregister();
       synchronized (this) {
-        if(mTask != null) {
+        if (mTask != null) {
           mTask.cancel();
         }
       }
@@ -1293,11 +1292,11 @@ public class MainActivity extends AppCompatActivity {
               current != null ? current : "(null)",
               ifacesToString(), haveInterface(current), isAnyNetInterfaceAvailable));
 
-      if(haveInterface(current)) {
+      if (haveInterface(current)) {
         onConnectionResumed();
-      } else if(current != null) {
+      } else if (current != null) {
         onConnectionLost();
-      } else if(isAnyNetInterfaceAvailable) {
+      } else if (isAnyNetInterfaceAvailable) {
         onNetworkInterfaceChanged();
       }
 

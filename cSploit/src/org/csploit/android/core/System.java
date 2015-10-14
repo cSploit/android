@@ -92,8 +92,7 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class System
-{
+public class System {
   public static final String SESSION_MAGIC = "cSploitSession";
 
   private static final String ERROR_LOG_FILENAME = "csploit-debug-error.log";
@@ -136,10 +135,10 @@ public class System
 
   private static Object mCustomData = null;
 
-  private static RPCClient mMsfRpc      = null;
-  private static Exploit mExploit       = null;
-  private static Payload mPayload       = null;
-  private static Session mMsfSession    = null;
+  private static RPCClient mMsfRpc = null;
+  private static Exploit mExploit = null;
+  private static Payload mPayload = null;
+  private static Session mMsfSession = null;
 
   private static boolean mCoreInitialized = false;
 
@@ -149,9 +148,9 @@ public class System
 
   private final static LinkedList<SettingReceiver> mSettingReceivers = new LinkedList<SettingReceiver>();
 
-  public static void init(Context context) throws Exception{
+  public static void init(Context context) throws Exception {
     mContext = context;
-    try{
+    try {
       Logger.debug("initializing System...");
       mStoragePath = getSettings().getString("PREF_SAVE_PATH", Environment.getExternalStorageDirectory().toString());
       mSessionName = "csploit-session-" + java.lang.System.currentTimeMillis();
@@ -164,30 +163,30 @@ public class System
       // if we are here, network initialization didn't throw any error, lock wifi
       WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
 
-      if(mWifiLock == null)
+      if (mWifiLock == null)
         mWifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, "wifiLock");
 
-      if(!mWifiLock.isHeld())
+      if (!mWifiLock.isHeld())
         mWifiLock.acquire();
 
       // wake lock if enabled
-      if(getSettings().getBoolean("PREF_WAKE_LOCK", true)){
+      if (getSettings().getBoolean("PREF_WAKE_LOCK", true)) {
         PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
 
-        if(mWakeLock == null)
+        if (mWakeLock == null)
           mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "wakeLock");
 
-        if(!mWakeLock.isHeld())
+        if (!mWakeLock.isHeld())
           mWakeLock.acquire();
       }
 
       // set ports
-      try{
-        HTTP_PROXY_PORT  = Integer.parseInt(getSettings().getString("PREF_HTTP_PROXY_PORT", "8080"));
+      try {
+        HTTP_PROXY_PORT = Integer.parseInt(getSettings().getString("PREF_HTTP_PROXY_PORT", "8080"));
         HTTP_SERVER_PORT = Integer.parseInt(getSettings().getString("PREF_HTTP_SERVER_PORT", "8081"));
         HTTPS_REDIR_PORT = Integer.parseInt(getSettings().getString("PREF_HTTPS_REDIRECTOR_PORT", "8082"));
-        MSF_RPC_PORT     = Integer.parseInt(getSettings().getString("MSF_RPC_PORT", "55553"));
-      } catch(NumberFormatException e){
+        MSF_RPC_PORT = Integer.parseInt(getSettings().getString("MSF_RPC_PORT", "55553"));
+      } catch (NumberFormatException e) {
         HTTP_PROXY_PORT = 8080;
         HTTP_SERVER_PORT = 8081;
         HTTPS_REDIR_PORT = 8082;
@@ -204,9 +203,8 @@ public class System
           preloadServices();
         }
       });
-    }
-    catch(Exception e){
-      if(!(e instanceof NoRouteToHostException))
+    } catch (Exception e) {
+      if (!(e instanceof NoRouteToHostException))
         errorLogging(e);
 
       throw e;
@@ -242,18 +240,18 @@ public class System
       String cmd;
 
       cmd = String.format("{ echo 'ACCESS GRANTED' >&2; cd '%s' && exec ./start_daemon.sh ;} || exit 1\n",
-          System.getCorePath());
+              System.getCorePath());
 
       writer.write(cmd.getBytes());
       writer.flush();
 
       ret = shell.waitFor();
 
-      if(ret != 0) {
+      if (ret != 0) {
         reader = new BufferedReader(new InputStreamReader(shell.getErrorStream()));
 
-        while((line = reader.readLine()) != null) {
-          if(line.equals("ACCESS GRANTED")) {
+        while ((line = reader.readLine()) != null) {
+          if (line.equals("ACCESS GRANTED")) {
             access_granted = true;
             Logger.debug("'ACCESS GRANTED' found");
           } else
@@ -262,28 +260,34 @@ public class System
       } else
         access_granted = true;
 
-    } catch ( IOException e) {
+    } catch (IOException e) {
       // command "su" not found or cannot write to it's stdin
       Logger.error(e.getMessage());
     } catch (InterruptedException e) {
       // interrupted while waiting for shell exit value
       Logger.error(e.getMessage());
     } finally {
-      if(writer != null)
-        try { writer.close(); } catch (IOException ignored) {}
-      if(reader != null)
-        try { reader.close(); } catch (IOException ignored) {}
+      if (writer != null)
+        try {
+          writer.close();
+        } catch (IOException ignored) {
+        }
+      if (reader != null)
+        try {
+          reader.close();
+        } catch (IOException ignored) {
+        }
     }
 
     mKnownIssues.fromFile(String.format("%s/issues", getCorePath()));
 
-    if(!access_granted)
+    if (!access_granted)
       throw new SuException();
 
-    if(ret != 0) {
+    if (ret != 0) {
       File log = new File(System.getCorePath(), "cSploitd.log");
       DaemonException daemonException = new DaemonException("core daemon returned " + ret);
-      if(log.exists() && log.canRead()) {
+      if (log.exists() && log.canRead()) {
         ACRAConfiguration conf = ACRA.getConfig();
         conf.setApplicationLogFile(log.getAbsolutePath());
         ACRA.setConfig(conf);
@@ -296,11 +300,11 @@ public class System
   /**
    * shutdown the core daemon
    */
-  public static void shutdownCoreDaemon(){
-    if(!Client.isConnected() && !Client.Connect(getCorePath() + "/cSploitd.sock")) {
+  public static void shutdownCoreDaemon() {
+    if (!Client.isConnected() && !Client.Connect(getCorePath() + "/cSploitd.sock")) {
       return; // daemon is not running
     }
-    if(!Client.isAuthenticated() && !Client.Login("android", "DEADBEEF")) {
+    if (!Client.isAuthenticated() && !Client.Login("android", "DEADBEEF")) {
       Logger.error("cannot login to daemon");
     }
     Client.Shutdown();
@@ -312,13 +316,13 @@ public class System
 
   public static void initCore() throws DaemonException, SuException {
 
-    if(mCoreInitialized)
+    if (mCoreInitialized)
       return;
 
     String socket_path = getCorePath() + "/cSploitd.sock";
 
-    if(!Client.isConnected()) {
-      if(!Client.Connect(socket_path)) {
+    if (!Client.isConnected()) {
+      if (!Client.Connect(socket_path)) {
         startCoreDaemon();
         if (!Client.Connect(socket_path))
           throw new DaemonException("cannot connect to core daemon");
@@ -349,15 +353,13 @@ public class System
     return mIfname;
   }
 
-  public static boolean reloadNetworkMapping(){
-    try{
+  public static boolean reloadNetworkMapping() {
+    try {
       uncaughtReloadNetworkMapping();
       return true;
-    }
-    catch(NoRouteToHostException nrthe){
+    } catch (NoRouteToHostException nrthe) {
       // swallow bitch
-    }
-    catch(Exception e){
+    } catch (Exception e) {
       errorLogging(e);
     }
     return false;
@@ -372,8 +374,8 @@ public class System
     mInitialized = true;
   }
 
-  public static boolean checkNetworking(final Activity current){
-    if(!mNetwork.isConnected()){
+  public static boolean checkNetworking(final Activity current) {
+    if (!mNetwork.isConnected()) {
 
       Intent intent = new Intent();
       intent.putExtra(WifiScannerActivity.CONNECTED, false);
@@ -396,7 +398,8 @@ public class System
 
   /**
    * notify that a specific target of the list has been changed
-   * @param target  the changed target
+   *
+   * @param target the changed target
    */
   public static void notifyTargetListChanged(Target target) {
     Observer o;
@@ -404,7 +407,7 @@ public class System
       o = targetListObserver;
     }
 
-    if(o==null)
+    if (o == null)
       return;
 
     o.update(null, target);
@@ -417,27 +420,27 @@ public class System
     notifyTargetListChanged(null);
   }
 
-  public static void setLastError(String error){
+  public static void setLastError(String error) {
     mLastError = error;
   }
 
-  public static String getLastError(){
+  public static String getLastError() {
     return mLastError;
   }
 
-  public static synchronized void errorLogging(Throwable e){
+  public static synchronized void errorLogging(Throwable e) {
     String message = "Unknown error.",
-      trace = "Unknown trace.",
-      filename = (new File(Environment.getExternalStorageDirectory().toString(), ERROR_LOG_FILENAME)).getAbsolutePath();
+            trace = "Unknown trace.",
+            filename = (new File(Environment.getExternalStorageDirectory().toString(), ERROR_LOG_FILENAME)).getAbsolutePath();
 
-    if(e != null){
-      if(e.getMessage() != null && !e.getMessage().isEmpty())
+    if (e != null) {
+      if (e.getMessage() != null && !e.getMessage().isEmpty())
         message = e.getMessage();
 
-      else if(e.toString() != null)
+      else if (e.toString() != null)
         message = e.toString();
 
-      if(message.equals(mLastError))
+      if (message.equals(mLastError))
         return;
 
       Writer sWriter = new StringWriter();
@@ -447,16 +450,15 @@ public class System
 
       trace = sWriter.toString();
 
-      if(mContext != null && getSettings().getBoolean("PREF_DEBUG_ERROR_LOGGING", false)){
-        try{
+      if (mContext != null && getSettings().getBoolean("PREF_DEBUG_ERROR_LOGGING", false)) {
+        try {
           FileWriter fWriter = new FileWriter(filename, true);
           BufferedWriter bWriter = new BufferedWriter(fWriter);
 
           bWriter.write(trace);
 
           bWriter.close();
-        }
-        catch(IOException ioe){
+        } catch (IOException ioe) {
           Logger.error(ioe.toString());
         }
       }
@@ -467,24 +469,22 @@ public class System
     Logger.error(trace);
   }
 
-  public static String getPlatform()
-  {
+  public static String getPlatform() {
     int api = Build.VERSION.SDK_INT;
     String abi = Build.CPU_ABI;
 
     return String.format("android%d.%s", api, abi);
   }
 
-  public static String getCompatiblePlatform()
-  {
+  public static String getCompatiblePlatform() {
     int api = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN ?
-                  Build.VERSION_CODES.JELLY_BEAN : Build.VERSION_CODES.GINGERBREAD);
+            Build.VERSION_CODES.JELLY_BEAN : Build.VERSION_CODES.GINGERBREAD);
     String abi = Build.CPU_ABI;
 
     return String.format("android%d.%s", api, abi);
   }
 
-  public static boolean isARM(){
+  public static boolean isARM() {
     String abi = Build.CPU_ABI;
 
     Logger.debug("Build.CPU_ABI = " + abi);
@@ -492,15 +492,15 @@ public class System
     return Build.CPU_ABI.toLowerCase().startsWith("armeabi");
   }
 
-  public static synchronized void setCustomData(Object data){
+  public static synchronized void setCustomData(Object data) {
     mCustomData = data;
   }
 
-  public static Object getCustomData(){
+  public static Object getCustomData() {
     return mCustomData;
   }
 
-  public static InputStream getRawResource(int id){
+  public static InputStream getRawResource(int id) {
     return mContext.getResources().openRawResource(id);
   }
 
@@ -525,7 +525,7 @@ public class System
   }
 
   public static String getCorePath() {
-      return mContext.getFilesDir().getAbsolutePath();
+    return mContext.getFilesDir().getAbsolutePath();
   }
 
   public static void registerSettingListener(SettingReceiver receiver) {
@@ -540,8 +540,8 @@ public class System
 
   public static void onSettingChanged(String key) {
     synchronized (mSettingReceivers) {
-      for(SettingReceiver r : mSettingReceivers) {
-        if(r.getFilter().contains(key))
+      for (SettingReceiver r : mSettingReceivers) {
+        if (r.getFilter().contains(key))
           r.onSettingChanged(key);
       }
     }
@@ -553,13 +553,13 @@ public class System
     }
   }
 
-  public static void preloadServices(){
+  public static void preloadServices() {
     if (!mServices.isEmpty())
       return;
 
     FileReader fr = null;
     BufferedReader reader = null;
-    try{
+    try {
       // preload network service and ports map
 
       fr = new FileReader(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-services");
@@ -589,9 +589,9 @@ public class System
     }
   }
 
-  private static void preloadVendors(){
-    if(mVendors == null){
-      try{
+  private static void preloadVendors() {
+    if (mVendors == null) {
+      try {
         mVendors = new HashMap<>();
         @SuppressWarnings("ConstantConditions")
         FileInputStream fstream = new FileInputStream(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-mac-prefixes");
@@ -600,47 +600,45 @@ public class System
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         String line;
 
-        while((line = reader.readLine()) != null){
+        while ((line = reader.readLine()) != null) {
           line = line.trim();
-          if(!line.startsWith("#") && !line.isEmpty()){
+          if (!line.startsWith("#") && !line.isEmpty()) {
             String[] tokens = line.split(" ", 2);
 
-            if(tokens.length == 2)
+            if (tokens.length == 2)
               mVendors.put(NetworkHelper.getOUICode(tokens[0]), tokens[1]);
           }
         }
 
         in.close();
-      }
-      catch(Exception e){
+      } catch (Exception e) {
         errorLogging(e);
       }
     }
   }
 
-  public static String getSessionName(){
+  public static String getSessionName() {
     return mSessionName;
   }
 
-  public static String getStoragePath(){
+  public static String getStoragePath() {
     return mStoragePath;
   }
 
-  public static SharedPreferences getSettings(){
+  public static SharedPreferences getSettings() {
     return PreferenceManager.getDefaultSharedPreferences(mContext);
   }
 
-  public static String getAppVersionName(){
-    if(mApkVersion !=null)
+  public static String getAppVersionName() {
+    if (mApkVersion != null)
       return mApkVersion;
-    try{
+    try {
       PackageManager manager = mContext.getPackageManager();
       PackageInfo info = manager != null ? manager.getPackageInfo(mContext.getPackageName(), 0) : null;
 
-      if(info != null)
+      if (info != null)
         return (mApkVersion = info.versionName);
-    }
-    catch(NameNotFoundException e){
+    } catch (NameNotFoundException e) {
       errorLogging(e);
     }
 
@@ -649,13 +647,14 @@ public class System
 
   /**
    * reade the first line of a file
+   *
    * @param filePath path of the file to read from
    * @return the first line of the file or {@code null} if an error occurs
    */
   private static String readFirstLine(String filePath) {
     BufferedReader reader = null;
 
-    if(filePath==null)
+    if (filePath == null)
       return null;
 
     try {
@@ -665,7 +664,7 @@ public class System
       Logger.debug(e.getMessage());
     } finally {
       try {
-        if(reader!=null)
+        if (reader != null)
           reader.close();
       } catch (IOException e) {
         //ignored
@@ -676,6 +675,7 @@ public class System
 
   /**
    * get currently installed core version
+   *
    * @return the version of the core, null if not present.
    */
   public static String getCoreVersion() {
@@ -684,6 +684,7 @@ public class System
 
   /**
    * get version of installed ruby
+   *
    * @return the installed version of ruby
    */
   public static String getLocalRubyVersion() {
@@ -692,36 +693,37 @@ public class System
 
   /**
    * get version of installed MetaSploit Framework
+   *
    * @return the version of installed MetaSploit Framework
    */
   public static String getLocalMsfVersion() {
     return readFirstLine(getMsfPath() + "/VERSION");
   }
 
-  public static boolean isServiceRunning(String name){
+  public static boolean isServiceRunning(String name) {
     ActivityManager manager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
 
     //noinspection ConstantConditions
-    for(RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
-      if(name.equals(service.service.getClassName()))
+    for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+      if (name.equals(service.service.getClassName()))
         return true;
     }
 
     return false;
   }
 
-  public static boolean isPortAvailable(int port){
+  public static boolean isPortAvailable(int port) {
     boolean available = true;
 
     int available_code = mOpenPorts.get(port);
 
-    if(available_code != 0)
+    if (available_code != 0)
       return available_code != 1;
 
-    try{
+    try {
       // attempt 3 times since proxy and server could be still releasing
       // their ports
-      for(int i = 0; i < 3; i++){
+      for (int i = 0; i < 3; i++) {
         Socket channel = new Socket();
         InetSocketAddress address = new InetSocketAddress(InetAddress.getByName(mNetwork.getLocalAddressAsString()), port);
 
@@ -731,13 +733,12 @@ public class System
 
         channel.close();
 
-        if(available)
+        if (available)
           break;
 
         Thread.sleep(200);
       }
-    }
-    catch(Exception e){
+    } catch (Exception e) {
       available = true;
     }
 
@@ -746,16 +747,16 @@ public class System
     return available;
   }
 
-  public static ArrayList<String> getAvailableSessionFiles(){
+  public static ArrayList<String> getAvailableSessionFiles() {
     ArrayList<String> files = new ArrayList<String>();
     File storage = new File(mStoragePath);
 
-    if(storage.exists()){
+    if (storage.exists()) {
       String[] children = storage.list();
 
-      if(children != null && children.length > 0){
-        for(String child : children){
-          if(child.endsWith(".dss"))
+      if (children != null && children.length > 0) {
+        for (String child : children) {
+          if (child.endsWith(".dss"))
             files.add(child);
         }
       }
@@ -764,10 +765,10 @@ public class System
     return files;
   }
 
-  public static String saveSession(String sessionName) throws IOException{
+  public static String saveSession(String sessionName) throws IOException {
     StringBuilder builder = new StringBuilder();
     String filename = mStoragePath + '/' + sessionName + ".dss",
-      session;
+            session;
 
     builder.append(SESSION_MAGIC + "\n");
 
@@ -794,16 +795,16 @@ public class System
     return filename;
   }
 
-  public static ArrayList<String> getAvailableHijackerSessionFiles(){
+  public static ArrayList<String> getAvailableHijackerSessionFiles() {
     ArrayList<String> files = new ArrayList<String>();
     File storage = new File(mStoragePath);
 
-    if(storage.exists()){
+    if (storage.exists()) {
       String[] children = storage.list();
 
-      if(children != null && children.length > 0){
-        for(String child : children){
-          if(child.endsWith(".dhs"))
+      if (children != null && children.length > 0) {
+        for (String child : children) {
+          if (child.endsWith(".dhs"))
             files.add(child);
         }
       }
@@ -812,10 +813,10 @@ public class System
     return files;
   }
 
-  public static void loadSession(String filename) throws Exception{
+  public static void loadSession(String filename) throws Exception {
     File file = new File(mStoragePath + '/' + filename);
 
-    if(file.exists() && file.length() > 0){
+    if (file.exists() && file.length() > 0) {
       BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
       String line;
 
@@ -844,7 +845,7 @@ public class System
 
         reader.close();
 
-      } catch(Exception e){
+      } catch (Exception e) {
         reset();
         reader.close();
         throw e;
@@ -856,7 +857,7 @@ public class System
   }
 
   public synchronized static ToolBox getTools() {
-    if(mTools == null) {
+    if (mTools == null) {
       mTools = new ToolBox();
       mTools.reload();
     }
@@ -867,8 +868,8 @@ public class System
     return mMsfRpc;
   }
 
-  public static void setMsfRpc(RPCClient value){
-    if(value==mMsfRpc)
+  public static void setMsfRpc(RPCClient value) {
+    if (value == mMsfRpc)
       return;
     mMsfRpc = value;
     // refresh all exploits
@@ -880,62 +881,59 @@ public class System
         }
       }
     }
-    for( Plugin plugin : getPluginsForTarget() ) {
+    for (Plugin plugin : getPluginsForTarget()) {
       plugin.onRpcChange(value);
     }
 
   }
 
-  public static Proxy getProxy(){
-    try{
-      if(mProxy == null)
+  public static Proxy getProxy() {
+    try {
+      if (mProxy == null)
         mProxy = new Proxy(getNetwork().getLocalAddress(), HTTP_PROXY_PORT);
-    }
-    catch(Exception e){
+    } catch (Exception e) {
       errorLogging(e);
     }
 
     return mProxy;
   }
 
-  public static HTTPSRedirector getHttpsRedirector(){
-    try{
-      if(mRedirector == null)
+  public static HTTPSRedirector getHttpsRedirector() {
+    try {
+      if (mRedirector == null)
         mRedirector = new HTTPSRedirector(mContext, getNetwork().getLocalAddress(), HTTPS_REDIR_PORT);
-    }
-    catch(Exception e){
+    } catch (Exception e) {
       errorLogging(e);
     }
 
     return mRedirector;
   }
 
-  public static Server getServer(){
-    try{
-      if(mServer == null)
+  public static Server getServer() {
+    try {
+      if (mServer == null)
         mServer = new Server(getNetwork().getLocalAddress(), HTTP_SERVER_PORT);
-    }
-    catch(Exception e){
+    } catch (Exception e) {
       errorLogging(e);
     }
 
     return mServer;
   }
 
-  public static String getImageMimeType(String fileName){
+  public static String getImageMimeType(String fileName) {
     String type = "image/jpeg",
-      name = fileName.toLowerCase();
+            name = fileName.toLowerCase();
 
-    if(name.endsWith(".jpeg") || name.endsWith(".jpg"))
+    if (name.endsWith(".jpeg") || name.endsWith(".jpg"))
       type = "image/jpeg";
 
-    else if(name.endsWith(".png"))
+    else if (name.endsWith(".png"))
       type = "image/png";
 
-    else if(name.endsWith(".gif"))
+    else if (name.endsWith(".gif"))
       type = "image/gif";
 
-    else if(name.endsWith(".tiff"))
+    else if (name.endsWith(".tiff"))
       type = "image/tiff";
 
     return type;
@@ -965,11 +963,11 @@ public class System
   }
 
   public static void scanThemAll() {
-    if(!Services.getNetworkRadar().isAutoScanEnabled()) {
+    if (!Services.getNetworkRadar().isAutoScanEnabled()) {
       return;
     }
     synchronized (mTargets) {
-      for(Target t : mTargets) {
+      for (Target t : mTargets) {
         Services.getNetworkRadar().onNewTargetFound(t);
       }
     }
@@ -977,15 +975,15 @@ public class System
 
   public static void markNetworkAsDisconnected() {
     synchronized (mTargets) {
-      for(Target t : mTargets) {
+      for (Target t : mTargets) {
         switch (t.getType()) {
           case NETWORK:
-            if(t.getNetwork() == mNetwork) {
+            if (t.getNetwork() == mNetwork) {
               t.setConneced(false);
             }
             break;
           case ENDPOINT:
-            if(mNetwork.isInternal(t.getAddress())) {
+            if (mNetwork.isInternal(t.getAddress())) {
               t.setConneced(false);
             }
             break;
@@ -999,14 +997,14 @@ public class System
     InetAddress localAddress = mNetwork.getLocalAddress();
     InetAddress gatewayAddress = mNetwork.getGatewayAddress();
     synchronized (mTargets) {
-      for(Target t : mTargets) {
+      for (Target t : mTargets) {
         switch (t.getType()) {
           case NETWORK:
-            if(t.getNetwork() == mNetwork) {
+            if (t.getNetwork() == mNetwork) {
               t.setConneced(true);
             }
           default:
-            if(localAddress.equals(t.getAddress()) ||
+            if (localAddress.equals(t.getAddress()) ||
                     gatewayAddress.equals(t.getAddress())) {
               t.setConneced(true);
             }
@@ -1017,7 +1015,7 @@ public class System
     notifyTargetListChanged();
   }
 
-  public static boolean isInitialized(){
+  public static boolean isInitialized() {
     return mInitialized;
   }
 
@@ -1033,14 +1031,14 @@ public class System
     return mKnownIssues;
   }
 
-  public static String getMacVendor(byte[] mac){
-    if(mac != null && mVendors != null && mac.length >= 3)
+  public static String getMacVendor(byte[] mac) {
+    if (mac != null && mVendors != null && mac.length >= 3)
       return mVendors.get(NetworkHelper.getOUICode(mac));
     else
       return null;
   }
 
-  public static String getProtocolByPort(String port){
+  public static String getProtocolByPort(String port) {
 
     return mPorts.containsKey(port) ? mPorts.get(port) : null;
   }
@@ -1049,12 +1047,12 @@ public class System
     return getProtocolByPort(Integer.toString(port));
   }
 
-  public static int getPortByProtocol(String protocol){
+  public static int getPortByProtocol(String protocol) {
 
     return mServices.containsKey(protocol) ? Integer.parseInt(mServices.get(protocol)) : 0;
   }
 
-  public static Context getContext(){
+  public static Context getContext() {
     return mContext;
   }
 
@@ -1064,9 +1062,10 @@ public class System
 
   /**
    * get a copy of the current targets
+   *
    * @return a copy of the target list
    */
-  public static List<Target> getTargets(){
+  public static List<Target> getTargets() {
     synchronized (mTargets) {
       return new ArrayList<>(mTargets);
     }
@@ -1074,15 +1073,16 @@ public class System
 
   /**
    * add a target to the list keeping it sorted.
+   *
    * @param target the target to add
    * @return true if target is added, false if already present
    */
-  public static boolean addOrderedTarget(Target target){
-    if(target == null)
+  public static boolean addOrderedTarget(Target target) {
+    if (target == null)
       return false;
 
     synchronized (mTargets) {
-      if(mTargets.contains(target)) {
+      if (mTargets.contains(target)) {
         return false;
       }
 
@@ -1100,7 +1100,7 @@ public class System
     }
   }
 
-  public static boolean hasTarget(Target target){
+  public static boolean hasTarget(Target target) {
     synchronized (mTargets) {
       return mTargets.contains(target);
     }
@@ -1110,14 +1110,14 @@ public class System
     mCurrentTarget = target;
   }
 
-  public static Target getCurrentTarget(){
+  public static Target getCurrentTarget() {
     return mCurrentTarget;
   }
 
-  public static Target getTargetByAddress(String address){
+  public static Target getTargetByAddress(String address) {
     try {
       return getTargetByAddress(InetAddress.getByName(address));
-    } catch ( UnknownHostException e) {
+    } catch (UnknownHostException e) {
       Logger.error("cannot convert '" + address + "' to InetAddress: " + e.getMessage());
     }
     return null;
@@ -1130,10 +1130,10 @@ public class System
 
       size = mTargets.size();
 
-      for(i=0;i<size;i++) {
+      for (i = 0; i < size; i++) {
         Target t = mTargets.get(i);
 
-        if(t != null && t.getAddress() != null && t.getAddress().equals(address)) {
+        if (t != null && t.getAddress() != null && t.getAddress().equals(address)) {
           return t;
         }
       }
@@ -1142,41 +1142,40 @@ public class System
     return null;
   }
 
-  public static void registerPlugin(Plugin plugin){
-    if (mPlugins.contains(plugin)){
+  public static void registerPlugin(Plugin plugin) {
+    if (mPlugins.contains(plugin)) {
       Logger.warning("registerPlugin() plugin " + plugin.getName() + " already added");
-    }
-    else
+    } else
       mPlugins.add(plugin);
   }
 
-  public static ArrayList<Plugin> getPlugins(){
+  public static ArrayList<Plugin> getPlugins() {
     return mPlugins;
   }
 
-  public static ArrayList<Plugin> getPluginsForTarget(Target target){
+  public static ArrayList<Plugin> getPluginsForTarget(Target target) {
     ArrayList<Plugin> filtered = new ArrayList<Plugin>();
 
-    if(target != null){
-      for(Plugin plugin : mPlugins)
-        if(plugin.isAllowedTarget(target))
+    if (target != null) {
+      for (Plugin plugin : mPlugins)
+        if (plugin.isAllowedTarget(target))
           filtered.add(plugin);
     }
 
     return filtered;
   }
 
-  public static ArrayList<Plugin> getPluginsForTarget(){
+  public static ArrayList<Plugin> getPluginsForTarget() {
     return getPluginsForTarget(getCurrentTarget());
   }
 
-  public static void setCurrentPlugin(Plugin plugin){
-    Logger.debug( "Setting current plugin : " + mContext.getString( plugin.getName() ) );
+  public static void setCurrentPlugin(Plugin plugin) {
+    Logger.debug("Setting current plugin : " + mContext.getString(plugin.getName()));
 
     mCurrentPlugin = plugin;
   }
 
-  public static Plugin getCurrentPlugin(){
+  public static Plugin getCurrentPlugin() {
     return mCurrentPlugin;
   }
 
@@ -1208,55 +1207,53 @@ public class System
     return getCurrentTarget().getExploits();
   }
 
-  public static String getGatewayAddress(){
+  public static String getGatewayAddress() {
     return mNetwork.getGatewayAddress().getHostAddress();
   }
 
-  public static boolean isForwardingEnabled(){
+  public static boolean isForwardingEnabled() {
     boolean forwarding = false;
     BufferedReader reader;
     String line;
 
-    try{
+    try {
       reader = new BufferedReader(new FileReader(IPV4_FORWARD_FILEPATH));
       line = reader.readLine().trim();
       forwarding = line.equals("1");
 
       reader.close();
 
-    }
-    catch(IOException e){
+    } catch (IOException e) {
       Logger.warning(e.toString());
     }
 
     return forwarding;
   }
 
-  public static void setForwarding(boolean enabled){
+  public static void setForwarding(boolean enabled) {
     Logger.debug("Setting ipv4 forwarding to " + enabled);
 
     String status = (enabled ? "1" : "0"),
-      cmd = "echo " + status + " > " + IPV4_FORWARD_FILEPATH;
+            cmd = "echo " + status + " > " + IPV4_FORWARD_FILEPATH;
 
-    try{
+    try {
       getTools().shell.run(cmd);
-    }
-    catch(Exception e){
+    } catch (Exception e) {
       Logger.error(e.getMessage());
     }
   }
 
-  public static void clean(boolean releaseLocks){
+  public static void clean(boolean releaseLocks) {
     setForwarding(false);
 
-    try{
-      if(releaseLocks){
+    try {
+      if (releaseLocks) {
         Logger.debug("Releasing locks.");
 
-        if(mWifiLock != null && mWifiLock.isHeld())
+        if (mWifiLock != null && mWifiLock.isHeld())
           mWifiLock.release();
 
-        if(mWakeLock != null && mWakeLock.isHeld())
+        if (mWakeLock != null && mWakeLock.isHeld())
           mWakeLock.release();
       }
 
@@ -1276,8 +1273,7 @@ public class System
       Client.Disconnect();
       mCoreInitialized = false;
       Services.getNetworkRadar().onAutoScanChanged();
-    }
-    catch(Exception e){
+    } catch (Exception e) {
       errorLogging(e);
     }
   }

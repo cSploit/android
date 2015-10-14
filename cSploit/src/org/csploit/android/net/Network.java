@@ -27,6 +27,8 @@ import android.net.wifi.WifiManager;
 
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.net.util.SubnetUtils;
+import org.csploit.android.core.Logger;
+import org.csploit.android.core.System;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -45,43 +47,37 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.csploit.android.core.Logger;
-import org.csploit.android.core.System;
-
-public class Network
-{
-  public enum Protocol{
+public class Network {
+  public enum Protocol {
     TCP,
     UDP,
     ICMP,
     IGMP,
     UNKNOWN;
 
-    public static Protocol fromString(String proto){
+    public static Protocol fromString(String proto) {
 
-      if(proto != null){
+      if (proto != null) {
         proto = proto.toLowerCase();
 
-        if(proto.equals("tcp"))
+        if (proto.equals("tcp"))
           return TCP;
 
-        else if(proto.equals("udp"))
+        else if (proto.equals("udp"))
           return UDP;
 
-        else if(proto.equals("icmp"))
+        else if (proto.equals("icmp"))
           return ICMP;
 
-        else if(proto.equals("igmp"))
+        else if (proto.equals("igmp"))
           return IGMP;
       }
 
       return UNKNOWN;
     }
 
-    public String toString()
-    {
-      switch(this)
-      {
+    public String toString() {
+      switch (this) {
         case ICMP:
           return "icmp";
         case IGMP:
@@ -106,7 +102,8 @@ public class Network
   private IP4Address mLocal = null;
   private IP4Address mBase = null;
 
-  /** see http://en.wikipedia.org/wiki/Reserved_IP_addresses
+  /**
+   * see http://en.wikipedia.org/wiki/Reserved_IP_addresses
    */
   private static final String[] PRIVATE_NETWORKS = {
           "10.0.0.0/8",
@@ -115,7 +112,7 @@ public class Network
           "192.168.0.0/16"
   };
 
-  public Network(Context context, String iface) throws SocketException, UnknownHostException{
+  public Network(Context context, String iface) throws SocketException, UnknownHostException {
     mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
     mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     mInfo = mWifiManager.getDhcpInfo();
@@ -125,11 +122,11 @@ public class Network
     mNetmask = getNetmask();
     mBase = new IP4Address(mInfo.netmask & mInfo.gateway);
 
-    if(iface != null){
-      if(initNetworkInterface(iface))
+    if (iface != null) {
+      if (initNetworkInterface(iface))
         return;
     } else {
-      for(String ifname : getAvailableInterfaces()) {
+      for (String ifname : getAvailableInterfaces()) {
         if (initNetworkInterface(ifname)) {
           return;
         }
@@ -139,7 +136,7 @@ public class Network
     throw new NoRouteToHostException("Not connected to any network.");
   }
 
-  public boolean initNetworkInterface (String iface) {
+  public boolean initNetworkInterface(String iface) {
 
     try {
       if (iface == null)
@@ -166,8 +163,7 @@ public class Network
       mBase = new IP4Address(su.getInfo().getNetworkAddress());
 
       return true;
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       Logger.error("Error: " + e.getLocalizedMessage());
     }
 
@@ -177,13 +173,13 @@ public class Network
   private IP4Address getNetmask() throws UnknownHostException {
     IP4Address result = new IP4Address(mInfo.netmask);
 
-    if(System.getSettings().getBoolean("WIDE_SCAN", false)) {
+    if (System.getSettings().getBoolean("WIDE_SCAN", false)) {
       SubnetUtils privateNetwork;
 
-      for(String cidr_notation : PRIVATE_NETWORKS) {
+      for (String cidr_notation : PRIVATE_NETWORKS) {
         privateNetwork = new SubnetUtils(cidr_notation);
 
-        if(privateNetwork.getInfo().isInRange(mLocal.toString())) {
+        if (privateNetwork.getInfo().isInRange(mLocal.toString())) {
           result = new IP4Address(privateNetwork.getInfo().getNetmask());
           break;
         }
@@ -193,7 +189,7 @@ public class Network
     return result;
   }
 
-  public boolean equals(Network network){
+  public boolean equals(Network network) {
     return mInfo.equals(network.getInfo());
   }
 
@@ -201,14 +197,14 @@ public class Network
     byte[] gateway = mGateway.toByteArray();
     byte[] mask = mNetmask.toByteArray();
 
-    for(int i = 0; i < gateway.length; i++)
-      if((gateway[i] & mask[i]) != (address[i] & mask[i]))
+    for (int i = 0; i < gateway.length; i++)
+      if ((gateway[i] & mask[i]) != (address[i] & mask[i]))
         return false;
 
     return true;
   }
 
-  public boolean isInternal(String ip){
+  public boolean isInternal(String ip) {
     try {
       return isInternal(InetAddress.getByName(ip).getAddress());
     } catch (UnknownHostException e) {
@@ -221,78 +217,77 @@ public class Network
     return isInternal(address.getAddress());
   }
 
-  public static boolean isWifiConnected(Context context){
+  public static boolean isWifiConnected(Context context) {
     ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     NetworkInfo info = manager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
     return info != null && info.isConnected() && info.isAvailable();
   }
 
-  public static boolean isConnectivityAvailable(Context context){
+  public static boolean isConnectivityAvailable(Context context) {
     ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     NetworkInfo info = manager.getActiveNetworkInfo();
 
     return info != null && info.isConnected();
   }
 
-  public boolean isConnected(){
+  public boolean isConnected() {
     return isIfaceConnected(mInterface);
   }
 
-  public String getSSID(){
+  public String getSSID() {
     String res = mWifiInfo.getSSID();
     return res.equals("<unknown ssid>") ? "" : res;
   }
 
-  public int getNumberOfAddresses(){
+  public int getNumberOfAddresses() {
     return IP4Address.ntohl(~mNetmask.toInteger());
   }
 
-  public IP4Address getStartAddress(){
+  public IP4Address getStartAddress() {
     return mBase;
   }
 
-  public String getNetworkMasked(){
+  public String getNetworkMasked() {
     SubnetUtils sub = new SubnetUtils(mLocal.toString(), mNetmask.toString());
     return sub.getInfo().getNetworkAddress();
   }
 
-  public String getNetworkRepresentation(){
+  public String getNetworkRepresentation() {
     return getNetworkMasked() + "/" + mNetmask.getPrefixLength();
   }
 
-  public DhcpInfo getInfo(){
+  public DhcpInfo getInfo() {
     return mInfo;
   }
 
-  public InetAddress getNetmaskAddress(){
+  public InetAddress getNetmaskAddress() {
     return mNetmask.toInetAddress();
   }
 
-  public InetAddress getGatewayAddress(){
+  public InetAddress getGatewayAddress() {
     return mGateway.toInetAddress();
   }
 
-  public byte[] getGatewayHardware(){
+  public byte[] getGatewayHardware() {
     return Endpoint.parseMacAddress(mWifiInfo.getBSSID());
   }
 
-  public byte[] getLocalHardware(){
-    try{
+  public byte[] getLocalHardware() {
+    try {
       return mInterface.getHardwareAddress();
-    }
-    catch(SocketException e){
+    } catch (SocketException e) {
       System.errorLogging(e);
     }
 
     return null;
   }
 
-  public String getLocalAddressAsString(){
+  public String getLocalAddressAsString() {
     return mLocal.toString();
   }
 
-  public InetAddress getLocalAddress(){
+  public InetAddress getLocalAddress() {
     return mLocal.toInetAddress();
   }
 
@@ -320,12 +315,12 @@ public class Network
       System.errorLogging(e);
     }
 
-    if(interfaces == null)
+    if (interfaces == null)
       return Collections.emptyList();
 
     result = new ArrayList<>();
 
-    while(interfaces.hasMoreElements()) {
+    while (interfaces.hasMoreElements()) {
       NetworkInterface iface = interfaces.nextElement();
       if (isIfaceConnected(iface)) {
         result.add(iface.getDisplayName());
@@ -335,11 +330,11 @@ public class Network
     return result;
   }
 
-  public NetworkInterface getInterface(){
+  public NetworkInterface getInterface() {
     return mInterface;
   }
 
-  public String getSystemGateway (String iface) {
+  public String getSystemGateway(String iface) {
     Pattern pattern = Pattern.compile(String.format("^%s\\t+00000000\\t+([0-9A-F]{8})", iface), Pattern.CASE_INSENSITIVE);
     BufferedReader reader = null;
     String line;
@@ -347,17 +342,17 @@ public class Network
     try {
       reader = new BufferedReader(new InputStreamReader(new FileInputStream("/proc/net/route")));
 
-      while((line = reader.readLine()) != null) {
+      while ((line = reader.readLine()) != null) {
         Matcher matcher = pattern.matcher(line);
-        if(!matcher.find()) {
+        if (!matcher.find()) {
           continue;
         }
         String rawAddress = matcher.group(1);
         StringBuilder sb = new StringBuilder();
-        for(int i = 6;; i-=2) {
-          String part = rawAddress.substring(i, i+2);
-          sb.append(Integer.parseInt(part,16));
-          if(i>0) {
+        for (int i = 6; ; i -= 2) {
+          String part = rawAddress.substring(i, i + 2);
+          sb.append(Integer.parseInt(part, 16));
+          if (i > 0) {
             sb.append('.');
           } else {
             break;
