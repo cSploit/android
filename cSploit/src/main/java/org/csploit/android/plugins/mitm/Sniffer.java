@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.FileObserver;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -50,6 +51,7 @@ import org.csploit.android.plugins.mitm.SpoofSession.OnSessionReadyListener;
 import org.csploit.android.tools.TcpDump;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -79,6 +81,7 @@ public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClic
   private boolean mDumpToFile = false;
   private String mPcapFileName = null;
   private Child mTcpdumpProcess = null;
+  private FileObserver mFileActivity = null;
 
   public class AddressStats implements Comparable<AddressStats>{
     public String mAddress = "";
@@ -402,6 +405,14 @@ public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClic
       mTcpdumpProcess.kill();
       mTcpdumpProcess = null;
     }
+
+    if(mDumpToFile) {
+      if (mFileActivity != null) {
+        mFileActivity.stopWatching();
+        mFileActivity = null;
+      }
+    }
+
     Sniffer.this.runOnUiThread(new Runnable() {
       @Override
       public void run() {
@@ -411,6 +422,44 @@ public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClic
 
         mRunning = false;
         mSniffToggleButton.setChecked(false);
+      }
+    });
+  }
+
+  private void addNewTarget (final AddressStats stats){
+    Sniffer.this.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        mAdapter.addStats(stats);
+        mAdapter.notifyDataSetChanged();
+      }
+    });
+  }
+
+  private void updateStats (final AddressStats stats, final long len){
+    Sniffer.this.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        long deltat;
+        stats.mBytes += len;
+
+        deltat = (java.lang.System.currentTimeMillis() - stats.mSampledTime);
+
+        if (deltat >= mSampleTime) {
+          stats.mBandwidth = (stats.mBytes - stats.mSampledBytes) / deltat;
+          stats.mSampledTime = java.lang.System.currentTimeMillis();
+          stats.mSampledBytes = stats.mBytes;
+        }
+        mAdapter.notifyDataSetChanged();
+      }
+    });
+  }
+
+  private void showMessage (final String text){
+    Sniffer.this.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        Toast.makeText(Sniffer.this, text, Toast.LENGTH_LONG).show();
       }
     });
   }
@@ -425,10 +474,59 @@ public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClic
     });
   }
 
-  private void setStartedState(){
+  /**
+   * Monitor a pcap file for changes, in order to let the user know that the capture is running.
+   */
+  private void startMonitoringPcapFile(){
+    final String str_address = (System.getCurrentTarget().getType() == Target.Type.NETWORK) ? System.getCurrentTarget().getDisplayAddress().split("/")[0] : System.getCurrentTarget().getDisplayAddress();
 
-    if(mDumpToFile)
-      Toast.makeText(Sniffer.this, getString(R.string.dumping_traffic_to) + mPcapFileName, Toast.LENGTH_SHORT).show();
+    final File pcapfile = new File(mPcapFileName);
+    try{
+      pcapfile.createNewFile();
+    }catch(IOException io)
+    {
+      Toast.makeText(this, "File not created: " + io.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+      return;
+    }
+
+    mFileActivity = new FileObserver(mPcapFileName) {
+      @Override
+      public void onEvent(int event, String s) {
+        switch (event){
+          case FileObserver.CLOSE_WRITE:
+            showMessage(getString(R.string.saved) + ":\n" + mPcapFileName);
+            break;
+          case FileObserver.MODIFY:
+
+            AddressStats stats = mAdapter.getStats(str_address);
+            updateStats(stats, pcapfile.length());
+            break;
+          case FileObserver.OPEN:
+            showMessage(getString(R.string.dumping_traffic_to) + mPcapFileName);
+            break;
+          default:
+            break;
+        }
+      }
+    };
+    final AddressStats stats = new AddressStats(str_address);
+    stats.mBytes = 0;
+    stats.mSampledTime = java.lang.System.currentTimeMillis();
+    addNewTarget(stats);
+    // android docs: The monitored file or directory must exist at this time,or else no events will be reported
+    mFileActivity.startWatching();
+  }
+
+  private void setStartedState(){
+    if (mRunning)
+      setStoppedState();
+
+    if(mDumpToFile) {
+      mSampleTime = 100;
+      startMonitoringPcapFile();
+    }
+    else
+      mSampleTime = 1000;
 
     try {
       mSpoofSession.start(new OnSessionReadyListener(){
@@ -453,7 +551,6 @@ public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClic
               @Override
               public void onPacket(InetAddress src, InetAddress dst, int len) {
               long now = java.lang.System.currentTimeMillis();
-              long deltat;
               AddressStats stats = null;
               String stringAddress = null;
 
@@ -472,25 +569,11 @@ public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClic
                 stats.mBytes = len;
                 stats.mSampledTime = now;
               } else {
-                stats.mBytes += len;
-
-                deltat = (now - stats.mSampledTime);
-
-                if (deltat >= mSampleTime) {
-                  stats.mBandwidth = (stats.mBytes - stats.mSampledBytes) / deltat;
-                  stats.mSampledTime = java.lang.System.currentTimeMillis();
-                  stats.mSampledBytes = stats.mBytes;
-                }
+                updateStats(stats, len);
               }
 
               final AddressStats fstats = stats;
-              Sniffer.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                  mAdapter.addStats(fstats);
-                  mAdapter.notifyDataSetChanged();
-                }
-              });
+              addNewTarget(fstats);
               }
             });
           } catch( ChildManager.ChildNotStartedException e ) {
