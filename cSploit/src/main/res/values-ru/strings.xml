@@ -490,4 +490,8 @@
     <string name="mitm_ss_select_target_title">Выбрать цель</string>
     <string name="mitm_ss_select_target_prompt">Выбрать %s ?</string>
     <string name="issue_message"><![CDATA[<p>Перед открытием новой проблемы поищите посмотрите список в <a href="%1$s">открытых проблем</a>, возможно она уже открыта. Если нету сообщения о проблеме нам нужны как можно больше данных, так что пожайлуста прочитайте <a href="%2$s">это руководство</a>, чтобы знать как правильно сообщить о баге.</p>]]></string>
+    <string name="connection_lost">соединение потеряно</string>
+    <string name="connection_lost_prompt">удалить текущую сессию и начать другую?</string>
+    <string name="any_interface">любой интерфейс</string>
+    <string name="error_initializing_interface">Ошибка инициализации %s</string>
 </resources>
