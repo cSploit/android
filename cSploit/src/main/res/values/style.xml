@@ -11,6 +11,8 @@
         <item name="colorAccent">@color/selectable_blue</item>
         <item name="actionModeBackground">@color/app_color_dark</item>
         <item name="colorControlHighlight">@color/selectable_blue</item>
+        <item name="android:colorBackground">@color/background_window</item>
+        <item name="android:animation">@style/AppAnimation</item>
     </style>
 
     <!-- this dark theme needs a lot of help and support in the app overall -->
@@ -26,6 +28,7 @@
         <item name="colorControlHighlight">@color/selectable_blue_dark</item>
         <item name="android:windowBackground">@color/background_window_dark</item>
         <item name="android:colorBackground">#ff21272b</item>
+        <item name="android:animation">@style/AppAnimation</item>
     </style>
 
     <style name="PrefsTheme" parent="AppTheme">
@@ -46,4 +49,8 @@
 
     <style name="Theme.Dialog" parent="@android:style/Theme.Dialog" />
 
+    <style name="AppAnimation" parent="android:Animation.Dialog">
+        <item name="android:inAnimation">@anim/fadein</item>
+        <item name="android:outAnimation">@anim/fadein</item>
+    </style>
 </resources>

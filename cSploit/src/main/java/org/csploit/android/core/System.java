@@ -40,7 +40,7 @@ import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.apache.commons.compress.utils.IOUtils;
 import org.csploit.android.R;
-import org.csploit.android.WifiScannerActivity;
+import org.csploit.android.WifiScannerFragment;
 import org.csploit.android.gui.dialogs.FatalDialog;
 import org.csploit.android.helpers.NetworkHelper;
 import org.csploit.android.helpers.ThreadHelper;
@@ -387,7 +387,7 @@ public class System {
     if (!mNetwork.isConnected()) {
 
       Intent intent = new Intent();
-      intent.putExtra(WifiScannerActivity.CONNECTED, false);
+      intent.putExtra(WifiScannerFragment.CONNECTED, false);
       current.setResult(Activity.RESULT_OK, intent);
 
       String title = current.getString(R.string.error);

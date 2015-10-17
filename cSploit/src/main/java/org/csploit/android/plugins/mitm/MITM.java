@@ -42,6 +42,7 @@ import android.widget.Toast;
 
 import org.csploit.android.R;
 import org.csploit.android.SettingsActivity;
+import org.csploit.android.SettingsFragment;
 import org.csploit.android.core.Child;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Logger;
@@ -302,7 +303,7 @@ public class MITM extends Plugin
           new ErrorDialog(getString(R.string.error), getString(R.string.unexpected_file_error) + e.getMessage(), MITM.this).show();
         }
       }
-    } else if(request == SettingsActivity.SETTINGS_DONE){
+    } else if(request == SettingsFragment.SETTINGS_DONE){
       new CheckForOpenPortsTask().execute();
     }
   }
@@ -336,7 +337,7 @@ public class MITM extends Plugin
         new ConfirmDialog( getString(R.string.warning), mMessage, MITM.this, new ConfirmDialogListener(){
           @Override
           public void onConfirm(){
-            startActivityForResult(new Intent(MITM.this, SettingsActivity.class), SettingsActivity.SETTINGS_DONE);
+            startActivityForResult(new Intent(MITM.this, SettingsActivity.class), SettingsFragment.SETTINGS_DONE);
           }
 
           @Override
