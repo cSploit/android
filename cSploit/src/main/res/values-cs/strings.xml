@@ -1,4 +1,5 @@
 <resources>
+    <string name="app_name" translatable="false">cSploit</string>
     <string name="menu_settings">Nastavení</string>
     <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Ooooops! Něco je špatně, ale zpráva bude odeslána mému vývojáři pro opravu chyby:)
@@ -7,6 +8,7 @@
     <string name="enter_redirection_details">Vyplňte přesměrovací údaje:</string>
     <string name="address">Adresa</string>
     <string name="port">Port</string>
+    <string name="ports">Porty</string>
     <string name="target">Cíl</string>
     <string name="unknown">neznámé</string>
     <string name="services">Služby</string>
@@ -23,6 +25,7 @@
     <string name="protocol">Protokol</string>
     <string name="csploit_catchphrase">cSploit - An Android network penetration suite.</string>
     <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
+    <string name="csploit_url" translatable="false">http://www.csploit.org/</string>
     <string name="disclaimer">Záruka</string>
     <string name="csploit_disclaimer">
         <![CDATA[Tato aplikace byla vytvořena pouze za účelem demonstrace jejích funkcí a může být použita pouze na sítích do kterých máte právo zasahovat. Za jiné použití vývojář nezodpovídá. Jinými slovy, nebuďte hloupí a neštvěte zlé lidi proti mě.]]></string>
@@ -79,7 +82,8 @@
     <string name="close_confirm">Opravdu zavřít?
     </string>
     <string name="press_back">Pro ukončení aplikace stiskněte znovu ZPĚT</string>
-    <string name="selected_">Vybráno&#160;</string>
+    <string name="selected_">Vybráno: &#160;</string>
+    <string name="github_new_issue_url" translatable="false">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">Na SD kartě nebyl nalezen žádný spoubor ze sezení</string>
     <string name="select_session_file">Vyberte soubor ze sezení na SD kartě :</string>
     <string name="select_session">Vyberte sezení</string>
@@ -293,6 +297,9 @@
     <string name="menu_submit_issue">Odeslat zprávu o chybě</string>
     <string name="menu_about">O aplikaci</string>
 
+    <string name="iface_dialog_title">Vyberte síťové rozhraní</string>
+    <string name="iface_error_no_available">Nejsou dostupná žádná síťová rozhraní</string>
+
     <string name="scanner_select_ports">Vyberte vlastní porty</string>
 
     <string name="wifi_initializing">Připravuji &#8230;</string>
@@ -371,6 +378,8 @@
     <string name="pref_folder">Složka</string>
     <string name="pref_msf_enable">Povolit MSF</string>
     <string name="pref_msf_enable_desc">Povolit the Metasploit Framework</string>
+    <string name="pref_msf_notifications">Upozornění o stavu MSF</string>
+	<string name="pref_msf_notifications_desc">Zobrazit stav připojení MSF RPC</string>
     <string name="pref_msf_delete">Odtranit MSF</string>
     <string name="pref_msf_delete_desc">Odstranit Metasploit Framework z vašeho zařízení</string>
     <string name="pref_msfwipe_message">Přejete si skutečně odstranit Metasploit Framework?</string>
@@ -385,9 +394,12 @@
     <string name="pref_err_buffer_size">Velikost Bufferu musí být mezi 1024 a 104857600.</string>
     <string name="pref_persistent_network_monitor">stálé sledování sítě</string>
     <string name="pref_persistent_network_monitor_desc">nechat monitor sítě sledovat síť</string>
+    <string name="pref_auto_portscan">Automatický sken portů</string>
+    <string name="pref_auto_portscan_desc">Vždy provést SYN sken k nalezení otevřených portů, když je objeven nový hostitel</string>
 
     <string name="exploit_finder">Hledač Exploitů</string>
     <string name="exploit_finder_desc">Hledat chyby které souhlasí se slabinami</string>
+    <string name="exploit_launch_all">Spustit vše</string>
     <string name="sessions">Sezení</string>
     <string name="sessions_desc">Sezení na PWNutém cíly.</string>
     <string name="exploit_launch">Spustit</string>
@@ -489,4 +501,12 @@
     <string name="msf_rank_good">Dobrý</string>
     <string name="msf_rank_great">Skvělý</string>
     <string name="msf_rank_excellent">Excellentní</string>
+    <string name="mitm_ss_select_target_title">Zvolte cíl</string>
+    <string name="mitm_ss_select_target_prompt">Zvolit %s ?</string>
+    <string name="github_issues_url" translatable="false">https://github.com/cSploit/android/issues</string>
+    <string name="issue_message"><![CDATA[<p>Před nahlášením nového problému se, prosím, podívejte na již sepsané <a href="%1$s">otevřené problémy</a>, pravděpodobně byl již někým nahlášen. Pokud ještě nhlášen nebyl, budeme potřebovat co nejvíce informací, které můžete sehnat, takže si, prosím, přečtěte <a href="%2$s">tuto příručku</a>, kde se dozvíte, jak správně ohlásit Váš problém.</p>]]></string>
+    <string name="connection_lost">připojení ztraceno</string>
+    <string name="connection_lost_prompt">smazat aktuální sezení a začít nové?</string>
+    <string name="any_interface">jakékoliv rozhraní</string>
+    <string name="error_initializing_interface">Chyba při načítání %s</string>
 </resources>
