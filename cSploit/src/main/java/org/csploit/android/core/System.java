@@ -196,19 +196,28 @@ public class System {
       // initialize network data at the end
       uncaughtReloadNetworkMapping();
 
-      ThreadHelper.getSharedExecutor().execute(new Runnable() {
-        @Override
-        public void run() {
-          preloadVendors();
-          preloadServices();
-        }
-      });
+      if(isCoreInstalled())
+        beginLoadServicesAndVendors();
     } catch (Exception e) {
       if (!(e instanceof NoRouteToHostException))
         errorLogging(e);
 
       throw e;
     }
+  }
+
+  private static void beginLoadServicesAndVendors() {
+    ThreadHelper.getSharedExecutor().execute(new Runnable() {
+      @Override
+      public void run() {
+        preloadVendors();
+        preloadServices();
+      }
+    });
+  }
+
+  public static void onCoreInstalled() {
+    beginLoadServicesAndVendors();
   }
 
   public static void reloadTools() {

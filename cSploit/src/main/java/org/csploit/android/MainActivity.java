@@ -150,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
   }
 
   private void onCoreUpdated() {
+    System.onCoreInstalled();
     MainActivity.this.runOnUiThread(new Runnable() {
       @Override
       public void run() {
