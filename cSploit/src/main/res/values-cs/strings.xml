@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">cSploit</string>
     <string name="menu_settings">Nastavení</string>
     <string name="title_activity_main">cSploit</string>
     <string name="crash_toast_text">Ooooops! Něco je špatně, ale zpráva bude odeslána mému vývojáři pro opravu chyby:)
@@ -25,7 +24,6 @@
     <string name="protocol">Protokol</string>
     <string name="csploit_catchphrase">cSploit - An Android network penetration suite.</string>
     <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
-    <string name="csploit_url" translatable="false">http://www.csploit.org/</string>
     <string name="disclaimer">Záruka</string>
     <string name="csploit_disclaimer">
         <![CDATA[Tato aplikace byla vytvořena pouze za účelem demonstrace jejích funkcí a může být použita pouze na sítích do kterých máte právo zasahovat. Za jiné použití vývojář nezodpovídá. Jinými slovy, nebuďte hloupí a neštvěte zlé lidi proti mě.]]></string>
@@ -83,7 +81,6 @@
     </string>
     <string name="press_back">Pro ukončení aplikace stiskněte znovu ZPĚT</string>
     <string name="selected_">Vybráno: &#160;</string>
-    <string name="github_new_issue_url" translatable="false">https://github.com/cSploit/android/issues/new</string>
     <string name="no_session_found">Na SD kartě nebyl nalezen žádný spoubor ze sezení</string>
     <string name="select_session_file">Vyberte soubor ze sezení na SD kartě :</string>
     <string name="select_session">Vyberte sezení</string>
@@ -503,7 +500,6 @@
     <string name="msf_rank_excellent">Excellentní</string>
     <string name="mitm_ss_select_target_title">Zvolte cíl</string>
     <string name="mitm_ss_select_target_prompt">Zvolit %s ?</string>
-    <string name="github_issues_url" translatable="false">https://github.com/cSploit/android/issues</string>
     <string name="issue_message"><![CDATA[<p>Před nahlášením nového problému se, prosím, podívejte na již sepsané <a href="%1$s">otevřené problémy</a>, pravděpodobně byl již někým nahlášen. Pokud ještě nhlášen nebyl, budeme potřebovat co nejvíce informací, které můžete sehnat, takže si, prosím, přečtěte <a href="%2$s">tuto příručku</a>, kde se dozvíte, jak správně ohlásit Váš problém.</p>]]></string>
     <string name="connection_lost">připojení ztraceno</string>
     <string name="connection_lost_prompt">smazat aktuální sezení a začít nové?</string>
