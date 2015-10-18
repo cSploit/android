@@ -280,6 +280,8 @@ public class MainActivity extends AppCompatActivity {
   }
 
   private void onCoreUpdated() {
+    System.onCoreInstalled();
+
     if (startCore()) {
       onCoreBeating();
     } else if (isRootMissing) {
