@@ -323,7 +323,7 @@ public class Network {
     while (interfaces.hasMoreElements()) {
       NetworkInterface iface = interfaces.nextElement();
       if (isIfaceConnected(iface)) {
-        result.add(iface.getDisplayName());
+        result.add(iface.getName());
       }
     }
 
