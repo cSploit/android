@@ -888,16 +888,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void clearSelection() {
-      for (Target t : list)
-        t.setSelected(false);
+      synchronized (this) {
+        for (Target t : list)
+          t.setSelected(false);
+      }
       notifyDataSetChanged();
       if (mActionMode != null)
         mActionMode.finish();
     }
 
     public void toggleSelection(int position) {
-      Target t = list.get(position);
-      t.setSelected(!t.isSelected());
+      synchronized (this) {
+        Target t = list.get(position);
+        t.setSelected(!t.isSelected());
+      }
       notifyDataSetChanged();
       if (mActionMode != null) {
         if (getSelectedCount() > 0)
@@ -909,27 +913,34 @@ public class MainActivity extends AppCompatActivity {
 
     public int getSelectedCount() {
       int i = 0;
-      for (Target t : list)
-        if (t.isSelected())
-          i++;
+      synchronized (this) {
+        for (Target t : list)
+          if (t.isSelected())
+            i++;
+      }
       return i;
     }
 
     public ArrayList<Target> getSelected() {
       ArrayList<Target> result = new ArrayList<Target>();
-      for (Target t : list)
-        if (t.isSelected())
-          result.add(t);
+      synchronized (this) {
+        for (Target t : list)
+          if (t.isSelected())
+            result.add(t);
+      }
       return result;
     }
 
     public int[] getSelectedPositions() {
-      int[] res = new int[getSelectedCount()];
+      int[] res;
       int j = 0;
 
-      for (int i = 0; i < list.size(); i++)
-        if (list.get(i).isSelected())
-          res[j++] = i;
+      synchronized (this) {
+        res = new int[getSelectedCount()];
+        for (int i = 0; i < list.size(); i++)
+          if (list.get(i).isSelected())
+            res[j++] = i;
+      }
       return res;
     }
 
@@ -949,13 +960,17 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
           if(lv == null)
             return;
-          int start = lv.getFirstVisiblePosition();
-          for(int i=start, j=lv.getLastVisiblePosition();i<=j;i++)
-            if(target==list.get(i)){
-              View view = lv.getChildAt(i-start);
-              getView(i, view, lv);
-              break;
-            }
+
+          synchronized (this) {
+            int start = lv.getFirstVisiblePosition();
+            int end = Math.min(lv.getLastVisiblePosition(), list.size());
+            for (int i = start; i <= end; i++)
+              if (target == list.get(i)) {
+                View view = lv.getChildAt(i - start);
+                getView(i, view, lv);
+                break;
+              }
+          }
         }
       });
 
@@ -963,7 +978,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void run() {
-      list = System.getTargets();
+      synchronized (this) {
+        list = System.getTargets();
+      }
       notifyDataSetChanged();
     }
 
