@@ -5,18 +5,6 @@
     android:orientation="vertical"
     android:padding="8dp">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/traceToggleButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="20dp"
-        android:src="@drawable/ic_play_arrow_24dp"
-        android:checked="false"
-        android:translationZ="8dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_margin="20dp" />
-
     <ListView
         android:id="@+id/traceListView"
         android:layout_width="match_parent"
@@ -31,5 +19,17 @@
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/traceListView"
         android:visibility="invisible" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/traceToggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:src="@drawable/ic_play_arrow_24dp"
+        android:checked="false"
+        android:translationZ="8dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="20dp" />
 
 </RelativeLayout>
