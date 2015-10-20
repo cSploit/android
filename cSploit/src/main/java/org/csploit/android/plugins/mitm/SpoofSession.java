@@ -89,12 +89,16 @@ public class SpoofSession
       }
     }
 
-    mArpSpoofProcess = System.getTools().arpSpoof.spoof(target, new ArpSpoof.ArpSpoofReceiver() {
-      @Override
-      public void onError(String line) {
-        listener.onError(line, 0);
-      }
-    });
+    if(System.getNetwork().haveGateway()) {
+      mArpSpoofProcess = System.getTools().arpSpoof.spoof(target, new ArpSpoof.ArpSpoofReceiver() {
+        @Override
+        public void onError(String line) {
+          listener.onError(line, 0);
+        }
+      });
+    } else {
+      mArpSpoofProcess = null;
+    }
 
     System.setForwarding(true);
 
@@ -112,13 +116,17 @@ public class SpoofSession
 
     this.stop();
 
-    mArpSpoofProcess =
-    System.getTools().arpSpoof.spoof(target, new ArpSpoof.ArpSpoofReceiver() {
-      @Override
-      public void onError(String line) {
-        SpoofSession.this.stop();
-      }
-    });
+    if(System.getNetwork().haveGateway()) {
+      mArpSpoofProcess =
+              System.getTools().arpSpoof.spoof(target, new ArpSpoof.ArpSpoofReceiver() {
+                @Override
+                public void onError(String line) {
+                  SpoofSession.this.stop();
+                }
+              });
+    } else {
+      mArpSpoofProcess = null;
+    }
 
     //System.setForwarding(true);
 
@@ -133,15 +141,18 @@ public class SpoofSession
 
   public void start(final OnDNSSpoofedReceiver listener) throws ChildManager.ChildNotStartedException {
 
-    mArpSpoofProcess =
-            System.getTools().arpSpoof.spoof(System.getCurrentTarget(), new ArpSpoof.ArpSpoofReceiver() {
-              @Override
-              public void onError(String line) {
-                SpoofSession.this.stop();
-                listener.onError(line);
-              }
-            });
-
+    if(System.getNetwork().haveGateway()) {
+      mArpSpoofProcess =
+              System.getTools().arpSpoof.spoof(System.getCurrentTarget(), new ArpSpoof.ArpSpoofReceiver() {
+                @Override
+                public void onError(String line) {
+                  SpoofSession.this.stop();
+                  listener.onError(line);
+                }
+              });
+    } else {
+      mArpSpoofProcess = null;
+    }
 
     try {
       mEttercapProcess = System.getTools().ettercap.dnsSpoof(System.getCurrentTarget(), listener);

@@ -55,13 +55,15 @@ public class ArpSpoof extends Tool
     String commandLine = "";
 
     try{
+      String gw = System.getNetwork().getGatewayAddress().getHostAddress();
+      String iface = System.getNetwork().getInterface().getDisplayName();
+
       if(target.getType() == Type.NETWORK)
-        commandLine = "-i " + System.getNetwork().getInterface().getDisplayName() + " " + System.getGatewayAddress();
+        commandLine = "-i " + iface + " " + gw;
 
       else
-        commandLine = "-i " + System.getNetwork().getInterface().getDisplayName() + " -t " + target.getCommandLineRepresentation() + " " + System.getGatewayAddress();
-    }
-    catch(Exception e){
+        commandLine = "-i " + iface + " -t " + target.getCommandLineRepresentation() + " " + gw;
+    } catch(Exception e) {
       System.errorLogging(e);
     }
 
