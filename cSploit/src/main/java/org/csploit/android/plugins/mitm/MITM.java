@@ -96,16 +96,22 @@ public class MITM extends Plugin
     public String name;
     public String description;
     public OnClickListener listener;
+    public ActionEnabler enabler;
 
-    public Action(String name, String description, int resourceId, OnClickListener listener){
+    public Action(String name, String description, int resourceId, OnClickListener listener, ActionEnabler enabler){
       this.resourceId = resourceId;
       this.name = name;
       this.description = description;
       this.listener = listener;
+      this.enabler = enabler;
     }
 
     public Action(String name, String description, OnClickListener listener){
-      this(name, description, R.drawable.action_plugin, listener);
+      this(name, description, R.drawable.action_plugin, listener, null);
+    }
+
+    public interface ActionEnabler {
+      boolean isEnabled();
     }
   }
 
@@ -139,11 +145,11 @@ public class MITM extends Plugin
         if (getSharedPreferences("THEME", 0).getBoolean("isDark", false))
             row.setBackgroundResource(R.drawable.card_background_dark);
         holder = new ActionHolder();
-        holder.icon = (ImageView) (row != null ? row.findViewById(R.id.actionIcon) : null);
-        holder.name = (TextView) (row != null ? row.findViewById(R.id.itemName) : null);
-        holder.description = (TextView) (row != null ? row.findViewById(R.id.itemDescription) : null);
-        holder.activity = (ProgressBar) (row != null ? row.findViewById(R.id.itemActivity) : null);
-        if(row != null) row.setTag(holder);
+        holder.icon = (ImageView) row.findViewById(R.id.actionIcon);
+        holder.name = (TextView) row.findViewById(R.id.itemName);
+        holder.description = (TextView) row.findViewById(R.id.itemDescription);
+        holder.activity = (ProgressBar) row.findViewById(R.id.itemActivity);
+        row.setTag(holder);
 
       } else holder = (ActionHolder) row.getTag();
 
@@ -153,7 +159,8 @@ public class MITM extends Plugin
       holder.name.setText(action.name);
       holder.description.setText(action.description);
 
-      if(row != null) row.setOnClickListener(action.listener);
+      row.setOnClickListener(action.listener);
+      row.setEnabled(action.enabler == null || action.enabler.isEnabled());
 
       return row;
     }
@@ -443,7 +450,7 @@ public class MITM extends Plugin
                                 );
                         overridePendingTransition(R.anim.fadeout, R.anim.fadein);
                       }
-                    }));
+                    }, null));
 
     mActions.add(new Action
     (
@@ -453,7 +460,7 @@ public class MITM extends Plugin
       new OnClickListener(){
         @Override
         public void onClick(View v){
-          if(System.checkNetworking(MITM.this) == false)
+          if(!System.checkNetworking(MITM.this))
             return;
 
           setStoppedState();
@@ -468,7 +475,7 @@ public class MITM extends Plugin
             );
           overridePendingTransition(R.anim.fadeout, R.anim.fadein);
         }
-      }));
+      }, null));
 
 
       mActions.add(new Action
@@ -479,7 +486,7 @@ public class MITM extends Plugin
                new OnClickListener() {
                @Override
                public void onClick(View v) {
-                    if (System.checkNetworking(MITM.this) == false)
+                    if (!System.checkNetworking(MITM.this))
                        return;
 
                setStoppedState();
@@ -494,7 +501,7 @@ public class MITM extends Plugin
                );
                  overridePendingTransition(R.anim.fadeout, R.anim.fadein);
                           }
-      }));
+      }, null));
 
     mActions.add(new Action
     (
@@ -504,7 +511,7 @@ public class MITM extends Plugin
       new OnClickListener(){
         @Override
         public void onClick(View v){
-          if(System.checkNetworking(MITM.this) == false)
+          if (!System.checkNetworking(MITM.this))
             return;
 
           setStoppedState();
@@ -519,7 +526,7 @@ public class MITM extends Plugin
             );
           overridePendingTransition(R.anim.fadeout, R.anim.fadein);
         }
-      }));
+      }, null));
 
     mActions.add(new Action
     (
@@ -529,19 +536,21 @@ public class MITM extends Plugin
       new OnClickListener(){
         @Override
         public void onClick(View v){
-          if(System.checkNetworking(MITM.this) == false)
+          if (!System.checkNetworking(MITM.this))
             return;
 
           final ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);
 
           if(activity.getVisibility() == View.INVISIBLE){
-            if(System.getCurrentTarget().getType() != Target.Type.ENDPOINT)
+            if (System.getCurrentTarget().getType() != Target.Type.ENDPOINT) {
               new ErrorDialog(getString(R.string.error), getString(R.string.mitm_connection_kill_error), MITM.this).show();
-
-            else{
+            } else if(!System.getNetwork().haveGateway() && !System.getNetwork().isTetheringEnabled()) {
+              new ErrorDialog(getString(R.string.error), "Connection killer requires a gateway or active Tethering", MITM.this).show();
+            } else {
               setStoppedState();
 
               try {
+                if(System.getNetwork().haveGateway()) {
                 mConnectionKillerProcess = System.getTools().arpSpoof.spoof(System.getCurrentTarget(), new ArpSpoof.ArpSpoofReceiver() {
 
                   @Override
@@ -561,6 +570,10 @@ public class MITM extends Plugin
                     });
                   }
                 });
+                } else {
+                  mConnectionKillerProcess = null;
+                  System.setForwarding(false);
+                }
 
                 activity.setVisibility(View.VISIBLE);
 
@@ -576,10 +589,19 @@ public class MITM extends Plugin
               mConnectionKillerProcess = null;
             }
 
+            if(!System.getNetwork().haveGateway() && System.getNetwork().isTetheringEnabled()) {
+              System.setForwarding(true);
+            }
+
             activity.setVisibility(View.INVISIBLE);
           }
         }
-      }));
+      }, new Action.ActionEnabler() {
+      @Override
+      public boolean isEnabled() {
+        return System.getNetwork().haveGateway() || System.getNetwork().isTetheringEnabled();
+      }
+    }));
 
     mActions.add(new Action
     (
@@ -644,7 +666,7 @@ public class MITM extends Plugin
           } else
             setStoppedState();
         }
-      }));
+      }, null));
 
     mActions.add(new Action
     (
@@ -746,7 +768,7 @@ public class MITM extends Plugin
             setStoppedState();
           }
         }
-      }));
+      }, null));
 
     mActions.add(new Action
     (
@@ -826,7 +848,7 @@ public class MITM extends Plugin
           } else
             setStoppedState();
         }
-      }));
+      }, null));
 
     mActions.add(new Action
     (
@@ -836,7 +858,7 @@ public class MITM extends Plugin
       new OnClickListener(){
         @Override
         public void onClick(View v){
-          if(System.checkNetworking(MITM.this) == false)
+          if(!System.checkNetworking(MITM.this))
             return;
 
           final ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);
@@ -913,7 +935,7 @@ public class MITM extends Plugin
             setStoppedState();
           }
         }
-      }));
+      }, null));
 
     mActions.add(new Action
     (
@@ -922,7 +944,7 @@ public class MITM extends Plugin
       new OnClickListener(){
       @Override
       public void onClick(View v){
-        if(System.checkNetworking(MITM.this) == false)
+        if(!System.checkNetworking(MITM.this))
           return;
 
         final ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);

@@ -34,6 +34,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
@@ -101,6 +102,7 @@ public class Network {
   private IP4Address mNetmask = null;
   private IP4Address mLocal = null;
   private IP4Address mBase = null;
+  private Method mTetheredIfacesMethod = null;
 
   /**
    * see http://en.wikipedia.org/wiki/Reserved_IP_addresses
@@ -121,6 +123,7 @@ public class Network {
     mGateway = new IP4Address(mInfo.gateway);
     mNetmask = getNetmask();
     mBase = new IP4Address(mInfo.netmask & mInfo.gateway);
+    mTetheredIfacesMethod = getTetheredIfacesMethod(mConnectivityManager);
 
     if (iface != null) {
       if (initNetworkInterface(iface))
@@ -134,6 +137,15 @@ public class Network {
     }
 
     throw new NoRouteToHostException("Not connected to any network.");
+  }
+
+  private static Method getTetheredIfacesMethod(ConnectivityManager connectivityManager) {
+    try {
+      return connectivityManager.getClass().getDeclaredMethod("getTetheredIfaces");
+    } catch (NoSuchMethodException e) {
+      Logger.warning("unable to get 'ConnectivityManager#getTetheredIfaces()': " + e.getMessage());
+      return null;
+    }
   }
 
   public boolean initNetworkInterface(String iface) {
@@ -158,9 +170,16 @@ public class Network {
                       Short.toString(ifaceAddress.getNetworkPrefixLength()));
 
       mLocal = new IP4Address(su.getInfo().getAddress());
-      mGateway = new IP4Address(getSystemGateway(mInterface.getDisplayName()));
       mNetmask = new IP4Address(su.getInfo().getNetmask());
       mBase = new IP4Address(su.getInfo().getNetworkAddress());
+
+      String gateway = getSystemGateway(mInterface.getDisplayName());
+
+      if(gateway == null) {
+        mGateway = null;
+      } else {
+        mGateway = new IP4Address(gateway);
+      }
 
       return true;
     } catch (Exception e) {
@@ -194,11 +213,11 @@ public class Network {
   }
 
   public boolean isInternal(byte[] address) {
-    byte[] gateway = mGateway.toByteArray();
+    byte[] local = mLocal.toByteArray();
     byte[] mask = mNetmask.toByteArray();
 
-    for (int i = 0; i < gateway.length; i++)
-      if ((gateway[i] & mask[i]) != (address[i] & mask[i]))
+    for (int i = 0; i < local.length; i++)
+      if ((local[i] & mask[i]) != (address[i] & mask[i]))
         return false;
 
     return true;
@@ -265,8 +284,25 @@ public class Network {
     return mNetmask.toInetAddress();
   }
 
+  public boolean haveGateway() {
+    return mGateway != null;
+  }
+
+  public boolean isTetheringEnabled() {
+    if(mTetheredIfacesMethod == null) {
+      return false;
+    }
+    try {
+      String[] ifaces = (String[]) mTetheredIfacesMethod.invoke(mConnectivityManager);
+      return ifaces.length > 0;
+    } catch (Exception e) {
+      Logger.error("unable to retrieve tethered ifaces: " + e.getMessage());
+      return false;
+    }
+  }
+
   public InetAddress getGatewayAddress() {
-    return mGateway.toInetAddress();
+    return mGateway == null ? null : mGateway.toInetAddress();
   }
 
   public byte[] getGatewayHardware() {
