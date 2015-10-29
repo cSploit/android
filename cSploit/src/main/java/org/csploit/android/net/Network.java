@@ -24,6 +24,7 @@ import android.net.DhcpInfo;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.util.Patterns;
 
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.net.util.SubnetUtils;
@@ -150,18 +151,29 @@ public class Network {
 
   public boolean initNetworkInterface(String iface) {
 
+    InterfaceAddress ifaceAddress = null;
     try {
       if (iface == null)
         iface = getAvailableInterfaces().get(0);
 
       mInterface = NetworkInterface.getByName(iface);
-      InterfaceAddress ifaceAddress;
 
       if (mInterface.getInterfaceAddresses().isEmpty()) {
         return false;
       }
 
-      ifaceAddress = mInterface.getInterfaceAddresses().get(1);
+      for (InterfaceAddress ia : mInterface.getInterfaceAddresses()) {
+        if(Patterns.IP_ADDRESS.matcher(ia.getAddress().getHostAddress()).matches()) {
+          ifaceAddress = ia;
+          Logger.warning("interfaceAddress: " + ia.getAddress().getHostAddress() + "/" + Short.toString(ia.getNetworkPrefixLength()));
+          break;
+        }
+        else
+          Logger.error("not valid ip: " + ia.getAddress().getHostAddress() + "/" + Short.toString(ia.getNetworkPrefixLength()));
+      }
+      if (ifaceAddress == null){
+        return false;
+      }
 
       SubnetUtils su = new SubnetUtils(
               // get(1) == ipv4
