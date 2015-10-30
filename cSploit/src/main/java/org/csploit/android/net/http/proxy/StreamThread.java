@@ -18,15 +18,15 @@
  */
 package org.csploit.android.net.http.proxy;
 
+import org.csploit.android.core.Logger;
+import org.csploit.android.core.Profiler;
+import org.csploit.android.core.System;
+import org.csploit.android.net.ByteBuffer;
+import org.csploit.android.net.http.RequestParser;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import org.csploit.android.core.Profiler;
-import org.csploit.android.core.System;
-import org.csploit.android.core.Logger;
-import org.csploit.android.net.ByteBuffer;
-import org.csploit.android.net.http.RequestParser;
 
 public class StreamThread implements Runnable
 {
@@ -159,7 +159,21 @@ public class StreamThread implements Runnable
 
         headers = patched;
 
-        mBuffer.setData((headers + HEAD_SEPARATOR + body).getBytes());
+        // try to get the charset encoding from the HTTP headers.
+        String charset = RequestParser.getCharsetFromHeaders(contentType);
+
+        // if we haven't found the charset encoding on the HTTP headers, try it out on the body.
+        if (charset == null) {
+          charset = RequestParser.getCharsetFromBody(body);
+        }
+
+        if (charset != null) {
+          mBuffer.setData((headers + HEAD_SEPARATOR + body).getBytes(charset));
+        }
+        else {
+          // if we haven't found the charset encoding, just handle it on ByteBuffer()
+          mBuffer.setData((headers + HEAD_SEPARATOR + body).getBytes());
+        }
 
         mWriter.write(mBuffer.getData());
         mWriter.flush();

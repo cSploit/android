@@ -27,6 +27,8 @@ import java.net.HttpCookie;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RequestParser
 {
@@ -474,6 +476,48 @@ public class RequestParser
       }
 
       return cookies.size() > 0 ? cookies : null;
+    }
+
+    return null;
+  }
+
+  /**
+   * extract the charset encoding from the HTTP response headers.
+   *
+   * @param contentType content-type header to be parsed
+   * @return returns the charset encoding if we've found it, or null.
+   */
+  public static String getCharsetFromHeaders(String contentType){
+    if (contentType != null && contentType.toLowerCase().trim().contains("charset=")){
+      String[] parts = contentType.toLowerCase().trim().split("=");
+      if (parts.length > 0)
+        return parts[1];
+    }
+
+    return null;
+  }
+
+  /**
+   * extract the charset encoding of a web site from the <meta> headers.
+   *
+   * @param body html body of the site to be parsed
+   * @return returns the charset encoding if we've found it, or null.
+   */
+  public static String getCharsetFromBody(String body) {
+    if (body != null) {
+      // match <body>, <body onLoad="">, etc...
+      int headEnd = body.toLowerCase().indexOf("</head>");
+
+      // return null if there's no head tags
+      if (headEnd == -1)
+        return null;
+
+      String body_head = body.toLowerCase().substring(0, headEnd);
+
+      Pattern p = Pattern.compile("charset=([\"a-z0-9A-Z-]+)");
+      Matcher m = p.matcher(body_head);
+      if (m.find())
+        return m.toMatchResult().group(1).replaceAll("\"", "");
     }
 
     return null;
