@@ -164,7 +164,7 @@ class MsgpackProxy implements InternalFramework {
   public List<? extends Post> getPosts() throws IOException, MsfException {
     if(framework.getModuleManager().getOfType("post").isEmpty()) {
       for(String name : client.getPosts()) {
-        loader.lazyLoadModule("post", (String) name);
+        loader.lazyLoadModule("post", name);
       }
     }
     return framework.getPosts();
