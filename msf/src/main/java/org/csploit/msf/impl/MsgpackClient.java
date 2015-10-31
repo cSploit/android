@@ -52,7 +52,7 @@ class MsgpackClient {
     put("session.compatible_modules", SingleTemplate.getModulesInstance());
     put("session.stop", SingleTemplate.getBoolInstance());
     put("session.shell_read", SingleTemplate.getReadInstance());
-    put("session.shell_write", SingleTemplate.getReadInstance());
+    put("session.shell_write", SingleTemplate.getWriteInstance());
     put("session.shell_upgrade", SingleTemplate.getBoolInstance());
     put("session.meterpreter_read", SingleTemplate.getReadInstance());
     put("session.meterpreter_write", SingleTemplate.getBoolInstance());
