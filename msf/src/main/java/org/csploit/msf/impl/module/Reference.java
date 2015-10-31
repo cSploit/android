@@ -4,7 +4,7 @@ package org.csploit.msf.impl.module;
  * A reference to some sort of information.  This is typically a URL, but could
  * be any type of referential value that people could use to research a topic.
  */
-public class Reference {
+public class Reference implements org.csploit.msf.api.module.Reference {
   protected String str;
 
   public Reference(String str) {

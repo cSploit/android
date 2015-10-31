@@ -14,14 +14,14 @@ import java.util.HashMap;
  * with.
  */
 class SessionManager extends HashMap<Integer, Session> implements Offspring {
-  private Framework framework;
+  private InternalFramework framework;
 
-  public SessionManager(Framework framework) {
+  public SessionManager(InternalFramework framework) {
     this.framework = framework;
   }
 
   @Override
-  public Framework getFramework() {
+  public InternalFramework getFramework() {
     return framework;
   }
 
@@ -31,7 +31,7 @@ class SessionManager extends HashMap<Integer, Session> implements Offspring {
   }
 
   @Override
-  public void setFramework(Framework framework) {
+  public void setFramework(InternalFramework framework) {
     this.framework = framework;
   }
 }

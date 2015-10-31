@@ -2,6 +2,7 @@ package org.csploit.msf.impl.module;
 
 import org.csploit.msf.api.module.Platform;
 
+import java.util.Collection;
 import java.util.HashSet;
 
 /**
@@ -27,7 +28,7 @@ public class PlatformList extends HashSet<Platform> {
     }
   }
 
-  public PlatformList intersect(PlatformList other) {
+  public PlatformList intersect(Collection<Platform> other) {
     PlatformList res = new PlatformList();
 
     for(Platform pl1 : this) {

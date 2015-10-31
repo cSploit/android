@@ -2,6 +2,7 @@ package org.csploit.msf.api;
 
 import org.csploit.msf.impl.Option;
 
+import java.io.IOException;
 import java.util.Collection;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Collection;
  */
 public interface Customizable {
   void setOption(String key, String value);
-  Collection<Option> getOptions();
+  Collection<Option> getOptions() throws IOException, MsfException;
   Collection<String> getInvalidOptions();
   <T> T getOptionValue(Option<T> option);
 }

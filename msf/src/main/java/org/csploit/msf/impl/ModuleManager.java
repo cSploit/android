@@ -1,6 +1,10 @@
 package org.csploit.msf.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -8,7 +12,7 @@ import java.util.Map;
  */
 class ModuleManager implements Offspring {
 
-  private final static String[] validModuleTypes = {
+  final static String[] validModuleTypes = {
           "encoder",
           "exploit",
           "nop",
@@ -18,7 +22,7 @@ class ModuleManager implements Offspring {
   };
 
   private Map<String, ModuleSet> sets = new HashMap<>();
-  private Framework framework;
+  private InternalFramework framework;
 
   public ModuleManager(Framework framework, String types) {
     this(framework, types.equals("all") ? validModuleTypes : types.split(","));
@@ -50,33 +54,48 @@ class ModuleManager implements Offspring {
     return false;
   }
 
-  public Module get(String name) {
-    String[] parts = name.split("/");
-    String refname;
+  public InternalModule get(String name) {
+    try {
+      String[] parts = NameHelper.getTypeAndRefnameFromFullname(name);
 
-    if(!sets.containsKey(parts[0])) {
-      if(!isValidType(parts[0])) {
-        return worldSearch(name);
-      } else {
-        return null;
-      }
+      return get(parts[0], parts[1]);
+    } catch (NameHelper.BadModuleNameException | NameHelper.BadModuleTypeException e) {
+      return worldSearch(name);
     }
-
-    refname = name.substring(parts[0].length() + 1);
-
-    return sets.get(parts[0]).get(refname);
   }
 
-  private Module worldSearch(String name) {
+  public InternalModule get(String type, String refname) {
+    if(!sets.containsKey(type)) {
+      if(isValidType(type)) {
+        return null;
+      }
+      return worldSearch(type + "/" + refname);
+    }
+    return sets.get(type).get(refname);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends InternalModule> List<T> getOfType(String type) {
+    if(!sets.containsKey(type)) {
+      return Collections.emptyList();
+    }
+
+    ArrayList<T> result = new ArrayList<>();
+    result.addAll((Collection<? extends T>) sets.get(type).values());
+    Collections.sort(result);
+    return result;
+  }
+
+  private InternalModule worldSearch(String name) {
     for(ModuleSet set : sets.values()) {
-      Module m = set.get(name);
+      InternalModule m = set.get(name);
       if(m != null)
         return m;
     }
     return null;
   }
 
-  public void put(Module module) {
+  public void put(InternalModule module) {
     String type = module.getType();
     if(!sets.containsKey(type)) {
       return;
@@ -90,12 +109,12 @@ class ModuleManager implements Offspring {
   }
 
   @Override
-  public Framework getFramework() {
+  public InternalFramework getFramework() {
     return framework;
   }
 
   @Override
-  public void setFramework(Framework framework) {
+  public void setFramework(InternalFramework framework) {
     this.framework = framework;
   }
 }

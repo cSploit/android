@@ -3,6 +3,9 @@ package org.csploit.msf.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.csploit.msf.api.Exploit;
+import org.csploit.msf.api.Payload;
+
 /**
  * The session class represents a post-exploitation, uh, session.
  * Sessions can be written to, read from, and interacted with.  The
@@ -15,8 +18,8 @@ import java.util.List;
  * payloads through a common interface that is not necessarily
  * tied to a network connection.
  */
-public abstract class Session implements Offspring, org.csploit.msf.api.Session {
-  private Framework framework;
+abstract class Session implements Offspring, org.csploit.msf.api.Session {
+  private InternalFramework framework;
   private int id;
   private String localTunnel;
   private String peerTunnel;
@@ -30,7 +33,7 @@ public abstract class Session implements Offspring, org.csploit.msf.api.Session 
   private String targetHost;
   private String username;
   private String uuid;
-  private List<String> routes = new ArrayList<>();
+  private String[] routes;
 
   public Session(int id) {
     this.id = id;
@@ -136,20 +139,26 @@ public abstract class Session implements Offspring, org.csploit.msf.api.Session 
     this.uuid = uuid;
   }
 
+  public String[] getRoutes() {
+    return routes;
+  }
+
+  public void setRoutes(String[] routes) {
+    this.routes = routes;
+  }
+
   @Override
   public boolean haveFramework() {
     return framework != null;
   }
 
   @Override
-  public Framework getFramework() {
+  public InternalFramework getFramework() {
     return framework;
   }
 
   @Override
-  public void setFramework(Framework framework) {
+  public void setFramework(InternalFramework framework) {
     this.framework = framework;
   }
-
-  public abstract String getType();
 }

@@ -1,5 +1,8 @@
 package org.csploit.msf.api;
 
+import java.io.IOException;
+import java.util.List;
+
 /**
  * The session class represents a post-exploitation, uh, session.
  * Sessions can be written to, read from, and interacted with.  The
@@ -13,17 +16,20 @@ package org.csploit.msf.api;
  * tied to a network connection.
  */
 public interface Session {
-     int getId();
-     String getLocalTunnel();
-     String getPeerTunnel();
-     Exploit getExploit();
-     Payload getPayload();
-     String getDescription();
-     String getInfo();
-     String getWorkspace();
-     String getSessionHost();
-     int getSessionPort();
-     String getTargetHost();
-     String getUsername();
-     String getUuid();
+  int getId();
+  String getLocalTunnel();
+  String getPeerTunnel();
+  Exploit getExploit();
+  Payload getPayload();
+  String getDescription();
+  String getInfo();
+  String getWorkspace();
+  String getSessionHost();
+  int getSessionPort();
+  String getTargetHost();
+  String getUsername();
+  String getUuid();
+  String[] getRoutes();
+  List<? extends Module> getCompatibleModules() throws IOException, MsfException;
+  void close() throws IOException, MsfException;
 }

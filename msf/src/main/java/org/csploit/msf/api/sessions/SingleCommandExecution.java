@@ -12,5 +12,4 @@ public interface SingleCommandExecution extends Session {
   void init(String cmd, String[] args); // TODO: options ??
   String read(int length);
   int write(String data);
-  void close();
 }

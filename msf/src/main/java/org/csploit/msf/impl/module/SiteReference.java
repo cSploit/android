@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 /**
  * A reference to a website.
  */
-public class SiteReference extends Reference {
+public class SiteReference extends Reference implements org.csploit.msf.api.module.SiteReference {
   protected String ctx_id;
   protected String ctx_val;
 
@@ -47,5 +47,10 @@ public class SiteReference extends Reference {
       return null;
     }
     return new SiteReference("URL", str);
+  }
+
+  @Override
+  public String getUrl() {
+    return toString();
   }
 }

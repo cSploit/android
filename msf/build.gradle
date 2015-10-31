@@ -5,4 +5,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'commons-io:commons-io:2.4'
     compile 'org.apache.commons:commons-lang3:3.4'
+    compile 'org.msgpack:msgpack:0.6.12'
 }

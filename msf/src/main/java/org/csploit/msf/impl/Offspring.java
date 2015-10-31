@@ -5,6 +5,6 @@ package org.csploit.msf.impl;
  */
 interface Offspring {
   boolean haveFramework();
-  Framework getFramework();
-  void setFramework(Framework framework);
+  InternalFramework getFramework();
+  void setFramework(InternalFramework framework);
 }

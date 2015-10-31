@@ -1,5 +1,8 @@
 package org.csploit.msf.impl;
 
+import org.csploit.msf.api.Payload;
+import org.csploit.msf.api.Exploit;
+
 import java.util.Date;
 
 /**
@@ -22,8 +25,20 @@ class Job implements org.csploit.msf.api.Job {
     this.payload = payload;
   }
 
-  public void setStartTime(Date startTime) {
+  public Job(int id, String name, Exploit exploit, Payload payload) {
+    this(null, id, name, exploit, payload);
+  }
+
+  public Job(int id, String name) {
+    this(null, id, name, null, null);
+  }
+
+  void setStartTime(Date startTime) {
     this.startTime = startTime;
+  }
+
+  void setName(String name) {
+    this.name = name;
   }
 
   public int getId() {
@@ -40,5 +55,17 @@ class Job implements org.csploit.msf.api.Job {
 
   public void stop() {
     container.remove(id);
+  }
+
+  void setContainer(JobContainer container) {
+    this.container = container;
+  }
+
+  public void setExploit(Exploit exploit) {
+    this.exploit = exploit;
+  }
+
+  public void setPayload(Payload payload) {
+    this.payload = payload;
   }
 }

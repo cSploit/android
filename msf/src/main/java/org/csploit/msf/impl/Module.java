@@ -1,48 +1,42 @@
 package org.csploit.msf.impl;
 
-import org.csploit.msf.api.Customizable;
+import org.csploit.msf.api.Arch;
 import org.csploit.msf.api.License;
+import org.csploit.msf.api.MsfException;
+import org.csploit.msf.api.module.Platform;
+import org.csploit.msf.api.module.Rank;
 import org.csploit.msf.impl.module.ArchSet;
 import org.csploit.msf.impl.module.PlatformList;
 import org.csploit.msf.impl.module.Reference;
 
+import java.io.IOException;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * Represent a module of the MSF
  */
-abstract class Module implements Offspring, DataHolder, Customizable, org.csploit.msf.api.Module {
+abstract class Module implements InternalModule {
   protected Author[] authors;
   protected ArchSet arch;
   protected PlatformList platform;
   protected Reference[] references;
   protected OptionContainer options;
-  protected Framework framework;
+  protected InternalFramework framework;
   protected ModuleDataStore datastore;
   protected boolean privileged;
   protected License license;
+  protected Rank rank;
 
+  protected final String refname;
   protected String name;
-  protected String refname;
   protected String description;
   protected String version;
 
-  public Module(String name, String description, String version, Author[] authors, ArchSet arch, PlatformList platform, Reference[] references, boolean privileged, License license ) {
-    this.name = name;
-    this.description = description;
-    this.version = version;
-    this.authors = authors;
-    this.arch = arch;
-    this.platform = platform;
-    this.references = references;
-    this.privileged = privileged;
-    this.license = license;
+  public Module(String refname) {
+    this.refname = refname;
     this.options = new OptionContainer();
     this.datastore = new ModuleDataStore(this);
-  }
-
-  public Module() {
-    this("No module name", "No module description", "0", null, new ArchSet(), new PlatformList(), null, false, License.MSF);
   }
 
   @Override
@@ -51,12 +45,12 @@ abstract class Module implements Offspring, DataHolder, Customizable, org.csploi
   }
 
   @Override
-  public Framework getFramework() {
+  public InternalFramework getFramework() {
     return framework;
   }
 
   @Override
-  public void setFramework(Framework framework) {
+  public void setFramework(InternalFramework framework) {
     this.framework = framework;
   }
 
@@ -69,12 +63,6 @@ abstract class Module implements Offspring, DataHolder, Customizable, org.csploi
     return refname;
   }
 
-  public void setRefname(String refname) {
-    this.refname = refname;
-  }
-
-  public abstract String getType();
-
   public String getFullName() {
     return getType() + "/" + getRefname();
   }
@@ -82,6 +70,98 @@ abstract class Module implements Offspring, DataHolder, Customizable, org.csploi
   public String getShortName() {
     String[] parts = getRefname().split("/");
     return parts[parts.length - 1];
+  }
+
+  public void setAuthors(Author[] authors) {
+    this.authors = authors;
+  }
+
+  public void setArch(ArchSet arch) {
+    this.arch = arch;
+  }
+
+  public void setPlatform(PlatformList platform) {
+    this.platform = platform;
+  }
+
+  public void setReferences(Reference[] references) {
+    this.references = references;
+  }
+
+  public void setOptions(OptionContainer options) {
+    this.options = options;
+  }
+
+  public void setDatastore(ModuleDataStore datastore) {
+    this.datastore = datastore;
+  }
+
+  public void setPrivileged(boolean privileged) {
+    this.privileged = privileged;
+  }
+
+  public void setLicense(License license) {
+    this.license = license;
+  }
+
+  public void setRank(Rank rank) {
+    this.rank = rank;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setVersion(String version) {
+    this.version = version;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public License getLicense() {
+    return license;
+  }
+
+  @Override
+  public Rank getRank() {
+    return rank;
+  }
+
+  @Override
+  public Reference[] getReferences() {
+    return references;
+  }
+
+  @Override
+  public Author[] getAuthors() {
+    return authors;
+  }
+
+  @Override
+  public Set<Arch> getArches() {
+    return arch;
+  }
+
+  @Override
+  public Set<Platform> getPlatforms() {
+    return platform;
+  }
+
+  public int compareTo(org.csploit.msf.api.Module module) {
+    return getFullName().compareToIgnoreCase(module.getFullName());
+  }
+
+  @Override
+  public String getDescription() {
+    return description;
   }
 
   public void registerOption(String name, Option option, boolean advanced, boolean evasion) {
@@ -94,7 +174,7 @@ abstract class Module implements Offspring, DataHolder, Customizable, org.csploi
   }
 
   @Override
-  public Collection<Option> getOptions() {
+  public Collection<Option> getOptions() throws IOException, MsfException {
     return options.values();
   }
 
@@ -111,5 +191,21 @@ abstract class Module implements Offspring, DataHolder, Customizable, org.csploi
   @Override
   public int hashCode() {
     return refname != null ? refname.hashCode() : 0;
+  }
+
+  public static InternalModule fromType(String type, String refname) throws NameHelper.BadModuleTypeException {
+    switch (type) {
+      case "exploit":
+        return new Exploit(refname);
+      case "payload":
+        return new Payload(refname);
+      case "post":
+        return new Post(refname);
+      case "nop":
+      case "encoder":
+        //TODO
+      default:
+        throw new NameHelper.BadModuleTypeException(type);
+    }
   }
 }

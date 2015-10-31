@@ -1,25 +1,25 @@
 package org.csploit.msf.impl;
 
-import org.csploit.msf.api.License;
-import org.csploit.msf.impl.module.ArchSet;
-import org.csploit.msf.impl.module.PlatformList;
-import org.csploit.msf.impl.module.Reference;
+import org.csploit.msf.api.MsfException;
+
+import java.io.IOException;
 
 /**
  * A Post-exploitation module.
  */
 class Post extends Module implements org.csploit.msf.api.Post {
 
-  public Post(String name, String description, String version, Author[] authors, ArchSet arch, PlatformList platform, Reference[] references, boolean privileged, License license) {
-    super(name, description, version, authors, arch, platform, references, privileged, license);
-  }
-
-  public Post() {
-    super();
+  public Post(String refname) {
+    super(refname);
   }
 
   @Override
   public String getType() {
     return "post";
+  }
+
+  @Override
+  public void execute() throws IOException, MsfException {
+    throw new UnsupportedOperationException("not implemented yet");
   }
 }

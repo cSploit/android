@@ -15,7 +15,7 @@ public class Target implements org.csploit.msf.api.module.Target {
   }
 
   public Target(String name) {
-    this(name, new PlatformList(), new ArchSet());
+    this(name, null, null);
   }
 
   public String getName() {

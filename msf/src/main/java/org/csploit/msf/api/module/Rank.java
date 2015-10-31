@@ -21,6 +21,15 @@ public enum Rank {
     this.name = name;
   }
 
+  public int getValue() {
+    return value;
+  }
+
+  @Override
+  public String toString() {
+    return name;
+  }
+
   public static Rank fromName(String name) {
     name = name.trim();
     name = name.toLowerCase();
@@ -33,11 +42,12 @@ public enum Rank {
   }
 
   public static Rank fromValue(int value) {
+    Rank result = Rank.MANUAL;
     for (Rank r : values()) {
-      if (r.value <= value) {
-        return r;
+      if (r.value <= value && r.value > result.value) {
+        result = r;
       }
     }
-    return null;
+    return result;
   }
 }

@@ -1,6 +1,9 @@
 package org.csploit.msf.api.sessions;
 
+import org.csploit.msf.api.MsfException;
 import org.csploit.msf.api.Session;
+
+import java.io.IOException;
 
 /**
  * This interface is to be implemented by a session that is only capable of
@@ -8,7 +11,6 @@ import org.csploit.msf.api.Session;
  */
 public interface SingleCommandShell extends Session {
   void init();
-  String read(int length);
-  int write(String data);
-  void close();
+  String read() throws IOException, MsfException;
+  int write(String data) throws IOException, MsfException;
 }

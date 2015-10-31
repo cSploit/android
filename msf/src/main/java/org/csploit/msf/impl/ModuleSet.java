@@ -9,9 +9,9 @@ import java.util.HashMap;
  * A module set contains zero or more named module classes of an arbitrary
  * type.
  */
-class ModuleSet extends HashMap<String, Module> implements Offspring {
+class ModuleSet extends HashMap<String, InternalModule> implements Offspring {
   protected String type;
-  private Framework framework;
+  private InternalFramework framework;
 
   public ModuleSet(String type) {
     this.type = type;
@@ -27,16 +27,16 @@ class ModuleSet extends HashMap<String, Module> implements Offspring {
   }
 
   @Override
-  public Framework getFramework() {
+  public InternalFramework getFramework() {
     return framework;
   }
 
   @Override
-  public void setFramework(Framework framework) {
+  public void setFramework(InternalFramework framework) {
     this.framework = framework;
   }
 
-  public void add(Module module) {
+  public void add(InternalModule module) {
     module.setFramework(framework);
     put(module.getRefname(), module);
   }
@@ -44,13 +44,13 @@ class ModuleSet extends HashMap<String, Module> implements Offspring {
   public ModuleSet filter(ArchSet architectures, PlatformList platforms) {
     ModuleSet res = new ModuleSet(getType());
     res.setFramework(framework);
-    for(Module m : values()) {
+    for(InternalModule m : values()) {
 
-      if(architectures != null && m.arch.intersect(architectures).isEmpty()) {
+      if(architectures != null && architectures.intersect(m.getArches()).isEmpty()) {
         continue;
       }
 
-      if(platforms != null && m.platform.intersect(platforms).isEmpty()) {
+      if(platforms != null && platforms.intersect(m.getPlatforms()).isEmpty()) {
         continue;
       }
 

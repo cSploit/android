@@ -33,7 +33,7 @@ public class ArchSet extends HashSet<Arch> {
     return arch == Arch.ANY || contains(arch);
   }
 
-  public ArchSet intersect(ArchSet other) {
+  public ArchSet intersect(Collection<Arch> other) {
     ArchSet res = new ArchSet(this);
     res.retainAll(other);
     return res;
