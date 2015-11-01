@@ -505,8 +505,7 @@ public class RequestParser
    */
   public static String getCharsetFromBody(String body) {
     if (body != null) {
-      // match <body>, <body onLoad="">, etc...
-      int headEnd = body.toLowerCase().indexOf("</head>");
+      int headEnd = body.toLowerCase().trim().indexOf("</head>");
 
       // return null if there's no head tags
       if (headEnd == -1)
@@ -514,10 +513,13 @@ public class RequestParser
 
       String body_head = body.toLowerCase().substring(0, headEnd);
 
-      Pattern p = Pattern.compile("charset=([\"a-z0-9A-Z-]+)");
+      Pattern p = Pattern.compile("charset=([\"\'a-z0-9A-Z-]+)");
       Matcher m = p.matcher(body_head);
-      if (m.find())
-        return m.toMatchResult().group(1).replaceAll("\"", "");
+      String str_match = "";
+      if (m.find()) {
+        str_match = m.toMatchResult().group(1);
+        return str_match.replaceAll("[\"']", "");
+      }
     }
 
     return null;
