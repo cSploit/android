@@ -300,15 +300,17 @@ public class RequestParser
           tld_parts = tld.split("\\.");
         int itld = tld_parts.length,
           ihost = host_parts.length,
-          i = 0,
-          stop = ihost - 1;
+          i = 0;
+
+        if ((ihost - itld) == 0)
+          return hostname;
 
         domain = "";
-        for(i = ihost - itld; i <= stop; i++){
-          domain += host_parts[i] + (i == stop ? "" : ".");
+        for(i = ihost - itld - 1; i < ihost; i++){
+          domain += host_parts[i] + ".";
         }
 
-        return domain;
+        return domain.substring(0, domain.length() - 1);
       }
     }
 
