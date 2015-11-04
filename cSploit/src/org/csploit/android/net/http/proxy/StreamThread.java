@@ -27,6 +27,7 @@ import org.csploit.android.net.http.RequestParser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 
 public class StreamThread implements Runnable
 {
@@ -168,7 +169,13 @@ public class StreamThread implements Runnable
         }
 
         if (charset != null) {
-          mBuffer.setData((headers + HEAD_SEPARATOR + body).getBytes(charset));
+          try {
+            mBuffer.setData((headers + HEAD_SEPARATOR + body).getBytes(charset));
+          }
+          catch (UnsupportedEncodingException e){
+            Logger.error("UnsupportedEncoding: " + e.getLocalizedMessage());
+            mBuffer.setData((headers + HEAD_SEPARATOR + body).getBytes());
+          }
         }
         else {
           // if we haven't found the charset encoding, just handle it on ByteBuffer()
