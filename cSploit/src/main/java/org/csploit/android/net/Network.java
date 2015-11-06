@@ -414,6 +414,21 @@ public class Network {
       IOUtils.closeQuietly(reader);
     }
 
+    Logger.warning("cannot get default gateway for interface " + iface);
+    Logger.debug("/proc/net/route dump:");
+
+    try {
+      reader = new BufferedReader(new InputStreamReader(new FileInputStream("/proc/net/route")));
+
+      while((line = reader.readLine()) != null) {
+        Logger.debug(line);
+      }
+    } catch (IOException e) {
+      System.errorLogging(e);
+    } finally {
+      IOUtils.closeQuietly(reader);
+    }
+
     return null;
   }
 }
