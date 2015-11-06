@@ -406,7 +406,9 @@ public class Network {
             break;
           }
         }
-        return sb.toString();
+        String res = sb.toString();
+        Logger.debug("found system default gateway for interface " + iface + ": " + res);
+        return res;
       }
     } catch (IOException e) {
       System.errorLogging(e);
