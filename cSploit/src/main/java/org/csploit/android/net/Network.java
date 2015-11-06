@@ -189,8 +189,11 @@ public class Network {
 
       if(gateway == null) {
         mGateway = null;
+        Logger.debug("gateway not found");
       } else {
         mGateway = new IP4Address(gateway);
+        Logger.debug("gateway: " + gateway);
+        Logger.debug("mGateway: " + mGateway);
       }
 
       return true;
