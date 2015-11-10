@@ -22,6 +22,7 @@ import android.util.Patterns;
 
 import org.csploit.android.core.Logger;
 import org.csploit.android.net.ByteBuffer;
+import org.csploit.android.net.http.proxy.DNSCache;
 
 import java.net.HttpCookie;
 import java.util.ArrayList;
@@ -296,6 +297,11 @@ public class RequestParser
     if(Patterns.IP_ADDRESS.matcher(hostname).matches())
       return hostname;
 
+    String cached_domain = DNSCache.getInstance().getCachedRootDomain(hostname);
+    if (cached_domain != null) {
+      return cached_domain;
+    }
+
     for(String tld : TLD){
       if(hostname.endsWith(tld)){
         String[] host_parts = hostname.split("\\."),
@@ -312,6 +318,7 @@ public class RequestParser
           domain += host_parts[i] + ".";
         }
 
+        DNSCache.getInstance().addCachedRootDomain(domain.substring(0, domain.length() - 1));
         return domain.substring(0, domain.length() - 1);
       }
     }
@@ -320,14 +327,15 @@ public class RequestParser
       nextIndex = hostname.indexOf('.'),
       lastIndex = hostname.lastIndexOf('.');
 
-    while(nextIndex < lastIndex){
+    while(nextIndex < lastIndex) {
       startIndex = nextIndex + 1;
       nextIndex = hostname.indexOf('.', startIndex);
     }
 
-    if(startIndex > 0)
+    if(startIndex > 0) {
+      DNSCache.getInstance().addCachedRootDomain(hostname.substring(startIndex));
       return hostname.substring(startIndex);
-
+    }
     else
       return hostname;
   }
