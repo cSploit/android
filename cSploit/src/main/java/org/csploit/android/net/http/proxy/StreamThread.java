@@ -41,7 +41,7 @@ public class StreamThread implements Runnable
     };
 
   private final static String HEAD_SEPARATOR = "\r\n\r\n";
-  private final static int CHUNK_SIZE = 1024;
+  private final static int CHUNK_SIZE = 64 * 1024;
 
   private String mClient = null;
   private InputStream mReader = null;
