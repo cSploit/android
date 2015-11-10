@@ -1307,22 +1307,29 @@ public class MainFragment extends Fragment {
         }
 
         private void check() {
-            loadInterfaces();
-            String current = System.getIfname();
-
-            Logger.debug(String.format("current='%s', ifaces=[%s], haveInterface=%s, isAnyNetInterfaceAvailable=%s",
-                    current != null ? current : "(null)",
-                    ifacesToString(), haveInterface(current), isAnyNetInterfaceAvailable));
-
-            if (haveInterface(current)) {
-                onConnectionResumed();
-            } else if (current != null) {
-                onConnectionLost();
-            } else if (isAnyNetInterfaceAvailable) {
-                onNetworkInterfaceChanged();
-            }
-
             synchronized (getActivity()) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        loadInterfaces();
+
+                        String current = System.getIfname();
+
+                        Logger.debug(String.format("current='%s', ifaces=[%s], haveInterface=%s, isAnyNetInterfaceAvailable=%s",
+                                current != null ? current : "(null)",
+                                ifacesToString(), haveInterface(current), isAnyNetInterfaceAvailable));
+
+                        if (haveInterface(current)) {
+                            onConnectionResumed();
+                        } else if (current != null) {
+                            onConnectionLost();
+                        } else if (isAnyNetInterfaceAvailable) {
+                            onNetworkInterfaceChanged();
+                        }
+
+                    }
+                });
+
                 mTask = null;
             }
         }
