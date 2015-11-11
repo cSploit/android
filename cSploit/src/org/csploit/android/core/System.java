@@ -1041,7 +1041,9 @@ public class System
 
       boolean inserted = false;
 
-      for (int i = 0; i < mTargets.size(); i++) {
+      int start_idx = 3;
+      if(!mNetwork.haveGateway()) start_idx = 2;
+      for (int i = start_idx; i < mTargets.size(); i++) {
         if (mTargets.get(i).comesAfter(target)) {
           mTargets.add(i, target);
           inserted = true;
