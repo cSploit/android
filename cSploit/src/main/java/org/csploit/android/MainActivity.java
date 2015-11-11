@@ -46,9 +46,9 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    MainFragment f;
+    MainFragment mMainFragment;
     ActionBarDrawerToggle mDrawerToggle;
-    DrawerLayout dl;
+    DrawerLayout mDrawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,29 +63,29 @@ public class MainActivity extends AppCompatActivity {
             if (savedInstanceState != null) {
                 return;
             }
-            dl = (DrawerLayout) findViewById(R.id.drawer_layout);
-            ListView rv = (ListView) findViewById(R.id.drawer_listview);
-            String[] items = getResources().getStringArray(R.array.sidebar_item_array);
-            TypedArray option_icons = getResources().obtainTypedArray(R.array.sidebar_icon_array);
-            ArrayList<DrawerItem> itemsList = new ArrayList<>();
+            mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+            ListView mListView = (ListView) findViewById(R.id.drawer_listview);
+            String[] mString = getResources().getStringArray(R.array.sidebar_item_array);
+            TypedArray mTypedArray = getResources().obtainTypedArray(R.array.sidebar_icon_array);
+            ArrayList<DrawerItem> mArrayList = new ArrayList<>();
             // load up the drawer with options from the array
-            for (int x = 0; x < items.length; x++) {
-                itemsList.add(new DrawerItem(option_icons.getResourceId(x, -1), items[x]));
+            for (int x = 0; x < mString.length; x++) {
+                mArrayList.add(new DrawerItem(mTypedArray.getResourceId(x, -1), mString[x]));
             }
-            option_icons.recycle();
-            rv.setAdapter(new SideBarArrayAdapter(this,
-                    R.layout.main_drawer_item, itemsList));
-            rv.setOnItemClickListener(new DrawerItemClickListener());
+            mTypedArray.recycle();
+            mListView.setAdapter(new SideBarArrayAdapter(this,
+                    R.layout.main_drawer_item, mArrayList));
+            mListView.setOnItemClickListener(new DrawerItemClickListener());
             mDrawerToggle = new ActionBarDrawerToggle(this,
-                    dl, R.string.drawer_was_opened, R.string.drawer_was_closed);
-            dl.setDrawerListener(mDrawerToggle);
+                    mDrawerLayout, R.string.drawer_was_opened, R.string.drawer_was_closed);
+            mDrawerLayout.setDrawerListener(mDrawerToggle);
             mDrawerToggle.syncState();
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
 
-            f = new MainFragment();
+            mMainFragment = new MainFragment();
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.mainframe, f).commit();
+                    .add(R.id.mainframe, mMainFragment).commit();
         }
     }
 
@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onBackPressed() {
-        f.onBackPressed();
+        mMainFragment.onBackPressed();
     }
 
     public void launchSettings() {
@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView parent, View view, int position, long id) {
-            dl.closeDrawers();
+            mDrawerLayout.closeDrawers();
             switch (position) {
                 case 0: //about
                     launchAbout();
