@@ -45,7 +45,4 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    public void onBackPressed() {
-        f.onBackPressed();
-    }
 }

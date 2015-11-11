@@ -25,7 +25,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -57,7 +56,6 @@ import org.csploit.android.core.MultiAttackService;
 import org.csploit.android.core.Plugin;
 import org.csploit.android.core.System;
 import org.csploit.android.events.Event;
-import org.csploit.android.gui.dialogs.AboutDialog;
 import org.csploit.android.gui.dialogs.ChoiceDialog;
 import org.csploit.android.gui.dialogs.ConfirmDialog;
 import org.csploit.android.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
@@ -323,8 +321,6 @@ public class MainFragment extends Fragment {
 
         mMenu = menu;
         configureMenu();
-        super.onCreateOptionsMenu(menu, inflater);
-        getActivity().onCreateOptionsMenu(menu);
     }
 
     private boolean isConnectivityAvailable() {
@@ -812,11 +808,6 @@ public class MainFragment extends Fragment {
                             .show();
                 return true;
 
-            case R.id.settings:
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
-                getActivity().overridePendingTransition(R.anim.fadeout, R.anim.fadein);
-                return true;
-
             case R.id.ss_monitor:
                 new Thread(new Runnable() {
                     @Override
@@ -833,18 +824,6 @@ public class MainFragment extends Fragment {
                         Services.getMsfRpcdService().onMenuClick(getActivity(), item);
                     }
                 }).start();
-                return true;
-
-            case R.id.submit_issue:
-                String uri = getString(R.string.github_new_issue_url);
-                Intent browser = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-                startActivity(browser);
-                // for fat-tire:
-                //   String.format(getString(R.string.issue_message), getString(R.string.github_issues_url), getString(R.string.github_new_issue_url));
-                return true;
-
-            case R.id.about:
-                new AboutDialog(getActivity()).show();
                 return true;
 
             default:

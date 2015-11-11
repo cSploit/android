@@ -32,7 +32,6 @@ import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.TwoStatePreference;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -71,7 +70,8 @@ public class SettingsFragment extends Fragment {
             getActivity().setTheme(R.style.PrefsTheme);
         super.onCreate(savedInstanceState);
         getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(android.R.id.content, new PrefsFrag())
+                .add(R.id.mainframe, new PrefsFrag())
+                .addToBackStack(null)
                 .commit();
     }
 
@@ -576,18 +576,6 @@ public class SettingsFragment extends Fragment {
         }
 
         @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            switch (item.getItemId()) {
-                case android.R.id.home:
-                    getActivity().onBackPressed();
-                    return true;
-
-                default:
-                    return super.onOptionsItemSelected(item);
-            }
-        }
-
-        @Override
         public void onDestroy() {
             if (mReceiver != null) {
                 getActivity().unregisterReceiver(mReceiver);
@@ -597,8 +585,4 @@ public class SettingsFragment extends Fragment {
         }
     }
 
-    public void onBackPressed() {
-        getActivity().finish();
-        getActivity().overridePendingTransition(R.anim.fadeout, R.anim.fadein);
-    }
 }

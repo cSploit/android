@@ -31,6 +31,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     MainFragment mMainFragment;
     ActionBarDrawerToggle mDrawerToggle;
     DrawerLayout mDrawerLayout;
+    private Menu mMenu = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,30 +82,69 @@ public class MainActivity extends AppCompatActivity {
             mDrawerToggle = new ActionBarDrawerToggle(this,
                     mDrawerLayout, R.string.drawer_was_opened, R.string.drawer_was_closed);
             mDrawerLayout.setDrawerListener(mDrawerToggle);
-            mDrawerToggle.syncState();
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
 
             mMainFragment = new MainFragment();
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.mainframe, mMainFragment).commit();
+                    .add(R.id.mainframe, mMainFragment, "MainFragment")
+                    .setCustomAnimations(R.anim.fadein, R.anim.fadeout, R.anim.fadein, R.anim.fadeout)
+                    .commit();
         }
     }
 
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.top, menu);
+        mMenu = menu;
         return true;
     }
 
-    public void onBackPressed() {
-        mMainFragment.onBackPressed();
-    }
 
     public void launchSettings() {
-        startActivity(new Intent(this, SettingsActivity.class));
-        overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.mainframe, new SettingsFragment.PrefsFrag())
+                .addToBackStack(null)
+                .setCustomAnimations(R.anim.fadein, R.anim.fadeout, R.anim.fadein, R.anim.fadeout)
+                .commit();
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
+        switch (item.getItemId()) {
+
+            case R.id.settings:
+                launchSettings();
+                return true;
+
+            case R.id.about:
+                launchAbout();
+                return true;
+
+            case R.id.submit_issue:
+                submitIssue();
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    public void submitIssue() {
+        String uri = getString(R.string.github_new_issue_url);
+        Intent browser = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+        startActivity(browser);
+
+        // for fat-tire:
+        //   String.format(getString(R.string.issue_message), getString(R.string.github_issues_url), getString(R.string.github_new_issue_url));
+
     }
 
     public void launchAbout() {
@@ -144,9 +186,7 @@ public class MainActivity extends AppCompatActivity {
                     launchSettings();
                     break;
                 case 2:
-                    String uri = getString(R.string.github_new_issue_url);
-                    Intent browser = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-                    startActivity(browser);
+                    submitIssue();
                     break;
             }
         }
@@ -182,5 +222,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    @Override
+    public void onBackPressed() {
+        // Only ask for the double-backpressed when MainFragment is all that's left.
+        if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+            mMainFragment.onBackPressed();
+        } else {
+            super.onBackPressed();
+        }
+    }
 }

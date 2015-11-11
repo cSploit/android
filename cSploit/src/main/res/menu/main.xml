@@ -1,29 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:csploit="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:csploit="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/add"
         android:icon="@drawable/target_add"
-        csploit:showAsAction="ifRoom"
-        android:title="@string/menu_add" />
+        android:title="@string/menu_add"
+        csploit:showAsAction="ifRoom" />
     <item
         android:id="@+id/scan"
         android:icon="@drawable/ic_refresh"
-        csploit:showAsAction="ifRoom"
-        android:title="@string/menu_scan" />
+        android:title="@string/menu_scan"
+        csploit:showAsAction="ifRoom" />
     <item
         android:id="@+id/wifi_scan"
         android:icon="@drawable/ic_wifi_signal_4"
-        csploit:showAsAction="ifRoom"
-        android:title="@string/menu_wifi_scan" />
+        android:title="@string/menu_wifi_scan"
+        csploit:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/wifi_ifaces"
         android:icon="@drawable/ic_refresh"
-        csploit:showAsAction="ifRoom"
-        android:title="@string/menu_ifaces" />
+        android:title="@string/menu_ifaces"
+        csploit:showAsAction="ifRoom" />
 
     <group android:id="@+id/session_group">
         <item
@@ -35,9 +34,6 @@
         <item
             android:id="@+id/restore_session"
             android:title="@string/menu_restore_session" />
-        <item
-            android:id="@+id/settings"
-            android:title="@string/menu_settings" />
     </group>
     <group android:id="@+id/misc_group">
         <item
@@ -46,12 +42,6 @@
         <item
             android:id="@+id/ss_msfrpcd"
             android:title="@string/menu_stop_msfrpcd" />
-        <item
-            android:id="@+id/submit_issue"
-            android:title="@string/menu_submit_issue" />
-        <item
-            android:id="@+id/about"
-            android:title="@string/menu_about" />
     </group>
 
 </menu>
