@@ -2,6 +2,7 @@ package org.csploit.msf.impl;
 
 import org.csploit.msf.api.License;
 import org.csploit.msf.api.Module;
+import org.csploit.msf.api.Option;
 import org.csploit.msf.api.module.Rank;
 import org.csploit.msf.impl.module.ArchSet;
 import org.csploit.msf.impl.module.PlatformList;
@@ -24,5 +25,5 @@ interface InternalModule extends Module, DataHolder, Offspring {
   void setName(String name);
   void setVersion(String version);
   void setDescription(String description);
-  void registerOption(String name, Option option, boolean advanced, boolean evasion);
+  void registerOption(Option option);
 }

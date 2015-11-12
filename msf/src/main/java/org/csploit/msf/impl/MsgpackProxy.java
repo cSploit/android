@@ -4,12 +4,15 @@ import org.csploit.msf.api.*;
 import org.csploit.msf.api.Exploit;
 import org.csploit.msf.api.Module;
 import org.csploit.msf.api.Payload;
+import org.csploit.msf.api.Session;
 import org.csploit.msf.api.Post;
+import org.csploit.msf.api.listeners.Listener;
 import org.csploit.msf.api.module.AuxiliaryAction;
 import org.csploit.msf.api.module.Platform;
 import org.csploit.msf.api.module.Rank;
 import org.csploit.msf.api.module.Target;
 import org.csploit.msf.api.sessions.CommandShell;
+import org.csploit.msf.api.sessions.Interactive;
 import org.csploit.msf.api.sessions.UpgradableShell;
 import org.csploit.msf.impl.module.ArchSet;
 import org.csploit.msf.impl.module.PlatformList;
@@ -38,6 +41,7 @@ class MsgpackProxy implements InternalFramework {
   public MsgpackProxy(MsgpackClient client) {
     this.client = client;
     this.loader = new MsgpackLoader(client, this);
+    framework.getSessionManager().setWatchList(true);
   }
 
   public void setGlobalOption(String key, String value) {
@@ -51,16 +55,6 @@ class MsgpackProxy implements InternalFramework {
 
   public ModuleManager getModuleManager() {
     return framework.getModuleManager();
-  }
-
-  @Override
-  public void registerSession(Session session) {
-    framework.registerSession(session);
-  }
-
-  @Override
-  public void unregisterSession(Session session) {
-    framework.unregisterSession(session);
   }
 
   @Override
@@ -113,31 +107,52 @@ class MsgpackProxy implements InternalFramework {
   @Override
   public List<Session> getSessions() throws IOException, MsfException {
     Map<Integer, MsgpackClient.SessionInfo> result = client.getSessions();
+    SessionManager manager = framework.getSessionManager();
 
-    for(Session session : framework.getSessions()) {
-      if(!result.containsKey(session.getId())) {
-        framework.unregisterSession(session);
+    for(Session session : manager.getSessions()) {
+      if(result.containsKey(session.getId())) {
+        // remove a session from the results
+        // when we already have it locally.
+        result.remove(session.getId());
+      } else {
+        // remove a session from local store
+        // when the remote lost it.
+        manager.unregister(session);
       }
     }
+
+    // parse the remaining results
 
     for(int id : result.keySet()) {
-      if(framework.getSession(id) != null) {
-        continue;
-      }
-
       try {
         Session session = loader.buildSession(id, result.get(id));
-        framework.registerSession(session);
+        manager.register(session);
       } catch (NameHelper.BadSessionTypeException e) {
-        // ignored
+        // not supported yet
       }
     }
 
-    return framework.getSessions();
+    return manager.getSessions();
   }
 
-  public Session getSession(int id) {
-    return framework.getSession(id);
+  @Override
+  public SessionManager getSessionManager() {
+    return framework.getSessionManager();
+  }
+
+  @Override
+  public EventManager getEventManager() {
+    return framework.getEventManager();
+  }
+
+  @Override
+  public void addSubscriber(Listener listener) {
+    framework.addSubscriber(listener);
+  }
+
+  @Override
+  public void removeSubscriber(Listener listener) {
+    framework.removeSubscriber(listener);
   }
 
   @Override
@@ -175,8 +190,9 @@ class MsgpackProxy implements InternalFramework {
     void setClient(MsgpackClient client);
   }
 
-  private static abstract class SessionProxy extends Session implements MsgpackCommunicator {
+  private static abstract class SessionProxy extends AbstractSession implements MsgpackCommunicator, Interactive {
     private MsgpackClient client;
+    private boolean interacting = false;
 
     public SessionProxy(int id) {
       super(id);
@@ -212,6 +228,27 @@ class MsgpackProxy implements InternalFramework {
     @Override
     public void close() throws IOException, MsfException {
       getClient().stopSession(getId());
+
+    }
+
+    @Override
+    public void interact() throws IOException, MsfException {
+      interacting = true;
+    }
+
+    @Override
+    public void suspend() throws IOException, MsfException {
+      interacting = false;
+    }
+
+    @Override
+    public void complete() throws IOException, MsfException {
+      close();
+    }
+
+    @Override
+    public boolean isInteracting() throws IOException, MsfException {
+      return interacting;
     }
 
     @Override
@@ -416,8 +453,8 @@ class MsgpackProxy implements InternalFramework {
       instance.setDescription(description);
     }
 
-    public void registerOption(String name, Option option, boolean advanced, boolean evasion) {
-      instance.registerOption(name, option, advanced, evasion);
+    public void registerOption(Option option) {
+      instance.registerOption(option);
     }
 
     @Override
@@ -593,7 +630,7 @@ class MsgpackProxy implements InternalFramework {
       return new MsgpackProxy(client);
     }
 
-    public static Session newSessionFromType(String type, int id)
+    public static AbstractSession newSessionFromType(String type, int id)
             throws NameHelper.BadSessionTypeException {
       switch (type) {
         case "shell":

@@ -10,12 +10,14 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        DataStoreTest.class,
-        MsgpackLoaderTest.class,
-        NameHelperTest.class,
-        RpcSampleTest.class,
-        PlatformListTest.class,
-        PlatformTest.class
+  DataStoreTest.class,
+  MsgpackLoaderTest.class,
+  NameHelperTest.class,
+  RpcSampleTest.class,
+  PlatformListTest.class,
+  PlatformTest.class,
+  SessionManagerTest.class,
+  EventManagerTest.class
 })
 public class OfflineTestSuite {
 }

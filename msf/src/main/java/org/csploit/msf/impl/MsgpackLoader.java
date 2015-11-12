@@ -4,6 +4,7 @@ import org.csploit.msf.api.License;
 import org.csploit.msf.api.Exploit;
 import org.csploit.msf.api.Payload;
 import org.csploit.msf.api.Module;
+import org.csploit.msf.api.Session;
 import org.csploit.msf.api.MsfException;
 import org.csploit.msf.api.module.Rank;
 import org.csploit.msf.impl.module.AuxiliaryAction;
@@ -167,7 +168,7 @@ class MsgpackLoader {
 
     for(String name : list.keySet()) {
       MsgpackClient.OptionInfo info = list.get(name);
-      Option result;
+      AbstractOption result;
 
       switch (info.type) {
         case "address":
@@ -208,7 +209,10 @@ class MsgpackLoader {
           result = new StringOption(name, info.required, info.description, s);
       }
 
-      module.registerOption(name, result, info.advanced, info.evasion);
+      result.setAdvanced(info.advanced);
+      result.setEvasion(info.evasion);
+
+      module.registerOption(result);
     }
   }
 
@@ -231,7 +235,7 @@ class MsgpackLoader {
 
   public Session buildSession(int id, MsgpackClient.SessionInfo info)
           throws NameHelper.BadSessionTypeException {
-    Session session;
+    AbstractSession session;
 
     session = MsgpackProxy.Factory.newSessionFromType(info.type, id);
 

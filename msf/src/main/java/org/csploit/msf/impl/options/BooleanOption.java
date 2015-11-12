@@ -1,13 +1,13 @@
 package org.csploit.msf.impl.options;
 
-import org.csploit.msf.impl.Option;
+import org.csploit.msf.impl.AbstractOption;
 
 import java.util.regex.Pattern;
 
 /**
  * Boolean option.
  */
-public class BooleanOption extends Option<Boolean> {
+public class BooleanOption extends AbstractOption<Boolean> {
   private static final Pattern TRUE = Pattern.compile("^(y|yes|t|1|true)$", Pattern.CASE_INSENSITIVE);
   private static final Pattern BOOLEAN = Pattern.compile("^(y|yes|n|no|t|f|0|1|true|false)$", Pattern.CASE_INSENSITIVE);
 
@@ -20,7 +20,7 @@ public class BooleanOption extends Option<Boolean> {
   }
 
   @Override
-  protected Boolean normalize(String input) {
+  public Boolean normalize(String input) {
     return input != null && TRUE.matcher(input).matches();
   }
 }

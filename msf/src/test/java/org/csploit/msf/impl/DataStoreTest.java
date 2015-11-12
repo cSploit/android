@@ -17,8 +17,7 @@ public class DataStoreTest {
     DataStore store = new DataStore();
     OptionContainer options = new OptionContainer();
 
-    options.addOption("A",
-            new StringOption("A", "description", "default value"), false, false);
+    options.add(new StringOption("A", "description", "default value"));
 
     store.importOptions(options, true);
 

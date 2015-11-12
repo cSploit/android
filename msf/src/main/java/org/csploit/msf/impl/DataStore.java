@@ -1,5 +1,7 @@
 package org.csploit.msf.impl;
 
+import org.csploit.msf.api.Option;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -44,7 +46,7 @@ class DataStore extends HashMap<String, String> {
         continue;
       }
       if(opt.haveDefaultValue() && (overwrite || get(name) == null)) {
-        String val = opt.display(opt.defaultValue);
+        String val = opt.display(opt.getDefaultValue());
         importOption(name, val, true, isDefault);
       }
     }

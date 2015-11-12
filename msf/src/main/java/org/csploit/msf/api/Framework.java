@@ -1,5 +1,7 @@
 package org.csploit.msf.api;
 
+import org.csploit.msf.api.listeners.Listener;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -16,4 +18,6 @@ public interface Framework {
   Job getJob(int id) throws IOException, MsfException;
   void setGlobalOption(String key, String value);
   void unsetGlobalOption(String key);
+  void addSubscriber(Listener listener);
+  void removeSubscriber(Listener listener);
 }

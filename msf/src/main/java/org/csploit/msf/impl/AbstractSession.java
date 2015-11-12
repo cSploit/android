@@ -1,8 +1,5 @@
 package org.csploit.msf.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.csploit.msf.api.Exploit;
 import org.csploit.msf.api.Payload;
 
@@ -18,7 +15,7 @@ import org.csploit.msf.api.Payload;
  * payloads through a common interface that is not necessarily
  * tied to a network connection.
  */
-abstract class Session implements Offspring, org.csploit.msf.api.Session {
+abstract class AbstractSession implements Offspring, org.csploit.msf.api.Session {
   private InternalFramework framework;
   private int id;
   private String localTunnel;
@@ -35,7 +32,7 @@ abstract class Session implements Offspring, org.csploit.msf.api.Session {
   private String uuid;
   private String[] routes;
 
-  public Session(int id) {
+  public AbstractSession(int id) {
     this.id = id;
   }
 

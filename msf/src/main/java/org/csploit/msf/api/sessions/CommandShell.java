@@ -5,6 +5,6 @@ package org.csploit.msf.api.sessions;
  * endpoint.  This session is initialized with a stream that will be used
  * as the pipe for reading and writing the command shell.
  */
-public interface CommandShell extends SingleCommandShell {
+public interface CommandShell extends SingleCommandShell, Interactive {
   //TODO
 }

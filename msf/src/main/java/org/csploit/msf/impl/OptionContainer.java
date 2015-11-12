@@ -1,5 +1,7 @@
 package org.csploit.msf.impl;
 
+import org.csploit.msf.api.Option;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,18 +12,8 @@ import java.util.Map;
  */
 class OptionContainer extends HashMap<String, Option> {
 
-  public void addAdvancedOption(String name, Option option) {
-    addOption(name, option, true, false);
-  }
-
-  public void addEvasionOption(String name, Option option) {
-    addOption(name, option, false, true);
-  }
-
-  public void addOption(String name, Option option, boolean advanced, boolean evasion) {
-    option.setEvasion(evasion);
-    option.setAdvanced(advanced);
-    put(name, option);
+  public void add(Option option) {
+    put(option.getName(), option);
   }
 
   /**

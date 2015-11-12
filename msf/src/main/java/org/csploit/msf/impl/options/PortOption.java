@@ -1,11 +1,11 @@
 package org.csploit.msf.impl.options;
 
-import org.csploit.msf.impl.Option;
+import org.csploit.msf.impl.AbstractOption;
 
 /**
  * Network port option.
  */
-public class PortOption extends Option<Integer> {
+public class PortOption extends AbstractOption<Integer> {
 
   public PortOption(String name, boolean required, String description, Integer defaultValue) {
     super(name, required, description, defaultValue);
@@ -16,7 +16,7 @@ public class PortOption extends Option<Integer> {
   }
 
   @Override
-  protected Integer normalize(String input) {
+  public Integer normalize(String input) {
     try {
       int val = Integer.parseInt(input);
       return isValid(val) ? val : null;
@@ -27,7 +27,7 @@ public class PortOption extends Option<Integer> {
   }
 
   @Override
-  protected boolean isValid(Integer input) {
+  public boolean isValid(Integer input) {
     return super.isValid(input) && (input == null || input >= 0 && input <= 65535);
   }
 }

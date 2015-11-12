@@ -2,6 +2,8 @@ package org.csploit.msf.impl;
 
 import org.csploit.msf.api.License;
 import org.csploit.msf.api.Exploit;
+import org.csploit.msf.api.Option;
+import org.csploit.msf.api.Session;
 import org.csploit.msf.api.module.Rank;
 import org.csploit.msf.api.module.Reference;
 import org.csploit.msf.api.module.SiteReference;

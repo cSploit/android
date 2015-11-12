@@ -1,6 +1,6 @@
 package org.csploit.msf.impl.options;
 
-import org.csploit.msf.impl.Option;
+import org.csploit.msf.impl.AbstractOption;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -8,7 +8,7 @@ import java.net.UnknownHostException;
 /**
  * Network address option.
  */
-public class AddressOption extends Option<InetAddress> {
+public class AddressOption extends AbstractOption<InetAddress> {
 
   public AddressOption(String name, boolean required, String description, InetAddress defaultValue) {
     super(name, required, description, defaultValue);
@@ -23,7 +23,7 @@ public class AddressOption extends Option<InetAddress> {
   }
 
   @Override
-  protected InetAddress normalize(String input) {
+  public InetAddress normalize(String input) {
     return sNormalize(input);
   }
 

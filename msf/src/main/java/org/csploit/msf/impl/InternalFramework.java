@@ -7,9 +7,9 @@ import org.csploit.msf.api.Framework;
  */
 interface InternalFramework extends Framework, DataHolder {
   ModuleManager getModuleManager();
-  void registerSession(Session session);
-  void unregisterSession(Session session);
+  SessionManager getSessionManager();
   JobContainer getJobContainer();
   void registerJob(Job job);
   void unregisterJob(int id);
+  EventManager getEventManager();
 }

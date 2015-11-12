@@ -2,7 +2,7 @@ package org.csploit.msf.impl.options;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.csploit.msf.impl.Option;
+import org.csploit.msf.impl.AbstractOption;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Network address range option.
  */
-public class AddressRangeOption extends Option<InetAddress[]> {
+public class AddressRangeOption extends AbstractOption<InetAddress[]> {
 
   public AddressRangeOption(String name, boolean required, String description, InetAddress[] defaultValue) {
     super(name, required, description, defaultValue);
@@ -27,7 +27,7 @@ public class AddressRangeOption extends Option<InetAddress[]> {
   }
 
   @Override
-  protected InetAddress[] normalize(String input) {
+  public InetAddress[] normalize(String input) {
     if(input == null)
       return null;
 
@@ -73,7 +73,7 @@ public class AddressRangeOption extends Option<InetAddress[]> {
   }
 
   @Override
-  protected String display(InetAddress[] value) {
+  public String display(InetAddress[] value) {
     return StringUtils.join(value, " ");
   }
 }

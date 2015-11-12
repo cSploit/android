@@ -2,9 +2,11 @@ package org.csploit.msf.impl;
 
 import org.csploit.msf.api.*;
 import org.csploit.msf.api.Exploit;
+import org.csploit.msf.api.Session;
 import org.csploit.msf.api.Module;
 import org.csploit.msf.api.Payload;
 import org.csploit.msf.api.Post;
+import org.csploit.msf.api.listeners.Listener;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,20 +14,25 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Represent a MetaSploit Framework instance
+ * Represent a Metasploit Framework instance
  */
 class Framework implements DataHolder, InternalFramework {
 
   private DataStore dataStore;
   private ModuleManager moduleManager;
   private JobContainer jobs;
-  private SessionManager sessions;
+  private SessionManager sessionManager;
+  private EventManager eventManager;
 
   public Framework() {
     dataStore = new DataStore();
     moduleManager = new ModuleManager(this, "all");
     jobs = new JobContainer();
-    sessions = new SessionManager(this);
+    sessionManager = new SessionManager();
+    eventManager = new EventManager();
+
+    sessionManager.setFramework(this);
+    sessionManager.start();
   }
 
   @Override
@@ -46,14 +53,23 @@ class Framework implements DataHolder, InternalFramework {
     getDataStore().remove(key);
   }
 
+  @Override
+  public EventManager getEventManager() {
+    return eventManager;
+  }
+
+  @Override
+  public void addSubscriber(Listener listener) {
+    eventManager.addSubscriber(listener);
+  }
+
+  @Override
+  public void removeSubscriber(Listener listener) {
+    eventManager.removeSubscriber(listener);
+  }
+
   public List<Session> getSessions() {
-    List<Integer> keys = new ArrayList<>(sessions.keySet());
-    Collections.sort(keys);
-    List<Session> result = new ArrayList<>(keys.size());
-    for(int k : keys) {
-      result.add(sessions.get(k));
-    }
-    return result;
+    return sessionManager.getSessions();
   }
 
   @Override
@@ -76,16 +92,9 @@ class Framework implements DataHolder, InternalFramework {
     return moduleManager.<org.csploit.msf.impl.Post>getOfType("post");
   }
 
-  public Session getSession(int id) {
-    return sessions.get(id);
-  }
-
-  public void registerSession(Session session) {
-    sessions.put(session.getId(), session);
-  }
-
-  public void unregisterSession(Session session) {
-    sessions.remove(session.getId());
+  @Override
+  public SessionManager getSessionManager() {
+    return sessionManager;
   }
 
   @Override

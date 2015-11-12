@@ -1,11 +1,11 @@
 package org.csploit.msf.impl.options;
 
-import org.csploit.msf.impl.Option;
+import org.csploit.msf.impl.AbstractOption;
 
 /**
  * Enum option.
  */
-public class EnumOption extends Option<String> {
+public class EnumOption extends AbstractOption<String> {
 
   private String[] enums;
 
@@ -20,7 +20,7 @@ public class EnumOption extends Option<String> {
   }
 
   @Override
-  protected String normalize(String input) {
+  public String normalize(String input) {
     for(String s : enums) {
       if(s.equals(input)) {
         return s;
@@ -30,7 +30,7 @@ public class EnumOption extends Option<String> {
   }
 
   @Override
-  protected boolean isValid(String input) {
+  public boolean isValid(String input) {
     return super.isValid(input) && (input == null || normalize(input) != null);
   }
 }

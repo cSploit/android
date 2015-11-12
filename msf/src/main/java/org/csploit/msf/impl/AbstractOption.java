@@ -5,7 +5,7 @@ import org.csploit.msf.api.Module;
 /**
  * Represent an option
  */
-public abstract class Option<T> implements org.csploit.msf.api.Option<T> {
+public abstract class AbstractOption<T> implements org.csploit.msf.api.Option<T> {
   protected boolean advanced;
   protected T defaultValue;
   protected String description;
@@ -14,14 +14,14 @@ public abstract class Option<T> implements org.csploit.msf.api.Option<T> {
   protected Module owner;
   protected boolean required;
 
-  public Option(String name, boolean required, String description, T defaultValue) {
+  public AbstractOption(String name, boolean required, String description, T defaultValue) {
     this.name = name;
     this.required = required;
     this.description = description;
     this.defaultValue = defaultValue;
   }
 
-  public Option(String name, String description, T defaultValue) {
+  public AbstractOption(String name, String description, T defaultValue) {
     this(name, false, description, defaultValue);
   }
 
@@ -73,13 +73,11 @@ public abstract class Option<T> implements org.csploit.msf.api.Option<T> {
     return required;
   }
 
-  protected abstract T normalize(String input);
-
-  protected String display(T value) {
+  public String display(T value) {
     return value.toString();
   }
 
-  protected boolean isValid(T input) {
+  public boolean isValid(T input) {
     if(isRequired() && (input == null || input.toString().length() == 0)) {
       return false;
     }

@@ -1,13 +1,13 @@
 package org.csploit.msf.impl.options;
 
-import org.csploit.msf.impl.Option;
+import org.csploit.msf.impl.AbstractOption;
 
 import java.util.regex.Pattern;
 
 /**
  * A regex option
  */
-public class RegexpOption extends Option<Pattern> {
+public class RegexpOption extends AbstractOption<Pattern> {
 
   public RegexpOption(String name, boolean required, String description, Pattern defaultValue) {
     super(name, required, description, defaultValue);
@@ -18,12 +18,12 @@ public class RegexpOption extends Option<Pattern> {
   }
 
   @Override
-  protected Pattern normalize(String input) {
+  public Pattern normalize(String input) {
     return Pattern.compile(input);
   }
 
   @Override
-  protected String display(Pattern value) {
+  public String display(Pattern value) {
     return value.pattern();
   }
 }

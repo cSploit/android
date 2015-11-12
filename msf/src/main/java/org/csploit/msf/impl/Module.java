@@ -3,6 +3,7 @@ package org.csploit.msf.impl;
 import org.csploit.msf.api.Arch;
 import org.csploit.msf.api.License;
 import org.csploit.msf.api.MsfException;
+import org.csploit.msf.api.Option;
 import org.csploit.msf.api.module.Platform;
 import org.csploit.msf.api.module.Rank;
 import org.csploit.msf.impl.module.ArchSet;
@@ -164,8 +165,8 @@ abstract class Module implements InternalModule {
     return description;
   }
 
-  public void registerOption(String name, Option option, boolean advanced, boolean evasion) {
-    options.addOption(name, option, advanced, evasion);
+  public void registerOption(Option option) {
+    options.add(option);
   }
 
   @Override

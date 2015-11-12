@@ -1,7 +1,5 @@
 package org.csploit.msf.api;
 
-import org.csploit.msf.impl.Option;
-
 import java.io.IOException;
 import java.util.Collection;
 
