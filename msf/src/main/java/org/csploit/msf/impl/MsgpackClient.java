@@ -3,6 +3,7 @@ package org.csploit.msf.impl;
 import org.apache.commons.io.IOUtils;
 import org.csploit.msf.api.MsfException;
 import org.msgpack.MessagePack;
+import org.msgpack.MessagePackable;
 import org.msgpack.packer.Packer;
 import org.msgpack.template.AbstractTemplate;
 import org.msgpack.template.Template;
@@ -36,6 +37,7 @@ class MsgpackClient {
   private static final Template<Map<String, String>> mapStringStringTemplate = Templates.tMap(Templates.TString, Templates.TString);
   private static final Template<Map<Integer, String>> mapIntegerStringTemplate = Templates.tMap(Templates.TInteger, Templates.TString);
   private static final Map<String, Template> methodTemplatesMap = new HashMap<String, Template>() {{
+    put("core.version", mapStringStringTemplate);
     put("auth.login", mapStringStringTemplate);
     put("auth.token_generate", mapStringStringTemplate);
     put("module.exploits", SingleTemplate.getModulesInstance());
@@ -50,19 +52,29 @@ class MsgpackClient {
     put("job.info", JobInfoTemplate.getInstance());
     put("session.list", Templates.tMap(Templates.TInteger, SessionInfoTemplate.getInstance()));
     put("session.compatible_modules", SingleTemplate.getModulesInstance());
-    put("session.stop", SingleTemplate.getBoolInstance());
+    put("session.stop", BooleanResultTemplate.getInstance());
     put("session.shell_read", SingleTemplate.getReadInstance());
     put("session.shell_write", SingleTemplate.getWriteInstance());
-    put("session.shell_upgrade", SingleTemplate.getBoolInstance());
+    put("session.shell_upgrade", BooleanResultTemplate.getInstance());
     put("session.meterpreter_read", SingleTemplate.getReadInstance());
-    put("session.meterpreter_write", SingleTemplate.getBoolInstance());
-    put("session.meterpreter_detach", SingleTemplate.getBoolInstance());
-    put("session.meterpreter_session_kill", SingleTemplate.getBoolInstance());
+    put("session.meterpreter_write", BooleanResultTemplate.getInstance());
+    put("session.meterpreter_detach", BooleanResultTemplate.getInstance());
+    put("session.meterpreter_session_kill", BooleanResultTemplate.getInstance());
     put("session.meterpreter_tabs", SingleTemplate.getTabsInstance());
+    put("console.list", SingleTemplate.getConsolesInstance());
+    put("console.destroy", BooleanResultTemplate.getInstance());
+    put("console.read", ConsoleReadInfoTemplate.getInstance());
+    put("console.write", SingleTemplate.getWroteInstance());
+    put("console.tabs", SingleTemplate.getTabsInstance());
+    put("console.session_kill", BooleanResultTemplate.getInstance());
+    put("console.session_detach", BooleanResultTemplate.getInstance());
   }};
   private static final Map<String, Template> parametricTemplatesMap = new HashMap<String, Template>() {{
     put("module.execute(payload)", SingleTemplate.getPayloadGenerateInstance());
     put("module.execute", SingleTemplate.getJobIdInstance());
+  }};
+  private static final Map<String, Class> methodClassMap = new HashMap<String, Class>() {{
+    put("console.create", ConsoleInfo.class);
   }};
 
   public MsgpackClient(final String host, final String username, final String password, final int port, final boolean ssl) throws IOException, MsfException {
@@ -129,7 +141,7 @@ class MsgpackClient {
       throw new MsfException("failed to execute command: " + methodName, exception);
     } catch (IllegalArgumentException e) {
       bis.reset();
-      unpacker = msgpack.createUnpacker(bis);
+      unpacker = msgpack.createUnpacker(bis); // TODO: check if we can skip this
     }
 
     Template t = null;
@@ -146,11 +158,13 @@ class MsgpackClient {
       }
     }
 
-    if(t == null) {
+    if (t != null) {
+      return unpacker.read(t);
+    } else if (methodClassMap.containsKey(methodName)) {
+      return unpacker.read(methodClassMap.get(methodName));
+    } else {
       throw new MsfException("unknown command: " + (withArg != null ? withArg : methodName));
     }
-
-    return unpacker.read(t);
   }
 
   private void login(String username, String password) throws IOException, MsfException {
@@ -279,6 +293,58 @@ class MsgpackClient {
     return (byte[]) call("module.execute", type, name, options);
   }
 
+  public ConsoleInfo createConsole(boolean allowCommandPassthru, boolean realReadline, String histFile,
+                                   String[] resources, boolean skipDatabaseInit) throws IOException, MsfException {
+
+    Map<String, Object> options = new HashMap<>();
+
+    options.put("AllowCommandPassthru", allowCommandPassthru);
+    options.put("RealReadline", realReadline);
+    options.put("SkipDatabaseInit", skipDatabaseInit);
+
+    if(resources != null) {
+      options.put("Resources", resources);
+    }
+
+    if(histFile != null) {
+      options.put("HistFile", histFile);
+    }
+
+    return (ConsoleInfo) call("console.create", options);
+  }
+
+  public ConsoleInfo createConsole() throws IOException, MsfException {
+    return (ConsoleInfo) call("console.create");
+  }
+
+  public ConsoleInfo[] getConsoles() throws IOException, MsfException {
+    return (ConsoleInfo[]) call("console.list");
+  }
+
+  public boolean closeConsole(int id) throws IOException, MsfException {
+    return (Boolean) call("console.destroy", id);
+  }
+
+  public ConsoleReadInfo readFromConsole(int id) throws IOException, MsfException {
+    return (ConsoleReadInfo) call("console.read", id);
+  }
+
+  public int writeToConsole(int id, String data) throws IOException, MsfException {
+    return (Integer) call("console.write", id, data);
+  }
+
+  public String[] getConsoleTabs(int id, String part) throws IOException, MsfException {
+    return (String[]) call("console.tabs", id, part);
+  }
+
+  public boolean killSessionInConsole(int id) throws IOException, MsfException {
+    return (Boolean) call("console.session_kill", id);
+  }
+
+  public boolean detachSessionFromConsole(int id) throws IOException, MsfException {
+    return (Boolean) call("console.session_detach", id);
+  }
+
   @Override
   public String toString() {
     return String.format("%s: { Url: %s }", this.getClass().getSimpleName(), u);
@@ -325,6 +391,45 @@ class MsgpackClient {
     boolean required, advanced, evasion;
     Object defaultValue;
     String[] enums;
+  }
+
+  public static class ConsoleInfo implements MessagePackable {
+    public int id;
+    public String prompt;
+    public boolean busy;
+
+    @Override
+    public void writeTo(Packer pk) throws IOException {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void readFrom(Unpacker u) throws IOException {
+      int size = u.readMapBegin();
+
+      for(int i = 0; i < size; i++) {
+        String key = u.readString();
+        switch (key) {
+          case "id":
+            id = Integer.parseInt(u.readString());
+            break;
+          case "prompt":
+            prompt = u.readString();
+            break;
+          case "busy":
+            busy = u.readBoolean();
+            break;
+        }
+      }
+
+      u.readMapEnd();
+    }
+  }
+
+  public static class ConsoleReadInfo {
+    public String data;
+    public String prompt;
+    public boolean busy;
   }
 
   public static class ServerException extends MsfException {
@@ -747,15 +852,120 @@ class MsgpackClient {
     }
   }
 
+  private static class ConsoleReadInfoTemplate extends AbstractTemplate<ConsoleReadInfo> {
+
+    private static final ConsoleReadInfoTemplate instance = new ConsoleReadInfoTemplate();
+
+    private ConsoleReadInfoTemplate() { }
+
+    public static ConsoleReadInfoTemplate getInstance() {
+      return instance;
+    }
+
+    @Override
+    public void write(Packer pk, ConsoleReadInfo v, boolean required) throws IOException {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ConsoleReadInfo read(Unpacker u, ConsoleReadInfo to, boolean required) throws IOException {
+      if(!required && u.trySkipNil()) {
+        return null;
+      }
+      int size = u.readMapBegin();
+      int foundFieldsCount = 0;
+
+      if(to == null) {
+        to = new ConsoleReadInfo();
+      }
+
+      for(int i = 0; i < size; i++) {
+        String key = u.readString();
+        switch (key) {
+          case "data":
+            to.data = u.readString();
+            break;
+          case "prompt":
+            to.prompt = u.readString();
+            break;
+          case "busy":
+            to.busy = u.readBoolean();
+            break;
+          default:
+            u.skip();
+            continue;
+        }
+        foundFieldsCount++;
+      }
+
+      if(foundFieldsCount != 3) {
+        throw new IOException("not a " + getClass().getSimpleName() + " hash");
+      }
+
+      u.readMapEnd();
+
+      return to;
+    }
+  }
+
+  private static class BooleanResultTemplate extends AbstractTemplate<Boolean> {
+
+    private static final BooleanResultTemplate instance = new BooleanResultTemplate();
+
+    private BooleanResultTemplate() { }
+
+    public static BooleanResultTemplate getInstance() {
+      return instance;
+    }
+
+    @Override
+    public void write(Packer pk, Boolean v, boolean required) throws IOException {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Boolean read(Unpacker u, Boolean to, boolean required) throws IOException {
+      if(!required && u.trySkipNil()) {
+        return null;
+      }
+      int size = u.readMapBegin();
+
+      for(int i = 0; i < size; i++) {
+        String key = u.readString().toLowerCase();
+        if(!key.equals("result")) {
+          u.skip();
+          continue;
+        }
+        switch (u.getNextType()) {
+          case RAW:
+            String value = u.readString().toLowerCase();
+            to = value.equals("success") || value.equals("yes") || value.equals("true");
+            break;
+          case BOOLEAN:
+            to = u.readBoolean();
+            break;
+          default:
+            throw new IOException("not a boolean result: " + u.readValue());
+        }
+        break;
+      }
+
+      u.readMapEnd();
+
+      return to;
+    }
+  }
+
   private static class SingleTemplate<T> extends AbstractTemplate<T> {
 
     private static final SingleTemplate<Integer> writeInstance = new SingleTemplate<>("write_count", int.class);
+    private static final SingleTemplate<Integer> wroteInstance = new SingleTemplate<>("wrote", int.class);
     private static final SingleTemplate<Integer> jobIdInstance = new SingleTemplate<>("job_id", int.class);
     private static final SingleTemplate<String>  readInstance  = new SingleTemplate<>("data", String.class);
-    private static final SingleTemplate<Boolean> boolInstance = new SingleTemplate<>("result", boolean.class);
     private static final SingleTemplate<byte[]> payloadGenerateInstance = new SingleTemplate<>("payload", byte[].class);
     private static final SingleTemplate<String[]> modulesInstance = new SingleTemplate<>("modules", String[].class);
     private static final SingleTemplate<String[]> tabsInstance = new SingleTemplate<>("tabs", String[].class);
+    private static final SingleTemplate<ConsoleInfo[]> consolesInstance = new SingleTemplate<>("consoles", ConsoleInfo[].class);
 
     private final String mapKey;
     private final Class<? extends T> klass;
@@ -778,10 +988,6 @@ class MsgpackClient {
       return readInstance;
     }
 
-    public static SingleTemplate<Boolean> getBoolInstance() {
-      return boolInstance;
-    }
-
     public static SingleTemplate<byte[]> getPayloadGenerateInstance() {
       return payloadGenerateInstance;
     }
@@ -792,6 +998,14 @@ class MsgpackClient {
 
     public static SingleTemplate<String[]> getTabsInstance() {
       return tabsInstance;
+    }
+
+    public static SingleTemplate<ConsoleInfo[]> getConsolesInstance() {
+      return consolesInstance;
+    }
+
+    public static SingleTemplate<Integer> getWroteInstance() {
+      return wroteInstance;
     }
 
     @Override
@@ -806,14 +1020,21 @@ class MsgpackClient {
       }
 
       int size = u.readMapBegin();
+      boolean found = false;
+
       to = null;
       for(int i = 0; i < size; i++) {
         String key = u.readString();
         if(mapKey.equals(key)) {
           to = u.read(klass);
+          found = true;
           break;
         }
         u.skip();
+      }
+
+      if(!found) {
+        throw new IOException("hash does not contain key '" + mapKey + "'");
       }
 
       u.readMapEnd();

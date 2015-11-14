@@ -228,7 +228,6 @@ class MsgpackProxy implements InternalFramework {
     @Override
     public void close() throws IOException, MsfException {
       getClient().stopSession(getId());
-
     }
 
     @Override
@@ -243,6 +242,7 @@ class MsgpackProxy implements InternalFramework {
 
     @Override
     public void complete() throws IOException, MsfException {
+      interacting = false;
       close();
     }
 

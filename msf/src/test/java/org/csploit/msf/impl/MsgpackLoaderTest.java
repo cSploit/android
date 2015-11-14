@@ -264,4 +264,23 @@ public class MsgpackLoaderTest {
       assertThat(o.getName(), is(o.getClass().getSimpleName()));
     }
   }
+
+  @Test
+  public void testFillConsole() throws Exception {
+    MsgpackConsole console = new MsgpackConsole(null, 0);
+
+    console.setPrompt("");
+    console.setBusy(true);
+
+    MsgpackClient.ConsoleInfo info = new MsgpackClient.ConsoleInfo();
+    info.id = 1;
+    info.prompt = "hello world";
+    info.busy = false;
+
+    MsgpackLoader.fillConsole(info, console);
+
+    assertThat(console.getId(), is(0));
+    assertThat(console.getPrompt(), is("hello world"));
+    assertThat(console.isBusy(), is(false));
+  }
 }

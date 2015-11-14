@@ -1,5 +1,6 @@
 package org.csploit.msf.impl;
 
+import org.csploit.msf.api.Console;
 import org.csploit.msf.api.License;
 import org.csploit.msf.api.Exploit;
 import org.csploit.msf.api.Payload;
@@ -317,5 +318,15 @@ class MsgpackLoader {
     job.setStartTime(new Date(info.startTime));
 
     return job;
+  }
+
+  /**
+   * fill a console with data from {@link org.csploit.msf.impl.MsgpackClient.ConsoleInfo}
+   * @param info source data
+   * @param console destination class
+   */
+  static void fillConsole(MsgpackClient.ConsoleInfo info, MsgpackConsole console) {
+    console.setBusy(info.busy);
+    console.setPrompt(info.prompt);
   }
 }
