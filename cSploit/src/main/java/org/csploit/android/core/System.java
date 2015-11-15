@@ -40,7 +40,7 @@ import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.apache.commons.compress.utils.IOUtils;
 import org.csploit.android.R;
-import org.csploit.android.WifiScannerActivity;
+import org.csploit.android.WifiScannerFragment;
 import org.csploit.android.gui.dialogs.FatalDialog;
 import org.csploit.android.helpers.NetworkHelper;
 import org.csploit.android.helpers.ThreadHelper;
@@ -196,19 +196,28 @@ public class System {
       // initialize network data at the end
       uncaughtReloadNetworkMapping();
 
-      ThreadHelper.getSharedExecutor().execute(new Runnable() {
-        @Override
-        public void run() {
-          preloadVendors();
-          preloadServices();
-        }
-      });
+      if(isCoreInstalled())
+        beginLoadServicesAndVendors();
     } catch (Exception e) {
       if (!(e instanceof NoRouteToHostException))
         errorLogging(e);
 
       throw e;
     }
+  }
+
+  private static void beginLoadServicesAndVendors() {
+    ThreadHelper.getSharedExecutor().execute(new Runnable() {
+      @Override
+      public void run() {
+        preloadVendors();
+        preloadServices();
+      }
+    });
+  }
+
+  public static void onCoreInstalled() {
+    beginLoadServicesAndVendors();
   }
 
   public static void reloadTools() {
@@ -378,7 +387,7 @@ public class System {
     if (!mNetwork.isConnected()) {
 
       Intent intent = new Intent();
-      intent.putExtra(WifiScannerActivity.CONNECTED, false);
+      intent.putExtra(WifiScannerFragment.CONNECTED, false);
       current.setResult(Activity.RESULT_OK, intent);
 
       String title = current.getString(R.string.error);
@@ -945,15 +954,22 @@ public class System {
     synchronized (mTargets) {
       mTargets.clear();
 
-      Target network = new Target(mNetwork),
-              gateway = new Target(mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware()),
-              device = new Target(mNetwork.getLocalAddress(), mNetwork.getLocalHardware());
+      Target network, gateway, device;
 
-      gateway.setAlias(mNetwork.getSSID());
+      network = new Target(mNetwork);
+      device = new Target(mNetwork.getLocalAddress(), mNetwork.getLocalHardware());
+
+
       device.setAlias(android.os.Build.MODEL);
 
       mTargets.add(network);
-      mTargets.add(gateway);
+
+      if(mNetwork.haveGateway()) {
+        gateway = new Target(mNetwork.getGatewayAddress(), mNetwork.getGatewayHardware());
+        gateway.setAlias(mNetwork.getSSID());
+        mTargets.add(gateway);
+      }
+
       mTargets.add(device);
 
       scanThemAll();
@@ -995,7 +1011,9 @@ public class System {
 
   public static void markInitialNetworkTargetsAsConnected() {
     InetAddress localAddress = mNetwork.getLocalAddress();
+    boolean haveGateway = mNetwork.haveGateway();
     InetAddress gatewayAddress = mNetwork.getGatewayAddress();
+
     synchronized (mTargets) {
       for (Target t : mTargets) {
         switch (t.getType()) {
@@ -1005,7 +1023,7 @@ public class System {
             }
           default:
             if (localAddress.equals(t.getAddress()) ||
-                    gatewayAddress.equals(t.getAddress())) {
+                    (haveGateway && gatewayAddress.equals(t.getAddress()))) {
               t.setConneced(true);
             }
             break;
@@ -1210,10 +1228,6 @@ public class System {
 
   public static Collection<Exploit> getCurrentExploits() {
     return getCurrentTarget().getExploits();
-  }
-
-  public static String getGatewayAddress() {
-    return mNetwork.getGatewayAddress().getHostAddress();
   }
 
   public static boolean isForwardingEnabled() {

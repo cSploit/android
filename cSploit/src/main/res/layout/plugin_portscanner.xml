@@ -4,18 +4,6 @@
     android:layout_height="fill_parent"
     android:orientation="vertical">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/scanToggleButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_margin="16dp"
-        android:checked="false"
-        android:src="@drawable/ic_play_arrow_24dp"
-        android:translationZ="8dp" />
-
-
     <ListView
         android:id="@+id/scanListView"
         android:layout_width="match_parent"
@@ -69,5 +57,16 @@
         android:textAlignment="center"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:visibility="gone" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/scanToggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="16dp"
+        android:checked="false"
+        android:src="@drawable/ic_play_arrow_24dp"
+        android:translationZ="8dp" />
 
 </RelativeLayout>

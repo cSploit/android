@@ -66,6 +66,10 @@ This program is free software: you can redistribute it and/or modify it under th
 
 Copyleft Margaritelli of Simone aka evilsocket and then fused with zANTI2 continued by @tux-mind and additional contributors.
 
+## Support us
+
+[![Click here to lend your support to:  cSploit, an open source penetration testing suite and make a donation at pledgie.com !](https://pledgie.com/campaigns/30393.png?skin_name=chrome)](https://pledgie.com/campaigns/30393)
+
 [![Click here to lend your support to: cSploit and make a donation at www.paypal.com](https://www.paypalobjects.com/en_GB/i/btn/btn_donate_LG.gif?skin_name=chrome)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=FTKXDCBEDMW9G&lc=GB&item_name=cSploit&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted)
 
 ## Disclaimer

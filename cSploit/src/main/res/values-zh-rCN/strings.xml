@@ -359,6 +359,8 @@ If not, see http://www.gnu.org/licenses/.
     <string name="pref_theme">暗色主题</string>
     <string name="pref_choose_theme">启用暗色主题，更加护眼</string>
     <string name="please_restart">新的主题将在您重新启动应用后生效</string>
+    <string name="pref_auto_portscan">端口自动扫描</string>
+    <string name="pref_auto_portscan_desc">自动使用SYN扫描发现的新主机端口</string>
     <string name="evasion">规避</string>
     <string name="search_exact_version">精确版本</string>
     <string name="sessions_title">单击会话打开终端，或长按以查看更多选项。</string>
