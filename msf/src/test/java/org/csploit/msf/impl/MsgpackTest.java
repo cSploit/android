@@ -15,6 +15,7 @@ import org.csploit.msf.api.Job;
 import org.csploit.msf.api.events.ConsoleEvent;
 import org.csploit.msf.api.events.ConsoleOutputEvent;
 import org.csploit.msf.api.listeners.ConsoleListener;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -25,11 +26,7 @@ import java.util.List;
  */
 public class MsgpackTest {
 
-  private static final String host = "127.0.0.1";
-  private static final String username = "msf";
-  private static final String password = "msf";
-  private static final int port = 55553;
-  private static final boolean ssl = false;
+  private MsgpackFactory factory;
 
   private static class DummyConsoleListener implements ConsoleListener {
 
@@ -60,24 +57,21 @@ public class MsgpackTest {
     }
   }
 
-  private static Framework createMsgpackFramework() throws Exception {
-    return FrameworkFactory.newMsgpackFramework(host, username, password, port, ssl);
-  }
-
-  private static ConsoleManager createMsgpackConsoleManager() throws Exception {
-    return ConsoleManagerFactory.createMsgpackConsoleManager(host, username, password, port, ssl);
+  @Before
+  public void setUp() throws Exception {
+    factory = new MsgpackFactory("127.0.0.1", "msf", "msf", 55553, false);
   }
 
   @Test
   public void testSessionsList() throws Exception {
-    Framework framework = createMsgpackFramework();
+    Framework framework = factory.createFramework();
 
     framework.getSessions();
   }
 
   @Test
   public void testSessionCompatibleModules() throws Exception {
-    Framework framework = createMsgpackFramework();
+    Framework framework = factory.createFramework();
 
     for(Session s : framework.getSessions()) {
       s.getCompatibleModules();
@@ -86,14 +80,14 @@ public class MsgpackTest {
 
   @Test
   public void testJobList() throws Exception {
-    Framework framework = createMsgpackFramework();
+    Framework framework = factory.createFramework();
 
     framework.getJobs();
   }
 
   @Test
   public void testGetJob() throws Exception {
-    Framework framework = createMsgpackFramework();
+    Framework framework = factory.createFramework();
 
     for(Job j : framework.getJobs()) {
       framework.getJob(j.getId());
@@ -102,7 +96,7 @@ public class MsgpackTest {
 
   @Test
   public void testGetExploits() throws Exception {
-    Framework framework = createMsgpackFramework();
+    Framework framework = factory.createFramework();
 
     List<? extends Exploit> result = framework.getExploits();
 
@@ -119,7 +113,7 @@ public class MsgpackTest {
 
   @Test
   public void testGetModuleOptions() throws Exception {
-    Framework framework = createMsgpackFramework();
+    Framework framework = factory.createFramework();
 
     List<Module> allModules = new ArrayList<>();
 
@@ -134,7 +128,7 @@ public class MsgpackTest {
 
   @Test
   public void testGetPayloads() throws Exception {
-    Framework framework = createMsgpackFramework();
+    Framework framework = factory.createFramework();
 
     List<? extends Payload> result = framework.getPayloads();
 
@@ -151,7 +145,7 @@ public class MsgpackTest {
 
   @Test
   public void testGetPosts() throws Exception {
-    Framework framework = createMsgpackFramework();
+    Framework framework = factory.createFramework();
 
     List<? extends Post> result = framework.getPosts();
 
@@ -168,7 +162,7 @@ public class MsgpackTest {
 
   @Test(timeout = 10000)
   public void testConsoles() throws Exception {
-    ConsoleManager consoleManager = createMsgpackConsoleManager();
+    ConsoleManager consoleManager = factory.createConsoleManager();
     DummyConsoleListener listener = new DummyConsoleListener();
 
     consoleManager.start();
