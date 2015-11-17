@@ -182,7 +182,8 @@ public class MsgpackLoaderTest {
 
   @Test
   public void testFillModule() throws Exception {
-    InternalModule module = MsgpackProxy.Factory.newModule("exploit", "test");
+    InternalModule module = new MsgpackProxy.ModuleFactory(null, null)
+            .createModule("exploit", "test");
 
     MsgpackLoader.fillModule(module, sampleModuleInfo);
 
@@ -252,7 +253,8 @@ public class MsgpackLoaderTest {
 
   @Test
   public void testFillModuleOptions() throws Exception {
-    InternalModule sampleModule = MsgpackProxy.Factory.newModule("exploit", "test");
+    InternalModule sampleModule = new MsgpackProxy.ModuleFactory(null, null)
+            .createModule("exploit", "test");
 
     assertThat(sampleModule.getOptions().isEmpty(), is(true));
 

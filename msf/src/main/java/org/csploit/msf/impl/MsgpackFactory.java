@@ -10,6 +10,7 @@ import java.io.IOException;
  */
 public class MsgpackFactory {
   private final MsgpackClient client;
+  private final MsgpackProxy.FrameworkFactory frameworkFactory;
 
   /**
    * create a {@link MsgpackFactory} using the specified parameters
@@ -22,19 +23,20 @@ public class MsgpackFactory {
   public MsgpackFactory(String host, String username, String password, int port, boolean ssl)
           throws IOException, MsfException {
     this.client = new MsgpackClient(host, username, password, port, ssl);
+    frameworkFactory = new MsgpackProxy.FrameworkFactory(client);
   }
 
   /**
    * create a {@link Framework}
-   * @return
+   * @return a new {@link Framework}
    */
   public Framework createFramework() {
-    return MsgpackProxy.Factory.newFramework(client);
+    return frameworkFactory.createFramework();
   }
 
   /**
    * create a {@link ConsoleManager}
-   * @return
+   * @return a new {@link ConsoleManager}
    */
   public ConsoleManager createConsoleManager() {
     return new MsgpackConsoleManager(client);

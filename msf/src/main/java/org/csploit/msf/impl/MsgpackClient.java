@@ -41,6 +41,8 @@ class MsgpackClient {
     put("auth.login", mapStringStringTemplate);
     put("auth.token_generate", mapStringStringTemplate);
     put("module.exploits", SingleTemplate.getModulesInstance());
+    put("module.compatible_payloads", SingleTemplate.getPayloadsInstance());
+    put("module.target_compatible_payloads", SingleTemplate.getPayloadsInstance());
     put("module.post", SingleTemplate.getModulesInstance());
     put("module.payloads", SingleTemplate.getModulesInstance());
     put("module.auxiliary", SingleTemplate.getModulesInstance());
@@ -203,6 +205,23 @@ class MsgpackClient {
 
   public String[] getExploits() throws IOException, MsfException {
     return (String[]) call("module.exploits");
+  }
+
+  /**
+   * @see {@link MsgpackClient#getExploitCompatiblePayloads(String, int)}
+   */
+  public String[] getExploitCompatiblePayloads(String refname) throws IOException, MsfException {
+    return (String[]) call("module.compatible_payloads", refname);
+  }
+
+  /**
+   * get payloads that are compatible with the specified exploit
+   * @param refname the exploit refname
+   * @param i the chosen target index
+   * @return a list of compatible payloads
+   */
+  public String[] getExploitCompatiblePayloads(String refname, int i) throws IOException, MsfException {
+    return (String[]) call("module.target_compatible_payloads", refname, i);
   }
 
   public String[] getPayloads() throws IOException, MsfException {
@@ -966,6 +985,7 @@ class MsgpackClient {
     private static final SingleTemplate<String[]> modulesInstance = new SingleTemplate<>("modules", String[].class);
     private static final SingleTemplate<String[]> tabsInstance = new SingleTemplate<>("tabs", String[].class);
     private static final SingleTemplate<ConsoleInfo[]> consolesInstance = new SingleTemplate<>("consoles", ConsoleInfo[].class);
+    private static final SingleTemplate<String[]> payloadsInstance = new SingleTemplate<>("payloads", String[].class);
 
     private final String mapKey;
     private final Class<? extends T> klass;
@@ -1006,6 +1026,10 @@ class MsgpackClient {
 
     public static SingleTemplate<Integer> getWroteInstance() {
       return wroteInstance;
+    }
+
+    public static SingleTemplate<String[]> getPayloadsInstance() {
+      return payloadsInstance;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package org.csploit.msf.impl;
 
-import org.csploit.msf.api.Console;
 import org.csploit.msf.api.License;
 import org.csploit.msf.api.Exploit;
 import org.csploit.msf.api.Payload;
@@ -29,9 +28,15 @@ class MsgpackLoader {
   private final MsgpackClient client;
   private final InternalFramework framework;
 
+  private final MsgpackProxy.ModuleFactory moduleFactory;
+  private final MsgpackProxy.SessionFactory sessionFactory;
+
   public MsgpackLoader(MsgpackClient client, InternalFramework framework) {
     this.client = client;
     this.framework = framework;
+
+    moduleFactory = new MsgpackProxy.ModuleFactory(client, framework);
+    sessionFactory = new MsgpackProxy.SessionFactory(client, framework);
   }
 
   public Module loadModule(String fullname) throws IOException, MsfException {
@@ -63,7 +68,9 @@ class MsgpackLoader {
       return result;
     }
 
-    result = MsgpackProxy.Factory.newModule(type, name);
+    result = moduleFactory.createModule(type, name);
+
+    result.setFramework(framework);
 
     if(result instanceof MsgpackProxy.MsgpackCommunicator) {
       ((MsgpackProxy.MsgpackCommunicator) result).setClient(client);
@@ -75,10 +82,16 @@ class MsgpackLoader {
   }
 
   private InternalModule fetchModule(String type, String refname) throws IOException, MsfException, IllegalArgumentException {
-    InternalModule module = MsgpackProxy.Factory.newModule(type, refname);
+    InternalModule module = moduleFactory.createModule(type, refname);
     MsgpackClient.ModuleInfo response = client.getModuleInfo(type, refname);
 
     fillModule(module, response);
+
+    module.setFramework(framework);
+
+    if(module instanceof MsgpackProxy.MsgpackCommunicator) {
+      ((MsgpackProxy.MsgpackCommunicator) module).setClient(client);
+    }
 
     return module;
   }
@@ -238,7 +251,7 @@ class MsgpackLoader {
           throws NameHelper.BadSessionTypeException {
     AbstractSession session;
 
-    session = MsgpackProxy.Factory.newSessionFromType(info.type, id);
+    session = sessionFactory.createSession(info.type, id);
 
     session.setFramework(framework);
     ((MsgpackProxy.MsgpackCommunicator) session).setClient(client);

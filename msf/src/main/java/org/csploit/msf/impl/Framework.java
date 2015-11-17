@@ -124,4 +124,10 @@ class Framework implements DataHolder, InternalFramework {
   public void unregisterJob(int id) {
     jobs.remove(id);
   }
+
+  @Override
+  protected void finalize() throws Throwable {
+    sessionManager.stop();
+    super.finalize();
+  }
 }

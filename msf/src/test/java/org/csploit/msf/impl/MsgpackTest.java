@@ -109,6 +109,10 @@ public class MsgpackTest {
     first = (Exploit) framework.getModule(first.getFullName());
 
     assertThat(MsgpackLoader.isModuleAlreadyFetched(first), is(true));
+
+    for(Exploit e : result) {
+      e.getCompatiblePayloads();
+    }
   }
 
   @Test

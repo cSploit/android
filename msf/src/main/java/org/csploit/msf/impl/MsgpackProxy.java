@@ -338,11 +338,12 @@ class MsgpackProxy implements InternalFramework {
     }
   }
 
-  static abstract class ModuleProxy implements InternalModule, MsgpackCommunicator {
+  static abstract class ModuleProxy<T extends InternalModule> implements InternalModule, MsgpackCommunicator {
     private MsgpackClient client;
-    protected InternalModule instance;
+    private MsgpackLoader loader;
+    protected T instance;
 
-    public ModuleProxy(InternalModule instance) {
+    public ModuleProxy(T instance) {
       this.instance = instance;
     }
 
@@ -354,6 +355,13 @@ class MsgpackProxy implements InternalFramework {
     @Override
     public void setClient(MsgpackClient client) {
       this.client = client;
+    }
+
+    protected MsgpackLoader getLoader() {
+      if(loader == null) {
+        loader = new MsgpackLoader(client, getFramework());
+      }
+      return loader;
     }
 
     @Override
@@ -373,7 +381,7 @@ class MsgpackProxy implements InternalFramework {
     }
 
     @Override
-    public <T> T getOptionValue(Option<T> option) {
+    public <K> K getOptionValue(Option<K> option) {
       return instance.getOptionValue(option);
     }
 
@@ -533,26 +541,49 @@ class MsgpackProxy implements InternalFramework {
     }
   }
 
-  static class ExploitProxy extends ModuleProxy implements InternalExploit {
+  static class ExploitProxy extends ModuleProxy<InternalExploit> implements InternalExploit {
 
     public ExploitProxy(InternalExploit instance) {
       super(instance);
     }
 
     public void setTargets(Target[] targets) {
-      ((InternalExploit)instance).setTargets(targets);
+      instance.setTargets(targets);
     }
 
     public void setDefaultTarget(int defaultTarget) {
-      ((InternalExploit)instance).setDefaultTarget(defaultTarget);
+      instance.setDefaultTarget(defaultTarget);
     }
 
     public Target[] getTargets() {
-      return ((InternalExploit)instance).getTargets();
+      return instance.getTargets();
     }
 
     public Target getTarget() {
-      return ((InternalExploit)instance).getTarget();
+      return instance.getTarget();
+    }
+
+    @Override
+    public void setTarget(int i) {
+      instance.setTarget(i);
+    }
+
+    @Override
+    public int getTargetIndex() {
+      return instance.getTargetIndex();
+    }
+
+    @Override
+    public List<? extends Payload> getCompatiblePayloads() throws IOException, MsfException {
+      String [] response = getClient()
+              .getExploitCompatiblePayloads(getRefname(), getTargetIndex());
+      List<Payload> result = new ArrayList<>();
+
+      for(String refname : response) {
+        result.add((Payload) getLoader().lazyLoadModule("payload", refname));
+      }
+
+      return result;
     }
 
     @Override
@@ -563,7 +594,7 @@ class MsgpackProxy implements InternalFramework {
     }
   }
 
-  static class PayloadProxy extends ModuleProxy implements Payload {
+  static class PayloadProxy extends ModuleProxy<InternalModule> implements Payload {
 
     public PayloadProxy(InternalModule payload) {
       super(payload);
@@ -575,7 +606,7 @@ class MsgpackProxy implements InternalFramework {
     }
   }
 
-  static class PostProxy extends ModuleProxy implements Post {
+  static class PostProxy extends ModuleProxy<InternalModule> implements Post {
 
     public PostProxy(InternalModule instance) {
       super(instance);
@@ -587,7 +618,7 @@ class MsgpackProxy implements InternalFramework {
     }
   }
 
-  static class AuxiliaryProxy extends ModuleProxy implements InternalAuxiliary {
+  static class AuxiliaryProxy extends ModuleProxy<InternalAuxiliary> implements InternalAuxiliary {
 
     public AuxiliaryProxy(InternalAuxiliary instance) {
       super(instance);
@@ -595,27 +626,27 @@ class MsgpackProxy implements InternalFramework {
 
     @Override
     public void setDefaultAction(String defaultAction) {
-      ((InternalAuxiliary) instance).setDefaultAction(defaultAction);
+      instance.setDefaultAction(defaultAction);
     }
 
     @Override
     public void setActions(AuxiliaryAction[] actions) {
-      ((InternalAuxiliary) instance).setActions(actions);
+      instance.setActions(actions);
     }
 
     @Override
     public void setDefaultAction(int defaultAction) {
-      ((InternalAuxiliary) instance).setDefaultAction(defaultAction);
+      instance.setDefaultAction(defaultAction);
     }
 
     @Override
     public AuxiliaryAction[] getActions() {
-      return ((InternalAuxiliary) instance).getActions();
+      return instance.getActions();
     }
 
     @Override
     public AuxiliaryAction getDefaultAction() {
-      return ((InternalAuxiliary) instance).getDefaultAction();
+      return instance.getDefaultAction();
     }
 
     @Override
@@ -624,41 +655,81 @@ class MsgpackProxy implements InternalFramework {
     }
   }
 
-  public static final class Factory {
+  public static class FrameworkFactory {
+    private final MsgpackClient client;
 
-    public static org.csploit.msf.api.Framework newFramework(MsgpackClient client) {
-      return new MsgpackProxy(client);
+    public FrameworkFactory(MsgpackClient client) {
+      this.client = client;
     }
 
-    public static AbstractSession newSessionFromType(String type, int id)
-            throws NameHelper.BadSessionTypeException {
+    public org.csploit.msf.api.Framework createFramework() {
+      return new MsgpackProxy(client);
+    }
+  }
+
+  public static class SessionFactory {
+    private final MsgpackClient client;
+    private final InternalFramework framework;
+
+    public SessionFactory(MsgpackClient client, InternalFramework framework) {
+      this.client = client;
+      this.framework = framework;
+    }
+
+    public AbstractSession createSession(String type, int id)
+      throws NameHelper.BadSessionTypeException {
+      SessionProxy result;
+
       switch (type) {
         case "shell":
-          return new MsgpackProxy.ShellProxy(id);
+          result = new MsgpackProxy.ShellProxy(id);
+          break;
         case "meterpreter":
-          return new MsgpackProxy.MeterpreterProxy(id);
+          result = new MsgpackProxy.MeterpreterProxy(id);
+          break;
         default:
           throw new NameHelper.BadSessionTypeException(type);
       }
+
+      result.setFramework(framework);
+      result.setClient(client);
+
+      return result;
+    }
+  }
+
+  public static class ModuleFactory {
+    private final MsgpackClient client;
+    private final InternalFramework framework;
+
+    public ModuleFactory(MsgpackClient client, InternalFramework framework) {
+      this.client = client;
+      this.framework = framework;
     }
 
-    public static InternalModule newModule(String type, String refname)
-            throws NameHelper.BadModuleTypeException {
-
+    public InternalModule createModule(String type, String refname)
+      throws NameHelper.BadModuleTypeException {
       InternalModule module = org.csploit.msf.impl.Module.fromType(type, refname);
 
+      module.setFramework(framework);
+
       if(module instanceof InternalExploit) {
-        return new ExploitProxy((InternalExploit) module);
+        module = new ExploitProxy((InternalExploit) module);
       } else if(module instanceof InternalAuxiliary) {
-        return new AuxiliaryProxy((InternalAuxiliary) module);
+        module = new AuxiliaryProxy((InternalAuxiliary) module);
       } else if(module instanceof Post) {
-        return new PostProxy(module);
+        module = new PostProxy(module);
       } else if(module instanceof Payload) {
-        return new PayloadProxy(module);
-      } else {
-        // unproxied
-        return module;
+        module = new PayloadProxy(module);
       }
+
+      module.setFramework(framework);
+
+      if(module instanceof MsgpackCommunicator) {
+        ((MsgpackCommunicator) module).setClient(client);
+      }
+
+      return module;
     }
   }
 }
