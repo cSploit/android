@@ -24,6 +24,7 @@ import android.net.DhcpInfo;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.support.annotation.NonNull;
 import android.util.Patterns;
 
 import org.apache.commons.compress.utils.IOUtils;
@@ -49,7 +50,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Network {
+public class Network implements Comparable<Network> {
   public enum Protocol {
     TCP,
     UDP,
@@ -337,6 +338,14 @@ public class Network {
 
   public InetAddress getLocalAddress() {
     return mLocal.toInetAddress();
+  }
+
+  @Override
+  public int compareTo(@NonNull Network another) {
+    if(mBase.equals(another.mBase)) {
+      return mNetmask.getPrefixLength() - another.mNetmask.getPrefixLength();
+    }
+    return mBase.compareTo(another.mBase);
   }
 
   private static boolean isIfaceConnected(NetworkInterface networkInterface) {
