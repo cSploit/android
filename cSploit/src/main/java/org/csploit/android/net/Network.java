@@ -158,7 +158,7 @@ public class Network {
 
       mInterface = NetworkInterface.getByName(iface);
 
-      if (mInterface.getInterfaceAddresses().isEmpty()) {
+      if (mInterface == null || mInterface.getInterfaceAddresses().isEmpty()) {
         return false;
       }
 
