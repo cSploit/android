@@ -32,8 +32,8 @@ public class DNSCache
 {
   private static DNSCache mInstance = new DNSCache();
 
-  private HashMap<String, InetAddress> mCache = null;
-  private ArrayList<String> mCachedRootDomain = null;
+  private final HashMap<String, InetAddress> mCache;
+  private final ArrayList<String> mRootDomainCache;
 
   public static DNSCache getInstance(){
     return mInstance;
@@ -41,7 +41,7 @@ public class DNSCache
 
   private DNSCache() {
     mCache = new HashMap<>();
-    mCachedRootDomain = new ArrayList<>();
+    mRootDomainCache = new ArrayList<>();
   }
 
   /**
@@ -50,10 +50,12 @@ public class DNSCache
    * @param hostname hostname to check
    * @return String the root domain or null
    */
-  public String getCachedRootDomain (String hostname){
-    for (String rootDomain : mCachedRootDomain){
-      if (hostname.endsWith(rootDomain)){
-        return rootDomain;
+  public String getRootDomain(String hostname){
+    synchronized (mRootDomainCache) {
+      for (String rootDomain : mRootDomainCache) {
+        if (hostname.endsWith(rootDomain)) {
+          return rootDomain;
+        }
       }
     }
 
@@ -66,8 +68,10 @@ public class DNSCache
    *
    * @param rootdomain Root domain to add to the list
    */
-  public void addCachedRootDomain (String rootdomain){
-    mCachedRootDomain.add(rootdomain);
+  public void addRootDomain(String rootdomain){
+    synchronized (mRootDomainCache) {
+      mRootDomainCache.add(rootdomain);
+    }
   }
 
   private InetAddress getAddress(String server) throws IOException{
