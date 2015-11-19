@@ -30,21 +30,18 @@ import javax.net.SocketFactory;
 
 public class DNSCache
 {
-  private static DNSCache mInstance = null;
+  private static DNSCache mInstance = new DNSCache();
 
   private HashMap<String, InetAddress> mCache = null;
   private ArrayList<String> mCachedRootDomain = null;
 
   public static DNSCache getInstance(){
-    if(mInstance == null)
-      mInstance = new DNSCache();
-
     return mInstance;
   }
 
-  public DNSCache(){
-    mCache = new HashMap<String, InetAddress>();
-    mCachedRootDomain = new ArrayList<String>();
+  private DNSCache() {
+    mCache = new HashMap<>();
+    mCachedRootDomain = new ArrayList<>();
   }
 
   /**
