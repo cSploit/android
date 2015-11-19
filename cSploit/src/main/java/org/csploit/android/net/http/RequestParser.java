@@ -297,7 +297,7 @@ public class RequestParser
     if(Patterns.IP_ADDRESS.matcher(hostname).matches())
       return hostname;
 
-    String cached_domain = DNSCache.getInstance().getCachedRootDomain(hostname);
+    String cached_domain = DNSCache.getInstance().getRootDomain(hostname);
     if (cached_domain != null) {
       return cached_domain;
     }
@@ -318,7 +318,7 @@ public class RequestParser
           domain += host_parts[i] + ".";
         }
 
-        DNSCache.getInstance().addCachedRootDomain(domain.substring(0, domain.length() - 1));
+        DNSCache.getInstance().addRootDomain(domain.substring(0, domain.length() - 1));
         return domain.substring(0, domain.length() - 1);
       }
     }
@@ -333,7 +333,7 @@ public class RequestParser
     }
 
     if(startIndex > 0) {
-      DNSCache.getInstance().addCachedRootDomain(hostname.substring(startIndex));
+      DNSCache.getInstance().addRootDomain(hostname.substring(startIndex));
       return hostname.substring(startIndex);
     }
     else
