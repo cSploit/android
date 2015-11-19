@@ -24,6 +24,7 @@ import android.net.DhcpInfo;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.support.annotation.NonNull;
 
 import org.apache.commons.net.util.SubnetUtils;
 
@@ -36,7 +37,7 @@ import java.net.UnknownHostException;
 import org.csploit.android.core.Logger;
 import org.csploit.android.core.System;
 
-public class Network
+public class Network implements Comparable<Network>
 {
   public enum Protocol{
     TCP,
@@ -264,5 +265,13 @@ public class Network
 
   public NetworkInterface getInterface(){
     return mInterface;
+  }
+
+  @Override
+  public int compareTo(@NonNull Network another) {
+    if(mBase.equals(another.mBase)) {
+      return mNetmask.getPrefixLength() - another.mNetmask.getPrefixLength();
+    }
+    return mBase.compareTo(another.mBase);
   }
 }

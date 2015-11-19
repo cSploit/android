@@ -19,6 +19,7 @@
 package org.csploit.android.net;
 
 import android.os.StrictMode;
+import android.support.annotation.NonNull;
 
 import org.csploit.android.R;
 import org.csploit.android.core.Logger;
@@ -39,7 +40,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Target
+public class Target implements Comparable<Target>
 {
 
   public enum Type{
@@ -440,8 +441,34 @@ public class Target
     return mAlias != null && !mAlias.isEmpty();
   }
 
-  public boolean comesAfter(Target target){
-    return mType != Type.NETWORK && (mType != Type.ENDPOINT || target.getType() == Type.ENDPOINT && mEndpoint.getAddressAsLong() > target.getEndpoint().getAddressAsLong());
+  @Override
+  public int compareTo(@NonNull Target another) {
+    if(mType != another.mType) {
+      if(mType == Type.NETWORK) {
+        return -1;
+      } else if (mType == Type.REMOTE) {
+        return +1;
+      } else if (another.mType == Type.NETWORK){
+        return +1;
+      } else { // another is REMOTE
+        return -1;
+      }
+    }
+    if(mType == Type.NETWORK) {
+      return mNetwork.compareTo(another.mNetwork);
+    } else if(mType == Type.REMOTE){
+      return mHostname.compareTo(another.mHostname);
+    } else {
+      try {
+        if (mEndpoint.getAddress().equals(System.getNetwork().getGatewayAddress()))
+          return -1;
+        else if (mEndpoint.getAddress().equals(System.getNetwork().getLocalAddress()))
+          return +1;
+      } catch (Exception e) {
+        System.errorLogging(e);
+      }
+      return mEndpoint.compareTo(another.mEndpoint);
+    }
   }
 
   public Target(Network net){
@@ -482,7 +509,6 @@ public class Target
       else if(mType == Type.REMOTE)
         return mHostname.equals(target.getHostname());
     }
-
 
     return false;
   }

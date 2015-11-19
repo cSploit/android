@@ -18,14 +18,17 @@
  */
 package org.csploit.android.net;
 
+import android.support.annotation.NonNull;
+
 import java.io.BufferedReader;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.csploit.android.core.System;
+import org.csploit.android.helpers.NetworkHelper;
 
-public class Endpoint
+public class Endpoint implements Comparable<Endpoint>
 {
   private InetAddress mAddress = null;
   private byte[] mHardware = null;
@@ -99,14 +102,19 @@ public class Endpoint
       return mAddress.equals(endpoint.getAddress());
   }
 
-  public InetAddress getAddress(){
-    return mAddress;
+  @Override
+  public int compareTo(@NonNull Endpoint another) {
+    if(mHardware != null && another.mHardware != null) {
+      if(NetworkHelper.compareByteArray(mHardware, another.mHardware) == 0) {
+        return 0;
+      }
+    }
+
+    return NetworkHelper.compareInetAddresses(mAddress, another.mAddress);
   }
 
-  public long getAddressAsLong(){
-    byte[] baddr = mAddress.getAddress();
-
-    return ((baddr[0] & 0xFFl) << 24) + ((baddr[1] & 0xFFl) << 16) + ((baddr[2] & 0xFFl) << 8) + (baddr[3] & 0xFFl);
+  public InetAddress getAddress(){
+    return mAddress;
   }
 
   public void setAddress(InetAddress address){

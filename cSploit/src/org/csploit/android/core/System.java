@@ -87,6 +87,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Observer;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -111,7 +113,7 @@ public class System
   private static WifiLock mWifiLock = null;
   private static WakeLock mWakeLock = null;
   private static Network mNetwork = null;
-  private static final List<Target> mTargets = new ArrayList<>();
+  private static final SortedSet<Target> mTargets = new TreeSet<>();
   private static Target mCurrentTarget = null;
   private static Map<String, String> mServices = null;
   private static Map<String, String> mPorts = null;
@@ -824,20 +826,11 @@ public class System
 
         // read targets
         int targets = Integer.parseInt(reader.readLine());
-        for(int i = 0; i < targets; i++){
-          Target target = new Target(reader);
 
-          if(!hasTarget(target)){
-            System.addOrderedTarget(target);
-          } else{
-            synchronized (mTargets) {
-              for (int j = 0; j < mTargets.size(); j++) {
-                if (mTargets.get(j) != null && mTargets.get(j).equals(target)) {
-                  mTargets.set(j, target);
-                  break;
-                }
-              }
-            }
+        synchronized (mTargets) {
+          for (int i = 0; i < targets; i++) {
+            Target target = new Target(reader);
+            mTargets.add(target);
           }
         }
 
@@ -1034,30 +1027,16 @@ public class System
     if(target == null)
       return false;
 
+    boolean changed;
+
     synchronized (mTargets) {
-      if(mTargets.contains(target)) {
-        return false;
+      changed = mTargets.add(target);
+      if(changed) {
+        Services.getNetworkRadar().onNewTargetFound(target);
+        notifyTargetListChanged();
       }
-
-      boolean inserted = false;
-
-      int start_idx = 3;
-      if(!mNetwork.haveGateway()) start_idx = 2;
-      for (int i = start_idx; i < mTargets.size(); i++) {
-        if (mTargets.get(i).comesAfter(target)) {
-          mTargets.add(i, target);
-          inserted = true;
-          break;
-        }
-      }
-
-      if(!inserted)
-        mTargets.add(target);
-
-      Services.getNetworkRadar().onNewTargetFound(target);
-      notifyTargetListChanged();
-      return true;
     }
+    return changed;
   }
 
   public static boolean hasTarget(Target target){
@@ -1084,16 +1063,9 @@ public class System
   }
 
   public static Target getTargetByAddress(InetAddress address) {
-    int i, size;
-
     synchronized (mTargets) {
-
-      size = mTargets.size();
-
-      for(i=0;i<size;i++) {
-        Target t = mTargets.get(i);
-
-        if(t != null && t.getAddress() != null && t.getAddress().equals(address)) {
+      for(Target t : mTargets) {
+        if (t != null && t.getAddress() != null && t.getAddress().equals(address)) {
           return t;
         }
       }
