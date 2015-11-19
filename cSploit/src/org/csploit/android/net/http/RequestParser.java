@@ -291,8 +291,6 @@ public class RequestParser
 
 
   public static String getBaseDomain(String hostname){
-    String domain = "";
-
     // if hostname is an IP address return that address
     if(Patterns.IP_ADDRESS.matcher(hostname).matches())
       return hostname;
@@ -313,13 +311,19 @@ public class RequestParser
         if ((ihost - itld) == 0 || ihost == 2)
           return hostname;
 
-        domain = "";
+        StringBuilder sb = new StringBuilder();
+
         for(i = ihost - itld; i < ihost; i++){
-          domain += host_parts[i] + ".";
+          sb.append(host_parts[i]);
+          if(i < ihost - 1) {
+            sb.append(".");
+          }
         }
 
-        DNSCache.getInstance().addRootDomain(domain.substring(0, domain.length() - 1));
-        return domain.substring(0, domain.length() - 1);
+        String domain = sb.toString();
+
+        DNSCache.getInstance().addRootDomain(domain);
+        return domain;
       }
     }
 
