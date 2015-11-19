@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -58,7 +59,12 @@ public class ActionFragment extends Fragment {
 
         if (mTarget != null) {
             getActivity().setTitle("cSploit > " + mTarget);
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
+
+            if(ab != null) {
+                ab.setDisplayHomeAsUpEnabled(true);
+            }
+
             theList = (ListView) getActivity().findViewById(R.id.android_list);
             mAvailable = System.getPluginsForTarget();
             ActionsAdapter mActionsAdapter = new ActionsAdapter();
