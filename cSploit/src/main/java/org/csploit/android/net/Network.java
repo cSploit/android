@@ -449,6 +449,11 @@ public class Network {
         if(gw != null) {
           return;
         }
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+          return;
+        }
       }
     }
   }
