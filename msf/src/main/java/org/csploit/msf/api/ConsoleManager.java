@@ -1,5 +1,6 @@
 package org.csploit.msf.api;
 
+import org.csploit.msf.api.exceptions.ResourceNotFoundException;
 import org.csploit.msf.api.listeners.ConsoleListener;
 
 import java.io.IOException;
@@ -14,6 +15,15 @@ public interface ConsoleManager {
    * @return a list of consoles managed by this {@link ConsoleManager}
    */
   List<? extends Console> getConsoles() throws IOException, MsfException;
+
+  /**
+   * get a console by it's id
+   * @param id of the console
+   * @return the console with the supplied id
+   * @throws ResourceNotFoundException when a console with
+   *          the specified {@code id} cannot be found
+   */
+  Console getConsole(int id) throws IOException, MsfException;
 
   /**
    * Create a new console

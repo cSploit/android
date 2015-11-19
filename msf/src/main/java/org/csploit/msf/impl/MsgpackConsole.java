@@ -13,6 +13,7 @@ class MsgpackConsole implements InternalConsole {
   private String prompt;
   private boolean busy;
   private boolean interacting = false;
+  private boolean changed = false;
 
   public MsgpackConsole(MsgpackClient client, int id) {
     this.client = client;
@@ -30,6 +31,7 @@ class MsgpackConsole implements InternalConsole {
   }
 
   public void setPrompt(String prompt) {
+    changed |= this.prompt == null ? prompt != null : !this.prompt.equals(prompt);
     this.prompt = prompt;
   }
 
@@ -39,6 +41,7 @@ class MsgpackConsole implements InternalConsole {
   }
 
   public void setBusy(boolean busy) {
+    changed |= this.busy != busy;
     this.busy = busy;
   }
 
@@ -99,5 +102,20 @@ class MsgpackConsole implements InternalConsole {
   @Override
   public boolean isInteracting() throws IOException, MsfException {
     return interacting;
+  }
+
+  @Override
+  public void clearChanged() {
+    changed = false;
+  }
+
+  @Override
+  public boolean hasChanged() {
+    return changed;
+  }
+
+  @Override
+  public String toString() {
+    return String.format("MsgpackConsole: {id=%d, busy=%s}", id, busy);
   }
 }

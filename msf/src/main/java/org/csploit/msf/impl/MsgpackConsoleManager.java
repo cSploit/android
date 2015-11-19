@@ -5,6 +5,7 @@ import org.csploit.msf.api.ConsoleManager;
 import org.csploit.msf.api.MsfException;
 import org.csploit.msf.api.events.ConsoleEvent;
 import org.csploit.msf.api.events.ConsoleOutputEvent;
+import org.csploit.msf.api.exceptions.ResourceNotFoundException;
 import org.csploit.msf.api.listeners.ConsoleListener;
 
 import java.io.IOException;
@@ -38,8 +39,7 @@ class MsgpackConsoleManager implements ConsoleManager, Runnable {
     executor = Executors.newSingleThreadExecutor();
   }
 
-  @Override
-  public List<? extends Console> getConsoles() throws IOException, MsfException {
+  private void updateConsoles() throws IOException, MsfException {
     MsgpackClient.ConsoleInfo[] remote = client.getConsoles(); // n
     List<Integer> remoteIds = new LinkedList<>();
     Set<Integer> toRemove;
@@ -66,13 +66,11 @@ class MsgpackConsoleManager implements ConsoleManager, Runnable {
       for (MsgpackClient.ConsoleInfo info : remote) { // n
         MsgpackConsole console = map.get(info.id); // log(m)
         if (console != null) {
-          boolean changed = info.busy != console.isBusy();
-          changed |= info.prompt != null ?
-                  !info.prompt.equals(console.getPrompt()) : console.getPrompt() != null;
           MsgpackLoader.fillConsole(info, console);
 
-          if(changed) {
+          if (console.hasChanged()) {
             notifyConsoleChanged(console);
+            console.clearChanged();
           }
         } else {
           console = buildConsole(info);
@@ -80,9 +78,40 @@ class MsgpackConsoleManager implements ConsoleManager, Runnable {
           notifyConsoleOpened(console);
         }
       }
+    }
+  }
 
+  @Override
+  public List<? extends Console> getConsoles() throws IOException, MsfException {
+
+    updateConsoles();
+
+    synchronized (map) {
       return new ArrayList<>(map.values());
     }
+  }
+
+  @Override
+  public Console getConsole(int id) throws IOException, MsfException {
+    Console result;
+    synchronized (map) {
+      result = map.get(id);
+      if(result != null) {
+        return result;
+      }
+    }
+
+    updateConsoles();
+
+    synchronized (map) {
+      result = map.get(id);
+    }
+
+    if(result == null) {
+      throw new ResourceNotFoundException("console #" + id + " not found");
+    }
+
+    return result;
   }
 
   private MsgpackConsole addConsole(MsgpackClient.ConsoleInfo info) throws IOException, MsfException {
@@ -153,7 +182,15 @@ class MsgpackConsoleManager implements ConsoleManager, Runnable {
 
         try {
           String output = c.read();
-          notifyConsoleOutput(c, output);
+
+          if(output != null && output.length() > 0) {
+            notifyConsoleOutput(c, output);
+          }
+
+          if(c.hasChanged()) {
+            c.clearChanged();
+            notifyConsoleChanged(c);
+          }
         } catch (IOException | MsfException e) {
           // ignored
         }

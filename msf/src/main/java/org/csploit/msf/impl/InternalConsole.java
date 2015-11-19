@@ -14,4 +14,15 @@ interface InternalConsole extends Console {
    * @return the data read from the console
    */
   String read() throws IOException, MsfException;
+
+  /**
+   * reset the changed flag
+   */
+  void clearChanged();
+
+  /**
+   * has the console been changed ?
+   * @return {@code true} if the console has changed, {@code false} otherwise
+   */
+  boolean hasChanged();
 }
