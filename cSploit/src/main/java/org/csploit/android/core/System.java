@@ -381,6 +381,8 @@ public class System {
     reset();
 
     mInitialized = true;
+
+    Network.watchForIssue480();
   }
 
   public static boolean checkNetworking(final Activity current) {
@@ -1291,6 +1293,7 @@ public class System {
 
       Client.Disconnect();
       mCoreInitialized = false;
+      mInitialized = false;
       Services.getNetworkRadar().onAutoScanChanged();
     } catch (Exception e) {
       errorLogging(e);

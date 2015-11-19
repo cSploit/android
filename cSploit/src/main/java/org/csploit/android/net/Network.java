@@ -385,7 +385,7 @@ public class Network {
     return mInterface;
   }
 
-  public String getSystemGateway(String iface) {
+  public static String getSystemGateway(String iface) {
     Pattern pattern = Pattern.compile(String.format("^%s\\t+00000000\\t+([0-9A-F]{8})", iface), Pattern.CASE_INSENSITIVE);
     BufferedReader reader = null;
     String line;
@@ -435,5 +435,21 @@ public class Network {
     }
 
     return null;
+  }
+
+  public static void watchForIssue480() {
+    new Thread(new GatewayWatcher()).start();
+  }
+
+  private static class GatewayWatcher implements Runnable {
+    @Override
+    public void run() {
+      while(System.isInitialized()) {
+        String gw = getSystemGateway(System.getNetwork().getInterface().getDisplayName());
+        if(gw != null) {
+          return;
+        }
+      }
+    }
   }
 }
