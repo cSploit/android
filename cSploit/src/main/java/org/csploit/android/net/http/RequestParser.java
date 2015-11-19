@@ -22,6 +22,7 @@ import android.util.Patterns;
 
 import org.csploit.android.core.Logger;
 import org.csploit.android.net.ByteBuffer;
+import org.csploit.android.net.http.proxy.DNSCache;
 
 import java.net.HttpCookie;
 import java.util.ArrayList;
@@ -290,11 +291,14 @@ public class RequestParser
 
 
   public static String getBaseDomain(String hostname){
-    String domain = "";
-
     // if hostname is an IP address return that address
     if(Patterns.IP_ADDRESS.matcher(hostname).matches())
       return hostname;
+
+    String cached_domain = DNSCache.getInstance().getRootDomain(hostname);
+    if (cached_domain != null) {
+      return cached_domain;
+    }
 
     for(String tld : TLD){
       if(hostname.endsWith(tld)){
@@ -307,12 +311,19 @@ public class RequestParser
         if ((ihost - itld) == 0 || ihost == 2)
           return hostname;
 
-        domain = "";
+        StringBuilder sb = new StringBuilder();
+
         for(i = ihost - itld; i < ihost; i++){
-          domain += host_parts[i] + ".";
+          sb.append(host_parts[i]);
+          if(i < ihost - 1) {
+            sb.append(".");
+          }
         }
 
-        return domain.substring(0, domain.length() - 1);
+        String domain = sb.toString();
+
+        DNSCache.getInstance().addRootDomain(domain);
+        return domain;
       }
     }
 
@@ -320,14 +331,15 @@ public class RequestParser
       nextIndex = hostname.indexOf('.'),
       lastIndex = hostname.lastIndexOf('.');
 
-    while(nextIndex < lastIndex){
+    while(nextIndex < lastIndex) {
       startIndex = nextIndex + 1;
       nextIndex = hostname.indexOf('.', startIndex);
     }
 
-    if(startIndex > 0)
+    if(startIndex > 0) {
+      DNSCache.getInstance().addRootDomain(hostname.substring(startIndex));
       return hostname.substring(startIndex);
-
+    }
     else
       return hostname;
   }
