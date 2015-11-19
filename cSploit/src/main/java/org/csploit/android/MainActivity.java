@@ -19,216 +19,211 @@
  */
 package org.csploit.android;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.content.res.TypedArray;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 
+import org.csploit.android.core.*;
+import org.csploit.android.core.System;
 import org.csploit.android.gui.dialogs.AboutDialog;
 
-import java.util.ArrayList;
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
 
-public class MainActivity extends AppCompatActivity {
+  private MainFragment mMainFragment;
+  private ActionBarDrawerToggle mDrawerToggle;
+  private DrawerLayout mDrawerLayout;
+  private NavigationView nvDrawer;
+  private Toolbar toolbar;
+  private Menu mMenu = null;
 
-    MainFragment mMainFragment;
-    ActionBarDrawerToggle mDrawerToggle;
-    DrawerLayout mDrawerLayout;
-    private Menu mMenu = null;
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+    if (themePrefs.getBoolean("isDark", false))
+      setTheme(R.style.DarkTheme);
+    else
+      setTheme(R.style.AppTheme);
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-        if (themePrefs.getBoolean("isDark", false))
-            setTheme(R.style.DarkTheme);
-        else
-            setTheme(R.style.AppTheme);
-        setContentView(R.layout.main);
-        if (findViewById(R.id.mainframe) != null) {
-            if (savedInstanceState != null) {
-                return;
-            }
-            mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-            ListView mListView = (ListView) findViewById(R.id.drawer_listview);
-            String[] mString = getResources().getStringArray(R.array.sidebar_item_array);
-            TypedArray mTypedArray = getResources().obtainTypedArray(R.array.sidebar_icon_array);
-            ArrayList<DrawerItem> mArrayList = new ArrayList<>();
-            // load up the drawer with options from the array
-            for (int x = 0; x < mString.length; x++) {
-                mArrayList.add(new DrawerItem(mTypedArray.getResourceId(x, -1), mString[x]));
-            }
-            mTypedArray.recycle();
-            mListView.setAdapter(new SideBarArrayAdapter(this,
-                    R.layout.main_drawer_item, mArrayList));
-            mListView.setOnItemClickListener(new DrawerItemClickListener());
-            mDrawerToggle = new ActionBarDrawerToggle(this,
-                    mDrawerLayout, R.string.drawer_was_opened, R.string.drawer_was_closed);
-            mDrawerLayout.setDrawerListener(mDrawerToggle);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeButtonEnabled(true);
+    setContentView(R.layout.main);
 
-            mMainFragment = new MainFragment();
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.mainframe, mMainFragment, "MainFragment")
-                    .setCustomAnimations(R.anim.fadein, R.anim.fadeout, R.anim.fadein, R.anim.fadeout)
-                    .commit();
-        }
+    toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+
+    if (savedInstanceState != null) {
+      return;
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.top, menu);
-        mMenu = menu;
+    mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+    nvDrawer = (NavigationView) findViewById(R.id.nvView);
+
+    nvDrawer.setNavigationItemSelectedListener(this);
+
+    mDrawerToggle = new ActionBarDrawerToggle(this,
+            mDrawerLayout, R.string.drawer_was_opened, R.string.drawer_was_closed);
+    mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    getSupportActionBar().setHomeButtonEnabled(true);
+
+
+    mMainFragment = new MainFragment();
+    getSupportFragmentManager().beginTransaction()
+            .add(R.id.mainframe, mMainFragment, "MainFragment")
+            .setCustomAnimations(R.anim.fadein, R.anim.fadeout, R.anim.fadein, R.anim.fadeout)
+            .commit();
+  }
+
+  @Override
+  public boolean onNavigationItemSelected(MenuItem item) {
+    Fragment fragment = null;
+    String iface = null;
+
+    switch(item.getItemId()) {
+      case R.id.nav_iface_eth0:
+        iface = "eth0";
+        fragment = getSupportFragmentManager().findFragmentByTag("MainFragment");
+        break;
+      case R.id.nav_iface_rmnet:
+        iface = "rmnet_usb0";
+        fragment = getSupportFragmentManager().findFragmentByTag("MainFragment");
+        break;
+      case R.id.nav_iface_wlan0:
+        iface = "wlan0";
+        fragment = getSupportFragmentManager().findFragmentByTag("MainFragment");
+        break;
+      case R.id.nav_settings:
+        fragment = new SettingsFragment.PrefsFrag();
+        break;
+      case R.id.nav_about:
+        launchAbout();
+        break;
+      case R.id.nav_report_issue:
+        submitIssue();
+        break;
+    }
+
+    if(iface != null) {
+      if(!changeIface(iface)) {
+        mDrawerLayout.closeDrawers();
+        return false;
+      }
+    }
+
+    if(fragment != null) {
+      changeFragment(fragment);
+      setTitle(item.getTitle());
+    }
+
+    mDrawerLayout.closeDrawers();
+
+    return fragment != null;
+  }
+
+  private boolean changeIface(@NonNull String ifname) {
+    String current = System.getNetwork().getInterface().getDisplayName();
+
+    if(ifname.equals(current)) {
+      return true;
+    }
+
+    System.setIfname(ifname);
+    if(System.reloadNetworkMapping()) {
+      return true;
+    }
+
+    Logger.warning("failed to change iface from " + current + " to " + ifname);
+
+    System.setIfname(current);
+    System.reloadNetworkMapping();
+    return false;
+  }
+
+  private void changeFragment(@NonNull Fragment fragment) {
+    Logger.debug("loading fragment " + fragment);
+    getSupportFragmentManager().beginTransaction()
+            .replace(R.id.mainframe, fragment)
+            .addToBackStack(null)
+            .setCustomAnimations(R.anim.fadein, R.anim.fadeout, R.anim.fadein, R.anim.fadeout)
+            .commit();
+  }
+
+  private void launchSettings() {
+    changeFragment(new SettingsFragment.PrefsFrag());
+  }
+
+
+  @Override
+  public boolean onOptionsItemSelected(final MenuItem item) {
+    if (mDrawerToggle.onOptionsItemSelected(item)) {
+      return true;
+    }
+
+    switch (item.getItemId()) {
+
+      case R.id.nav_settings:
+        launchSettings();
+        return true;
+
+      case R.id.nav_about:
+        launchAbout();
+        return true;
+
+      case R.id.nav_report_issue:
+        submitIssue();
         return true;
     }
 
+    return super.onOptionsItemSelected(item);
+  }
 
-    public void launchSettings() {
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.mainframe, new SettingsFragment.PrefsFrag())
-                .addToBackStack(null)
-                .setCustomAnimations(R.anim.fadein, R.anim.fadeout, R.anim.fadein, R.anim.fadeout)
-                .commit();
+  public void submitIssue() {
+    String uri = getString(R.string.github_new_issue_url);
+    Intent browser = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+    startActivity(browser);
+
+    // for fat-tire:
+    //   String.format(getString(R.string.issue_message), getString(R.string.github_issues_url), getString(R.string.github_new_issue_url));
+
+  }
+
+  public void launchAbout() {
+    new AboutDialog(this).show();
+  }
+
+  @Override
+  protected void onPostCreate(Bundle savedInstanceState) {
+    super.onPostCreate(savedInstanceState);
+    // Sync the toggle state after onRestoreInstanceState has occurred.
+    mDrawerToggle.syncState();
+  }
+
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+    // Pass any configuration change to the drawer toggles
+    mDrawerToggle.onConfigurationChanged(newConfig);
+  }
+
+  @Override
+  public void onBackPressed() {
+    // Only ask for the double-backpressed when MainFragment is all that's left.
+    if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+      mMainFragment.onBackPressed();
+    } else {
+      super.onBackPressed();
     }
-
-
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-
-        switch (item.getItemId()) {
-
-            case R.id.settings:
-                launchSettings();
-                return true;
-
-            case R.id.about:
-                launchAbout();
-                return true;
-
-            case R.id.submit_issue:
-                submitIssue();
-                return true;
-
-            default:
-                return false;
-        }
-    }
-
-    public void submitIssue() {
-        String uri = getString(R.string.github_new_issue_url);
-        Intent browser = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-        startActivity(browser);
-
-        // for fat-tire:
-        //   String.format(getString(R.string.issue_message), getString(R.string.github_issues_url), getString(R.string.github_new_issue_url));
-
-    }
-
-    public void launchAbout() {
-        new AboutDialog(this).show();
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        // Sync the toggle state after onRestoreInstanceState has occurred.
-        mDrawerToggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        mDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    public class DrawerItem {
-        public int icon;
-        public String name;
-
-        public DrawerItem(int icon, String name) {
-            this.icon = icon;
-            this.name = name;
-        }
-    }
-
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView parent, View view, int position, long id) {
-            mDrawerLayout.closeDrawers();
-            switch (position) {
-                case 0: //about
-                    launchAbout();
-                    break;
-                case 1:
-                    launchSettings();
-                    break;
-                case 2:
-                    submitIssue();
-                    break;
-            }
-        }
-    }
-
-    public class SideBarArrayAdapter extends ArrayAdapter<DrawerItem> {
-
-        private final Context context;
-        private final int layoutResourceId;
-        private ArrayList<DrawerItem> data = null;
-
-        public SideBarArrayAdapter(Context context, int layoutResourceId, ArrayList<DrawerItem> data) {
-            super(context, layoutResourceId, data);
-            this.context = context;
-            this.layoutResourceId = layoutResourceId;
-            this.data = data;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-            View v = inflater.inflate(layoutResourceId, parent, false);
-
-            ImageView imageView = (ImageView) v.findViewById(R.id.drawer_item_icon);
-            TextView textView = (TextView) v.findViewById(R.id.drawer_item_title);
-
-            DrawerItem item = data.get(position);
-
-            imageView.setImageResource(item.icon);
-            textView.setText(item.name);
-
-            return v;
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        // Only ask for the double-backpressed when MainFragment is all that's left.
-        if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
-            mMainFragment.onBackPressed();
-        } else {
-            super.onBackPressed();
-        }
-    }
+  }
 }
