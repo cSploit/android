@@ -1261,7 +1261,7 @@ public class MainFragment extends Fragment {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            synchronized (getActivity()) {
+            synchronized (this) {
                 if (mTask != null) {
                     mTask.cancel();
                 }
@@ -1278,7 +1278,7 @@ public class MainFragment extends Fragment {
         @Override
         public void unregister() {
             super.unregister();
-            synchronized (getActivity()) {
+            synchronized (this) {
                 if (mTask != null) {
                     mTask.cancel();
                 }
@@ -1286,29 +1286,29 @@ public class MainFragment extends Fragment {
         }
 
         private void check() {
-            synchronized (getActivity()) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        loadInterfaces();
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    loadInterfaces();
 
-                        String current = System.getIfname();
+                    String current = System.getIfname();
 
-                        Logger.debug(String.format("current='%s', ifaces=[%s], haveInterface=%s, isAnyNetInterfaceAvailable=%s",
-                                current != null ? current : "(null)",
-                                ifacesToString(), haveInterface(current), isAnyNetInterfaceAvailable));
+                    Logger.debug(String.format("current='%s', ifaces=[%s], haveInterface=%s, isAnyNetInterfaceAvailable=%s",
+                            current != null ? current : "(null)",
+                            ifacesToString(), haveInterface(current), isAnyNetInterfaceAvailable));
 
-                        if (haveInterface(current)) {
-                            onConnectionResumed();
-                        } else if (current != null) {
-                            onConnectionLost();
-                        } else if (isAnyNetInterfaceAvailable) {
-                            onNetworkInterfaceChanged();
-                        }
-
+                    if (haveInterface(current)) {
+                        onConnectionResumed();
+                    } else if (current != null) {
+                        onConnectionLost();
+                    } else if (isAnyNetInterfaceAvailable) {
+                        onNetworkInterfaceChanged();
                     }
-                });
 
+                }
+            });
+
+            synchronized (this) {
                 mTask = null;
             }
         }
