@@ -23,11 +23,11 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteOrder;
 
-public class IP4Address
+public class IP4Address implements Comparable<IP4Address>
 {
   private byte[] mByteArray = null;
   private String mString = "";
-  private int mInteger = 0;
+  private final int mInteger;
   private InetAddress mAddress = null;
 
   public static int ntohl(int n){
@@ -123,6 +123,11 @@ public class IP4Address
 
   public boolean equals(InetAddress address){
     return mAddress.equals(address);
+  }
+
+  @Override
+  public int compareTo(IP4Address another) {
+    return mInteger - another.mInteger;
   }
 
   public int getPrefixLength(){

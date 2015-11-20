@@ -18,30 +18,60 @@
  */
 package org.csploit.android.net.http.proxy;
 
+import org.csploit.android.core.Logger;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.net.SocketFactory;
 
-import org.csploit.android.core.Logger;
-
 public class DNSCache
 {
-  private static DNSCache mInstance = null;
+  private static DNSCache mInstance = new DNSCache();
 
-  private HashMap<String, InetAddress> mCache = null;
+  private final HashMap<String, InetAddress> mCache;
+  private final ArrayList<String> mRootDomainCache;
 
   public static DNSCache getInstance(){
-    if(mInstance == null)
-      mInstance = new DNSCache();
-
     return mInstance;
   }
 
-  public DNSCache(){
-    mCache = new HashMap<String, InetAddress>();
+  private DNSCache() {
+    mCache = new HashMap<>();
+    mRootDomainCache = new ArrayList<>();
+  }
+
+  /**
+   * checks if a domain ends with an already intercepted root domain.
+   *
+   * @param hostname hostname to check
+   * @return String the root domain or null
+   */
+  public String getRootDomain(String hostname){
+    synchronized (mRootDomainCache) {
+      for (String rootDomain : mRootDomainCache) {
+        if (hostname.endsWith(rootDomain)) {
+          return rootDomain;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Adds a root domain extracted from the domain of a request,
+   * to the list of intercepted root domains.
+   *
+   * @param rootdomain Root domain to add to the list
+   */
+  public void addRootDomain(String rootdomain){
+    synchronized (mRootDomainCache) {
+      mRootDomainCache.add(rootdomain);
+    }
   }
 
   private InetAddress getAddress(String server) throws IOException{
