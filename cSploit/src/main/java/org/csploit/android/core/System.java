@@ -352,6 +352,7 @@ public class System {
 
     mCoreInitialized = true;
     Services.getNetworkRadar().onAutoScanChanged();
+    getNetwork().onCoreAttached();
   }
 
   public static void setIfname(String ifname) {
@@ -381,8 +382,6 @@ public class System {
     reset();
 
     mInitialized = true;
-
-    Network.watchForIssue480();
   }
 
   public static boolean checkNetworking(final Activity current) {
