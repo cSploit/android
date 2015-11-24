@@ -354,6 +354,7 @@ public class System {
 
     mCoreInitialized = true;
     Services.getNetworkRadar().onAutoScanChanged();
+    getNetwork().onCoreAttached();
   }
 
   public static void setIfname(String ifname) {

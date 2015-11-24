@@ -36,6 +36,7 @@ public class ToolBox {
   public final NetworkRadar networkRadar;
   public final MsfRpcd msfrpcd;
   public final Logcat logcat;
+  public final Ip ip;
 
   public ToolBox() {
     raw = new Raw();
@@ -52,6 +53,7 @@ public class ToolBox {
     networkRadar = new NetworkRadar();
     msfrpcd = new MsfRpcd();
     logcat = new Logcat();
+    ip = new Ip();
   }
 
   public void reload() {
@@ -66,6 +68,7 @@ public class ToolBox {
     tcpDump.setEnabled();
     networkRadar.setEnabled();
     logcat.setEnabled();
+    ip.setEnabled();
 
     ruby.init();
     msf.init();
