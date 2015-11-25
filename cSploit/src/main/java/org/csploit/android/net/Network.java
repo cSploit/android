@@ -153,7 +153,7 @@ public class Network implements Comparable<Network> {
 
       mInterface = NetworkInterface.getByName(iface);
 
-      if (mInterface.getInterfaceAddresses().isEmpty()) {
+      if (mInterface == null || mInterface.getInterfaceAddresses().isEmpty()) {
         return false;
       }
 

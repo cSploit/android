@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:title="Network">
+            <!-- the following menu will be dynamic -->
+            <menu>
+                <item android:id="@+id/nav_iface_wlan0"
+                      android:icon="@drawable/ic_wifi_signal_4"
+                      android:title="WiFi (wlan0)" />
+                <item android:id="@+id/nav_iface_rmnet"
+                      android:icon="@drawable/action_mitm"
+                      android:title="Mobile (rmnet_usb0)" />
+                <item android:id="@+id/nav_iface_eth0"
+                      android:icon="@drawable/target_remote"
+                      android:title="Wired (eth0)" />
+            </menu>
+        </item>
+        <item android:id="@+id/nav_msf"
+              android:icon="@drawable/exploit_msf"
+              android:title="MSF" />
+        <item
+            android:id="@+id/nav_report_issue"
+            android:icon="@drawable/ic_bug_report_24dp"
+            android:title="@string/menu_submit_issue" />
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_settings_24dp"
+            android:title="@string/menu_settings" />
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@drawable/ic_info_24dp"
+            android:title="@string/menu_about" />
+    </group>
+</menu>

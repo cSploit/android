@@ -537,4 +537,7 @@
     <string name="connection_lost_prompt">delete current session and start another?</string>
     <string name="any_interface">any interface</string>
     <string name="error_initializing_interface">Error initializing %s</string>
+    <string name="drawer_was_opened">The Drawer was opened.</string>
+    <string name="drawer_was_closed">The Drawer was closed.</string>
+
 </resources>
