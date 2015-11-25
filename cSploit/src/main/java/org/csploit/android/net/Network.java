@@ -27,15 +27,11 @@ import android.net.wifi.WifiManager;
 import android.support.annotation.NonNull;
 import android.util.Patterns;
 
-import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.net.util.SubnetUtils;
 import org.csploit.android.core.Logger;
 import org.csploit.android.core.System;
+import org.csploit.android.helpers.NetworkHelper;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
@@ -47,8 +43,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Network implements Comparable<Network> {
   public enum Protocol {
@@ -186,13 +180,7 @@ public class Network implements Comparable<Network> {
       mNetmask = new IP4Address(su.getInfo().getNetmask());
       mBase = new IP4Address(su.getInfo().getNetworkAddress());
 
-      String gateway = getSystemGateway(mInterface.getDisplayName());
-
-      if(gateway == null) {
-        mGateway = null;
-      } else {
-        mGateway = new IP4Address(gateway);
-      }
+      updateGateway();
 
       return true;
     } catch (Exception e) {
@@ -200,6 +188,35 @@ public class Network implements Comparable<Network> {
     }
 
     return false;
+  }
+
+  private void updateGateway() throws UnknownHostException {
+    String gateway = NetworkHelper.getIfaceGateway(mInterface.getDisplayName());
+
+    if(gateway != null) {
+      mGateway = new IP4Address(gateway);
+    } else {
+      Logger.warning("gateway not found");
+    }
+  }
+
+  public void onCoreAttached() {
+    if(haveGateway())
+      return;
+
+    try {
+      updateGateway();
+    } catch (UnknownHostException e) {
+      Logger.warning(e.getMessage());
+    }
+
+    if(!haveGateway())
+      return;
+
+    Target gateway = new Target(getGatewayAddress(), getGatewayHardware());
+    gateway.setAlias(getSSID());
+
+    System.addOrderedTarget(gateway);
   }
 
   private IP4Address getNetmask() throws UnknownHostException {
@@ -389,40 +406,5 @@ public class Network implements Comparable<Network> {
 
   public NetworkInterface getInterface() {
     return mInterface;
-  }
-
-  public String getSystemGateway(String iface) {
-    Pattern pattern = Pattern.compile(String.format("^%s\\t+00000000\\t+([0-9A-F]{8})", iface), Pattern.CASE_INSENSITIVE);
-    BufferedReader reader = null;
-    String line;
-
-    try {
-      reader = new BufferedReader(new InputStreamReader(new FileInputStream("/proc/net/route")));
-
-      while ((line = reader.readLine()) != null) {
-        Matcher matcher = pattern.matcher(line);
-        if (!matcher.find()) {
-          continue;
-        }
-        String rawAddress = matcher.group(1);
-        StringBuilder sb = new StringBuilder();
-        for (int i = 6; ; i -= 2) {
-          String part = rawAddress.substring(i, i + 2);
-          sb.append(Integer.parseInt(part, 16));
-          if (i > 0) {
-            sb.append('.');
-          } else {
-            break;
-          }
-        }
-        return sb.toString();
-      }
-    } catch (IOException e) {
-      System.errorLogging(e);
-    } finally {
-      IOUtils.closeQuietly(reader);
-    }
-
-    return null;
   }
 }
