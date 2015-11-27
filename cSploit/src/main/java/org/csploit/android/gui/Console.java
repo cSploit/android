@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.view.KeyEvent;
@@ -25,7 +26,7 @@ import org.csploit.android.net.metasploit.ShellSession;
 /**
  * this Activity allow user to run commands on pwned shells
  */
-public class Console extends AppCompatActivity {
+public class Console extends Fragment {
 
     private EditText mInput;
     private TextView mOutput;
@@ -38,7 +39,7 @@ public class Console extends AppCompatActivity {
 
         @Override
         public void onNewLine(final String line) {
-            Console.this.runOnUiThread(new Runnable() {
+            getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     mOutput.append("\n" + line);
@@ -49,10 +50,10 @@ public class Console extends AppCompatActivity {
         @Override
         public void onEnd(int exitCode) {
             if (exitCode != 0)
-                Toast.makeText(Console.this, "command returned " + exitCode, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "command returned " + exitCode, Toast.LENGTH_SHORT).show();
             try {
                 Thread.sleep(200);
-                Console.this.runOnUiThread(new Runnable() {
+                getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         mOutput.append(Html.fromHtml("\n<font color=\"green\">Enter Command:&gt;</font>  "));
@@ -68,25 +69,23 @@ public class Console extends AppCompatActivity {
 
         @Override
         public void onRpcClosed() {
-            new FatalDialog("Connection lost", "RPC connection closed", Console.this).show();
+            new FatalDialog("Connection lost", "RPC connection closed", getActivity()).show();
         }
 
         @Override
         public void onTimedOut() {
-            new FatalDialog("Command timed out", "your submitted command generated an infinite loop or some connection error occurred.", Console.this).show();
+            new FatalDialog("Command timed out", "your submitted command generated an infinite loop or some connection error occurred.", getActivity()).show();
         }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.console_layout);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mInput = (EditText) findViewById(R.id.input);
-        mOutput = (TextView) findViewById(R.id.output);
-        mScrollView = (ScrollView) findViewById(R.id.outputscroll);
-        runButton = (FloatingActionButton) findViewById(R.id.myFAB);
+        mInput = (EditText) getActivity().findViewById(R.id.input);
+        mOutput = (TextView) getActivity().findViewById(R.id.output);
+        mScrollView = (ScrollView) getActivity().findViewById(R.id.outputscroll);
+        runButton = (FloatingActionButton) getActivity().findViewById(R.id.myFAB);
 
         // make TextView scrollable
        // mOutput.setMovementMethod(ScrollingMovementMethod.getInstance());
@@ -134,17 +133,15 @@ public class Console extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+    public void onDetach() {
+        super.onDetach();
         System.setCurrentSession(null);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.console, menu);
-        return super.onCreateOptionsMenu(menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -155,10 +152,10 @@ public class Console extends AppCompatActivity {
                 return true;
             case android.R.id.copy:
                 if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
-                    android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
                     clipboard.setText(mOutput.getText().toString());
                 } else {
-                    android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
                     android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", mOutput.getText().toString());
                     clipboard.setPrimaryClip(clip);
                 }

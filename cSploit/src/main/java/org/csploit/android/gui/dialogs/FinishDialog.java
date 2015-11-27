@@ -21,6 +21,7 @@ package org.csploit.android.gui.dialogs;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.support.v4.app.FragmentActivity;
 
 public class FinishDialog extends AlertDialog{
   public FinishDialog(String title, String message, final Activity activity){
@@ -32,7 +33,11 @@ public class FinishDialog extends AlertDialog{
     this.setButton(BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener(){
       public void onClick(DialogInterface dialog, int id){
         dialog.dismiss();
-        activity.finish();
+        if(!(activity instanceof FragmentActivity)) {
+          activity.finish();
+        }
+
+        activity.onBackPressed();
       }
     });
   }

@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -51,7 +52,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PasswordSniffer extends AppCompatActivity {
+public class PasswordSniffer extends Fragment {
 	private ToggleButton mSniffToggleButton = null;
 	private ProgressBar mSniffProgress = null;
 	private ExpandableListView mListView = null;
@@ -192,23 +193,14 @@ public class PasswordSniffer extends AppCompatActivity {
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-		Boolean isDark = themePrefs.getBoolean("isDark", false);
-		if (isDark)
-			setTheme(R.style.DarkTheme);
-		else
-			setTheme(R.style.AppTheme);
-		setTitle(System.getCurrentTarget() + " > MITM > Password Sniffer");
-		setContentView(R.layout.plugin_mitm_password_sniffer);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		mFileOutput = (new File(System.getStoragePath(), System.getSettings()
 				.getString("PREF_PASSWORD_FILENAME",
 						"csploit-password-sniff.log"))).getAbsolutePath();
-		mSniffToggleButton = (ToggleButton) findViewById(R.id.sniffToggleButton);
-		mSniffProgress = (ProgressBar) findViewById(R.id.sniffActivity);
-		mListView = (ExpandableListView) findViewById(R.id.listView);
-		mAdapter = new ListViewAdapter(this);
+		mSniffToggleButton = (ToggleButton) getActivity().findViewById(R.id.sniffToggleButton);
+		mSniffProgress = (ProgressBar) getActivity().findViewById(R.id.sniffActivity);
+		mListView = (ExpandableListView) getActivity().findViewById(R.id.listView);
+		mAdapter = new ListViewAdapter(getActivity());
 		mSpoofSession = new SpoofSession(false, false, null, null);
 
 		mListView.setAdapter(mAdapter);
@@ -226,13 +218,12 @@ public class PasswordSniffer extends AppCompatActivity {
 	}
 
 	@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.password_sniffer, menu);
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+			inflater.inflate(R.menu.password_sniffer, menu);
 
-        mMenu = menu;
+			mMenu = menu;
 
-        return super.onCreateOptionsMenu(menu);
+			super.onCreateOptionsMenu(menu, inflater);
     }
 
 	@Override
@@ -240,18 +231,13 @@ public class PasswordSniffer extends AppCompatActivity {
 		switch (item.getItemId()) {
 			case R.id.action_fields:
 				if (mSniffToggleButton.isEnabled() == false)
-					Toast.makeText(this, "The changes won't take effect until you stop the current traffic sniffing", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getContext(), "The changes won't take effect until you stop the current traffic sniffing", Toast.LENGTH_SHORT).show();
 
-				Intent _fields = new Intent(PasswordSniffer.this, FileEdit.class);
+				Intent _fields = new Intent(getActivity(), FileEdit.class);
 				_fields.putExtra(FileEdit.KEY_FILEPATH, "/tools/ettercap/share/etter.fields");
 				startActivityForResult(_fields, 0);
 
 				return true;
-		case android.R.id.home:
-
-			onBackPressed();
-
-			return true;
 
 		default:
 			return super.onOptionsItemSelected(item);
@@ -279,7 +265,7 @@ public class PasswordSniffer extends AppCompatActivity {
 			mFileWriter = new FileWriter(mFileOutput, true);
 			mBufferedWriter = new BufferedWriter(mFileWriter);
 		} catch (IOException e) {
-			new FatalDialog("Error", e.toString(), PasswordSniffer.this).show();
+			new FatalDialog("Error", e.toString(), getActivity()).show();
 		}
 
 
@@ -289,19 +275,19 @@ public class PasswordSniffer extends AppCompatActivity {
         public void onAccount(final String protocol, final String address,
             final String username, final String password) {
           final String line = username + ": " + password;
-          PasswordSniffer.this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-              if (mAdapter.hasChild(protocol, line) == false) {
-                try {
-                  mBufferedWriter.write(line + "\n");
-                } catch (IOException e) {
-                  System.errorLogging(e);
-                }
+          getActivity().runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							if (mAdapter.hasChild(protocol, line) == false) {
+								try {
+									mBufferedWriter.write(line + "\n");
+								} catch (IOException e) {
+									System.errorLogging(e);
+								}
 
-                mAdapter.addChild(protocol, line);
-              }
-            }
+								mAdapter.addChild(protocol, line);
+							}
+						}
           });
         }
 
@@ -312,30 +298,30 @@ public class PasswordSniffer extends AppCompatActivity {
 
         @Override
         public void onEnd(final int exitValue) {
-          PasswordSniffer.this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-              if(exitValue!=0) {
-                Toast.makeText(PasswordSniffer.this, "ettercap returned #" + exitValue, Toast.LENGTH_LONG).show();
-              }
-              setStoppedState();
-            }
+          getActivity().runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							if (exitValue != 0) {
+								Toast.makeText(getContext(), "ettercap returned #" + exitValue, Toast.LENGTH_LONG).show();
+							}
+							setStoppedState();
+						}
           });
         }
 
         @Override
         public void onDeath(final int signal) {
-          PasswordSniffer.this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-              Toast.makeText(PasswordSniffer.this, "ettercap killed by signal #" + signal, Toast.LENGTH_LONG).show();
-              setStoppedState();
-            }
+          getActivity().runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							Toast.makeText(getContext(), "ettercap killed by signal #" + signal, Toast.LENGTH_LONG).show();
+							setStoppedState();
+						}
           });
         }
       });
 
-      Toast.makeText(PasswordSniffer.this, "Logging to " + mFileOutput,
+      Toast.makeText(getContext(), "Logging to " + mFileOutput,
               Toast.LENGTH_LONG).show();
 
       mSniffProgress.setVisibility(View.VISIBLE);
@@ -344,14 +330,14 @@ public class PasswordSniffer extends AppCompatActivity {
     } catch (ChildManager.ChildNotStartedException e) {
       System.errorLogging(e);
       mSniffToggleButton.setChecked(false);
-      Toast.makeText(PasswordSniffer.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
+      Toast.makeText(getContext(), getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
     }
 	}
 
 	@Override
-	public void onBackPressed() {
+	public void onDetach() {
 		setStoppedState();
-		super.onBackPressed();
-		overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+		super.onDetach();
+		getActivity().overridePendingTransition(R.anim.fadeout, R.anim.fadein);
 	}
 }

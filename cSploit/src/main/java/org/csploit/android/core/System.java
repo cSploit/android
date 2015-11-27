@@ -34,6 +34,7 @@ import android.os.Environment;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.util.SparseIntArray;
 
 import org.acra.ACRA;
@@ -150,8 +151,11 @@ public class System {
 
   private final static LinkedList<SettingReceiver> mSettingReceivers = new LinkedList<SettingReceiver>();
 
-  public static void init(Context context) throws Exception {
+  public static void setApplicationContext(Context context) {
     mContext = context;
+  }
+
+  public static void init() throws Exception {
     try {
       Logger.debug("initializing System...");
       mStoragePath = getSettings().getString("PREF_SAVE_PATH", Environment.getExternalStorageDirectory().toString());
@@ -1140,6 +1144,23 @@ public class System {
       }
     }
 
+    return null;
+  }
+
+  /**
+   * retrieve a target from the global list by it's identifier
+   * @param id the target id
+   * @return the found target or {@code null} if not found
+   */
+  @Nullable
+  public static Target getTargetById(String id) {
+    synchronized (mTargets) {
+      for(Target t : mTargets) {
+        if(t.getIdentifier().equals(id)) {
+          return t;
+        }
+      }
+    }
     return null;
   }
 

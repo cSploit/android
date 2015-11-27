@@ -375,7 +375,7 @@
     <string name="pref_msf_branch_title">MSF branch</string>
     <string name="pref_performance_vuln_title">Search preferences</string>
     <string name="pref_performance_vuln_desc">Search for vulnerability using</string>
-    <string-array name="pref_performance_vuln" >
+    <string-array name="pref_performance_vuln">
         <item>OSVDB</item>
         <item>CVE</item>
         <item>both CVE and OSVDB</item>
@@ -386,7 +386,7 @@
         <item>BOTH</item>
     </string-array>
     <string name="pref_performance_exploit_desc">Search exploits</string>
-    <string-array name="pref_performance_exploit" >
+    <string-array name="pref_performance_exploit">
         <item>MSF compatible only</item>
         <item>on exploitdb only</item>
         <item>from both exploitdb and MSF</item>
@@ -435,13 +435,13 @@
     <string name="show_full_description">Show full description</string>
     <string name="choose_an_option">Choose an option</string>
     <string name="required">Required</string>
-    
+
     <string name="menu_add">Add</string>
     <string name="menu_scan">Scan</string>
     <string name="menu_ifaces">Net interfaces</string>
     <string name="menu_wifi_scan">WiFi scan</string>
     <string name="menu_stop_msfrpcd">Stop MSFRPCD</string>
-    
+
     <string name="pref_theme">Dark theme</string>
     <string name="pref_choose_theme">Enable the dark theme, which is easier on the eyes</string>
     <string name="please_restart">The new theme will not be applied until you restart the app</string>
@@ -539,5 +539,10 @@
     <string name="error_initializing_interface">Error initializing %s</string>
     <string name="drawer_was_opened">The Drawer was opened.</string>
     <string name="drawer_was_closed">The Drawer was closed.</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_target_list">Targets</string>
+    <string name="title_target_detail">Target Detail</string>
 
 </resources>

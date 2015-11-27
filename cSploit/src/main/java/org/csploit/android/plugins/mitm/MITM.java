@@ -19,6 +19,7 @@
 package org.csploit.android.plugins.mitm;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -60,6 +61,7 @@ import org.csploit.android.gui.dialogs.InputDialog;
 import org.csploit.android.gui.dialogs.InputDialog.InputDialogListener;
 import org.csploit.android.gui.dialogs.RedirectionDialog;
 import org.csploit.android.gui.dialogs.RedirectionDialog.RedirectionDialogListener;
+import org.csploit.android.helpers.FragmentHelper;
 import org.csploit.android.net.Target;
 import org.csploit.android.net.http.proxy.Proxy;
 import org.csploit.android.net.http.proxy.Proxy.ProxyFilter;
@@ -127,7 +129,7 @@ public class MITM extends Plugin
     }
 
     public ActionAdapter(int layoutId, ArrayList<Action> actions){
-      super(MITM.this, layoutId, actions);
+      super(getActivity(), layoutId, actions);
 
       mLayoutId = layoutId;
       mActions = actions;
@@ -140,9 +142,9 @@ public class MITM extends Plugin
       ActionHolder holder = null;
 
       if(row == null){
-        LayoutInflater inflater = (LayoutInflater) MITM.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         row = inflater.inflate(mLayoutId, parent, false);
-        if (getSharedPreferences("THEME", 0).getBoolean("isDark", false))
+        if (getActivity().getSharedPreferences("THEME", 0).getBoolean("isDark", false))
             row.setBackgroundResource(R.drawable.card_background_dark);
         holder = new ActionHolder();
         holder.icon = (ImageView) row.findViewById(R.id.actionIcon);
@@ -179,10 +181,10 @@ public class MITM extends Plugin
   }
 
   @Override
-  protected void onActivityResult(int request, int result, Intent intent){
+  public void onActivityResult(int request, int result, Intent intent){
     super.onActivityResult(request, result, intent);
 
-    if(request == SELECT_PICTURE && result == RESULT_OK){
+    if(request == SELECT_PICTURE && result == Activity.RESULT_OK){
       try{
         Uri uri = intent.getData();
         String fileName = null,
@@ -190,7 +192,7 @@ public class MITM extends Plugin
 
         if(uri != null){
           String[] columns = {MediaColumns.DATA};
-          Cursor cursor = getContentResolver().query(uri, columns, null, null, null);
+          Cursor cursor = getActivity().getContentResolver().query(uri, columns, null, null, null);
           cursor.moveToFirst();
 
           int index = cursor.getColumnIndex(MediaColumns.DATA);
@@ -203,7 +205,7 @@ public class MITM extends Plugin
 
         if(fileName == null){
           setStoppedState();
-          new ErrorDialog( getString(R.string.error), getString(R.string.error_filepath2), MITM.this).show();
+          new ErrorDialog( getString(R.string.error), getString(R.string.error_filepath2), getActivity()).show();
         } else{
           mimeType = System.getImageMimeType(fileName);
           mSpoofSession = new SpoofSession(true, true, fileName, mimeType);
@@ -214,7 +216,7 @@ public class MITM extends Plugin
           mSpoofSession.start(new OnSessionReadyListener(){
             @Override
             public void onSessionReady(){
-              MITM.this.runOnUiThread(new Runnable(){
+              getActivity().runOnUiThread(new Runnable(){
                 @Override
                 public void run(){
                   System.getProxy().setFilter(new Proxy.ProxyFilter(){
@@ -240,7 +242,7 @@ public class MITM extends Plugin
                     }
                   });
 
-                  Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
+                  Toast.makeText(getContext(), getString(R.string.tap_again), Toast.LENGTH_LONG).show();
                 }
               });
             }
@@ -256,14 +258,14 @@ public class MITM extends Plugin
       catch(Exception e){
         System.errorLogging(e);
       }
-    } else if(request == SELECT_SCRIPT && result == RESULT_OK){
+    } else if(request == SELECT_SCRIPT && result == Activity.RESULT_OK){
       String fileName = null;
 
       if(intent != null && intent.getData() != null)
         fileName = intent.getData().getPath();
 
       if(fileName == null){
-        new ErrorDialog( getString(R.string.error), getString(R.string.error_filepath), MITM.this).show();
+        new ErrorDialog( getString(R.string.error), getString(R.string.error_filepath), getActivity()).show();
       } else{
         try{
 
@@ -285,7 +287,7 @@ public class MITM extends Plugin
 
           mCurrentActivity.setVisibility(View.VISIBLE);
 
-          Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
+          Toast.makeText(getContext(), getString(R.string.tap_again), Toast.LENGTH_LONG).show();
 
           final String code = js;
           mSpoofSession = new SpoofSession();
@@ -307,7 +309,7 @@ public class MITM extends Plugin
             }
           });
         } catch(Exception e){
-          new ErrorDialog(getString(R.string.error), getString(R.string.unexpected_file_error) + e.getMessage(), MITM.this).show();
+          new ErrorDialog(getString(R.string.error), getString(R.string.unexpected_file_error) + e.getMessage(), getActivity()).show();
         }
       }
     } else if(request == SettingsFragment.SETTINGS_DONE){
@@ -341,15 +343,15 @@ public class MITM extends Plugin
     @Override
     protected void onPostExecute(Boolean result){
       if(mMessage != null){
-        new ConfirmDialog( getString(R.string.warning), mMessage, MITM.this, new ConfirmDialogListener(){
+        new ConfirmDialog( getString(R.string.warning), mMessage, getActivity(), new ConfirmDialogListener(){
           @Override
           public void onConfirm(){
-            startActivityForResult(new Intent(MITM.this, SettingsActivity.class), SettingsFragment.SETTINGS_DONE);
+            FragmentHelper.switchToFragment(MITM.this, SettingsFragment.PrefsFrag.class);
           }
 
           @Override
           public void onCancel(){
-            new FinishDialog(getString(R.string.error), getString(R.string.error_mitm_ports), MITM.this).show();
+            new FinishDialog(getString(R.string.error), getString(R.string.error_mitm_ports), getActivity()).show();
           }
         }).show();
       }
@@ -357,10 +359,10 @@ public class MITM extends Plugin
   }
 
   private void setSpoofErrorState(final String error){
-    MITM.this.runOnUiThread(new Runnable(){
+    getActivity().runOnUiThread(new Runnable() {
       @Override
-      public void run(){
-        new ErrorDialog(getString(R.string.error), error, MITM.this).show();
+      public void run() {
+        new ErrorDialog(getString(R.string.error), error, getActivity()).show();
 
         mCurrentActivity = null;
         setStoppedState();
@@ -402,12 +404,6 @@ public class MITM extends Plugin
 
   @Override
   public void onCreate(Bundle savedInstanceState){
-	  SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-		Boolean isDark = themePrefs.getBoolean("isDark", false);
-		if (isDark)
-			setTheme(R.style.DarkTheme);
-		else
-			setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);
 
     new CheckForOpenPortsTask().execute();
@@ -435,20 +431,12 @@ public class MITM extends Plugin
                     new OnClickListener() {
                       @Override
                       public void onClick(View v) {
-                        if (System.checkNetworking(MITM.this) == false)
+                        if (System.checkNetworking(getActivity()) == false)
                           return;
 
                         setStoppedState();
 
-                        startActivity
-                                (
-                                        new Intent
-                                                (
-                                                        MITM.this,
-                                                        Sniffer.class
-                                                )
-                                );
-                        overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+                        FragmentHelper.switchToFragment(MITM.this, Sniffer.class);
                       }
                     }, null));
 
@@ -460,47 +448,30 @@ public class MITM extends Plugin
       new OnClickListener(){
         @Override
         public void onClick(View v){
-          if(!System.checkNetworking(MITM.this))
+          if(!System.checkNetworking(getActivity()))
             return;
 
           setStoppedState();
 
-          startActivity
-            (
-              new Intent
-                (
-                  MITM.this,
-                  PasswordSniffer.class
-                )
-            );
-          overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+          FragmentHelper.switchToFragment(MITM.this, PasswordSniffer.class);
         }
       }, null));
 
 
-      mActions.add(new Action
-              (
-               getString(R.string.mitm_dns_spoofing),
-               getString(R.string.mitm_dns_spoofing_desc),
-               R.drawable.action_redirect,
-               new OnClickListener() {
-               @Override
-               public void onClick(View v) {
-                    if (!System.checkNetworking(MITM.this))
-                       return;
+      mActions.add(new Action(
+        getString(R.string.mitm_dns_spoofing),
+        getString(R.string.mitm_dns_spoofing_desc),
+        R.drawable.action_redirect,
+        new OnClickListener() {
+          @Override
+          public void onClick(View v) {
+            if (!System.checkNetworking(getActivity()))
+               return;
 
-               setStoppedState();
+            setStoppedState();
 
-               startActivity
-               (
-                  new Intent
-                  (
-                     MITM.this,
-                     DNSSpoofing.class
-                  )
-               );
-                 overridePendingTransition(R.anim.fadeout, R.anim.fadein);
-                          }
+            FragmentHelper.switchToFragment(MITM.this, DNSSpoofing.class);
+          }
       }, null));
 
     mActions.add(new Action
@@ -511,20 +482,12 @@ public class MITM extends Plugin
       new OnClickListener(){
         @Override
         public void onClick(View v){
-          if (!System.checkNetworking(MITM.this))
+          if (!System.checkNetworking(getActivity()))
             return;
 
           setStoppedState();
 
-          startActivity
-            (
-              new Intent
-                (
-                  MITM.this,
-                  Hijacker.class
-                )
-            );
-          overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+          FragmentHelper.switchToFragment(MITM.this, Hijacker.class);
         }
       }, null));
 
@@ -536,16 +499,16 @@ public class MITM extends Plugin
       new OnClickListener(){
         @Override
         public void onClick(View v){
-          if (!System.checkNetworking(MITM.this))
+          if (!System.checkNetworking(getActivity()))
             return;
 
           final ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);
 
           if(activity.getVisibility() == View.INVISIBLE){
             if (System.getCurrentTarget().getType() != Target.Type.ENDPOINT) {
-              new ErrorDialog(getString(R.string.error), getString(R.string.mitm_connection_kill_error), MITM.this).show();
+              new ErrorDialog(getString(R.string.error), getString(R.string.mitm_connection_kill_error), getActivity()).show();
             } else if(!System.getNetwork().haveGateway() && !System.getNetwork().isTetheringEnabled()) {
-              new ErrorDialog(getString(R.string.error), "Connection killer requires a gateway or active Tethering", MITM.this).show();
+              new ErrorDialog(getString(R.string.error), "Connection killer requires a gateway or active Tethering", getActivity()).show();
             } else {
               setStoppedState();
 
@@ -561,10 +524,10 @@ public class MITM extends Plugin
 
                   @Override
                   public void onError(String line) {
-                    MITM.this.runOnUiThread(new Runnable() {
+                    getActivity().runOnUiThread(new Runnable() {
                       @Override
                       public void run() {
-                        Toast.makeText(MITM.this, "arpspoof error", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "arpspoof error", Toast.LENGTH_LONG).show();
                         activity.setVisibility(View.INVISIBLE);
                       }
                     });
@@ -577,9 +540,9 @@ public class MITM extends Plugin
 
                 activity.setVisibility(View.VISIBLE);
 
-                Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getString(R.string.tap_again), Toast.LENGTH_LONG).show();
               } catch (ChildManager.ChildNotStartedException e) {
-                Toast.makeText(MITM.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
               }
             }
           } else {
@@ -611,7 +574,7 @@ public class MITM extends Plugin
       new OnClickListener(){
         @Override
         public void onClick(View v){
-          if(System.checkNetworking(MITM.this) == false)
+          if(System.checkNetworking(getActivity()) == false)
             return;
 
           final ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);
@@ -619,7 +582,7 @@ public class MITM extends Plugin
           if(activity.getVisibility() == View.INVISIBLE){
             setStoppedState();
 
-            new RedirectionDialog( getString(R.string.mitm_redirection), MITM.this, new RedirectionDialogListener(){
+            new RedirectionDialog( getString(R.string.mitm_redirection), getActivity(), new RedirectionDialogListener(){
               @Override
               public void onInputEntered(String address, String port){
                 if(address.isEmpty() == false && port.isEmpty() == false){
@@ -635,7 +598,7 @@ public class MITM extends Plugin
                     address = url.getHost();
 
                     activity.setVisibility(View.VISIBLE);
-                    Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), getString(R.string.tap_again), Toast.LENGTH_LONG).show();
 
 
                     final String faddress = address;
@@ -657,10 +620,10 @@ public class MITM extends Plugin
                     });
 
                   } catch(Exception e){
-                    new ErrorDialog(getString(R.string.error), e.getMessage(), MITM.this).show();
+                    new ErrorDialog(getString(R.string.error), e.getMessage(), getActivity()).show();
                   }
                 } else
-                  new ErrorDialog(getString(R.string.error), getString(R.string.error_invalid_address_or_port), MITM.this).show();
+                  new ErrorDialog(getString(R.string.error), getString(R.string.error_invalid_address_or_port), getActivity()).show();
               }
             }).show();
           } else
@@ -676,7 +639,7 @@ public class MITM extends Plugin
       new OnClickListener(){
         @Override
         public void onClick(View v){
-          if(System.checkNetworking(MITM.this) == false)
+          if(System.checkNetworking(getActivity()) == false)
             return;
 
           final ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);
@@ -684,7 +647,7 @@ public class MITM extends Plugin
           if(activity.getVisibility() == View.INVISIBLE){
             setStoppedState();
 
-            new ChoiceDialog(MITM.this, getString(R.string.choose_source), new String[]{ getString(R.string.local_images), "Web URL"}, new ChoiceDialogListener(){
+            new ChoiceDialog(getActivity(), getString(R.string.choose_source), new String[]{ getString(R.string.local_images), "Web URL"}, new ChoiceDialogListener(){
               @Override
               public void onChoice(int choice){
                 if(choice == 0){
@@ -692,7 +655,7 @@ public class MITM extends Plugin
                     mCurrentActivity = activity;
                     startActivityForResult(mImagePicker, SELECT_PICTURE);
                   } catch(ActivityNotFoundException e){
-                    new ErrorDialog(getString(R.string.error), getString(R.string.error_image_intent), MITM.this).show();
+                    new ErrorDialog(getString(R.string.error), getString(R.string.error_image_intent), getActivity()).show();
                   }
                 } else{
                   new InputDialog
@@ -702,7 +665,7 @@ public class MITM extends Plugin
                       "",
                       true,
                       false,
-                      MITM.this,
+                      getActivity(),
                       new InputDialogListener(){
                         @Override
                         public void onInputEntered(String input){
@@ -748,13 +711,13 @@ public class MITM extends Plugin
                                 }
                               });
 
-                              Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
+                              Toast.makeText(getActivity(), getString(R.string.tap_again), Toast.LENGTH_LONG).show();
 
                             } catch (ChildManager.ChildNotStartedException e) {
-                              Toast.makeText(MITM.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
+                              Toast.makeText(getActivity(), getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
                             }
                           } else
-                            new ErrorDialog(getString(R.string.error), getString(R.string.error_image_url), MITM.this).show();
+                            new ErrorDialog(getString(R.string.error), getString(R.string.error_image_url), getActivity()).show();
                         }
                       }
                     ).show();
@@ -778,7 +741,7 @@ public class MITM extends Plugin
       new OnClickListener(){
         @Override
         public void onClick(View v){
-          if(System.checkNetworking(MITM.this) == false)
+          if(System.checkNetworking(getActivity()) == false)
             return;
 
           final ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);
@@ -793,7 +756,7 @@ public class MITM extends Plugin
                 "http://www.youtube.com/watch?v=dQw4w9WgXcQ",
                 true,
                 false,
-                MITM.this,
+                getActivity(),
                 new InputDialogListener(){
                   @Override
                   public void onInputEntered(String input){
@@ -834,14 +797,14 @@ public class MITM extends Plugin
 
                         activity.setVisibility(View.VISIBLE);
 
-                        Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.tap_again), Toast.LENGTH_LONG).show();
 
                       } catch (ChildManager.ChildNotStartedException e) {
                         System.errorLogging(e);
-                        Toast.makeText(MITM.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
                       }
                     } else
-                      new ErrorDialog(getString(R.string.error), getString(R.string.error_video_url), MITM.this).show();
+                      new ErrorDialog(getString(R.string.error), getString(R.string.error_video_url), getActivity()).show();
                   }
                 }
               ).show();
@@ -858,7 +821,7 @@ public class MITM extends Plugin
       new OnClickListener(){
         @Override
         public void onClick(View v){
-          if(!System.checkNetworking(MITM.this))
+          if(!System.checkNetworking(getActivity()))
             return;
 
           final ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);
@@ -866,7 +829,7 @@ public class MITM extends Plugin
           if(activity.getVisibility() == View.INVISIBLE){
             setStoppedState();
 
-            new ChoiceDialog(MITM.this, getString(R.string.choose_method), new String[]{ getString(R.string.local_files), getString(R.string.custom_code)}, new ChoiceDialogListener(){
+            new ChoiceDialog(getActivity(), getString(R.string.choose_method), new String[]{ getString(R.string.local_files), getString(R.string.custom_code)}, new ChoiceDialogListener(){
               @Override
               public void onChoice(int choice){
                 if(choice == 0){
@@ -874,7 +837,7 @@ public class MITM extends Plugin
                     mCurrentActivity = activity;
                     startActivityForResult(mScriptPicker, SELECT_SCRIPT);
                   } catch(ActivityNotFoundException e){
-                    new ErrorDialog(getString(R.string.error), getString(R.string.error_file_intent), MITM.this).show();
+                    new ErrorDialog(getString(R.string.error), getString(R.string.error_file_intent), getActivity()).show();
                   }
                 } else{
                   new InputDialog
@@ -886,7 +849,7 @@ public class MITM extends Plugin
                         "</script>",
                       true,
                       false,
-                      MITM.this,
+                      getActivity(),
                       new InputDialogListener(){
                         @Override
                         public void onInputEntered(String input){
@@ -915,14 +878,14 @@ public class MITM extends Plugin
 
                               activity.setVisibility(View.VISIBLE);
 
-                              Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
+                              Toast.makeText(getContext(), getString(R.string.tap_again), Toast.LENGTH_LONG).show();
 
                             } catch (ChildManager.ChildNotStartedException e) {
                               System.errorLogging(e);
-                              Toast.makeText(MITM.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
+                              Toast.makeText(getContext(), getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
                             }
                           } else
-                            new ErrorDialog(getString(R.string.error), getString(R.string.error_js_code), MITM.this).show();
+                            new ErrorDialog(getString(R.string.error), getString(R.string.error_js_code), getActivity()).show();
                         }
                       }
                     ).show();
@@ -944,7 +907,7 @@ public class MITM extends Plugin
       new OnClickListener(){
       @Override
       public void onClick(View v){
-        if(!System.checkNetworking(MITM.this))
+        if(!System.checkNetworking(getActivity()))
           return;
 
         final ProgressBar activity = (ProgressBar) v.findViewById(R.id.itemActivity);
@@ -952,7 +915,7 @@ public class MITM extends Plugin
         if(activity.getVisibility() == View.INVISIBLE){
           setStoppedState();
 
-          new CustomFilterDialog( getString(R.string.custom_filter), MITM.this, new CustomFilterDialogListener(){
+          new CustomFilterDialog( getString(R.string.custom_filter), getActivity(), new CustomFilterDialogListener(){
             @Override
             public void onInputEntered(final ArrayList<String> from, final ArrayList<String> to){
 
@@ -987,16 +950,16 @@ public class MITM extends Plugin
 
                   activity.setVisibility(View.VISIBLE);
 
-                  Toast.makeText(MITM.this, getString(R.string.tap_again), Toast.LENGTH_LONG).show();
+                  Toast.makeText(getContext(), getString(R.string.tap_again), Toast.LENGTH_LONG).show();
 
                 } catch(PatternSyntaxException e){
-                  new ErrorDialog(getString(R.string.error), getString(R.string.error_filter) + ": " + e.getDescription() + " .", MITM.this).show();
+                  new ErrorDialog(getString(R.string.error), getString(R.string.error_filter) + ": " + e.getDescription() + " .", getActivity()).show();
                 } catch (ChildManager.ChildNotStartedException e) {
                   System.errorLogging(e);
-                  Toast.makeText(MITM.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
+                  Toast.makeText(getContext(), getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
                 }
               } else
-                new ErrorDialog(getString(R.string.error), getString(R.string.error_filter), MITM.this).show();
+                new ErrorDialog(getString(R.string.error), getString(R.string.error_filter), getActivity()).show();
             }
           }
           ).show();
@@ -1007,9 +970,8 @@ public class MITM extends Plugin
   }
 
   @Override
-  public void onBackPressed(){
+  public void onDetach(){
     setStoppedState();
-    super.onBackPressed();
-    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+    super.onDetach();
   }
 }

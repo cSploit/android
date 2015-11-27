@@ -26,6 +26,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -73,7 +74,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Hijacker extends AppCompatActivity {
+public class Hijacker extends Fragment {
 	private ToggleButton mHijackToggleButton = null;
 	private ProgressBar mHijackProgress = null;
 	private SessionListAdapter mAdapter = null;
@@ -241,10 +242,10 @@ public class Hijacker extends AppCompatActivity {
 		}
 
 		public SessionListAdapter(int layoutId) {
-			super(Hijacker.this, layoutId);
+			super(getActivity(), layoutId);
 
 			mLayoutId = layoutId;
-			mSessions = new HashMap<String, Session>();
+			mSessions = new HashMap<>();
 		}
 
 		public Session getSession(String address, String domain, boolean https) {
@@ -292,7 +293,7 @@ public class Hijacker extends AppCompatActivity {
 			Session session = getByPosition(position);
 
 			if (row == null) {
-				LayoutInflater inflater = (LayoutInflater) Hijacker.this
+				LayoutInflater inflater = (LayoutInflater) getActivity()
 						.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 				row = inflater.inflate(mLayoutId, parent, false);
 
@@ -387,7 +388,7 @@ public class Hijacker extends AppCompatActivity {
 				}
 
 				final Session fsession = session;
-				Hijacker.this.runOnUiThread(new Runnable() {
+				getActivity().runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
 						mAdapter.addSession(fsession);
@@ -399,21 +400,9 @@ public class Hijacker extends AppCompatActivity {
 	}
 
 	public void onCreate(Bundle savedInstanceState) {
-		SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-		Boolean isDark = themePrefs.getBoolean("isDark", false);
-		if (isDark)
-			setTheme(R.style.DarkTheme);
-		else
-			setTheme(R.style.AppTheme);
-		super.onCreate(savedInstanceState);
-		setTitle(System.getCurrentTarget() + " > MITM > "
-				+ getString(R.string.session_sniffer));
-		setContentView(R.layout.plugin_mitm_hijacker);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-		mHijackToggleButton = (ToggleButton) findViewById(R.id.hijackToggleButton);
-		mHijackProgress = (ProgressBar) findViewById(R.id.hijackActivity);
-		ListView mListView = (ListView) findViewById(R.id.listView);
+		mHijackToggleButton = (ToggleButton) getActivity().findViewById(R.id.hijackToggleButton);
+		mHijackProgress = (ProgressBar) getActivity().findViewById(R.id.hijackActivity);
+		ListView mListView = (ListView) getActivity().findViewById(R.id.listView);
 		mAdapter = new SessionListAdapter(
 				R.layout.plugin_mitm_hijacker_list_item);
 		mSpoof = new SpoofSession();
@@ -428,7 +417,7 @@ public class Hijacker extends AppCompatActivity {
 					new ConfirmDialog(getString(R.string.hijack_session),
 							mRunning ? getString(R.string.start_hijacking)
 									: getString(R.string.start_hijacking2),
-							Hijacker.this, new ConfirmDialogListener() {
+							getActivity(), new ConfirmDialogListener() {
 								@Override
 								public void onConfirm() {
 									if (mRunning)
@@ -436,8 +425,7 @@ public class Hijacker extends AppCompatActivity {
 
 									System.setCustomData(session);
 
-									startActivity(new Intent(Hijacker.this,
-											HijackerWebView.class));
+									startActivity(new Intent(getActivity(), HijackerWebView.class));
 								}
 
 								@Override
@@ -456,7 +444,7 @@ public class Hijacker extends AppCompatActivity {
 				if (session != null) {
 					new InputDialog(getString(R.string.save_session),
 							getString(R.string.set_session_filename), session
-									.getFileName(), true, false, Hijacker.this,
+									.getFileName(), true, false, getActivity(),
 							new InputDialogListener() {
 								@Override
 								public void onInputEntered(String name) {
@@ -467,21 +455,21 @@ public class Hijacker extends AppCompatActivity {
 													.save(name);
 
 											Toast.makeText(
-													Hijacker.this,
+													getContext(),
 													getString(R.string.session_saved_to)
 															+ filename + " .",
 													Toast.LENGTH_SHORT).show();
 										} catch (IOException e) {
 											new ErrorDialog(
 													getString(R.string.error),
-													e.toString(), Hijacker.this)
+													e.toString(), getActivity())
 													.show();
 										}
 									} else
 										new ErrorDialog(
 												getString(R.string.error),
 												getString(R.string.invalid_session),
-												Hijacker.this).show();
+												getActivity()).show();
 								}
 							}).show();
 				}
@@ -505,10 +493,9 @@ public class Hijacker extends AppCompatActivity {
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.hijacker, menu);
-		return super.onCreateOptionsMenu(menu);
+		super.onCreateOptionsMenu(menu, inflater);
 	}
 
 	private void setStartedState() {
@@ -520,7 +507,7 @@ public class Hijacker extends AppCompatActivity {
       mSpoof.start(new OnSessionReadyListener() {
         @Override
         public void onSessionReady() {
-          Hijacker.this.runOnUiThread(new Runnable() {
+          getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
               mHijackToggleButton.setText(R.string.stop);
@@ -538,17 +525,17 @@ public class Hijacker extends AppCompatActivity {
       });
     } catch (ChildManager.ChildNotStartedException e) {
       Logger.error(e.getMessage());
-      Toast.makeText(Hijacker.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
+      Toast.makeText(getContext(), getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
     }
   }
 
 	private void setSpoofErrorState(final String error) {
-		Hijacker.this.runOnUiThread(new Runnable() {
+		getActivity().runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				if (!Hijacker.this.isFinishing()) {
+				if (!getActivity().isFinishing()) {
 					new ErrorDialog(getString(R.string.error), error,
-							Hijacker.this).show();
+							getActivity()).show();
 					setStoppedState();
 				}
 			}
@@ -572,11 +559,6 @@ public class Hijacker extends AppCompatActivity {
 		int itemId = item.getItemId();
 
 		switch (itemId) {
-		case android.R.id.home:
-
-			onBackPressed();
-
-			return true;
 
 		case R.id.load:
 
@@ -587,7 +569,7 @@ public class Hijacker extends AppCompatActivity {
 				new SpinnerDialog(getString(R.string.select_session),
 						getString(R.string.select_session_file),
 						sessions.toArray(new String[sessions.size()]),
-						Hijacker.this, new SpinnerDialogListener() {
+						getActivity(), new SpinnerDialogListener() {
 							@Override
 							public void onItemSelected(int index) {
 								String filename = sessions.get(index);
@@ -602,13 +584,13 @@ public class Hijacker extends AppCompatActivity {
 								} catch (Exception e) {
 									e.printStackTrace();
 									new ErrorDialog("Error", e.getMessage(),
-											Hijacker.this).show();
+											getActivity()).show();
 								}
 							}
 						}).show();
 			} else
 				new ErrorDialog(getString(R.string.error),
-						getString(R.string.no_session_found), Hijacker.this)
+						getString(R.string.no_session_found), getActivity())
 						.show();
 
 			return true;
@@ -619,9 +601,8 @@ public class Hijacker extends AppCompatActivity {
 	}
 
 	@Override
-	public void onBackPressed() {
+	public void onDetach() {
 		setStoppedState();
-		super.onBackPressed();
-		overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+		super.onDetach();
 	}
 }

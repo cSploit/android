@@ -130,10 +130,10 @@ public class PortScanner extends Plugin {
 
     mScanProgress.setVisibility(View.INVISIBLE);
     mRunning = false;
-    mScanFloatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_play_arrow_24dp));
+    mScanFloatingActionButton.setImageDrawable(getDrawable(R.drawable.ic_play_arrow_24dp));
 
     if (mPortList.size() == 0)
-      Toast.makeText(this, getString(R.string.no_open_ports),
+      Toast.makeText(getActivity(), getString(R.string.no_open_ports),
               Toast.LENGTH_LONG).show();
   }
 
@@ -152,9 +152,9 @@ public class PortScanner extends Plugin {
       mRunning = true;
     } catch (ChildManager.ChildNotStartedException e) {
       System.errorLogging(e);
-      Toast.makeText(PortScanner.this, getString(R.string.child_not_started) + "\n" + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+      Toast.makeText(getActivity(), getString(R.string.child_not_started) + "\n" + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
     }
-    mScanFloatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_stop_24dp));
+    mScanFloatingActionButton.setImageDrawable(getDrawable(R.drawable.ic_stop_24dp));
   }
 
   private void createPortList() {
@@ -178,12 +178,6 @@ public class PortScanner extends Plugin {
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
-    SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-    Boolean isDark = themePrefs.getBoolean("isDark", false);
-    if (isDark)
-      setTheme(R.style.DarkTheme);
-    else
-      setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);
 
     mPreferences = System.getSettings();
@@ -219,7 +213,7 @@ public class PortScanner extends Plugin {
 
     mScanReceiver = new Receiver(target);
 
-    mListAdapter = new ArrayAdapter<>(this,
+    mListAdapter = new ArrayAdapter<>(getActivity(),
             android.R.layout.simple_list_item_1, mPortList);
     mScanList.setAdapter(mListAdapter);
     mScanList.setOnItemLongClickListener(new OnItemLongClickListener() {
@@ -236,7 +230,7 @@ public class PortScanner extends Plugin {
                 cmdlineRep, portNumber);
 
         new ConfirmDialog("Open", "Open " + url + " ?",
-                PortScanner.this, new ConfirmDialogListener() {
+                getActivity(), new ConfirmDialogListener() {
           @Override
           public void onConfirm() {
             try {
@@ -250,7 +244,7 @@ public class PortScanner extends Plugin {
               new ErrorDialog(
                       getString(R.string.error),
                       getString(R.string.no_activities_for_url),
-                      PortScanner.this).show();
+                      getActivity()).show();
             }
 
           }
@@ -266,14 +260,13 @@ public class PortScanner extends Plugin {
   }
 
   @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    MenuInflater inflater = getMenuInflater();
+  public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
     inflater.inflate(R.menu.port_scanner, menu);
     mMenu = menu;
     mMenu.findItem(R.id.scanner_custom_parameters).
             setChecked(mPreferences.getBoolean(CUSTOM_PARAMETERS, false));
 
-    return super.onCreateOptionsMenu(menu);
+    super.onCreateOptionsMenu(menu, inflater);
   }
 
   @Override
@@ -290,7 +283,7 @@ public class PortScanner extends Plugin {
       case R.id.select_ports:
 
         new InputDialog(getString(R.string.select_ports),
-                getString(R.string.enter_ports_list), this,
+                getString(R.string.enter_ports_list), getActivity(),
                 new InputDialogListener() {
                   @Override
                   public void onInputEntered(String input) {
@@ -313,7 +306,7 @@ public class PortScanner extends Plugin {
                           }
                         } catch (Exception e) {
                           new ErrorDialog("Error", e.toString(),
-                                  PortScanner.this).show();
+                                  getActivity()).show();
                           return;
                         }
                       }
@@ -329,7 +322,7 @@ public class PortScanner extends Plugin {
                         mCustomPorts = null;
                         new ErrorDialog(getString(R.string.error),
                                 getString(R.string.invalid_ports),
-                                PortScanner.this).show();
+                                getActivity()).show();
                       }
 
                       hideParametersField();
@@ -339,7 +332,7 @@ public class PortScanner extends Plugin {
                     } else
                       new ErrorDialog(getString(R.string.error),
                               getString(R.string.empty_port_list),
-                              PortScanner.this).show();
+                              getActivity()).show();
                   }
                 }).show();
 
@@ -351,10 +344,9 @@ public class PortScanner extends Plugin {
   }
 
   @Override
-  public void onBackPressed() {
+  public void onDetach() {
     setStoppedState();
-    super.onBackPressed();
-    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+    super.onDetach();
   }
 
   private class Receiver extends NMap.SynScanReceiver {
@@ -369,7 +361,7 @@ public class PortScanner extends Plugin {
     public void onStart(String commandLine) {
       super.onStart(commandLine);
 
-      PortScanner.this.runOnUiThread(new Runnable() {
+      getActivity().runOnUiThread(new Runnable() {
         @Override
         public void run() {
           mRunning = true;
@@ -382,7 +374,7 @@ public class PortScanner extends Plugin {
     public void onEnd(int exitCode) {
       super.onEnd(exitCode);
 
-      PortScanner.this.runOnUiThread(new Runnable() {
+      getActivity().runOnUiThread(new Runnable() {
         @Override
         public void run() {
           setStoppedState();
@@ -402,7 +394,7 @@ public class PortScanner extends Plugin {
       );
 
       if(!mPortList.contains(entry)) {
-        PortScanner.this.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
           @Override
           public void run() {
             mPortList.add(entry);

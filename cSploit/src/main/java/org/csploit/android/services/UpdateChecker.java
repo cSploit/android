@@ -27,7 +27,6 @@ import com.github.zafarkhaja.semver.Version;
 import org.csploit.android.core.*;
 import org.csploit.android.core.System;
 import org.csploit.android.net.GitHubParser;
-import org.csploit.android.services.UpdateService;
 import org.csploit.android.update.ApkUpdate;
 import org.csploit.android.update.CoreUpdate;
 import org.csploit.android.update.MsfUpdate;
@@ -36,7 +35,7 @@ import org.csploit.android.update.Update;
 
 import java.io.File;
 
-public class UpdateChecker extends Thread
+public class UpdateChecker implements Runnable
 {
   public static final String UPDATE_CHECKING = "UpdateChecker.action.CHECKING";
   public static final String UPDATE_AVAILABLE = "UpdateChecker.action.UPDATE_AVAILABLE";
@@ -45,8 +44,6 @@ public class UpdateChecker extends Thread
   private Context mContext = null;
 
   public UpdateChecker(Context context){
-    super("UpdateChecker");
-
     mContext = context;
   }
 
@@ -54,7 +51,7 @@ public class UpdateChecker extends Thread
     Intent intent = new Intent(msg);
 
     if(update != null)
-      intent.putExtra(UpdateService.UPDATE, update);
+      intent.putExtra(UpdateInstaller.UPDATE, update);
 
     mContext.sendBroadcast(intent);
   }
@@ -220,11 +217,15 @@ public class UpdateChecker extends Thread
 
   public void run(){
 
-    send(UPDATE_CHECKING);
-
     Logger.debug("Service started.");
 
     SharedPreferences prefs = System.getSettings();
+
+    if(!prefs.getBoolean("PREF_CHECK_UPDATES", true)) {
+      send(UPDATE_NOT_AVAILABLE);
+    }
+
+    send(UPDATE_CHECKING);
 
     boolean checkApp = prefs.getBoolean("PREF_UPDATES_APP", true);
 

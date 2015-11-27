@@ -27,6 +27,7 @@ import org.acra.annotation.ReportsCrashes;
 import org.acra.sender.HttpSender;
 import org.csploit.android.core.Logger;
 import org.csploit.android.core.System;
+import org.csploit.android.helpers.GUIHelper;
 import org.csploit.android.plugins.ExploitFinder;
 import org.csploit.android.plugins.Inspector;
 import org.csploit.android.plugins.LoginCracker;
@@ -55,38 +56,14 @@ import java.net.NoRouteToHostException;
 public class CSploitApplication extends Application {
   @Override
   public void onCreate() {
-    SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-    Boolean isDark = themePrefs.getBoolean("isDark", false);
-    if (isDark)
-      setTheme(R.style.DarkTheme);
-    else
-      setTheme(R.style.AppTheme);
-
     super.onCreate();
 
+    System.setApplicationContext(this);
+
+    GUIHelper.setupTheme(this);
     ACRA.init(this);
     Services.init(this);
 
-    // initialize the system
-    try {
-      System.init(this);
-    } catch (Exception e) {
-      // ignore exception when the user has wifi off
-      if (!(e instanceof NoRouteToHostException))
-        System.errorLogging(e);
-    }
-
     ACRA.setConfig(ACRA.getConfig().setApplicationLogFile(System.getCorePath() + "/cSploitd.log"));
-
-    // load system modules even if the initialization failed
-    System.registerPlugin(new RouterPwn());
-    System.registerPlugin(new Traceroute());
-    System.registerPlugin(new PortScanner());
-    System.registerPlugin(new Inspector());
-    System.registerPlugin(new ExploitFinder());
-    System.registerPlugin(new LoginCracker());
-    System.registerPlugin(new Sessions());
-    System.registerPlugin(new MITM());
-    System.registerPlugin(new PacketForger());
   }
 }

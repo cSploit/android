@@ -22,9 +22,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-public class ActionActivity extends AppCompatActivity {
+import org.csploit.android.gui.fragments.PluginList;
 
-  ActionFragment f;
+public class ActionActivity extends AppCompatActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -39,14 +39,9 @@ public class ActionActivity extends AppCompatActivity {
       if (savedInstanceState != null) {
         return;
       }
-      f = new ActionFragment();
+      PluginList f = new PluginList();
       getSupportFragmentManager().beginTransaction()
               .add(R.id.mainframe, f).commit();
     }
-  }
-
-  @Override
-  public void onBackPressed() {
-    f.onBackPressed();
   }
 }

@@ -18,10 +18,8 @@
  */
 package org.csploit.android.plugins;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -63,12 +61,12 @@ public class Traceroute extends Plugin {
     }
 		mTraceProgress.setVisibility(View.INVISIBLE);
 		mRunning = false;
-		mTraceFloatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_play_arrow_24dp));
+		mTraceFloatingActionButton.setImageDrawable(getDrawable(R.drawable.ic_play_arrow_24dp));
 	}
 
 	private void setStartedState() {
 		mListAdapter.clear();
-		mTraceFloatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_stop_24dp));
+		mTraceFloatingActionButton.setImageDrawable(getDrawable(R.drawable.ic_stop_24dp));
 
     try {
       System.getTools().nmap.trace(System.getCurrentTarget(), resolveNames, mTraceReceiver);
@@ -76,18 +74,12 @@ public class Traceroute extends Plugin {
       mRunning = true;
     } catch (ChildManager.ChildNotStartedException e) {
       System.errorLogging(e);
-      Toast.makeText(Traceroute.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
+      Toast.makeText(getContext(), getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
     }
   }
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-		Boolean isDark = themePrefs.getBoolean("isDark", false);
-		if (isDark)
-			setTheme(R.style.DarkTheme);
-		else
-			setTheme(R.style.AppTheme);
 		super.onCreate(savedInstanceState);
 
 		mTraceFloatingActionButton = (FloatingActionButton) findViewById(R.id.traceToggleButton);
@@ -106,25 +98,24 @@ public class Traceroute extends Plugin {
 
 		ListView mTraceList = (ListView) findViewById(R.id.traceListView);
 
-		mListAdapter = new ArrayAdapter<String>(this,
+		mListAdapter = new ArrayAdapter<>(getActivity(),
 				android.R.layout.simple_list_item_1);
 		mTraceList.setAdapter(mListAdapter);
 	}
 
   @Override
-  public boolean onCreateOptionsMenu(Menu menu){
-    MenuInflater inflater = getMenuInflater();
+  public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
     inflater.inflate(R.menu.traceroute, menu);
-    return super.onCreateOptionsMenu(menu);
+    super.onCreateOptionsMenu(menu, inflater);
   }
 
   @Override
-  public boolean onPrepareOptionsMenu(Menu menu) {
+  public void onPrepareOptionsMenu(Menu menu) {
     MenuItem item = menu.findItem(R.id.resolve_names);
     if(item != null) {
       item.setChecked(resolveNames);
     }
-    return super.onPrepareOptionsMenu(menu);
+    super.onPrepareOptionsMenu(menu);
   }
 
   @Override
@@ -140,10 +131,9 @@ public class Traceroute extends Plugin {
   }
 
 	@Override
-	public void onBackPressed() {
+	public void onDetach() {
 		setStoppedState();
-		super.onBackPressed();
-		overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+		super.onDetach();
 	}
 
 	private class Receiver extends NMap.TraceReceiver {
@@ -151,7 +141,7 @@ public class Traceroute extends Plugin {
 		public void onStart(String commandLine) {
 			super.onStart(commandLine);
 
-			Traceroute.this.runOnUiThread(new Runnable() {
+			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					mRunning = true;
@@ -164,7 +154,7 @@ public class Traceroute extends Plugin {
 		public void onEnd(int exitCode) {
 			super.onEnd(exitCode);
 
-			Traceroute.this.runOnUiThread(new Runnable() {
+			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					setStoppedState();
@@ -200,7 +190,7 @@ public class Traceroute extends Plugin {
     @Override
     public void onHop(int hop, final long usec, final String address, final String name) {
 
-			Traceroute.this.runOnUiThread(new Runnable() {
+			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 

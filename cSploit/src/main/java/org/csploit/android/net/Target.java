@@ -663,6 +663,25 @@ public class Target implements Comparable<Target>
     return mType;
   }
 
+  public String getIdentifier() {
+    String addr = "";
+
+    switch (mType) {
+      case ENDPOINT:
+        addr = getEndpoint().getHardwareAsString();
+        addr += "|" + getAddress().getHostAddress();
+        break;
+      case REMOTE:
+        addr = getHostname();
+        break;
+      case NETWORK:
+        addr = mNetwork.getNetworkRepresentation();
+        break;
+    }
+
+    return addr;
+  }
+
   public Network getNetwork(){
     return mNetwork;
   }

@@ -18,7 +18,6 @@
  */
 package org.csploit.android.plugins;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -72,7 +71,7 @@ public class Inspector extends Plugin{
 
     mActivity.setVisibility(View.INVISIBLE);
     mRunning = false;
-    mStartButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_play_arrow_24dp));
+    mStartButton.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_play_arrow_24dp));
   }
 
   private void write_services()
@@ -109,7 +108,7 @@ public class Inspector extends Plugin{
     if(ThreadHelper.isOnMainThread()) {
       write_services();
     } else {
-      runOnUiThread(new Runnable() {
+      getActivity().runOnUiThread(new Runnable() {
         @Override
         public void run() {
           write_services();
@@ -126,24 +125,18 @@ public class Inspector extends Plugin{
       updateView();
 
       mProcess = System.getTools().nmap.inpsect( target, mReceiver, mFocusedScan);
-      mStartButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_stop_24dp));
+      mStartButton.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_stop_24dp));
 
       mActivity.setVisibility(View.VISIBLE);
       mRunning = true;
     } catch (ChildManager.ChildNotStartedException e) {
       System.errorLogging(e);
-      Toast.makeText(Inspector.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
+      Toast.makeText(getActivity(), getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
     }
   }
 
   @Override
   public void onCreate(Bundle savedInstanceState){
-	  SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-		Boolean isDark = themePrefs.getBoolean("isDark", false);
-		if (isDark)
-			setTheme(R.style.DarkTheme);
-		else
-			setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);
 
     mStartButton = (FloatingActionButton) findViewById(R.id.inspectToggleButton);
@@ -184,27 +177,25 @@ public class Inspector extends Plugin{
   }
 
   @Override
-  public void onBackPressed(){
+  public void onDetach(){
     setStoppedState();
-    super.onBackPressed();
-    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+    super.onDetach();
   }
 
   @Override
-  public boolean onCreateOptionsMenu(Menu menu){
-    MenuInflater inflater = getMenuInflater();
+  public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
     inflater.inflate(R.menu.inspector, menu);
-    return super.onCreateOptionsMenu(menu);
+    super.onCreateOptionsMenu(menu, inflater);
   }
 
   @Override
-  public boolean onPrepareOptionsMenu(Menu menu) {
+  public void onPrepareOptionsMenu(Menu menu) {
     MenuItem item = menu.findItem(R.id.focused_scan);
     if(item != null) {
       item.setChecked(mFocusedScan);
       item.setEnabled(System.getCurrentTarget().hasOpenPorts());
     }
-    return super.onPrepareOptionsMenu(menu);
+    super.onPrepareOptionsMenu(menu);
   }
 
   @Override
@@ -259,7 +250,7 @@ public class Inspector extends Plugin{
     public void onOsFound(final String os){
       target.setDeviceOS(os);
 
-      Inspector.this.runOnUiThread(new Runnable(){
+      getActivity().runOnUiThread(new Runnable(){
         @Override
         public void run(){
           mDeviceOS.setText(os);
@@ -271,7 +262,7 @@ public class Inspector extends Plugin{
     public void onDeviceFound(final String device){
       target.setDeviceType(device);
 
-      Inspector.this.runOnUiThread(new Runnable(){
+      getActivity().runOnUiThread(new Runnable(){
         @Override
         public void run(){
           mDeviceType.setText(device);
@@ -281,7 +272,7 @@ public class Inspector extends Plugin{
 
     @Override
     public void onEnd(int code){
-      Inspector.this.runOnUiThread(new Runnable(){
+      getActivity().runOnUiThread(new Runnable(){
         @Override
         public void run(){
           if(mRunning)

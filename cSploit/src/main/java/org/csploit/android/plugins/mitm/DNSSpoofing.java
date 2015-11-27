@@ -18,10 +18,8 @@
  */
 package org.csploit.android.plugins.mitm;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
+import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -41,180 +39,150 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 
-public class DNSSpoofing extends AppCompatActivity {
-    private ToggleButton mSniffToggleButton = null;
-	private ProgressBar mSniffProgress = null;
-	private TextView mTextDnsList = null;
-    private Button mCmdSave = null;
-	private boolean mRunning = false;
-	private FileWriter mFileWriter = null;
-	private BufferedWriter mBufferedWriter = null;
-	private SpoofSession mSpoofSession = null;
+public class DNSSpoofing extends Fragment {
+  private ToggleButton mSniffToggleButton = null;
+  private ProgressBar mSniffProgress = null;
+  private TextView mTextDnsList = null;
+  private Button mCmdSave = null;
+  private boolean mRunning = false;
+  private BufferedWriter mBufferedWriter = null;
+  private SpoofSession mSpoofSession = null;
 
-    	public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
 
-		SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-		Boolean isDark = themePrefs.getBoolean("isDark", false);
-		if (isDark)
-			setTheme(R.style.DarkTheme);
-		else
-			setTheme(R.style.AppTheme);
+    mTextDnsList = (TextView) getActivity().findViewById(R.id.textViewDNSList);
+    mCmdSave = (Button) getActivity().findViewById(R.id.cmd_save);
+    mSniffToggleButton = (ToggleButton) getActivity().findViewById(R.id.sniffToggleButton);
+    mSniffProgress = (ProgressBar) getActivity().findViewById(R.id.sniffActivity);
+    mTextDnsList.setHorizontallyScrolling(true);
 
-		setTitle(System.getCurrentTarget() + " > MITM > DNS spoofing");
-		setContentView(R.layout.plugin_mitm_dns_spoofing);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    mSpoofSession = new SpoofSession(false, false, null, null);
 
-		mTextDnsList = (TextView) findViewById(R.id.textViewDNSList);
-        mCmdSave = (Button) findViewById(R.id.cmd_save);
-		mSniffToggleButton = (ToggleButton) findViewById(R.id.sniffToggleButton);
-		mSniffProgress = (ProgressBar) findViewById(R.id.sniffActivity);
-        mTextDnsList.setHorizontallyScrolling(true);
+    readDNSlist();
 
-		mSpoofSession = new SpoofSession(false, false, null, null);
-
-        readDNSlist();
-
-		mSniffToggleButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (mRunning) {
-					setStoppedState();
-				} else {
-					setStartedState();
-				}
-			}
-		});
-        mCmdSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveDNSlist();
-            }
-        });
+    mSniffToggleButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        if (mRunning) {
+          setStoppedState();
+        } else {
+          setStartedState();
         }
+      }
+    });
+    mCmdSave.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        saveDNSlist();
+      }
+    });
+  }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case android.R.id.home:
+  private void setStoppedState() {
+    mSpoofSession.stop();
 
-			onBackPressed();
-
-			return true;
-
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-	}
-
-    private void setStoppedState() {
-		mSpoofSession.stop();
-
-		try {
-			if (mBufferedWriter != null)
-				mBufferedWriter.close();
-		} catch (IOException e) {
-			System.errorLogging(e);
-		}
-
-		mSniffProgress.setVisibility(View.INVISIBLE);
-		mRunning = false;
-		mSniffToggleButton.setChecked(false);
-	}
-
-    public void readDNSlist(){
-        String _line="";
-
-        try {
-            BufferedReader inputReader = new BufferedReader(new FileReader(System.getContext().getFilesDir().getAbsolutePath() + "/tools/ettercap/share/etter.dns"));
-            while ((_line = inputReader.readLine()) != null) {
-                mTextDnsList.append(_line + "\n");
-            }
-
-            inputReader.close();
-        }
-        catch (Exception e){
-            Logger.error("readDNSList() error: " + e.getLocalizedMessage());
-        }
+    try {
+      if (mBufferedWriter != null)
+        mBufferedWriter.close();
+    } catch (IOException e) {
+      System.errorLogging(e);
     }
 
-    public void saveDNSlist(){
+    mSniffProgress.setVisibility(View.INVISIBLE);
+    mRunning = false;
+    mSniffToggleButton.setChecked(false);
+  }
 
-        try {
-            Logger.info("saveDNSList() saving dnss to: " + System.getContext().getFilesDir().getAbsolutePath() + "/tools/ettercap/share/etter.dns");
-            File f = new File(System.getContext().getFilesDir().getAbsolutePath() + "/tools/ettercap/share/etter.dns");
-            FileOutputStream fos = new FileOutputStream(f);
-            fos.write(mTextDnsList.getText().toString().getBytes());
-            fos.close();
+  public void readDNSlist() {
+    String _line = "";
 
-            Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
-        }
-        catch (Exception e){
-            Logger.error("readDNSList() error: " + e.getLocalizedMessage());
-            Toast.makeText(this, "Error: " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-        }
+    try {
+      BufferedReader inputReader = new BufferedReader(new FileReader(System.getContext().getFilesDir().getAbsolutePath() + "/tools/ettercap/share/etter.dns"));
+      while ((_line = inputReader.readLine()) != null) {
+        mTextDnsList.append(_line + "\n");
+      }
+
+      inputReader.close();
+    } catch (Exception e) {
+      Logger.error("readDNSList() error: " + e.getLocalizedMessage());
     }
+  }
 
-	private void setStartedState() {
+  public void saveDNSlist() {
+
+    try {
+      Logger.info("saveDNSList() saving dnss to: " + System.getContext().getFilesDir().getAbsolutePath() + "/tools/ettercap/share/etter.dns");
+      File f = new File(System.getContext().getFilesDir().getAbsolutePath() + "/tools/ettercap/share/etter.dns");
+      FileOutputStream fos = new FileOutputStream(f);
+      fos.write(mTextDnsList.getText().toString().getBytes());
+      fos.close();
+
+      Toast.makeText(getContext(), "Saved", Toast.LENGTH_SHORT).show();
+    } catch (Exception e) {
+      Logger.error("readDNSList() error: " + e.getLocalizedMessage());
+      Toast.makeText(getContext(), "Error: " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+    }
+  }
+
+  private void setStartedState() {
 
     try {
       mSpoofSession.start(new Ettercap.OnDNSSpoofedReceiver() {
         @Override
         public void onSpoofed(String line) {
-            Logger.info("DNSSpoofing.onevent() line: " + line);
+          Logger.info("DNSSpoofing.onevent() line: " + line);
 
-            if (line.contains("spoofed to"))
-                Toast.makeText(DNSSpoofing.this, line, Toast.LENGTH_LONG).show();
+          if (line.contains("spoofed to"))
+            Toast.makeText(getContext(), line, Toast.LENGTH_LONG).show();
 
         }
 
         @Override
-        public void onStderr(String line)
-        {
-            if (line.contains("spoofed to"))
-                Toast.makeText(DNSSpoofing.this, line, Toast.LENGTH_LONG).show();
+        public void onStderr(String line) {
+          if (line.contains("spoofed to"))
+            Toast.makeText(getContext(), line, Toast.LENGTH_LONG).show();
         }
 
         @Override
-        public void onReady(){
+        public void onReady() {
         }
 
         @Override
         public void onEnd(final int exitValue) {
-          DNSSpoofing.this.runOnUiThread(new Runnable() {
+          getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-              if(exitValue!=0) {
-                Toast.makeText(DNSSpoofing.this, "ettercap returned #" + exitValue, Toast.LENGTH_LONG).show();
+              if (exitValue != 0) {
+                Toast.makeText(getContext(), "ettercap returned #" + exitValue, Toast.LENGTH_LONG).show();
               }
               setStoppedState();
             }
           });
         }
 
-          @Override
-          public void onError(final String error) {
-              DNSSpoofing.this.runOnUiThread(new Runnable() {
-                  @Override
-                  public void run() {
-                      if (!DNSSpoofing.this.isFinishing()) {
-                          new ErrorDialog(getString(R.string.error), error,
-                                  DNSSpoofing.this).show();
-                          setStoppedState();
-                      }
-                  }
-              });
-          }
+        @Override
+        public void onError(final String error) {
+          getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              if (!getActivity().isFinishing()) {
+                new ErrorDialog(getString(R.string.error), error,
+                        getActivity()).show();
+                setStoppedState();
+              }
+            }
+          });
+        }
 
         @Override
         public void onDeath(final int signal) {
-          DNSSpoofing.this.runOnUiThread(new Runnable() {
+          getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-              Toast.makeText(DNSSpoofing.this, "ettercap killed by signal #" + signal, Toast.LENGTH_LONG).show();
+              Toast.makeText(getContext(), "ettercap killed by signal #" + signal, Toast.LENGTH_LONG).show();
               setStoppedState();
             }
           });
@@ -228,15 +196,13 @@ public class DNSSpoofing extends AppCompatActivity {
     } catch (ChildManager.ChildNotStartedException e) {
       System.errorLogging(e);
       mSniffToggleButton.setChecked(false);
-      Toast.makeText(DNSSpoofing.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
+      Toast.makeText(getContext(), getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
     }
-	}
+  }
 
-	@Override
-	public void onBackPressed() {
-		setStoppedState();
-		super.onBackPressed();
-        overridePendingTransition(R.anim.fadeout, R.anim.fadein);
-	}
-
+  @Override
+  public void onDetach() {
+    setStoppedState();
+    super.onDetach();
+  }
 }

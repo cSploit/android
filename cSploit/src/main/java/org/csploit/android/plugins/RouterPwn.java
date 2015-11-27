@@ -49,9 +49,8 @@ public class RouterPwn extends Plugin{
 
 
   @Override
-  public void onBackPressed() {
-    super.onBackPressed();
-    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+  public void onDetach() {
+    super.onDetach();
   }
 
   @Override

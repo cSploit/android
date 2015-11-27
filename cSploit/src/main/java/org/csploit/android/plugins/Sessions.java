@@ -36,6 +36,7 @@ import org.csploit.android.gui.dialogs.ChoiceDialog;
 import org.csploit.android.gui.dialogs.ErrorDialog;
 import org.csploit.android.gui.dialogs.FinishDialog;
 import org.csploit.android.gui.dialogs.ListChoiceDialog;
+import org.csploit.android.helpers.FragmentHelper;
 import org.csploit.android.net.Target;
 import org.csploit.android.net.metasploit.RPCClient;
 import org.csploit.android.net.metasploit.Session;
@@ -70,20 +71,19 @@ public class Sessions extends Plugin {
       }
       availableChoices.add(R.string.delete);
 
-      new ListChoiceDialog(R.string.choose_an_option,availableChoices.toArray(new Integer[availableChoices.size()]),Sessions.this, new ChoiceDialog.ChoiceDialogListener() {
+      new ListChoiceDialog(R.string.choose_an_option,availableChoices.toArray(new Integer[availableChoices.size()]),getActivity(), new ChoiceDialog.ChoiceDialogListener() {
         @Override
         public void onChoice(int choice) {
           switch (availableChoices.get(choice)) {
             case R.string.open_shell:
               System.setCurrentSession(s);
-              startActivity(new Intent(Sessions.this, Console.class));
-              overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+              FragmentHelper.switchToFragment(Sessions.this, Console.class);
               break;
             case R.string.show_full_description:
               String message = s.getDescription();
               if(s.getInfo().length()>0)
                 message+= "\n\nInfo:\n"+s.getInfo();
-              new ErrorDialog(s.getName(),message,Sessions.this).show();
+              new ErrorDialog(s.getName(),message,getActivity()).show();
               break;
             case R.string.clear_event_log:
 
@@ -93,17 +93,17 @@ public class Sessions extends Plugin {
 
                 @Override
                 public void onEnd(int exitValue) {
-                  Toast.makeText(Sessions.this,"command returned "+exitValue,Toast.LENGTH_LONG).show();
+                  Toast.makeText(getContext(),"command returned "+exitValue,Toast.LENGTH_LONG).show();
                 }
 
                 @Override
                 public void onRpcClosed() {
-                  Toast.makeText(Sessions.this,"RPC channel has been closed",Toast.LENGTH_LONG).show();
+                  Toast.makeText(getContext(),"RPC channel has been closed",Toast.LENGTH_LONG).show();
                 }
 
                 @Override
                 public void onTimedOut() {
-                  Toast.makeText(Sessions.this,"command timed out",Toast.LENGTH_LONG).show();
+                  Toast.makeText(getContext(),"command timed out",Toast.LENGTH_LONG).show();
                 }
               });
               break;
@@ -125,8 +125,7 @@ public class Sessions extends Plugin {
       Session s = mAdapter.getItem(position);
       if(s.haveShell()) {
         System.setCurrentSession(s);
-        startActivity(new Intent(Sessions.this,Console.class));
-        overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+        FragmentHelper.switchToFragment(Sessions.this, Console.class);
       } else {
         longClickListener.onItemLongClick(parent, view, position, id);
       }
@@ -135,25 +134,19 @@ public class Sessions extends Plugin {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-		Boolean isDark = themePrefs.getBoolean("isDark", false);
-		if (isDark)
-			setTheme(R.style.DarkTheme);
-		else
-			setTheme(R.style.AppTheme);
 		super.onCreate(savedInstanceState);
 
     UIThread = this;
 
     if(System.getMsfRpc()==null) {
-      new FinishDialog(getString(R.string.error),"MSF RPC not connected",Sessions.this).show();
+      new FinishDialog(getString(R.string.error),"MSF RPC not connected",getActivity()).show();
       return;
 		}
 
     mResults = System.getCurrentTarget().getSessions();
 
     mListView = (ListView) findViewById(android.R.id.list);
-    mAdapter  = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mResults);
+    mAdapter  = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, mResults);
 
     mListView.setAdapter(mAdapter);
 
@@ -165,11 +158,11 @@ public class Sessions extends Plugin {
       @Override
       public void run() {
         System.getMsfRpc().updateSessions();
-        runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
           @Override
           public void run() {
             if(mResults.isEmpty()) {
-              new FinishDialog(getString(R.string.warning),getString(R.string.no_opened_sessions),Sessions.this).show();
+              new FinishDialog(getString(R.string.warning),getString(R.string.no_opened_sessions),getActivity()).show();
             } else {
               mAdapter.notifyDataSetChanged();
             }
@@ -186,12 +179,6 @@ public class Sessions extends Plugin {
     if(this!=UIThread)
       UIThread.onRpcChange(currentValue);
     else if(currentValue == null)
-      new FinishDialog(getString(R.string.error),getString(R.string.msfrpc_disconnected),Sessions.this).show();
+      new FinishDialog(getString(R.string.error),getString(R.string.msfrpc_disconnected),getActivity()).show();
 	}
-
-  @Override
-  public void onBackPressed() {
-    super.onBackPressed();
-    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
-  }
 }

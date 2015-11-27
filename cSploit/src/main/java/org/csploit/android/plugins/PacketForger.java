@@ -70,12 +70,6 @@ public class PacketForger extends Plugin implements OnClickListener {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-		Boolean isDark = themePrefs.getBoolean("isDark", false);
-		if (isDark)
-			setTheme(R.style.DarkTheme);
-		else
-			setTheme(R.style.AppTheme);
 		super.onCreate(savedInstanceState);
 
 		mProtocol = (Spinner) findViewById(R.id.protocolSpinner);
@@ -89,7 +83,7 @@ public class PacketForger extends Plugin implements OnClickListener {
 		if (System.getCurrentTarget().getType() != Type.ENDPOINT)
 			mSendWOL.setVisibility(View.INVISIBLE);
 
-		mProtocol.setAdapter(new ArrayAdapter<String>(this,
+		mProtocol.setAdapter(new ArrayAdapter<>(getActivity(),
 				android.R.layout.simple_spinner_item, PROTOCOLS));
 
 		mSendButton.setOnClickListener(this);
@@ -149,8 +143,7 @@ public class PacketForger extends Plugin implements OnClickListener {
 										}
 
 										final String text = response;
-										PacketForger.this
-												.runOnUiThread(new Runnable() {
+										getActivity().runOnUiThread(new Runnable() {
 													public void run() {
 														mResponse.setText(text);
 													}
@@ -188,8 +181,7 @@ public class PacketForger extends Plugin implements OnClickListener {
 										mUdpSocket.receive(response);
 
 										final String text = new String(buffer);
-										PacketForger.this
-												.runOnUiThread(new Runnable() {
+										getActivity().runOnUiThread(new Runnable() {
 													public void run() {
 														mResponse.setText(text);
 													}
@@ -206,9 +198,9 @@ public class PacketForger extends Plugin implements OnClickListener {
 						mBinaryData = null;
 
 						final String errorMessage = error;
-						PacketForger.this.runOnUiThread(new Runnable() {
+						getActivity().runOnUiThread(new Runnable() {
 							public void run() {
-								Toast.makeText(PacketForger.this,
+								Toast.makeText(getActivity(),
 										getString(R.string.request_sent),
 										Toast.LENGTH_SHORT).show();
 								setStoppedState(errorMessage);
@@ -249,11 +241,11 @@ public class PacketForger extends Plugin implements OnClickListener {
 
 					mData.setText(hex);
 
-					Toast.makeText(this,
+					Toast.makeText(getActivity(),
 							getString(R.string.customize_wol_port),
 							Toast.LENGTH_SHORT).show();
 				} else
-					Toast.makeText(this,
+					Toast.makeText(getActivity(),
 							getString(R.string.couldnt_send_wol_packet),
 							Toast.LENGTH_SHORT).show();
 			}
@@ -281,15 +273,14 @@ public class PacketForger extends Plugin implements OnClickListener {
 
 		}
 
-		if (errorMessage != null && !isFinishing())
-			new ErrorDialog(getString(R.string.error), errorMessage, this)
+		if (errorMessage != null && !getActivity().isFinishing())
+			new ErrorDialog(getString(R.string.error), errorMessage, getActivity())
 					.show();
 	}
 
 	@Override
-	public void onBackPressed() {
+	public void onDetach() {
 		setStoppedState(null);
-		super.onBackPressed();
-		overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+		super.onDetach();
 	}
 }

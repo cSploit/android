@@ -1,13 +1,13 @@
 package org.csploit.android.gui;
 
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
-import android.preference.EditTextPreference;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
-import android.preference.PreferenceScreen;
+import android.support.v7.preference.CheckBoxPreference;
+import android.support.v7.preference.EditTextPreference;
+import android.support.v7.preference.ListPreference;
+import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceCategory;
+import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.v7.preference.PreferenceScreen;
 import android.text.InputType;
 import android.util.Patterns;
 import android.widget.Toast;
@@ -26,7 +26,7 @@ import java.util.Collection;
  * activity fo setting exploit options.
  */
 
-public class MsfPreferences extends PreferenceActivity {
+public class MsfPreferences extends PreferenceFragmentCompat {
 
   private Collection<Option> options;
   private final Preference.OnPreferenceChangeListener listener = new Preference.OnPreferenceChangeListener() {
@@ -56,7 +56,7 @@ public class MsfPreferences extends PreferenceActivity {
             opt.setValue((String)newValue);
             return true;
           } else
-            Toast.makeText(getApplicationContext(),getString(R.string.error_invalid_address_or_port),Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),getString(R.string.error_invalid_address_or_port),Toast.LENGTH_LONG).show();
           break;
         case INTEGER:
           try {
@@ -64,7 +64,7 @@ public class MsfPreferences extends PreferenceActivity {
             opt.setValue(""+res);
             return true;
           } catch ( NumberFormatException e) {
-            Toast.makeText(getApplicationContext(),getString(R.string.pref_err_invalid_number),Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(),getString(R.string.pref_err_invalid_number),Toast.LENGTH_SHORT).show();
           }
           break;
         case BOOLEAN:
@@ -81,9 +81,9 @@ public class MsfPreferences extends PreferenceActivity {
             opt.setValue(""+res);
             return true;
           } catch ( NumberFormatException e) {
-            Toast.makeText(getApplicationContext(),getString(R.string.pref_err_invalid_number),Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(),getString(R.string.pref_err_invalid_number),Toast.LENGTH_SHORT).show();
           } catch (RuntimeException e) {
-            Toast.makeText(getApplicationContext(),getString(R.string.invalid_port),Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(),getString(R.string.invalid_port),Toast.LENGTH_SHORT).show();
           }
           break;
       }
@@ -93,23 +93,26 @@ public class MsfPreferences extends PreferenceActivity {
 
 
   @Override
-  protected void onCreate(Bundle savedInstanceState) {
+  public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    // no actionbar in preferenceactivity
-    //getActionBar().setDisplayHomeAsUpEnabled(true);
 
     setPreferenceScreen(createPreferenceHierarchy());
   }
 
+  @Override
+  public void onCreatePreferences(Bundle bundle, String s) {
+    // ??
+  }
+
   private PreferenceScreen createPreferenceHierarchy() {
     // Root
-    PreferenceScreen root = getPreferenceManager().createPreferenceScreen(this);
+    PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
 
     String title = null;
-    PreferenceCategory cat_required = new PreferenceCategory(this);
-    PreferenceCategory cat_general = new PreferenceCategory(this);
-    PreferenceCategory cat_advanced = new PreferenceCategory(this);
-    PreferenceCategory cat_evasion = new PreferenceCategory(this);
+    PreferenceCategory cat_required = new PreferenceCategory(getActivity());
+    PreferenceCategory cat_general = new PreferenceCategory(getActivity());
+    PreferenceCategory cat_advanced = new PreferenceCategory(getActivity());
+    PreferenceCategory cat_evasion = new PreferenceCategory(getActivity());
     ArrayList<Preference> required = new ArrayList<Preference>();
     ArrayList<Preference> general = new ArrayList<Preference>();
     ArrayList<Preference> advanced = new ArrayList<Preference>();
@@ -143,7 +146,7 @@ public class MsfPreferences extends PreferenceActivity {
       Logger.error(error_message);
     }
 
-    setTitle(title + " > " + getString(R.string.menu_settings));
+    getActivity().setTitle(title + " > " + getString(R.string.menu_settings));
     cat_required.setTitle(R.string.required);
     cat_general.setTitle(R.string.pref_general);
     cat_advanced.setTitle(R.string.pref_advanced);
@@ -159,7 +162,7 @@ public class MsfPreferences extends PreferenceActivity {
         case PATH:
         case INTEGER:
         case PORT:
-          item = new EditTextPreference(this);
+          item = new EditTextPreference(getActivity());
           item.setTitle(opt.getName());
           ((EditTextPreference)item).setDialogTitle(opt.getName());
           ((EditTextPreference)item).setDialogMessage(opt.getDescription());
@@ -168,14 +171,14 @@ public class MsfPreferences extends PreferenceActivity {
           item.setDefaultValue(opt.getValue());
           break;
         case BOOLEAN:
-          item = new CheckBoxPreference(this);
+          item = new CheckBoxPreference(getActivity());
           item.setTitle(opt.getName());
           item.setKey(opt.getName());
           item.setSummary(opt.getDescription());
           ((CheckBoxPreference)item).setChecked(opt.getValue().equals("true"));
           break;
         case ENUM:
-          item = new ListPreference(this);
+          item = new ListPreference(getActivity());
           ((ListPreference)item).setEntries(opt.getEnum());
           ((ListPreference)item).setEntryValues(opt.getEnum());
           ((ListPreference)item).setDialogTitle(opt.getName());
@@ -186,6 +189,7 @@ public class MsfPreferences extends PreferenceActivity {
           break;
       }
 
+      /*
       switch (opt.getType()) {
         case ADDRESS:
           inputType=InputType.TYPE_CLASS_PHONE;
@@ -201,7 +205,7 @@ public class MsfPreferences extends PreferenceActivity {
       }
 
       if(inputType!=0)
-        ((EditTextPreference)item).getEditText().setInputType(inputType);
+        ((EditTextPreference)item).getEditText().setInputType(inputType); */
 
       if(opt.isAdvanced())
         advanced.add(item);

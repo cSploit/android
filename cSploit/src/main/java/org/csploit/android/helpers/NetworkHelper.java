@@ -1,5 +1,9 @@
 package org.csploit.android.helpers;
 
+import android.content.Context;
+
+import org.csploit.android.net.Network;
+
 import java.net.InetAddress;
 
 /**
@@ -45,6 +49,14 @@ public final class NetworkHelper {
     }
 
     return 0;
+  }
+
+  /**
+   * is connectivity available ?
+   * @return {@code true} if we can connect to internet, false otherwise
+   */
+  public static boolean isConnectivityAvailable(Context context) {
+    return Network.isConnectivityAvailable(context) || Network.isWifiConnected(context);
   }
 
   /**

@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.csploit.android">
+<manifest package="org.csploit.android"
+          xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.ACCESS_SUPERUSER" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.ACCESS_SUPERUSER"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="18" />
-    <uses-permission android:name="android.permission.READ_LOGS" />
+        android:maxSdkVersion="18"/>
+    <uses-permission android:name="android.permission.READ_LOGS"/>
 
     <application
         android:name=".CSploitApplication"
@@ -28,113 +28,125 @@
             android:label="@string/title_activity_main"
             android:launchMode="singleTask">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-        <activity android:name="org.acra.CrashReportDialog"
-                  android:theme="@style/Theme.Dialog"
-                  android:launchMode="singleInstance"
-                  android:excludeFromRecents="true"
-                  android:finishOnTaskLaunch="true" />
+        <activity
+            android:name="org.acra.CrashReportDialog"
+            android:excludeFromRecents="true"
+            android:finishOnTaskLaunch="true"
+            android:launchMode="singleInstance"
+            android:theme="@style/Theme.Dialog"/>
 
         <!-- suppress AndroidDomInspection -->
         <service
-            android:name=".services.UpdateService"
-            android:enabled="true" />
-
+            android:name=".services.UpdateInstaller"
+            android:enabled="true"/>
         <service
             android:name=".core.MultiAttackService"
-            android:enabled="true" />
+            android:enabled="true"/>
 
         <activity
             android:name=".WifiScannerActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"/>
         <activity
             android:name=".SettingsActivity"
-            android:theme="@style/Theme.AppCompat.Light"
-
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"
+            android:theme="@style/Theme.AppCompat.Light"/>
         <activity
             android:name=".gui.DirectoryPicker"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"/>
         <activity
             android:name=".gui.MsfPreferences"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"/>
         <activity
             android:name=".gui.Console"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"/>
         <activity
             android:name=".ActionActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"/>
         <activity
             android:name=".plugins.RouterPwn"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"/>
         <activity
             android:name=".plugins.Traceroute"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"/>
         <activity
             android:name=".plugins.PortScanner"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"/>
         <activity
             android:name=".plugins.Inspector"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"/>
         <activity
             android:name=".plugins.Sessions"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"/>
         <activity
             android:name=".plugins.ExploitFinder"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"/>
         <activity
             android:name=".plugins.mitm.MITM"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"/>
         <activity
             android:name=".plugins.mitm.Sniffer"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"/>
         <activity
             android:name=".plugins.mitm.PasswordSniffer"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"/>
         <activity
             android:name=".plugins.mitm.DNSSpoofing"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"/>
         <activity
             android:name=".plugins.mitm.hijacker.Hijacker"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"/>
         <activity
             android:name=".plugins.mitm.hijacker.HijackerWebView"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"/>
         <activity
             android:name=".plugins.LoginCracker"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"/>
         <activity
             android:name=".plugins.PacketForger"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+            android:label="@string/title_activity_main"/>
         <activity
             android:name=".gui.FileEdit"
             android:label="@string/title_activity_main"
-            android:parentActivityName=".plugins.mitm.PasswordSniffer" >
+            android:parentActivityName=".plugins.mitm.PasswordSniffer">
+        </activity>
+        <activity
+            android:name=".TargetListActivity"
+            android:label="@string/title_target_list"
+            android:theme="@style/AppTheme">
+        </activity>
+        <activity
+            android:name=".TargetDetailActivity"
+            android:label="@string/title_target_detail"
+            android:parentActivityName=".TargetListActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.csploit.android.TargetListActivity"/>
         </activity>
     </application>
 

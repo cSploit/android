@@ -19,17 +19,18 @@
 package org.csploit.android.core;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.MenuItem;
+import android.view.View;
 
 import org.csploit.android.R;
 import org.csploit.android.net.Target;
-import org.csploit.android.net.Target.Exploit;
-import org.csploit.android.net.Target.Port;
 import org.csploit.android.net.metasploit.RPCClient;
 
-public abstract class Plugin extends AppCompatActivity {
+public abstract class Plugin extends Fragment {
   public static final int NO_LAYOUT = -1;
 
   private int mNameStringId = -1;
@@ -80,26 +81,23 @@ public abstract class Plugin extends AppCompatActivity {
     return mLayoutId != -1;
   }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
+  public void onActionClick(Context context){
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
+  }
 
-    public void onActionClick(Context context){
+  protected View findViewById(int id) {
+    return getActivity().findViewById(id);
+  }
 
+  protected Drawable getDrawable(int id) {
+    return ContextCompat.getDrawable(getActivity(), id);
   }
 
   @Override
   public void onCreate(Bundle savedInstanceState){
     super.onCreate(savedInstanceState);
-    setTitle(System.getCurrentTarget() + " > " + getString( mNameStringId ) );
-    setContentView(mLayoutId);
-    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    getActivity().setTitle(System.getCurrentTarget() + " > " + getString( mNameStringId ) );
+    getActivity().setContentView(mLayoutId);
   }
 
   @Override
@@ -107,7 +105,7 @@ public abstract class Plugin extends AppCompatActivity {
     switch(item.getItemId()){
       case android.R.id.home:
 
-        onBackPressed();
+        onDetach();
 
         return true;
 
@@ -117,9 +115,9 @@ public abstract class Plugin extends AppCompatActivity {
   }
 
   @Override
-  public void onBackPressed(){
-    super.onBackPressed();
-    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+  public void onDetach() {
+    super.onDetach();
+    getActivity().overridePendingTransition(R.anim.fadeout, R.anim.fadein);
   }
 
   public void onRpcChange(RPCClient currentValue) { }

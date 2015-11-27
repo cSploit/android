@@ -67,6 +67,8 @@ import org.csploit.android.gui.dialogs.ListChoiceDialog;
 import org.csploit.android.gui.dialogs.MultipleChoiceDialog;
 import org.csploit.android.gui.dialogs.SpinnerDialog;
 import org.csploit.android.gui.dialogs.SpinnerDialog.SpinnerDialogListener;
+import org.csploit.android.gui.fragments.PluginList;
+import org.csploit.android.helpers.FragmentHelper;
 import org.csploit.android.helpers.ThreadHelper;
 import org.csploit.android.net.Network;
 import org.csploit.android.net.Target;
@@ -81,7 +83,7 @@ import org.csploit.android.plugins.Traceroute;
 import org.csploit.android.plugins.mitm.MITM;
 import org.csploit.android.services.Services;
 import org.csploit.android.services.UpdateChecker;
-import org.csploit.android.services.UpdateService;
+import org.csploit.android.services.UpdateInstaller;
 import org.csploit.android.services.receivers.MsfRpcdServiceReceiver;
 import org.csploit.android.services.receivers.NetworkRadarReceiver;
 import org.csploit.android.update.CoreUpdate;
@@ -166,7 +168,7 @@ public class MainFragment extends Fragment {
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setHasOptionsMenu(true);
-    return inflater.inflate(R.layout.target_layout, container, false);
+    return inflater.inflate(R.layout.target_list, container, false);
   }
 
   @Override
@@ -194,17 +196,23 @@ public class MainFragment extends Fragment {
           return;
         }
 
-        Target target = (Target) mTargetAdapter.getItem(position);
+        final Target target = (Target) mTargetAdapter.getItem(position);
         System.setCurrentTarget(target);
 
         ThreadHelper.getSharedExecutor().execute(new Runnable() {
           @Override
           public void run() {
 
-            startActivityForResult(new Intent(getActivity(),
-                    ActionActivity.class), WIFI_CONNECTION_REQUEST);
+            PluginList fragment = (PluginList) getActivity().getSupportFragmentManager()
+                    .findFragmentByTag("ActionFragment");
 
-            getActivity().overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+            if(fragment != null) {
+              PluginList.setup(fragment, target);
+            } else {
+              fragment = PluginList.newInstance(target);
+            }
+
+            FragmentHelper.switchToFragment(MainFragment.this, fragment);
           }
         });
 
@@ -356,7 +364,7 @@ public class MainFragment extends Fragment {
   private boolean initSystem() {
     // retry
     try {
-      System.init(getActivity().getApplicationContext());
+      System.init();
     } catch (Exception e) {
       boolean isFatal = !(e instanceof NoRouteToHostException);
 
@@ -620,13 +628,7 @@ public class MainFragment extends Fragment {
   public void startUpdateChecker() {
     if (!isConnectivityAvailable() || mIsUpdateDownloading)
       return;
-    if (System.getSettings().getBoolean("PREF_CHECK_UPDATES", true)) {
-      new UpdateChecker(getActivity()).start();
-      mIsUpdateDownloading = true;
-    } else {
-      getActivity().sendBroadcast(new Intent(UPDATE_NOT_AVAILABLE));
-      mIsUpdateDownloading = false;
-    }
+    Services.getUpdateService().start();
   }
 
   public void startNetworkRadar() {
@@ -715,9 +717,7 @@ public class MainFragment extends Fragment {
         mRadarReceiver.unregister();
         mUpdateReceiver.unregister();
 
-        startActivityForResult(new Intent(getActivity(),
-                WifiScannerActivity.class), WIFI_CONNECTION_REQUEST);
-        getActivity().overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+        FragmentHelper.switchToFragment(this, WifiScannerFragment.class);
         return true;
 
       case R.id.new_session:
@@ -899,8 +899,9 @@ public class MainFragment extends Fragment {
     public View getView(int position, View convertView, ViewGroup parent) {
       View row = convertView;
       TargetHolder holder;
+      Object tag = row != null ? row.getTag() : null;
 
-      if (row == null) {
+      if (row == null || tag == null || !(tag instanceof TargetHolder)) {
         LayoutInflater inflater = (LayoutInflater) getActivity()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         row = inflater.inflate(R.layout.target_list_item, parent, false);
@@ -909,22 +910,17 @@ public class MainFragment extends Fragment {
           row.setBackgroundResource(R.drawable.card_background_dark);
 
         holder = new TargetHolder();
-        holder.itemImage = (ImageView) (row != null ? row
-                .findViewById(R.id.itemIcon) : null);
-        holder.itemTitle = (TextView) (row != null ? row
-                .findViewById(R.id.itemTitle) : null);
-        holder.itemDescription = (TextView) (row != null ? row
-                .findViewById(R.id.itemDescription) : null);
-        holder.portCount = (TextView) (row != null ? row
-                .findViewById(R.id.portCount) : null);
-        holder.portCountLayout = (LinearLayout) (row != null ? row
-                .findViewById(R.id.portCountLayout) : null);
+        holder.itemImage = (ImageView) row.findViewById(R.id.itemIcon);
+        holder.itemTitle = (TextView) row.findViewById(R.id.itemTitle);
+        holder.itemDescription = (TextView) row.findViewById(R.id.itemDescription);
+        holder.portCount = (TextView) row.findViewById(R.id.portCount);
+        holder.portCountLayout = (LinearLayout) row.findViewById(R.id.portCountLayout);
         if (isDark)
           holder.portCountLayout.setBackgroundResource(R.drawable.rounded_square_grey);
-        if (row != null)
-          row.setTag(holder);
-      } else
-        holder = (TargetHolder) row.getTag();
+        row.setTag(holder);
+      } else {
+        holder = (TargetHolder) tag;
+      }
 
       final Target target = list.get(position);
 
@@ -1111,8 +1107,8 @@ public class MainFragment extends Fragment {
       mFilter.addAction(UPDATE_CHECKING);
       mFilter.addAction(UPDATE_AVAILABLE);
       mFilter.addAction(UPDATE_NOT_AVAILABLE);
-      mFilter.addAction(UpdateService.ERROR);
-      mFilter.addAction(UpdateService.DONE);
+      mFilter.addAction(UpdateInstaller.ERROR);
+      mFilter.addAction(UpdateInstaller.DONE);
     }
 
     public IntentFilter getFilter() {
@@ -1128,9 +1124,9 @@ public class MainFragment extends Fragment {
             @Override
             public void onConfirm() {
               StopRPCServer();
-              Intent i = new Intent(getActivity(), UpdateService.class);
-              i.setAction(UpdateService.START);
-              i.putExtra(UpdateService.UPDATE, update);
+              Intent i = new Intent(getActivity(), UpdateInstaller.class);
+              i.setAction(UpdateInstaller.START);
+              i.putExtra(UpdateInstaller.UPDATE, update);
 
               getActivity().startService(i);
               mIsUpdateDownloading = true;
@@ -1199,8 +1195,8 @@ public class MainFragment extends Fragment {
       String action = intent.getAction();
       Update update = null;
 
-      if (intent.hasExtra(UpdateService.UPDATE)) {
-        update = (Update) intent.getSerializableExtra(UpdateService.UPDATE);
+      if (intent.hasExtra(UpdateInstaller.UPDATE)) {
+        update = (Update) intent.getSerializableExtra(UpdateInstaller.UPDATE);
       }
 
       switch (action) {
@@ -1221,11 +1217,11 @@ public class MainFragment extends Fragment {
         case UPDATE_AVAILABLE:
           onUpdateAvailable(update);
           break;
-        case UpdateService.DONE:
+        case UpdateInstaller.DONE:
           onUpdateDone(update);
           break;
-        case UpdateService.ERROR:
-          int message = intent.getIntExtra(UpdateService.MESSAGE, R.string.error_occured);
+        case UpdateInstaller.ERROR:
+          int message = intent.getIntExtra(UpdateInstaller.MESSAGE, R.string.error_occured);
           onUpdateError(update, message);
           break;
       }

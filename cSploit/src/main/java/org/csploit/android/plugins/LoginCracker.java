@@ -18,6 +18,7 @@
  */
 package org.csploit.android.plugins;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -116,12 +117,12 @@ public class LoginCracker extends Plugin {
     mRunning = false;
     mAccountFound = true;
 
-    LoginCracker.this.runOnUiThread(new Runnable() {
+    getActivity().runOnUiThread(new Runnable() {
       @Override
       public void run() {
         mActivity.setVisibility(View.INVISIBLE);
         mProgressBar.setProgress(0);
-        mStartButton.setImageDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_play_arrow_24dp));
+        mStartButton.setImageDrawable(getDrawable(R.drawable.ic_play_arrow_24dp));
         mStatusText.setTextColor(Color.GREEN);
         mStatusText.setText("USERNAME = " + user + " - PASSWORD = "
                 + pass);
@@ -136,12 +137,12 @@ public class LoginCracker extends Plugin {
     }
     mRunning = false;
 
-    LoginCracker.this.runOnUiThread(new Runnable() {
+    getActivity().runOnUiThread(new Runnable() {
       @Override
       public void run() {
         mActivity.setVisibility(View.INVISIBLE);
         mProgressBar.setProgress(0);
-        mStartButton.setImageDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_play_arrow_24dp));
+        mStartButton.setImageDrawable(getDrawable(R.drawable.ic_play_arrow_24dp));
         if (!mAccountFound) {
           mStatusText.setTextColor(Color.DKGRAY);
           mStatusText.setText(getString(R.string.stopped_dots));
@@ -160,7 +161,7 @@ public class LoginCracker extends Plugin {
     mAccountFound = false;
 
     try {
-      mStartButton.setImageDrawable(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_stop_24dp));
+      mStartButton.setImageDrawable(getDrawable(R.drawable.ic_stop_24dp));
       mProcess =
               System.getTools().hydra
                       .crack(System.getCurrentTarget(),
@@ -185,17 +186,13 @@ public class LoginCracker extends Plugin {
   }
 
   public void onCreate(Bundle savedInstanceState) {
-    SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-    Boolean isDark = themePrefs.getBoolean("isDark", false);
-    if (isDark)
-      setTheme(R.style.DarkTheme);
-    else
-      setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);
 
-    if (!System.getCurrentTarget().hasOpenPorts())
+    if (!System.getCurrentTarget().hasOpenPorts()) {
       new FinishDialog(getString(R.string.warning),
-              getString(R.string.no_open_ports), this).show();
+              getString(R.string.no_open_ports), getActivity()).show();
+      return;
+    }
 
     final ArrayList<String> ports = new ArrayList<String>();
 
@@ -205,7 +202,7 @@ public class LoginCracker extends Plugin {
     mProtocolAdapter = new ProtocolAdapter();
 
     mPortSpinner = (Spinner) findViewById(R.id.portSpinner);
-    mPortSpinner.setAdapter(new ArrayAdapter<String>(this,
+    mPortSpinner.setAdapter(new ArrayAdapter<>(getActivity(),
             android.R.layout.simple_spinner_item, ports));
     mPortSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
       public void onItemSelected(AdapterView<?> adapter, View view,
@@ -238,7 +235,7 @@ public class LoginCracker extends Plugin {
             });
 
     mCharsetSpinner = (Spinner) findViewById(R.id.charsetSpinner);
-    mCharsetSpinner.setAdapter(new ArrayAdapter<String>(this,
+    mCharsetSpinner.setAdapter(new ArrayAdapter<>(getActivity(),
             android.R.layout.simple_spinner_item, CHARSETS));
     mCharsetSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
       public void onItemSelected(AdapterView<?> adapter, View view,
@@ -246,7 +243,7 @@ public class LoginCracker extends Plugin {
         if (CHARSETS_MAPPING[position] == null) {
           new InputDialog(getString(R.string.custom_charset),
                   getString(R.string.enter_chars_wanted),
-                  LoginCracker.this, new InputDialogListener() {
+                  getActivity(), new InputDialogListener() {
             @Override
             public void onInputEntered(String input) {
               input = input.trim();
@@ -268,7 +265,7 @@ public class LoginCracker extends Plugin {
     });
 
     mUserSpinner = (Spinner) findViewById(R.id.userSpinner);
-    mUserSpinner.setAdapter(new ArrayAdapter<String>(this,
+    mUserSpinner.setAdapter(new ArrayAdapter<>(getActivity(),
             android.R.layout.simple_spinner_item, USERNAMES));
     mUserSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
       public void onItemSelected(AdapterView<?> adapter, View view,
@@ -277,7 +274,7 @@ public class LoginCracker extends Plugin {
         if (user != null && user.equals("-- ADD --")) {
           new InputDialog(getString(R.string.add_username),
                   getString(R.string.enter_username),
-                  LoginCracker.this, new InputDialogListener() {
+                  getActivity(), new InputDialogListener() {
             @Override
             public void onInputEntered(String input) {
               USERNAMES = Arrays.copyOf(USERNAMES,
@@ -286,8 +283,8 @@ public class LoginCracker extends Plugin {
               USERNAMES[USERNAMES.length - 2] = input;
 
               mUserSpinner
-                      .setAdapter(new ArrayAdapter<String>(
-                              LoginCracker.this,
+                      .setAdapter(new ArrayAdapter<>(
+                              getActivity(),
                               android.R.layout.simple_spinner_item,
                               USERNAMES));
               mUserSpinner
@@ -302,10 +299,10 @@ public class LoginCracker extends Plugin {
     });
 
     mMaxSpinner = (Spinner) findViewById(R.id.maxSpinner);
-    mMaxSpinner.setAdapter(new ArrayAdapter<String>(this,
+    mMaxSpinner.setAdapter(new ArrayAdapter<>(getActivity(),
             android.R.layout.simple_spinner_item, LENGTHS));
     mMinSpinner = (Spinner) findViewById(R.id.minSpinner);
-    mMinSpinner.setAdapter(new ArrayAdapter<String>(this,
+    mMinSpinner.setAdapter(new ArrayAdapter<>(getActivity(),
             android.R.layout.simple_spinner_item, LENGTHS));
 
     mStartButton = (FloatingActionButton) findViewById(R.id.startFAB);
@@ -338,10 +335,9 @@ public class LoginCracker extends Plugin {
   }
 
   @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    MenuInflater inflater = getMenuInflater();
+  public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
     inflater.inflate(R.menu.login_cracker, menu);
-    return super.onCreateOptionsMenu(menu);
+    super.onCreateOptionsMenu(menu, inflater);
   }
 
   @Override
@@ -371,10 +367,10 @@ public class LoginCracker extends Plugin {
 
   @SuppressWarnings("ConstantConditions")
   @Override
-  protected void onActivityResult(int request, int result, Intent intent) {
+  public void onActivityResult(int request, int result, Intent intent) {
     super.onActivityResult(request, result, intent);
 
-    if (request == SELECT_USER_WORDLIST && result == RESULT_OK) {
+    if (request == SELECT_USER_WORDLIST && result == Activity.RESULT_OK) {
       try {
         String fileName = null;
 
@@ -384,14 +380,14 @@ public class LoginCracker extends Plugin {
         if (fileName == null) {
           new ErrorDialog(getString(R.string.error),
                   getString(R.string.error_filepath),
-                  LoginCracker.this).show();
+                  getActivity()).show();
         } else {
           mUserWordlist = fileName;
         }
       } catch (Exception e) {
         System.errorLogging(e);
       }
-    } else if (request == SELECT_PASS_WORDLIST && result == RESULT_OK) {
+    } else if (request == SELECT_PASS_WORDLIST && result == Activity.RESULT_OK) {
       try {
         String fileName = null;
 
@@ -401,7 +397,7 @@ public class LoginCracker extends Plugin {
         if (fileName == null) {
           new ErrorDialog(getString(R.string.error),
                   getString(R.string.error_filepath),
-                  LoginCracker.this).show();
+                  getActivity()).show();
         } else {
           mPassWordlist = fileName;
         }
@@ -412,10 +408,9 @@ public class LoginCracker extends Plugin {
   }
 
   @Override
-  public void onBackPressed() {
+  public void onDetach() {
     setStoppedState();
-    super.onBackPressed();
-    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+    super.onDetach();
   }
 
   public class ProtocolAdapter extends BaseAdapter implements SpinnerAdapter {
@@ -429,7 +424,7 @@ public class LoginCracker extends Plugin {
 
     public ProtocolAdapter() {
       mOpenPorts = System.getCurrentTarget().getOpenPorts();
-      mProtocols = new ArrayList<String>(Arrays.asList(PROTOCOLS));
+      mProtocols = new ArrayList<>(Arrays.asList(PROTOCOLS));
 
       // first sort alphabetically
       Collections.sort(mProtocols, Collator.getInstance());
@@ -515,7 +510,7 @@ public class LoginCracker extends Plugin {
       Holder holder;
 
       if(spinView == null) {
-        LayoutInflater inflater = (LayoutInflater) LoginCracker.this
+        LayoutInflater inflater = (LayoutInflater) getActivity()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         holder = new Holder();
@@ -611,7 +606,7 @@ public class LoginCracker extends Plugin {
       final String text = status;
       final int percentage = (int) ((progress / total) * 100);
 
-      LoginCracker.this.runOnUiThread(new Runnable() {
+      getActivity().runOnUiThread(new Runnable() {
         @Override
         public void run() {
           mStatusText.setTextColor(Color.DKGRAY);
@@ -625,7 +620,7 @@ public class LoginCracker extends Plugin {
     public void onAccountFound(final String login, final String password) {
       reset();
 
-      LoginCracker.this.runOnUiThread(new Runnable() {
+      getActivity().runOnUiThread(new Runnable() {
         @Override
         public void run() {
           setStoppedState(login, password);
@@ -639,7 +634,7 @@ public class LoginCracker extends Plugin {
 
       final String error = message;
 
-      LoginCracker.this.runOnUiThread(new Runnable() {
+      getActivity().runOnUiThread(new Runnable() {
         @Override
         public void run() {
           mStatusText.setTextColor(Color.YELLOW);
@@ -654,7 +649,7 @@ public class LoginCracker extends Plugin {
 
       final String error = message;
 
-      LoginCracker.this.runOnUiThread(new Runnable() {
+      getActivity().runOnUiThread(new Runnable() {
         @Override
         public void run() {
           setStoppedState();
@@ -669,7 +664,7 @@ public class LoginCracker extends Plugin {
       if (mRunning) {
         reset();
 
-        LoginCracker.this.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
           @Override
           public void run() {
             setStoppedState();
