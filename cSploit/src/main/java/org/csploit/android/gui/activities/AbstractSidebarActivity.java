@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -12,13 +13,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import org.csploit.android.R;
 import org.csploit.android.SettingsFragment;
-import org.csploit.android.core.*;
+import org.csploit.android.core.Logger;
 import org.csploit.android.core.System;
 import org.csploit.android.gui.dialogs.AboutDialog;
 import org.csploit.android.gui.dialogs.ConfirmDialog;
@@ -29,6 +32,9 @@ import org.csploit.android.helpers.FragmentHelper;
 import org.csploit.android.helpers.GUIHelper;
 import org.csploit.android.helpers.ThreadHelper;
 import org.csploit.android.services.Services;
+import org.csploit.android.services.receivers.ConnectivityReceiver;
+
+import java.util.List;
 
 /**
  * An activity that have a sidebar panel ( a navigation drawer )
@@ -48,6 +54,15 @@ public abstract class AbstractSidebarActivity extends AppCompatActivity
   private long backToCloseTimeout = 0;
   private Toast backPressedToast;
   private boolean isShown;
+  private ConnectivityReceiver connectivityReceiver;
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    connectivityReceiver = new ConnectivityReceiver(this);
+    connectivityReceiver.register(this);
+  }
 
   @Override
   public void setContentView(int layoutResID) {
@@ -74,32 +89,31 @@ public abstract class AbstractSidebarActivity extends AppCompatActivity
   @Override
   public boolean onNavigationItemSelected(MenuItem item) {
     Fragment fragment = null;
-    String iface = null;
+    String iface;
 
-    switch(item.getItemId()) {
-      case R.id.nav_iface_eth0:
-        iface = "eth0";
-        break;
-      case R.id.nav_iface_rmnet:
-        iface = "rmnet_usb0";
-        break;
-      case R.id.nav_iface_wlan0:
-        iface = "wlan0";
-        break;
-      case R.id.nav_settings:
-        fragment = new SettingsFragment.PrefsFrag();
-        break;
-      case R.id.nav_about:
-        launchAbout();
-        break;
-      case R.id.nav_report_issue:
-        submitIssue();
-        break;
+    if(item.getGroupId() == R.id.nav_network_group) {
+      iface = item.getTitle().toString();
+      Logger.info("selected interface " + iface);
+      changeIface(iface);
+    } else {
+      switch (item.getItemId()) {
+        case R.id.nav_network_single:
+          connectivityReceiver.tryLoadDefaultInterface();
+          FragmentHelper.switchToFragment(this, TargetList.class);
+          break;
+        case R.id.nav_settings:
+          fragment = new SettingsFragment.PrefsFrag();
+          break;
+        case R.id.nav_about:
+          launchAbout();
+          break;
+        case R.id.nav_report_issue:
+          submitIssue();
+          break;
+      }
     }
 
-    if(iface != null) {
-      changeIface(iface);
-    } else if(fragment != null) {
+    if(fragment != null) {
       FragmentHelper.switchToFragment(this, fragment);
       setTitle(item.getTitle());
     }
@@ -107,6 +121,12 @@ public abstract class AbstractSidebarActivity extends AppCompatActivity
     drawerLayout.closeDrawers();
 
     return fragment != null;
+  }
+
+  @Override
+  protected void onDestroy() {
+    connectivityReceiver.unregister();
+    super.onDestroy();
   }
 
   private void submitIssue() {
@@ -127,14 +147,17 @@ public abstract class AbstractSidebarActivity extends AppCompatActivity
   }
 
   private void changeIface(@NonNull final String ifname) {
-    final String current = org.csploit.android.core.System.getNetwork().getInterface().getDisplayName();
+    final String current = System.getIfname();
 
     if(ifname.equals(current)) {
+      if (canSwitchFragment()) {
+        FragmentHelper.switchToFragment(AbstractSidebarActivity.this, TargetList.class);
+      }
       return;
     }
 
     final ProgressDialog dialog = new ProgressDialog("changing interface", "please wait", this);
-    dialog.setMinElapsedTime(200);
+    dialog.setMinElapsedTime(300);
     dialog.setMinShownTime(3000);
 
     dialog.show();
@@ -163,7 +186,7 @@ public abstract class AbstractSidebarActivity extends AppCompatActivity
 
         dialog.dismiss();
 
-        if(errMsg != null) {
+        if (errMsg != null) {
           final String message = errMsg;
           runOnUiThread(new Runnable() {
             @Override
@@ -222,7 +245,7 @@ public abstract class AbstractSidebarActivity extends AppCompatActivity
     if (backToCloseTimeout < java.lang.System.currentTimeMillis()) {
       backPressedToast = Toast.makeText(this, getString(R.string.press_back), Toast.LENGTH_SHORT);
       backPressedToast.show();
-      backToCloseTimeout = java.lang.System.currentTimeMillis() + BACK_TO_CLOSE_TIMEOUT;
+      backToCloseTimeout = java.lang.System.currentTimeMillis() + (BACK_TO_CLOSE_TIMEOUT * 1000);
     } else {
       new ConfirmDialog(getString(R.string.exit),
               getString(R.string.close_confirm), this,
@@ -260,11 +283,58 @@ public abstract class AbstractSidebarActivity extends AppCompatActivity
   protected void onPostResume() {
     super.onPostResume();
     isShown = true;
+    connectivityReceiver.updateSidebar();
   }
 
   @Override
   protected void onSaveInstanceState(Bundle outState) {
     isShown = false;
     super.onSaveInstanceState(outState);
+  }
+
+  public void updateNetworks(List<? extends NavNetworkItem> items) {
+    Menu mainMenu = nvDrawer.getMenu();
+    MenuItem single = mainMenu.findItem(R.id.nav_network_single);
+    MenuItem listWrapper = mainMenu.findItem(R.id.nav_network_list_wrapper);
+    SubMenu networkMenu = listWrapper.getSubMenu();
+
+    networkMenu.clear();
+
+    boolean isSingle = items.isEmpty() || items.size() == 1;
+
+    if(isSingle) {
+      if(items.isEmpty()) {
+        single.setTitle("Network unavailable");
+        single.setIcon(null);
+      } else {
+        single.setTitle("Network");
+        single.setIcon(items.get(0).getDrawableId());
+      }
+    } else {
+      int i = 0;
+      for (NavNetworkItem item : items) {
+        MenuItem item1 = networkMenu.add(R.id.nav_network_group, Menu.NONE, i++, item.getName());
+        item1.setIcon(item.getDrawableId());
+      }
+    }
+
+    single.setVisible(isSingle);
+    listWrapper.setVisible(!isSingle);
+
+    StringBuilder sb = new StringBuilder();
+
+    for(NavNetworkItem item : items) {
+      if(sb.length() > 0)
+        sb.append(", ");
+
+      sb.append(item.getName());
+    }
+
+    Logger.debug("updateNetworks([" + sb.toString() + "]): isSingle=" + isSingle);
+  }
+
+  public interface NavNetworkItem {
+    String getName();
+    @DrawableRes int getDrawableId();
   }
 }

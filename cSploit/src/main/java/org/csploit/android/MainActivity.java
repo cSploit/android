@@ -32,6 +32,7 @@ import org.csploit.android.gui.fragments.TargetDetail;
 import org.csploit.android.gui.fragments.TargetList;
 import org.csploit.android.helpers.FragmentHelper;
 import org.csploit.android.net.Target;
+import org.csploit.android.services.receivers.ConnectivityReceiver;
 import org.csploit.android.services.receivers.UpdateReceiver;
 
 public class MainActivity extends AbstractSidebarActivity
@@ -66,7 +67,6 @@ public class MainActivity extends AbstractSidebarActivity
   @Override
   protected void onDestroy() {
     updateReceiver.unregister();
-    updateReceiver = null;
 
     super.onDestroy();
   }
@@ -94,8 +94,6 @@ public class MainActivity extends AbstractSidebarActivity
       return;
     }
 
-    // loadInterfaces(); => load interfaces into drawer
-    // services should be started by Init
     FragmentHelper.switchToFragment(this, TargetList.class);
   }
 

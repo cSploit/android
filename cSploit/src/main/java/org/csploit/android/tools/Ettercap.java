@@ -90,7 +90,7 @@ public class Ettercap extends Tool
 
     sb.append("-Tpq -i ");
     try {
-      sb.append(System.getNetwork().getInterface().getDisplayName());
+      sb.append(System.getNetwork().getInterface());
     } catch (Exception e) {
       System.errorLogging(e);
       throw new ChildManager.ChildNotStartedException();
@@ -116,7 +116,7 @@ public class Ettercap extends Tool
     sb.append("-Tq -P dns_spoof -i ");
 
     try {
-      sb.append(System.getNetwork().getInterface().getDisplayName());
+      sb.append(System.getNetwork().getInterface());
     } catch (Exception e) {
       System.errorLogging(e);
       throw new ChildManager.ChildNotStartedException();

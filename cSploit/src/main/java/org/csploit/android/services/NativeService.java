@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import org.csploit.android.core.Child;
+import org.csploit.android.helpers.ThreadHelper;
 
 import java.io.Serializable;
 
@@ -17,6 +18,16 @@ public abstract class NativeService implements Service {
   protected abstract int getStopSignal();
 
   @Override
+  public void startAsync() {
+    ThreadHelper.getSharedExecutor().execute(new Runnable() {
+      @Override
+      public void run() {
+        start();
+      }
+    });
+  }
+
+  @Override
   public boolean stop() {
     if(nativeProcess == null || !nativeProcess.running)
       return false;
@@ -28,6 +39,16 @@ public abstract class NativeService implements Service {
       return false;
     }
     return true;
+  }
+
+  @Override
+  public void stopAsync() {
+    ThreadHelper.getSharedExecutor().execute(new Runnable() {
+      @Override
+      public void run() {
+        stop();
+      }
+    });
   }
 
   @Override

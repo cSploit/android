@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import org.csploit.android.R;
+import org.csploit.android.core.System;
 import org.csploit.android.gui.adapters.TargetListAdapter;
 import org.csploit.android.net.Target;
 import org.csploit.android.services.Services;
@@ -45,6 +46,7 @@ public class TargetList extends BaseListFragment {
   private int mActivatedPosition = ListView.INVALID_POSITION;
 
   private NetworkRadarReceiver radarReceiver;
+  private TargetListAdapter adapter;
 
   /**
    * Mandatory empty constructor for the fragment manager to instantiate the
@@ -60,7 +62,7 @@ public class TargetList extends BaseListFragment {
 
     radarReceiver.register(getActivity());
 
-    TargetListAdapter adapter = new TargetListAdapter(getActivity());
+    adapter = new TargetListAdapter(getActivity());
     setListAdapter(adapter);
   }
 
@@ -110,7 +112,6 @@ public class TargetList extends BaseListFragment {
   public void onViewCreated(View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
-    TargetListAdapter adapter = (TargetListAdapter) getListAdapter();
     ListView lv = getListView();
 
     adapter.setListView(lv);
@@ -121,6 +122,13 @@ public class TargetList extends BaseListFragment {
       int pos = adapter.indexOf(id);
       setActivatedPosition(pos >= 0 ? pos : ListView.INVALID_POSITION);
     }
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    System.setTargetListObserver(adapter);
+    adapter.update(null, null);
   }
 
   @Override

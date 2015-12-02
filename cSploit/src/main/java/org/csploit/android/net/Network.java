@@ -25,6 +25,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Patterns;
 
 import org.apache.commons.compress.utils.IOUtils;
@@ -46,7 +47,9 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -99,12 +102,13 @@ public class Network implements Comparable<Network> {
   private WifiManager mWifiManager = null;
   private DhcpInfo mInfo = null;
   private WifiInfo mWifiInfo = null;
-  private NetworkInterface mInterface = null;
   private IP4Address mGateway = null;
   private IP4Address mNetmask = null;
   private IP4Address mLocal = null;
   private IP4Address mBase = null;
   private Method mTetheredIfacesMethod = null;
+  private byte[] mLocalHardware = null;
+  private String mInterface = null;
 
   /**
    * see http://en.wikipedia.org/wiki/Reserved_IP_addresses
@@ -128,17 +132,33 @@ public class Network implements Comparable<Network> {
     mTetheredIfacesMethod = getTetheredIfacesMethod(mConnectivityManager);
 
     if (iface != null) {
-      if (initNetworkInterface(iface))
+      if (initNetworkInterface(iface)) {
+        mInterface = iface;
         return;
+      }
     } else {
       for (String ifname : getAvailableInterfaces()) {
         if (initNetworkInterface(ifname)) {
+          mInterface = ifname;
           return;
         }
       }
     }
 
     throw new NoRouteToHostException("Not connected to any network.");
+  }
+
+  /**
+   * get the name of the fist usable interface
+   * @return
+   */
+  public static @Nullable String getFirstUsableInterface() {
+    for (String ifname : getAvailableInterfaces()) {
+      if(getUsableInterfaceFromName(ifname) != null) {
+        return ifname;
+      }
+    }
+    return null;
   }
 
   private static Method getTetheredIfacesMethod(ConnectivityManager connectivityManager) {
@@ -150,20 +170,23 @@ public class Network implements Comparable<Network> {
     }
   }
 
-  public boolean initNetworkInterface(String iface) {
+  /**
+   * get the usable IPv4 network address associated with the specified interface
+   * @param name of the interface
+   * @return the IPv4 address for the specified interface or null if no one has been found.
+   */
+  private static @Nullable InterfaceAddress getUsableInterfaceFromName(@NonNull String name) {
 
     InterfaceAddress ifaceAddress = null;
+
     try {
-      if (iface == null)
-        iface = getAvailableInterfaces().get(0);
+      NetworkInterface networkInterface = NetworkInterface.getByName(name);
 
-      mInterface = NetworkInterface.getByName(iface);
-
-      if (mInterface == null || mInterface.getInterfaceAddresses().isEmpty()) {
-        return false;
+      if (networkInterface == null) {
+        return null;
       }
 
-      for (InterfaceAddress ia : mInterface.getInterfaceAddresses()) {
+      for (InterfaceAddress ia : networkInterface.getInterfaceAddresses()) {
         if(Patterns.IP_ADDRESS.matcher(ia.getAddress().getHostAddress()).matches()) {
           ifaceAddress = ia;
           Logger.warning("interfaceAddress: " + ia.getAddress().getHostAddress() + "/" + Short.toString(ia.getNetworkPrefixLength()));
@@ -172,12 +195,22 @@ public class Network implements Comparable<Network> {
         else
           Logger.error("not valid ip: " + ia.getAddress().getHostAddress() + "/" + Short.toString(ia.getNetworkPrefixLength()));
       }
+    } catch (Exception e) {
+      Logger.error("Error: " + e.getMessage());
+    }
+
+    return ifaceAddress;
+  }
+
+  public boolean initNetworkInterface(String iface) {
+    try {
+      InterfaceAddress ifaceAddress = getUsableInterfaceFromName(iface);
+
       if (ifaceAddress == null){
         return false;
       }
 
       SubnetUtils su = new SubnetUtils(
-              // get(1) == ipv4
               ifaceAddress.getAddress().getHostAddress() +
                       "/" +
                       Short.toString(ifaceAddress.getNetworkPrefixLength()));
@@ -185,8 +218,9 @@ public class Network implements Comparable<Network> {
       mLocal = new IP4Address(su.getInfo().getAddress());
       mNetmask = new IP4Address(su.getInfo().getNetmask());
       mBase = new IP4Address(su.getInfo().getNetworkAddress());
+      mLocalHardware = NetworkInterface.getByName(iface).getHardwareAddress();
 
-      String gateway = getSystemGateway(mInterface.getDisplayName());
+      String gateway = getSystemGateway(iface);
 
       if(gateway == null) {
         mGateway = null;
@@ -323,13 +357,7 @@ public class Network implements Comparable<Network> {
   }
 
   public byte[] getLocalHardware() {
-    try {
-      return mInterface.getHardwareAddress();
-    } catch (SocketException e) {
-      System.errorLogging(e);
-    }
-
-    return null;
+    return mLocalHardware;
   }
 
   public String getLocalAddressAsString() {
@@ -352,6 +380,14 @@ public class Network implements Comparable<Network> {
     try {
       return networkInterface.isUp() && !networkInterface.isLoopback() &&
               !networkInterface.getInterfaceAddresses().isEmpty();
+    } catch (SocketException e) {
+      return false;
+    }
+  }
+
+  private static boolean isIfaceConnected(String ifname) {
+    try {
+      return isIfaceConnected(NetworkInterface.getByName(ifname));
     } catch (SocketException e) {
       return false;
     }
@@ -387,7 +423,7 @@ public class Network implements Comparable<Network> {
     return result;
   }
 
-  public NetworkInterface getInterface() {
+  public String getInterface() {
     return mInterface;
   }
 

@@ -60,7 +60,7 @@ public class NetworkRadar extends Tool {
       throw new ChildManager.ChildNotStartedException();
     }
 
-    ifName = System.getNetwork().getInterface().getDisplayName();
+    ifName = System.getNetwork().getInterface();
 
     return async(ifName, receiver);
   }

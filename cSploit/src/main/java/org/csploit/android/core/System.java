@@ -368,6 +368,10 @@ public class System {
     return mIfname;
   }
 
+  public static String getDefaultIfname() {
+    return Network.getFirstUsableInterface();
+  }
+
   public static boolean reloadNetworkMapping() {
     try {
       uncaughtReloadNetworkMapping();
@@ -382,7 +386,7 @@ public class System {
 
   private static void uncaughtReloadNetworkMapping() throws UnknownHostException, SocketException {
     mNetwork = new Network(mContext, mIfname);
-    mIfname = mNetwork.getInterface().getName();
+    mIfname = mNetwork.getInterface();
 
     reset();
 

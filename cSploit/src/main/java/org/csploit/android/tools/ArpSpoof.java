@@ -56,7 +56,7 @@ public class ArpSpoof extends Tool
 
     try{
       String gw = System.getNetwork().getGatewayAddress().getHostAddress();
-      String iface = System.getNetwork().getInterface().getDisplayName();
+      String iface = System.getNetwork().getInterface();
 
       if(target.getType() == Type.NETWORK)
         commandLine = "-i " + iface + " " + gw;
