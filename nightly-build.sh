@@ -49,7 +49,7 @@ cd "${DIR}" >&3 2>&1 || die
 
 echo -n -e "${YELLOW}Cleaning old files${RESET}\n" | tee >(cat - >&3)
 LAST_APK=$(readlink "${NIGHTLIES_OUT_DIR}/cSploit-lastest.apk")
-find $NIGHTLIES_OUT_DIR -type f -a -mtime +${MAX_DAYS} -a ! -name "${LAST_APK}" -exec rm -f "{}" \; >&3 2>&1
+# find $NIGHTLIES_OUT_DIR -type f -a -mtime +${MAX_DAYS} -a ! -name "${LAST_APK}" -exec rm -f "{}" \; >&3 2>&1
 find $LOG_DIR -type f -a -mtime +${MAX_DAYS} -exec rm -f "{}" \; >&3 2>&1
 
 echo -n -e "${CYAN}Syncing git repo...${RESET}\n" | tee >(cat - >&3)
