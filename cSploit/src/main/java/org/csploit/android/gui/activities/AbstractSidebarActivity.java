@@ -76,10 +76,10 @@ public abstract class AbstractSidebarActivity extends AppCompatActivity
     toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
 
-    GUIHelper.setupTheme(this);
-
     nvDrawer = (NavigationView) findViewById(R.id.nvView);
     nvDrawer.setNavigationItemSelectedListener(this);
+
+    GUIHelper.setupTheme(this, nvDrawer);
 
     drawerToggle = new ActionBarDrawerToggle(this,
             drawerLayout, R.string.drawer_was_opened, R.string.drawer_was_closed);

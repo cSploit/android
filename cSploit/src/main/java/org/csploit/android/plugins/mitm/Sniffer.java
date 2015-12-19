@@ -21,6 +21,7 @@ package org.csploit.android.plugins.mitm;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.FileObserver;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -500,9 +501,14 @@ public class Sniffer extends Fragment implements AdapterView.OnItemClickListener
 
     try {
       mSpoofSession.start(new OnSessionReadyListener(){
+
         @Override
-        public void onError(String error, int resId){
-          error = error == null ? getString(resId) : error;
+        public void onError(@StringRes int stringId) {
+          onError(getString(stringId));
+        }
+
+        @Override
+        public void onError(String error){
           setSpoofErrorState(error);
         }
 

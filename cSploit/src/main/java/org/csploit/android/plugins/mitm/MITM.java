@@ -23,13 +23,13 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore.MediaColumns;
+import android.support.annotation.StringRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -42,7 +42,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.csploit.android.R;
-import org.csploit.android.SettingsActivity;
 import org.csploit.android.SettingsFragment;
 import org.csploit.android.core.Child;
 import org.csploit.android.core.ChildManager;
@@ -66,7 +65,7 @@ import org.csploit.android.net.Target;
 import org.csploit.android.net.http.proxy.Proxy;
 import org.csploit.android.net.http.proxy.Proxy.ProxyFilter;
 import org.csploit.android.plugins.mitm.SpoofSession.OnSessionReadyListener;
-import org.csploit.android.plugins.mitm.hijacker.Hijacker;
+import org.csploit.android.gui.fragments.plugins.mitm.Hijacker;
 import org.csploit.android.tools.ArpSpoof;
 
 import java.io.BufferedReader;
@@ -213,30 +212,30 @@ public class MITM extends Plugin
           if(mCurrentActivity != null)
             mCurrentActivity.setVisibility(View.VISIBLE);
 
-          mSpoofSession.start(new OnSessionReadyListener(){
+          mSpoofSession.start(new BaseSessionReadyListener(){
             @Override
             public void onSessionReady(){
-              getActivity().runOnUiThread(new Runnable(){
+              getActivity().runOnUiThread(new Runnable() {
                 @Override
-                public void run(){
-                  System.getProxy().setFilter(new Proxy.ProxyFilter(){
+                public void run() {
+                  System.getProxy().setFilter(new Proxy.ProxyFilter() {
                     @Override
-                    public String onDataReceived(String headers, String data){
+                    public String onDataReceived(String headers, String data) {
                       String resource = System.getServer().getResourceURL();
 
                       // handle img tags
                       data = data.replaceAll
-                        (
-                          "(?i)<img([^/]+)src=(['\"])[^'\"]+(['\"])",
-                          "<img$1src=$2" + resource + "$3"
-                        );
+                              (
+                                      "(?i)<img([^/]+)src=(['\"])[^'\"]+(['\"])",
+                                      "<img$1src=$2" + resource + "$3"
+                              );
 
                       // handle css background declarations
                       data = data.replaceAll
-                        (
-                          "(?i)background\\s*(:|-)\\s*url\\s*[\\(|:][^\\);]+\\)?.*",
-                          "background: url(" + resource + ")"
-                        );
+                              (
+                                      "(?i)background\\s*(:|-)\\s*url\\s*[\\(|:][^\\);]+\\)?.*",
+                                      "background: url(" + resource + ")"
+                              );
 
                       return data;
                     }
@@ -245,12 +244,6 @@ public class MITM extends Plugin
                   Toast.makeText(getContext(), getString(R.string.tap_again), Toast.LENGTH_LONG).show();
                 }
               });
-            }
-
-            @Override
-            public void onError(String error, int resId){
-              error = error == null ? getString(resId) : error;
-              setSpoofErrorState(error);
             }
           });
         }
@@ -291,21 +284,15 @@ public class MITM extends Plugin
 
           final String code = js;
           mSpoofSession = new SpoofSession();
-          mSpoofSession.start(new OnSessionReadyListener(){
+          mSpoofSession.start(new BaseSessionReadyListener(){
             @Override
             public void onSessionReady(){
-              System.getProxy().setFilter(new Proxy.ProxyFilter(){
+              System.getProxy().setFilter(new Proxy.ProxyFilter() {
                 @Override
-                public String onDataReceived(String headers, String data){
+                public String onDataReceived(String headers, String data) {
                   return data.replaceAll("(?i)</head>", code + "</head>");
                 }
               });
-            }
-
-            @Override
-            public void onError(String error, int resId){
-              error = error == null ? getString(resId) : error;
-              setSpoofErrorState(error);
             }
           });
         } catch(Exception e){
@@ -606,16 +593,10 @@ public class MITM extends Plugin
 
                     mSpoofSession = new SpoofSession();
 
-                    mSpoofSession.start(new OnSessionReadyListener(){
+                    mSpoofSession.start(new BaseSessionReadyListener(){
                       @Override
                       public void onSessionReady(){
                         System.getProxy().setRedirection(faddress, fport);
-                      }
-
-                      @Override
-                      public void onError(String error, int resId){
-                        error = error == null ? getString(resId) : error;
-                        setSpoofErrorState(error);
                       }
                     });
 
@@ -679,35 +660,29 @@ public class MITM extends Plugin
                             final String resource = image;
                             mSpoofSession = new SpoofSession();
                             try {
-                              mSpoofSession.start(new OnSessionReadyListener(){
+                              mSpoofSession.start(new BaseSessionReadyListener(){
                                 @Override
                                 public void onSessionReady(){
-                                  System.getProxy().setFilter(new ProxyFilter(){
+                                  System.getProxy().setFilter(new ProxyFilter() {
                                     @Override
-                                    public String onDataReceived(String headers, String data){
+                                    public String onDataReceived(String headers, String data) {
                                       // handle img tags
                                       data = data.replaceAll
-                                        (
-                                          "(?i)<img([^/]+)src=(['\"])[^'\"]+(['\"])",
-                                          "<img$1src=$2" + resource + "$3"
-                                        );
+                                              (
+                                                      "(?i)<img([^/]+)src=(['\"])[^'\"]+(['\"])",
+                                                      "<img$1src=$2" + resource + "$3"
+                                              );
 
                                       // handle css background declarations
                                       data = data.replaceAll
-                                        (
-                                          "(?i)background\\s*(:|-)\\s*url\\s*[\\(|:][^\\);]+\\)?.*",
-                                          "background: url(" + resource + ")"
-                                        );
+                                              (
+                                                      "(?i)background\\s*(:|-)\\s*url\\s*[\\(|:][^\\);]+\\)?.*",
+                                                      "background: url(" + resource + ")"
+                                              );
 
                                       return data;
                                     }
                                   });
-                                }
-
-                                @Override
-                                public void onError(String error, int resId){
-                                  error = error == null ? getString(resId) : error;
-                                  setSpoofErrorState(error);
                                 }
                               });
 
@@ -768,30 +743,24 @@ public class MITM extends Plugin
 
                       mSpoofSession = new SpoofSession();
                       try {
-                        mSpoofSession.start(new OnSessionReadyListener(){
+                        mSpoofSession.start(new BaseSessionReadyListener(){
                           @Override
                           public void onSessionReady(){
-                            System.getProxy().setFilter(new ProxyFilter(){
+                            System.getProxy().setFilter(new ProxyFilter() {
                               @Override
-                              public String onDataReceived(String headers, String data){
-                                if(data.matches("(?s).+/v=[a-zA-Z0-9_-]+.+"))
+                              public String onDataReceived(String headers, String data) {
+                                if (data.matches("(?s).+/v=[a-zA-Z0-9_-]+.+"))
                                   data = data.replaceAll("(?s)/v=[a-zA-Z0-9_-]+", "/v=" + videoId);
 
-                                else if(data.matches("(?s).+/v/[a-zA-Z0-9_-]+.+"))
+                                else if (data.matches("(?s).+/v/[a-zA-Z0-9_-]+.+"))
                                   data = data.replaceAll("(?s)/v/[a-zA-Z0-9_-]+", "/v/" + videoId);
 
-                                else if(data.matches("(?s).+/embed/[a-zA-Z0-9_-]+.+"))
+                                else if (data.matches("(?s).+/embed/[a-zA-Z0-9_-]+.+"))
                                   data = data.replaceAll("(?s)/embed/[a-zA-Z0-9_-]+", "/embed/" + videoId);
 
                                 return data;
                               }
                             });
-                          }
-
-                          @Override
-                          public void onError(String error, int resId){
-                            error = error == null ? getString(resId) : error;
-                            setSpoofErrorState(error);
                           }
                         });
 
@@ -858,21 +827,15 @@ public class MITM extends Plugin
 
                             mSpoofSession = new SpoofSession();
                             try {
-                              mSpoofSession.start(new OnSessionReadyListener(){
+                              mSpoofSession.start(new BaseSessionReadyListener(){
                                 @Override
                                 public void onSessionReady(){
-                                  System.getProxy().setFilter(new ProxyFilter(){
+                                  System.getProxy().setFilter(new ProxyFilter() {
                                     @Override
-                                    public String onDataReceived(String headers, String data){
+                                    public String onDataReceived(String headers, String data) {
                                       return data.replaceAll("(?i)</head>", js + "</head>");
                                     }
                                   });
-                                }
-
-                                @Override
-                                public void onError(String error, int resId){
-                                  error = error == null ? getString(resId) : error;
-                                  setSpoofErrorState(error);
                                 }
                               });
 
@@ -926,25 +889,19 @@ public class MITM extends Plugin
                   }
 
                   mSpoofSession = new SpoofSession();
-                  mSpoofSession.start(new OnSessionReadyListener(){
+                  mSpoofSession.start(new BaseSessionReadyListener(){
                     @Override
                     public void onSessionReady(){
-                      System.getProxy().setFilter(new ProxyFilter(){
+                      System.getProxy().setFilter(new ProxyFilter() {
                         @Override
-                        public String onDataReceived(String headers, String data){
-                          for(int i = 0; i < from.size(); i++){
+                        public String onDataReceived(String headers, String data) {
+                          for (int i = 0; i < from.size(); i++) {
                             data = data.replaceAll(from.get(i), to.get(i));
                           }
 
                           return data;
                         }
                       });
-                    }
-
-                    @Override
-                    public void onError(String error, int resId){
-                      error = error == null ? getString(resId) : error;
-                      setSpoofErrorState(error);
                     }
                   });
 
@@ -973,5 +930,18 @@ public class MITM extends Plugin
   public void onDetach(){
     setStoppedState();
     super.onDetach();
+  }
+
+  private abstract class BaseSessionReadyListener implements OnSessionReadyListener {
+
+    @Override
+    public void onError(String line) {
+      setSpoofErrorState(line);
+    }
+
+    @Override
+    public void onError(@StringRes int stringId) {
+      onError(getString(stringId));
+    }
   }
 }

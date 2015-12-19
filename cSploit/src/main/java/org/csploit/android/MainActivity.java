@@ -19,6 +19,7 @@
  */
 package org.csploit.android;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.widget.Toast;
@@ -30,8 +31,11 @@ import org.csploit.android.gui.fragments.Heartless;
 import org.csploit.android.gui.fragments.Init;
 import org.csploit.android.gui.fragments.TargetDetail;
 import org.csploit.android.gui.fragments.TargetList;
+import org.csploit.android.gui.fragments.plugins.mitm.Hijacker;
 import org.csploit.android.helpers.FragmentHelper;
 import org.csploit.android.net.Target;
+import org.csploit.android.plugins.mitm.hijacker.HijackerWebView;
+import org.csploit.android.plugins.mitm.hijacker.Session;
 import org.csploit.android.services.receivers.ConnectivityReceiver;
 import org.csploit.android.services.receivers.UpdateReceiver;
 
@@ -40,7 +44,8 @@ public class MainActivity extends AbstractSidebarActivity
         TargetList.OnFragmentInteraction,
         TargetDetail.OnFragmentInteractionListener,
         Init.OnFragmentInteractionListener,
-        UpdateReceiver.CoreUpdateListener {
+        UpdateReceiver.CoreUpdateListener,
+        Hijacker.OnFragmentInteractionListener {
 
   private UpdateReceiver updateReceiver;
 
@@ -104,7 +109,7 @@ public class MainActivity extends AbstractSidebarActivity
 
       if (plugin.hasLayoutToShow()) {
         Toast.makeText(this, getString(R.string.selected) + getString(plugin.getName()), Toast.LENGTH_SHORT).show();
-        FragmentHelper.switchToFragment(this, plugin);
+        FragmentHelper.openFragment(this, plugin);
       } else
         plugin.onActionClick(this);
     }
@@ -125,5 +130,12 @@ public class MainActivity extends AbstractSidebarActivity
     }
 
     FragmentHelper.openFragment(this, fragment);
+  }
+
+  @Override
+  public void onHijackerSessionSelected(Session session) {
+    System.setCustomData(session);
+    //TODO: fragment it
+    startActivity(new Intent(this, HijackerWebView.class));
   }
 }

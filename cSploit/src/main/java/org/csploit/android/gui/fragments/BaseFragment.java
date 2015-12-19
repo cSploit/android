@@ -9,7 +9,7 @@ import org.csploit.android.helpers.GUIHelper;
 /**
  * A Fragment that give us some handy stuff
  */
-abstract class BaseFragment extends Fragment {
+public abstract class BaseFragment extends Fragment {
 
   @Override
   public void onViewCreated(View view, Bundle savedInstanceState) {

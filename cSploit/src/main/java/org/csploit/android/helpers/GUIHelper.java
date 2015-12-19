@@ -1,6 +1,8 @@
 package org.csploit.android.helpers;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -54,5 +56,28 @@ public final class GUIHelper {
         ab.setHomeButtonEnabled(true);
       }
     }
+  }
+
+  /**
+   * add a logo to an image
+   */
+  public static Bitmap addLogo(Bitmap mainImage, Bitmap logoImage) {
+    Bitmap finalImage;
+    int width, height;
+
+    width = mainImage.getWidth();
+    height = mainImage.getHeight();
+
+    finalImage = Bitmap.createBitmap(width, height,
+            mainImage.getConfig());
+
+    Canvas canvas = new Canvas(finalImage);
+
+    canvas.drawBitmap(mainImage, 0, 0, null);
+    canvas.drawBitmap(logoImage,
+            canvas.getWidth() - logoImage.getWidth(),
+            canvas.getHeight() - logoImage.getHeight(), null);
+
+    return finalImage;
   }
 }

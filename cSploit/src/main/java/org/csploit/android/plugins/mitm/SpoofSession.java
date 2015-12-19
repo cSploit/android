@@ -18,6 +18,8 @@
  */
 package org.csploit.android.plugins.mitm;
 
+import android.support.annotation.StringRes;
+
 import org.csploit.android.R;
 import org.csploit.android.core.Child;
 import org.csploit.android.core.ChildManager;
@@ -39,7 +41,8 @@ public class SpoofSession
 
   public interface OnSessionReadyListener{
     void onSessionReady();
-    void onError(String errorString, int errorStringId);
+    void onError(String line);
+    void onError(@StringRes int stringId);
   }
 
   public SpoofSession(boolean withProxy, boolean withServer, String serverFileName, String serverMimeType){
@@ -59,13 +62,13 @@ public class SpoofSession
 
     if(mWithProxy){
       if(System.getProxy() == null){
-        listener.onError( null, R.string.error_mitm_proxy );
+        listener.onError(R.string.error_mitm_proxy );
         return;
       }
 
       if(System.getSettings().getBoolean("PREF_HTTPS_REDIRECT", true)){
         if(System.getHttpsRedirector() == null){
-          listener.onError( null, R.string.error_mitm_https_redirector );
+          listener.onError(R.string.error_mitm_https_redirector );
           return;
         }
         new Thread(System.getHttpsRedirector()).start();
@@ -77,7 +80,7 @@ public class SpoofSession
     if(mWithServer){
       try{
         if(System.getServer() == null){
-          listener.onError( null, R.string.error_mitm_resource_server );
+          listener.onError(R.string.error_mitm_resource_server );
           return;
         }
 
@@ -93,7 +96,7 @@ public class SpoofSession
       mArpSpoofProcess = System.getTools().arpSpoof.spoof(target, new ArpSpoof.ArpSpoofReceiver() {
         @Override
         public void onError(String line) {
-          listener.onError(line, 0);
+          listener.onError(line);
         }
       });
     } else {

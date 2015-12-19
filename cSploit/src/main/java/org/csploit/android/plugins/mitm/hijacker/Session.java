@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpCookie;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -28,8 +29,22 @@ public class Session
   public String mUserAgent = "";
   public HashMap<String, HttpCookie> mCookies = null;
 
-  public Session(){
-    mCookies = new HashMap<String, HttpCookie>();
+  private Session() {
+    mCookies = new HashMap<>();
+  }
+
+  public Session(boolean https, String address, String domain, String userAgent){
+    mCookies = new HashMap<>();
+    mHTTPS = https;
+    mAddress = address;
+    mDomain = domain;
+    mUserAgent = userAgent;
+  }
+
+  public void updateCookies(Collection<HttpCookie> cookies) {
+    for(HttpCookie cookie : cookies) {
+      mCookies.put(cookie.getName(), cookie);
+    }
   }
 
   public String getFileName(){
