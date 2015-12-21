@@ -32,7 +32,6 @@ public abstract class BaseLiveListAdapter<T, H> extends BaseAdapter {
     dark = GUIHelper.isDarkThemeEnabled();
     this.holderClass = holderClass;
     inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    list = getListCopy();
   }
 
   @Override
@@ -52,7 +51,7 @@ public abstract class BaseLiveListAdapter<T, H> extends BaseAdapter {
       holder = (H) tag;
     }
 
-    final T item = list.get(position);
+    final T item = getList().get(position);
 
     updateView(item, holder);
 
@@ -61,12 +60,12 @@ public abstract class BaseLiveListAdapter<T, H> extends BaseAdapter {
 
   @Override
   public int getCount() {
-    return list.size();
+    return getList().size();
   }
 
   @Override
   public Object getItem(int position) {
-    return list.get(position);
+    return getList().get(position);
   }
 
   @Override
@@ -102,10 +101,11 @@ public abstract class BaseLiveListAdapter<T, H> extends BaseAdapter {
     activity.runOnUiThread(new Runnable() {
       @Override
       public void run() {
+        List<T> l = getList();
         int start = lv.getFirstVisiblePosition();
-        int end = Math.min(lv.getLastVisiblePosition(), list.size());
+        int end = Math.min(lv.getLastVisiblePosition(), l.size());
         for (int i = start; i <= end; i++) {
-          if (item == list.get(i)) {
+          if (item == l.get(i)) {
             View view = lv.getChildAt(i - start);
             getView(i, view, lv);
             break;
@@ -124,6 +124,8 @@ public abstract class BaseLiveListAdapter<T, H> extends BaseAdapter {
   }
 
   protected List<T> getList() {
+    if(list == null)
+      list = getListCopy();
     return list;
   }
 
