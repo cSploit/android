@@ -253,6 +253,7 @@ public abstract class AbstractSidebarActivity extends AppCompatActivity
                 @Override
                 public void onConfirm() {
                   finish();
+                  System.clean(true);
                 }
 
                 @Override
