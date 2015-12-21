@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import org.csploit.android.gui.fragments.PluginList;
+import org.csploit.android.gui.fragments.PortList;
 import org.csploit.android.net.Target;
 
 /**
@@ -28,7 +29,7 @@ public class TargetPagerAdapter extends FragmentStatePagerAdapter {
       case 0:
         return PluginList.newInstance(target);
       case 1:
-        return null; // TODO: PortList
+        return PortList.newInstance(target);
     }
 
     return null;

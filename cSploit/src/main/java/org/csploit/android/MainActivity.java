@@ -29,6 +29,7 @@ import org.csploit.android.core.System;
 import org.csploit.android.gui.activities.AbstractSidebarActivity;
 import org.csploit.android.gui.fragments.Heartless;
 import org.csploit.android.gui.fragments.Init;
+import org.csploit.android.gui.fragments.PortList;
 import org.csploit.android.gui.fragments.TargetDetail;
 import org.csploit.android.gui.fragments.TargetList;
 import org.csploit.android.gui.fragments.plugins.mitm.Hijacker;
@@ -45,7 +46,8 @@ public class MainActivity extends AbstractSidebarActivity
         TargetDetail.OnFragmentInteractionListener,
         Init.OnFragmentInteractionListener,
         UpdateReceiver.CoreUpdateListener,
-        Hijacker.OnFragmentInteractionListener {
+        Hijacker.OnFragmentInteractionListener,
+        PortList.OnFragmentInteractionListener {
 
   private UpdateReceiver updateReceiver;
 
@@ -137,5 +139,10 @@ public class MainActivity extends AbstractSidebarActivity
     System.setCustomData(session);
     //TODO: fragment it
     startActivity(new Intent(this, HijackerWebView.class));
+  }
+
+  @Override
+  public void onPortChosen(Target.Port port) {
+    //TODO
   }
 }
