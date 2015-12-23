@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import org.csploit.android.R;
 import org.csploit.android.net.Target;
+import org.csploit.android.core.System;
 
 import java.util.List;
 import java.util.Observable;
@@ -47,8 +48,27 @@ public class PortListAdapter extends BaseLiveListAdapter<Target.Port, PortListAd
 
   @Override
   protected void updateView(Target.Port port, PortHolder holder) {
-    holder.title.setText(port.getProtocol() + ": " + port.getNumber());
-    holder.description.setText(port.getService() + " - " + port.getVersion());
+    String title;
+    String description;
+    String protocolName = System.getProtocolByPort(port.getNumber());
+    String version = port.getVersion();
+
+    title = port.getProtocol() + ": " + port.getNumber();
+
+    if(protocolName != null && !protocolName.isEmpty()) {
+      title += " [" + protocolName + "]";
+    }
+
+    description = port.getService();
+
+    if(description == null) {
+      description = "";
+    } else if(!description.isEmpty() && version != null && !version.isEmpty()) {
+      description += " - " + version;
+    }
+
+    holder.title.setText(title);
+    holder.description.setText(description);
   }
 
   @Override
