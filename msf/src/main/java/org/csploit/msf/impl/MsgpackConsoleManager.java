@@ -3,7 +3,9 @@ package org.csploit.msf.impl;
 import org.csploit.msf.api.Console;
 import org.csploit.msf.api.ConsoleManager;
 import org.csploit.msf.api.MsfException;
-import org.csploit.msf.api.events.ConsoleEvent;
+import org.csploit.msf.api.events.ConsoleChangedEvent;
+import org.csploit.msf.api.events.ConsoleClosedEvent;
+import org.csploit.msf.api.events.ConsoleOpenedEvent;
 import org.csploit.msf.api.events.ConsoleOutputEvent;
 import org.csploit.msf.api.exceptions.ResourceNotFoundException;
 import org.csploit.msf.api.listeners.ConsoleListener;
@@ -236,14 +238,14 @@ class MsgpackConsoleManager implements ConsoleManager, Runnable {
   }
 
   private void notifyConsoleOpened(Console console) {
-    final int id = console.getId();
+    final ConsoleOpenedEvent event = new ConsoleOpenedEvent(this, console);
 
     executor.execute(new Runnable() {
       @Override
       public void run() {
         synchronized (listeners) {
           for (ConsoleListener listener : listeners) {
-            listener.onConsoleOpened(new ConsoleEventImpl(id));
+            listener.onConsoleOpened(event);
           }
         }
       }
@@ -251,29 +253,29 @@ class MsgpackConsoleManager implements ConsoleManager, Runnable {
   }
 
   private void notifyConsoleChanged(Console console) {
-    final int id = console.getId();
+    final ConsoleChangedEvent event = new ConsoleChangedEvent(this, console);
 
     executor.execute(new Runnable() {
       @Override
       public void run() {
         synchronized (listeners) {
           for (ConsoleListener listener : listeners) {
-            listener.onConsoleChanged(new ConsoleEventImpl(id));
+            listener.onConsoleChanged(event);
           }
         }
       }
     });
   }
 
-  private void notifyConsoleOutput(Console console, final String output) {
-    final int id = console.getId();
+  private void notifyConsoleOutput(Console console, String output) {
+    final ConsoleOutputEvent event = new ConsoleOutputEvent(this, console, output);
 
     executor.execute(new Runnable() {
       @Override
       public void run() {
         synchronized (listeners) {
           for(ConsoleListener listener : listeners) {
-            listener.onConsoleOutput(new ConsoleOutputEventImpl(id, output));
+            listener.onConsoleOutput(event);
           }
         }
       }
@@ -281,14 +283,14 @@ class MsgpackConsoleManager implements ConsoleManager, Runnable {
   }
 
   private void notifyConsoleClosed(Console console) {
-    final int id = console.getId();
+    final ConsoleClosedEvent event = new ConsoleClosedEvent(this, console);
 
     executor.execute(new Runnable() {
       @Override
       public void run() {
         synchronized (listeners) {
           for(ConsoleListener listener : listeners) {
-            listener.onConsoleClosed(new ConsoleEventImpl(id));
+            listener.onConsoleClosed(event);
           }
         }
       }
@@ -299,38 +301,5 @@ class MsgpackConsoleManager implements ConsoleManager, Runnable {
   protected void finalize() throws Throwable {
     super.finalize();
     stop();
-  }
-
-  private class ConsoleEventImpl implements ConsoleEvent {
-    private final int id;
-
-    public ConsoleEventImpl(int id) {
-      this.id = id;
-    }
-
-    @Override
-    public int getId() {
-      return id;
-    }
-  }
-
-  private class ConsoleOutputEventImpl implements ConsoleOutputEvent {
-    private final int id;
-    private final String output;
-
-    public ConsoleOutputEventImpl(int id, String output) {
-      this.id = id;
-      this.output = output;
-    }
-
-    @Override
-    public int getId() {
-      return id;
-    }
-
-    @Override
-    public String getOutput() {
-      return output;
-    }
   }
 }

@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Manage consoles
  */
-public interface ConsoleManager {
+public interface ConsoleManager extends Publisher<ConsoleListener> {
   /**
    * get a list of consoles managed by this {@link ConsoleManager}
    * @return a list of consoles managed by this {@link ConsoleManager}
@@ -51,18 +51,6 @@ public interface ConsoleManager {
    * @return a new {@link Console}
    */
   Console create() throws IOException, MsfException;
-
-  /**
-   * add an event subscriber
-   * @param listener to add
-   */
-  void addSubscriber(ConsoleListener listener);
-
-  /**
-   * remove an event subscriber
-   * @param listener to remove
-   */
-  void removeSubscriber(ConsoleListener listener);
 
   /**
    * start watching for consoles output

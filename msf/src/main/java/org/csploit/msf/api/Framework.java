@@ -1,14 +1,13 @@
 package org.csploit.msf.api;
 
-import org.csploit.msf.api.listeners.Listener;
-
 import java.io.IOException;
+import java.util.EventListener;
 import java.util.List;
 
 /**
  * A Metasploit Framework interface
  */
-public interface Framework {
+public interface Framework extends Publisher<EventListener> {
   List<? extends Session> getSessions() throws IOException, MsfException;
   List<? extends Exploit> getExploits() throws IOException, MsfException;
   List<? extends Payload> getPayloads() throws IOException, MsfException;
@@ -18,6 +17,4 @@ public interface Framework {
   Job getJob(int id) throws IOException, MsfException;
   void setGlobalOption(String key, String value);
   void unsetGlobalOption(String key);
-  void addSubscriber(Listener listener);
-  void removeSubscriber(Listener listener);
 }

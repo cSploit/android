@@ -1,23 +1,27 @@
 package org.csploit.msf.api.listeners;
 
-import org.csploit.msf.api.events.ConsoleEvent;
+import org.csploit.msf.api.events.ConsoleChangedEvent;
+import org.csploit.msf.api.events.ConsoleClosedEvent;
+import org.csploit.msf.api.events.ConsoleOpenedEvent;
 import org.csploit.msf.api.events.ConsoleOutputEvent;
+
+import java.util.EventListener;
 
 /**
  * Something that is listening on Console events
  */
-public interface ConsoleListener {
+public interface ConsoleListener extends EventListener {
   /**
    * A {@link org.csploit.msf.api.Console} has been opened
    * @param event event data
    */
-  void onConsoleOpened(ConsoleEvent event);
+  void onConsoleOpened(ConsoleOpenedEvent event);
 
   /**
    * A {@link org.csploit.msf.api.Console} has changed it's state
    * @param event event data
    */
-  void onConsoleChanged(ConsoleEvent event);
+  void onConsoleChanged(ConsoleChangedEvent event);
 
   /**
    * A {@link org.csploit.msf.api.Console} has printed something
@@ -29,5 +33,5 @@ public interface ConsoleListener {
    * A {@link org.csploit.msf.api.Console} has been closed
    * @param event event data
    */
-  void onConsoleClosed(ConsoleEvent event);
+  void onConsoleClosed(ConsoleClosedEvent event);
 }

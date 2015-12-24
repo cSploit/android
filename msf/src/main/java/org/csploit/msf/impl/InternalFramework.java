@@ -11,5 +11,4 @@ interface InternalFramework extends Framework, DataHolder {
   JobContainer getJobContainer();
   void registerJob(Job job);
   void unregisterJob(int id);
-  EventManager getEventManager();
 }

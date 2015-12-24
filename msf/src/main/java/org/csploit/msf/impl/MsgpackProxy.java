@@ -1,12 +1,14 @@
 package org.csploit.msf.impl;
 
-import org.csploit.msf.api.*;
+import org.csploit.msf.api.Arch;
 import org.csploit.msf.api.Exploit;
+import org.csploit.msf.api.License;
 import org.csploit.msf.api.Module;
+import org.csploit.msf.api.MsfException;
+import org.csploit.msf.api.Option;
 import org.csploit.msf.api.Payload;
-import org.csploit.msf.api.Session;
 import org.csploit.msf.api.Post;
-import org.csploit.msf.api.listeners.Listener;
+import org.csploit.msf.api.Session;
 import org.csploit.msf.api.module.AuxiliaryAction;
 import org.csploit.msf.api.module.Platform;
 import org.csploit.msf.api.module.Rank;
@@ -22,6 +24,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,17 +144,12 @@ class MsgpackProxy implements InternalFramework {
   }
 
   @Override
-  public EventManager getEventManager() {
-    return framework.getEventManager();
-  }
-
-  @Override
-  public void addSubscriber(Listener listener) {
+  public void addSubscriber(EventListener listener) throws IOException, MsfException {
     framework.addSubscriber(listener);
   }
 
   @Override
-  public void removeSubscriber(Listener listener) {
+  public void removeSubscriber(EventListener listener) throws IOException, MsfException {
     framework.removeSubscriber(listener);
   }
 

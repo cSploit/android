@@ -1,16 +1,17 @@
 package org.csploit.msf.impl;
 
-import org.csploit.msf.api.*;
 import org.csploit.msf.api.Exploit;
-import org.csploit.msf.api.Session;
 import org.csploit.msf.api.Module;
+import org.csploit.msf.api.MsfException;
 import org.csploit.msf.api.Payload;
 import org.csploit.msf.api.Post;
-import org.csploit.msf.api.listeners.Listener;
+import org.csploit.msf.api.Session;
+import org.csploit.msf.api.listeners.SessionListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EventListener;
 import java.util.List;
 
 /**
@@ -22,16 +23,13 @@ class Framework implements DataHolder, InternalFramework {
   private ModuleManager moduleManager;
   private JobContainer jobs;
   private SessionManager sessionManager;
-  private EventManager eventManager;
 
   public Framework() {
     dataStore = new DataStore();
     moduleManager = new ModuleManager(this, "all");
     jobs = new JobContainer();
     sessionManager = new SessionManager();
-    eventManager = new EventManager();
 
-    sessionManager.setFramework(this);
     sessionManager.start();
   }
 
@@ -54,21 +52,21 @@ class Framework implements DataHolder, InternalFramework {
   }
 
   @Override
-  public EventManager getEventManager() {
-    return eventManager;
+  public void addSubscriber(EventListener listener) throws IOException, MsfException {
+    if(listener instanceof SessionListener) {
+      sessionManager.addSubscriber((SessionListener) listener);
+    }
   }
 
   @Override
-  public void addSubscriber(Listener listener) {
-    eventManager.addSubscriber(listener);
+  public void removeSubscriber(EventListener listener) throws IOException, MsfException {
+    if(listener instanceof SessionListener) {
+      sessionManager.removeSubscriber((SessionListener) listener);
+    }
   }
 
   @Override
-  public void removeSubscriber(Listener listener) {
-    eventManager.removeSubscriber(listener);
-  }
-
-  public List<Session> getSessions() {
+  public List<Session> getSessions() throws IOException, MsfException {
     return sessionManager.getSessions();
   }
 

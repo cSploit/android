@@ -1,18 +1,17 @@
 package org.csploit.msf.impl;
 
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
-
 import org.csploit.msf.api.Console;
 import org.csploit.msf.api.ConsoleManager;
 import org.csploit.msf.api.Exploit;
 import org.csploit.msf.api.Framework;
+import org.csploit.msf.api.Job;
 import org.csploit.msf.api.Module;
 import org.csploit.msf.api.Payload;
 import org.csploit.msf.api.Post;
 import org.csploit.msf.api.Session;
-import org.csploit.msf.api.Job;
-import org.csploit.msf.api.events.ConsoleEvent;
+import org.csploit.msf.api.events.ConsoleChangedEvent;
+import org.csploit.msf.api.events.ConsoleClosedEvent;
+import org.csploit.msf.api.events.ConsoleOpenedEvent;
 import org.csploit.msf.api.events.ConsoleOutputEvent;
 import org.csploit.msf.api.listeners.ConsoleListener;
 import org.junit.Before;
@@ -20,6 +19,9 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * Test msf library usage for messagepack usage
@@ -33,13 +35,13 @@ public class MsgpackTest {
     public boolean open, changed, output; // default to false
 
     @Override
-    public synchronized void onConsoleOpened(ConsoleEvent event) {
+    public synchronized void onConsoleOpened(ConsoleOpenedEvent event) {
       open = true;
       notifyAll();
     }
 
     @Override
-    public synchronized void onConsoleChanged(ConsoleEvent event) {
+    public synchronized void onConsoleChanged(ConsoleChangedEvent event) {
       changed = true;
       notifyAll();
     }
@@ -51,7 +53,7 @@ public class MsgpackTest {
     }
 
     @Override
-    public synchronized void onConsoleClosed(ConsoleEvent event) {
+    public synchronized void onConsoleClosed(ConsoleClosedEvent event) {
       open = false;
       notifyAll();
     }

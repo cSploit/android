@@ -2,7 +2,8 @@ package org.csploit.msf.impl;
 
 import org.csploit.msf.api.MsfException;
 import org.csploit.msf.api.Session;
-import org.csploit.msf.api.events.SessionEvent;
+import org.csploit.msf.api.events.SessionClosedEvent;
+import org.csploit.msf.api.events.SessionOpenedEvent;
 import org.csploit.msf.api.events.SessionOutputEvent;
 import org.csploit.msf.api.listeners.SessionListener;
 import org.junit.Test;
@@ -10,8 +11,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * test the session manager
@@ -37,7 +38,7 @@ public class SessionManagerTest {
     private boolean opened = false;
 
     @Override
-    public synchronized void onSessionOpened(SessionEvent e) {
+    public synchronized void onSessionOpened(SessionOpenedEvent e) {
       opened = true;
       notifyAll();
     }
@@ -46,7 +47,7 @@ public class SessionManagerTest {
     public void onSessionOutput(SessionOutputEvent e) { }
 
     @Override
-    public synchronized void onSessionClosed(SessionEvent e) {
+    public synchronized void onSessionClosed(SessionClosedEvent e) {
       opened = false;
       notifyAll();
     }

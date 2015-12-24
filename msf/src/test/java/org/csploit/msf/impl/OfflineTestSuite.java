@@ -16,8 +16,7 @@ import org.junit.runners.Suite;
   RpcSampleTest.class,
   PlatformListTest.class,
   PlatformTest.class,
-  SessionManagerTest.class,
-  EventManagerTest.class
+  SessionManagerTest.class
 })
 public class OfflineTestSuite {
 }
