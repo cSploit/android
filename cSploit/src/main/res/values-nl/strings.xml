@@ -35,7 +35,7 @@
     <string name="connected_to2"><![CDATA[</b> met sleutel <b><font color=\"green\">]]></string>
     <string name="connected_to3"><![CDATA[</font></b>!]]></string>
     <string name="connecting">Verbinden&#8230;</string>
-    <string name="connection_failed">Verbinding VERBROKEN!</string>
+    <string name="connection_failed">Verbinding verbroken!</string>
     <string name="connection_to"><![CDATA[Verbinden met <b>]]></string>
     <string name="connection_to2"><![CDATA[</b> <b><font color=\"red\">GEFAALD</font></b>.]]></string>
     <string name="could_not_read_folder">Kan de inhoud van de map niet lezen.</string>
@@ -120,7 +120,7 @@
     <string name="hijacker_load_from_file">Laad van bestand</string>
     <string name="image">Afbeelding</string>
     <string name="initialization_error">Initialisatie Fout</string>
-    <string name="initializing">Initialisatiestring&#8230;</string>
+    <string name="initializing">Initialiseren…</string>
     <string name="inspector">Service Inspecteur</string>
     <string name="inspector_desc">Voer een besturingssyteem en service inspectie uit op doelwit.(langzamer dan port scanner, maar specifieker)</string>
     <string name="install_error">Fout opgetreden tijdens installatie!</string>
@@ -194,7 +194,7 @@
     <string name="multiple_attack">Meerdere aanvallen</string>
     <string name="net_discovery_start_failed">Netwerk Discovery heeft GEFAALD om te starten!</string>
     <string name="net_discovery_started">Netwerk discovery is gestart.</string>
-    <string name="net_discovery_stopped">Netwerk discovery is gestopd.</string>
+    <string name="net_discovery_stopped">Netwerk discovery is gestopt.</string>
     <string name="network_subnet_mask">Dit is jou netwerk subnet mask.</string>
     <string name="new_apk_found">App versie %s is beschikbaar, wil je updaten?</string>
     <string name="new_core_found">Core versie %s is beschikbaar, wil je updaten?</string>
@@ -228,7 +228,7 @@
     <string name="only_4_root">Deze applicatie kan alleen werken op apparaaten die ROOT hebben.</string>
     <string name="open_shell">Open shell</string>
     <string name="open_url">Open URL</string>
-    <string name="os">OS:</string>
+    <string name="os">OS</string>
     <string name="packet_forger">Paket Maker</string>
     <string name="packet_forger_desc">Maak en verstuur een aangepaste TCP of UDP packet naar het doelwit.</string>
     <string name="patching_shebang">Patching shebang</string>
@@ -249,7 +249,7 @@
     <string name="pref_err_buffer_size">Buffer groote moet zijn tussen 1024 en 104857600.</string>
     <string name="pref_err_busy_port">Een ander proces is aan het luisteren op dit port, gebruik een andere port.</string>
     <string name="pref_err_executable">het staat geen creaties van executables toe.</string>
-    <string name="pref_err_exists">het bestaat niet.</string>
+    <string name="pref_err_exists">bestaat niet.</string>
     <string name="pref_err_invalid_number">Ongeldig nummer.</string>
     <string name="pref_err_port_range">Het port moet tussen 1024 en 65535 zijn.</string>
     <string name="pref_err_sample_time">Voorbeeld tijd moet zijn tussen 0.4 en 1.0.</string>
@@ -437,4 +437,11 @@
     <string name="pref_auto_portscan">Automatische poort-scan</string>
     <string name="pref_auto_portscan_desc">Scan altijd een doelwit met SYNC scanner als een doelwit gevonden word</string>
     <string name="scanner_custom_parameters">Aangepaste parameters</string>
+    <string name="any_interface">elke interface</string>
+    <string name="connection_lost">verbinding verloren</string>
+    <string name="error_initializing_interface">Fout tijdens initialiseren %s</string>
+    <string name="connection_lost_prompt">verwijder deze sessie en begin een nieuwe?</string>
+    <string name="iface_dialog_title">Kies een netwerk interface</string>
+    <string name="iface_error_no_available">Er zijn geen netwerk interface\'s beschikbaar</string>
+    <string name="menu_ifaces">Net interfaces</string>
 </resources>
