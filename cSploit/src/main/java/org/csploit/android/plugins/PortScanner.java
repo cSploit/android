@@ -25,6 +25,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -72,20 +73,22 @@ public class PortScanner extends Plugin {
   private static final String CUSTOM_PARAMETERS = "PortScanner.Prefs.CustomParameters";
   private static final String CUSTOM_PARAMETERS_TEXT = "PortScanner.Prefs.CustomParameters.Text";
   private SharedPreferences mPreferences = null;
-  private Map<Integer, String> urlFormats = new HashMap<>();
   private boolean mShowCustomParameters = false;
+
+  private static SparseArray<String> urlFormats = new SparseArray<String>() {{
+    put(80, "http://%s/");
+    put(443, "https://%s/");
+    put(21, "ftp://%s");
+    put(22, "ssh://%s");
+    put(23, "telnet://%s/");
+    put(0, "telnet://%s:%d/"); ///< default
+  }};
 
   public PortScanner() {
     super(R.string.port_scanner, R.string.port_scanner_desc,
 
             new Target.Type[]{Target.Type.ENDPOINT, Target.Type.REMOTE},
             R.layout.plugin_portscanner, R.drawable.action_scanner);
-    urlFormats.put(80, "http://%s/");
-    urlFormats.put(443, "https://%s/");
-    urlFormats.put(21, "ftp://%s");
-    urlFormats.put(22, "ssh://%s");
-    urlFormats.put(23, "telnet://%s/");
-    urlFormats.put(0, "telnet://%s:%d/"); ///< default
   }
 
   /**
@@ -222,7 +225,7 @@ public class PortScanner extends Plugin {
                                      int position, long id) {
         int portNumber = target.getOpenPorts().get(position).getNumber();
 
-        if(!urlFormats.containsKey(portNumber)) {
+        if(urlFormats.indexOfKey(portNumber) < 0) {
           portNumber = 0;
         }
 
