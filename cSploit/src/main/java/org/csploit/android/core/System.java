@@ -641,7 +641,7 @@ public class System {
   }
 
   public static String getStoragePath() {
-    return mStoragePath;
+    return mStoragePath != null ? mStoragePath : Environment.getExternalStorageDirectory().toString();
   }
 
   public static SharedPreferences getSettings() {
