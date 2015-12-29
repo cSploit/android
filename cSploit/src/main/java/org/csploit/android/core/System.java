@@ -115,13 +115,13 @@ public class System {
   private static Network mNetwork = null;
   private static final SortedSet<Target> mTargets = new TreeSet<>();
   private static Target mCurrentTarget = null;
-  private static Map<String, String> mServices = null;
-  private static Map<String, String> mPorts = null;
-  private static Map<Integer, String> mVendors = null;
-  private static SparseIntArray mOpenPorts = null;
+  private static Map<String, String> mServices = new HashMap<>();
+  private static Map<String, String> mPorts = new HashMap<>();
+  private static Map<Integer, String> mVendors = new HashMap<>();
+  private static SparseIntArray mOpenPorts = new SparseIntArray(3);
 
   // registered plugins
-  private static ArrayList<Plugin> mPlugins = null;
+  private static ArrayList<Plugin> mPlugins = new ArrayList<>();
   private static Plugin mCurrentPlugin = null;
   // toolbox singleton
   private static ToolBox mTools = null;
@@ -145,7 +145,7 @@ public class System {
 
   private static boolean mCoreInitialized = false;
 
-  private static KnownIssues mKnownIssues = null;
+  private static KnownIssues mKnownIssues = new KnownIssues();
 
   private static Observer targetListObserver = null;
 
@@ -160,11 +160,6 @@ public class System {
       Logger.debug("initializing System...");
       mStoragePath = getSettings().getString("PREF_SAVE_PATH", Environment.getExternalStorageDirectory().toString());
       mSessionName = "csploit-session-" + java.lang.System.currentTimeMillis();
-      mKnownIssues = new KnownIssues();
-      mPlugins = new ArrayList<>();
-      mOpenPorts = new SparseIntArray(3);
-      mServices = new HashMap<>();
-      mPorts = new HashMap<>();
 
       // if we are here, network initialization didn't throw any error, lock wifi
       WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
@@ -609,30 +604,31 @@ public class System {
   }
 
   private static void preloadVendors() {
-    if (mVendors == null) {
-      try {
-        mVendors = new HashMap<>();
-        @SuppressWarnings("ConstantConditions")
-        FileInputStream fstream = new FileInputStream(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-mac-prefixes");
+    if(!mVendors.isEmpty()) {
+      return;
+    }
 
-        DataInputStream in = new DataInputStream(fstream);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        String line;
+    try {
+      @SuppressWarnings("ConstantConditions")
+      FileInputStream fstream = new FileInputStream(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-mac-prefixes");
 
-        while ((line = reader.readLine()) != null) {
-          line = line.trim();
-          if (!line.startsWith("#") && !line.isEmpty()) {
-            String[] tokens = line.split(" ", 2);
+      DataInputStream in = new DataInputStream(fstream);
+      BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+      String line;
 
-            if (tokens.length == 2)
-              mVendors.put(NetworkHelper.getOUICode(tokens[0]), tokens[1]);
-          }
+      while ((line = reader.readLine()) != null) {
+        line = line.trim();
+        if (!line.startsWith("#") && !line.isEmpty()) {
+          String[] tokens = line.split(" ", 2);
+
+          if (tokens.length == 2)
+            mVendors.put(NetworkHelper.getOUICode(tokens[0]), tokens[1]);
         }
-
-        in.close();
-      } catch (Exception e) {
-        errorLogging(e);
       }
+
+      in.close();
+    } catch (Exception e) {
+      errorLogging(e);
     }
   }
 
