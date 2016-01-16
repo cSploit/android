@@ -214,14 +214,84 @@ public class SettingsActivity extends AppCompatActivity {
       }
     }
 
+    private boolean isDirectoryEmptyOrWithVersion(File folder) {
+      String[] files = folder.list();
+
+      if(files.length > 0) {
+        for(String fname : files) {
+          if("VERSION".equals(fname)) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      return true;
+    }
+
+    private ExecChecker getCheckerForKey(String key) {
+      switch (key) {
+        case "RUBY_DIR":
+          return ExecChecker.ruby();
+        case "MSF_DIR":
+          return ExecChecker.msf();
+      }
+      return null;
+    }
+
+    private String getCurrentPathForKey(String key) {
+      switch (key) {
+        case "RUBY_DIR":
+          return System.getRubyPath();
+        case "MSF_DIR":
+          return System.getMsfPath();
+      }
+      return null;
+    }
+
+    private boolean shallAskForDelete(String key) {
+      return key.equals("RUBY_DIR") || key.equals("MSF_DIR");
+    }
+
+    /**
+     * check if selected directory is valid for the given key.
+     * @param key to be updated
+     * @param path of the chosen directory
+     * @return true if {@code path} is valid, false otherwise
+     */
+    private boolean canChangeDirectoryTo(String key, String path) {
+      File folder = new File(path);
+      ExecChecker checker = getCheckerForKey(key);
+      String oldPath = getCurrentPathForKey(key);
+      String toastMessage = null;
+      boolean valid = false;
+      boolean checkEmptyOrVersion = shallAskForDelete(key);
+
+      if (!folder.exists()) {
+        toastMessage = getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_exists);
+      } else if (!folder.canWrite()) {
+        toastMessage = getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_writable);
+      } else if (checker != null && !checker.canExecuteInDir(path)) {
+        toastMessage = getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_executable);
+      } else if (checkEmptyOrVersion && !isDirectoryEmptyOrWithVersion(folder)) {
+        toastMessage = getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_empty_or_old);
+      } else if (oldPath == null || !oldPath.equals(path)) {
+        valid = true;
+      }
+
+      if(toastMessage != null) {
+        Toast.makeText(getContext(), toastMessage, Toast.LENGTH_LONG).show();
+      }
+
+      return valid;
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
       if (requestCode == DirectoryPicker.PICK_DIRECTORY && resultCode != RESULT_CANCELED) {
         Bundle extras = intent.getExtras();
         String path;
         String key;
-        File folder;
-        String oldPath = null;
 
         if (extras == null) {
           Logger.debug("null extra: " + intent);
@@ -236,35 +306,18 @@ public class SettingsActivity extends AppCompatActivity {
           return;
         }
 
-        folder = new File(path);
-        ExecChecker checker = null;
+        if(canChangeDirectoryTo(key, path)) {
 
 
-        if (key.equals("RUBY_DIR")) {
-          oldPath = System.getRubyPath();
-          checker = ExecChecker.ruby();
-        } else if (key.equals("MSF_DIR")) {
-          oldPath = System.getMsfPath();
-          checker = ExecChecker.msf();
-        }
-
-        if (!folder.exists())
-          Toast.makeText(getActivity(), getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_exists), Toast.LENGTH_SHORT).show();
-
-        else if (!folder.canWrite())
-          Toast.makeText(getActivity(), getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_writable), Toast.LENGTH_SHORT).show();
-
-        else if (checker != null && !checker.canExecuteInDir(path))
-          Toast.makeText(getActivity(), getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_executable), Toast.LENGTH_LONG).show();
-
-        else {
-          //noinspection ConstantConditions
           getPreferenceManager().getSharedPreferences().edit().putString(key, path).commit();
-          if (oldPath != null && !oldPath.equals(path)) {
-            File current = new File(oldPath);
 
-            if (current.exists() && current.isDirectory() && current.listFiles().length > 2) {
-              wipe_prompt_older(current);
+          if(shallAskForDelete(key)) {
+            String oldPath = getCurrentPathForKey(key);
+            if(oldPath != null) {
+              File current = new File(oldPath);
+              if(current.exists() && current.isDirectory() && current.list().length > 0) {
+                wipe_prompt_older(current);
+              }
             }
           }
         }
