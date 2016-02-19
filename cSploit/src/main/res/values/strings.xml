@@ -190,7 +190,7 @@
         (slower than port scanner, but more accurate).
     </string>
     <string name="login_cracker">Login cracker</string>
-    <string name="login_cracker_desc">A very fast network logon cracker which support many different
+    <string name="login_cracker_desc">A very fast network logon cracker which supports many different
         services.
     </string>
     <string name="packet_forger">Packet forger</string>
@@ -323,7 +323,7 @@
     <string name="wifi_scan_finished">Scanning finished.</string>
 
     <string name="mitm_dns_spoofing">DNS spoofing</string>
-    <string name="mitm_dns_spoofing_desc">Redirect domains to a different web/IP</string>
+    <string name="mitm_dns_spoofing_desc">Redirect domains to a different web/IP.</string>
     <string name="mitm_dns_spoofing_list_saved">Saved</string>
 
     <!-- preferences -->
