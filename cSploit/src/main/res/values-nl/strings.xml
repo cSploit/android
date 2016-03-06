@@ -8,7 +8,7 @@
     <string name="arm_error"><![CDATA[<p>Het lijkt erop dat je apparaat geen ARM ondersteund, helaas word je apparaat niet ondersteund door cSploit.</p>]]></string>
     <string name="arm_error2"><![CDATA[<p>Voor meer informatie ga naar <a href=\"http://csploit.net/#requirements\">requirements</a> section.</p>]]></string>
     <string name="bad_permissions">Het locale bestand dat je geselecteerd hebt, heeft cSploit geen toegang tot, we kunnen het niet lezen/in schrijven.</string>
-    <string name="buildinfo">Build informatie</string>
+    <string name="buildinfo">App informatie</string>
     <string name="busybox_required">Complete BusyBox instalatie verplicht, killall binary is niet gevonden(misschien heb je een verouderde busybox)</string>
     <string name="cancel">Annuleer</string>
     <string name="cancel_dialog">Annuleer</string>
@@ -24,7 +24,7 @@
     <string name="choose_method">Kies een methode:</string>
     <string name="choose_source">Kies een bron:</string>
     <string name="clear">Verschoon</string>
-    <string name="clear_event_log">Verschoon de activitieiten log</string>
+    <string name="clear_event_log">Verschoon de activitieiten logboek</string>
     <string name="click_here_to_upgrade">Klik hier om te upgraden</string>
     <string name="close_confirm">Dit zal cSploit afsluiten, weet je het zeker?</string>
     <string name="command">Opdracht</string>
@@ -117,7 +117,7 @@
     <string name="heart_attack">Heart aanval</string>
     <string name="heart_attack_update">Heart aanval is opgedoken, de applicatie zou nu gaan kijken voor updates.#STATUS#</string>
     <string name="hijack_session">Hijack sessie</string>
-    <string name="hijacker_load_from_file">Laad van bestand</string>
+    <string name="hijacker_load_from_file">Laad vanuit bestand</string>
     <string name="image">Afbeelding</string>
     <string name="initialization_error">Initialisatie Fout</string>
     <string name="initializing">Initialiseren…</string>
@@ -136,7 +136,7 @@
     <string name="left">links</string>
     <string name="license">Licentie</string>
     <string name="loading_changelog">Veranderingen aan het laden&#8230;</string>
-    <string name="local_files">Lokale bestand</string>
+    <string name="local_files">Lokale bestanden</string>
     <string name="local_images">Lokale afbeeldingen</string>
     <string name="login_cracker">Login Kraker</string>
     <string name="login_cracker_desc">Een erg snele netwerk login kraker die verschillende services ondersteund.</string>
@@ -168,7 +168,7 @@
     <string name="mitm_custom_desc">Vervang een specifieke tekst op pagina\'s met een andere specifieke tekst.</string>
     <string name="mitm_desc">Voer diverse man-in-the-middle aanvallen uit, zoals netwerk sniffing, verkeer manipulatie, ect&#8230;</string>
     <string name="mitm_dns_spoofing">DNS spoofing</string>
-    <string name="mitm_dns_spoofing_desc">Herleid alle domeinen naar een website/IP</string>
+    <string name="mitm_dns_spoofing_desc">Herleid alle domeinen naar een website of IP.</string>
     <string name="mitm_dns_spoofing_list_saved">Opgeslagen</string>
     <string name="mitm_image_replace">Vervang afbeeldingen</string>
     <string name="mitm_image_replace_desc">Vervang alle afbeeldingen op een website met één specifieke afbeelding.</string>
@@ -198,13 +198,13 @@
     <string name="network_subnet_mask">Dit is jou netwerk subnet mask.</string>
     <string name="new_apk_found">App versie %s is beschikbaar, wil je updaten?</string>
     <string name="new_core_found">Core versie %s is beschikbaar, wil je updaten?</string>
-    <string name="new_gems_update_desc">Een update voor ruby gems</string>
+    <string name="new_gems_update_desc">Een update voor Ruby Gems</string>
     <string name="new_msf_found">Een nieuwe MSF versie is beschikbaar, wil je updaten?</string>
     <string name="new_msf_update_desc">Een MetasploitFramework update</string>
     <string name="new_ruby_found">Een nieuwe versie van Ruby is beschikbaar, wil je updaten?</string>
     <string name="new_ruby_update_desc">Een update voor Ruby is beschikbaar</string>
     <string name="new_session_started">Nieuwe sessie is gestart</string>
-    <string name="new_update_desc"></string>Een nieuwe update voor versie</string>
+    <string name="new_update_desc">Een nieuwe update voor versie</string>
     <string name="new_update_desc2">is beschikbaar, wil je updaten?</string>
     <string name="new_version">Nieuwe versie</string>
     <string name="new_version2">beschikbaar!</string>
@@ -224,7 +224,7 @@
     <string name="no_updates_available">Geen updates beschikbaar.</string>
     <string name="no_vulnerabilities_found">Geen zwakke plekken gevonden op dit doelwit, voer eerst de Exploit vinder uit</string>
     <string name="no_wifi_available">Geen WiFi connecties beschikbaar, de applicatie zal nu kijken voor updates, #STATUS#</string>
-    <string name="nothing_found">Niets gevonden</string>
+    <string name="nothing_found"><![CDATA[<small><i>Niets gevonden</i></small>]]></string>
     <string name="only_4_root">Deze applicatie kan alleen werken op apparaaten die ROOT hebben.</string>
     <string name="open_shell">Open shell</string>
     <string name="open_url">Open URL</string>
@@ -440,7 +440,7 @@
     <string name="any_interface">Elke interface</string>
     <string name="connection_lost">Verbinding verloren</string>
     <string name="error_initializing_interface">Fout tijdens initialiseren %s</string>
-    <string name="connection_lost_prompt">Verwijder deze sessie en begin een nieuwe?</string>
+    <string name="connection_lost_prompt">Verwijder huidige sessie en begin een nieuwe?</string>
     <string name="iface_dialog_title">Kies een netwerk interface</string>
     <string name="iface_error_no_available">Er zijn geen netwerk interface\'s beschikbaar</string>
     <string name="menu_ifaces">Net interfaces</string>
