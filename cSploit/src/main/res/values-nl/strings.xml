@@ -204,7 +204,7 @@
     <string name="new_ruby_found">Een nieuwe versie van Ruby is beschikbaar, wil je updaten?</string>
     <string name="new_ruby_update_desc">Een update voor Ruby is beschikbaar</string>
     <string name="new_session_started">Nieuwe sessie is gestart</string>
-    <string name="new_update_desc"></string>Een nieuwe update voor versie</string>
+    <string name="new_update_desc">Een nieuwe update voor versie</string>
     <string name="new_update_desc2">is beschikbaar, wil je updaten?</string>
     <string name="new_version">Nieuwe versie</string>
     <string name="new_version2">beschikbaar!</string>
