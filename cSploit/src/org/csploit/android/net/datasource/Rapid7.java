@@ -308,9 +308,11 @@ class Rapid7
     private void parseExploit(String html) {
       MsfExploit exploit = ExploitReceiver.parsePage(html);
 
-      exploit.setPort(port);
+      if(exploit != null) {
+        exploit.setPort(port);
 
-      receiver.onItemFound(exploit);
+        receiver.onItemFound(exploit);
+      }
     }
 
     @Override
