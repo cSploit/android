@@ -211,6 +211,10 @@ class Rapid7
     public void onContentFetched(byte[] content) {
 
       MsfExploit result = parsePage(new String(content));
+
+      if(result == null)
+        return;
+
       result.copyTo(exploit);
 
       receiver.onFoundItemChanged(exploit);
