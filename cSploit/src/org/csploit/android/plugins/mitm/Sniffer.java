@@ -50,8 +50,7 @@ import org.csploit.android.net.Target;
 import org.csploit.android.plugins.mitm.SpoofSession.OnSessionReadyListener;
 import org.csploit.android.tools.TcpDump;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -337,7 +336,7 @@ public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClic
       @Override
       public void onConfirm(){
         mDumpToFile = true;
-        mPcapFileName = (new File(System.getStoragePath(), "csploit-sniff-" + java.lang.System.currentTimeMillis() + ".pcap")).getAbsolutePath();
+        mPcapFileName = (new File(Sniffer.this.getCacheDir(), "csploit-sniff-" + java.lang.System.currentTimeMillis() + ".pcap")).getAbsolutePath();
       }
 
       @Override
@@ -410,6 +409,20 @@ public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClic
       if (mFileActivity != null) {
         mFileActivity.stopWatching();
         mFileActivity = null;
+        //copy pcap file from cache to storage
+          try {
+              InputStream in = new FileInputStream(mPcapFileName);
+              OutputStream out = new FileOutputStream(new File(System.getStoragePath(),new File(mPcapFileName).getName()));
+              byte[] buf = new byte[1024];
+              int len;
+              while ((len = in.read(buf)) > 0) {
+                  out.write(buf, 0, len);
+              }
+              in.close();
+              out.close();
+          } catch (IOException e) {
+              e.printStackTrace();
+          }
       }
     }
 
