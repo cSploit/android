@@ -410,19 +410,20 @@ public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClic
         mFileActivity.stopWatching();
         mFileActivity = null;
         //copy pcap file from cache to storage
-        try {
-            InputStream in = new FileInputStream(mPcapFileName);
-            OutputStream out = new FileOutputStream(new File(System.getStoragePath(),new File(mPcapFileName).getName()));
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-            in.close();
-            out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+          try {
+              InputStream in = new FileInputStream(mPcapFileName);
+              OutputStream out = new FileOutputStream(new File(System.getStoragePath(),new File(mPcapFileName).getName()));
+              byte[] buf = new byte[1024];
+              int len;
+              while ((len = in.read(buf)) > 0) {
+                  out.write(buf, 0, len);
+              }
+              in.close();
+              out.close();
+          } catch (IOException e) {
+              e.printStackTrace();
+          }
+
       }
     }
 
