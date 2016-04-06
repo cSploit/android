@@ -401,13 +401,13 @@ public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClic
     }
   }
 
-  private void movePcapFileFromCacheToStorage()
-  {
+  private void movePcapFileFromCacheToStorage() {
+    File inputFile = new File(mPcapFileName);
     InputStream in = null;
     OutputStream out = null;
 
     try {
-      in = new FileInputStream(mPcapFileName);
+      in = new FileInputStream(inputFile);
       out = new FileOutputStream(new File(System.getStoragePath(),new File(mPcapFileName).getName()));
       IOUtils.copy(in, out);
     } catch (IOException e) {
@@ -415,6 +415,7 @@ public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClic
     } finally {
       IOUtils.closeQuietly(in);
       IOUtils.closeQuietly(out);
+      inputFile.delete();
     }
   }
 
