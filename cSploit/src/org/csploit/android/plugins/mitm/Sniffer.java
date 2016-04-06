@@ -39,10 +39,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import org.apache.commons.compress.utils.IOUtils;
 import org.csploit.android.ActionActivity;
 import org.csploit.android.R;
 import org.csploit.android.core.Child;
 import org.csploit.android.core.ChildManager;
+import org.csploit.android.core.Logger;
 import org.csploit.android.core.System;
 import org.csploit.android.gui.dialogs.ConfirmDialog;
 import org.csploit.android.gui.dialogs.ErrorDialog;
@@ -399,6 +401,23 @@ public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClic
     }
   }
 
+  private void movePcapFileFromCacheToStorage()
+  {
+    InputStream in = null;
+    OutputStream out = null;
+
+    try {
+      in = new FileInputStream(mPcapFileName);
+      out = new FileOutputStream(new File(System.getStoragePath(),new File(mPcapFileName).getName()));
+      IOUtils.copy(in, out);
+    } catch (IOException e) {
+      System.errorLogging(e);
+    } finally {
+      IOUtils.closeQuietly(in);
+      IOUtils.closeQuietly(out);
+    }
+  }
+
   private void setStoppedState(){
     if(mTcpdumpProcess != null) {
       mTcpdumpProcess.kill();
@@ -409,20 +428,7 @@ public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClic
       if (mFileActivity != null) {
         mFileActivity.stopWatching();
         mFileActivity = null;
-        //copy pcap file from cache to storage
-          try {
-              InputStream in = new FileInputStream(mPcapFileName);
-              OutputStream out = new FileOutputStream(new File(System.getStoragePath(),new File(mPcapFileName).getName()));
-              byte[] buf = new byte[1024];
-              int len;
-              while ((len = in.read(buf)) > 0) {
-                  out.write(buf, 0, len);
-              }
-              in.close();
-              out.close();
-          } catch (IOException e) {
-              e.printStackTrace();
-          }
+        movePcapFileFromCacheToStorage();
       }
     }
 
