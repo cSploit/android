@@ -39,10 +39,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import org.apache.commons.compress.utils.IOUtils;
 import org.csploit.android.ActionActivity;
 import org.csploit.android.R;
 import org.csploit.android.core.Child;
 import org.csploit.android.core.ChildManager;
+import org.csploit.android.core.Logger;
 import org.csploit.android.core.System;
 import org.csploit.android.gui.dialogs.ConfirmDialog;
 import org.csploit.android.gui.dialogs.ErrorDialog;
@@ -50,8 +52,7 @@ import org.csploit.android.net.Target;
 import org.csploit.android.plugins.mitm.SpoofSession.OnSessionReadyListener;
 import org.csploit.android.tools.TcpDump;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -337,7 +338,7 @@ public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClic
       @Override
       public void onConfirm(){
         mDumpToFile = true;
-        mPcapFileName = (new File(System.getStoragePath(), "csploit-sniff-" + java.lang.System.currentTimeMillis() + ".pcap")).getAbsolutePath();
+        mPcapFileName = (new File(Sniffer.this.getCacheDir(), "csploit-sniff-" + java.lang.System.currentTimeMillis() + ".pcap")).getAbsolutePath();
       }
 
       @Override
@@ -400,6 +401,24 @@ public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClic
     }
   }
 
+  private void movePcapFileFromCacheToStorage() {
+    File inputFile = new File(mPcapFileName);
+    InputStream in = null;
+    OutputStream out = null;
+
+    try {
+      in = new FileInputStream(inputFile);
+      out = new FileOutputStream(new File(System.getStoragePath(),new File(mPcapFileName).getName()));
+      IOUtils.copy(in, out);
+    } catch (IOException e) {
+      System.errorLogging(e);
+    } finally {
+      IOUtils.closeQuietly(in);
+      IOUtils.closeQuietly(out);
+      inputFile.delete();
+    }
+  }
+
   private void setStoppedState(){
     if(mTcpdumpProcess != null) {
       mTcpdumpProcess.kill();
@@ -410,6 +429,7 @@ public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClic
       if (mFileActivity != null) {
         mFileActivity.stopWatching();
         mFileActivity = null;
+        movePcapFileFromCacheToStorage();
       }
     }
 
