@@ -303,7 +303,7 @@ public class PacketForger extends Plugin implements OnClickListener {
 
 		while (currentIndex < input.length()) {
 			addedByte = (byte)input.charAt(currentIndex);
-			if (input.charAt(currentIndex) == '\\') {
+			if (addedByte == '\\') {
 				nextIndex = currentIndex + 1;
 				if (nextIndex >= input.length()) {
 					throw new IllegalArgumentException("Escaped string is malformed");
@@ -323,6 +323,8 @@ public class PacketForger extends Plugin implements OnClickListener {
 						break;
 					case 'n':
 						addedByte = (byte)0x0a;
+						break;
+					case '\\':
 						break;
 					default:
 						throw new IllegalArgumentException("Escaped string is malformed");
