@@ -315,7 +315,7 @@ public class PacketForger extends Plugin implements OnClickListener {
 							throw new IllegalArgumentException("Escaped string is malformed");
 						}
 						String x = input.substring(nextIndex + 1, nextIndex + 3);
-						addedByte = Byte.parseByte(x, 16);
+						addedByte = (byte)Integer.parseInt(x, 16);
 						nextIndex += 2;
 						break;
 					case 'r':
