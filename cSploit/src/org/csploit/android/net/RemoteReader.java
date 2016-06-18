@@ -357,7 +357,6 @@ public class RemoteReader implements Runnable {
     boolean isError;
     InputStream stream;
     Notifier notifier;
-    URL url;
 
     running = true;
 
@@ -385,23 +384,28 @@ public class RemoteReader implements Runnable {
       stream = null;
 
       try {
-        url = new URL(task.getUrl());
-      } catch (MalformedURLException e) {
-        notifiers.execute(new Notifier(task, ("Bad URL: " + task.getUrl()).getBytes(), true));
-        continue;
-      }
+        String url = task.getUrl();
 
-      if(!url.getHost().equals(host)) {
-        Logger.error(String.format("RemoteReader[%s]: URL '%s' does not belong to me", host, task.getUrl()));
-        notifiers.execute(new Notifier(task, "Host mismatch".getBytes(), true));
-        continue;
-      }
+        Logger.info("fetching '" + url + "'");
 
-      Logger.info("fetching '" + url.toString() + "'");
+        URL current = new URL(url);
 
-      try {
-        connection = url.openConnection();
-        stream = connection.getInputStream();
+        for(int i=0;i<30;i++) {
+          connection = current.openConnection();
+          stream = connection.getInputStream();
+
+          if(!(connection instanceof HttpURLConnection))
+            break;
+
+          HttpURLConnection httpURLConnection = (HttpURLConnection) connection;
+          int code = httpURLConnection.getResponseCode();
+
+          if(code != HttpURLConnection.HTTP_MOVED_PERM && code != HttpURLConnection.HTTP_MOVED_TEMP )
+            break;
+
+          String location = connection.getHeaderField("Location");
+          current = new URL(current, location);
+        }
       } catch (IOException e) {
         if (connection != null && connection instanceof HttpURLConnection) {
           stream = ((HttpURLConnection) connection).getErrorStream();
