@@ -43,6 +43,7 @@ Also see the [wiki](https://github.com/cSploit/android/wiki) for instructions on
 
 * A **ROOTED** Android version 2.3 (Gingerbread) or a newer version
 * The Android OS must have a [BusyBox](http://www.busybox.net/about.html) **full installation** with **every** utility installed (not the partial installation).  If you do not have busybox already, you can get it [here](https://play.google.com/store/apps/details?id=stericson.busybox) or [here](https://play.google.com/store/apps/details?id=com.jrummy.busybox.installer) (note cSploit does not endorse any busybox installer, these are just two we found).
+* You must install SuperSU (it will work __only__ if you have it)
 
 ## Downloads
 
