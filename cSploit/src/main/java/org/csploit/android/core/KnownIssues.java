@@ -31,8 +31,9 @@ public class KnownIssues {
   public void fromFile(String file) {
     String line = null;
 
+    BufferedReader reader = null;
     try {
-      BufferedReader reader = new BufferedReader(new FileReader(file));
+      reader = new BufferedReader(new FileReader(file));
 
       while((line = reader.readLine()) != null) {
         line = line.trim();
@@ -54,6 +55,14 @@ public class KnownIssues {
       Logger.warning(String.format("unable to read from '%s': %s", file, e.getMessage()));
     } catch (NumberFormatException e) {
       Logger.error(String.format("unable to parse '%s' as number.", line));
+    } finally {
+      if (reader != null) {
+        try {
+          reader.close();
+        } catch (IOException e) {
+          // Nothing else matters
+        }
+      }
     }
   }
 
