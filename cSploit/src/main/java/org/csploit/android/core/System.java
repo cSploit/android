@@ -109,8 +109,8 @@ public class System {
   private static boolean mInitialized = false;
   private static String mLastError = "";
   private static Context mContext = null;
-  private static WifiLock mWifiLock = null;
-  private static WakeLock mWakeLock = null;
+  private static volatile WifiLock mWifiLock = null;
+  private static volatile WakeLock mWakeLock = null;
   private static Network mNetwork = null;
   private static final SortedSet<Target> mTargets = new TreeSet<>();
   private static Target mCurrentTarget = null;
@@ -125,9 +125,9 @@ public class System {
   // toolbox singleton
   private static ToolBox mTools = null;
 
-  private static HTTPSRedirector mRedirector = null;
-  private static Proxy mProxy = null;
-  private static Server mServer = null;
+  private static volatile HTTPSRedirector mRedirector = null;
+  private static volatile Proxy mProxy = null;
+  private static volatile Server mServer = null;
 
   private static String mIfname = null;
   private static String mStoragePath = null;
@@ -601,7 +601,7 @@ public class System {
     }
   }
 
-  private static void preloadVendors() {
+  private static synchronized void preloadVendors() {
     if (mVendors == null) {
       FileInputStream fstream = null;
       DataInputStream in = null;
