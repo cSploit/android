@@ -608,9 +608,9 @@ public class System {
       BufferedReader reader = null;
       try {
         mVendors = new HashMap<>();
-        @SuppressWarnings("ConstantConditions")
-                fstream = new FileInputStream(
-                mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-mac-prefixes");
+
+        fstream = new FileInputStream(
+        mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-mac-prefixes");
 
         in = new DataInputStream(fstream);
         reader = new BufferedReader(new InputStreamReader(in));
