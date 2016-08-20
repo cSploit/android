@@ -22,6 +22,7 @@ package org.csploit.android.net;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 
 public class IP4Address implements Comparable<IP4Address>
 {
@@ -82,7 +83,7 @@ public class IP4Address implements Comparable<IP4Address>
   }
 
   public IP4Address(byte[] address) throws UnknownHostException{
-    mByteArray = address;
+    mByteArray = Arrays.copyOf(address, address.length);
     mAddress = InetAddress.getByAddress(mByteArray);
     mString = mAddress.getHostAddress();
     mInteger = ((mByteArray[0] & 0xFF) << 24) +
@@ -102,7 +103,7 @@ public class IP4Address implements Comparable<IP4Address>
   }
 
   public byte[] toByteArray(){
-    return mByteArray;
+    return Arrays.copyOf(mByteArray, mByteArray.length);
   }
 
   public String toString(){

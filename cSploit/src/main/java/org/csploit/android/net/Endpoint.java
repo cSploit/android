@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 import org.csploit.android.core.System;
 import org.csploit.android.helpers.NetworkHelper;
@@ -58,7 +59,7 @@ public class Endpoint implements Comparable<Endpoint>
 
   public Endpoint(InetAddress address, byte[] hardware){
     mAddress = address;
-    mHardware = hardware;
+    mHardware = Arrays.copyOf(hardware, hardware.length);
   }
 
   public Endpoint(String address, String hardware){
@@ -122,7 +123,7 @@ public class Endpoint implements Comparable<Endpoint>
   }
 
   public byte[] getHardware(){
-    return mHardware;
+    return Arrays.copyOf(mHardware, mHardware.length);
   }
 
   public String getHardwareAsString(){
@@ -139,7 +140,7 @@ public class Endpoint implements Comparable<Endpoint>
   }
 
   public void setHardware(byte[] hardware){
-    this.mHardware = hardware;
+    this.mHardware = Arrays.copyOf(hardware, hardware.length);
   }
 
   public String toString(){

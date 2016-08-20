@@ -168,8 +168,6 @@ public class ProxyThread extends Thread
               mServer = DNSCache.getInstance().connect(mServerName, HTTP_SERVER_PORT);
 
               Logger.debug(client + " > " + mServerName + " [�" + (java.lang.System.currentTimeMillis() - millis) + " ms ]");
-
-              millis = java.lang.System.currentTimeMillis();
             }
           }
           // just redirect requests

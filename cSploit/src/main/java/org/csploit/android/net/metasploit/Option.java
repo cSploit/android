@@ -5,6 +5,7 @@ import org.csploit.android.core.Logger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -94,7 +95,7 @@ public class Option {
   }
 
   public String[] getEnum() {
-    return enums;
+    return Arrays.copyOf(enums, enums.length);
   }
 
   // TODO: make more setValue methods each with the corresponding type.

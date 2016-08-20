@@ -1,6 +1,7 @@
 package org.csploit.android.events;
 
 import java.net.InetAddress;
+import java.util.Arrays;
 
 /**
  * an host has been found
@@ -11,7 +12,7 @@ public class Host implements Event {
   public final String name;
 
   public Host(byte[] ethAddress, InetAddress ipAddress, String name) {
-    this.ethAddress = ethAddress;
+    this.ethAddress = Arrays.copyOf(ethAddress, ethAddress.length);
     this.ipAddress = ipAddress;
     this.name = name;
   }

@@ -22,6 +22,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
+import java.util.Arrays;
 
 import org.csploit.android.core.System;
 import org.csploit.android.core.Logger;
@@ -42,7 +43,7 @@ public class ServerThread extends Thread
     mSocket = socket;
     mWriter = new BufferedOutputStream(mSocket.getOutputStream());
     mReader = mSocket.getInputStream();
-    mData = data;
+    mData = Arrays.copyOf(data, data.length);
     mContentType = contentType;
   }
 
