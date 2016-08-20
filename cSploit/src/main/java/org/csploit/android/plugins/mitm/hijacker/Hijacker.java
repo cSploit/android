@@ -148,15 +148,15 @@ public class Hijacker extends AppCompatActivity {
 					InputStream input = conn.getInputStream();
 					BufferedReader reader = new BufferedReader(
 							new InputStreamReader(input));
-					String line, data = "";
-
+					String line;
+					final StringBuilder dataBuilder = new StringBuilder();
 					while ((line = reader.readLine()) != null)
-						data += line;
+						dataBuilder.append(line);
 
 					reader.close();
 					input.close();
 
-					JSONObject response = new JSONObject(data);
+					JSONObject response = new JSONObject(dataBuilder.toString());
 
 					username = response.getString("name");
 				} catch (Exception e) {

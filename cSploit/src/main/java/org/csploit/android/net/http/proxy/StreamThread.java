@@ -147,18 +147,19 @@ public class StreamThread implements Runnable
           HTTPSMonitor.getInstance().addURL(mClient, location.replace("https://", "http://").replace("&amp;", "&"));
         }
 
-        String body = (split.length > 1 ? split[1] : ""),
-          patched = "";
+        String body = (split.length > 1 ? split[1] : "");
+
+        final StringBuilder patchedBuilder = new StringBuilder();
 
         body = mFilter.onDataReceived(headers, body);
 
         // remove explicit content length, just in case the body changed after filtering
         for(String header : headers.split("\n")){
           if(header.toLowerCase().contains("content-length") == false)
-            patched += header + "\n";
+          patchedBuilder.append(header).append("\n");
         }
 
-        headers = patched;
+        headers = patchedBuilder.toString();
 
         // try to get the charset encoding from the HTTP headers.
         String charset = RequestParser.getCharsetFromHeaders(contentType);

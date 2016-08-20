@@ -47,8 +47,8 @@ public class FileEdit extends AppCompatActivity {
     }
 
     public String loadFile (String _path) {
-        String _line = "";
-        String _str_line = "";
+        final StringBuilder builder = new StringBuilder();
+
         BufferedReader inputReader = null;
 
         if (_path == null){
@@ -58,8 +58,10 @@ public class FileEdit extends AppCompatActivity {
 
         try {
             inputReader = new BufferedReader(new FileReader(_path));
+
+            String _line;
             while ((_line = inputReader.readLine()) != null) {
-                _str_line += _line + "\n";
+                builder.append(_line).append("\n");
             }
         }
         catch (Exception e){
@@ -73,7 +75,7 @@ public class FileEdit extends AppCompatActivity {
             catch (Exception e){}
         }
 
-        return _str_line;
+        return builder.toString();
     }
 
     public boolean saveFile (String _file_text, String _path){

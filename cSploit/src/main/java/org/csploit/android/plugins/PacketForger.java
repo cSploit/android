@@ -142,13 +142,13 @@ public class PacketForger extends Plugin implements OnClickListener {
 										BufferedReader reader = new BufferedReader(
 												new InputStreamReader(mSocket
 														.getInputStream()));
-										String response = "", line = null;
-
+										String line;
+										final StringBuilder responseBuilder = new StringBuilder();
 										while ((line = reader.readLine()) != null) {
-											response += line + "\n";
+											responseBuilder.append(line).append("\n");
 										}
 
-										final String text = response;
+										final String text = responseBuilder.toString();
 										PacketForger.this
 												.runOnUiThread(new Runnable() {
 													public void run() {
@@ -240,14 +240,12 @@ public class PacketForger extends Plugin implements OnClickListener {
 								mac.length);
 					}
 
-					String hex = "";
-
+					final StringBuilder hexBuilder = new StringBuilder();
 					for (i = 0; i < mBinaryData.length; i++)
-						hex += "\\x"
-								+ Integer.toHexString(0xFF & mBinaryData[i])
-										.toUpperCase();
+						hexBuilder.append("\\x")
+							.append(Integer.toHexString(0xFF & mBinaryData[i]).toUpperCase());
 
-					mData.setText(hex);
+					mData.setText(hexBuilder.toString());
 
 					Toast.makeText(this,
 							getString(R.string.customize_wol_port),

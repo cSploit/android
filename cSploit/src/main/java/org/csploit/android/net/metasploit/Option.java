@@ -127,11 +127,11 @@ public class Option {
         //TODO: handle integer enums
         ArrayList<String> valid = ((ArrayList<String>)mAttributes.get("enums"));
         if(!valid.contains(value)) {
-          String valid_line = "";
+          final StringBuilder validLineBuilder = new StringBuilder();
           for(String v : valid) {
-            valid_line+=" " + v;
+            validLineBuilder.append(" ").append(v);
           }
-          Logger.warning("expected: (" + valid_line + ") got: " + value);
+          Logger.warning("expected: (" + validLineBuilder.toString() + ") got: " + value);
           throw new NumberFormatException("invalid choice");
         }
         mValue = value;

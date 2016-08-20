@@ -155,7 +155,7 @@ public class RemoteReader implements Runnable {
   /**
    * send the fetched content to the receiver.
    */
-  private class Notifier implements Runnable {
+  private static class Notifier implements Runnable {
     private final Task task;
     private final byte[] content;
     private final boolean isError;

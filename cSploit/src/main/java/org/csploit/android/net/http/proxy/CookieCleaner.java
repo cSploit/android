@@ -55,8 +55,10 @@ public class CookieCleaner{
   }
 
   public String getExpiredResponse(String request, String hostname){
-    String domain = RequestParser.getBaseDomain(hostname),
-      response = "HTTP/1.1 302 Found\n";
+    final StringBuilder responseBuilder = new StringBuilder();
+    String domain = RequestParser.getBaseDomain(hostname);
+
+    responseBuilder.append("HTTP/1.1 302 Found\n");
 
     for(String line : request.split("\n")){
       if(line.indexOf(':') != -1){
@@ -72,18 +74,24 @@ public class CookieCleaner{
             if(split.length == 2){
               cookie = split[0].trim();
 
-              response += "Set-Cookie: " + cookie + "=EXPIRED;Path=/;Domain=" + domain + ";Expires=Mon, 01-Jan-1990 00:00:00 GMT\n" +
-                "Set-Cookie: " + cookie + "=EXPIRED;Path=/;Domain=" + hostname + ";Expires=Mon, 01-Jan-1990 00:00:00 GMT\n";
+              responseBuilder.append("Set-Cookie: ").append(cookie)
+                      .append("=EXPIRED;Path=/;Domain=").append(domain)
+                      .append(";Expires=Mon, 01-Jan-1990 00:00:00 GMT\n")
+                      .append("Set-Cookie: ").append(cookie)
+                      .append("=EXPIRED;Path=/;Domain=").append(hostname)
+                      .append(";Expires=Mon, 01-Jan-1990 00:00:00 GMT\n");
             }
           }
         }
       }
     }
 
-    response += "Location: " + RequestParser.getUrlFromRequest(hostname, request) + "\n" +
-      "Connection: close\n\n";
+    responseBuilder.append("Location: ")
+            .append(RequestParser.getUrlFromRequest(hostname, request))
+            .append("\n")
+            .append("Connection: close\n\n");
 
-    return response;
+    return responseBuilder.toString();
   }
 
   public void addCleaned(String client, String hostname){
