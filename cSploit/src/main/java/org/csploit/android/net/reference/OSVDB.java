@@ -52,7 +52,11 @@ public class OSVDB implements Vulnerability {
 
   @Override
   public boolean equals(Object o) {
-    return o.getClass() == OSVDB.class && id == ((OSVDB) o).id;
+    if (o == null) {
+      return false;
+    }
+
+    return o.getClass() == this.getClass() && id == ((OSVDB) o).id;
   }
 
   public static boolean owns(String url) {
