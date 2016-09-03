@@ -1,7 +1,7 @@
 <resources>
     <string name="menu_settings">设置</string>
     <string name="title_activity_main">cSploit</string>
-    <string name="crash_toast_text">额！崩溃了...不过我将给我的开发者发送报告来帮助解决这个问题。</string>
+    <string name="crash_toast_text">崩溃了...不过我将给我的开发者发送报告来帮助解决这个问题。</string>
     <string name="toggle_button">切换按钮</string>
     <string name="enter_redirection_details">在下方键入跳转详情:</string>
     <string name="address">地址</string>
@@ -114,7 +114,7 @@ If not, see http://www.gnu.org/licenses/.
 <string name="something_went_wrong">发生了未知的错误，请尝试选择一个新的目标。
 </string>
     <string name="mitm_dns_spoofing">DNS欺骗</string> 
-    <string name="mitm_dns_spoofing_desc">重定向连接到指定的web/IP</string> 
+    <string name="mitm_dns_spoofing_desc">重定向链接到指定的域名或者IP</string> 
     <string name="mitm_dns_spoofing_list_saved">储存</string> 
     <string name="selected">已经选择</string>
     <string name="nothing_found"><![CDATA[<small><i>未找到</i></small>]]></string>
@@ -208,6 +208,10 @@ If not, see http://www.gnu.org/licenses/.
     <string name="error_rpc">远程过程调用失败</string>
     <string name="error_rpcd_inval">无效的设置</string>
     <string name="error_rpcd_shell">无法执行终端命令</string>
+    <string name="msfrpcd_killed">Metasploit RPC守护进程停止!</string>
+    <string name="msfrcd_start_failed">Metasploit RPC守护进程启动失败!</string>
+    <string name="msf_connection_failed">连接到Metasploit RPC守护进程失败!</string>
+    <string name="net_discovery_start_failed">网络发现失败启动!</string>
     <string name="rpcd_starting">正在启动 Metasploit 远程过程调用守护程序&#8230;</string>
     <string name="rpcd_started">Metasploit 远程过程调用守护程序已经启动</string>
     <string name="rpcd_stopped">Metasploit 远程过程调用守护程序已经停止</string>
@@ -359,8 +363,6 @@ If not, see http://www.gnu.org/licenses/.
     <string name="pref_theme">暗色主题</string>
     <string name="pref_choose_theme">启用暗色主题，更加护眼</string>
     <string name="please_restart">新的主题将在您重新启动应用后生效</string>
-    <string name="pref_auto_portscan">端口自动扫描</string>
-    <string name="pref_auto_portscan_desc">自动使用SYN扫描发现的新主机端口</string>
     <string name="evasion">规避</string>
     <string name="search_exact_version">精确版本</string>
     <string name="sessions_title">单击会话打开终端，或长按以查看更多选项。</string>
@@ -427,7 +429,8 @@ If not, see http://www.gnu.org/licenses/.
     <string name="crash_dialog_text">发生了一个预料之外的错误，致使应用或其组件强制停止。请发送错误数据来帮助我们修复这个错误。</string>
     <string name="crash_dialog_comment">您可以在下面描述您遇到的问题</string>
     <string name="JNI_crash_detected">检测到 JNI 库在上次崩溃，我希望您能发送错误报告。</string>
-
+    <string name="new_ruby_found">Ruby 新版本可用，您希望更新吗？</string>
+    <string name="new_msf_found">Metasploit 新版本可用，您希望更新吗？</string>
     <string name="new_msf_update_desc">Metasploit框架有更新可用</string>
         <string name="missing_core_update">核心未安装, 应用将仅检查更新... #STATUS#
     </string>
@@ -461,6 +464,8 @@ If not, see http://www.gnu.org/licenses/.
     <string name="pref_err_executable">不允许创建可执行内容。</string>
     <string name="pref_persistent_network_monitor">持续网络监控</string>
     <string name="pref_persistent_network_monitor_desc">使监控器持续监控网络</string>
+    <string name="pref_auto_portscan">自动端口扫描</string>
+    <string name="pref_auto_portscan_desc">查找主机时，自动使用SYN进行端口扫描</string>
     <string name="exploit_launch_all">启动全部</string>
     <string name="exploit_launch">启动</string>
     <string name="exploit_edit_options">编辑选项</string>
