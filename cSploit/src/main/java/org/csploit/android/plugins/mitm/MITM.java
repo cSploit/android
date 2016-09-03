@@ -684,7 +684,7 @@ public class MITM extends Plugin
           if(activity.getVisibility() == View.INVISIBLE){
             setStoppedState();
 
-            new ChoiceDialog(MITM.this, getString(R.string.choose_source), new String[]{ getString(R.string.local_images), "Web URL"}, new ChoiceDialogListener(){
+            new ChoiceDialog(MITM.this, getString(R.string.choose_source), new String[]{ getString(R.string.local_images), getString(R.string.web_images)}, new ChoiceDialogListener(){
               @Override
               public void onChoice(int choice){
                 if(choice == 0){
