@@ -482,7 +482,7 @@ If not, see http://www.gnu.org/licenses/.
     <string name="choose_an_option">选择一项</string>
     <string name="required">必须</string>
     <string name="connection_lost">连接丢失</string>
-    <string name="connection_lost_prompt">删除当前会话并启动另一个?</string>
+    <string name="connection_lost_prompt">删除当前会话并启动另一个？</string>
     <string name="any_interface">任意接口</string>
     <string name="error_initializing_interface">初始化 %s 错误</string>
 
