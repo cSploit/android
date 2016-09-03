@@ -482,7 +482,7 @@ public class MITM extends Plugin
               (
                getString(R.string.mitm_dns_spoofing),
                getString(R.string.mitm_dns_spoofing_desc),
-               R.drawable.action_redirect,
+               R.drawable.action_redirectdns,
                new OnClickListener() {
                @Override
                public void onClick(View v) {
