@@ -24,6 +24,8 @@ import java.util.List;
 
 import org.csploit.android.wifi.Keygen;
 
+import android.text.TextUtils;
+
 /*
  * The algorithm for the type of network
  * whose SSID must be in the form of [pP]1XXXXXX0000X
@@ -91,11 +93,13 @@ public class OnoKeygen extends Keygen{
 
 
   private String padto64(String val){
-    if(val.equals(""))
+    if (TextUtils.isEmpty(val))
       return "";
-    String ret = "";
+
+    final StringBuilder retBuilder = new StringBuilder();
     for(int i = 0; i < (1 + (64 / (val.length()))); ++i)
-      ret += val;
-    return ret.substring(0, 64);
+      retBuilder.append(val);
+
+    return retBuilder.toString().substring(0, 64);
   }
 }

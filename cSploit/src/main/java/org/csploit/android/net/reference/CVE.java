@@ -73,7 +73,11 @@ public class CVE implements Vulnerability {
 
   @Override
   public boolean equals(Object o) {
-    return o.getClass() == CVE.class && id.equals(((CVE) o).id);
+    if (o == null) {
+      return false;
+    }
+
+    return o.getClass() == this.getClass() && id.equals(((CVE) o).id);
   }
 
   public static boolean owns(String url) {

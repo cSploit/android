@@ -29,6 +29,8 @@ import org.csploit.android.net.Target.Exploit;
 import org.csploit.android.net.Target.Port;
 import org.csploit.android.net.metasploit.RPCClient;
 
+import java.util.Arrays;
+
 public abstract class Plugin extends AppCompatActivity {
   public static final int NO_LAYOUT = -1;
 
@@ -43,7 +45,7 @@ public abstract class Plugin extends AppCompatActivity {
     mNameStringId = nameStringId;
     mDescriptionStringId = descStringId;
 
-    mAllowedTargetTypes = allowedTargetTypes;
+    mAllowedTargetTypes = Arrays.copyOf(allowedTargetTypes, allowedTargetTypes.length);
     mLayoutId = layoutId;
     mIconId = iconResourceId;
   }
@@ -61,7 +63,7 @@ public abstract class Plugin extends AppCompatActivity {
   }
 
   public Target.Type[] getAllowedTargetTypes(){
-    return mAllowedTargetTypes;
+    return Arrays.copyOf(mAllowedTargetTypes, mAllowedTargetTypes.length);
   }
 
   public int getIconResourceId(){

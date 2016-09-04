@@ -63,16 +63,18 @@ public class AliceKeygen extends Keygen{
       setErrorMessage("This phone cannot process a SHA256 hash.");
       return null;
     }
+    final StringBuilder serialStrBuilder = new StringBuilder();
     for(int j = 0; j < supportedAlice.size(); ++j){/*For pre AGPF 4.5.0sx*/
-      String serialStr = supportedAlice.get(j).getSerial() + "X";
+      serialStrBuilder.append(supportedAlice.get(j).getSerial()).append("X");
+
       int Q = supportedAlice.get(j).getMagic()[0];
       int k = supportedAlice.get(j).getMagic()[1];
       int serial = (Integer.valueOf(ssidIdentifier) - Q) / k;
       String tmp = Integer.toString(serial);
       for(int i = 0; i < 7 - tmp.length(); i++){
-        serialStr += "0";
+        serialStrBuilder.append("0");
       }
-      serialStr += tmp;
+      serialStrBuilder.append(tmp);
 
       byte[] mac = new byte[6];
       String key = "";
@@ -88,7 +90,7 @@ public class AliceKeygen extends Keygen{
         md.reset();
         md.update(specialSeq);
         try{
-          md.update(serialStr.getBytes("ASCII"));
+          md.update(serialStrBuilder.toString().getBytes("ASCII"));
         } catch(UnsupportedEncodingException e){
           e.printStackTrace();
         }
@@ -121,7 +123,7 @@ public class AliceKeygen extends Keygen{
       md.reset();
       md.update(specialSeq);
       try{
-        md.update(serialStr.getBytes("ASCII"));
+        md.update(serialStrBuilder.toString().getBytes("ASCII"));
       } catch(UnsupportedEncodingException e){
         e.printStackTrace();
       }

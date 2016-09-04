@@ -27,7 +27,7 @@ public class ShellSession extends Session {
     public abstract void onTimedOut();
   }
 
-  private class CmdAndReceiver {
+  private static class CmdAndReceiver {
     public final String command;
     public final RpcShellReceiver receiver;
 

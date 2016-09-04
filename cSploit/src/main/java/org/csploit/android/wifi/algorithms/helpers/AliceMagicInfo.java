@@ -21,6 +21,8 @@ package org.csploit.android.wifi.algorithms.helpers;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Arrays;
+
 public class AliceMagicInfo implements Parcelable{
   final private String alice;
   final private int[] magic;
@@ -29,7 +31,7 @@ public class AliceMagicInfo implements Parcelable{
 
   public AliceMagicInfo(String alice, int[] magic, String serial, String mac){
     this.alice = alice;
-    this.magic = magic;
+    this.magic = Arrays.copyOf(magic, magic.length);
     this.serial = serial;
     this.mac = mac;
   }
@@ -39,7 +41,7 @@ public class AliceMagicInfo implements Parcelable{
   }
 
   public int[] getMagic(){
-    return magic;
+    return Arrays.copyOf(magic, magic.length);
   }
 
   public String getSerial(){

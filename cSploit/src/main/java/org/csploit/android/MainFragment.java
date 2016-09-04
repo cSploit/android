@@ -525,6 +525,7 @@ public class MainFragment extends Fragment {
         }
     }
 
+    //FIXME: This method is never called. Is this a bug?
     private void displayNetworkInterfaces() {
         displayNetworkInterfaces(false);
     }

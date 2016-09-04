@@ -35,7 +35,7 @@ public class RPCClient
   private URL u;
   private URLConnection huc;
   private String token;
-  private static MessagePack msgpack = null;
+  private static volatile MessagePack msgpack = null;
   private final Map callCache = new HashMap();
   private final Lock lock = new ReentrantLock();
   private final boolean mRemote;

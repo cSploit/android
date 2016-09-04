@@ -18,24 +18,6 @@
  */
 package org.csploit.android.core;
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningServiceInfo;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.net.wifi.WifiManager;
-import android.net.wifi.WifiManager.WifiLock;
-import android.os.Build;
-import android.os.Environment;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
-import android.preference.PreferenceManager;
-import android.util.SparseIntArray;
-
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.apache.commons.compress.utils.IOUtils;
@@ -58,6 +40,24 @@ import org.csploit.android.net.metasploit.RPCClient;
 import org.csploit.android.net.metasploit.Session;
 import org.csploit.android.services.Services;
 import org.csploit.android.tools.ToolBox;
+
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiManager.WifiLock;
+import android.os.Build;
+import android.os.Environment;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+import android.preference.PreferenceManager;
+import android.util.SparseIntArray;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -109,8 +109,8 @@ public class System {
   private static boolean mInitialized = false;
   private static String mLastError = "";
   private static Context mContext = null;
-  private static WifiLock mWifiLock = null;
-  private static WakeLock mWakeLock = null;
+  private static volatile WifiLock mWifiLock = null;
+  private static volatile WakeLock mWakeLock = null;
   private static Network mNetwork = null;
   private static final SortedSet<Target> mTargets = new TreeSet<>();
   private static Target mCurrentTarget = null;
@@ -125,9 +125,9 @@ public class System {
   // toolbox singleton
   private static ToolBox mTools = null;
 
-  private static HTTPSRedirector mRedirector = null;
-  private static Proxy mProxy = null;
-  private static Server mServer = null;
+  private static volatile HTTPSRedirector mRedirector = null;
+  private static volatile Proxy mProxy = null;
+  private static volatile Server mServer = null;
 
   private static String mIfname = null;
   private static String mStoragePath = null;
@@ -601,15 +601,19 @@ public class System {
     }
   }
 
-  private static void preloadVendors() {
+  private static synchronized void preloadVendors() {
     if (mVendors == null) {
+      FileInputStream fstream = null;
+      DataInputStream in = null;
+      BufferedReader reader = null;
       try {
         mVendors = new HashMap<>();
-        @SuppressWarnings("ConstantConditions")
-        FileInputStream fstream = new FileInputStream(mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-mac-prefixes");
 
-        DataInputStream in = new DataInputStream(fstream);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        fstream = new FileInputStream(
+        mContext.getFilesDir().getAbsolutePath() + "/tools/nmap/nmap-mac-prefixes");
+
+        in = new DataInputStream(fstream);
+        reader = new BufferedReader(new InputStreamReader(in));
         String line;
 
         while ((line = reader.readLine()) != null) {
@@ -625,6 +629,17 @@ public class System {
         in.close();
       } catch (Exception e) {
         errorLogging(e);
+      } finally {
+        try {
+          if (fstream != null) fstream.close();
+          if (in != null) in.close();
+          if (reader != null) reader.close();
+        } catch (IOException e) {
+          // Nothing else matters
+        }
+
+
+
       }
     }
   }

@@ -36,7 +36,7 @@ public class ExecChecker {
 
     @Override
     public boolean equals(Object o) {
-      if(o.getClass() != FuseBind.class)
+      if(o == null || o.getClass() != FuseBind.class)
         return false;
 
       FuseBind b = (FuseBind)o;
@@ -56,6 +56,8 @@ public class ExecChecker {
       return true;
     }
   }
+
+
 
   /**
    * test if root can execute stuff inside a directory

@@ -38,6 +38,10 @@ public class Link implements Url, Reference {
 
   @Override
   public boolean equals(Object o) {
-    return o.getClass() == Link.class && url.equals(((Link) o).url);
+    if (o == null) {
+      return false;
+    }
+
+    return o.getClass() == this.getClass() && url.equals(((Link) o).url);
   }
 }

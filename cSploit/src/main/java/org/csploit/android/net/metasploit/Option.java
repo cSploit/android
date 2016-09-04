@@ -5,6 +5,7 @@ import org.csploit.android.core.Logger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -94,7 +95,7 @@ public class Option {
   }
 
   public String[] getEnum() {
-    return enums;
+    return Arrays.copyOf(enums, enums.length);
   }
 
   // TODO: make more setValue methods each with the corresponding type.
@@ -126,11 +127,11 @@ public class Option {
         //TODO: handle integer enums
         ArrayList<String> valid = ((ArrayList<String>)mAttributes.get("enums"));
         if(!valid.contains(value)) {
-          String valid_line = "";
+          final StringBuilder validLineBuilder = new StringBuilder();
           for(String v : valid) {
-            valid_line+=" " + v;
+            validLineBuilder.append(" ").append(v);
           }
-          Logger.warning("expected: (" + valid_line + ") got: " + value);
+          Logger.warning("expected: (" + validLineBuilder.toString() + ") got: " + value);
           throw new NumberFormatException("invalid choice");
         }
         mValue = value;

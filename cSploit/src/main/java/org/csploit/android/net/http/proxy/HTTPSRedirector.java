@@ -133,6 +133,7 @@ public class HTTPSRedirector implements Runnable
 
                   while((line = bReader.readLine()) != null){
                     if(headersProcessed == false){
+                      //FIXME: It had been modified, but it had not been used further. Is this a bug?
                       headers.add(line);
 
                       // \r\n\r\n received ?

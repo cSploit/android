@@ -20,7 +20,7 @@ import org.csploit.android.services.MsfRpcdService;
  */
 public class MsfRpcdServiceReceiver extends ManagedReceiver {
 
-  final int MSF_NOTIFICATION = 1337;
+  final static int MSF_NOTIFICATION = 1337;
   private final IntentFilter filter;
 
   public MsfRpcdServiceReceiver() {

@@ -125,11 +125,11 @@ public class ByteBuffer{
   }
 
   public byte[] getData(){
-    return mBuffer;
+    return Arrays.copyOf(mBuffer, mBuffer.length);
   }
 
   public void setData(byte[] buffer){
-    mBuffer = buffer;
+    mBuffer = Arrays.copyOf(buffer, buffer.length);
     mCharsetDetector.handleData(buffer, 0, buffer.length);
   }
 

@@ -211,7 +211,10 @@ public class MsfPreferences extends PreferenceActivity {
         evasion.add(item);
       else
         general.add(item);
-      item.setOnPreferenceChangeListener(listener);
+
+      if (item != null) {
+        item.setOnPreferenceChangeListener(listener);
+      }
     }
 
     if(required.size()>0) {
