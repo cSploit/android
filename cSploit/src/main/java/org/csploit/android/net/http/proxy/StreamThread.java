@@ -36,8 +36,9 @@ public class StreamThread implements Runnable
       "/html",
       "/css",
       "/javascript",
-      "/javascript",
-      "/x-javascript"
+      "/json",
+      "/x-javascript",
+      "/x-json"
     };
 
   private final static String HEAD_SEPARATOR = "\r\n\r\n";
