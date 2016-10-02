@@ -404,7 +404,7 @@
 
     <string name="connect_msf">connetti a MetaSploit</string>
     <string name="disconnect_msf">disconnetti da MetaSploit</string>
-    <string name="connected_msf">connecsso a MetaSploit</string>
+    <string name="connected_msf">connesso a MetaSploit</string>
     <string name="connection_failed">connessione FALLITA!</string>
 
     <string name="please_restart">Il nuovo tema sarà applicato al prossimo riavvio dell\'applicazione</string>
