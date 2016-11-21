@@ -456,6 +456,42 @@
     <string name="crash_dialog_text">Ocorreu um erro inesperado forçando a aplicação ou um componente para parar. Por favor, ajude-nos a corrigir isso , enviando-nos os dados de erro , tudo que você tem a fazer é clicar \'OK\'.</string>
     <string name="crash_dialog_comment">Você pode adicionar o seu comentário sobre o problema abaixo</string>
     <string name="JNI_crash_detected">Biblioteca JNI já havia deixado de funcionar, eu espero que você envie o relatório.</string>
-
-
+    <string name="any_interface">Qualquer Interface</string>
+    <string name="connection_lost">Conexão Perdida</string>
+    <string name="connection_lost_prompt">Deletar Sessão Atual e Iniciar Outra?</string>
+    <string name="error_initializing_interface">Erro ao Inicializar %s</string>
+    <string name="iface_dialog_title">Escolha uma interface de Rede</string>
+    <string name="iface_error_no_available">Não Há Interface de rede Disponível</string>
+    <string name="menu_ifaces">Interfaces de rede</string>
+    <string name="menu_resolve_names">Resolver Nomes de Host</string>
+    <string name="mitm_dns_spoofing">Spoofing de DNS</string>
+    <string name="mitm_dns_spoofing_list_saved">Salvo</string>
+    <string name="mitm_dns_spoofing_desc">Redirecionar Domínio para uma Web/IP Diferente.</string>
+    <string name="mitm_password_sniff_menu_fields">Campos de Usuário/Senha</string>
+    <string name="mitm_ss_select_target_prompt">Selecionar %s ?</string>
+    <string name="mitm_ss_select_target_title">Selecionar Alvo</string>
+    <string name="msf_connection_failed">A Conexão com o MSF RPC daemon FALHOU!</string>
+    <string name="msf_exploit_ranking">Classificação: %s</string>
+    <string name="msf_rank_average">Média</string>
+    <string name="msf_rank_excellent">Excelente</string>
+    <string name="msf_rank_good">Bom</string>
+    <string name="msf_rank_great">Ótimo</string>
+    <string name="msf_rank_low">Baixo</string>
+    <string name="msf_rank_manual">Manual</string>
+    <string name="msf_rank_normal">Normal</string>
+    <string name="msf_status">Status do Metasploit</string>
+    <string name="msfrcd_start_failed">MSF RPC daemon falhou ao Iniciar</string>
+    <string name="msfrpcd_killed">MSF RPC daemon Morto</string>
+    <string name="net_discovery_start_failed">Descoberta de Rede Falhou ao Iniciar!</string>
+    <string name="new_apk_found">Versão do App %s está Disponível, Deseja Atualizar ?</string>
+    <string name="new_msf_found">Uma Nova Versão do MSF está disponível, deseja atualizar ?</string>
+    <string name="new_ruby_found">Uma nova versão do Ruby está disponível,Deseja atualizar ?</string>
+    <string name="ports">Portas</string>
+    <string name="pref_auto_portscan">Scan automático de portas</string>
+    <string name="pref_auto_portscan_desc">Sempre Usar SYS scan para portas abertas quando novos hosts forem descobertos</string>
+    <string name="pref_msf_notifications">Notificação de estado do MSF</string>
+    <string name="pref_msf_notifications_desc">Visualizar estado de conexão do MSF RPC</string>
+    <string name="save">Salvar</string>
+    <string name="saved">Salvo</string>
+    <string name="scanner_custom_parameters">Parametros personalizados</string>
 </resources>
