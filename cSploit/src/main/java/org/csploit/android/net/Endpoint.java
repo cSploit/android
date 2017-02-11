@@ -19,15 +19,15 @@
 package org.csploit.android.net;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import org.csploit.android.core.System;
+import org.csploit.android.helpers.NetworkHelper;
 
 import java.io.BufferedReader;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
-
-import org.csploit.android.core.System;
-import org.csploit.android.helpers.NetworkHelper;
 
 public class Endpoint implements Comparable<Endpoint>
 {
@@ -57,15 +57,9 @@ public class Endpoint implements Comparable<Endpoint>
     this(address, null);
   }
 
-  public Endpoint(InetAddress address, byte[] hardware){
-  try{
+  public Endpoint(InetAddress address, @Nullable byte[] hardware){
     mAddress = address;
-    mHardware = Arrays.copyOf(hardware, hardware.length);
-    }
-    catch(Exception e){
-     System.errorLogging(e);
-     mAddress = null;
-    }
+    mHardware = hardware != null ? Arrays.copyOf(hardware, hardware.length) : null;
   }
 
   public Endpoint(String address, String hardware){
