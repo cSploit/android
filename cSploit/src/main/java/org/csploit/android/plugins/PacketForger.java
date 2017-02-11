@@ -44,6 +44,8 @@ import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PacketForger extends Plugin implements OnClickListener {
 	private static final int TCP_PROTOCOL = 0;
@@ -135,7 +137,7 @@ public class PacketForger extends Plugin implements OnClickListener {
 									OutputStream writer = mSocket
 											.getOutputStream();
 
-									writer.write(data.getBytes());
+									writer.write(escapeInputString(data));
 									writer.flush();
 
 									if (waitResponse) {
@@ -289,5 +291,53 @@ public class PacketForger extends Plugin implements OnClickListener {
 		setStoppedState(null);
 		super.onBackPressed();
 		overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+	}
+
+	private byte[] escapeInputString(String input) {
+		List<Byte> bytes = new ArrayList<>();
+		int currentIndex = 0;
+		int nextIndex = currentIndex;
+		byte addedByte = 0;
+
+		while (currentIndex < input.length()) {
+			addedByte = (byte)input.charAt(currentIndex);
+			if (addedByte == '\\') {
+				nextIndex = currentIndex + 1;
+				if (nextIndex >= input.length()) {
+					throw new IllegalArgumentException("Escaped string is malformed");
+				}
+				char modifier = input.charAt(nextIndex);
+				switch (modifier) {
+					case 'x':
+						if (nextIndex + 2 > input.length()) {
+							throw new IllegalArgumentException("Escaped string is malformed");
+						}
+						String x = input.substring(nextIndex + 1, nextIndex + 3);
+						addedByte = (byte)Integer.parseInt(x, 16);
+						nextIndex += 2;
+						break;
+					case 'r':
+						addedByte = (byte)0x0d;
+						break;
+					case 'n':
+						addedByte = (byte)0x0a;
+						break;
+					case '\\':
+						break;
+					default:
+						throw new IllegalArgumentException("Escaped string is malformed");
+				}
+				currentIndex = nextIndex;
+			}
+			bytes.add(addedByte);
+			currentIndex++;
+		}
+
+		byte[] result = new byte[bytes.size()];
+		for (int i = 0; i < bytes.size(); ++i) {
+			result[i] = bytes.get(i);
+		}
+
+		return result;
 	}
 }
