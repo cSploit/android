@@ -58,8 +58,14 @@ public class Endpoint implements Comparable<Endpoint>
   }
 
   public Endpoint(InetAddress address, byte[] hardware){
+  try{
     mAddress = address;
     mHardware = Arrays.copyOf(hardware, hardware.length);
+    }
+    catch(Exeption e){
+     System.errorLogging(e);
+     mAddress = null;
+    }
   }
 
   public Endpoint(String address, String hardware){
