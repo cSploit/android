@@ -25,20 +25,15 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Patterns;
-
 import org.apache.commons.net.util.SubnetUtils;
 import org.csploit.android.core.Logger;
 import org.csploit.android.core.System;
 import org.csploit.android.helpers.NetworkHelper;
 
 import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.net.InterfaceAddress;
-import java.net.NetworkInterface;
-import java.net.NoRouteToHostException;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -339,9 +334,10 @@ public class Network implements Comparable<Network> {
     return Endpoint.parseMacAddress(mWifiInfo.getBSSID());
   }
 
+  @Nullable
   public byte[] getLocalHardware() {
     try {
-      return mInterface.getHardwareAddress();
+      return mInterface.getHardwareAddress(); //FIXME: #831
     } catch (SocketException e) {
       System.errorLogging(e);
     }
