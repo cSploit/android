@@ -122,8 +122,9 @@ public class Endpoint implements Comparable<Endpoint>
     this.mAddress = address;
   }
 
+  @Nullable
   public byte[] getHardware(){
-    return Arrays.copyOf(mHardware, mHardware.length);
+    return mHardware != null ? Arrays.copyOf(mHardware, mHardware.length) : null;
   }
 
   public String getHardwareAsString(){

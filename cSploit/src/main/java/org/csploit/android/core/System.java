@@ -18,6 +18,24 @@
  */
 package org.csploit.android.core;
 
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiManager.WifiLock;
+import android.os.Build;
+import android.os.Environment;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
+import android.util.SparseIntArray;
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
 import org.apache.commons.compress.utils.IOUtils;
@@ -41,54 +59,9 @@ import org.csploit.android.net.metasploit.Session;
 import org.csploit.android.services.Services;
 import org.csploit.android.tools.ToolBox;
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningServiceInfo;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.net.wifi.WifiManager;
-import android.net.wifi.WifiManager.WifiLock;
-import android.os.Build;
-import android.os.Environment;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
-import android.preference.PreferenceManager;
-import android.util.SparseIntArray;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.NoRouteToHostException;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Observer;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -1062,7 +1035,7 @@ public class System {
     return mKnownIssues;
   }
 
-  public static String getMacVendor(byte[] mac) {
+  public static String getMacVendor(@Nullable byte[] mac) {
     if (mac != null && mVendors != null && mac.length >= 3)
       return mVendors.get(NetworkHelper.getOUICode(mac));
     else
