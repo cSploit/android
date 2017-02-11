@@ -62,7 +62,7 @@ public class Endpoint implements Comparable<Endpoint>
     mAddress = address;
     mHardware = Arrays.copyOf(hardware, hardware.length);
     }
-    catch(Exeption e){
+    catch(Exception e){
      System.errorLogging(e);
      mAddress = null;
     }
