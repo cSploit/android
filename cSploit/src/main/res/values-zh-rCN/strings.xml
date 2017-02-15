@@ -114,7 +114,7 @@ If not, see http://www.gnu.org/licenses/.
 <string name="something_went_wrong">发生了未知的错误，请尝试选择一个新的目标。
 </string>
     <string name="mitm_dns_spoofing">DNS欺骗</string> 
-    <string name="mitm_dns_spoofing_desc">重定向连接到指定的web/IP</string> 
+    <string name="mitm_dns_spoofing_desc">重定向链接到指定的域名或者IP</string> 
     <string name="mitm_dns_spoofing_list_saved">储存</string> 
     <string name="selected">已经选择</string>
     <string name="nothing_found"><![CDATA[<small><i>未找到</i></small>]]></string>
@@ -201,7 +201,7 @@ If not, see http://www.gnu.org/licenses/.
     <string name="the_port">端口</string>
     <string name="error_proxy_port">透明代理是必须的，但其端口已经被占用。打开程序设置？</string>
     <string name="error_mitm_port">中间人攻击的必要端口已经被占用。打开程序设置？</string>
-    <string name="error_https_port">https中间人攻击的必要端口已经被占用。打开程序设置？</string>
+    <string name="error_https_port">HTTPS中间人攻击的必要端口已经被占用。打开程序设置？</string>
     <string name="error_mitm_ports">中间人攻击需要全部的端口可用。</string>
 
     <!-- rpc stuff -->
@@ -237,6 +237,7 @@ If not, see http://www.gnu.org/licenses/.
     <string name="mitm_image_replace_desc">使用特定的图片替换网页上的全部图片。</string>
     <string name="choose_source">选择一个来源：</string>
     <string name="local_images">本地图片</string>
+    <string name="web_images">网络地址</string>
     <string name="error_image_intent">奇怪了，好像你并没有一个负责选择图片的程序。</string>
     <string name="image">图片</string>
     <string name="enter_image_url">输入图片的URL：</string>
@@ -245,7 +246,7 @@ If not, see http://www.gnu.org/licenses/.
     <string name="mitm_video_replace_desc">将网页上的YouTube视频全部替换成另一个。</string>
     <string name="video">视频</string>
     <string name="enter_video_url">输入视频URL：</string>
-    <string name="error_video_url">无效的youtube视频。</string>
+    <string name="error_video_url">无效的YouTube视频。</string>
     <string name="mitm_script_injection">脚本注入</string>
     <string name="mitm_script_injection_desc">在每一个访问的页面上注入一个脚本。</string>
     <string name="choose_method">选择一个方式：</string>
@@ -278,7 +279,10 @@ If not, see http://www.gnu.org/licenses/.
     <string name="menu_about">关于</string>
 
     <string name="scanner_select_ports">选择自定义端口</string>
-     <string name="scanner_custom_parameters">自定义参数</string>
+    <string name="scanner_custom_parameters">自定义参数</string>
+     
+    <string name="iface_dialog_title">选择网络接口</string>
+    <string name="iface_error_no_available">没有可用的网络接口</string>
 
     <string name="wifi_initializing">正在初始化 &#8230;</string>
     <string name="wifi_activating_iface">正在激活 WiFi 接口 &#8230;</string>
@@ -353,6 +357,7 @@ If not, see http://www.gnu.org/licenses/.
 
     <string name="menu_add">添加</string>
     <string name="menu_scan">扫描</string>
+    <string name="menu_ifaces">网络接口</string>
     <string name="menu_wifi_scan">WiFi 扫描</string>
     <string name="menu_stop_msfrpcd">停止Metasploit远程过程调用守护程序</string>
 
@@ -471,5 +476,9 @@ If not, see http://www.gnu.org/licenses/.
     <string name="show_full_description">显示详细描述</string>
     <string name="choose_an_option">选择一项</string>
     <string name="required">必须</string>
+    <string name="connection_lost">连接丢失</string>
+    <string name="connection_lost_prompt">删除当前会话并启动另一个?</string>
+    <string name="any_interface">任意接口</string>
+    <string name="error_initializing_interface">初始化 %s 错误</string>
 
 </resources>
