@@ -1,7 +1,7 @@
 <resources>
     <string name="menu_settings">设置</string>
     <string name="title_activity_main">cSploit</string>
-    <string name="crash_toast_text">额！崩溃了...不过我将给我的开发者发送报告来帮助解决这个问题。</string>
+    <string name="crash_toast_text">崩溃了...不过我将给我的开发者发送报告来帮助解决这个问题。</string>
     <string name="toggle_button">切换按钮</string>
     <string name="enter_redirection_details">在下方键入跳转详情:</string>
     <string name="address">地址</string>
@@ -114,7 +114,7 @@ If not, see http://www.gnu.org/licenses/.
 <string name="something_went_wrong">发生了未知的错误，请尝试选择一个新的目标。
 </string>
     <string name="mitm_dns_spoofing">DNS欺骗</string> 
-    <string name="mitm_dns_spoofing_desc">重定向连接到指定的web/IP</string> 
+    <string name="mitm_dns_spoofing_desc">重定向链接到指定的域名或者IP</string> 
     <string name="mitm_dns_spoofing_list_saved">储存</string> 
     <string name="selected">已经选择</string>
     <string name="nothing_found"><![CDATA[<small><i>未找到</i></small>]]></string>
@@ -201,13 +201,17 @@ If not, see http://www.gnu.org/licenses/.
     <string name="the_port">端口</string>
     <string name="error_proxy_port">透明代理是必须的，但其端口已经被占用。打开程序设置？</string>
     <string name="error_mitm_port">中间人攻击的必要端口已经被占用。打开程序设置？</string>
-    <string name="error_https_port">https中间人攻击的必要端口已经被占用。打开程序设置？</string>
+    <string name="error_https_port">HTTPS中间人攻击的必要端口已经被占用。打开程序设置？</string>
     <string name="error_mitm_ports">中间人攻击需要全部的端口可用。</string>
 
     <!-- rpc stuff -->
     <string name="error_rpc">远程过程调用失败</string>
     <string name="error_rpcd_inval">无效的设置</string>
     <string name="error_rpcd_shell">无法执行终端命令</string>
+    <string name="msfrpcd_killed">Metasploit RPC守护进程停止!</string>
+    <string name="msfrcd_start_failed">Metasploit RPC守护进程启动失败!</string>
+    <string name="msf_connection_failed">连接到Metasploit RPC守护进程失败!</string>
+    <string name="net_discovery_start_failed">网络发现失败启动!</string>
     <string name="rpcd_starting">正在启动 Metasploit 远程过程调用守护程序&#8230;</string>
     <string name="rpcd_started">Metasploit 远程过程调用守护程序已经启动</string>
     <string name="rpcd_stopped">Metasploit 远程过程调用守护程序已经停止</string>
@@ -237,6 +241,7 @@ If not, see http://www.gnu.org/licenses/.
     <string name="mitm_image_replace_desc">使用特定的图片替换网页上的全部图片。</string>
     <string name="choose_source">选择一个来源：</string>
     <string name="local_images">本地图片</string>
+    <string name="web_images">网络地址</string>
     <string name="error_image_intent">奇怪了，好像你并没有一个负责选择图片的程序。</string>
     <string name="image">图片</string>
     <string name="enter_image_url">输入图片的URL：</string>
@@ -276,9 +281,12 @@ If not, see http://www.gnu.org/licenses/.
     <string name="menu_stop_monitor">停止网络监控工具</string>
     <string name="menu_submit_issue">提交问题或建议（英文）</string>
     <string name="menu_about">关于</string>
+    
+    <string name="iface_dialog_title">选择网络接口</string>
+    <string name="iface_error_no_available">没有可用的网络接口</string>
 
     <string name="scanner_select_ports">选择自定义端口</string>
-     <string name="scanner_custom_parameters">自定义参数</string>
+    <string name="scanner_custom_parameters">自定义参数</string>
 
     <string name="wifi_initializing">正在初始化 &#8230;</string>
     <string name="wifi_activating_iface">正在激活 WiFi 接口 &#8230;</string>
@@ -353,14 +361,13 @@ If not, see http://www.gnu.org/licenses/.
 
     <string name="menu_add">添加</string>
     <string name="menu_scan">扫描</string>
+    <string name="menu_ifaces">网络接口</string>
     <string name="menu_wifi_scan">WiFi 扫描</string>
     <string name="menu_stop_msfrpcd">停止Metasploit远程过程调用守护程序</string>
 
     <string name="pref_theme">暗色主题</string>
     <string name="pref_choose_theme">启用暗色主题，更加护眼</string>
     <string name="please_restart">新的主题将在您重新启动应用后生效</string>
-    <string name="pref_auto_portscan">端口自动扫描</string>
-    <string name="pref_auto_portscan_desc">自动使用SYN扫描发现的新主机端口</string>
     <string name="evasion">规避</string>
     <string name="search_exact_version">精确版本</string>
     <string name="sessions_title">单击会话打开终端，或长按以查看更多选项。</string>
@@ -427,7 +434,8 @@ If not, see http://www.gnu.org/licenses/.
     <string name="crash_dialog_text">发生了一个预料之外的错误，致使应用或其组件强制停止。请发送错误数据来帮助我们修复这个错误。</string>
     <string name="crash_dialog_comment">您可以在下面描述您遇到的问题</string>
     <string name="JNI_crash_detected">检测到 JNI 库在上次崩溃，我希望您能发送错误报告。</string>
-
+    <string name="new_ruby_found">Ruby 新版本可用，您希望更新吗？</string>
+    <string name="new_msf_found">Metasploit 新版本可用，您希望更新吗？</string>
     <string name="new_msf_update_desc">Metasploit框架有更新可用</string>
         <string name="missing_core_update">核心未安装, 应用将仅检查更新... #STATUS#
     </string>
@@ -461,6 +469,8 @@ If not, see http://www.gnu.org/licenses/.
     <string name="pref_err_executable">不允许创建可执行内容。</string>
     <string name="pref_persistent_network_monitor">持续网络监控</string>
     <string name="pref_persistent_network_monitor_desc">使监控器持续监控网络</string>
+    <string name="pref_auto_portscan">自动端口扫描</string>
+    <string name="pref_auto_portscan_desc">查找主机时，自动使用SYN进行端口扫描</string>
     <string name="exploit_launch_all">启动全部</string>
     <string name="exploit_launch">启动</string>
     <string name="exploit_edit_options">编辑选项</string>
@@ -471,5 +481,9 @@ If not, see http://www.gnu.org/licenses/.
     <string name="show_full_description">显示详细描述</string>
     <string name="choose_an_option">选择一项</string>
     <string name="required">必须</string>
+    <string name="connection_lost">连接丢失</string>
+    <string name="connection_lost_prompt">删除当前会话并启动另一个？</string>
+    <string name="any_interface">任意接口</string>
+    <string name="error_initializing_interface">初始化 %s 错误</string>
 
 </resources>
