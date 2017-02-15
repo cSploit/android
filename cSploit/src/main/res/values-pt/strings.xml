@@ -2,7 +2,7 @@
 <resources>
     <string name="menu_settings">Configurações</string>
     <string name="title_activity_main">cSploit</string>
-    <string name="crash_toast_text">Oooops! houve um erro , mas um relatório será enviado para o meu desenvolvedor para ajudar a corrigir o problema :)</string>
+    <string name="crash_toast_text">Oooops! Houve um erro, mas um relatório será enviado para o desenvolvedor para ajudar a corrigir o problema :)</string>
     <string name="toggle_button">Botão de Alternância</string>
     <string name="enter_redirection_details">Digite os detalhes de redirecionamento abaixo:</string>
     <string name="address">Endereço</string>
@@ -12,7 +12,7 @@
     <string name="services">Serviços</string>
     <string name="os">SO</string>
     <string name="device_type">Tipo de Dispositivo</string>
-    <string name="start_hijack">Toque em uma sessão para iniciar sequestro, ou um toque longo para salvá-lo para o arquivo.</string>
+    <string name="start_hijack">Toque numa sessão para iniciar o sequestro, ou faça um toque longo para salvá-lo para o arquivo.</string>
     <string name="sort">Tipo:</string>
     <string name="select_module">Selecione um módulo para executar</string>
     <string name="choose">Escolher</string>
@@ -22,13 +22,13 @@
     <string name="protocol">Protocolo</string>
     <string name="csploit_catchphrase">cSploit - Uma suíte android de penetração de rede.</string>
     <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
-    <string name="disclaimer">Termo de responsabilidade</string>
+    <string name="disclaimer">Termos de responsabilidade</string>
     <string name="csploit_disclaimer">
-        <![CDATA[Esta aplicação não é para ser usada para quaisquer fins que não para demonstrar suas funções, e só deve ser utilizado em redes para as quais você tem permissão para fazer isso. Qualquer outro uso não é de responsabilidade do desenvolvedor. Em outras palavras, Não seja estúpido, e não direcione as pessoas com raiva para mim.]]></string>
+        <![CDATA[Esta aplicação não é para ser usada para quaisquer fins que não para demonstrar as suas funções, e só deve ser utilizado em redes para as quais você tem permissão para fazer isso. Qualquer outro uso não é da responsabilidade do desenvolvedor. Em outras palavras, não seja estúpido, e não direcione as pessoas com raiva para mim.]]></string>
     <string name="license">Licença</string>
-    <string name="gpl_license">Este programa é um software livre: você pode redistribuí-lo e / ou modificá-lo sob os termos da GNU General Public License como publicado pela Free Software Foundation, tanto a versão 3 da Licença, ou (a seu critério) qualquer versão posterior.Este programa é distribuído na esperança de que seja útil, mas SEM NENHUMA GARANTIA;sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou ADEQUAÇÃO A UM DETERMINADO FIM.Veja a GNU General Public License para mais detalhes.Você deve ter recebido uma cópia da GNU General Public License juntamente com este programa.Se não, veja http://www.gnu.org/licenses/.</string>
+    <string name="gpl_license">Este programa é um software livre: você pode redistribuí-lo e / ou modificá-lo sob os termos da GNU General Public License como publicado pela Free Software Foundation, tanto a versão 3 da Licença, ou (a seu critério) qualquer versão posterior. Este programa é distribuído na esperança de que seja útil, mas SEM NENHUMA GARANTIA; sem mesmo a garantia implícita de COMERCIALIZAÇÃO ou ADEQUAÇÃO A UM DETERMINADO FIM.Veja a GNU General Public License para mais detalhes. Você deve ter recebido uma cópia da GNU General Public License juntamente com este programa. Se não, veja http://www.gnu.org/licenses/.</string>
     <string name="service">Serviço</string>
-    <string name="stopped">Parado…</string>
+    <string name="stopped">Parado</string>
     <string name="start">Iniciar</string>
     <string name="stop">Parar</string>
     <string name="stopped_dots">Parado …</string>
@@ -44,7 +44,7 @@
     <string name="send">Enviar</string>
     <string name="update_available">Atualização Disponível</string>
     <string name="new_update_desc">Uma nova atualização para a versão</string>
-    <string name="new_update_desc2">está disponível, você quer fazer o download?</string>
+    <string name="new_update_desc2">está disponível. Quer fazer o download?</string>
     <string name="checking">Verificando…</string>
     <string name="no_updates_available">Não há atualizações disponíveis.</string>
     <string name="new_msf_update_desc">Uma atualização do Metasploit Framework</string>
@@ -54,7 +54,7 @@
     <string name="connecting">Conectando…</string>
     <string name="cancel">Cancelar</string>
     <string name="error">Erro</string>
-    <string name="error_occured">Ocorreu um erro durante o download da Atualização.</string>
+    <string name="error_occured">Ocorreu um erro durante o download da atualização.</string>
     <string name="invalid_target">Alvo Inválido.</string>
     <string name="add_custom_target">Adicionar alvo personalizado</string>
     <string name="enter_url">Digite uma URL, o nome do host ou endereço IP abaixo:</string>
@@ -90,12 +90,12 @@
         <![CDATA[<p>Para mais informações, leia o <a href=\"http://csploit.net/#requirements\">requirements</a> section.</p>]]></string>
     <string name="busybox_required">Necessária a instalação completa do BusyBox,o binário killall não foi encontrado (talvez você tenha uma versão antiga do busybox).
     </string>
-    <string name="only_4_root">Este aplicativo pode ser executado apenas em dispositivos com acesso Root.</string>
+    <string name="only_4_root">Este aplicativo só pode ser executado em dispositivos com acesso root.</string>
     <string name="initializing">Inicializando…</string>
     <string name="initialization_error">Erro de inicialização</string>
     <string name="target_alias">Apelido do Alvo</string>
     <string name="set_alias">Defina um Apelido para este alvo:</string>
-    <string name="no_connectivity">Sem conectividade disponível.</string>
+    <string name="no_connectivity">Sem conetividade disponível.</string>
     <string name="wifi_key_copied">Chave WiFi copiada para a área de Transferência.</string>
     <string name="connected_to"><![CDATA[Conectado a <b>]]></string>
     <string name="connected_to2"><![CDATA[</b> com chave <b><font color=\"green\">]]></string>
