@@ -14,7 +14,7 @@ OS version:
 
 
 **logcat** *(filter it!):*
-[How-to guide] (https://forum.xda-developers.com/showthread.php?t=1726238)
+[How-to guide](https://forum.xda-developers.com/showthread.php?t=1726238)
 
 ------------------------------------------------------------------------------------------------------------------------------
 
