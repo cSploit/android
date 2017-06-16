@@ -72,7 +72,8 @@
             android:layout_below="@+id/linearLayout2"
             android:layout_toLeftOf="@+id/sendWOL"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="8dp"
+            android:text="Wait for response"/>
 
     <LinearLayout
             android:id="@+id/linearLayout3"
