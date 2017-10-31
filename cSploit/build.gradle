@@ -33,6 +33,7 @@ dependencies {
     compile 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
     compile 'org.tukaani:xz:1.5'
     compile 'ch.acra:acra:4.6.2'
+    compile 'com.android.support:recyclerview-v7:+'
     testCompile 'junit:junit:4.12'
 }
 
