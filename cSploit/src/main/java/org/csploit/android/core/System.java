@@ -36,8 +36,7 @@ import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.SparseIntArray;
-import org.acra.ACRA;
-import org.acra.ACRAConfiguration;
+
 import org.apache.commons.compress.utils.IOUtils;
 import org.csploit.android.R;
 import org.csploit.android.WifiScannerFragment;
@@ -59,9 +58,36 @@ import org.csploit.android.net.metasploit.Session;
 import org.csploit.android.services.Services;
 import org.csploit.android.tools.ToolBox;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.NoRouteToHostException;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Observer;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -271,12 +297,12 @@ public class System {
     if (ret != 0) {
       File log = new File(System.getCorePath(), "cSploitd.log");
       DaemonException daemonException = new DaemonException("core daemon returned " + ret);
-      if (log.exists() && log.canRead()) {
+   /*   if (log.exists() && log.canRead()) {
         ACRAConfiguration conf = ACRA.getConfig();
         conf.setApplicationLogFile(log.getAbsolutePath());
         ACRA.setConfig(conf);
         ACRA.getErrorReporter().handleException(daemonException, false);
-      }
+      }*/
       throw daemonException;
     }
   }

@@ -17,6 +17,7 @@ import org.csploit.android.net.metasploit.MsfExploit;
 import org.csploit.android.tools.NMap;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -84,8 +85,9 @@ public class MultiAttackService extends IntentService {
 
         synchronized (MultiAttackService.this) {
           completedTargets++;
-          mBuilder.setContentInfo(String.format("%d/%d",
-                  completedTargets, totalTargets));
+          mBuilder.setContentInfo(String.format(Locale.getDefault(), "%d/%d",
+                  completedTargets, totalTargets))
+                  .setChannelId(getBaseContext().getString(R.string.csploitChannelId));
           mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
         }
 
@@ -199,7 +201,7 @@ public class MultiAttackService extends IntentService {
     // get notification manager
     mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     // get notification builder
-    mBuilder = new NotificationCompat.Builder(this);
+    mBuilder = new NotificationCompat.Builder(this, getBaseContext().getString(R.string.csploitChannelId));
     // create a broadcast receiver to get actions
     // performed on the notification by the user
     mReceiver = new BroadcastReceiver() {
@@ -237,7 +239,8 @@ public class MultiAttackService extends IntentService {
       mBuilder.setContentIntent(PendingIntent.getActivity(this, CLICK_CODE, mContentIntent, 0))
               .setProgress(0,0,false)
               .setAutoCancel(true)
-              .setDeleteIntent(PendingIntent.getActivity(this, 0, new Intent(), 0));
+              .setDeleteIntent(PendingIntent.getActivity(this, 0, new Intent(), 0))
+              .setChannelId(getBaseContext().getString(R.string.csploitChannelId));
       mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     }
     if(mReceiver!=null)

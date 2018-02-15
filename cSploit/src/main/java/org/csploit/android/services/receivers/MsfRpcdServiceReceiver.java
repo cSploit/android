@@ -69,12 +69,13 @@ public class MsfRpcdServiceReceiver extends ManagedReceiver {
 
   private void updateNotificationForStatus(Context context, MsfRpcdService.Status status) {
     NotificationCompat.Builder mBuilder =
-            new NotificationCompat.Builder(context)
+            new NotificationCompat.Builder(context, context.getString(R.string.csploitChannelId))
             .setSmallIcon(R.drawable.exploit_msf)
             .setContentTitle(context.getString(R.string.msf_status))
             .setProgress(0, 0, status.inProgress())
             .setContentText(context.getString(status.getText()))
-            .setColor(ContextCompat.getColor(context, status.getColor()));
+            .setColor(ContextCompat.getColor(context, status.getColor()))
+            .setChannelId(context.getString(R.string.csploitChannelId));
 
     NotificationManager mNotificationManager =
             (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

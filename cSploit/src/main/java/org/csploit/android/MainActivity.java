@@ -19,17 +19,35 @@
  */
 package org.csploit.android;
 
+import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
   MainFragment f;
+  final static int MY_PERMISSIONS_WANTED = 1;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+      NotificationChannel mChannel = new NotificationChannel(getString(R.string.csploitChannelId),
+              getString(R.string.cSploitChannelDescription), NotificationManager.IMPORTANCE_DEFAULT);
+      NotificationManager mNotificationManager =
+              (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+      if (mNotificationManager != null) {
+          mNotificationManager.createNotificationChannel(mChannel);
+      }
+    }
     SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
     if (themePrefs.getBoolean("isDark", false))
       setTheme(R.style.DarkTheme);
@@ -44,9 +62,35 @@ public class MainActivity extends AppCompatActivity {
       getSupportFragmentManager().beginTransaction()
               .add(R.id.mainframe, f).commit();
     }
+    verifyPerms();
   }
 
-  public void onBackPressed() {
-    f.onBackPressed();
-  }
+  public void verifyPerms() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) {
+          ActivityCompat.requestPermissions(this,
+                  new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE},
+                  MY_PERMISSIONS_WANTED);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_WANTED: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, R.string.permissions_succeed, Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this, R.string.permissions_fail, Toast.LENGTH_LONG).show();
+                    finish();
+                }
+            }
+        }
+    }
 }

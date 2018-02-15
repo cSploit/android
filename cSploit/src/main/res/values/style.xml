@@ -47,8 +47,6 @@
         <item name="android:windowBackground">@color/background_window_dark</item>
     </style>
 
-    <style name="Theme.Dialog" parent="@android:style/Theme.Dialog" />
-
     <style name="AppAnimation" parent="android:Animation.Dialog">
         <item name="android:inAnimation">@anim/fadein</item>
         <item name="android:outAnimation">@anim/fadein</item>

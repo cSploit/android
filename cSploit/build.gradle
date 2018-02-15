@@ -1,19 +1,17 @@
 buildscript {
     repositories {
+        google()
         jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
+        classpath 'com.android.tools.build:gradle:3.2.0-alpha03'
     }
-}
-
-def getDate() {
-    return Calendar.getInstance().getTimeInMillis();
 }
 
 allprojects {
     repositories {
+        google()
         jcenter()
         mavenCentral()
     }
@@ -21,28 +19,29 @@ allprojects {
 apply plugin:  'com.android.application'
 
 dependencies {
-    compile 'com.android.support:support-v4:23.1.1'
-    compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.android.support:design:23.1.1'
-    compile 'com.android.support:preference-v7:23.1.1'
-    compile 'org.apache.commons:commons-compress:1.10'
-    compile 'commons-net:commons-net:3.3'
-    compile 'com.github.zafarkhaja:java-semver:0.9.0'
-    compile 'org.unbescape:unbescape:1.1.1.RELEASE'
-    compile 'org.msgpack:msgpack:0.6.12'
-    compile 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
-    compile 'org.tukaani:xz:1.5'
-    compile 'ch.acra:acra:4.6.2'
-    testCompile 'junit:junit:4.12'
+    implementation 'com.android.support:support-v4:27.0.2'
+    implementation 'com.android.support:appcompat-v7:27.0.2'
+    implementation 'com.android.support:design:27.0.2'
+    implementation 'com.android.support:preference-v7:27.0.2'
+    implementation 'org.apache.commons:commons-compress:1.16.1'
+    implementation 'commons-net:commons-net:3.6'
+    implementation 'com.github.zafarkhaja:java-semver:0.9.0'
+    implementation 'org.unbescape:unbescape:1.1.5.RELEASE'
+    implementation 'org.msgpack:msgpack:0.6.12'
+    implementation 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
+    implementation 'org.tukaani:xz:1.8'
+    implementation 'ch.acra:acra-http:5.1.0'
+    implementation 'ch.acra:acra-notification:5.1.0'
+    testImplementation 'junit:junit:4.12'
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '23.0.2'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     packagingOptions {
@@ -51,8 +50,8 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion 22
+        minSdkVersion 14
+        targetSdkVersion 27
         versionCode 4
         versionName "1.7.0-unstable"
         if(System.getenv("NIGHTLY_BUILD")) {
@@ -81,8 +80,8 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField "java.util.Date", "BUILD_TIME", "new java.util.Date(" + getDate() + "L)"
-            buildConfigField "String", "BUILD_NAME", "\"" + System.getenv("USER") + "\"";
+            buildConfigField "java.util.Date", "BUILD_TIME", "new java.util.Date(" + Calendar.getInstance().getTimeInMillis() + "L)"
+            buildConfigField "String", "BUILD_NAME", "\"" + System.getenv("USER") + "\""
             minifyEnabled false
             shrinkResources false
             debuggable true
@@ -91,8 +90,8 @@ android {
             multiDexEnabled true
         }
         release {
-            buildConfigField "java.util.Date", "BUILD_TIME", "new java.util.Date(" + getDate() + "L)"
-            buildConfigField "String", "BUILD_NAME", "\"" + System.getenv("USER") + "\"";
+            buildConfigField "java.util.Date", "BUILD_TIME", "new java.util.Date(" + Calendar.getInstance().getTimeInMillis() + "L)"
+            buildConfigField "String", "BUILD_NAME", "\"" + System.getenv("USER") + "\""
             if (System.getenv("KEYSTORE_FILE") != null) {
                 signingConfig signingConfigs.release
             }
