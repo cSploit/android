@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.0-alpha03'
+        classpath 'com.android.tools.build:gradle:3.2.0-alpha04'
     }
 }
 
@@ -30,8 +30,8 @@ dependencies {
     implementation 'org.msgpack:msgpack:0.6.12'
     implementation 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
     implementation 'org.tukaani:xz:1.8'
-    implementation 'ch.acra:acra-http:5.1.0'
-    implementation 'ch.acra:acra-notification:5.1.0'
+    implementation 'ch.acra:acra-http:5.1.1'
+    implementation 'ch.acra:acra-notification:5.1.1'
     testImplementation 'junit:junit:4.12'
 }
 
