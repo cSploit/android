@@ -99,6 +99,7 @@ public class SettingsFragment extends Fragment {
 
             @Override
             public void onViewCreated(View v, Bundle savedInstanceState) {
+                super.onViewCreated(v, savedInstanceState);
                 SharedPreferences themePrefs = getActivity().getSharedPreferences("THEME", 0);
                 Boolean isDark = themePrefs.getBoolean("isDark", false);
                 if (isDark) {
@@ -140,7 +141,7 @@ public class SettingsFragment extends Fragment {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     SharedPreferences themePrefs = getActivity().getBaseContext().getSharedPreferences("THEME", 0);
-                    themePrefs.edit().putBoolean("isDark", (Boolean) newValue).commit();
+                    themePrefs.edit().putBoolean("isDark", (Boolean) newValue).apply();
                     Toast.makeText(getActivity().getBaseContext(), getString(R.string.please_restart), Toast.LENGTH_LONG).show();
                     return true;
                 }
@@ -276,7 +277,7 @@ public class SettingsFragment extends Fragment {
 
                 else {
                     //noinspection ConstantConditions
-                    getPreferenceManager().getSharedPreferences().edit().putString(key, path).commit();
+                    getPreferenceManager().getSharedPreferences().edit().putString(key, path).apply();
                     if (oldPath != null && !oldPath.equals(path)) {
                         File current = new File(oldPath);
 
