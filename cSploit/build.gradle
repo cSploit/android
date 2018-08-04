@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.0-beta1'
+        classpath 'com.android.tools.build:gradle:3.2.0-beta05'
     }
 }
 
@@ -19,10 +19,10 @@ allprojects {
 apply plugin:  'com.android.application'
 
 dependencies {
-    implementation 'com.android.support:support-v4:28.0.0-alpha3'
-    implementation 'com.android.support:appcompat-v7:28.0.0-alpha3'
-    implementation 'com.android.support:design:28.0.0-alpha3'
-    implementation 'com.android.support:preference-v7:28.0.0-alpha3'
+    implementation 'com.android.support:support-v4:28.0.0-beta01'
+    implementation 'com.android.support:appcompat-v7:28.0.0-beta01'
+    implementation 'com.android.support:design:28.0.0-beta01'
+    implementation 'com.android.support:preference-v7:28.0.0-beta01'
     implementation 'org.apache.commons:commons-compress:1.17'
     implementation 'commons-net:commons-net:3.6'
     implementation 'com.github.zafarkhaja:java-semver:0.9.0'
@@ -37,7 +37,7 @@ dependencies {
 
 android {
     compileSdkVersion 28
-    buildToolsVersion '28.0.0'
+    buildToolsVersion '28.0.1'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
