@@ -136,23 +136,16 @@ public class SettingsFragment extends Fragment {
             mMsfBranch = (ListPreference) getPreferenceScreen().findPreference("MSF_BRANCH");
             mMsfEnabled = (TwoStatePreference) getPreferenceScreen().findPreference("MSF_ENABLED");
 
-            mThemeChooser.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
+            mThemeChooser.setOnPreferenceChangeListener((Preference preference, Object newValue) -> {
                     SharedPreferences themePrefs = getActivity().getBaseContext().getSharedPreferences("THEME", 0);
                     themePrefs.edit().putBoolean("isDark", (Boolean) newValue).apply();
                     Toast.makeText(getActivity().getBaseContext(), getString(R.string.please_restart), Toast.LENGTH_LONG).show();
                     return true;
-                }
             });
 
-            mSavePath.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
+            mSavePath.setOnPreferenceClickListener((Preference preference) -> {
                     startDirectoryPicker(preference);
                     return true;
-                }
             });
 
             if (mMsfEnabled.isEnabled())
@@ -428,10 +421,7 @@ public class SettingsFragment extends Fragment {
             // start measureMsfSize ASAP
             onMsfPathChanged();
 
-            Preference.OnPreferenceClickListener directoryPickerWithDefaultPath = new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-
+            Preference.OnPreferenceClickListener directoryPickerWithDefaultPath = (Preference preference) -> {
                     final String currentValue;
                     final String defaultValue;
                     final String key = preference.getKey();
@@ -451,9 +441,7 @@ public class SettingsFragment extends Fragment {
 
                     if (!currentValue.equals(defaultValue)) {
                         final Preference fPref = preference;
-                        (new ChoiceDialog(
-                                getActivity(),
-                                getString(R.string.choose_an_option),
+                        (new ChoiceDialog(getActivity(),getString(R.string.choose_an_option),
                                 new String[]{getString(R.string.restore_default_path), getString(R.string.choose_a_custom_path)},
                                 new ChoiceDialog.ChoiceDialogListener() {
                                     @Override
@@ -478,7 +466,6 @@ public class SettingsFragment extends Fragment {
                         startDirectoryPicker(preference);
                     }
                     return true;
-                }
             };
 
             mRubyDir.setDefaultValue(System.getDefaultRubyPath());
@@ -497,14 +484,11 @@ public class SettingsFragment extends Fragment {
 
             getMsfBranches();
 
-            mReceiver = new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    if (intent.getAction().equals(SETTINGS_WIPE_DONE)) {
-                        onMsfPathChanged();
-                    } else if (intent.getAction().equals(SETTINGS_MSF_BRANCHES_AVAILABLE)) {
-                        onMsfBranchesAvailable();
-                    }
+            mReceiver = (Context context, Intent intent) -> {
+                if (intent.getAction().equals(SETTINGS_WIPE_DONE)) {
+                    onMsfPathChanged();
+                } else if (intent.getAction().equals(SETTINGS_MSF_BRANCHES_AVAILABLE)) {
+                    onMsfBranchesAvailable();
                 }
             };
             IntentFilter filter = new IntentFilter();
@@ -525,17 +509,14 @@ public class SettingsFragment extends Fragment {
             }
 
             mMsfBranch.setEnabled(false);
-            mBranchesWaiter = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        GitHubParser.getMsfRepo().getBranches();
-                        getActivity().sendBroadcast(new Intent(SETTINGS_MSF_BRANCHES_AVAILABLE));
-                    } catch (JSONException e) {
-                        System.errorLogging(e);
-                    } catch (IOException e) {
-                        Logger.error(e.getMessage());
-                    }
+            mBranchesWaiter = new Thread(() -> {
+                try {
+                    GitHubParser.getMsfRepo().getBranches();
+                    getActivity().sendBroadcast(new Intent(SETTINGS_MSF_BRANCHES_AVAILABLE));
+                } catch (JSONException e) {
+                    System.errorLogging(e);
+                } catch (IOException e) {
+                    Logger.error(e.getMessage());
                 }
             });
             mBranchesWaiter.start();
