@@ -38,8 +38,9 @@
         without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
         See the GNU General Public License for more details.
         You should have received a copy of the GNU General Public License along with this program.
-        If not, see http://www.gnu.org/licenses/.\n\nAdditionally, some icons have been distributed under the CC-BY 4.0 license and are copyrighted by Google, Inc.
-        The full icon set is available at https://www.google.com/design/icons .
+        If not, see https://www.gnu.org/licenses/.\n\nAdditionally, some icons have been distributed
+        under the CC-BY 4.0 license and are copyrighted by Google, Inc.
+        The full icon set is available at https://www.google.com/design/icons.
     </string>
     <string name="service">Service</string>
     <string name="stopped">Stopped&#8230;</string>

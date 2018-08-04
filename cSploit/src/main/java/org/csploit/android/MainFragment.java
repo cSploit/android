@@ -141,25 +141,18 @@ public class MainFragment extends Fragment {
     }
 
     private void onInitializationError(final String message) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                new FatalDialog(getString(R.string.initialization_error),
-                        message, message.contains(">"),
-                        getActivity()).show();
-            }
-        });
+        getActivity().runOnUiThread(() ->
+            new FatalDialog(getString(R.string.initialization_error),
+                    message, message.contains(">"),
+                    getActivity()).show());
     }
 
     private void onCoreUpdated() {
         System.onCoreInstalled();
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                init();
-                startAllServices();
-                notifyMenuChanged();
-            }
+        getActivity().runOnUiThread(() -> {
+            init();
+            startAllServices();
+            notifyMenuChanged();
         });
     }
 
@@ -186,11 +179,7 @@ public class MainFragment extends Fragment {
         lv = (ListView) v.findViewById(R.id.android_list);
         mTextView = (TextView) v.findViewById(R.id.textView);
 
-        lv.setOnItemClickListener(new ListView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+        lv.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id) -> {
                 if (mActionMode != null) {
                     mTargetAdapter.toggleSelection(position);
                     return;
@@ -199,26 +188,19 @@ public class MainFragment extends Fragment {
                 Target target = (Target) mTargetAdapter.getItem(position);
                 System.setCurrentTarget(target);
 
-                ThreadHelper.getSharedExecutor().execute(new Runnable() {
-                    @Override
-                    public void run() {
-
+                ThreadHelper.getSharedExecutor().execute(() -> {
                         startActivityForResult(new Intent(getActivity(),
                                 ActionActivity.class), WIFI_CONNECTION_REQUEST);
 
                         getActivity().overridePendingTransition(R.anim.fadeout, R.anim.fadein);
-                    }
                 });
 
                 Toast.makeText(getActivity(),
                         getString(R.string.selected_) + System.getCurrentTarget(),
                         Toast.LENGTH_SHORT).show();
-
-            }
         });
-        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+        lv.setOnItemLongClickListener((AdapterView<?> parent, View view, int position, long id) -> {
                 Target t = (Target) mTargetAdapter.getItem(position);
                 if (t.getType() == Target.Type.NETWORK) {
                     if (mActionMode == null)
@@ -231,8 +213,8 @@ public class MainFragment extends Fragment {
                 }
                 mTargetAdapter.toggleSelection(position);
                 return true;
-            }
         });
+
         mTargetAdapter = new TargetAdapter();
 
         lv.setEmptyView(v.findViewById(android.R.id.empty));
@@ -447,14 +429,11 @@ public class MainFragment extends Fragment {
 
         final String msg = toastMessage;
 
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+        getActivity().runOnUiThread(() -> {
                 if (msg != null) {
                     Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
                 }
                 notifyMenuChanged();
-            }
         });
     }
 
@@ -467,9 +446,7 @@ public class MainFragment extends Fragment {
         stopNetworkRadar();
         System.markNetworkAsDisconnected();
 
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+        getActivity().runOnUiThread(() -> {
                 new ConfirmDialog(getString(R.string.connection_lost),
                         getString(R.string.connection_lost_prompt), getActivity(),
                         new ConfirmDialogListener() {
@@ -484,7 +461,6 @@ public class MainFragment extends Fragment {
                             public void onCancel() {
                             }
                         }).show();
-            }
         });
     }
 
@@ -638,33 +614,20 @@ public class MainFragment extends Fragment {
         if (!isAnyNetInterfaceAvailable || !mIsDaemonBeating) {
             return;
         }
-        ThreadHelper.getSharedExecutor().execute(new Runnable() {
-            @Override
-            public void run() {
-                Services.getNetworkRadar().start();
-            }
-        });
+        ThreadHelper.getSharedExecutor().execute(() -> Services.getNetworkRadar().start());
     }
 
     public void stopNetworkRadar() {
-        ThreadHelper.getSharedExecutor().execute(new Runnable() {
-            @Override
-            public void run() {
-                Services.getNetworkRadar().stop();
-            }
-        });
+        ThreadHelper.getSharedExecutor().execute(() -> Services.getNetworkRadar().stop());
     }
 
     /**
      * start MSF RPC Daemon
      */
     public void startRPCServer() {
-        ThreadHelper.getSharedExecutor().execute(new Runnable() {
-            @Override
-            public void run() {
+        ThreadHelper.getSharedExecutor().execute(() -> {
                 if (Services.getMsfRpcdService().isAvailable())
                     Services.getMsfRpcdService().start();
-            }
         });
     }
 
@@ -672,12 +635,7 @@ public class MainFragment extends Fragment {
      * stop MSF RPC Daemon
      */
     public void StopRPCServer() {
-        ThreadHelper.getSharedExecutor().execute(new Runnable() {
-            @Override
-            public void run() {
-                Services.getMsfRpcdService().stop();
-            }
-        });
+        ThreadHelper.getSharedExecutor().execute(() -> Services.getMsfRpcdService().stop());
     }
 
     @Override
@@ -692,16 +650,11 @@ public class MainFragment extends Fragment {
                             public void onInputEntered(String input) {
                                 final Target target = Target.getFromString(input);
                                 if (target != null) {
-                                    ThreadHelper.getSharedExecutor().execute(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            System.addOrderedTarget(target);
-                                        }
-                                    });
-                                } else
-                                    new ErrorDialog(getString(R.string.error),
-                                            getString(R.string.invalid_target),
+                                    ThreadHelper.getSharedExecutor().execute(() -> System.addOrderedTarget(target));
+                                } else {
+                                    new ErrorDialog(getString(R.string.error),getString(R.string.invalid_target),
                                             getActivity()).show();
+                                }
                             }
                         }).show();
                 return true;
@@ -734,8 +687,7 @@ public class MainFragment extends Fragment {
                                 try {
                                     System.reset();
 
-                                    Toast.makeText(
-                                            getActivity(),
+                                    Toast.makeText(getActivity(),
                                             getString(R.string.new_session_started),
                                             Toast.LENGTH_SHORT).show();
                                 } catch (Exception e) {
@@ -819,20 +771,14 @@ public class MainFragment extends Fragment {
                 return true;
 
             case R.id.ss_monitor:
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
+                new Thread(() -> {
                         Services.getNetworkRadar().onMenuClick(getActivity(), item);
-                    }
                 }).start();
                 return true;
 
             case R.id.ss_msfrpcd:
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
+                new Thread(() -> {
                         Services.getMsfRpcdService().onMenuClick(getActivity(), item);
-                    }
                 }).start();
                 return true;
 
@@ -841,7 +787,7 @@ public class MainFragment extends Fragment {
                 Intent browser = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
                 startActivity(browser);
                 // for fat-tire:
-                //   String.format(getString(R.string.issue_message), getString(R.string.github_issues_url), getString(R.string.github_new_issue_url));
+                // String.format(getString(R.string.issue_message), getString(R.string.github_issues_url), getString(R.string.github_new_issue_url));
                 return true;
 
             case R.id.about:
@@ -1038,9 +984,7 @@ public class MainFragment extends Fragment {
             }
 
             // update only a row, if it's displayed
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
+            getActivity().runOnUiThread(() -> {
                     if (lv == null)
                         return;
                     synchronized (this) {
@@ -1053,9 +997,7 @@ public class MainFragment extends Fragment {
                                 break;
                             }
                     }
-                }
             });
-
         }
 
         @Override
@@ -1142,9 +1084,7 @@ public class MainFragment extends Fragment {
         }
 
         private void onUpdateAvailable(final Update update, final boolean mandatory) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
+            getActivity().runOnUiThread(() -> {
                     new ConfirmDialog(getString(R.string.update_available),
                             update.prompt, getActivity(), new ConfirmDialogListener() {
                         @Override
@@ -1164,12 +1104,10 @@ public class MainFragment extends Fragment {
                             if (!mandatory) {
                                 return;
                             }
-
                             onInitializationError(getString(R.string.mandatory_update));
                         }
                     }
                     ).show();
-                }
             });
         }
 
@@ -1309,9 +1247,7 @@ public class MainFragment extends Fragment {
 
         private void check() {
             synchronized (getActivity()) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
+                getActivity().runOnUiThread(() -> {
                         loadInterfaces();
 
                         String current = System.getIfname();
@@ -1327,10 +1263,7 @@ public class MainFragment extends Fragment {
                         } else if (isAnyNetInterfaceAvailable) {
                             onNetworkInterfaceChanged();
                         }
-
-                    }
                 });
-
                 mTask = null;
             }
         }
