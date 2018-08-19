@@ -40,6 +40,11 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data android:name="WindowManagerPreference:SuppressWindowControlNavigationButton" android:value="true" />
+            <layout
+                android:gravity="center"
+                android:minHeight="320dp"
+                android:minWidth="480dp" />
         </activity>
 
         <!-- suppress AndroidDomInspection -->
