@@ -19,12 +19,13 @@
 package org.csploit.android.gui.dialogs;
 
 import android.content.DialogInterface;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.widget.EditText;
 
 import org.csploit.android.R;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.FragmentActivity;
 
 public class InputDialog extends AlertDialog{
   private EditText mEditText = null;

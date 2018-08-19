@@ -19,8 +19,8 @@
 package org.csploit.android.gui.dialogs;
 
 import android.content.DialogInterface;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AlertDialog;
+import androidx.fragment.app.FragmentActivity;
+import androidx.appcompat.app.AlertDialog;
 
 public class ErrorDialog extends AlertDialog {
   public ErrorDialog(String title, String message, final FragmentActivity activity){

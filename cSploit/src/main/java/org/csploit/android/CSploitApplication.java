@@ -21,7 +21,7 @@ package org.csploit.android;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.multidex.MultiDex;
+import androidx.multidex.MultiDex;
 
 import org.acra.ACRA;
 import org.acra.annotation.AcraCore;

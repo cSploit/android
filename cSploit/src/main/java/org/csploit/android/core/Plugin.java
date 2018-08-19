@@ -20,13 +20,11 @@ package org.csploit.android.core;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import org.csploit.android.R;
 import org.csploit.android.net.Target;
-import org.csploit.android.net.Target.Exploit;
-import org.csploit.android.net.Target.Port;
 import org.csploit.android.net.metasploit.RPCClient;
 
 import java.util.Arrays;

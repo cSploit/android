@@ -19,8 +19,6 @@
 package org.csploit.android.gui.dialogs;
 
 import android.content.DialogInterface;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -28,6 +26,9 @@ import android.widget.CheckedTextView;
 import android.widget.ListView;
 
 import org.csploit.android.R;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.FragmentActivity;
 
 public class MultipleChoiceDialog extends AlertDialog{
 

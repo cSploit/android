@@ -22,13 +22,14 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v4.app.FragmentActivity;
 
 import org.csploit.android.R;
 import org.csploit.android.core.Plugin;
 import org.csploit.android.core.System;
 import org.csploit.android.gui.dialogs.ErrorDialog;
 import org.csploit.android.net.Target;
+
+import androidx.fragment.app.FragmentActivity;
 
 public class RouterPwn extends Plugin{
   public RouterPwn(){
