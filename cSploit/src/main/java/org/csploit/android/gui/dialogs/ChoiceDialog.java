@@ -18,9 +18,9 @@
  */
 package org.csploit.android.gui.dialogs;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -33,7 +33,7 @@ public class ChoiceDialog extends AlertDialog{
     void onChoice(int choice);
   }
 
-  public ChoiceDialog(final Activity activity, String title, String[] choices, final ChoiceDialogListener listener){
+  public ChoiceDialog(final FragmentActivity activity, String title, String[] choices, final ChoiceDialogListener listener){
     super(activity);
 
     this.setTitle(title);

@@ -18,9 +18,9 @@
  */
 package org.csploit.android.gui.dialogs;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -40,7 +40,7 @@ public class MultipleChoiceDialog extends AlertDialog{
   /** create a list choice dialog from android resource ids
    * @param items String ids
    */
-  public MultipleChoiceDialog(int title, int[] items, Activity activity, final MultipleChoiceDialogListener listener){
+  public MultipleChoiceDialog(int title, int[] items, FragmentActivity activity, final MultipleChoiceDialogListener listener){
     super(activity);
 
     String[] _items = new String[items.length];
@@ -55,7 +55,7 @@ public class MultipleChoiceDialog extends AlertDialog{
    * @param items Strings to choose from
    */
 
-  public MultipleChoiceDialog(String title, String[] items, Activity activity, final MultipleChoiceDialogListener listener){
+  public MultipleChoiceDialog(String title, String[] items, FragmentActivity activity, final MultipleChoiceDialogListener listener){
     super(activity);
 
     commonCtor(title, items, activity, listener);
@@ -64,7 +64,7 @@ public class MultipleChoiceDialog extends AlertDialog{
   /** create a list choice dialog from generic objects array ( call toString on every object )
    * @param items
    */
-  public MultipleChoiceDialog(String title, Object[] items, Activity activity, final MultipleChoiceDialogListener listener) {
+  public MultipleChoiceDialog(String title, Object[] items, FragmentActivity activity, final MultipleChoiceDialogListener listener) {
     super(activity);
 
     String[] _items = new String[items.length];
@@ -75,7 +75,7 @@ public class MultipleChoiceDialog extends AlertDialog{
     commonCtor(title, _items, activity, listener);
   }
 
-  private void commonCtor(String title, String[] items, Activity activity, final MultipleChoiceDialogListener listener) {
+  private void commonCtor(String title, String[] items, FragmentActivity activity, final MultipleChoiceDialogListener listener) {
 
     ListView mList = new ListView(activity);
 

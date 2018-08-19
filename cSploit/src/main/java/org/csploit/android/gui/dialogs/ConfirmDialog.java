@@ -18,9 +18,9 @@
  */
 package org.csploit.android.gui.dialogs;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
 
 import org.csploit.android.R;
 
@@ -31,7 +31,7 @@ public class ConfirmDialog extends AlertDialog{
     void onCancel();
   }
 
-  public ConfirmDialog(String title, CharSequence message, Activity activity, ConfirmDialogListener confirmDialogListener){
+  public ConfirmDialog(String title, CharSequence message, FragmentActivity activity, ConfirmDialogListener confirmDialogListener){
     super(activity);
 
     this.setTitle(title);

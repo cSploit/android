@@ -18,11 +18,11 @@
  */
 package org.csploit.android.plugins;
 
-import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.v4.app.FragmentActivity;
 
 import org.csploit.android.R;
 import org.csploit.android.core.Plugin;
@@ -64,7 +64,7 @@ public class RouterPwn extends Plugin{
     }
     catch(ActivityNotFoundException e){
       System.errorLogging(e);
-      new ErrorDialog(getString(R.string.error), getString(R.string.no_activities_for_url), (Activity) context).show();
+      new ErrorDialog(getString(R.string.error), getString(R.string.no_activities_for_url), (FragmentActivity) context).show();
     }
   }
 }

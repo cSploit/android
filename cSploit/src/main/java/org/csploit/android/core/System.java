@@ -18,7 +18,6 @@
  */
 package org.csploit.android.core;
 
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
@@ -35,6 +34,8 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.SparseIntArray;
 
 import org.apache.commons.compress.utils.IOUtils;
@@ -385,12 +386,12 @@ public class System {
     mInitialized = true;
   }
 
-  public static boolean checkNetworking(final Activity current) {
+  public static boolean checkNetworking(final FragmentActivity current) {
     if (!mNetwork.isConnected()) {
 
       Intent intent = new Intent();
       intent.putExtra(WifiScannerFragment.CONNECTED, false);
-      current.setResult(Activity.RESULT_OK, intent);
+      current.setResult(AppCompatActivity.RESULT_OK, intent);
 
       String title = current.getString(R.string.error);
       String message = current.getString(R.string.wifi_went_down);

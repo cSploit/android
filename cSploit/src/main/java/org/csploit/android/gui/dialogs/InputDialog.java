@@ -18,9 +18,9 @@
  */
 package org.csploit.android.gui.dialogs;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.widget.EditText;
 
@@ -33,11 +33,11 @@ public class InputDialog extends AlertDialog{
     void onInputEntered(String input);
   }
 
-  public InputDialog(String title, String message, Activity activity, InputDialogListener inputDialogListener){
+  public InputDialog(String title, String message, FragmentActivity activity, InputDialogListener inputDialogListener){
     this(title, message, null, true, false, activity, inputDialogListener);
   }
 
-  public InputDialog(String title, String message, String text, boolean editable, boolean password, Activity activity, InputDialogListener inputDialogListener){
+  public InputDialog(String title, String message, String text, boolean editable, boolean password, FragmentActivity activity, InputDialogListener inputDialogListener){
     super(activity);
 
     mEditText = new EditText(activity);

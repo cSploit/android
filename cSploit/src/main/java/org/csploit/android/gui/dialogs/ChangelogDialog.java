@@ -19,10 +19,10 @@
 package org.csploit.android.gui.dialogs;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.widget.TextView;
 
@@ -41,7 +41,7 @@ public class ChangelogDialog extends AlertDialog
   private ProgressDialog mLoader = null;
 
   @SuppressLint("SetJavaScriptEnabled")
-  public ChangelogDialog(final Activity activity){
+  public ChangelogDialog(final AppCompatActivity activity){
     super(activity);
 
     this.setTitle("Changelog");

@@ -18,9 +18,9 @@
  */
 package org.csploit.android.gui.dialogs;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.widget.EditText;
 
@@ -29,7 +29,7 @@ import org.csploit.android.R;
 public class WifiCrackDialog extends AlertDialog{
   private EditText mEditText = null;
 
-  public WifiCrackDialog(String title, String message, Activity activity, WifiCrackDialogListener wifiCrackDialogListener){
+  public WifiCrackDialog(String title, String message, FragmentActivity activity, WifiCrackDialogListener wifiCrackDialogListener){
     super(activity);
 
     mEditText = new EditText(activity);

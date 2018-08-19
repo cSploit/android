@@ -18,15 +18,15 @@
  */
 package org.csploit.android.gui.dialogs;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.widget.TextView;
 
 public class FatalDialog extends AlertDialog{
-  public FatalDialog(String title, String message, boolean html, final Activity activity){
+  public FatalDialog(String title, String message, boolean html, final FragmentActivity activity){
     super(activity);
 
     this.setTitle(title);
@@ -52,7 +52,7 @@ public class FatalDialog extends AlertDialog{
     });
   }
 
-  public FatalDialog(String title, String message, final Activity activity){
+  public FatalDialog(String title, String message, final FragmentActivity activity){
     this(title, message, false, activity);
   }
 }
