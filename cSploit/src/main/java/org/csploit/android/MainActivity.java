@@ -70,9 +70,13 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_PHONE_STATE)
-                != PackageManager.PERMISSION_GRANTED) {
+                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this,
+              Manifest.permission.WAKE_LOCK)
+              != PackageManager.PERMISSION_GRANTED)
+      {
           ActivityCompat.requestPermissions(this,
-                  new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE},
+                  new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE,
+                  Manifest.permission.WAKE_LOCK},
                   MY_PERMISSIONS_WANTED);
         }
     }
