@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.0-alpha06'
+        classpath 'com.android.tools.build:gradle:3.3.0-alpha07'
     }
 }
 
@@ -22,6 +22,7 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0-rc01'
     implementation 'androidx.appcompat:appcompat:1.0.0-rc01'
     implementation 'androidx.preference:preference:1.0.0-rc01'
+    implementation 'androidx.multidex:multidex:2.0.0'
     implementation 'com.google.android.material:material:1.0.0-rc01'
     implementation 'org.apache.commons:commons-compress:1.18'
     implementation 'commons-net:commons-net:3.6'
