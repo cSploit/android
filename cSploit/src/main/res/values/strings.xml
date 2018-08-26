@@ -543,6 +543,6 @@
     <string name="cSploitChannelDescription" >cSploit-related messages</string>
 
     <!-- permissions -->
-    <string name="permissions_fail">Sorry, you need to approve both permission requests.</string>
+    <string name="permissions_fail">Sorry, you need to approve all permission requests.</string>
     <string name="permissions_succeed">Thanks!</string>
 </resources>

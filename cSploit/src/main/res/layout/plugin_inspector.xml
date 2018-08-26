@@ -148,7 +148,7 @@
     Later children in a RelativeLayout tend to float over earlier children in a RelativeLayout.
     https://www.stackoverflow.com/a/28651543
     -->
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/inspectToggleButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

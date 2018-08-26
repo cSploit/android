@@ -18,8 +18,8 @@
  */
 package org.csploit.android.net;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import org.csploit.android.core.System;
 import org.csploit.android.helpers.NetworkHelper;
 

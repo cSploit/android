@@ -19,7 +19,6 @@
 package org.csploit.android.net;
 
 import android.os.StrictMode;
-import android.support.annotation.NonNull;
 
 import org.csploit.android.R;
 import org.csploit.android.core.Logger;
@@ -39,6 +38,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import androidx.annotation.NonNull;
 
 public class Target implements Comparable<Target>
 {

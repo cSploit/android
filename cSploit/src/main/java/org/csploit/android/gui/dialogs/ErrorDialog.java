@@ -18,12 +18,12 @@
  */
 package org.csploit.android.gui.dialogs;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
+import androidx.fragment.app.FragmentActivity;
+import androidx.appcompat.app.AlertDialog;
 
-public class ErrorDialog extends AlertDialog{
-  public ErrorDialog(String title, String message, final Activity activity){
+public class ErrorDialog extends AlertDialog {
+  public ErrorDialog(String title, String message, final FragmentActivity activity){
     super(activity);
 
     this.setTitle(title);

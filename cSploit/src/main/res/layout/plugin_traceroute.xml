@@ -20,7 +20,7 @@
         android:layout_alignRight="@+id/traceListView"
         android:visibility="invisible" />
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/traceToggleButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

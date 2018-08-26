@@ -18,9 +18,9 @@
  */
 package org.csploit.android.gui.dialogs;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
+import androidx.fragment.app.FragmentActivity;
+import androidx.appcompat.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -31,8 +31,8 @@ import org.csploit.android.core.System;
 
 import java.text.DateFormat;
 
-public class AboutDialog extends AlertDialog{
-  public AboutDialog(Activity activity){
+public class AboutDialog extends AlertDialog {
+  public AboutDialog(FragmentActivity activity){
     super(activity);
 
     DateFormat df = DateFormat.getDateTimeInstance();
