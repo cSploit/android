@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.4.0-beta6'
+        classpath 'com.android.tools.build:gradle:1.5.0'
     }
 }
 
@@ -52,8 +52,8 @@ android {
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 22
-        versionCode 3
-        versionName "1.6.1"
+        versionCode 6
+        versionName "1.6.5"
         if(System.getenv("NIGHTLY_BUILD")) {
             versionName += "+" + System.getenv("NIGHTLY_BUILD_COMMIT").substring(0, 7)
         }
