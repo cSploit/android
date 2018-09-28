@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <item name="actionBarStyle">@style/Theme.CSploitActionBarStyle</item>
         <item name="android:windowBackground">@color/background_window</item>
         <item name="colorPrimary">@color/app_color</item>
@@ -17,7 +17,7 @@
 
     <!-- this dark theme needs a lot of help and support in the app overall -->
 
-    <style name="DarkTheme" parent="Theme.AppCompat">
+    <style name="DarkTheme" parent="Theme.MaterialComponents">
         <item name="actionBarStyle">@style/Theme.CSploitActionBarDarkStyle</item>
         <item name="actionModeBackground">@color/app_color_dark</item>
         <item name="colorPrimary">@color/selectable_blue_dark</item>
