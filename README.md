@@ -1,3 +1,7 @@
+# Submitting issues and reporting bugs
+
+Before posting an issue, please have a look at [our guide](https://github.com/cSploit/android/wiki/How-to-open-an-issue).
+
 # cSploit: Android network pentesting suite
 
 <img src="http://i.imgur.com/cFll5P9.jpg" width="250" />
