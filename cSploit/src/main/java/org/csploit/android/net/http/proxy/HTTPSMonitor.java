@@ -21,34 +21,34 @@ package org.csploit.android.net.http.proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class HTTPSMonitor{
-  private static HTTPSMonitor mInstance = null;
+public class HTTPSMonitor {
+    private static HTTPSMonitor mInstance = null;
 
-  private HashMap<String, ArrayList<String>> mMap = null;
+    private HashMap<String, ArrayList<String>> mMap;
 
-  public static HTTPSMonitor getInstance(){
-    if(mInstance == null)
-      mInstance = new HTTPSMonitor();
+    public HTTPSMonitor() {
+        mMap = new HashMap<>();
+    }
 
-    return mInstance;
-  }
+    public static HTTPSMonitor getInstance() {
+        if (mInstance == null)
+            mInstance = new HTTPSMonitor();
 
-  public HTTPSMonitor(){
-    mMap = new HashMap<String, ArrayList<String>>();
-  }
+        return mInstance;
+    }
 
-  public void addURL(String client, String url){
-    if(mMap.containsKey(client) == false)
-      mMap.put(client, new ArrayList<String>());
+    public void addURL(String client, String url) {
+        if (!mMap.containsKey(client))
+            mMap.put(client, new ArrayList<>());
 
-    mMap.get(client).add(url);
-  }
+        mMap.get(client).add(url);
+    }
 
-  public boolean hasURL(String client, String url){
-    ArrayList<String> urls = mMap.get(client);
-    if(urls != null)
-      return urls.contains(url);
-    else
-      return false;
-  }
+    public boolean hasURL(String client, String url) {
+        ArrayList<String> urls = mMap.get(client);
+        if (urls != null)
+            return urls.contains(url);
+        else
+            return false;
+    }
 }

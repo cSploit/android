@@ -28,57 +28,56 @@ import org.csploit.android.core.System;
  */
 public class Ruby extends Tool {
 
-  private final static String rubyLib = "%1$s/site_ruby/1.9.1:%1$s/site_ruby/1.9.1/arm-linux-androideabi:%1$s/site_ruby:%1$s/vendor_ruby/1.9.1:%1$s/vendor_ruby/1.9.1/arm-linux-androideabi:%1$s/vendor_ruby:%1$s/1.9.1:%1$s/1.9.1/arm-linux-androideabi";
+    private final static String rubyLib = "%1$s/site_ruby/1.9.1:%1$s/site_ruby/1.9.1/arm-linux-androideabi:%1$s/site_ruby:%1$s/vendor_ruby/1.9.1:%1$s/vendor_ruby/1.9.1/arm-linux-androideabi:%1$s/vendor_ruby:%1$s/1.9.1:%1$s/1.9.1/arm-linux-androideabi";
+    protected SettingReceiver onSettingsChanged = new SettingReceiver() {
 
-  public Ruby() {
-    mHandler = "raw";
-  }
+        public void onSettingChanged(String key) {
+            setEnabled();
+        }
+    };
 
-  public void init() {
-    setEnabled();
-
-    if(mEnabled)
-      setupEnvironment();
-
-    registerSettingReceiver();
-  }
-
-  @Override
-  public void setEnabled() {
-    super.setEnabled();
-    mEnabled = mEnabled &&
-            System.getSettings().getBoolean("MSF_ENABLED", true) &&
-                    (ExecChecker.ruby().getRoot() != null ||
-                            ExecChecker.ruby().canExecuteInDir(System.getRubyPath()));
-  }
-
-  protected void registerSettingReceiver() {
-    onSettingsChanged.addFilter("MSF_ENABLED");
-    onSettingsChanged.addFilter("RUBY_DIR");
-    System.registerSettingListener(onSettingsChanged);
-  }
-
-  protected void unregisterSettingReceiver() {
-    System.unregisterSettingListener(onSettingsChanged);
-  }
-
-  protected SettingReceiver onSettingsChanged = new SettingReceiver() {
-
-    public void onSettingChanged(String key) {
-      setEnabled();
+    public Ruby() {
+        mHandler = "raw";
     }
-  };
 
-  public void setupEnvironment() {
-    String rubyRoot;
-    String path;
-    mEnv = new String[3];
+    public void init() {
+        setEnabled();
 
-    rubyRoot = ExecChecker.ruby().getRoot();
-    path = java.lang.System.getenv("PATH");
+        if (mEnabled)
+            setupEnvironment();
 
-    mEnv[0] = String.format("RUBYLIB=" + rubyLib, rubyRoot + "/lib/ruby");
-    mEnv[1] = String.format("PATH=%s:%s", path, rubyRoot + "/bin");
-    mEnv[2] = String.format("HOME=%s", rubyRoot + "/home/ruby");
-  }
+        registerSettingReceiver();
+    }
+
+    @Override
+    public void setEnabled() {
+        super.setEnabled();
+        mEnabled = mEnabled &&
+                System.getSettings().getBoolean("MSF_ENABLED", true) &&
+                (ExecChecker.ruby().getRoot() != null ||
+                        ExecChecker.ruby().canExecuteInDir(System.getRubyPath()));
+    }
+
+    protected void registerSettingReceiver() {
+        onSettingsChanged.addFilter("MSF_ENABLED");
+        onSettingsChanged.addFilter("RUBY_DIR");
+        System.registerSettingListener(onSettingsChanged);
+    }
+
+    protected void unregisterSettingReceiver() {
+        System.unregisterSettingListener(onSettingsChanged);
+    }
+
+    public void setupEnvironment() {
+        String rubyRoot;
+        String path;
+        mEnv = new String[3];
+
+        rubyRoot = ExecChecker.ruby().getRoot();
+        path = java.lang.System.getenv("PATH");
+
+        mEnv[0] = String.format("RUBYLIB=" + rubyLib, rubyRoot + "/lib/ruby");
+        mEnv[1] = String.format("PATH=%s:%s", path, rubyRoot + "/bin");
+        mEnv[2] = String.format("HOME=%s", rubyRoot + "/home/ruby");
+    }
 }

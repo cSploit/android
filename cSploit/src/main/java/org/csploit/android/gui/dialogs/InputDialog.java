@@ -18,7 +18,6 @@
  */
 package org.csploit.android.gui.dialogs;
 
-import android.content.DialogInterface;
 import android.text.InputType;
 import android.widget.EditText;
 
@@ -27,48 +26,44 @@ import org.csploit.android.R;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
-public class InputDialog extends AlertDialog{
-  private EditText mEditText = null;
+public class InputDialog extends AlertDialog {
+    private EditText mEditText = null;
 
-  public interface InputDialogListener{
-    void onInputEntered(String input);
-  }
+    public InputDialog(String title, String message, FragmentActivity activity,
+                       InputDialogListener inputDialogListener) {
+        this(title, message, null, true, false, activity, inputDialogListener);
+    }
 
-  public InputDialog(String title, String message, FragmentActivity activity, InputDialogListener inputDialogListener){
-    this(title, message, null, true, false, activity, inputDialogListener);
-  }
+    public InputDialog(String title, String message, String text, boolean editable,
+                       boolean password, FragmentActivity activity, InputDialogListener inputDialogListener) {
+        super(activity);
 
-  public InputDialog(String title, String message, String text, boolean editable, boolean password, FragmentActivity activity, InputDialogListener inputDialogListener){
-    super(activity);
+        mEditText = new EditText(activity);
 
-    mEditText = new EditText(activity);
+        if (text != null)
+            mEditText.setText(text);
 
-    if(text != null)
-      mEditText.setText(text);
+        mEditText.setEnabled(editable);
+        mEditText.setMaxHeight(250);
 
-    mEditText.setEnabled(editable);
-    mEditText.setMaxHeight(250);
+        if (password)
+            mEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
-    if(password)
-      mEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        this.setTitle(title);
+        this.setMessage(message);
 
-    this.setTitle(title);
-    this.setMessage(message);
+        this.setView(mEditText, 40, 0, 40, 0);
 
-    this.setView(mEditText, 40, 0, 40, 0);
+        final InputDialogListener listener = inputDialogListener;
+        this.setButton(BUTTON_POSITIVE, "Ok", (dialog, id) -> {
+            if (listener != null)
+                listener.onInputEntered(mEditText.getText() + "");
+        });
 
-    final InputDialogListener listener = inputDialogListener;
-    this.setButton(BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int id) {
-        if(listener != null)
-          listener.onInputEntered(mEditText.getText() + "");
-      }
-    });
+        this.setButton(BUTTON_NEGATIVE, activity.getString(R.string.cancel_dialog), (dialog, id) -> dialog.dismiss());
+    }
 
-    this.setButton(BUTTON_NEGATIVE, activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int id) {
-        dialog.dismiss();
-      }
-    });
-  }
+    public interface InputDialogListener {
+        void onInputEntered(String input);
+    }
 }

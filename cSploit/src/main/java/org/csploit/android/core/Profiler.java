@@ -16,54 +16,54 @@
  * You should have received a copy of the GNU General Public License
  * along with dSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.csploit.android.core;
 
 // a little class to profile network latency ^_^
-public class Profiler{
-  private static volatile Profiler mInstance = null;
+public class Profiler {
+    private static volatile Profiler mInstance = null;
+    private volatile boolean mEnabled;
+    private volatile long mTick = 0;
+    private volatile String mProfiling = null;
 
-  public static Profiler instance(){
-    if(mInstance == null)
-      mInstance = new Profiler();
-
-    return mInstance;
-  }
-
-  private volatile boolean mEnabled = false;
-  private volatile long mTick = 0;
-  private volatile String mProfiling = null;
-
-  public Profiler(){
-    mEnabled = System.getSettings().getBoolean("PREF_ENABLE_PROFILER", false);
-  }
-
-  private String format(long delta){
-    if(delta < 1000)
-      return delta + " ms";
-
-    else if(delta < 60000)
-      return (delta / 1000.0) + " s";
-
-    else
-      return (delta / 60000.0) + " m";
-  }
-
-  public void emit(){
-    if(mEnabled && mTick > 0 && mProfiling != null){
-      long delta = java.lang.System.currentTimeMillis() - mTick;
-
-      Logger.debug("[" + mProfiling + "] " + format(delta));
-
-      mProfiling = null;
-      mTick = 0;
+    public Profiler() {
+        mEnabled = System.getSettings().getBoolean("PREF_ENABLE_PROFILER", false);
     }
-  }
 
-  public void profile(String label){
-    emit();
-    if(mEnabled){
-      mTick = java.lang.System.currentTimeMillis();
-      mProfiling = label;
+    public static Profiler instance() {
+        if (mInstance == null)
+            mInstance = new Profiler();
+
+        return mInstance;
     }
-  }
+
+    private String format(long delta) {
+        if (delta < 1000)
+            return delta + " ms";
+
+        else if (delta < 60000)
+            return (delta / 1000.0) + " s";
+
+        else
+            return (delta / 60000.0) + " m";
+    }
+
+    public void emit() {
+        if (mEnabled && mTick > 0 && mProfiling != null) {
+            long delta = java.lang.System.currentTimeMillis() - mTick;
+
+            Logger.debug("[" + mProfiling + "] " + format(delta));
+
+            mProfiling = null;
+            mTick = 0;
+        }
+    }
+
+    public void profile(String label) {
+        emit();
+        if (mEnabled) {
+            mTick = java.lang.System.currentTimeMillis();
+            mProfiling = label;
+        }
+    }
 }

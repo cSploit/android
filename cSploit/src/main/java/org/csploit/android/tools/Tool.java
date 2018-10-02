@@ -22,56 +22,55 @@ import org.csploit.android.core.Child;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Logger;
 
-public abstract class Tool
-{
-  protected boolean mEnabled = true;
-  protected String mHandler = null;
-  protected String mCmdPrefix = null;
-  protected String[] mEnv = null;
+public abstract class Tool {
+    protected boolean mEnabled = true;
+    protected String mHandler = null;
+    protected String mCmdPrefix = null;
+    protected String[] mEnv = null;
 
-  public int run(String args, Child.EventReceiver receiver) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
-    return ChildManager.wait(async(args, receiver));
-  }
-
-  public int run(Child.EventReceiver receiver) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
-    return run(null, receiver);
-  }
-
-  public int run(String args) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
-    return run(args, null);
-  }
-
-  public Child async(String args, Child.EventReceiver receiver) throws ChildManager.ChildNotStartedException {
-
-    if(!mEnabled) {
-      Logger.warning(mHandler + (mCmdPrefix != null ? ":" + mCmdPrefix : "" ) + ": disabled");
-      throw new ChildManager.ChildNotStartedException();
+    public int run(String args, Child.EventReceiver receiver) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
+        return ChildManager.wait(async(args, receiver));
     }
 
-    if(mCmdPrefix!=null) {
-      if(args != null) {
-        args = mCmdPrefix + " " + args;
-      } else {
-        args = mCmdPrefix;
-      }
+    public int run(Child.EventReceiver receiver) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
+        return run(null, receiver);
     }
 
-    return ChildManager.async(mHandler, args, mEnv, receiver);
-  }
+    public int run(String args) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
+        return run(args, null);
+    }
 
-  public Child async(String args) throws ChildManager.ChildNotStartedException {
-    return this.async(args, null);
-  }
+    public Child async(String args, Child.EventReceiver receiver) throws ChildManager.ChildNotStartedException {
 
-  public Child async(Child.EventReceiver receiver) throws ChildManager.ChildNotStartedException {
-    return async(null, receiver);
-  }
+        if (!mEnabled) {
+            Logger.warning(mHandler + (mCmdPrefix != null ? ":" + mCmdPrefix : "") + ": disabled");
+            throw new ChildManager.ChildNotStartedException();
+        }
 
-  public boolean isEnabled() {
-    return mEnabled;
-  }
+        if (mCmdPrefix != null) {
+            if (args != null) {
+                args = mCmdPrefix + " " + args;
+            } else {
+                args = mCmdPrefix;
+            }
+        }
 
-  public void setEnabled() {
-    mEnabled = ChildManager.handlers != null && ChildManager.handlers.contains(mHandler);
-  }
+        return ChildManager.async(mHandler, args, mEnv, receiver);
+    }
+
+    public Child async(String args) throws ChildManager.ChildNotStartedException {
+        return this.async(args, null);
+    }
+
+    public Child async(Child.EventReceiver receiver) throws ChildManager.ChildNotStartedException {
+        return async(null, receiver);
+    }
+
+    public boolean isEnabled() {
+        return mEnabled;
+    }
+
+    public void setEnabled() {
+        mEnabled = ChildManager.handlers != null && ChildManager.handlers.contains(mHandler);
+    }
 }

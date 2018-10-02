@@ -18,41 +18,37 @@
  */
 package org.csploit.android.gui.dialogs;
 
-import android.content.DialogInterface;
-import androidx.fragment.app.FragmentActivity;
-import androidx.appcompat.app.AlertDialog;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.widget.TextView;
 
-public class FatalDialog extends AlertDialog{
-  public FatalDialog(String title, String message, boolean html, final FragmentActivity activity){
-    super(activity);
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.FragmentActivity;
 
-    this.setTitle(title);
+public class FatalDialog extends AlertDialog {
+    public FatalDialog(String title, String message, boolean html, final FragmentActivity activity) {
+        super(activity);
 
-    if(!html)
-      this.setMessage(message);
+        this.setTitle(title);
 
-    else{
-      TextView text = new TextView(activity);
+        if (!html)
+            this.setMessage(message);
 
-      text.setMovementMethod(LinkMovementMethod.getInstance());
-      text.setText(Html.fromHtml(message));
-      text.setPadding(10, 10, 10, 10);
+        else {
+            TextView text = new TextView(activity);
 
-      this.setView(text);
+            text.setMovementMethod(LinkMovementMethod.getInstance());
+            text.setText(Html.fromHtml(message));
+            text.setPadding(10, 10, 10, 10);
+
+            this.setView(text);
+        }
+
+        this.setCancelable(false);
+        this.setButton(BUTTON_POSITIVE, "Ok", (dialog, id) -> activity.finish());
     }
 
-    this.setCancelable(false);
-    this.setButton(BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener(){
-      public void onClick(DialogInterface dialog, int id){
-        activity.finish();
-      }
-    });
-  }
-
-  public FatalDialog(String title, String message, final FragmentActivity activity){
-    this(title, message, false, activity);
-  }
+    public FatalDialog(String title, String message, final FragmentActivity activity) {
+        this(title, message, false, activity);
+    }
 }

@@ -18,9 +18,6 @@
  */
 package org.csploit.android.gui.dialogs;
 
-import android.content.DialogInterface;
-import androidx.fragment.app.FragmentActivity;
-import androidx.appcompat.app.AlertDialog;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -29,48 +26,45 @@ import android.widget.Spinner;
 
 import org.csploit.android.R;
 
-public class SpinnerDialog extends AlertDialog{
-  private int mSelected = 0;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.FragmentActivity;
 
-  public SpinnerDialog(String title, String message, String[] items, int default_index, FragmentActivity activity, final SpinnerDialogListener listener){
-    super(activity);
+public class SpinnerDialog extends AlertDialog {
+    private int mSelected = 0;
 
-    Spinner mSpinner = new Spinner(activity);
-    mSpinner.setAdapter(new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, items));
+    public SpinnerDialog(String title, String message, String[] items,
+                         int default_index, FragmentActivity activity, final SpinnerDialogListener listener) {
+        super(activity);
 
-    mSpinner.setOnItemSelectedListener(new OnItemSelectedListener(){
-      public void onItemSelected(AdapterView<?> adapter, View view, int position, long id){
-        mSelected = position;
-      }
+        Spinner mSpinner = new Spinner(activity);
+        mSpinner.setAdapter(new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, items));
 
-      public void onNothingSelected(AdapterView<?> arg0){
-      }
-    });
+        mSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> adapter, View view, int position, long id) {
+                mSelected = position;
+            }
 
-    mSpinner.setSelection(default_index);
+            public void onNothingSelected(AdapterView<?> arg0) {
+            }
+        });
 
-    this.setTitle(title);
-    this.setMessage(message);
-    this.setView(mSpinner);
+        mSpinner.setSelection(default_index);
 
-    this.setButton(BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener(){
-      public void onClick(DialogInterface dialog, int id){
-        listener.onItemSelected(mSelected);
-      }
-    });
+        this.setTitle(title);
+        this.setMessage(message);
+        this.setView(mSpinner);
 
-    this.setButton(BUTTON_NEGATIVE, activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int id) {
-        dialog.dismiss();
-      }
-    });
-  }
+        this.setButton(BUTTON_POSITIVE, "Ok", (dialog, id) -> listener.onItemSelected(mSelected));
 
-  public SpinnerDialog(String title, String message, String[] items, FragmentActivity activity, final SpinnerDialogListener listener) {
-    this(title,message,items,0,activity,listener);
-  }
+        this.setButton(BUTTON_NEGATIVE, activity.getString(R.string.cancel_dialog), (dialog, id) -> dialog.dismiss());
+    }
 
-  public interface SpinnerDialogListener{
-    void onItemSelected(int index);
-  }
+    public SpinnerDialog(String title, String message, String[] items, FragmentActivity activity,
+                         final SpinnerDialogListener listener) {
+        this(title, message, items, 0, activity, listener);
+    }
+
+    public interface SpinnerDialogListener {
+        void onItemSelected(int index);
+    }
 }

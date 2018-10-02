@@ -23,35 +23,35 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
-public abstract class ManagedReceiver extends BroadcastReceiver{
-  private boolean mRegistered = false;
-  private Context mContext = null;
+public abstract class ManagedReceiver extends BroadcastReceiver {
+    private boolean mRegistered = false;
+    private Context mContext = null;
 
-  @Override
-  public void onReceive(Context context, Intent intent){
-  }
-
-  public void unregister(){
-    if(mRegistered && mContext != null){
-      mContext.unregisterReceiver(this);
-      mRegistered = false;
-      mContext = null;
+    @Override
+    public void onReceive(Context context, Intent intent) {
     }
-  }
 
-  public void register(Context context){
-    if(mRegistered)
-      unregister();
+    public void unregister() {
+        if (mRegistered && mContext != null) {
+            mContext.unregisterReceiver(this);
+            mRegistered = false;
+            mContext = null;
+        }
+    }
 
-    context.registerReceiver(this, getFilter());
-    mRegistered = true;
-    mContext = context;
-  }
+    public void register(Context context) {
+        if (mRegistered)
+            unregister();
 
-  public abstract IntentFilter getFilter();
+        context.registerReceiver(this, getFilter());
+        mRegistered = true;
+        mContext = context;
+    }
 
-  protected void finalize() throws Throwable{
-    unregister();
-    super.finalize();
-  }
+    public abstract IntentFilter getFilter();
+
+    protected void finalize() throws Throwable {
+        unregister();
+        super.finalize();
+    }
 }

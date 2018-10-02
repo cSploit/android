@@ -29,10 +29,6 @@ import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import androidx.fragment.app.ListFragment;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.MenuItemCompat;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.ClipboardManager;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -52,7 +48,6 @@ import org.csploit.android.core.ManagedReceiver;
 import org.csploit.android.core.System;
 import org.csploit.android.gui.dialogs.ErrorDialog;
 import org.csploit.android.gui.dialogs.InputDialog;
-import org.csploit.android.gui.dialogs.InputDialog.InputDialogListener;
 import org.csploit.android.gui.dialogs.WifiCrackDialog;
 import org.csploit.android.gui.dialogs.WifiCrackDialog.WifiCrackDialogListener;
 import org.csploit.android.wifi.Keygen;
@@ -62,16 +57,19 @@ import org.csploit.android.wifi.WirelessMatcher;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuItemCompat;
+import androidx.fragment.app.ListFragment;
 
 import static android.net.wifi.WifiManager.EXTRA_NEW_STATE;
 import static android.net.wifi.WifiManager.SCAN_RESULTS_AVAILABLE_ACTION;
 import static android.net.wifi.WifiManager.SUPPLICANT_STATE_CHANGED_ACTION;
 
 @SuppressWarnings("deprecation")
-public class WifiScannerFragment extends ListFragment
-{
+public class WifiScannerFragment extends ListFragment {
     public static final String CONNECTED = "WifiScannerActivity.CONNECTED";
     private WifiManager mWifiManager = null;
     private WirelessMatcher mWifiMatcher = null;
@@ -93,15 +91,15 @@ public class WifiScannerFragment extends ListFragment
         List<WifiConfiguration> configurations = mWifiManager.getConfiguredNetworks();
         boolean restore = false;
 
-        if(configurations != null) {
-            for(WifiConfiguration config : configurations){
+        if (configurations != null) {
+            for (WifiConfiguration config : configurations) {
                 mWifiManager.enableNetwork(config.networkId, false);
                 restore = restore || (mPreviousConfig != null && mPreviousConfig.SSID.equals(config.SSID) &&
-                        ( mCurrentKey == null || !mCurrentKey.equals(mPreviousConfig.preSharedKey) ) );
+                        (mCurrentKey == null || !mCurrentKey.equals(mPreviousConfig.preSharedKey)));
             }
         }
 
-        if(restore && !mConnected) {
+        if (restore && !mConnected) {
             restorePreviousConfig();
         }
     }
@@ -109,20 +107,22 @@ public class WifiScannerFragment extends ListFragment
     private void restorePreviousConfig() {
         WifiConfiguration config = NetworkManager.getWifiConfiguration(mWifiManager, mPreviousConfig);
 
-        if(config != null) {
+        if (config != null) {
             mWifiManager.removeNetwork(config.networkId);
         }
 
-        if(mWifiManager.addNetwork(mPreviousConfig) != -1) {
+        if (mWifiManager.addNetwork(mPreviousConfig) != -1) {
             mWifiManager.saveConfiguration();
         }
 
         mPreviousConfig = null;
     }
 
-    public void onSuccessfulConnection(){
-        if(mCurrentKey != null){
-            mStatusText.setText(Html.fromHtml(getString(R.string.connected_to) + mCurrentAp.SSID + getString(R.string.connected_to2) + mCurrentKey + getString(R.string.connected_to3)));
+    public void onSuccessfulConnection() {
+        if (mCurrentKey != null) {
+            mStatusText.setText(Html.fromHtml(getString(R.string.connected_to) +
+                    mCurrentAp.SSID + getString(R.string.connected_to2) +
+                    mCurrentKey + getString(R.string.connected_to3)));
             Toast.makeText(getActivity(), getString(R.string.wifi_key_copied), Toast.LENGTH_SHORT).show();
             mClipboard.setText(mCurrentKey);
         } else
@@ -134,19 +134,20 @@ public class WifiScannerFragment extends ListFragment
         onEnd();
     }
 
-    public void onFailedConnection(){
+    public void onFailedConnection() {
         mWifiManager.removeNetwork(mCurrentNetworkId);
 
-        if(!mKeyList.isEmpty()) {
+        if (!mKeyList.isEmpty()) {
             nextConnectionAttempt();
             return;
         }
 
-        mStatusText.setText(Html.fromHtml(getString(R.string.connection_to) + mCurrentAp.SSID + getString(R.string.connection_to2)));
+        mStatusText.setText(Html.fromHtml(getString(R.string.connection_to) +
+                mCurrentAp.SSID + getString(R.string.connection_to2)));
 
         List<WifiConfiguration> configurations = mWifiManager.getConfiguredNetworks();
-        if(configurations != null){
-            for(WifiConfiguration config : configurations){
+        if (configurations != null) {
+            for (WifiConfiguration config : configurations) {
                 mWifiManager.enableNetwork(config.networkId, false);
             }
         }
@@ -156,7 +157,7 @@ public class WifiScannerFragment extends ListFragment
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState){
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SharedPreferences themePrefs = getActivity().getSharedPreferences("THEME", 0);
         Boolean isDark = themePrefs.getBoolean("isDark", false);
@@ -181,83 +182,81 @@ public class WifiScannerFragment extends ListFragment
         if (isDark) {
             getActivity().setTheme(R.style.DarkTheme);
             v.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.background_window_dark));
-        }
-        else {
+        } else {
             getActivity().setTheme(R.style.AppTheme);
             v.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.background_window));
         }
-        mWifiManager = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
+        mWifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         mClipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
         mWifiMatcher = new WirelessMatcher(getResources().openRawResource(R.raw.alice));
         mScanReceiver = new ScanReceiver();
         mConnectionReceiver = new ConnectionReceiver();
-        mStatusText = (TextView) v.findViewById(R.id.scanStatusText);
+        mStatusText = v.findViewById(R.id.scanStatusText);
         mAdapter = new ScanAdapter();
         mKeyList = new ArrayList<>();
 
         getListView().setAdapter(mAdapter);
 
-        mStatusText.setText( getString(R.string.wifi_initializing) );
+        mStatusText.setText(getString(R.string.wifi_initializing));
 
-        if(!mWifiManager.isWifiEnabled()){
-            mStatusText.setText( getString(R.string.wifi_activating_iface) );
+        if (!mWifiManager.isWifiEnabled()) {
+            mStatusText.setText(getString(R.string.wifi_activating_iface));
             mWifiManager.setWifiEnabled(true);
             mStatusText.setText(getString(R.string.wifi_activated));
         }
 
         mScanReceiver.register(getActivity());
 
-        if(mMenu != null) {
+        if (mMenu != null) {
             MenuItem menuScan = mMenu.findItem(R.id.scan);
             MenuItemCompat.setActionView(menuScan, new ProgressBar(getActivity()));
         }
 
-        mStatusText.setText( getString(R.string.wifi_scanning) );
+        mStatusText.setText(getString(R.string.wifi_scanning));
         mScanning = true;
 
         mWifiManager.startScan();
     }
 
-    private int performConnection(final ScanResult ap, final String key){
+    private int performConnection(final ScanResult ap, final String key) {
         mWifiManager.disconnect();
 
         mCurrentKey = key;
         mCurrentAp = ap;
 
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (key != null)
-                    mStatusText.setText(Html.fromHtml(getString(R.string.wifi_attempting_to) + " <b>" + ap.SSID + "</b> " + getString(R.string.wifi_with_key) + " <b>" + key + "</b> ..."));
-                else
-                    mStatusText.setText(Html.fromHtml(getString(R.string.wifi_connecting_to) + " <b>" + ap.SSID + "</b> ..."));
-            }
+        getActivity().runOnUiThread(() -> {
+            if (key != null)
+                mStatusText.setText(Html.fromHtml(getString(R.string.wifi_attempting_to) +
+                        " <b>" + ap.SSID + "</b> " + getString(R.string.wifi_with_key) + " <b>" + key + "</b> ..."));
+            else
+                mStatusText.setText(Html.fromHtml(getString(R.string.wifi_connecting_to) +
+                        " <b>" + ap.SSID + "</b> ..."));
         });
 
         WifiConfiguration config = new WifiConfiguration();
-        int network = -1;
+        int network;
 
         config.SSID = "\"" + ap.SSID + "\"";
         config.BSSID = ap.BSSID;
 
-		/*
+        /*
          * Configure security.
-		 */
-        if(ap.capabilities.contains("WEP")){
+         */
+        if (ap.capabilities.contains("WEP")) {
             config.wepKeys[0] = "\"" + key + "\"";
             config.wepTxKeyIndex = 0;
             config.status = WifiConfiguration.Status.ENABLED;
             config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
             config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
-        } else if(ap.capabilities.contains("WPA"))
+        } else if (ap.capabilities.contains("WPA"))
             config.preSharedKey = "\"" + key + "\"";
 
         else
             config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
 
         network = mWifiManager.addNetwork(config);
-        if(network != -1){
-            if(mWifiManager.saveConfiguration()){
+        if (network != -1) {
+            if (mWifiManager.saveConfiguration()) {
                 config = NetworkManager.getWifiConfiguration(mWifiManager, config);
 
                 // Make it the highest priority.
@@ -266,7 +265,7 @@ public class WifiScannerFragment extends ListFragment
                 int old_priority = config.priority,
                         max_priority = NetworkManager.getMaxPriority(mWifiManager) + 1;
 
-                if(max_priority > 9999){
+                if (max_priority > 9999) {
                     NetworkManager.shiftPriorityAndSave(mWifiManager);
                     config = NetworkManager.getWifiConfiguration(mWifiManager, config);
                 }
@@ -275,16 +274,16 @@ public class WifiScannerFragment extends ListFragment
                 config.priority = max_priority;
                 network = mWifiManager.updateNetwork(config);
 
-                if(network != -1){
+                if (network != -1) {
                     // Do not disable others
-                    if(mWifiManager.enableNetwork(network, false)){
-                        if(mWifiManager.saveConfiguration()){
+                    if (mWifiManager.enableNetwork(network, false)) {
+                        if (mWifiManager.saveConfiguration()) {
                             // We have to retrieve the WifiConfiguration after save.
                             config = NetworkManager.getWifiConfiguration(mWifiManager, config);
-                            if(config != null){
+                            if (config != null) {
                                 // Disable others, but do not save.
                                 // Just to force the WifiManager to connect to it.
-                                if(mWifiManager.enableNetwork(config.networkId, true)){
+                                if (mWifiManager.enableNetwork(config.networkId, true)) {
                                     return mWifiManager.reassociate() ? config.networkId : -1;
                                 }
                             }
@@ -299,14 +298,14 @@ public class WifiScannerFragment extends ListFragment
         return network;
     }
 
-    private void nextConnectionAttempt(){
-        if(mKeyList.size() > 0){
+    private void nextConnectionAttempt() {
+        if (mKeyList.size() > 0) {
             mCurrentKey = mKeyList.get(0);
 
             mKeyList.remove(0);
 
             mCurrentNetworkId = performConnection(mCurrentAp, mCurrentKey);
-            if(mCurrentNetworkId != -1)
+            if (mCurrentNetworkId != -1)
                 mConnectionReceiver.register(getActivity());
 
             else
@@ -315,68 +314,62 @@ public class WifiScannerFragment extends ListFragment
             mConnectionReceiver.unregister();
     }
 
-    private void performCracking(final Keygen keygen, final ScanResult ap){
+    private void performCracking(final Keygen keygen, final ScanResult ap) {
 
-        final ProgressDialog dialog = ProgressDialog.show(getActivity(), "", getString(R.string.generating_keys), true, false);
+        final ProgressDialog dialog = ProgressDialog.show(getActivity(), "",
+                getString(R.string.generating_keys), true, false);
 
-        new Thread(new Runnable(){
-            @Override
-            public void run(){
-                dialog.show();
+        new Thread(() -> {
+            dialog.show();
 
-                try{
-                    List<String> keys = keygen.getKeys();
+            try {
+                List<String> keys = keygen.getKeys();
 
-                    if(keys == null || keys.size() == 0){
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                new ErrorDialog(getString(R.string.error), keygen.getErrorMessage().isEmpty() ? getString(R.string.wifi_error_keys) : keygen.getErrorMessage(), getActivity()).show();
-                            }
-                        });
-                    }
-                    else{
-                        mCurrentAp = ap;
-                        mKeyList = keys;
+                if (keys == null || keys.size() == 0) {
+                    getActivity().runOnUiThread(() ->
+                            new ErrorDialog(getString(R.string.error), keygen.getErrorMessage().isEmpty() ?
+                                    getString(R.string.wifi_error_keys) : keygen.getErrorMessage(),
+                                    getActivity()).show());
+                } else {
+                    mCurrentAp = ap;
+                    mKeyList = keys;
 
-                        nextConnectionAttempt();
-                    }
+                    nextConnectionAttempt();
                 }
-                catch(Exception e){
-                    System.errorLogging(e);
-                } finally{
-                    dialog.dismiss();
-                }
+            } catch (Exception e) {
+                System.errorLogging(e);
+            } finally {
+                dialog.dismiss();
             }
         }).start();
     }
 
     @Override
-    public void onListItemClick(ListView l, View v, int position, long id){
+    public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
         final ScanResult result = mAdapter.getItem(position);
-        if(result != null){
+        if (result != null) {
             final Keygen keygen = mWifiMatcher.getKeygen(result);
 
             mPreviousConfig = NetworkManager.getWifiConfiguration(mWifiManager, result);
 
-            if(mPreviousConfig != null ) {
+            if (mPreviousConfig != null) {
                 mWifiManager.removeNetwork(mPreviousConfig.networkId);
             }
 
-            if(keygen != null && (result.capabilities.contains("WEP") || result.capabilities.contains("WPA"))){
+            if (keygen != null && (result.capabilities.contains("WEP") || result.capabilities.contains("WPA"))) {
                 mKeyList.clear();
                 new WifiCrackDialog
                         (
                                 result.SSID,
                                 getResources().getString(R.string.enter_key_or_crack),
                                 getActivity(),
-                                new WifiCrackDialogListener(){
+                                new WifiCrackDialogListener() {
                                     @Override
-                                    public void onManualConnect(String key){
+                                    public void onManualConnect(String key) {
                                         mCurrentNetworkId = performConnection(result, key);
-                                        if(mCurrentNetworkId != -1)
+                                        if (mCurrentNetworkId != -1)
                                             mConnectionReceiver.register(getActivity());
 
                                         else
@@ -384,22 +377,20 @@ public class WifiScannerFragment extends ListFragment
                                     }
 
                                     @Override
-                                    public void onCrack(){
+                                    public void onCrack() {
                                         performCracking(keygen, result);
                                     }
                                 }
                         ).show();
-            } else{
-                if(result.capabilities.contains("WEP") || result.capabilities.contains("WPA")){
-                    new InputDialog(result.SSID, getString(R.string.enter_wifi_key), null, true, true, getActivity(), new InputDialogListener(){
-                        @Override
-                        public void onInputEntered(String input){
-                            mCurrentNetworkId = performConnection(result, input);
-                            if(mCurrentNetworkId != -1)
-                                mConnectionReceiver.register(getActivity());
-                            else
-                                mConnectionReceiver.unregister();
-                        }
+            } else {
+                if (result.capabilities.contains("WEP") || result.capabilities.contains("WPA")) {
+                    new InputDialog(result.SSID, getString(R.string.enter_wifi_key),
+                            null, true, true, getActivity(), input -> {
+                        mCurrentNetworkId = performConnection(result, input);
+                        if (mCurrentNetworkId != -1)
+                            mConnectionReceiver.register(getActivity());
+                        else
+                            mConnectionReceiver.unregister();
                     }).show();
                 } else
                     performConnection(result, null);
@@ -408,11 +399,11 @@ public class WifiScannerFragment extends ListFragment
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater mi){
+    public void onCreateOptionsMenu(Menu menu, MenuInflater mi) {
         mMenu = menu;
         mi.inflate(R.menu.wifi_scanner, menu);
 
-        if(mScanning) {
+        if (mScanning) {
             MenuItem menuScan = mMenu.findItem(R.id.scan);
             MenuItemCompat.setActionView(menuScan, new ProgressBar(getActivity()));
         }
@@ -420,9 +411,9 @@ public class WifiScannerFragment extends ListFragment
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        if(item.getItemId() == R.id.scan){
-            if(mMenu != null){
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.scan) {
+            if (mMenu != null) {
                 MenuItem menuScan = mMenu.findItem(R.id.scan);
                 MenuItemCompat.setActionView(menuScan, new ProgressBar(getActivity()));
             }
@@ -434,14 +425,14 @@ public class WifiScannerFragment extends ListFragment
 
             return true;
         }
-        if(item.getItemId() == android.R.id.home){
+        if (item.getItemId() == android.R.id.home) {
             onBackPressed();
             return true;
         } else
             return super.onOptionsItemSelected(item);
     }
 
-    public void onBackPressed(){
+    public void onBackPressed() {
         mScanReceiver.unregister();
         mConnectionReceiver.unregister();
 
@@ -456,76 +447,64 @@ public class WifiScannerFragment extends ListFragment
         getActivity().overridePendingTransition(R.anim.fadeout, R.anim.fadein);
     }
 
-    public class ScanAdapter extends ArrayAdapter<ScanResult>{
-        private ArrayList<ScanResult> mResults = null;
+    public class ScanAdapter extends ArrayAdapter<ScanResult> {
+        private ArrayList<ScanResult> mResults;
 
-        public ScanAdapter(){
+        public ScanAdapter() {
             super(getActivity(), R.layout.wifi_scanner_list_item);
 
-            mResults = new ArrayList<ScanResult>();
+            mResults = new ArrayList<>();
         }
 
-        public void addResult(ScanResult result){
-            for(ScanResult res : mResults){
-                if(res.BSSID.equals(result.BSSID))
+        public void addResult(ScanResult result) {
+            for (ScanResult res : mResults) {
+                if (res.BSSID.equals(result.BSSID))
                     return;
             }
 
             mResults.add(result);
 
-            Collections.sort(mResults, new Comparator<ScanResult>(){
-                @Override
-                public int compare(ScanResult lhs, ScanResult rhs){
-                    if(lhs.level > rhs.level)
-                        return -1;
-
-                    else if(rhs.level > lhs.level)
-                        return 1;
-
-                    else
-                        return 0;
-                }
-            });
+            Collections.sort(mResults, (lhs, rhs) -> Integer.compare(rhs.level, lhs.level));
         }
 
-        public void reset(){
+        public void reset() {
             mResults.clear();
             notifyDataSetChanged();
         }
 
         @Override
-        public int getCount(){
+        public int getCount() {
             return mResults.size();
         }
 
         @Override
-        public ScanResult getItem(int position){
+        public ScanResult getItem(int position) {
             return mResults.get(position);
         }
 
-        public int getWifiIcon(ScanResult wifi){
+        public int getWifiIcon(ScanResult wifi) {
             int level = Math.abs(wifi.level);
 
-            if(wifi.capabilities.contains("WPA") || wifi.capabilities.contains("WEP")){
-                if(level <= 76)
+            if (wifi.capabilities.contains("WPA") || wifi.capabilities.contains("WEP")) {
+                if (level <= 76)
                     return R.drawable.ic_wifi_lock_signal_4;
 
-                else if(level <= 87)
+                else if (level <= 87)
                     return R.drawable.ic_wifi_lock_signal_3;
 
-                else if(level <= 98)
+                else if (level <= 98)
                     return R.drawable.ic_wifi_lock_signal_2;
 
                 else
                     return R.drawable.ic_wifi_lock_signal_1;
-            } else{
-                if(level <= 76)
+            } else {
+                if (level <= 76)
                     return R.drawable.ic_wifi_signal_4;
 
-                else if(level <= 87)
+                else if (level <= 87)
                     return R.drawable.ic_wifi_signal_3;
 
-                else if(level <= 98)
+                else if (level <= 98)
                     return R.drawable.ic_wifi_signal_2;
 
                 else
@@ -534,11 +513,11 @@ public class WifiScannerFragment extends ListFragment
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent){
+        public View getView(int position, View convertView, ViewGroup parent) {
             View row = convertView;
-            ResultHolder holder = null;
+            ResultHolder holder;
 
-            if(row == null){
+            if (row == null) {
                 LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 row = inflater.inflate(R.layout.wifi_scanner_list_item, parent, false);
 
@@ -549,10 +528,10 @@ public class WifiScannerFragment extends ListFragment
                 holder.ssid = (TextView) (row != null ? row.findViewById(R.id.ssid) : null);
                 holder.bssid = (TextView) (row != null ? row.findViewById(R.id.bssid) : null);
 
-                if(row != null)
+                if (row != null)
                     row.setTag(holder);
 
-            } else{
+            } else {
                 holder = (ResultHolder) row.getTag();
             }
 
@@ -567,38 +546,38 @@ public class WifiScannerFragment extends ListFragment
 
             List<String> capabilities = Arrays.asList(result.capabilities.split("[\\-\\[\\]]"));
 
-            if(capabilities.contains("WEP")){
+            if (capabilities.contains("WEP")) {
                 isOpen = false;
                 protection = "<b>WEP</b>";
-            } else if(capabilities.contains("WPA2")){
+            } else if (capabilities.contains("WPA2")) {
                 isOpen = false;
                 protection = "<b>WPA2</b>";
-            } else if(capabilities.contains("WPA")){
+            } else if (capabilities.contains("WPA")) {
                 isOpen = false;
                 protection = "<b>WPA</b>";
             }
 
-            if(capabilities.contains("PSK"))
+            if (capabilities.contains("PSK"))
                 protection += " PSK";
 
-            if(capabilities.contains("WPS"))
+            if (capabilities.contains("WPS"))
                 protection += " ( WPS )";
 
             holder.bssid.setText(Html.fromHtml(
-                            result.BSSID.toUpperCase() + " " + protection + " <small>( " + (Math.round((result.frequency / 1000.0) * 10.0) / 10.0) + " Ghz )</small>")
+                    result.BSSID.toUpperCase() + " " + protection + " <small>( " +
+                            (Math.round((result.frequency / 1000.0) * 10.0) / 10.0) + " Ghz )</small>")
             );
 
-            if(mWifiMatcher.getKeygen(result) != null || isOpen)
+            if (mWifiMatcher.getKeygen(result) != null || isOpen)
                 holder.supported.setImageResource(R.drawable.ic_possible);
 
             else
                 holder.supported.setImageResource(R.drawable.ic_impossible);
 
-
             return row;
         }
 
-        class ResultHolder{
+        class ResultHolder {
             ImageView supported;
             ImageView powerIcon;
             TextView ssid;
@@ -606,32 +585,32 @@ public class WifiScannerFragment extends ListFragment
         }
     }
 
-    private class ScanReceiver extends ManagedReceiver{
-        private IntentFilter mFilter = null;
+    private class ScanReceiver extends ManagedReceiver {
+        private IntentFilter mFilter;
 
-        public ScanReceiver(){
+        public ScanReceiver() {
             mFilter = new IntentFilter(SCAN_RESULTS_AVAILABLE_ACTION);
         }
 
-        public IntentFilter getFilter(){
+        public IntentFilter getFilter() {
             return mFilter;
         }
 
         @SuppressWarnings("ConstantConditions")
         @Override
-        public void onReceive(Context context, Intent intent){
-            if(intent.getAction().equals(SCAN_RESULTS_AVAILABLE_ACTION)){
-                if(mScanning){
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(SCAN_RESULTS_AVAILABLE_ACTION)) {
+                if (mScanning) {
                     mAdapter.reset();
 
-                    if(mMenu != null){
+                    if (mMenu != null) {
                         MenuItem menuScan = mMenu.findItem(R.id.scan);
                         MenuItemCompat.setActionView(menuScan, null);
                     }
 
                     List<ScanResult> results = mWifiManager.getScanResults();
 
-                    for(ScanResult result : results){
+                    for (ScanResult result : results) {
                         mAdapter.addResult(result);
                     }
 
@@ -644,25 +623,25 @@ public class WifiScannerFragment extends ListFragment
         }
     }
 
-    private class ConnectionReceiver extends ManagedReceiver{
-        private IntentFilter mFilter = null;
+    private class ConnectionReceiver extends ManagedReceiver {
+        private IntentFilter mFilter;
 
-        public ConnectionReceiver(){
+        public ConnectionReceiver() {
             mFilter = new IntentFilter(SUPPLICANT_STATE_CHANGED_ACTION);
         }
 
-        public IntentFilter getFilter(){
+        public IntentFilter getFilter() {
             return mFilter;
         }
 
         @Override
-        public void onReceive(Context context, Intent intent){
+        public void onReceive(Context context, Intent intent) {
             SupplicantState state = intent.getParcelableExtra(EXTRA_NEW_STATE);
 
-            if(state != null){
-                if(state.equals(SupplicantState.COMPLETED)){
+            if (state != null) {
+                if (state.equals(SupplicantState.COMPLETED)) {
                     onSuccessfulConnection();
-                } else if(state.equals(SupplicantState.DISCONNECTED)){
+                } else if (state.equals(SupplicantState.DISCONNECTED)) {
                     onFailedConnection();
                 }
             }

@@ -22,56 +22,56 @@ package org.csploit.android.tools;
  * a container of tools.* instances
  */
 public class ToolBox {
-  public final Raw raw;
-  public final Shell shell;
-  public final Ruby ruby;
-  public final NMap nmap;
-  public final Hydra hydra;
-  public final ArpSpoof arpSpoof;
-  public final Ettercap ettercap;
-  public final Fusemounts fusemounts;
-  public final IPTables ipTables;
-  public final TcpDump tcpDump;
-  public final Msf msf;
-  public final NetworkRadar networkRadar;
-  public final MsfRpcd msfrpcd;
-  public final Logcat logcat;
-  public final Ip ip;
+    public final Raw raw;
+    public final Shell shell;
+    public final Ruby ruby;
+    public final NMap nmap;
+    public final Hydra hydra;
+    public final ArpSpoof arpSpoof;
+    public final Ettercap ettercap;
+    public final Fusemounts fusemounts;
+    public final IPTables ipTables;
+    public final TcpDump tcpDump;
+    public final Msf msf;
+    public final NetworkRadar networkRadar;
+    public final MsfRpcd msfrpcd;
+    public final Logcat logcat;
+    public final Ip ip;
 
-  public ToolBox() {
-    raw = new Raw();
-    shell = new Shell();
-    ruby = new Ruby();
-    nmap = new NMap();
-    hydra = new Hydra();
-    arpSpoof = new ArpSpoof();
-    ettercap = new Ettercap();
-    fusemounts = new Fusemounts();
-    ipTables = new IPTables();
-    tcpDump = new TcpDump();
-    msf = new Msf();
-    networkRadar = new NetworkRadar();
-    msfrpcd = new MsfRpcd();
-    logcat = new Logcat();
-    ip = new Ip();
-  }
+    public ToolBox() {
+        raw = new Raw();
+        shell = new Shell();
+        ruby = new Ruby();
+        nmap = new NMap();
+        hydra = new Hydra();
+        arpSpoof = new ArpSpoof();
+        ettercap = new Ettercap();
+        fusemounts = new Fusemounts();
+        ipTables = new IPTables();
+        tcpDump = new TcpDump();
+        msf = new Msf();
+        networkRadar = new NetworkRadar();
+        msfrpcd = new MsfRpcd();
+        logcat = new Logcat();
+        ip = new Ip();
+    }
 
-  public void reload() {
-    raw.setEnabled();
-    shell.setEnabled();
-    nmap.setEnabled();
-    hydra.setEnabled();
-    arpSpoof.setEnabled();
-    ettercap.setEnabled();
-    fusemounts.setEnabled();
-    ipTables.setEnabled();
-    tcpDump.setEnabled();
-    networkRadar.setEnabled();
-    logcat.setEnabled();
-    ip.setEnabled();
+    public void reload() {
+        raw.setEnabled();
+        shell.setEnabled();
+        nmap.setEnabled();
+        hydra.setEnabled();
+        arpSpoof.setEnabled();
+        ettercap.setEnabled();
+        fusemounts.setEnabled();
+        ipTables.setEnabled();
+        tcpDump.setEnabled();
+        networkRadar.setEnabled();
+        logcat.setEnabled();
+        ip.setEnabled();
 
-    ruby.init();
-    msf.init();
-    msfrpcd.init();
-  }
+        ruby.init();
+        msf.init();
+        msfrpcd.init();
+    }
 }

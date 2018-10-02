@@ -7,32 +7,33 @@ import java.util.ArrayList;
  */
 public abstract class SettingReceiver {
 
-  protected ArrayList<String> mFilter = new ArrayList<String>();
+    protected ArrayList<String> mFilter = new ArrayList<>();
 
-  /**
-   * return an list of preferences keys to listen on
-   * @return an ArrayList containing all preference keys to listen on, null if no filter
-   */
-  public ArrayList<String> getFilter() {
-    return mFilter;
-  }
+    /**
+     * return an list of preferences keys to listen on
+     *
+     * @return an ArrayList containing all preference keys to listen on, null if no filter
+     */
+    public ArrayList<String> getFilter() {
+        return mFilter;
+    }
 
-  public void setFilter(ArrayList<String> filter) {
-    mFilter = filter;
-  }
+    public void setFilter(ArrayList<String> filter) {
+        mFilter = filter;
+    }
 
-  public void addFilter(String filter) {
-    mFilter.add(filter);
-  }
+    public void addFilter(String filter) {
+        mFilter.add(filter);
+    }
 
-  /**
-   * callback function called whence a setting has changed
-   */
-  public abstract void onSettingChanged(String key);
+    /**
+     * callback function called whence a setting has changed
+     */
+    public abstract void onSettingChanged(String key);
 
-  @Override
-  protected void finalize() throws Throwable {
-    System.unregisterSettingListener(this);
-    super.finalize();
-  }
+    @Override
+    protected void finalize() throws Throwable {
+        System.unregisterSettingListener(this);
+        super.finalize();
+    }
 }

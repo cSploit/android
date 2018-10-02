@@ -20,9 +20,6 @@ package org.csploit.android.gui.dialogs;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.Html;
 import android.widget.TextView;
 
@@ -34,43 +31,39 @@ import org.json.JSONException;
 
 import java.io.IOException;
 
-public class ChangelogDialog extends AlertDialog
-{
-  private final String ERROR_HTML = getContext().getString(R.string.something_went_wrong_changelog);
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
-  private ProgressDialog mLoader = null;
+public class ChangelogDialog extends AlertDialog {
 
-  @SuppressLint("SetJavaScriptEnabled")
-  public ChangelogDialog(final AppCompatActivity activity){
-    super(activity);
+    @SuppressLint("SetJavaScriptEnabled")
+    public ChangelogDialog(final AppCompatActivity activity) {
+        super(activity);
 
-    this.setTitle("Changelog");
+        this.setTitle("Changelog");
 
 
-    TextView view = new TextView(activity);
+        TextView view = new TextView(activity);
 
-    this.setView(view);
+        this.setView(view);
 
-    if(mLoader == null)
-      mLoader = ProgressDialog.show(activity, "", getContext().getString(R.string.loading_changelog));
+        ProgressDialog mLoader;
+        mLoader = ProgressDialog.show(activity, "", getContext().getString(R.string.loading_changelog));
 
-    try {
-      view.setText(GitHubParser.getcSploitRepo().getReleaseBody(System.getAppVersionName()));
-    } catch (JSONException e) {
-      view.setText(Html.fromHtml(ERROR_HTML.replace("{DESCRIPTION}", e.getMessage())));
-      System.errorLogging(e);
-    } catch (IOException e) {
-      view.setText(Html.fromHtml(ERROR_HTML.replace("{DESCRIPTION}", e.getMessage())));
-      Logger.error(e.getMessage());
+        String ERROR_HTML = getContext().getString(R.string.something_went_wrong_changelog);
+        try {
+            view.setText(GitHubParser.getcSploitRepo().getReleaseBody(System.getAppVersionName()));
+        } catch (JSONException e) {
+            view.setText(Html.fromHtml(ERROR_HTML.replace("{DESCRIPTION}", e.getMessage())));
+            System.errorLogging(e);
+        } catch (IOException e) {
+            view.setText(Html.fromHtml(ERROR_HTML.replace("{DESCRIPTION}", e.getMessage())));
+            Logger.error(e.getMessage());
+        }
+
+        mLoader.dismiss();
+
+        this.setCancelable(false);
+        this.setButton(BUTTON_POSITIVE, "Ok", (dialog, id) -> dialog.dismiss());
     }
-
-    mLoader.dismiss();
-
-    this.setCancelable(false);
-    this.setButton(BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener(){
-      public void onClick(DialogInterface dialog, int id){
-        dialog.dismiss();
-      }
-    });
-  }
 }

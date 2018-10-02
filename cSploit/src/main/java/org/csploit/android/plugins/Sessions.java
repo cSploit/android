@@ -22,7 +22,6 @@ package org.csploit.android.plugins;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -44,154 +43,144 @@ import org.csploit.android.net.metasploit.ShellSession;
 import java.util.ArrayList;
 
 public class Sessions extends Plugin {
-	private ListView mListView = null;
-  private ArrayList<Session> mResults;
-  private ArrayAdapter<Session> mAdapter = null;
-  private Sessions              UIThread = null;
-
-	public Sessions() {
-		super(R.string.sessions, R.string.sessions_desc,
-
-		new Target.Type[] { Target.Type.ENDPOINT, Target.Type.REMOTE },
-				R.layout.plugin_sessions_layout, R.drawable.action_session);
-	}
-
-  private AdapterView.OnItemLongClickListener longClickListener = new AdapterView.OnItemLongClickListener() {
-    @Override
-    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-      final Session s = mAdapter.getItem(position);
-      final ArrayList<Integer> availableChoices = new ArrayList<Integer>();
-      availableChoices.add(R.string.show_full_description);
-      if(s.haveShell())
-        availableChoices.add(R.string.open_shell);
-      if(s.isMeterpreter()) {
-        if(System.getCurrentTarget().getDeviceOS().toLowerCase().contains("windows"))
-          availableChoices.add(R.string.clear_event_log);
-      }
-      availableChoices.add(R.string.delete);
-
-      new ListChoiceDialog(R.string.choose_an_option,availableChoices.toArray(new Integer[availableChoices.size()]),Sessions.this, new ChoiceDialog.ChoiceDialogListener() {
-        @Override
-        public void onChoice(int choice) {
-          switch (availableChoices.get(choice)) {
-            case R.string.open_shell:
-              System.setCurrentSession(s);
-              startActivity(new Intent(Sessions.this, Console.class));
-              overridePendingTransition(R.anim.fadeout, R.anim.fadein);
-              break;
-            case R.string.show_full_description:
-              String message = s.getDescription();
-              if(s.getInfo().length()>0)
-                message+= "\n\nInfo:\n"+s.getInfo();
-              new ErrorDialog(s.getName(),message,Sessions.this).show();
-              break;
-            case R.string.clear_event_log:
-
-              ((ShellSession)s).addCommand("clearev", new ShellSession.RpcShellReceiver() {
-                @Override
-                public void onNewLine(String line) { }
-
-                @Override
-                public void onEnd(int exitValue) {
-                  Toast.makeText(Sessions.this,"command returned "+exitValue,Toast.LENGTH_LONG).show();
-                }
-
-                @Override
-                public void onRpcClosed() {
-                  Toast.makeText(Sessions.this,"RPC channel has been closed",Toast.LENGTH_LONG).show();
-                }
-
-                @Override
-                public void onTimedOut() {
-                  Toast.makeText(Sessions.this,"command timed out",Toast.LENGTH_LONG).show();
-                }
-              });
-              break;
-            case R.string.delete:
-              s.stopSession();
-              System.getCurrentTarget().getSessions().remove(s);
-              mAdapter.notifyDataSetChanged();
-              break;
-          }
+    private ArrayList<Session> mResults;
+    private ArrayAdapter<Session> mAdapter = null;
+    private Sessions UIThread = null;
+    private AdapterView.OnItemLongClickListener longClickListener = (parent, view, position, id) -> {
+        final Session s = mAdapter.getItem(position);
+        final ArrayList<Integer> availableChoices = new ArrayList<>();
+        availableChoices.add(R.string.show_full_description);
+        if (s.haveShell())
+            availableChoices.add(R.string.open_shell);
+        if (s.isMeterpreter()) {
+            if (System.getCurrentTarget().getDeviceOS().toLowerCase().contains("windows"))
+                availableChoices.add(R.string.clear_event_log);
         }
-      }).show();
-      return true;
-    }
-  };
+        availableChoices.add(R.string.delete);
 
-  private AdapterView.OnItemClickListener clickListener = new AdapterView.OnItemClickListener() {
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-      Session s = mAdapter.getItem(position);
-      if(s.haveShell()) {
-        System.setCurrentSession(s);
-        startActivity(new Intent(Sessions.this,Console.class));
-        overridePendingTransition(R.anim.fadeout, R.anim.fadein);
-      } else {
-        longClickListener.onItemLongClick(parent, view, position, id);
-      }
-    }
-  };
+        new ListChoiceDialog(R.string.choose_an_option, availableChoices.toArray(
+                new Integer[0]), Sessions.this, (ChoiceDialog.ChoiceDialogListener) choice -> {
+            switch (availableChoices.get(choice)) {
+                case R.string.open_shell:
+                    System.setCurrentSession(s);
+                    startActivity(new Intent(Sessions.this, Console.class));
+                    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+                    break;
+                case R.string.show_full_description:
+                    String message = s.getDescription();
+                    if (s.getInfo().length() > 0)
+                        message += "\n\nInfo:\n" + s.getInfo();
+                    new ErrorDialog(s.getName(), message, Sessions.this).show();
+                    break;
+                case R.string.clear_event_log:
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-		Boolean isDark = themePrefs.getBoolean("isDark", false);
-		if (isDark)
-			setTheme(R.style.DarkTheme);
-		else
-			setTheme(R.style.AppTheme);
-		super.onCreate(savedInstanceState);
+                    ((ShellSession) s).addCommand("clearev", new ShellSession.RpcShellReceiver() {
+                        @Override
+                        public void onNewLine(String line) {
+                        }
 
-    UIThread = this;
+                        @Override
+                        public void onEnd(int exitValue) {
+                            Toast.makeText(Sessions.this, "command returned " +
+                                    exitValue, Toast.LENGTH_LONG).show();
+                        }
 
-    if(System.getMsfRpc()==null) {
-      new FinishDialog(getString(R.string.error),"MSF RPC not connected",Sessions.this).show();
-      return;
-		}
+                        @Override
+                        public void onRpcClosed() {
+                            Toast.makeText(Sessions.this, "RPC channel has been closed",
+                                    Toast.LENGTH_LONG).show();
+                        }
 
-    mResults = System.getCurrentTarget().getSessions();
-
-    mListView = (ListView) findViewById(android.R.id.list);
-    mAdapter  = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mResults);
-
-    mListView.setAdapter(mAdapter);
-
-    mListView.setOnItemClickListener(clickListener);
-
-    mListView.setOnItemLongClickListener(longClickListener);
-
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        System.getMsfRpc().updateSessions();
-        runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            if(mResults.isEmpty()) {
-              new FinishDialog(getString(R.string.warning),getString(R.string.no_opened_sessions),Sessions.this).show();
-            } else {
-              mAdapter.notifyDataSetChanged();
+                        @Override
+                        public void onTimedOut() {
+                            Toast.makeText(Sessions.this, "command timed out",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    break;
+                case R.string.delete:
+                    s.stopSession();
+                    System.getCurrentTarget().getSessions().remove(s);
+                    mAdapter.notifyDataSetChanged();
+                    break;
             }
-          }
-        });
-      }
-    }).start();
-	}
+        }).show();
+        return true;
+    };
+    private AdapterView.OnItemClickListener clickListener = (parent, view, position, id) -> {
+        Session s = mAdapter.getItem(position);
+        if (s.haveShell()) {
+            System.setCurrentSession(s);
+            startActivity(new Intent(Sessions.this, Console.class));
+            overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+        } else {
+            longClickListener.onItemLongClick(parent, view, position, id);
+        }
+    };
 
-  @Override
-  public void onRpcChange(RPCClient currentValue) {
-    if(UIThread==null)
-      return;
-    if(this!=UIThread)
-      UIThread.onRpcChange(currentValue);
-    else if(currentValue == null)
-      new FinishDialog(getString(R.string.error),getString(R.string.msfrpc_disconnected),Sessions.this).show();
-	}
+    public Sessions() {
+        super(R.string.sessions, R.string.sessions_desc,
 
-  @Override
-  public void onBackPressed() {
-    super.onBackPressed();
-    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
-  }
+                new Target.Type[]{Target.Type.ENDPOINT, Target.Type.REMOTE},
+                R.layout.plugin_sessions_layout, R.drawable.action_session);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+        Boolean isDark = themePrefs.getBoolean("isDark", false);
+        if (isDark)
+            setTheme(R.style.DarkTheme);
+        else
+            setTheme(R.style.AppTheme);
+        super.onCreate(savedInstanceState);
+
+        UIThread = this;
+
+        if (System.getMsfRpc() == null) {
+            new FinishDialog(getString(R.string.error), "MSF RPC not connected",
+                    Sessions.this).show();
+            return;
+        }
+
+        mResults = System.getCurrentTarget().getSessions();
+
+        ListView mListView = findViewById(android.R.id.list);
+        mAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mResults);
+
+        mListView.setAdapter(mAdapter);
+
+        mListView.setOnItemClickListener(clickListener);
+
+        mListView.setOnItemLongClickListener(longClickListener);
+
+        new Thread(() -> {
+            System.getMsfRpc().updateSessions();
+            runOnUiThread(() -> {
+                if (mResults.isEmpty()) {
+                    new FinishDialog(getString(R.string.warning),
+                            getString(R.string.no_opened_sessions), Sessions.this).show();
+                } else {
+                    mAdapter.notifyDataSetChanged();
+                }
+            });
+        }).start();
+    }
+
+    @Override
+    public void onRpcChange(RPCClient currentValue) {
+        if (UIThread == null)
+            return;
+        if (this != UIThread)
+            UIThread.onRpcChange(currentValue);
+        else if (currentValue == null)
+            new FinishDialog(getString(R.string.error),
+                    getString(R.string.msfrpc_disconnected), Sessions.this).show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+    }
 }

@@ -24,29 +24,28 @@ import org.csploit.android.core.Logger;
 import org.csploit.android.events.Event;
 import org.csploit.android.events.FuseBind;
 
-public class Fusemounts extends Tool
-{
-  public Fusemounts() {
-    mHandler = "fusemounts";
-    mCmdPrefix = null;
-  }
-
-  public static abstract class fuseReceiver extends Child.EventReceiver {
-
-    @Override
-    public void onEvent(Event e) {
-      if(e instanceof FuseBind) {
-        FuseBind f = (FuseBind)e;
-        onNewMountpoint(f.source, f.mountpoint);
-      } else {
-        Logger.error("unknown event: " + e);
-      }
+public class Fusemounts extends Tool {
+    public Fusemounts() {
+        mHandler = "fusemounts";
+        mCmdPrefix = null;
     }
 
-    public abstract void onNewMountpoint(String source, String mountpoint);
-  }
+    public Child getSources(fuseReceiver receiver) throws ChildManager.ChildNotStartedException {
+        return super.async(receiver);
+    }
 
-  public Child getSources(fuseReceiver receiver) throws ChildManager.ChildNotStartedException {
-    return super.async(receiver);
-  }
+    public static abstract class fuseReceiver extends Child.EventReceiver {
+
+        @Override
+        public void onEvent(Event e) {
+            if (e instanceof FuseBind) {
+                FuseBind f = (FuseBind) e;
+                onNewMountpoint(f.source, f.mountpoint);
+            } else {
+                Logger.error("unknown event: " + e);
+            }
+        }
+
+        public abstract void onNewMountpoint(String source, String mountpoint);
+    }
 }

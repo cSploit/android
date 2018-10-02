@@ -20,32 +20,33 @@ package org.csploit.android;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 public class WifiScannerActivity extends AppCompatActivity {
 
-  WifiScannerFragment f;
+    WifiScannerFragment f;
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-    if (themePrefs.getBoolean("isDark", false))
-      setTheme(R.style.DarkTheme);
-    else
-      setTheme(R.style.AppTheme);
-    setContentView(R.layout.main);
-    if (findViewById(R.id.mainframe) != null) {
-      if (savedInstanceState != null) {
-        return;
-      }
-      f = new WifiScannerFragment();
-      getSupportFragmentManager().beginTransaction()
-              .add(R.id.mainframe, f).commit();
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+        if (themePrefs.getBoolean("isDark", false))
+            setTheme(R.style.DarkTheme);
+        else
+            setTheme(R.style.AppTheme);
+        setContentView(R.layout.main);
+        if (findViewById(R.id.mainframe) != null) {
+            if (savedInstanceState != null) {
+                return;
+            }
+            f = new WifiScannerFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.mainframe, f).commit();
+        }
     }
-  }
 
-  public void onBackPressed() {
-    f.onBackPressed();
-  }
+    public void onBackPressed() {
+        f.onBackPressed();
+    }
 }

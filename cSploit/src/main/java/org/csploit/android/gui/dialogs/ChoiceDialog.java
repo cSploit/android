@@ -18,8 +18,6 @@
  */
 package org.csploit.android.gui.dialogs;
 
-import android.content.DialogInterface;
-import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -29,44 +27,38 @@ import org.csploit.android.R;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
-public class ChoiceDialog extends AlertDialog{
-  public interface ChoiceDialogListener{
-    void onChoice(int choice);
-  }
+public class ChoiceDialog extends AlertDialog {
+    public ChoiceDialog(final FragmentActivity activity, String title, String[] choices,
+                        final ChoiceDialogListener listener) {
+        super(activity);
 
-  public ChoiceDialog(final FragmentActivity activity, String title, String[] choices, final ChoiceDialogListener listener){
-    super(activity);
+        this.setTitle(title);
 
-    this.setTitle(title);
+        LinearLayout layout = new LinearLayout(activity);
 
-    LinearLayout layout = new LinearLayout(activity);
+        layout.setPadding(10, 10, 10, 10);
 
-    layout.setPadding(10, 10, 10, 10);
+        for (int i = 0; i < choices.length; i++) {
+            Button choice = new Button(activity);
 
-    for(int i = 0; i < choices.length; i++){
-      Button choice = new Button(activity);
+            choice.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
+                    LayoutParams.MATCH_PARENT, 0.5f));
+            choice.setTag("" + i);
+            choice.setOnClickListener(v -> {
+                ChoiceDialog.this.dismiss();
+                listener.onChoice(Integer.parseInt((String) v.getTag()));
+            });
 
-      choice.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, 0.5f));
-      choice.setTag("" + i);
-      choice.setOnClickListener(new View.OnClickListener(){
-        @Override
-        public void onClick(View v){
-          ChoiceDialog.this.dismiss();
-          listener.onChoice(Integer.parseInt((String) v.getTag()));
+            choice.setText(choices[i]);
+            layout.addView(choice);
         }
-      });
 
-      choice.setText(choices[i]);
-      layout.addView(choice);
+        setView(layout);
+
+        this.setButton(BUTTON_NEGATIVE, activity.getString(R.string.cancel_dialog), (dialog, id) -> dialog.dismiss());
     }
 
-    setView(layout);
-
-
-    this.setButton(BUTTON_NEGATIVE, activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener(){
-      public void onClick(DialogInterface dialog, int id){
-        dialog.dismiss();
-      }
-    });
-  }
+    public interface ChoiceDialogListener {
+        void onChoice(int choice);
+    }
 }

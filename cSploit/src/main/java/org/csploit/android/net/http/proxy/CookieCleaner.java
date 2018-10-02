@@ -18,88 +18,88 @@
  */
 package org.csploit.android.net.http.proxy;
 
+import org.csploit.android.net.http.RequestParser;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.csploit.android.net.http.RequestParser;
+public class CookieCleaner {
+    private static CookieCleaner mInstance = null;
 
-public class CookieCleaner{
-  private static CookieCleaner mInstance = null;
+    private HashMap<String, ArrayList<String>> mMap;
 
-  private HashMap<String, ArrayList<String>> mMap = null;
-
-  public static CookieCleaner getInstance(){
-    if(mInstance == null)
-      mInstance = new CookieCleaner();
-
-    return mInstance;
-  }
-
-  public CookieCleaner(){
-    mMap = new HashMap<String, ArrayList<String>>();
-  }
-
-  public boolean isClean(String client, String hostname, String request){
-    if(request.startsWith("POST "))
-      return true;
-
-    else if(request.contains("Cookie:") == false)
-      return true;
-
-    else{
-      String domain = RequestParser.getBaseDomain(hostname);
-      ArrayList<String> domains = mMap.get(client);
-
-      return (domains != null && domains.contains(domain));
+    public CookieCleaner() {
+        mMap = new HashMap<>();
     }
-  }
 
-  public String getExpiredResponse(String request, String hostname){
-    final StringBuilder responseBuilder = new StringBuilder();
-    String domain = RequestParser.getBaseDomain(hostname);
+    public static CookieCleaner getInstance() {
+        if (mInstance == null)
+            mInstance = new CookieCleaner();
 
-    responseBuilder.append("HTTP/1.1 302 Found\n");
+        return mInstance;
+    }
 
-    for(String line : request.split("\n")){
-      if(line.indexOf(':') != -1){
-        String[] split = line.split(":", 2);
-        String header = split[0].trim(),
-          value = split[1].trim();
+    public boolean isClean(String client, String hostname, String request) {
+        if (request.startsWith("POST "))
+            return true;
 
-        if(header.equals("Cookie")){
-          String[] cookies = value.split(";");
-          for(String cookie : cookies){
-            split = cookie.split("=");
+        else if (!request.contains("Cookie:"))
+            return true;
 
-            if(split.length == 2){
-              cookie = split[0].trim();
+        else {
+            String domain = RequestParser.getBaseDomain(hostname);
+            ArrayList<String> domains = mMap.get(client);
 
-              responseBuilder.append("Set-Cookie: ").append(cookie)
-                      .append("=EXPIRED;Path=/;Domain=").append(domain)
-                      .append(";Expires=Mon, 01-Jan-1990 00:00:00 GMT\n")
-                      .append("Set-Cookie: ").append(cookie)
-                      .append("=EXPIRED;Path=/;Domain=").append(hostname)
-                      .append(";Expires=Mon, 01-Jan-1990 00:00:00 GMT\n");
-            }
-          }
+            return (domains != null && domains.contains(domain));
         }
-      }
     }
 
-    responseBuilder.append("Location: ")
-            .append(RequestParser.getUrlFromRequest(hostname, request))
-            .append("\n")
-            .append("Connection: close\n\n");
+    public String getExpiredResponse(String request, String hostname) {
+        final StringBuilder responseBuilder = new StringBuilder();
+        String domain = RequestParser.getBaseDomain(hostname);
 
-    return responseBuilder.toString();
-  }
+        responseBuilder.append("HTTP/1.1 302 Found\n");
 
-  public void addCleaned(String client, String hostname){
-    String domain = RequestParser.getBaseDomain(hostname);
+        for (String line : request.split("\n")) {
+            if (line.indexOf(':') != -1) {
+                String[] split = line.split(":", 2);
+                String header = split[0].trim(),
+                        value = split[1].trim();
 
-    if(mMap.containsKey(client) == false)
-      mMap.put(client, new ArrayList<String>());
+                if (header.equals("Cookie")) {
+                    String[] cookies = value.split(";");
+                    for (String cookie : cookies) {
+                        split = cookie.split("=");
 
-    mMap.get(client).add(domain);
-  }
+                        if (split.length == 2) {
+                            cookie = split[0].trim();
+
+                            responseBuilder.append("Set-Cookie: ").append(cookie)
+                                    .append("=EXPIRED;Path=/;Domain=").append(domain)
+                                    .append(";Expires=Mon, 01-Jan-1990 00:00:00 GMT\n")
+                                    .append("Set-Cookie: ").append(cookie)
+                                    .append("=EXPIRED;Path=/;Domain=").append(hostname)
+                                    .append(";Expires=Mon, 01-Jan-1990 00:00:00 GMT\n");
+                        }
+                    }
+                }
+            }
+        }
+
+        responseBuilder.append("Location: ")
+                .append(RequestParser.getUrlFromRequest(hostname, request))
+                .append("\n")
+                .append("Connection: close\n\n");
+
+        return responseBuilder.toString();
+    }
+
+    public void addCleaned(String client, String hostname) {
+        String domain = RequestParser.getBaseDomain(hostname);
+
+        if (!mMap.containsKey(client))
+            mMap.put(client, new ArrayList<>());
+
+        mMap.get(client).add(domain);
+    }
 }

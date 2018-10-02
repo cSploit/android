@@ -19,10 +19,10 @@
 
 package org.csploit.android.tools;
 
-import org.csploit.android.core.ChildManager;
-import org.csploit.android.core.System;
 import org.csploit.android.core.Child;
+import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Logger;
+import org.csploit.android.core.System;
 import org.csploit.android.events.Event;
 import org.csploit.android.events.Host;
 import org.csploit.android.events.HostLost;
@@ -31,37 +31,38 @@ import java.net.InetAddress;
 
 public class NetworkRadar extends Tool {
 
-  public NetworkRadar() {
-    mHandler = "network-radar";
-    mCmdPrefix = null;
-  }
-
-  public static abstract class HostReceiver extends Child.EventReceiver {
-
-    public abstract void onHostFound(byte[] macAddress, InetAddress ipAddress, String name);
-    public abstract void onHostLost(InetAddress ipAddress);
-
-    public void onEvent(Event e) {
-      if ( e instanceof Host ) {
-        Host h = (Host)e;
-        onHostFound(h.ethAddress, h.ipAddress, h.name);
-      } else if ( e instanceof HostLost ) {
-        onHostLost(((HostLost)e).ipAddress);
-      } else {
-        Logger.error("Unknown event: " + e);
-      }
-    }
-  }
-
-  public Child start(HostReceiver receiver) throws ChildManager.ChildNotStartedException {
-    String ifName;
-
-    if(System.getNetwork() == null) {
-      throw new ChildManager.ChildNotStartedException();
+    public NetworkRadar() {
+        mHandler = "network-radar";
+        mCmdPrefix = null;
     }
 
-    ifName = System.getNetwork().getInterface().getDisplayName();
+    public Child start(HostReceiver receiver) throws ChildManager.ChildNotStartedException {
+        String ifName;
 
-    return async(ifName, receiver);
-  }
+        if (System.getNetwork() == null) {
+            throw new ChildManager.ChildNotStartedException();
+        }
+
+        ifName = System.getNetwork().getInterface().getDisplayName();
+
+        return async(ifName, receiver);
+    }
+
+    public static abstract class HostReceiver extends Child.EventReceiver {
+
+        public abstract void onHostFound(byte[] macAddress, InetAddress ipAddress, String name);
+
+        public abstract void onHostLost(InetAddress ipAddress);
+
+        public void onEvent(Event e) {
+            if (e instanceof Host) {
+                Host h = (Host) e;
+                onHostFound(h.ethAddress, h.ipAddress, h.name);
+            } else if (e instanceof HostLost) {
+                onHostLost(((HostLost) e).ipAddress);
+            } else {
+                Logger.error("Unknown event: " + e);
+            }
+        }
+    }
 }

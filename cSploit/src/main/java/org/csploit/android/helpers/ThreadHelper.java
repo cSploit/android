@@ -10,17 +10,18 @@ import java.util.concurrent.Executors;
  */
 public final class ThreadHelper {
 
-  private final static Executor EXECUTOR = Executors.newCachedThreadPool();
+    private final static Executor EXECUTOR = Executors.newCachedThreadPool();
 
-  /**
-   * share an Executor among all cSploit components
-   * @return an Executor for running background stuff
-   */
-  public static Executor getSharedExecutor() {
-    return EXECUTOR;
-  }
+    /**
+     * share an Executor among all cSploit components
+     *
+     * @return an Executor for running background stuff
+     */
+    public static Executor getSharedExecutor() {
+        return EXECUTOR;
+    }
 
-  public static boolean isOnMainThread() {
-    return Looper.myLooper() == Looper.getMainLooper();
-  }
+    public static boolean isOnMainThread() {
+        return Looper.myLooper() == Looper.getMainLooper();
+    }
 }

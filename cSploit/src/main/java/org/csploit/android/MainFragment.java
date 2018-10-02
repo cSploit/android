@@ -26,13 +26,7 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.ActionMode;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,7 +34,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -58,17 +51,14 @@ import org.csploit.android.core.Plugin;
 import org.csploit.android.core.System;
 import org.csploit.android.events.Event;
 import org.csploit.android.gui.dialogs.AboutDialog;
-import org.csploit.android.gui.dialogs.ChoiceDialog;
 import org.csploit.android.gui.dialogs.ConfirmDialog;
 import org.csploit.android.gui.dialogs.ConfirmDialog.ConfirmDialogListener;
 import org.csploit.android.gui.dialogs.ErrorDialog;
 import org.csploit.android.gui.dialogs.FatalDialog;
 import org.csploit.android.gui.dialogs.InputDialog;
-import org.csploit.android.gui.dialogs.InputDialog.InputDialogListener;
 import org.csploit.android.gui.dialogs.ListChoiceDialog;
 import org.csploit.android.gui.dialogs.MultipleChoiceDialog;
 import org.csploit.android.gui.dialogs.SpinnerDialog;
-import org.csploit.android.gui.dialogs.SpinnerDialog.SpinnerDialogListener;
 import org.csploit.android.helpers.ThreadHelper;
 import org.csploit.android.net.Network;
 import org.csploit.android.net.Target;
@@ -100,6 +90,12 @@ import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
 import static org.csploit.android.services.UpdateChecker.UPDATE_AVAILABLE;
 import static org.csploit.android.services.UpdateChecker.UPDATE_CHECKING;
 import static org.csploit.android.services.UpdateChecker.UPDATE_NOT_AVAILABLE;
@@ -124,11 +120,8 @@ public class MainFragment extends Fragment {
     private ListView lv;
     private boolean isRootMissing = false;
     private String[] mIfaces = null;
-    private boolean mIsCoreInstalled = false;
     private boolean mIsDaemonBeating = false;
-    private boolean mIsConnectivityAvailable = false;
     private boolean mIsUpdateDownloading = false;
-    private boolean mHaveAnyWifiInterface = true; // TODO: check is device have a wifi interface
     private boolean mOfflineMode = false;
 
     @Override
@@ -140,27 +133,87 @@ public class MainFragment extends Fragment {
         }
     }
 
-    private void onInitializationError(final String message) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                new FatalDialog(getString(R.string.initialization_error),
-                        message, message.contains(">"),
-                        getActivity()).show();
-            }
-        });
-    }
+    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
 
-    private void onCoreUpdated() {
-        System.onCoreInstalled();
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                init();
-                startAllServices();
-                notifyMenuChanged();
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.main_multi, menu);
+            return true;
+        }
+
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            int i = mTargetAdapter.getSelectedCount();
+            mode.setTitle(i + " " + getString((i > 1 ? R.string.targets_selected : R.string.target_selected)));
+            MenuItem item = menu.findItem(R.id.multi_action);
+            if (item != null)
+                item.setIcon((i > 1 ? android.R.drawable.ic_dialog_dialer : android.R.drawable.ic_menu_edit));
+            return false;
+        }
+
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            ArrayList<Plugin> commonPlugins;
+
+            switch (item.getItemId()) {
+                case R.id.multi_action:
+                    final int[] selected = mTargetAdapter.getSelectedPositions();
+                    if (selected.length > 1) {
+                        Target target = (Target) mTargetAdapter.getItem(selected[0]);
+                        commonPlugins = System.getPluginsForTarget(target);
+                        for (int i = 1; i < selected.length; i++) {
+                            target = (Target) mTargetAdapter.getItem(selected[i]);
+                            ArrayList<Plugin> targetPlugins = System.getPluginsForTarget(target);
+                            ArrayList<Plugin> removeThem = new ArrayList<>();
+                            for (Plugin p : commonPlugins) {
+                                if (!targetPlugins.contains(p))
+                                    removeThem.add(p);
+                            }
+                            for (Plugin p : removeThem) {
+                                commonPlugins.remove(p);
+                            }
+                        }
+                        if (commonPlugins.size() > 0) {
+                            final int[] actions = new int[commonPlugins.size()];
+                            for (int i = 0; i < actions.length; i++)
+                                actions[i] = commonPlugins.get(i).getName();
+
+                            (new MultipleChoiceDialog(R.string.choose_method, actions, getActivity(),
+                                    (MultipleChoiceDialog.MultipleChoiceDialogListener) choices -> {
+                                        Intent intent = new Intent(getActivity(), MultiAttackService.class);
+                                        int[] selectedActions = new int[choices.length];
+
+                                        for (int i = 0; i < selectedActions.length; i++)
+                                            selectedActions[i] = actions[choices[i]];
+
+                                        intent.putExtra(MultiAttackService.MULTI_TARGETS, selected);
+                                        intent.putExtra(MultiAttackService.MULTI_ACTIONS, selectedActions);
+
+                                        getActivity().startService(intent);
+                                    })).show();
+                        } else {
+                            (new ErrorDialog(getString(R.string.error),
+                                    "no common actions found", getActivity())).show();
+                        }
+                    } else {
+                        targetAliasPrompt((Target) mTargetAdapter.getItem(selected[0]));
+                    }
+                    mode.finish(); // Action picked, so close the CAB
+                    return true;
+                default:
+                    return false;
             }
-        });
+        }
+
+        // called when the user exits the action mode
+        public void onDestroyActionMode(ActionMode mode) {
+            mActionMode = null;
+            mTargetAdapter.clearSelection();
+        }
+    };
+
+    private void onInitializationError(final String message) {
+        getActivity().runOnUiThread(() -> new FatalDialog(getString(R.string.initialization_error),
+                message, message.contains(">"),
+                getActivity()).show());
     }
 
     @Nullable
@@ -169,6 +222,21 @@ public class MainFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         return inflater.inflate(R.layout.target_layout, container, false);
+    }
+
+    private void onCoreUpdated() {
+        System.onCoreInstalled();
+        getActivity().runOnUiThread(() -> {
+            init();
+            startAllServices();
+            notifyMenuChanged();
+        });
+    }
+
+    private void startAllServices() {
+        startNetworkRadar();
+        startUpdateChecker();
+        startRPCServer();
     }
 
     @Override
@@ -182,56 +250,45 @@ public class MainFragment extends Fragment {
             getActivity().setTheme(R.style.AppTheme);
             v.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.background_window));
         }
-        mEmptyTextView = (TextView) v.findViewById(R.id.emptyTextView);
-        lv = (ListView) v.findViewById(R.id.android_list);
-        mTextView = (TextView) v.findViewById(R.id.textView);
+        mEmptyTextView = v.findViewById(R.id.emptyTextView);
+        lv = v.findViewById(R.id.android_list);
+        mTextView = v.findViewById(R.id.textView);
 
-        lv.setOnItemClickListener(new ListView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                if (mActionMode != null) {
-                    mTargetAdapter.toggleSelection(position);
-                    return;
-                }
-
-                Target target = (Target) mTargetAdapter.getItem(position);
-                System.setCurrentTarget(target);
-
-                ThreadHelper.getSharedExecutor().execute(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        startActivityForResult(new Intent(getActivity(),
-                                ActionActivity.class), WIFI_CONNECTION_REQUEST);
-
-                        getActivity().overridePendingTransition(R.anim.fadeout, R.anim.fadein);
-                    }
-                });
-
-                Toast.makeText(getActivity(),
-                        getString(R.string.selected_) + System.getCurrentTarget(),
-                        Toast.LENGTH_SHORT).show();
-
-            }
-        });
-        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Target t = (Target) mTargetAdapter.getItem(position);
-                if (t.getType() == Target.Type.NETWORK) {
-                    if (mActionMode == null)
-                        targetAliasPrompt(t);
-                    return true;
-                }
-                if (mActionMode == null) {
-                    mTargetAdapter.clearSelection();
-                    mActionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(mActionModeCallback);
-                }
+        lv.setOnItemClickListener((parent, view, position, id) -> {
+            if (mActionMode != null) {
                 mTargetAdapter.toggleSelection(position);
+                return;
+            }
+
+            Target target = (Target) mTargetAdapter.getItem(position);
+            System.setCurrentTarget(target);
+
+            ThreadHelper.getSharedExecutor().execute(() -> {
+
+                startActivityForResult(new Intent(getActivity(),
+                        ActionActivity.class), WIFI_CONNECTION_REQUEST);
+
+                getActivity().overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+            });
+
+            Toast.makeText(getActivity(),
+                    getString(R.string.selected_) + System.getCurrentTarget(),
+                    Toast.LENGTH_SHORT).show();
+
+        });
+        lv.setOnItemLongClickListener((parent, view, position, id) -> {
+            Target t = (Target) mTargetAdapter.getItem(position);
+            if (t.getType() == Target.Type.NETWORK) {
+                if (mActionMode == null)
+                    targetAliasPrompt(t);
                 return true;
             }
+            if (mActionMode == null) {
+                mTargetAdapter.clearSelection();
+                mActionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(mActionModeCallback);
+            }
+            mTargetAdapter.toggleSelection(position);
+            return true;
         });
         mTargetAdapter = new TargetAdapter();
 
@@ -250,17 +307,22 @@ public class MainFragment extends Fragment {
         startAllServices();
     }
 
-    private void startAllServices() {
-        startNetworkRadar();
-        startUpdateChecker();
-        startRPCServer();
+    private void notifyMenuChanged() {
+        getActivity().invalidateOptionsMenu();
     }
 
-    private void notifyMenuChanged() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-            getActivity().invalidateOptionsMenu();
-        else
-            configureMenu();
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.main, menu);
+
+        mMenu = menu;
+        configureMenu();
+        super.onCreateOptionsMenu(menu, inflater);
+        getActivity().onCreateOptionsMenu(menu);
+    }
+
+    private boolean isConnectivityAvailable() {
+        return Network.isConnectivityAvailable(getActivity()) || Network.isWifiConnected(getActivity());
     }
 
     /**
@@ -270,9 +332,9 @@ public class MainFragment extends Fragment {
     public void init() {
         loadInterfaces();
         isAnyNetInterfaceAvailable = (mIfaces.length > 0);
-        mIsConnectivityAvailable = isConnectivityAvailable();
+        boolean mIsConnectivityAvailable = isConnectivityAvailable();
 
-        mIsCoreInstalled = System.isCoreInstalled();
+        boolean mIsCoreInstalled = System.isCoreInstalled();
         mIsDaemonBeating = System.isCoreInitialized();
 
         // check minimum requirements for system initialization
@@ -315,31 +377,6 @@ public class MainFragment extends Fragment {
 
         // if all is initialized, configure the network
         initSystem();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.main, menu);
-
-        mMenu = menu;
-        configureMenu();
-        super.onCreateOptionsMenu(menu, inflater);
-        getActivity().onCreateOptionsMenu(menu);
-    }
-
-    private boolean isConnectivityAvailable() {
-        return Network.isConnectivityAvailable(getActivity()) || Network.isWifiConnected(getActivity());
-    }
-
-    public void configureMenu() {
-        if (mMenu == null)
-            return;
-        mMenu.findItem(R.id.add).setVisible(isAnyNetInterfaceAvailable);
-        mMenu.findItem(R.id.scan).setVisible(mHaveAnyWifiInterface);
-        mMenu.findItem(R.id.wifi_ifaces).setEnabled(canChangeInterface());
-        mMenu.findItem(R.id.new_session).setEnabled(isAnyNetInterfaceAvailable);
-        mMenu.findItem(R.id.save_session).setEnabled(isAnyNetInterfaceAvailable);
-        mMenu.findItem(R.id.restore_session).setEnabled(isAnyNetInterfaceAvailable);
     }
 
     @Override
@@ -391,6 +428,31 @@ public class MainFragment extends Fragment {
         System.registerPlugin(new PacketForger());
     }
 
+    public void configureMenu() {
+        if (mMenu == null)
+            return;
+        mMenu.findItem(R.id.add).setVisible(isAnyNetInterfaceAvailable);
+        // TODO: check is device have a wifi interface
+        boolean mHaveAnyWifiInterface = true;
+        mMenu.findItem(R.id.scan).setVisible(true);
+        mMenu.findItem(R.id.wifi_ifaces).setEnabled(canChangeInterface());
+        mMenu.findItem(R.id.new_session).setEnabled(isAnyNetInterfaceAvailable);
+        mMenu.findItem(R.id.save_session).setEnabled(isAnyNetInterfaceAvailable);
+        mMenu.findItem(R.id.restore_session).setEnabled(isAnyNetInterfaceAvailable);
+    }
+
+    private boolean canChangeInterface() {
+        return mIfaces.length > 1 || (mOfflineMode && isAnyNetInterfaceAvailable);
+    }
+
+    private boolean haveInterface(String ifname) {
+        for (String s : mIfaces) {
+            if (s.equals(ifname))
+                return true;
+        }
+        return false;
+    }
+
     private void loadInterfaces() {
         boolean menuChanged;
         List<String> interfaces = Network.getAvailableInterfaces();
@@ -408,25 +470,8 @@ public class MainFragment extends Fragment {
         isAnyNetInterfaceAvailable = mIfaces.length > 0;
 
         if (menuChanged) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    notifyMenuChanged();
-                }
-            });
+            getActivity().runOnUiThread(this::notifyMenuChanged);
         }
-    }
-
-    private boolean canChangeInterface() {
-        return mIfaces.length > 1 || (mOfflineMode && isAnyNetInterfaceAvailable);
-    }
-
-    private boolean haveInterface(String ifname) {
-        for (String s : mIfaces) {
-            if (s.equals(ifname))
-                return true;
-        }
-        return false;
     }
 
     private void onNetworkInterfaceChanged() {
@@ -447,15 +492,20 @@ public class MainFragment extends Fragment {
 
         final String msg = toastMessage;
 
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (msg != null) {
-                    Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
-                }
-                notifyMenuChanged();
+        getActivity().runOnUiThread(() -> {
+            if (msg != null) {
+                Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
             }
+            notifyMenuChanged();
         });
+    }
+
+    private void onConnectionResumed() {
+        if (!mOfflineMode)
+            return;
+        mOfflineMode = false;
+        System.markInitialNetworkTargetsAsConnected();
+        startNetworkRadar();
     }
 
     private void onConnectionLost() {
@@ -467,33 +517,25 @@ public class MainFragment extends Fragment {
         stopNetworkRadar();
         System.markNetworkAsDisconnected();
 
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                new ConfirmDialog(getString(R.string.connection_lost),
-                        getString(R.string.connection_lost_prompt), getActivity(),
-                        new ConfirmDialogListener() {
-                            @Override
-                            public void onConfirm() {
-                                mOfflineMode = false;
-                                System.setIfname(null);
-                                onNetworkInterfaceChanged();
-                            }
+        getActivity().runOnUiThread(() -> new ConfirmDialog(getString(R.string.connection_lost),
+                getString(R.string.connection_lost_prompt), getActivity(),
+                new ConfirmDialogListener() {
+                    @Override
+                    public void onConfirm() {
+                        mOfflineMode = false;
+                        System.setIfname(null);
+                        onNetworkInterfaceChanged();
+                    }
 
-                            @Override
-                            public void onCancel() {
-                            }
-                        }).show();
-            }
-        });
+                    @Override
+                    public void onCancel() {
+                    }
+                }).show());
     }
 
-    private void onConnectionResumed() {
-        if (!mOfflineMode)
-            return;
-        mOfflineMode = false;
-        System.markInitialNetworkTargetsAsConnected();
-        startNetworkRadar();
+    //FIXME: This method is never called. Is this a bug?
+    private void displayNetworkInterfaces() {
+        displayNetworkInterfaces(false);
     }
 
     /**
@@ -512,12 +554,9 @@ public class MainFragment extends Fragment {
         } else if (isAnyNetInterfaceAvailable) {
             String title = getString(R.string.iface_dialog_title);
 
-            new ListChoiceDialog(title, mIfaces, getActivity(), new ChoiceDialog.ChoiceDialogListener() {
-                @Override
-                public void onChoice(int index) {
-                    System.setIfname(mIfaces[index]);
-                    onNetworkInterfaceChanged();
-                }
+            new ListChoiceDialog(title, mIfaces, getActivity(), index -> {
+                System.setIfname(mIfaces[index]);
+                onNetworkInterfaceChanged();
             }).show();
         } else {
             new ErrorDialog(getString(android.R.string.dialog_alert_title),
@@ -525,102 +564,16 @@ public class MainFragment extends Fragment {
         }
     }
 
-    //FIXME: This method is never called. Is this a bug?
-    private void displayNetworkInterfaces() {
-        displayNetworkInterfaces(false);
-    }
-
     private void targetAliasPrompt(final Target target) {
 
         new InputDialog(getString(R.string.target_alias),
                 getString(R.string.set_alias),
                 target.hasAlias() ? target.getAlias() : "", true,
-                false, getActivity(), new InputDialogListener() {
-            @Override
-            public void onInputEntered(String input) {
-                target.setAlias(input);
-                mTargetAdapter.notifyDataSetChanged();
-            }
+                false, getActivity(), input -> {
+            target.setAlias(input);
+            mTargetAdapter.notifyDataSetChanged();
         }).show();
     }
-
-    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
-
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.main_multi, menu);
-            return true;
-        }
-
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            int i = mTargetAdapter.getSelectedCount();
-            mode.setTitle(i + " " + getString((i > 1 ? R.string.targets_selected : R.string.target_selected)));
-            MenuItem item = menu.findItem(R.id.multi_action);
-            if (item != null)
-                item.setIcon((i > 1 ? android.R.drawable.ic_dialog_dialer : android.R.drawable.ic_menu_edit));
-            return false;
-        }
-
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            ArrayList<Plugin> commonPlugins = null;
-
-            switch (item.getItemId()) {
-                case R.id.multi_action:
-                    final int[] selected = mTargetAdapter.getSelectedPositions();
-                    if (selected.length > 1) {
-                        Target target = (Target) mTargetAdapter.getItem(selected[0]);
-                        commonPlugins = System.getPluginsForTarget(target);
-                        for (int i = 1; i < selected.length; i++) {
-                            target = (Target) mTargetAdapter.getItem(selected[i]);
-                            ArrayList<Plugin> targetPlugins = System.getPluginsForTarget(target);
-                            ArrayList<Plugin> removeThem = new ArrayList<Plugin>();
-                            for (Plugin p : commonPlugins) {
-                                if (!targetPlugins.contains(p))
-                                    removeThem.add(p);
-                            }
-                            for (Plugin p : removeThem) {
-                                commonPlugins.remove(p);
-                            }
-                        }
-                        if (commonPlugins.size() > 0) {
-                            final int[] actions = new int[commonPlugins.size()];
-                            for (int i = 0; i < actions.length; i++)
-                                actions[i] = commonPlugins.get(i).getName();
-
-                            (new MultipleChoiceDialog(R.string.choose_method, actions, getActivity(), new MultipleChoiceDialog.MultipleChoiceDialogListener() {
-                                @Override
-                                public void onChoice(int[] choices) {
-                                    Intent intent = new Intent(getActivity(), MultiAttackService.class);
-                                    int[] selectedActions = new int[choices.length];
-
-                                    for (int i = 0; i < selectedActions.length; i++)
-                                        selectedActions[i] = actions[choices[i]];
-
-                                    intent.putExtra(MultiAttackService.MULTI_TARGETS, selected);
-                                    intent.putExtra(MultiAttackService.MULTI_ACTIONS, selectedActions);
-
-                                    getActivity().startService(intent);
-                                }
-                            })).show();
-                        } else {
-                            (new ErrorDialog(getString(R.string.error), "no common actions found", getActivity())).show();
-                        }
-                    } else {
-                        targetAliasPrompt((Target) mTargetAdapter.getItem(selected[0]));
-                    }
-                    mode.finish(); // Action picked, so close the CAB
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        // called when the user exits the action mode
-        public void onDestroyActionMode(ActionMode mode) {
-            mActionMode = null;
-            mTargetAdapter.clearSelection();
-        }
-    };
 
     public void startUpdateChecker() {
         if (!isConnectivityAvailable() || mIsUpdateDownloading)
@@ -638,33 +591,20 @@ public class MainFragment extends Fragment {
         if (!isAnyNetInterfaceAvailable || !mIsDaemonBeating) {
             return;
         }
-        ThreadHelper.getSharedExecutor().execute(new Runnable() {
-            @Override
-            public void run() {
-                Services.getNetworkRadar().start();
-            }
-        });
+        ThreadHelper.getSharedExecutor().execute(() -> Services.getNetworkRadar().start());
     }
 
     public void stopNetworkRadar() {
-        ThreadHelper.getSharedExecutor().execute(new Runnable() {
-            @Override
-            public void run() {
-                Services.getNetworkRadar().stop();
-            }
-        });
+        ThreadHelper.getSharedExecutor().execute(() -> Services.getNetworkRadar().stop());
     }
 
     /**
      * start MSF RPC Daemon
      */
     public void startRPCServer() {
-        ThreadHelper.getSharedExecutor().execute(new Runnable() {
-            @Override
-            public void run() {
-                if (Services.getMsfRpcdService().isAvailable())
-                    Services.getMsfRpcdService().start();
-            }
+        ThreadHelper.getSharedExecutor().execute(() -> {
+            if (Services.getMsfRpcdService().isAvailable())
+                Services.getMsfRpcdService().start();
         });
     }
 
@@ -672,12 +612,7 @@ public class MainFragment extends Fragment {
      * stop MSF RPC Daemon
      */
     public void StopRPCServer() {
-        ThreadHelper.getSharedExecutor().execute(new Runnable() {
-            @Override
-            public void run() {
-                Services.getMsfRpcdService().stop();
-            }
-        });
+        ThreadHelper.getSharedExecutor().execute(() -> Services.getMsfRpcdService().stop());
     }
 
     @Override
@@ -686,24 +621,15 @@ public class MainFragment extends Fragment {
 
             case R.id.add:
                 new InputDialog(getString(R.string.add_custom_target),
-                        getString(R.string.enter_url), getActivity(),
-                        new InputDialogListener() {
-                            @Override
-                            public void onInputEntered(String input) {
-                                final Target target = Target.getFromString(input);
-                                if (target != null) {
-                                    ThreadHelper.getSharedExecutor().execute(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            System.addOrderedTarget(target);
-                                        }
-                                    });
-                                } else
-                                    new ErrorDialog(getString(R.string.error),
-                                            getString(R.string.invalid_target),
-                                            getActivity()).show();
-                            }
-                        }).show();
+                        getString(R.string.enter_url), getActivity(), input -> {
+                    final Target target = Target.getFromString(input);
+                    if (target != null) {
+                        ThreadHelper.getSharedExecutor().execute(() -> System.addOrderedTarget(target));
+                    } else
+                        new ErrorDialog(getString(R.string.error),
+                                getString(R.string.invalid_target),
+                                getActivity()).show();
+                }).show();
                 return true;
 
             case R.id.scan:
@@ -755,33 +681,29 @@ public class MainFragment extends Fragment {
             case R.id.save_session:
                 new InputDialog(getString(R.string.save_session),
                         getString(R.string.enter_session_name),
-                        System.getSessionName(), true, false, getActivity(),
-                        new InputDialogListener() {
-                            @Override
-                            public void onInputEntered(String input) {
-                                String name = input.trim().replace("/", "")
-                                        .replace("..", "");
+                        System.getSessionName(), true, false, getActivity(), input -> {
+                    String name = input.trim().replace("/", "")
+                            .replace("..", "");
 
-                                if (!name.isEmpty()) {
-                                    try {
-                                        String filename = System.saveSession(name);
+                    if (!name.isEmpty()) {
+                        try {
+                            String filename = System.saveSession(name);
 
-                                        Toast.makeText(
-                                                getActivity(),
-                                                getString(R.string.session_saved_to)
-                                                        + filename + " .",
-                                                Toast.LENGTH_SHORT).show();
-                                    } catch (IOException e) {
-                                        new ErrorDialog(getString(R.string.error),
-                                                e.toString(), getActivity())
-                                                .show();
-                                    }
-                                } else
-                                    new ErrorDialog(getString(R.string.error),
-                                            getString(R.string.invalid_session),
-                                            getActivity()).show();
-                            }
-                        }).show();
+                            Toast.makeText(
+                                    getActivity(),
+                                    getString(R.string.session_saved_to)
+                                            + filename + " .",
+                                    Toast.LENGTH_SHORT).show();
+                        } catch (IOException e) {
+                            new ErrorDialog(getString(R.string.error),
+                                    e.toString(), getActivity())
+                                    .show();
+                        }
+                    } else
+                        new ErrorDialog(getString(R.string.error),
+                                getString(R.string.invalid_session),
+                                getActivity()).show();
+                }).show();
                 return true;
 
             case R.id.restore_session:
@@ -791,20 +713,16 @@ public class MainFragment extends Fragment {
                 if (sessions != null && sessions.size() > 0) {
                     new SpinnerDialog(getString(R.string.select_session),
                             getString(R.string.select_session_file),
-                            sessions.toArray(new String[sessions.size()]),
-                            getActivity(), new SpinnerDialogListener() {
-                        @Override
-                        public void onItemSelected(int index) {
-                            String session = sessions.get(index);
-
-                            try {
-                                System.loadSession(session);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                new ErrorDialog(getString(R.string.error),
-                                        e.getMessage(), getActivity())
-                                        .show();
-                            }
+                            sessions.toArray(new String[0]),
+                            getActivity(), index -> {
+                        String session = sessions.get(index);
+                        try {
+                            System.loadSession(session);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            new ErrorDialog(getString(R.string.error),
+                                    e.getMessage(), getActivity())
+                                    .show();
                         }
                     }).show();
                 } else
@@ -819,21 +737,11 @@ public class MainFragment extends Fragment {
                 return true;
 
             case R.id.ss_monitor:
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Services.getNetworkRadar().onMenuClick(getActivity(), item);
-                    }
-                }).start();
+                new Thread(() -> Services.getNetworkRadar().onMenuClick(getActivity(), item)).start();
                 return true;
 
             case R.id.ss_msfrpcd:
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Services.getMsfRpcdService().onMenuClick(getActivity(), item);
-                    }
-                }).start();
+                new Thread(() -> Services.getMsfRpcdService().onMenuClick(getActivity(), item)).start();
                 return true;
 
             case R.id.submit_issue:
@@ -900,7 +808,8 @@ public class MainFragment extends Fragment {
     public class TargetAdapter extends BaseAdapter implements Runnable, Observer {
 
         private List<Target> list = System.getTargets();
-        private boolean isDark = getActivity().getSharedPreferences("THEME", 0).getBoolean("isDark", false);
+        private boolean isDark = getActivity().getSharedPreferences("THEME", 0)
+                .getBoolean("isDark", false);
 
         @Override
         public int getCount() {
@@ -957,7 +866,8 @@ public class MainFragment extends Fragment {
             } else {
                 holder.itemTitle.setText(target.toString());
             }
-            holder.itemTitle.setTextColor(ContextCompat.getColor(getActivity().getApplicationContext(), (target.isConnected() ? R.color.app_color : R.color.gray_text)));
+            holder.itemTitle.setTextColor(ContextCompat.getColor(getActivity()
+                    .getApplicationContext(), (target.isConnected() ? R.color.app_color : R.color.gray_text)));
 
             holder.itemTitle.setTypeface(null, Typeface.NORMAL);
             holder.itemImage.setImageResource(target.getDrawableResourceId());
@@ -1005,7 +915,7 @@ public class MainFragment extends Fragment {
         }
 
         public ArrayList<Target> getSelected() {
-            ArrayList<Target> result = new ArrayList<Target>();
+            ArrayList<Target> result = new ArrayList<>();
             synchronized (this) {
                 for (Target t : list)
                     if (t.isSelected())
@@ -1055,7 +965,6 @@ public class MainFragment extends Fragment {
                     }
                 }
             });
-
         }
 
         @Override
@@ -1076,7 +985,7 @@ public class MainFragment extends Fragment {
     }
 
     private class WipeReceiver extends ManagedReceiver {
-        private IntentFilter mFilter = null;
+        private IntentFilter mFilter;
 
         public WipeReceiver() {
             mFilter = new IntentFilter();
@@ -1125,7 +1034,7 @@ public class MainFragment extends Fragment {
     }
 
     private class UpdateReceiver extends ManagedReceiver {
-        private IntentFilter mFilter = null;
+        private IntentFilter mFilter;
 
         public UpdateReceiver() {
             mFilter = new IntentFilter();
@@ -1142,35 +1051,30 @@ public class MainFragment extends Fragment {
         }
 
         private void onUpdateAvailable(final Update update, final boolean mandatory) {
-            getActivity().runOnUiThread(new Runnable() {
+            getActivity().runOnUiThread(() -> new ConfirmDialog(getString(R.string.update_available),
+                    update.prompt, getActivity(), new ConfirmDialogListener() {
                 @Override
-                public void run() {
-                    new ConfirmDialog(getString(R.string.update_available),
-                            update.prompt, getActivity(), new ConfirmDialogListener() {
-                        @Override
-                        public void onConfirm() {
-                            StopRPCServer();
-                            Intent i = new Intent(getActivity(), UpdateService.class);
-                            i.setAction(UpdateService.START);
-                            i.putExtra(UpdateService.UPDATE, update);
+                public void onConfirm() {
+                    StopRPCServer();
+                    Intent i = new Intent(getActivity(), UpdateService.class);
+                    i.setAction(UpdateService.START);
+                    i.putExtra(UpdateService.UPDATE, update);
 
-                            getActivity().startService(i);
-                            mIsUpdateDownloading = true;
-                        }
-
-                        @Override
-                        public void onCancel() {
-                            mIsUpdateDownloading = false;
-                            if (!mandatory) {
-                                return;
-                            }
-
-                            onInitializationError(getString(R.string.mandatory_update));
-                        }
-                    }
-                    ).show();
+                    getActivity().startService(i);
+                    mIsUpdateDownloading = true;
                 }
-            });
+
+                @Override
+                public void onCancel() {
+                    mIsUpdateDownloading = false;
+                    if (!mandatory) {
+                        return;
+                    }
+
+                    onInitializationError(getString(R.string.mandatory_update));
+                }
+            }
+            ).show());
         }
 
         private void onUpdateAvailable(Update update) {
@@ -1204,13 +1108,8 @@ public class MainFragment extends Fragment {
                 return;
             }
 
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    new ErrorDialog(getString(R.string.error),
-                            getString(message), getActivity()).show();
-                }
-            });
+            getActivity().runOnUiThread(() -> new ErrorDialog(getString(R.string.error),
+                    getString(message), getActivity()).show());
 
             System.reloadTools();
         }
@@ -1247,7 +1146,7 @@ public class MainFragment extends Fragment {
                     onUpdateDone(update);
                     break;
                 case UpdateService.ERROR:
-                    int message = intent.getIntExtra(UpdateService.MESSAGE, R.string.error_occured);
+                    int message = intent.getIntExtra(UpdateService.MESSAGE, R.string.error_occurred);
                     onUpdateError(update, message);
                     break;
             }
@@ -1309,25 +1208,21 @@ public class MainFragment extends Fragment {
 
         private void check() {
             synchronized (getActivity()) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        loadInterfaces();
+                getActivity().runOnUiThread(() -> {
+                    loadInterfaces();
 
-                        String current = System.getIfname();
+                    String current = System.getIfname();
 
-                        Logger.debug(String.format("current='%s', ifaces=[%s], haveInterface=%s, isAnyNetInterfaceAvailable=%s",
-                                current != null ? current : "(null)",
-                                ifacesToString(), haveInterface(current), isAnyNetInterfaceAvailable));
+                    Logger.debug(String.format("current='%s', ifaces=[%s], haveInterface=%s, isAnyNetInterfaceAvailable=%s",
+                            current != null ? current : "(null)",
+                            ifacesToString(), haveInterface(current), isAnyNetInterfaceAvailable));
 
-                        if (haveInterface(current)) {
-                            onConnectionResumed();
-                        } else if (current != null) {
-                            onConnectionLost();
-                        } else if (isAnyNetInterfaceAvailable) {
-                            onNetworkInterfaceChanged();
-                        }
-
+                    if (haveInterface(current)) {
+                        onConnectionResumed();
+                    } else if (current != null) {
+                        onConnectionLost();
+                    } else if (isAnyNetInterfaceAvailable) {
+                        onNetworkInterfaceChanged();
                     }
                 });
 

@@ -54,7 +54,6 @@ import androidx.preference.TwoStatePreference;
 
 public class SettingsFragment extends Fragment {
 
-
     public static final int SETTINGS_DONE = 1285;
     public static final String SETTINGS_WIPE_START = "SettingsActivity.WIPE_START";
     public static final String SETTINGS_WIPE_DIR = "SettingsActivity.data.WIPE_DIR";
@@ -76,9 +75,8 @@ public class SettingsFragment extends Fragment {
                 .commit();
     }
 
-
-        public static class PrefsFrag extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
-
+    public static class PrefsFrag extends PreferenceFragmentCompat
+            implements SharedPreferences.OnSharedPreferenceChangeListener {
 
         private Preference mSavePath = null;
         private Preference mWipeMSF = null;
@@ -98,19 +96,19 @@ public class SettingsFragment extends Fragment {
         private BroadcastReceiver mReceiver = null;
         private Thread mBranchesWaiter = null;
 
-            @Override
-            public void onViewCreated(View v, Bundle savedInstanceState) {
-                super.onViewCreated(v, savedInstanceState);
-                SharedPreferences themePrefs = getActivity().getSharedPreferences("THEME", 0);
-                Boolean isDark = themePrefs.getBoolean("isDark", false);
-                if (isDark) {
-                    getActivity().setTheme(R.style.PrefsThemeDark);
-                    v.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.background_window_dark));
-                } else {
-                    getActivity().setTheme(R.style.PrefsTheme);
-                    v.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.background_window));
-                }
+        @Override
+        public void onViewCreated(View v, Bundle savedInstanceState) {
+            super.onViewCreated(v, savedInstanceState);
+            SharedPreferences themePrefs = getActivity().getSharedPreferences("THEME", 0);
+            Boolean isDark = themePrefs.getBoolean("isDark", false);
+            if (isDark) {
+                getActivity().setTheme(R.style.PrefsThemeDark);
+                v.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.background_window_dark));
+            } else {
+                getActivity().setTheme(R.style.PrefsTheme);
+                v.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.background_window));
             }
+        }
 
 
         @Override
@@ -137,23 +135,16 @@ public class SettingsFragment extends Fragment {
             mMsfBranch = (ListPreference) getPreferenceScreen().findPreference("MSF_BRANCH");
             mMsfEnabled = (TwoStatePreference) getPreferenceScreen().findPreference("MSF_ENABLED");
 
-            mThemeChooser.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    SharedPreferences themePrefs = getActivity().getBaseContext().getSharedPreferences("THEME", 0);
-                    themePrefs.edit().putBoolean("isDark", (Boolean) newValue).apply();
-                    Toast.makeText(getActivity().getBaseContext(), getString(R.string.please_restart), Toast.LENGTH_LONG).show();
-                    return true;
-                }
+            mThemeChooser.setOnPreferenceChangeListener((preference, newValue) -> {
+                SharedPreferences themePrefs1 = getActivity().getBaseContext().getSharedPreferences("THEME", 0);
+                themePrefs1.edit().putBoolean("isDark", (Boolean) newValue).apply();
+                Toast.makeText(getActivity().getBaseContext(), getString(R.string.please_restart), Toast.LENGTH_LONG).show();
+                return true;
             });
 
-            mSavePath.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    startDirectoryPicker(preference);
-                    return true;
-                }
+            mSavePath.setOnPreferenceClickListener(preference -> {
+                startDirectoryPicker(preference);
+                return true;
             });
 
             if (mMsfEnabled.isEnabled())
@@ -170,21 +161,22 @@ public class SettingsFragment extends Fragment {
             if (mMsfSize > 0) {
                 message += "\n" + String.format(getString(R.string.pref_msfwipe_size), mMsfSize);
             }
-            new ConfirmDialog(getString(R.string.warning), message, getActivity(), new ConfirmDialog.ConfirmDialogListener() {
-                @Override
-                public void onConfirm() {
-                    getActivity().sendBroadcast(new Intent(SETTINGS_WIPE_START));
-                }
+            new ConfirmDialog(getString(R.string.warning), message, getActivity(),
+                    new ConfirmDialog.ConfirmDialogListener() {
+                        @Override
+                        public void onConfirm() {
+                            getActivity().sendBroadcast(new Intent(SETTINGS_WIPE_START));
+                        }
 
-                @Override
-                public void onCancel() {
-
-                }
-            }).show();
+                        @Override
+                        public void onCancel() {
+                        }
+                    }).show();
         }
 
         private void wipe_prompt_older(final File oldDir) {
-            new ConfirmDialog(getString(R.string.warning), getString(R.string.delete_previous_location), getActivity(), new ConfirmDialog.ConfirmDialogListener() {
+            new ConfirmDialog(getString(R.string.warning), getString(R.string.delete_previous_location),
+                    getActivity(), new ConfirmDialog.ConfirmDialogListener() {
                 @Override
                 public void onConfirm() {
                     Intent i = new Intent(SETTINGS_WIPE_START);
@@ -194,40 +186,39 @@ public class SettingsFragment extends Fragment {
 
                 @Override
                 public void onCancel() {
-
                 }
             }).show();
         }
 
         private void measureMsfSize() {
             try {
-                System.getTools().raw.async(String.format("du -xsm '%s' '%s'", System.getRubyPath(), System.getMsfPath()),
-                        new Raw.RawReceiver() {
-                            private int size = 0;
+                System.getTools().raw.async(String.format("du -xsm '%s' '%s'", System.getRubyPath(),
+                        System.getMsfPath()), new Raw.RawReceiver() {
+                    private int size = 0;
 
-                            @SuppressWarnings("StatementWithEmptyBody")
-                            @Override
-                            public void onNewLine(String line) {
-                                if (line.isEmpty())
-                                    return;
-                                try {
-                                    int start, end;
-                                    for (start = 0; start < line.length() && java.lang.Character.isSpaceChar(line.charAt(start)); start++)
-                                        ;
-                                    for (end = start + 1; end < line.length() && java.lang.Character.isDigit(line.charAt(end)); end++)
-                                        ;
-                                    size += Integer.parseInt(line.substring(start, end));
-                                } catch (Exception e) {
-                                    System.errorLogging(e);
-                                }
-                            }
+                    @SuppressWarnings("StatementWithEmptyBody")
+                    @Override
+                    public void onNewLine(String line) {
+                        if (line.isEmpty())
+                            return;
+                        try {
+                            int start, end;
+                            for (start = 0; start < line.length() && java.lang.Character.isSpaceChar(line.charAt(start)); start++)
+                                ;
+                            for (end = start + 1; end < line.length() && java.lang.Character.isDigit(line.charAt(end)); end++)
+                                ;
+                            size += Integer.parseInt(line.substring(start, end));
+                        } catch (Exception e) {
+                            System.errorLogging(e);
+                        }
+                    }
 
-                            @Override
-                            public void onEnd(int exitCode) {
-                                if (exitCode == 0)
-                                    mMsfSize = size;
-                            }
-                        });
+                    @Override
+                    public void onEnd(int exitCode) {
+                        if (exitCode == 0)
+                            mMsfSize = size;
+                    }
+                });
             } catch (ChildManager.ChildNotStartedException e) {
                 Logger.error(e.getMessage());
             }
@@ -268,13 +259,16 @@ public class SettingsFragment extends Fragment {
                 }
 
                 if (!folder.exists())
-                    Toast.makeText(getActivity(), getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_exists), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), getString(R.string.pref_folder) + " " + path
+                            + " " + getString(R.string.pref_err_exists), Toast.LENGTH_SHORT).show();
 
                 else if (!folder.canWrite())
-                    Toast.makeText(getActivity(), getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_writable), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), getString(R.string.pref_folder) + " " + path
+                            + " " + getString(R.string.pref_err_writable), Toast.LENGTH_SHORT).show();
 
                 else if (checker != null && !checker.canExecuteInDir(path))
-                    Toast.makeText(getActivity(), getString(R.string.pref_folder) + " " + path + " " + getString(R.string.pref_err_executable), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), getString(R.string.pref_folder) + " " + path
+                            + " " + getString(R.string.pref_err_executable), Toast.LENGTH_LONG).show();
 
                 else {
                     //noinspection ConstantConditions
@@ -345,14 +339,19 @@ public class SettingsFragment extends Fragment {
                     port = 0;
                 }
 
-                if (key.equals("PREF_HTTP_PROXY_PORT")) {
-                    System.HTTP_PROXY_PORT = port;
-                } else if (key.equals("PREF_HTTP_SERVER_PORT")) {
-                    System.HTTP_SERVER_PORT = port;
-                } else if (key.equals("PREF_HTTPS_REDIRECTOR_PORT")) {
-                    System.HTTPS_REDIR_PORT = port;
-                } else if (key.equals("MSF_RPC_PORT")) {
-                    System.MSF_RPC_PORT = port;
+                switch (key) {
+                    case "PREF_HTTP_PROXY_PORT":
+                        System.HTTP_PROXY_PORT = port;
+                        break;
+                    case "PREF_HTTP_SERVER_PORT":
+                        System.HTTP_SERVER_PORT = port;
+                        break;
+                    case "PREF_HTTPS_REDIRECTOR_PORT":
+                        System.HTTPS_REDIR_PORT = port;
+                        break;
+                    case "MSF_RPC_PORT":
+                        System.MSF_RPC_PORT = port;
+                        break;
                 }
 
                 if (port == 0) {
@@ -429,57 +428,52 @@ public class SettingsFragment extends Fragment {
             // start measureMsfSize ASAP
             onMsfPathChanged();
 
-            Preference.OnPreferenceClickListener directoryPickerWithDefaultPath = new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
+            Preference.OnPreferenceClickListener directoryPickerWithDefaultPath = preference -> {
 
-                    final String currentValue;
-                    final String defaultValue;
-                    final String key = preference.getKey();
+                final String currentValue;
+                final String defaultValue;
+                final String key = preference.getKey();
 
-                    switch (key) {
-                        case "RUBY_DIR":
-                            currentValue = System.getRubyPath();
-                            defaultValue = System.getDefaultRubyPath();
-                            break;
-                        case "MSF_DIR":
-                            currentValue = System.getMsfPath();
-                            defaultValue = System.getDefaultMsfPath();
-                            break;
-                        default:
-                            return true;
-                    }
-
-                    if (!currentValue.equals(defaultValue)) {
-                        final Preference fPref = preference;
-                        (new ChoiceDialog(
-                                getActivity(),
-                                getString(R.string.choose_an_option),
-                                new String[]{getString(R.string.restore_default_path), getString(R.string.choose_a_custom_path)},
-                                new ChoiceDialog.ChoiceDialogListener() {
-                                    @Override
-                                    public void onChoice(int choice) {
-                                        if (choice == 0) {
-                                            // create default directory if it does not exists
-                                            File f = new File(defaultValue);
-                                            if (!f.exists())
-                                                f.mkdirs();
-                                            // simulate directory picker
-                                            Intent i = new Intent();
-                                            i.putExtra(DirectoryPicker.AFFECTED_PREF, key);
-                                            i.putExtra(DirectoryPicker.CHOSEN_DIRECTORY, defaultValue);
-                                            onActivityResult(DirectoryPicker.PICK_DIRECTORY, AppCompatActivity.RESULT_OK, i);
-                                        } else {
-                                            startDirectoryPicker(fPref);
-                                        }
-                                    }
-                                }
-                        )).show();
-                    } else {
-                        startDirectoryPicker(preference);
-                    }
-                    return true;
+                switch (key) {
+                    case "RUBY_DIR":
+                        currentValue = System.getRubyPath();
+                        defaultValue = System.getDefaultRubyPath();
+                        break;
+                    case "MSF_DIR":
+                        currentValue = System.getMsfPath();
+                        defaultValue = System.getDefaultMsfPath();
+                        break;
+                    default:
+                        return true;
                 }
+
+                if (!currentValue.equals(defaultValue)) {
+                    final Preference fPref = preference;
+                    (new ChoiceDialog(
+                            getActivity(),
+                            getString(R.string.choose_an_option),
+                            new String[]{getString(R.string.restore_default_path),
+                                    getString(R.string.choose_a_custom_path)},
+                            choice -> {
+                                if (choice == 0) {
+                                    // create default directory if it does not exists
+                                    File f = new File(defaultValue);
+                                    if (!f.exists())
+                                        f.mkdirs();
+                                    // simulate directory picker
+                                    Intent i = new Intent();
+                                    i.putExtra(DirectoryPicker.AFFECTED_PREF, key);
+                                    i.putExtra(DirectoryPicker.CHOSEN_DIRECTORY, defaultValue);
+                                    onActivityResult(DirectoryPicker.PICK_DIRECTORY, AppCompatActivity.RESULT_OK, i);
+                                } else {
+                                    startDirectoryPicker(fPref);
+                                }
+                            }
+                    )).show();
+                } else {
+                    startDirectoryPicker(preference);
+                }
+                return true;
             };
 
             mRubyDir.setDefaultValue(System.getDefaultRubyPath());
@@ -488,12 +482,9 @@ public class SettingsFragment extends Fragment {
             mMsfDir.setDefaultValue(System.getDefaultMsfPath());
             mMsfDir.setOnPreferenceClickListener(directoryPickerWithDefaultPath);
 
-            mWipeMSF.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    wipe_prompt();
-                    return true;
-                }
+            mWipeMSF.setOnPreferenceClickListener(preference -> {
+                wipe_prompt();
+                return true;
             });
 
             getMsfBranches();
@@ -526,17 +517,14 @@ public class SettingsFragment extends Fragment {
             }
 
             mMsfBranch.setEnabled(false);
-            mBranchesWaiter = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        GitHubParser.getMsfRepo().getBranches();
-                        getActivity().sendBroadcast(new Intent(SETTINGS_MSF_BRANCHES_AVAILABLE));
-                    } catch (JSONException e) {
-                        System.errorLogging(e);
-                    } catch (IOException e) {
-                        Logger.error(e.getMessage());
-                    }
+            mBranchesWaiter = new Thread(() -> {
+                try {
+                    GitHubParser.getMsfRepo().getBranches();
+                    getActivity().sendBroadcast(new Intent(SETTINGS_MSF_BRANCHES_AVAILABLE));
+                } catch (JSONException e) {
+                    System.errorLogging(e);
+                } catch (IOException e) {
+                    Logger.error(e.getMessage());
                 }
             });
             mBranchesWaiter.start();

@@ -18,42 +18,36 @@
  */
 package org.csploit.android.gui.dialogs;
 
-import android.content.DialogInterface;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
 import org.csploit.android.R;
 
-public class RedirectionDialog extends AlertDialog{
-  public RedirectionDialog(String title, AppCompatActivity activity, final RedirectionDialogListener listener){
-    super(activity);
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
-    final View view = LayoutInflater.from(activity).inflate(R.layout.plugin_mitm_redirect_dialog, null);
+public class RedirectionDialog extends AlertDialog {
+    public RedirectionDialog(String title, AppCompatActivity activity, final RedirectionDialogListener listener) {
+        super(activity);
 
-    this.setTitle(title);
-    this.setView(view);
+        final View view = LayoutInflater.from(activity).inflate(R.layout.plugin_mitm_redirect_dialog, null);
 
-    this.setButton(BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener(){
-      public void onClick(DialogInterface dialog, int id){
-        assert view != null;
-        String address = ((EditText) view.findViewById(R.id.redirAddress)).getText() + "".trim(),
-          port = ((EditText) view.findViewById(R.id.redirPort)).getText() + "".trim();
+        this.setTitle(title);
+        this.setView(view);
 
-        listener.onInputEntered(address, port);
-      }
-    });
+        this.setButton(BUTTON_POSITIVE, "Ok", (dialog, id) -> {
+            assert view != null;
+            String address = ((EditText) view.findViewById(R.id.redirAddress)).getText() + "".trim(),
+                    port = ((EditText) view.findViewById(R.id.redirPort)).getText() + "".trim();
 
-    this.setButton(BUTTON_NEGATIVE, activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int id) {
-        dialog.dismiss();
-      }
-    });
-  }
+            listener.onInputEntered(address, port);
+        });
 
-  public interface RedirectionDialogListener{
-    void onInputEntered(String address, String port);
-  }
+        this.setButton(BUTTON_NEGATIVE, activity.getString(R.string.cancel_dialog), (dialog, id) -> dialog.dismiss());
+    }
+
+    public interface RedirectionDialogListener {
+        void onInputEntered(String address, String port);
+    }
 }

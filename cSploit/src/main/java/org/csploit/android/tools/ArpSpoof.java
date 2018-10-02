@@ -27,46 +27,45 @@ import org.csploit.android.events.Message;
 import org.csploit.android.net.Target;
 import org.csploit.android.net.Target.Type;
 
-public class ArpSpoof extends Tool
-{
-  public ArpSpoof() {
-    mHandler = "arpspoof";
-  }
-
-  public abstract static class ArpSpoofReceiver extends Child.EventReceiver {
-
-    @Override
-    public void onEvent(Event e) {
-      if(e instanceof Message) {
-        Message m = (Message)e;
-        if(m.severity == Message.Severity.ERROR)
-          onError(m.message);
-        else
-          Logger.warning("unexpected message from arpspoof: " + m);
-      } else {
-        Logger.warning("unknown event " + e);
-      }
+public class ArpSpoof extends Tool {
+    public ArpSpoof() {
+        mHandler = "arpspoof";
     }
 
-    public abstract void onError(String line);
-  }
+    public Child spoof(Target target, ArpSpoofReceiver receiver) throws ChildManager.ChildNotStartedException {
+        String commandLine = "";
 
-  public Child spoof(Target target, ArpSpoofReceiver receiver) throws ChildManager.ChildNotStartedException {
-    String commandLine = "";
+        try {
+            String gw = System.getNetwork().getGatewayAddress().getHostAddress();
+            String iface = System.getNetwork().getInterface().getDisplayName();
 
-    try{
-      String gw = System.getNetwork().getGatewayAddress().getHostAddress();
-      String iface = System.getNetwork().getInterface().getDisplayName();
+            if (target.getType() == Type.NETWORK)
+                commandLine = "-i " + iface + " " + gw;
 
-      if(target.getType() == Type.NETWORK)
-        commandLine = "-i " + iface + " " + gw;
+            else
+                commandLine = "-i " + iface + " -t " + target.getCommandLineRepresentation() + " " + gw;
+        } catch (Exception e) {
+            System.errorLogging(e);
+        }
 
-      else
-        commandLine = "-i " + iface + " -t " + target.getCommandLineRepresentation() + " " + gw;
-    } catch(Exception e) {
-      System.errorLogging(e);
+        return super.async(commandLine, receiver);
     }
 
-    return super.async(commandLine, receiver);
-  }
+    public abstract static class ArpSpoofReceiver extends Child.EventReceiver {
+
+        @Override
+        public void onEvent(Event e) {
+            if (e instanceof Message) {
+                Message m = (Message) e;
+                if (m.severity == Message.Severity.ERROR)
+                    onError(m.message);
+                else
+                    Logger.warning("unexpected message from arpspoof: " + m);
+            } else {
+                Logger.warning("unknown event " + e);
+            }
+        }
+
+        public abstract void onError(String line);
+    }
 }

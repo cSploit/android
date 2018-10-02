@@ -27,24 +27,24 @@ import org.csploit.android.core.System;
  */
 public class Msf extends Ruby {
 
-  @Override
-  public void setEnabled() {
-    super.setEnabled();
+    @Override
+    public void setEnabled() {
+        super.setEnabled();
 
-    mEnabled = mEnabled && (ExecChecker.msf().getRoot() != null ||
-            ExecChecker.msf().canExecuteInDir(System.getMsfPath()));
-  }
+        mEnabled = mEnabled && (ExecChecker.msf().getRoot() != null ||
+                ExecChecker.msf().canExecuteInDir(System.getMsfPath()));
+    }
 
-  @Override
-  protected void registerSettingReceiver() {
-    super.registerSettingReceiver();
-    onSettingsChanged.addFilter("MSF_DIR");
-  }
+    @Override
+    protected void registerSettingReceiver() {
+        super.registerSettingReceiver();
+        onSettingsChanged.addFilter("MSF_DIR");
+    }
 
-  @Override
-  public void setupEnvironment() {
-    super.setupEnvironment();
+    @Override
+    public void setupEnvironment() {
+        super.setupEnvironment();
 
-    mEnv[1] += ":" + ExecChecker.msf().getRoot();
-  }
+        mEnv[1] += ":" + ExecChecker.msf().getRoot();
+    }
 }

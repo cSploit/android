@@ -18,43 +18,42 @@
  */
 package org.csploit.android.wifi.algorithms;
 
+import org.csploit.android.wifi.Keygen;
+
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-import org.csploit.android.wifi.Keygen;
-
 /*
- * This is the algorithm to generate the WPA passphrase 
+ * This is the algorithm to generate the WPA passphrase
  * for the Hitachi (TECOM) AH-4021 and Hitachi (TECOM) AH-4222.
  * The key is the 26 first characters from the SSID SHA1 hash.
  *  Link : http://rafale.org/~mattoufoutu/ebooks/Rafale-Mag/Rafale12/Rafale12.08.HTML
  */
-public class TecomKeygen extends Keygen{
+public class TecomKeygen extends Keygen {
 
-  private MessageDigest md;
-
-  public TecomKeygen(String ssid, String mac, int level, String enc){
-    super(ssid, mac, level, enc);
-  }
-
-  @Override
-  public List<String> getKeys(){
-    try{
-      md = MessageDigest.getInstance("SHA1");
-    } catch(NoSuchAlgorithmException e1){
-      setErrorMessage("This phone cannot process a SHA1 hash.");
-      return null;
+    public TecomKeygen(String ssid, String mac, int level, String enc) {
+        super(ssid, mac, level, enc);
     }
-    md.reset();
-    md.update(getSsidName().getBytes());
-    byte[] hash = md.digest();
-    try{
-      addPassword(getHexString(hash).substring(0, 26));
-    } catch(UnsupportedEncodingException e){
-      e.printStackTrace();
+
+    @Override
+    public List<String> getKeys() {
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("SHA1");
+        } catch (NoSuchAlgorithmException e1) {
+            setErrorMessage("This phone cannot process a SHA1 hash.");
+            return null;
+        }
+        md.reset();
+        md.update(getSsidName().getBytes());
+        byte[] hash = md.digest();
+        try {
+            addPassword(getHexString(hash).substring(0, 26));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return getResults();
     }
-    return getResults();
-  }
 }

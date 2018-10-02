@@ -23,7 +23,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.FileObserver;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -51,570 +50,558 @@ import org.csploit.android.net.Target;
 import org.csploit.android.plugins.mitm.SpoofSession.OnSessionReadyListener;
 import org.csploit.android.tools.TcpDump;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClickListener
-{
-  private static final String[] SORT = {
-    "Bandwidth ↓",
-    "Bandwidth ↑",
-    "Total ↓",
-    "Total ↑",
-    "Activity ↓",
-    "Activity ↑",
-  };
+import androidx.appcompat.app.AppCompatActivity;
 
-  private static final String PCAP_FILTER = "not '(src host localhost or dst host localhost or arp)'";
+public class Sniffer extends AppCompatActivity implements AdapterView.OnItemClickListener {
+    private static final String[] SORT = {
+            "Bandwidth ↓",
+            "Bandwidth ↑",
+            "Total ↓",
+            "Total ↑",
+            "Activity ↓",
+            "Activity ↑",
+    };
 
-  private ToggleButton mSniffToggleButton = null;
-  private Spinner mSortSpinner = null;
-  private int mSortType = 0;
-  private ProgressBar mSniffProgress = null;
-  private ListView mListView = null;
-  private StatListAdapter mAdapter = null;
-  private boolean mRunning = false;
-  private int mSampleTime = 1000; // sample every second
-  private SpoofSession mSpoofSession = null;
-  private boolean mDumpToFile = false;
-  private String mPcapFileName = null;
-  private Child mTcpdumpProcess = null;
-  private FileObserver mFileActivity = null;
+    private static final String PCAP_FILTER = "not '(src host localhost or dst host localhost or arp)'";
 
-  public class AddressStats implements Comparable<AddressStats>{
-    public String mAddress = "";
-    public long mBytes = 0;
-    public long mBandwidth = 0;
-    public long mSampledTime = 0;
-    public long mSampledBytes = 0;
+    private ToggleButton mSniffToggleButton = null;
+    private int mSortType = 0;
+    private ProgressBar mSniffProgress = null;
+    private StatListAdapter mAdapter = null;
+    private boolean mRunning = false;
+    private int mSampleTime = 1000; // sample every second
+    private SpoofSession mSpoofSession = null;
+    private boolean mDumpToFile = false;
+    private String mPcapFileName = null;
+    private Child mTcpdumpProcess = null;
+    private FileObserver mFileActivity = null;
 
-    public AddressStats(String address){
-      mAddress = address;
-      mBytes = 0;
-      mBandwidth = 0;
-      mSampledTime = 0;
-      mSampledBytes = 0;
-    }
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+        Boolean isDark = themePrefs.getBoolean("isDark", false);
 
-    @Override
-    public int compareTo(AddressStats stats){
-      int[] cmp;
-      double va,vb;
+        if (isDark)
+            setTheme(R.style.DarkTheme);
+        else
+            setTheme(R.style.AppTheme);
 
-      switch(getSortType()){
-        default:
-        case 0:
-          cmp = new int[]{-1, 1, 0};
-          va = mBandwidth;
-          vb = stats.mBandwidth;
-          break;
-        case 1:
-          cmp = new int[]{1, -1, 0};
-          va = mBandwidth;
-          vb = stats.mBandwidth;
-          break;
-        case 2:
-          cmp = new int[]{-1, 1, 0};
-          va = mBytes;
-          vb = stats.mBytes;
-          break;
-        case 3:
-          cmp = new int[]{1, -1, 0};
-          va = mBytes;
-          vb = stats.mBytes;
-          break;
-        case 4:
-          cmp = new int[]{-1, 1, 0};
-          va = mSampledTime;
-          vb = stats.mSampledTime;
-          break;
-        case 5:
-          cmp = new int[]{1, -1, 0};
-          va = mSampledTime;
-          vb = stats.mSampledTime;
-          break;
-      }
+        setTitle(System.getCurrentTarget() + " > MITM > Sniffer");
+        setContentView(R.layout.plugin_mitm_sniffer);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-      if(va > vb)
-        return cmp[0];
+        mSniffToggleButton = findViewById(R.id.sniffToggleButton);
+        mSniffProgress = findViewById(R.id.sniffActivity);
+        Spinner mSortSpinner = findViewById(R.id.sortSpinner);
+        ListView mListView = findViewById(R.id.listView);
+        mAdapter = new StatListAdapter(R.layout.plugin_mitm_sniffer_list_item);
+        mSampleTime = (int) (Double.parseDouble(System.getSettings()
+                .getString("PREF_SNIFFER_SAMPLE_TIME", "1.0")) * 1000);
+        mSpoofSession = new SpoofSession(false, false, null, null);
 
-      else if(va < vb)
-        return cmp[1];
+        mSortSpinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, SORT));
+        mSortSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> adapter, View view, int position, long id) {
+                mSortType = position;
+            }
 
-      else
-        return cmp[2];
-    }
-  }
+            public void onNothingSelected(AdapterView<?> arg0) {
+            }
+        });
 
-  public class StatListAdapter extends ArrayAdapter<AddressStats> {
-    private int mLayoutId = 0;
-    private final ArrayList<AddressStats> mStats;
+        mListView.setAdapter(mAdapter);
 
-    public class StatsHolder {
-      TextView address;
-      TextView description;
-    }
+        mListView.setOnItemClickListener(this);
 
-    public StatListAdapter(int layoutId) {
-      super(Sniffer.this, layoutId);
-
-      mLayoutId = layoutId;
-      mStats = new ArrayList<>();
-    }
-
-    public AddressStats getStats(String address) {
-      synchronized (mStats) {
-        for (AddressStats stats : mStats) {
-          if (stats.mAddress.equals(address))
-            return stats;
-        }
-      }
-
-      return null;
-    }
-
-    public synchronized void addStats(AddressStats stats) {
-      boolean found = false;
-
-      synchronized (mStats) {
-
-        for (AddressStats sstats : mStats) {
-          if (sstats.mAddress.equals(stats.mAddress)) {
-            sstats.mBytes = stats.mBytes;
-            sstats.mBandwidth = stats.mBandwidth;
-            sstats.mSampledTime = stats.mSampledTime;
-            sstats.mSampledBytes = stats.mSampledBytes;
-
-            found = true;
-            break;
-          }
-        }
-
-        if (!found)
-          mStats.add(stats);
-
-        Collections.sort(mStats);
-      }
-    }
-
-    private synchronized AddressStats getByPosition(int position) {
-      synchronized (mStats) {
-        return mStats.get(position);
-      }
-    }
-
-    @Override
-    public int getCount(){
-      synchronized (mStats) {
-        return mStats.size();
-      }
-    }
-
-    private String formatSize(long size){
-      if(size < 1024)
-        return size + " B";
-
-      else if(size < (1024 * 1024))
-        return (size / 1024) + " KB";
-
-      else if(size < (1024 * 1024 * 1024))
-        return (size / (1024 * 1024)) + " MB";
-
-      else
-        return (size / (1024 * 1024 * 1024)) + " GB";
-    }
-
-    private String formatSpeed(long speed){
-      if(speed < 1024)
-        return speed + " B/s";
-
-      else if(speed < (1024 * 1024))
-        return (speed / 1024) + " KB/s";
-
-      else if(speed < (1024 * 1024 * 1024))
-        return (speed / (1024 * 1024)) + " MB/s";
-
-      else
-        return (speed / (1024 * 1024 * 1024)) + " GB/s";
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent){
-      View row = convertView;
-      StatsHolder holder = null;
-
-      if(row == null){
-        LayoutInflater inflater = (LayoutInflater) Sniffer.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        row = inflater.inflate(mLayoutId, parent, false);
-
-        holder = new StatsHolder();
-
-        holder.address = (TextView) row.findViewById(R.id.statAddress);
-        holder.description = (TextView) row.findViewById(R.id.statDescription);
-
-        row.setTag(holder);
-      } else{
-        holder = (StatsHolder) row.getTag();
-      }
-
-      AddressStats stats = getByPosition(position);
-      Target target = System.getTargetByAddress(stats.mAddress);
-
-      if(target != null && target.hasAlias())
-        holder.address.setText
-          (
-            Html.fromHtml
-              (
-                "<b>" + target.getAlias() + "</b> <small>( " + target.getDisplayAddress() + " )</small>"
-              )
-          );
-      else
-        holder.address.setText(stats.mAddress);
-
-      holder.description.setText
-        (
-          Html.fromHtml
-            (
-              "<b>BANDWIDTH</b>: " + formatSpeed(stats.mBandwidth) + " | <b>TOTAL</b> " + formatSize(stats.mBytes)
-            )
+        mSniffToggleButton.setOnClickListener(v -> {
+                    if (mRunning) {
+                        setStoppedState();
+                    } else {
+                        setStartedState();
+                    }
+                }
         );
 
-      return row;
-    }
-  }
+        new ConfirmDialog(getString(R.string.file_output),
+                getString(R.string.question_save_to_pcap), this, new ConfirmDialog.ConfirmDialogListener() {
+            @Override
+            public void onConfirm() {
+                mDumpToFile = true;
+                mPcapFileName = (new File(Sniffer.this.getCacheDir(),
+                        "csploit-sniff-" + java.lang.System.currentTimeMillis() + ".pcap")).getAbsolutePath();
+            }
 
-  public void onCreate(Bundle savedInstanceState){
-    super.onCreate(savedInstanceState);
-    SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-  	Boolean isDark = themePrefs.getBoolean("isDark", false);
-
-    if (isDark)
-      setTheme(R.style.DarkTheme);
-    else
-      setTheme(R.style.AppTheme);
-
-    setTitle(System.getCurrentTarget() + " > MITM > Sniffer");
-    setContentView(R.layout.plugin_mitm_sniffer);
-    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-    mSniffToggleButton = (ToggleButton) findViewById(R.id.sniffToggleButton);
-    mSniffProgress = (ProgressBar) findViewById(R.id.sniffActivity);
-    mSortSpinner = (Spinner) findViewById(R.id.sortSpinner);
-    mListView = (ListView) findViewById(R.id.listView);
-    mAdapter = new StatListAdapter(R.layout.plugin_mitm_sniffer_list_item);
-    mSampleTime = (int)(Double.parseDouble(System.getSettings().getString("PREF_SNIFFER_SAMPLE_TIME", "1.0")) * 1000);
-    mSpoofSession = new SpoofSession(false, false, null, null);
-
-    mSortSpinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, SORT));
-    mSortSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-      public void onItemSelected(AdapterView<?> adapter, View view, int position, long id) {
-        mSortType = position;
-      }
-
-      public void onNothingSelected(AdapterView<?> arg0) {
-      }
-    });
-
-    mListView.setAdapter(mAdapter);
-
-    mListView.setOnItemClickListener(this);
-
-    mSniffToggleButton.setOnClickListener(new View.OnClickListener(){
-      @Override
-      public void onClick(View v){
-        if(mRunning){
-          setStoppedState();
-        } else{
-          setStartedState();
-        }
-      }
-    }
-    );
-
-    new ConfirmDialog( getString(R.string.file_output), getString(R.string.question_save_to_pcap), this, new ConfirmDialog.ConfirmDialogListener(){
-      @Override
-      public void onConfirm(){
-        mDumpToFile = true;
-        mPcapFileName = (new File(Sniffer.this.getCacheDir(), "csploit-sniff-" + java.lang.System.currentTimeMillis() + ".pcap")).getAbsolutePath();
-      }
-
-      @Override
-      public void onCancel(){
-        mDumpToFile = false;
-        mPcapFileName = null;
-      }
-    }).show();
-  }
-
-  @Override
-  public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-    String address = mAdapter.getByPosition(position).mAddress;
-    final Target t = System.getTargetByAddress(address);
-
-    if (t == null)
-      return;
-
-    new ConfirmDialog(getString(R.string.mitm_ss_select_target_title),
-            String.format(getString(R.string.mitm_ss_select_target_prompt), address),
-            Sniffer.this, new ConfirmDialog.ConfirmDialogListener() {
-      @Override
-      public void onConfirm() {
-        System.setCurrentTarget(t);
-
-        setStoppedState();
-
-        Toast.makeText(Sniffer.this,
-                getString(R.string.selected_) + System.getCurrentTarget(),
-                Toast.LENGTH_SHORT).show();
-
-        startActivity(new Intent(Sniffer.this,
-                ActionActivity.class));
-
-        overridePendingTransition(R.anim.slide_in_left,
-                R.anim.slide_out_left);
-      }
-
-      @Override
-      public void onCancel() {
-      }
-    }).show();
-  }
-
-  public synchronized int getSortType(){
-    return mSortType;
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item){
-    switch(item.getItemId()){
-      case android.R.id.home:
-
-        onBackPressed();
-
-        return true;
-
-      default:
-        return super.onOptionsItemSelected(item);
-    }
-  }
-
-  private void movePcapFileFromCacheToStorage() {
-    File inputFile = new File(mPcapFileName);
-    InputStream in = null;
-    OutputStream out = null;
-
-    try {
-      in = new FileInputStream(inputFile);
-      out = new FileOutputStream(new File(System.getStoragePath(),new File(mPcapFileName).getName()));
-      IOUtils.copy(in, out);
-    } catch (IOException e) {
-      System.errorLogging(e);
-    } finally {
-      IOUtils.closeQuietly(in);
-      IOUtils.closeQuietly(out);
-      inputFile.delete();
-    }
-  }
-
-  private void setStoppedState(){
-    if(mTcpdumpProcess != null) {
-      mTcpdumpProcess.kill();
-      mTcpdumpProcess = null;
+            @Override
+            public void onCancel() {
+                mDumpToFile = false;
+                mPcapFileName = null;
+            }
+        }).show();
     }
 
-    if(mDumpToFile) {
-      if (mFileActivity != null) {
-        mFileActivity.stopWatching();
-        mFileActivity = null;
-        movePcapFileFromCacheToStorage();
-      }
-    }
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        String address = mAdapter.getByPosition(position).mAddress;
+        final Target t = System.getTargetByAddress(address);
 
-    Sniffer.this.runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        mSpoofSession.stop();
+        if (t == null)
+            return;
 
-        mSniffProgress.setVisibility(View.INVISIBLE);
+        new ConfirmDialog(getString(R.string.mitm_ss_select_target_title),
+                String.format(getString(R.string.mitm_ss_select_target_prompt), address),
+                Sniffer.this, new ConfirmDialog.ConfirmDialogListener() {
+            @Override
+            public void onConfirm() {
+                System.setCurrentTarget(t);
 
-        mRunning = false;
-        mSniffToggleButton.setChecked(false);
-      }
-    });
-  }
-
-  private void addNewTarget (final AddressStats stats){
-    Sniffer.this.runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        mAdapter.addStats(stats);
-        mAdapter.notifyDataSetChanged();
-      }
-    });
-  }
-
-  private void updateStats (final AddressStats stats, final long len){
-    Sniffer.this.runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        long deltat;
-        stats.mBytes += len;
-
-        deltat = (java.lang.System.currentTimeMillis() - stats.mSampledTime);
-
-        if (deltat >= mSampleTime) {
-          stats.mBandwidth = (stats.mBytes - stats.mSampledBytes) / deltat;
-          stats.mSampledTime = java.lang.System.currentTimeMillis();
-          stats.mSampledBytes = stats.mBytes;
-        }
-        mAdapter.notifyDataSetChanged();
-      }
-    });
-  }
-
-  private void showMessage (final String text){
-    Sniffer.this.runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        Toast.makeText(Sniffer.this, text, Toast.LENGTH_LONG).show();
-      }
-    });
-  }
-
-  private void setSpoofErrorState(final String error){
-    Sniffer.this.runOnUiThread(new Runnable(){
-      @Override
-      public void run(){
-        new ErrorDialog("Error", error, Sniffer.this).show();
-        setStoppedState();
-      }
-    });
-  }
-
-  /**
-   * Monitor a pcap file for changes, in order to let the user know that the capture is running.
-   */
-  private void startMonitoringPcapFile(){
-    final String str_address = (System.getCurrentTarget().getType() == Target.Type.NETWORK) ? System.getCurrentTarget().getDisplayAddress().split("/")[0] : System.getCurrentTarget().getDisplayAddress();
-
-    final File pcapfile = new File(mPcapFileName);
-    try{
-      pcapfile.createNewFile();
-    }catch(IOException io)
-    {
-      Toast.makeText(this, "File not created: " + io.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-      return;
-    }
-
-    mFileActivity = new FileObserver(mPcapFileName) {
-      @Override
-      public void onEvent(int event, String s) {
-        switch (event){
-          case FileObserver.CLOSE_WRITE:
-            showMessage(getString(R.string.saved) + ":\n" + mPcapFileName);
-            break;
-          case FileObserver.MODIFY:
-
-            AddressStats stats = mAdapter.getStats(str_address);
-            updateStats(stats, pcapfile.length());
-            break;
-          case FileObserver.OPEN:
-            showMessage(getString(R.string.dumping_traffic_to) + mPcapFileName);
-            break;
-          default:
-            break;
-        }
-      }
-    };
-    final AddressStats stats = new AddressStats(str_address);
-    stats.mBytes = 0;
-    stats.mSampledTime = java.lang.System.currentTimeMillis();
-    addNewTarget(stats);
-    // android docs: The monitored file or directory must exist at this time,or else no events will be reported
-    mFileActivity.startWatching();
-  }
-
-  private void setStartedState(){
-    if (mRunning)
-      setStoppedState();
-
-    if(mDumpToFile) {
-      mSampleTime = 100;
-      startMonitoringPcapFile();
-    }
-    else
-      mSampleTime = 1000;
-
-    try {
-      mSpoofSession.start(new OnSessionReadyListener(){
-        @Override
-        public void onError(String error, int resId){
-          error = error == null ? getString(resId) : error;
-          setSpoofErrorState(error);
-        }
-
-        @Override
-        public void onSessionReady(){
-          if(mTcpdumpProcess!=null) {
-            mTcpdumpProcess.kill();
-          }
-
-          try {
-            mRunning = true;
-            mSniffProgress.setVisibility(View.VISIBLE);
-
-            mTcpdumpProcess = System.getTools().tcpDump.sniff(PCAP_FILTER, mPcapFileName, new TcpDump.TcpDumpReceiver() {
-
-              @Override
-              public void onPacket(InetAddress src, InetAddress dst, int len) {
-              long now = java.lang.System.currentTimeMillis();
-              AddressStats stats = null;
-              String stringAddress = null;
-
-              if (System.getNetwork().isInternal(src)) {
-                stringAddress = src.getHostAddress();
-                stats = mAdapter.getStats(stringAddress);
-              } else if (System.getNetwork().isInternal(dst)) {
-                stringAddress = dst.getHostAddress();
-                stats = mAdapter.getStats(stringAddress);
-              }
-
-              if (stats == null) {
-                if(stringAddress==null)
-                  return;
-                stats = new AddressStats(stringAddress);
-                stats.mBytes = len;
-                stats.mSampledTime = now;
-              } else {
-                updateStats(stats, len);
-              }
-
-              final AddressStats fstats = stats;
-              addNewTarget(fstats);
-              }
-            });
-          } catch( ChildManager.ChildNotStartedException e ) {
-            Sniffer.this.runOnUiThread( new Runnable() {
-              @Override
-              public void run() {
-                Toast.makeText(Sniffer.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
                 setStoppedState();
-              }
-            });
-          }
-        }
-      });
-    } catch (ChildManager.ChildNotStartedException e) {
-      setStoppedState();
-    }
-  }
 
-  @Override
-  public void onBackPressed(){
-    setStoppedState();
-    super.onBackPressed();
-    overridePendingTransition(R.anim.fadeout, R.anim.fadein);
-  }
+                Toast.makeText(Sniffer.this,
+                        getString(R.string.selected_) + System.getCurrentTarget(),
+                        Toast.LENGTH_SHORT).show();
+
+                startActivity(new Intent(Sniffer.this,
+                        ActionActivity.class));
+
+                overridePendingTransition(R.anim.slide_in_left,
+                        R.anim.slide_out_left);
+            }
+
+            @Override
+            public void onCancel() {
+            }
+        }).show();
+    }
+
+    public synchronized int getSortType() {
+        return mSortType;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+
+                onBackPressed();
+
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void movePcapFileFromCacheToStorage() {
+        File inputFile = new File(mPcapFileName);
+        InputStream in = null;
+        OutputStream out = null;
+
+        try {
+            in = new FileInputStream(inputFile);
+            out = new FileOutputStream(new File(System.getStoragePath(), new File(mPcapFileName).getName()));
+            IOUtils.copy(in, out);
+        } catch (IOException e) {
+            System.errorLogging(e);
+        } finally {
+            IOUtils.closeQuietly(in);
+            IOUtils.closeQuietly(out);
+            inputFile.delete();
+        }
+    }
+
+    private void setStoppedState() {
+        if (mTcpdumpProcess != null) {
+            mTcpdumpProcess.kill();
+            mTcpdumpProcess = null;
+        }
+
+        if (mDumpToFile) {
+            if (mFileActivity != null) {
+                mFileActivity.stopWatching();
+                mFileActivity = null;
+                movePcapFileFromCacheToStorage();
+            }
+        }
+
+        Sniffer.this.runOnUiThread(() -> {
+            mSpoofSession.stop();
+
+            mSniffProgress.setVisibility(View.INVISIBLE);
+
+            mRunning = false;
+            mSniffToggleButton.setChecked(false);
+        });
+    }
+
+    private void addNewTarget(final AddressStats stats) {
+        Sniffer.this.runOnUiThread(() -> {
+            mAdapter.addStats(stats);
+            mAdapter.notifyDataSetChanged();
+        });
+    }
+
+    private void updateStats(final AddressStats stats, final long len) {
+        Sniffer.this.runOnUiThread(() -> {
+            long deltat;
+            stats.mBytes += len;
+
+            deltat = (java.lang.System.currentTimeMillis() - stats.mSampledTime);
+
+            if (deltat >= mSampleTime) {
+                stats.mBandwidth = (stats.mBytes - stats.mSampledBytes) / deltat;
+                stats.mSampledTime = java.lang.System.currentTimeMillis();
+                stats.mSampledBytes = stats.mBytes;
+            }
+            mAdapter.notifyDataSetChanged();
+        });
+    }
+
+    private void showMessage(final String text) {
+        Sniffer.this.runOnUiThread(() -> Toast.makeText(Sniffer.this, text, Toast.LENGTH_LONG).show());
+    }
+
+    private void setSpoofErrorState(final String error) {
+        Sniffer.this.runOnUiThread(() -> {
+            new ErrorDialog("Error", error, Sniffer.this).show();
+            setStoppedState();
+        });
+    }
+
+    /**
+     * Monitor a pcap file for changes, in order to let the user know that the capture is running.
+     */
+    private void startMonitoringPcapFile() {
+        final String str_address =
+                (System.getCurrentTarget().getType() == Target.Type.NETWORK) ?
+                        System.getCurrentTarget().getDisplayAddress().split("/")[0] :
+                        System.getCurrentTarget().getDisplayAddress();
+
+        final File pcapfile = new File(mPcapFileName);
+        try {
+            pcapfile.createNewFile();
+        } catch (IOException io) {
+            Toast.makeText(this, "File not created: " +
+                    io.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        mFileActivity = new FileObserver(mPcapFileName) {
+            @Override
+            public void onEvent(int event, String s) {
+                switch (event) {
+                    case FileObserver.CLOSE_WRITE:
+                        showMessage(getString(R.string.saved) + ":\n" + mPcapFileName);
+                        break;
+                    case FileObserver.MODIFY:
+
+                        AddressStats stats = mAdapter.getStats(str_address);
+                        updateStats(stats, pcapfile.length());
+                        break;
+                    case FileObserver.OPEN:
+                        showMessage(getString(R.string.dumping_traffic_to) + mPcapFileName);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
+        final AddressStats stats = new AddressStats(str_address);
+        stats.mBytes = 0;
+        stats.mSampledTime = java.lang.System.currentTimeMillis();
+        addNewTarget(stats);
+        // android docs: The monitored file or directory must exist at this time,or else no events will be reported
+        mFileActivity.startWatching();
+    }
+
+    private void setStartedState() {
+        if (mRunning)
+            setStoppedState();
+
+        if (mDumpToFile) {
+            mSampleTime = 100;
+            startMonitoringPcapFile();
+        } else
+            mSampleTime = 1000;
+
+        try {
+            mSpoofSession.start(new OnSessionReadyListener() {
+                @Override
+                public void onError(String error, int resId) {
+                    error = error == null ? getString(resId) : error;
+                    setSpoofErrorState(error);
+                }
+
+                @Override
+                public void onSessionReady() {
+                    if (mTcpdumpProcess != null) {
+                        mTcpdumpProcess.kill();
+                    }
+
+                    try {
+                        mRunning = true;
+                        mSniffProgress.setVisibility(View.VISIBLE);
+
+                        mTcpdumpProcess = System.getTools()
+                                .tcpDump.sniff(PCAP_FILTER, mPcapFileName, new TcpDump.TcpDumpReceiver() {
+
+                                    @Override
+                                    public void onPacket(InetAddress src, InetAddress dst, int len) {
+                                        long now = java.lang.System.currentTimeMillis();
+                                        AddressStats stats = null;
+                                        String stringAddress = null;
+
+                                        if (System.getNetwork().isInternal(src)) {
+                                            stringAddress = src.getHostAddress();
+                                            stats = mAdapter.getStats(stringAddress);
+                                        } else if (System.getNetwork().isInternal(dst)) {
+                                            stringAddress = dst.getHostAddress();
+                                            stats = mAdapter.getStats(stringAddress);
+                                        }
+
+                                        if (stats == null) {
+                                            if (stringAddress == null)
+                                                return;
+                                            stats = new AddressStats(stringAddress);
+                                            stats.mBytes = len;
+                                            stats.mSampledTime = now;
+                                        } else {
+                                            updateStats(stats, len);
+                                        }
+
+                                        final AddressStats fstats = stats;
+                                        addNewTarget(fstats);
+                                    }
+                                });
+                    } catch (ChildManager.ChildNotStartedException e) {
+                        Sniffer.this.runOnUiThread(() -> {
+                            Toast.makeText(Sniffer.this,
+                                    getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
+                            setStoppedState();
+                        });
+                    }
+                }
+            });
+        } catch (ChildManager.ChildNotStartedException e) {
+            setStoppedState();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        setStoppedState();
+        super.onBackPressed();
+        overridePendingTransition(R.anim.fadeout, R.anim.fadein);
+    }
+
+    public class AddressStats implements Comparable<AddressStats> {
+        public String mAddress;
+        public long mBytes;
+        public long mBandwidth;
+        public long mSampledTime;
+        public long mSampledBytes;
+
+        public AddressStats(String address) {
+            mAddress = address;
+            mBytes = 0;
+            mBandwidth = 0;
+            mSampledTime = 0;
+            mSampledBytes = 0;
+        }
+
+        @Override
+        public int compareTo(AddressStats stats) {
+            int[] cmp;
+            double va, vb;
+
+            switch (getSortType()) {
+                default:
+                case 0:
+                    cmp = new int[]{-1, 1, 0};
+                    va = mBandwidth;
+                    vb = stats.mBandwidth;
+                    break;
+                case 1:
+                    cmp = new int[]{1, -1, 0};
+                    va = mBandwidth;
+                    vb = stats.mBandwidth;
+                    break;
+                case 2:
+                    cmp = new int[]{-1, 1, 0};
+                    va = mBytes;
+                    vb = stats.mBytes;
+                    break;
+                case 3:
+                    cmp = new int[]{1, -1, 0};
+                    va = mBytes;
+                    vb = stats.mBytes;
+                    break;
+                case 4:
+                    cmp = new int[]{-1, 1, 0};
+                    va = mSampledTime;
+                    vb = stats.mSampledTime;
+                    break;
+                case 5:
+                    cmp = new int[]{1, -1, 0};
+                    va = mSampledTime;
+                    vb = stats.mSampledTime;
+                    break;
+            }
+
+            if (va > vb)
+                return cmp[0];
+
+            else if (va < vb)
+                return cmp[1];
+
+            else
+                return cmp[2];
+        }
+    }
+
+    public class StatListAdapter extends ArrayAdapter<AddressStats> {
+        private final ArrayList<AddressStats> mStats;
+        private int mLayoutId;
+
+        public StatListAdapter(int layoutId) {
+            super(Sniffer.this, layoutId);
+
+            mLayoutId = layoutId;
+            mStats = new ArrayList<>();
+        }
+
+        public AddressStats getStats(String address) {
+            synchronized (mStats) {
+                for (AddressStats stats : mStats) {
+                    if (stats.mAddress.equals(address))
+                        return stats;
+                }
+            }
+
+            return null;
+        }
+
+        public synchronized void addStats(AddressStats stats) {
+            boolean found = false;
+
+            synchronized (mStats) {
+
+                for (AddressStats sstats : mStats) {
+                    if (sstats.mAddress.equals(stats.mAddress)) {
+                        sstats.mBytes = stats.mBytes;
+                        sstats.mBandwidth = stats.mBandwidth;
+                        sstats.mSampledTime = stats.mSampledTime;
+                        sstats.mSampledBytes = stats.mSampledBytes;
+
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                    mStats.add(stats);
+
+                Collections.sort(mStats);
+            }
+        }
+
+        private synchronized AddressStats getByPosition(int position) {
+            synchronized (mStats) {
+                return mStats.get(position);
+            }
+        }
+
+        @Override
+        public int getCount() {
+            synchronized (mStats) {
+                return mStats.size();
+            }
+        }
+
+        private String formatSize(long size) {
+            if (size < 1024)
+                return size + " B";
+
+            else if (size < (1024 * 1024))
+                return (size / 1024) + " KB";
+
+            else if (size < (1024 * 1024 * 1024))
+                return (size / (1024 * 1024)) + " MB";
+
+            else
+                return (size / (1024 * 1024 * 1024)) + " GB";
+        }
+
+        private String formatSpeed(long speed) {
+            if (speed < 1024)
+                return speed + " B/s";
+
+            else if (speed < (1024 * 1024))
+                return (speed / 1024) + " KB/s";
+
+            else if (speed < (1024 * 1024 * 1024))
+                return (speed / (1024 * 1024)) + " MB/s";
+
+            else
+                return (speed / (1024 * 1024 * 1024)) + " GB/s";
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View row = convertView;
+            StatsHolder holder;
+
+            if (row == null) {
+                LayoutInflater inflater = (LayoutInflater)
+                        Sniffer.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                row = inflater.inflate(mLayoutId, parent, false);
+
+                holder = new StatsHolder();
+
+                holder.address = row.findViewById(R.id.statAddress);
+                holder.description = row.findViewById(R.id.statDescription);
+
+                row.setTag(holder);
+            } else {
+                holder = (StatsHolder) row.getTag();
+            }
+
+            AddressStats stats = getByPosition(position);
+            Target target = System.getTargetByAddress(stats.mAddress);
+
+            if (target != null && target.hasAlias())
+                holder.address.setText
+                        (
+                                Html.fromHtml
+                                        (
+                                                "<b>" + target.getAlias() + "</b> <small>( " + target.getDisplayAddress() + " )</small>"
+                                        )
+                        );
+            else holder.address.setText(stats.mAddress);
+
+            holder.description.setText
+                    (
+                            Html.fromHtml
+                                    (
+                                            "<b>BANDWIDTH</b>: " + formatSpeed(stats.mBandwidth) + " | <b>TOTAL</b> " + formatSize(stats.mBytes)
+                                    )
+                    );
+
+            return row;
+        }
+
+        public class StatsHolder {
+            TextView address;
+            TextView description;
+        }
+    }
 }

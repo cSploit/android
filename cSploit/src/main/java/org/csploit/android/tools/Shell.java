@@ -23,39 +23,41 @@ import org.csploit.android.core.ChildManager;
 
 public class Shell extends Raw {
 
-  public Shell() {
-    mHandler = "raw";
-    mCmdPrefix = "sh";
-    mEnv = null;
-  }
-
-  /**
-   * run a shell command and return it's exit value
-   * @param cmd the shell command to execute
-   * @return the command exit status
-   */
-  @Override
-  public int run(String cmd, RawReceiver receiver) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
-    return super.run("-c '" + cmd.replace("'", "\\'") + "'", receiver);
-  }
-
-  public int run(String cmd) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
-    return this.run(cmd, null);
-  }
-
-  /**
-   * run a Shell command asynchronously
-   * @param cmd the shell command to execute
-   */
-  public Child async(String cmd, RawReceiver receiver) throws ChildManager.ChildNotStartedException {
-    Child c;
-
-    if(cmd != null) {
-      c = super.async("-c '" + cmd.replace("'", "\\'") + "'", receiver);
-    } else {
-      c = super.async(receiver);
+    public Shell() {
+        mHandler = "raw";
+        mCmdPrefix = "sh";
+        mEnv = null;
     }
 
-    return c;
-  }
+    /**
+     * run a shell command and return it's exit value
+     *
+     * @param cmd the shell command to execute
+     * @return the command exit status
+     */
+    @Override
+    public int run(String cmd, RawReceiver receiver) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
+        return super.run("-c '" + cmd.replace("'", "\\'") + "'", receiver);
+    }
+
+    public int run(String cmd) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
+        return this.run(cmd, null);
+    }
+
+    /**
+     * run a Shell command asynchronously
+     *
+     * @param cmd the shell command to execute
+     */
+    public Child async(String cmd, RawReceiver receiver) throws ChildManager.ChildNotStartedException {
+        Child c;
+
+        if (cmd != null) {
+            c = super.async("-c '" + cmd.replace("'", "\\'") + "'", receiver);
+        } else {
+            c = super.async(receiver);
+        }
+
+        return c;
+    }
 }

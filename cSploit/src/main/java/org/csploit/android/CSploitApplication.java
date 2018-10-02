@@ -21,7 +21,6 @@ package org.csploit.android;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import androidx.multidex.MultiDex;
 
 import org.acra.ACRA;
 import org.acra.annotation.AcraCore;
@@ -46,13 +45,15 @@ import org.csploit.android.services.Services;
 
 import java.net.NoRouteToHostException;
 
+import androidx.multidex.MultiDex;
+
 @AcraHttpSender(
-  httpMethod = HttpSender.Method.PUT,
-  uri = "http://csploit.iriscouch.com/acra-csploit/_design/acra-storage/_update/report",
-  basicAuthLogin = "android",
-  basicAuthPassword = "DEADBEEF"
+        httpMethod = HttpSender.Method.PUT,
+        uri = "http://csploit.iriscouch.com/acra-csploit/_design/acra-storage/_update/report",
+        basicAuthLogin = "android",
+        basicAuthPassword = "DEADBEEF"
 )
-@AcraNotification (
+@AcraNotification(
         resChannelName = R.string.csploitChannelId,
         resText = R.string.crash_dialog_text,
         resIcon = R.drawable.dsploit_icon,
@@ -64,51 +65,51 @@ import java.net.NoRouteToHostException;
 
 public class CSploitApplication extends Application {
 
-  @Override
-  public void onCreate() {
-    SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-    Boolean isDark = themePrefs.getBoolean("isDark", false);
-    if (isDark)
-      setTheme(R.style.DarkTheme);
-    else
-      setTheme(R.style.AppTheme);
+    @Override
+    public void onCreate() {
+        SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+        Boolean isDark = themePrefs.getBoolean("isDark", false);
+        if (isDark)
+            setTheme(R.style.DarkTheme);
+        else
+            setTheme(R.style.AppTheme);
 
-    super.onCreate();
+        super.onCreate();
 
-    ACRA.init(this);
-    Services.init(this);
+        ACRA.init(this);
+        Services.init(this);
 
-    // initialize the system
-    try {
-      System.init(this);
-    } catch (Exception e) {
-      // ignore exception when the user has wifi off
-      if (!(e instanceof NoRouteToHostException))
-        System.errorLogging(e);
+        // initialize the system
+        try {
+            System.init(this);
+        } catch (Exception e) {
+            // ignore exception when the user has wifi off
+            if (!(e instanceof NoRouteToHostException))
+                System.errorLogging(e);
+        }
+
+        CoreConfigurationBuilder builder = new CoreConfigurationBuilder(this);
+        builder.setBuildConfigClass(BuildConfig.class).setReportFormat(StringFormat.JSON);
+        builder.getPluginConfigurationBuilder(HttpSenderConfigurationBuilder.class);
+        builder.getPluginConfigurationBuilder(NotificationConfigurationBuilder.class);
+        ACRA.init(this, builder);
+
+        // load system modules even if the initialization failed
+        System.registerPlugin(new RouterPwn());
+        System.registerPlugin(new Traceroute());
+        System.registerPlugin(new PortScanner());
+        System.registerPlugin(new Inspector());
+        System.registerPlugin(new ExploitFinder());
+        System.registerPlugin(new LoginCracker());
+        System.registerPlugin(new Sessions());
+        System.registerPlugin(new MITM());
+        System.registerPlugin(new PacketForger());
     }
 
-    CoreConfigurationBuilder builder = new CoreConfigurationBuilder(this);
-    builder.setBuildConfigClass(BuildConfig.class).setReportFormat(StringFormat.JSON);
-    builder.getPluginConfigurationBuilder(HttpSenderConfigurationBuilder.class);
-    builder.getPluginConfigurationBuilder(NotificationConfigurationBuilder.class);
-    ACRA.init(this, builder);
-
-    // load system modules even if the initialization failed
-    System.registerPlugin(new RouterPwn());
-    System.registerPlugin(new Traceroute());
-    System.registerPlugin(new PortScanner());
-    System.registerPlugin(new Inspector());
-    System.registerPlugin(new ExploitFinder());
-    System.registerPlugin(new LoginCracker());
-    System.registerPlugin(new Sessions());
-    System.registerPlugin(new MITM());
-    System.registerPlugin(new PacketForger());
-  }
-
-  @Override
-  protected void attachBaseContext(Context base) {
-    super.attachBaseContext(base);
-    MultiDex.install(this);
-    ACRA.init(this);
-  }
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+        ACRA.init(this);
+    }
 }

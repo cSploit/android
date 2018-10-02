@@ -27,67 +27,65 @@ import org.csploit.android.events.Login;
 import org.csploit.android.events.Message;
 import org.csploit.android.net.Target;
 
-public class Hydra extends Tool
-{
-  public Hydra() {
-    mHandler = "hydra";
-    mCmdPrefix = null;
-  }
-
-  public static abstract class AttemptReceiver extends Child.EventReceiver
-  {
-    public abstract void onAttemptStatus(long progress, long total);
-
-    public abstract void onWarning(String message);
-
-    public abstract void onError(String message);
-
-    public abstract void onAccountFound(String login, String password);
-
-    public void onEvent(Event e) {
-      if(e instanceof Attempts) {
-        Attempts a = (Attempts)e;
-        onAttemptStatus(a.sent, a.sent + a.left);
-      } else if(e instanceof Message) {
-        Message m = (Message)e;
-
-        if(m.severity == Message.Severity.ERROR) {
-          onError(m.message);
-        } else if(m.severity == Message.Severity.WARNING) {
-          onWarning(m.message);
-        } else {
-          Logger.error("Unknown event: " + e);
-        }
-      } else if(e instanceof Login) {
-        Login login = (Login) e;
-
-        onAccountFound(login.login, login.password);
-      } else {
-        Logger.error("Unknown event: " + e);
-      }
+public class Hydra extends Tool {
+    public Hydra() {
+        mHandler = "hydra";
+        mCmdPrefix = null;
     }
-  }
 
-  public Child crack(Target target, int port, String service, String charset, int minlength, int maxlength, String username, String userWordlist, String passWordlist, AttemptReceiver receiver) throws ChildManager.ChildNotStartedException {
-    String command = "-F ";
+    public Child crack(Target target, int port, String service, String charset, int minlength, int maxlength, String username, String userWordlist, String passWordlist, AttemptReceiver receiver) throws ChildManager.ChildNotStartedException {
+        String command = "-F ";
 
-    if(userWordlist != null)
-      command += "-L " + userWordlist;
+        if (userWordlist != null)
+            command += "-L " + userWordlist;
 
-    else
-      command += "-l " + username;
+        else
+            command += "-l " + username;
 
-    if(passWordlist != null)
-      command += " -P " + passWordlist;
+        if (passWordlist != null)
+            command += " -P " + passWordlist;
 
-    else
-      command += " -x \"" + minlength + ":" + maxlength + ":" + charset + "\" ";
+        else
+            command += " -x \"" + minlength + ":" + maxlength + ":" + charset + "\" ";
 
-    command += " -s " + port + " -V -t 10 " + target.getCommandLineRepresentation() + " " + service;
+        command += " -s " + port + " -V -t 10 " + target.getCommandLineRepresentation() + " " + service;
 
-    if(service.equalsIgnoreCase("http-head"))
-      command += " /";
+        if (service.equalsIgnoreCase("http-head"))
+            command += " /";
 
-    return super.async(command, receiver);
-  }
+        return super.async(command, receiver);
+    }
+
+    public static abstract class AttemptReceiver extends Child.EventReceiver {
+        public abstract void onAttemptStatus(long progress, long total);
+
+        public abstract void onWarning(String message);
+
+        public abstract void onError(String message);
+
+        public abstract void onAccountFound(String login, String password);
+
+        public void onEvent(Event e) {
+            if (e instanceof Attempts) {
+                Attempts a = (Attempts) e;
+                onAttemptStatus(a.sent, a.sent + a.left);
+            } else if (e instanceof Message) {
+                Message m = (Message) e;
+
+                if (m.severity == Message.Severity.ERROR) {
+                    onError(m.message);
+                } else if (m.severity == Message.Severity.WARNING) {
+                    onWarning(m.message);
+                } else {
+                    Logger.error("Unknown event: " + e);
+                }
+            } else if (e instanceof Login) {
+                Login login = (Login) e;
+
+                onAccountFound(login.login, login.password);
+            } else {
+                Logger.error("Unknown event: " + e);
+            }
+        }
+    }
 }

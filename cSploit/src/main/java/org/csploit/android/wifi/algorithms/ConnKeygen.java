@@ -18,23 +18,23 @@
  */
 package org.csploit.android.wifi.algorithms;
 
-import java.util.List;
-
 import org.csploit.android.wifi.Keygen;
+
+import java.util.List;
 
 /*
  * This is not actual an algorithm as
  * it is just a default WEP password
  */
-public class ConnKeygen extends Keygen{
+public class ConnKeygen extends Keygen {
 
-  public ConnKeygen(String ssid, String mac, int level, String enc){
-    super(ssid, mac, level, enc);
-  }
+    public ConnKeygen(String ssid, String mac, int level, String enc) {
+        super(ssid, mac, level, enc);
+    }
 
-  @Override
-  public List<String> getKeys(){
-    addPassword("1234567890123");
-    return getResults();
-  }
+    @Override
+    public List<String> getKeys() {
+        addPassword("1234567890123");
+        return getResults();
+    }
 }

@@ -18,48 +18,47 @@
  */
 package org.csploit.android.wifi.algorithms;
 
+import org.csploit.android.wifi.Keygen;
+
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-import org.csploit.android.wifi.Keygen;
+public class ZyxelKeygen extends Keygen {
 
-public class ZyxelKeygen extends Keygen{
+    final private String ssidIdentifier;
 
-  final private String ssidIdentifier;
-  private MessageDigest md;
-
-  public ZyxelKeygen(String ssid, String mac, int level, String enc){
-    super(ssid, mac, level, enc);
-    ssidIdentifier = ssid.substring(ssid.length() - 4);
-  }
-
-  @Override
-  public List<String> getKeys(){
-    try{
-      md = MessageDigest.getInstance("MD5");
-    } catch(NoSuchAlgorithmException e1){
-      setErrorMessage("This phone cannot process a MD5 hash.");
-      return null;
+    public ZyxelKeygen(String ssid, String mac, int level, String enc) {
+        super(ssid, mac, level, enc);
+        ssidIdentifier = ssid.substring(ssid.length() - 4);
     }
-    final String mac = getMacAddress();
-    if(mac.length() != 12){
-      setErrorMessage("The MAC address is invalid.");
-      return null;
-    }
-    try{
 
-      final String macMod = mac.substring(0, 8) + ssidIdentifier;
-      md.reset();
-      md.update(macMod.toLowerCase().getBytes("ASCII"));
+    @Override
+    public List<String> getKeys() {
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e1) {
+            setErrorMessage("This phone cannot process a MD5 hash.");
+            return null;
+        }
+        final String mac = getMacAddress();
+        if (mac.length() != 12) {
+            setErrorMessage("The MAC address is invalid.");
+            return null;
+        }
+        try {
+            final String macMod = mac.substring(0, 8) + ssidIdentifier;
+            md.reset();
+            md.update(macMod.toLowerCase().getBytes("ASCII"));
 
-      byte[] hash = md.digest();
-      addPassword(getHexString(hash).substring(0, 20)
-        .toUpperCase());
-      return getResults();
-    } catch(UnsupportedEncodingException e){
+            byte[] hash = md.digest();
+            addPassword(getHexString(hash).substring(0, 20)
+                    .toUpperCase());
+            return getResults();
+        } catch (UnsupportedEncodingException e) {
+        }
+        return null;
     }
-    return null;
-  }
 }

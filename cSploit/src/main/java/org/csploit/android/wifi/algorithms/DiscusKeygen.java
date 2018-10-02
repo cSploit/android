@@ -18,30 +18,30 @@
  */
 package org.csploit.android.wifi.algorithms;
 
-import java.util.List;
-
 import org.csploit.android.wifi.Keygen;
 
+import java.util.List;
+
 /**
- * The algortihm is described on the pdf below
+ * The algorithm is described on the pdf below
  * Link:http://www.remote-exploit.org/content/Pirelli_Discus_DRG_A225_WiFi_router.pdf
  *
  * @author Rui Araújo
  */
-public class DiscusKeygen extends Keygen{
+public class DiscusKeygen extends Keygen {
 
 
-  public DiscusKeygen(String ssid, String mac, int level, String enc){
-    super(ssid, mac, level, enc);
-  }
+    static final int essidConst = 0xD0EC31;
 
-  static final int essidConst = 0xD0EC31;
+    public DiscusKeygen(String ssid, String mac, int level, String enc) {
+        super(ssid, mac, level, enc);
+    }
 
-  @Override
-  public List<String> getKeys(){
-    int routerEssid = Integer.parseInt(getSsidName().substring(getSsidName().length() - 6), 16);
-    int result = (routerEssid - essidConst) >> 2;
-    addPassword("YW0" + Integer.toString(result));
-    return getResults();
-  }
+    @Override
+    public List<String> getKeys() {
+        int routerEssid = Integer.parseInt(getSsidName().substring(getSsidName().length() - 6), 16);
+        int result = (routerEssid - essidConst) >> 2;
+        addPassword("YW0" + Integer.toString(result));
+        return getResults();
+    }
 }

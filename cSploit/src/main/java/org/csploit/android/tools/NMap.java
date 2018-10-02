@@ -34,169 +34,167 @@ import java.util.LinkedList;
 
 public class NMap extends Tool {
 
-  public static abstract class TraceReceiver extends Child.EventReceiver
-  {
-    public void onEnd( int exitCode ) {
-      if( exitCode != 0 )
-        Logger.error("nmap exited with code " + exitCode );
+    public NMap() {
+        mHandler = "nmap";
+        mCmdPrefix = null;
     }
 
-    public void onDeath( int signal ) {
-      Logger.error("nmap killed by signal " + signal);
+    public Child trace(Target target, boolean resolve, TraceReceiver receiver) throws ChildManager.ChildNotStartedException {
+
+        String cmd = String.format("-sn --traceroute --privileged --send-ip --system-dns -%c %s",
+                (resolve ? 'R' : 'n'), target.getCommandLineRepresentation());
+
+        return super.async(cmd, receiver);
     }
 
-    public void onEvent(Event e) {
-      if(e instanceof Hop) {
-        Hop hop = (Hop)e;
-        onHop(hop.hop, hop.usec, hop.node.getHostAddress(), hop.name);
-      } else {
-        Logger.error("unknown event: " + e);
-      }
+    public Child synScan(Target target, SynScanReceiver receiver, String custom) throws ChildManager.ChildNotStartedException {
+        String command = "-sS -P0 --privileged --send-ip --system-dns -vvv ";
+
+        if (custom != null)
+            command += "-p " + custom + " ";
+
+        command += target.getCommandLineRepresentation();
+
+        Logger.debug("synScan - " + command);
+
+        return super.async(command, receiver);
     }
 
-    public abstract void onHop( int hop, long usec, String address, String name );
-  }
-
-  public static abstract class SynScanReceiver extends Child.EventReceiver
-  {
-
-    public void onEnd( int exitCode ) {
-      if( exitCode != 0 )
-        Logger.error( "nmap exited with code " + exitCode );
+    public Child synScan(Target target, SynScanReceiver receiver) throws ChildManager.ChildNotStartedException {
+        return synScan(target, receiver, null);
     }
 
-    public void onDeath(int signal) {
-      Logger.error("nmap killed by signal " + signal);
+    public Child customScan(Target target, SynScanReceiver receiver, String custom) throws ChildManager.ChildNotStartedException {
+        String command = "-vvv ";
+
+        if (custom != null)
+            command += custom + " ";
+
+        command += target.getCommandLineRepresentation();
+
+        Logger.debug("customScan - " + command);
+
+        return super.async(command, receiver);
     }
 
-    public void onEvent( Event e) {
-      if(e instanceof Port) {
-        Port p = (Port)e;
-        onPortFound(p.port, p.protocol);
-      } else {
-        Logger.error("unkown event: " + e);
-      }
+    public Child inpsect(Target target, InspectionReceiver receiver, boolean focusedScan) throws ChildManager.ChildNotStartedException {
+        String cmd;
+        LinkedList<Integer> tcp, udp;
+        Network.Protocol protocol;
+        int pNumber;
+
+        if (focusedScan) {
+            tcp = new LinkedList<>();
+            udp = new LinkedList<>();
+            for (Target.Port p : target.getOpenPorts()) {
+                protocol = p.getProtocol();
+                pNumber = p.getNumber();
+
+                if (protocol.equals(Network.Protocol.TCP)) {
+                    if (!tcp.contains(pNumber))
+                        tcp.add(pNumber);
+                } else if (protocol.equals(Network.Protocol.UDP)) {
+                    if (!udp.contains(pNumber))
+                        udp.add(pNumber);
+                }
+            }
+            cmd = "-T4 -sV -O --privileged --send-ip --system-dns -Pn -oX - ";
+            if (tcp.size() + udp.size() > 0) {
+                cmd += "-p ";
+                if (tcp.size() > 0)
+                    cmd += "T:" + TextUtils.join(",", tcp);
+                if (udp.size() > 0)
+                    cmd += "U:" + TextUtils.join(",", udp);
+                cmd += " ";
+            }
+            cmd += target.getCommandLineRepresentation();
+        } else
+            cmd = "-T4 -F -O -sV --privileged --send-ip --system-dns -oX - " + target.getCommandLineRepresentation();
+
+        Logger.debug("Inspect - " + cmd);
+
+        return super.async(cmd, receiver);
     }
 
-    public abstract void onPortFound( int port, String protocol );
-  }
-
-  public static abstract class InspectionReceiver extends Child.EventReceiver
-  {
-
-    public void onEnd( int exitCode ) {
-      if( exitCode != 0 )
-        Logger.error( "nmap exited with code " + exitCode );
-    }
-
-    public void onDeath(int signal) {
-      Logger.error( "nmap killed by signal " + signal);
-    }
-
-    public void onEvent(Event e) {
-      if(e instanceof Port) {
-        Port p = (Port)e;
-        if(p.service == null) {
-          onOpenPortFound(p.port, p.protocol);
-        } else {
-          onServiceFound(p.port, p.protocol, p.service, p.version);
+    public static abstract class TraceReceiver extends Child.EventReceiver {
+        public void onEnd(int exitCode) {
+            if (exitCode != 0)
+                Logger.error("nmap exited with code " + exitCode);
         }
-      } else if(e instanceof Os) {
-        Os os = (Os) e;
-        onOsFound(os.os);
-        onDeviceFound(os.type);
-      } else {
-        Logger.error("unknown event: " + e);
-      }
-    }
 
-    public abstract void onOpenPortFound( int port, String protocol );
-    public abstract void onServiceFound( int port, String protocol, String service, String version );
-    public abstract void onOsFound( String os );
-    public abstract void onDeviceFound( String device );
-  }
-
-  public NMap() {
-    mHandler = "nmap";
-    mCmdPrefix = null;
-  }
-
-  public Child trace( Target target, boolean resolve, TraceReceiver receiver ) throws ChildManager.ChildNotStartedException {
-
-    String cmd = String.format("-sn --traceroute --privileged --send-ip --system-dns -%c %s",
-            (resolve ? 'R' : 'n'), target.getCommandLineRepresentation());
-
-    return super.async(cmd, receiver );
-  }
-
-  public Child synScan( Target target, SynScanReceiver receiver, String custom ) throws ChildManager.ChildNotStartedException {
-    String command = "-sS -P0 --privileged --send-ip --system-dns -vvv ";
-
-    if( custom != null )
-      command += "-p " + custom + " ";
-
-    command += target.getCommandLineRepresentation();
-
-    Logger.debug( "synScan - " + command );
-
-    return super.async( command, receiver );
-  }
-
-  public Child synScan( Target target, SynScanReceiver receiver) throws ChildManager.ChildNotStartedException {
-    return synScan(target, receiver, null);
-  }
-
-  public Child customScan( Target target, SynScanReceiver receiver, String custom ) throws ChildManager.ChildNotStartedException {
-    String command = "-vvv ";
-
-    if( custom != null )
-      command += custom + " ";
-
-    command += target.getCommandLineRepresentation();
-
-    Logger.debug( "customScan - " + command );
-
-    return super.async( command, receiver );
-  }
-
-  public Child inpsect( Target target, InspectionReceiver receiver, boolean focusedScan ) throws ChildManager.ChildNotStartedException {
-    String cmd;
-    LinkedList<Integer> tcp,udp;
-    Network.Protocol protocol;
-    int pNumber;
-
-    if(focusedScan)
-    {
-      tcp = new LinkedList<Integer>();
-      udp = new LinkedList<Integer>();
-      for( Target.Port p : target.getOpenPorts()) {
-        protocol = p.getProtocol();
-        pNumber = p.getNumber();
-
-        if(protocol.equals(Network.Protocol.TCP)) {
-          if(!tcp.contains(pNumber))
-            tcp.add(pNumber);
-        } else if(protocol.equals(Network.Protocol.UDP)) {
-          if(!udp.contains(pNumber))
-            udp.add(pNumber);
+        public void onDeath(int signal) {
+            Logger.error("nmap killed by signal " + signal);
         }
-      }
-      cmd = "-T4 -sV -O --privileged --send-ip --system-dns -Pn -oX - ";
-      if(tcp.size() + udp.size() > 0) {
-        cmd+= "-p ";
-        if(tcp.size()>0)
-          cmd+= "T:" + TextUtils.join(",",tcp);
-        if(udp.size()>0)
-          cmd+= "U:" + TextUtils.join(",", udp);
-        cmd+= " ";
-      }
-      cmd+= target.getCommandLineRepresentation();
+
+        public void onEvent(Event e) {
+            if (e instanceof Hop) {
+                Hop hop = (Hop) e;
+                onHop(hop.hop, hop.usec, hop.node.getHostAddress(), hop.name);
+            } else {
+                Logger.error("unknown event: " + e);
+            }
+        }
+
+        public abstract void onHop(int hop, long usec, String address, String name);
     }
-    else
-      cmd = "-T4 -F -O -sV --privileged --send-ip --system-dns -oX - " + target.getCommandLineRepresentation();
 
-    Logger.debug( "Inspect - " + cmd );
+    public static abstract class SynScanReceiver extends Child.EventReceiver {
 
-    return super.async( cmd, receiver);
-  }
+        public void onEnd(int exitCode) {
+            if (exitCode != 0)
+                Logger.error("nmap exited with code " + exitCode);
+        }
+
+        public void onDeath(int signal) {
+            Logger.error("nmap killed by signal " + signal);
+        }
+
+        public void onEvent(Event e) {
+            if (e instanceof Port) {
+                Port p = (Port) e;
+                onPortFound(p.port, p.protocol);
+            } else {
+                Logger.error("unkown event: " + e);
+            }
+        }
+
+        public abstract void onPortFound(int port, String protocol);
+    }
+
+    public static abstract class InspectionReceiver extends Child.EventReceiver {
+
+        public void onEnd(int exitCode) {
+            if (exitCode != 0)
+                Logger.error("nmap exited with code " + exitCode);
+        }
+
+        public void onDeath(int signal) {
+            Logger.error("nmap killed by signal " + signal);
+        }
+
+        public void onEvent(Event e) {
+            if (e instanceof Port) {
+                Port p = (Port) e;
+                if (p.service == null) {
+                    onOpenPortFound(p.port, p.protocol);
+                } else {
+                    onServiceFound(p.port, p.protocol, p.service, p.version);
+                }
+            } else if (e instanceof Os) {
+                Os os = (Os) e;
+                onOsFound(os.os);
+                onDeviceFound(os.type);
+            } else {
+                Logger.error("unknown event: " + e);
+            }
+        }
+
+        public abstract void onOpenPortFound(int port, String protocol);
+
+        public abstract void onServiceFound(int port, String protocol, String service, String version);
+
+        public abstract void onOsFound(String os);
+
+        public abstract void onDeviceFound(String device);
+    }
 }

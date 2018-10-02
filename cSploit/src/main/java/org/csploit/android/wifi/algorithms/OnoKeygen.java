@@ -18,20 +18,20 @@
  */
 package org.csploit.android.wifi.algorithms;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
+import android.text.TextUtils;
 
 import org.csploit.android.wifi.Keygen;
 
-import android.text.TextUtils;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 /*
  * The algorithm for the type of network
  * whose SSID must be in the form of [pP]1XXXXXX0000X
  * where X means a digit.
  * Algorithm:
- * Adding +1 to the last digit and use the resulting 
+ * Adding +1 to the last digit and use the resulting
  * string as the passphrase for WEP key generation.
  * Use the first of the 64 bit keys and the 128 bit one
  * as possible keys.
@@ -39,67 +39,65 @@ import android.text.TextUtils;
  *  pulido from http://foro.elhacker.net
  *  http://foro.elhacker.net/hacking_wireless/desencriptando_wep_por_defecto_de_las_redes_ono_wifi_instantaneamente-t160928.0.html
  * */
-public class OnoKeygen extends Keygen{
+public class OnoKeygen extends Keygen {
 
-  private MessageDigest md;
-
-  public OnoKeygen(String ssid, String mac, int level, String enc){
-    super(ssid, mac, level, enc);
-  }
-
-  @Override
-  public List<String> getKeys(){
-    if(getSsidName().length() != 13){
-      setErrorMessage("Invalid ESSID! It must have 13 characters.");
-      return null;
+    public OnoKeygen(String ssid, String mac, int level, String enc) {
+        super(ssid, mac, level, enc);
     }
-    String val = getSsidName().substring(0, 11) +
-      Integer.toString(Integer.parseInt(getSsidName().substring(11)) + 1);
-    if(val.length() < 13)
-      val = getSsidName().substring(0, 11) + "0" + getSsidName().substring(11);
-    int[] pseed = new int[4];
-    pseed[0] = 0;
-    pseed[1] = 0;
-    pseed[2] = 0;
-    pseed[3] = 0;
-    int randNumber = 0;
-    String key = "";
-    for(int i = 0; i < val.length(); i++){
-      pseed[i % 4] ^= (int) val.charAt(i);
+
+    @Override
+    public List<String> getKeys() {
+        if (getSsidName().length() != 13) {
+            setErrorMessage("Invalid ESSID! It must have 13 characters.");
+            return null;
+        }
+        String val = getSsidName().substring(0, 11) +
+                Integer.toString(Integer.parseInt(getSsidName().substring(11)) + 1);
+        if (val.length() < 13)
+            val = getSsidName().substring(0, 11) + "0" + getSsidName().substring(11);
+        int[] pseed = new int[4];
+        pseed[0] = 0;
+        pseed[1] = 0;
+        pseed[2] = 0;
+        pseed[3] = 0;
+        int randNumber;
+        StringBuilder key = new StringBuilder();
+        for (int i = 0; i < val.length(); i++) {
+            pseed[i % 4] ^= (int) val.charAt(i);
+        }
+        randNumber = pseed[0] | (pseed[1] << 8) | (pseed[2] << 16) | (pseed[3] << 24);
+        short tmp;
+        for (int j = 0; j < 5; j++) {
+            randNumber = (randNumber * 0x343fd + 0x269ec3);
+            tmp = (short) ((randNumber >> 16) & 0xff);
+            key.append(getHexString(tmp).toUpperCase());
+        }
+        addPassword(key.toString());
+        key = new StringBuilder();
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e1) {
+            setErrorMessage("This phone cannot process a MD5 hash");
+            return null;
+        }
+        md.reset();
+        md.update(padto64(val).getBytes());
+        byte[] hash = md.digest();
+        for (int i = 0; i < 13; ++i)
+            key.append(getHexString((short) hash[i]));
+        addPassword(key.toString().toUpperCase());
+        return getResults();
     }
-    randNumber = pseed[0] | (pseed[1] << 8) | (pseed[2] << 16) | (pseed[3] << 24);
-    short tmp = 0;
-    for(int j = 0; j < 5; j++){
-      randNumber = (randNumber * 0x343fd + 0x269ec3) & 0xffffffff;
-      tmp = (short) ((randNumber >> 16) & 0xff);
-      key += getHexString(tmp).toUpperCase();
+
+    private String padto64(String val) {
+        if (TextUtils.isEmpty(val))
+            return "";
+
+        final StringBuilder retBuilder = new StringBuilder();
+        for (int i = 0; i < (1 + (64 / (val.length()))); ++i)
+            retBuilder.append(val);
+
+        return retBuilder.toString().substring(0, 64);
     }
-    addPassword(key);
-    key = "";
-    try{
-      md = MessageDigest.getInstance("MD5");
-    } catch(NoSuchAlgorithmException e1){
-      setErrorMessage("This phone cannot process a MD5 hash");
-      return null;
-    }
-    md.reset();
-    md.update(padto64(val).getBytes());
-    byte[] hash = md.digest();
-    for(int i = 0; i < 13; ++i)
-      key += getHexString((short) hash[i]);
-    addPassword(key.toUpperCase());
-    return getResults();
-  }
-
-
-  private String padto64(String val){
-    if (TextUtils.isEmpty(val))
-      return "";
-
-    final StringBuilder retBuilder = new StringBuilder();
-    for(int i = 0; i < (1 + (64 / (val.length()))); ++i)
-      retBuilder.append(val);
-
-    return retBuilder.toString().substring(0, 64);
-  }
 }

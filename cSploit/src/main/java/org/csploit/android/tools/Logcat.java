@@ -2,54 +2,54 @@ package org.csploit.android.tools;
 
 /**
  * Manage android logcat
- *
+ * <p>
  * this isn't a cSploit tool
  */
 public class Logcat extends Raw {
-  /**
-   * receive logcat output
-   */
-  public abstract static class FullReceiver extends RawReceiver {
-
-    private final StringBuilder sb = new StringBuilder();
-
-    @Override
-    public void onNewLine(String line) {
-      sb.append(line);
-      sb.append("\n");
+    public Logcat() {
+        super();
+        mCmdPrefix = "logcat -d";
     }
 
-    @Override
-    final public void onEnd(int exitValue) {
-      onLogcat(sb.toString());
-    }
+    /**
+     * receive logcat output
+     */
+    public abstract static class FullReceiver extends RawReceiver {
 
-    public abstract void onLogcat(String logcat);
-  }
+        private final StringBuilder sb = new StringBuilder();
 
-  /**
-   * receive libc fatal messages from logcat
-   */
-  public abstract static class LibcReceiver extends FullReceiver {
-    private String libcFingerprint = null;
-
-    @Override
-    public void onNewLine(String line) {
-      if (libcFingerprint == null) {
-        if(!line.contains("*** *** ***")) {
-          return;
+        @Override
+        public void onNewLine(String line) {
+            sb.append(line);
+            sb.append("\n");
         }
-        libcFingerprint = line.substring(0, line.indexOf(':') + 1);
-      } else if (!line.startsWith(libcFingerprint)) {
-        return;
-      }
 
-      super.onNewLine(line);
+        @Override
+        final public void onEnd(int exitValue) {
+            onLogcat(sb.toString());
+        }
+
+        public abstract void onLogcat(String logcat);
     }
-  }
 
-  public Logcat() {
-    super();
-    mCmdPrefix = "logcat -d";
-  }
+    /**
+     * receive libc fatal messages from logcat
+     */
+    public abstract static class LibcReceiver extends FullReceiver {
+        private String libcFingerprint = null;
+
+        @Override
+        public void onNewLine(String line) {
+            if (libcFingerprint == null) {
+                if (!line.contains("*** *** ***")) {
+                    return;
+                }
+                libcFingerprint = line.substring(0, line.indexOf(':') + 1);
+            } else if (!line.startsWith(libcFingerprint)) {
+                return;
+            }
+
+            super.onNewLine(line);
+        }
+    }
 }

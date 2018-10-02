@@ -18,9 +18,6 @@
  */
 package org.csploit.android.gui.dialogs;
 
-import android.content.DialogInterface;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -29,69 +26,66 @@ import org.csploit.android.R;
 
 import java.util.ArrayList;
 
-public class CustomFilterDialog extends AlertDialog{
-  public interface CustomFilterDialogListener{
-    void onInputEntered(ArrayList<String> from, ArrayList<String> to);
-  }
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
-  public CustomFilterDialog(String title, AppCompatActivity activity, final CustomFilterDialogListener listener){
-    super(activity);
+public class CustomFilterDialog extends AlertDialog {
+    public CustomFilterDialog(String title, AppCompatActivity activity, final CustomFilterDialogListener listener) {
+        super(activity);
 
-    final View view = LayoutInflater.from(activity).inflate(R.layout.plugin_mitm_filter_dialog, null);
+        final View view = LayoutInflater.from(activity).inflate(R.layout.plugin_mitm_filter_dialog, null);
 
-    this.setTitle(title);
-    this.setView(view);
+        this.setTitle(title);
+        this.setView(view);
 
-    this.setButton(BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener(){
-      public void onClick(DialogInterface dialog, int id){
-        assert view != null;
-        String f0 = ((EditText) view.findViewById(R.id.fromText0)).getText() + "".trim(),
-          f1 = ((EditText) view.findViewById(R.id.fromText1)).getText() + "".trim(),
-          f2 = ((EditText) view.findViewById(R.id.fromText2)).getText() + "".trim(),
-          f3 = ((EditText) view.findViewById(R.id.fromText3)).getText() + "".trim(),
-          f4 = ((EditText) view.findViewById(R.id.fromText4)).getText() + "".trim(),
-          t0 = ((EditText) view.findViewById(R.id.toText0)).getText() + "".trim(),
-          t1 = ((EditText) view.findViewById(R.id.toText1)).getText() + "".trim(),
-          t2 = ((EditText) view.findViewById(R.id.toText2)).getText() + "".trim(),
-          t3 = ((EditText) view.findViewById(R.id.toText3)).getText() + "".trim(),
-          t4 = ((EditText) view.findViewById(R.id.toText4)).getText() + "".trim();
+        this.setButton(BUTTON_POSITIVE, "Ok", (dialog, id) -> {
+            assert view != null;
+            String f0 = ((EditText) view.findViewById(R.id.fromText0)).getText() + "".trim(),
+                    f1 = ((EditText) view.findViewById(R.id.fromText1)).getText() + "".trim(),
+                    f2 = ((EditText) view.findViewById(R.id.fromText2)).getText() + "".trim(),
+                    f3 = ((EditText) view.findViewById(R.id.fromText3)).getText() + "".trim(),
+                    f4 = ((EditText) view.findViewById(R.id.fromText4)).getText() + "".trim(),
+                    t0 = ((EditText) view.findViewById(R.id.toText0)).getText() + "".trim(),
+                    t1 = ((EditText) view.findViewById(R.id.toText1)).getText() + "".trim(),
+                    t2 = ((EditText) view.findViewById(R.id.toText2)).getText() + "".trim(),
+                    t3 = ((EditText) view.findViewById(R.id.toText3)).getText() + "".trim(),
+                    t4 = ((EditText) view.findViewById(R.id.toText4)).getText() + "".trim();
 
-        ArrayList<String> from = new ArrayList<String>(),
-          to = new ArrayList<String>();
+            ArrayList<String> from = new ArrayList<>(),
+                    to = new ArrayList<>();
 
-        if(!f0.isEmpty() && !t0.isEmpty()){
-          from.add(f0);
-          to.add(t0);
-        }
+            if (!f0.isEmpty() && !t0.isEmpty()) {
+                from.add(f0);
+                to.add(t0);
+            }
 
-        if(!f1.isEmpty() && !t1.isEmpty()){
-          from.add(f1);
-          to.add(t1);
-        }
+            if (!f1.isEmpty() && !t1.isEmpty()) {
+                from.add(f1);
+                to.add(t1);
+            }
 
-        if(!f2.isEmpty() && !t2.isEmpty()){
-          from.add(f2);
-          to.add(t2);
-        }
+            if (!f2.isEmpty() && !t2.isEmpty()) {
+                from.add(f2);
+                to.add(t2);
+            }
 
-        if(!f3.isEmpty() && !t3.isEmpty()){
-          from.add(f3);
-          to.add(t3);
-        }
+            if (!f3.isEmpty() && !t3.isEmpty()) {
+                from.add(f3);
+                to.add(t3);
+            }
 
-        if(!f4.isEmpty() && !t4.isEmpty()){
-          from.add(f4);
-          to.add(t4);
-        }
+            if (!f4.isEmpty() && !t4.isEmpty()) {
+                from.add(f4);
+                to.add(t4);
+            }
 
-        listener.onInputEntered(from, to);
-      }
-    });
+            listener.onInputEntered(from, to);
+        });
 
-    this.setButton(BUTTON_NEGATIVE, activity.getString(R.string.cancel_dialog), new DialogInterface.OnClickListener(){
-      public void onClick(DialogInterface dialog, int id){
-        dialog.dismiss();
-      }
-    });
-  }
+        this.setButton(BUTTON_NEGATIVE, activity.getString(R.string.cancel_dialog), (dialog, id) -> dialog.dismiss());
+    }
+
+    public interface CustomFilterDialogListener {
+        void onInputEntered(ArrayList<String> from, ArrayList<String> to);
+    }
 }

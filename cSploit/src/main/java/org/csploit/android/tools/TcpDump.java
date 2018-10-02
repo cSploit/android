@@ -18,58 +18,58 @@
  */
 package org.csploit.android.tools;
 
-import java.net.InetAddress;
-
 import org.csploit.android.core.Child;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Logger;
 import org.csploit.android.events.Event;
 import org.csploit.android.events.Packet;
 
-public class TcpDump extends Tool{
+import java.net.InetAddress;
 
-  public TcpDump() {
-    mHandler = "tcpdump";
-    mCmdPrefix = null;
-  }
+public class TcpDump extends Tool {
 
-  public static abstract class TcpDumpReceiver extends Child.EventReceiver {
-
-    @Override
-    public void onEvent(Event e) {
-      if(e instanceof Packet) {
-        Packet p = (Packet)e;
-        onPacket(p.src, p.dst, p.len);
-      } else {
-        Logger.warning("Unknown event: " + e);
-      }
+    public TcpDump() {
+        mHandler = "tcpdump";
+        mCmdPrefix = null;
     }
 
-    public abstract void onPacket(InetAddress src, InetAddress dst, int len);
-  }
+    public Child sniff(String filter, String pcap, TcpDumpReceiver receiver) throws ChildManager.ChildNotStartedException {
 
-  public Child sniff(String filter, String pcap, TcpDumpReceiver receiver) throws ChildManager.ChildNotStartedException {
+        StringBuilder sb = new StringBuilder("-nvs 0 ");
 
-    StringBuilder sb = new StringBuilder("-nvs 0 ");
+        if (pcap != null) {
+            // TODO: find a way to receive tcpdump output when saving to a file
+            // NOTE: tcpdump -w - | tee file.pcap | tcpdump -r -
+            sb.append("-Uw '");
+            sb.append(pcap);
+            sb.append("' ");
+        } else {
+            sb.append("-l ");
+        }
 
-    if(pcap != null) {
-      // TODO: find a way to receive tcpdump output when saving to a file
-      // NOTE: tcpdump -w - | tee file.pcap | tcpdump -r -
-      sb.append("-Uw '");
-      sb.append(pcap);
-      sb.append("' ");
-    } else {
-      sb.append("-l ");
+        if (filter != null) {
+            sb.append(filter);
+        }
+
+        return super.async(sb.toString(), receiver);
     }
 
-    if(filter != null) {
-      sb.append(filter);
+    public void sniff(TcpDumpReceiver receiver) throws ChildManager.ChildNotStartedException {
+        sniff(null, null, receiver);
     }
 
-    return super.async(sb.toString(), receiver);
-  }
+    public static abstract class TcpDumpReceiver extends Child.EventReceiver {
 
-  public void sniff(TcpDumpReceiver receiver) throws ChildManager.ChildNotStartedException {
-    sniff(null, null, receiver);
-  }
+        @Override
+        public void onEvent(Event e) {
+            if (e instanceof Packet) {
+                Packet p = (Packet) e;
+                onPacket(p.src, p.dst, p.len);
+            } else {
+                Logger.warning("Unknown event: " + e);
+            }
+        }
+
+        public abstract void onPacket(InetAddress src, InetAddress dst, int len);
+    }
 }

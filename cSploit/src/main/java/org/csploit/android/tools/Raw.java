@@ -29,34 +29,34 @@ import org.csploit.android.events.Newline;
  */
 public class Raw extends Tool {
 
-  public static abstract class RawReceiver extends Child.EventReceiver {
-
-    @Override
-    public void onEvent(Event e) {
-      if(e instanceof Newline)
-        onNewLine(((Newline)e).line);
-      else
-        Logger.warning("unknown event: " + e);
+    public Raw() {
+        mHandler = "raw";
+        mCmdPrefix = null;
     }
 
-    public abstract void onNewLine(String line);
-  }
+    public int run(String cmd, RawReceiver receiver) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
+        return super.run(cmd, receiver);
+    }
 
-  public Raw() {
-    mHandler = "raw";
-    mCmdPrefix = null;
-  }
+    @Override
+    public int run(String cmd) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
+        return this.run(cmd, null);
+    }
 
-  public int run(String cmd, RawReceiver receiver) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
-    return super.run(cmd, receiver);
-  }
+    public Child async(String cmd, RawReceiver receiver) throws ChildManager.ChildNotStartedException {
+        return super.async(cmd, receiver);
+    }
 
-  @Override
-  public int run(String cmd) throws InterruptedException, ChildManager.ChildDiedException, ChildManager.ChildNotStartedException {
-    return this.run(cmd, null);
-  }
+    public static abstract class RawReceiver extends Child.EventReceiver {
 
-  public Child async(String cmd, RawReceiver receiver) throws ChildManager.ChildNotStartedException {
-    return super.async(cmd, receiver);
-  }
+        @Override
+        public void onEvent(Event e) {
+            if (e instanceof Newline)
+                onNewLine(((Newline) e).line);
+            else
+                Logger.warning("unknown event: " + e);
+        }
+
+        public abstract void onNewLine(String line);
+    }
 }

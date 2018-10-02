@@ -28,72 +28,70 @@ import java.util.HashMap;
 
 import javax.net.SocketFactory;
 
-public class DNSCache
-{
-  private static DNSCache mInstance = new DNSCache();
+public class DNSCache {
+    private static DNSCache mInstance = new DNSCache();
 
-  private final HashMap<String, InetAddress> mCache;
-  private final ArrayList<String> mRootDomainCache;
+    private final HashMap<String, InetAddress> mCache;
+    private final ArrayList<String> mRootDomainCache;
 
-  public static DNSCache getInstance(){
-    return mInstance;
-  }
+    private DNSCache() {
+        mCache = new HashMap<>();
+        mRootDomainCache = new ArrayList<>();
+    }
 
-  private DNSCache() {
-    mCache = new HashMap<>();
-    mRootDomainCache = new ArrayList<>();
-  }
+    public static DNSCache getInstance() {
+        return mInstance;
+    }
 
-  /**
-   * checks if a domain ends with an already intercepted root domain.
-   *
-   * @param hostname hostname to check
-   * @return String the root domain or null
-   */
-  public String getRootDomain(String hostname){
-    synchronized (mRootDomainCache) {
-      for (String rootDomain : mRootDomainCache) {
-        if (hostname.endsWith(rootDomain)) {
-          return rootDomain;
+    /**
+     * checks if a domain ends with an already intercepted root domain.
+     *
+     * @param hostname hostname to check
+     * @return String the root domain or null
+     */
+    public String getRootDomain(String hostname) {
+        synchronized (mRootDomainCache) {
+            for (String rootDomain : mRootDomainCache) {
+                if (hostname.endsWith(rootDomain)) {
+                    return rootDomain;
+                }
+            }
         }
-      }
+
+        return null;
     }
 
-    return null;
-  }
-
-  /**
-   * Adds a root domain extracted from the domain of a request,
-   * to the list of intercepted root domains.
-   *
-   * @param rootdomain Root domain to add to the list
-   */
-  public void addRootDomain(String rootdomain){
-    synchronized (mRootDomainCache) {
-      mRootDomainCache.add(rootdomain);
+    /**
+     * Adds a root domain extracted from the domain of a request,
+     * to the list of intercepted root domains.
+     *
+     * @param rootdomain Root domain to add to the list
+     */
+    public void addRootDomain(String rootdomain) {
+        synchronized (mRootDomainCache) {
+            mRootDomainCache.add(rootdomain);
+        }
     }
-  }
 
-  private InetAddress getAddress(String server) throws IOException{
-    InetAddress address = mCache.get(server);
+    private InetAddress getAddress(String server) throws IOException {
+        InetAddress address = mCache.get(server);
 
-    if(address == null){
-      address = InetAddress.getByName(server);
-      mCache.put(server, address);
+        if (address == null) {
+            address = InetAddress.getByName(server);
+            mCache.put(server, address);
 
-      Logger.debug(server + " resolved to " + address.getHostAddress());
+            Logger.debug(server + " resolved to " + address.getHostAddress());
+        } else
+            Logger.debug("Returning a cached DSN result for " + server + " : " + address.getHostAddress());
+
+        return address;
     }
-    else
-      Logger.debug("Returning a cached DSN result for " + server + " : " + address.getHostAddress());
 
-    return address;
-  }
+    public Socket connect(String server, int port) throws IOException {
+        return new Socket(getAddress(server), port);
+    }
 
-  public Socket connect(String server, int port) throws IOException{
-    return new Socket(getAddress(server), port);
-  }
-
-  public Socket connect(SocketFactory factory, String server, int port) throws IOException{
-    return factory.createSocket(getAddress(server), port);
-  }
+    public Socket connect(SocketFactory factory, String server, int port) throws IOException {
+        return factory.createSocket(getAddress(server), port);
+    }
 }

@@ -7,17 +7,16 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Router Keygen is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Router Keygen.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.csploit.android.wifi.algorithms.helpers;
-
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -26,9 +25,9 @@ package org.csploit.android.wifi.algorithms.helpers;
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -65,147 +64,145 @@ package org.csploit.android.wifi.algorithms.helpers;
  *
  * @author yonik
  */
-public class JenkinsHash{
-  /**
-   * A Java implementation of hashword from lookup3.c by Bob Jenkins
-   * (<a href="http://burtleburtle.net/bob/c/lookup3.c">original source</a>).
-   *
-   * @param k   the key to hash
-   * @param offset   offset of the start of the key
-   * @param length   length of the key
-   * @param initval  initial value to fold into the hash
-   * @return the 32 bit hash code
-   */
+public class JenkinsHash {
+    /**
+     * A Java implementation of hashword from lookup3.c by Bob Jenkins
+     * (<a href="http://burtleburtle.net/bob/c/lookup3.c">original source</a>).
+     *
+     * @param k   the key to hash
+     * @param offset   offset of the start of the key
+     * @param length   length of the key
+     * @param initval  initial value to fold into the hash
+     * @return the 32 bit hash code
+     */
 
 
-  // max value to limit it to 4 bytes
-  private static final long MAX_VALUE = 0xFFFFFFFFL;
+    // max value to limit it to 4 bytes
+    private static final long MAX_VALUE = 0xFFFFFFFFL;
 
-  // internal variables used in the various calculations
-  long a;
-  long b;
-  long c;
-
-
-  /**
-   * Do addition and turn into 4 bytes.
-   *
-   * @param val
-   * @param add
-   * @return
-   */
-  private long add(long val, long add){
-    return (val + add) & MAX_VALUE;
-  }
-
-  /**
-   * Do subtraction and turn into 4 bytes.
-   *
-   * @param val
-   * @param subtract
-   * @return
-   */
-  private long subtract(long val, long subtract){
-    return (val - subtract) & MAX_VALUE;
-  }
-
-  /**
-   * Left shift val by shift bits and turn in 4 bytes.
-   *
-   * @param val
-   * @param xor
-   * @return
-   */
-  private long xor(long val, long xor){
-    return (val ^ xor) & MAX_VALUE;
-  }
-
-  /**
-   * Left shift val by shift bits.  Cut down to 4 bytes.
-   *
-   * @param val
-   * @param shift
-   * @return
-   */
-  private long leftShift(long val, int shift){
-    return (val << shift) & MAX_VALUE;
-  }
+    // internal variables used in the various calculations
+    long a;
+    long b;
+    long c;
 
 
-  private long rot(long val, int shift){
-    return (leftShift(val, shift) | (val >>> (32 - shift))) & MAX_VALUE;
-  }
-
-  /**
-   * Mix up the values in the hash function.
-   */
-  private void hashMix(){
-    a = subtract(a, c);
-    a = xor(a, rot(c, 4));
-    c = add(c, b);
-    b = subtract(b, a);
-    b = xor(b, rot(a, 6));
-    a = add(a, c);
-    c = subtract(c, b);
-    c = xor(c, rot(b, 8));
-    b = add(b, a);
-    a = subtract(a, c);
-    a = xor(a, rot(c, 16));
-    c = add(c, b);
-    b = subtract(b, a);
-    b = xor(b, rot(a, 19));
-    a = add(a, c);
-    c = subtract(c, b);
-    c = xor(c, rot(b, 4));
-    b = add(b, a);
-  }
-
-  @SuppressWarnings("fallthrough")
-  public long hashword(long[] k, int length, long initval){
-
-    a = b = c = 0xdeadbeef + (length << 2) + (initval & MAX_VALUE);
-
-    int i = 0;
-    while(length > 3){
-      a = add(a, k[i + 0]);
-      b = add(b, k[i + 1]);
-      c = add(c, k[i + 2]);
-      hashMix();
-
-      length -= 3;
-      i += 3;
+    /**
+     * Do addition and turn into 4 bytes.
+     *
+     * @param val
+     * @param add
+     * @return
+     */
+    private long add(long val, long add) {
+        return (val + add) & MAX_VALUE;
     }
 
-    switch(length){
-      case 3:
-        c = add(c, k[i + 2]);  // fall through
-      case 2:
-        b = add(b, k[i + 1]);  // fall through
-      case 1:
-        a = add(a, k[i + 0]);  // fall through
-        finalHash();
-      case 0:
-        break;
+    /**
+     * Do subtraction and turn into 4 bytes.
+     *
+     * @param val
+     * @param subtract
+     * @return
+     */
+    private long subtract(long val, long subtract) {
+        return (val - subtract) & MAX_VALUE;
     }
-    return c;
-  }
 
-  void finalHash(){
-    c = xor(c, b);
-    c = subtract(c, rot(b, 14));
-    a = xor(a, c);
-    a = subtract(a, rot(c, 11));
-    b = xor(b, a);
-    b = subtract(b, rot(a, 25));
-    c = xor(c, b);
-    c = subtract(c, rot(b, 16));
-    a = xor(a, c);
-    a = subtract(a, rot(c, 4));
-    b = xor(b, a);
-    b = subtract(b, rot(a, 14));
-    c = xor(c, b);
-    c = subtract(c, rot(b, 24));
-  }
+    /**
+     * Left shift val by shift bits and turn in 4 bytes.
+     *
+     * @param val
+     * @param xor
+     * @return
+     */
+    private long xor(long val, long xor) {
+        return (val ^ xor) & MAX_VALUE;
+    }
+
+    /**
+     * Left shift val by shift bits.  Cut down to 4 bytes.
+     *
+     * @param val
+     * @param shift
+     * @return
+     */
+    private long leftShift(long val, int shift) {
+        return (val << shift) & MAX_VALUE;
+    }
 
 
+    private long rot(long val, int shift) {
+        return (leftShift(val, shift) | (val >>> (32 - shift))) & MAX_VALUE;
+    }
+
+    /**
+     * Mix up the values in the hash function.
+     */
+    private void hashMix() {
+        a = subtract(a, c);
+        a = xor(a, rot(c, 4));
+        c = add(c, b);
+        b = subtract(b, a);
+        b = xor(b, rot(a, 6));
+        a = add(a, c);
+        c = subtract(c, b);
+        c = xor(c, rot(b, 8));
+        b = add(b, a);
+        a = subtract(a, c);
+        a = xor(a, rot(c, 16));
+        c = add(c, b);
+        b = subtract(b, a);
+        b = xor(b, rot(a, 19));
+        a = add(a, c);
+        c = subtract(c, b);
+        c = xor(c, rot(b, 4));
+        b = add(b, a);
+    }
+
+    @SuppressWarnings("fallthrough")
+    public long hashword(long[] k, int length, long initval) {
+
+        a = b = c = 0xdeadbeef + (length << 2) + (initval & MAX_VALUE);
+
+        int i = 0;
+        while (length > 3) {
+            a = add(a, k[i]);
+            b = add(b, k[i + 1]);
+            c = add(c, k[i + 2]);
+            hashMix();
+
+            length -= 3;
+            i += 3;
+        }
+
+        switch (length) {
+            case 3:
+                c = add(c, k[i + 2]);  // fall through
+            case 2:
+                b = add(b, k[i + 1]);  // fall through
+            case 1:
+                a = add(a, k[i]);  // fall through
+                finalHash();
+            case 0:
+                break;
+        }
+        return c;
+    }
+
+    void finalHash() {
+        c = xor(c, b);
+        c = subtract(c, rot(b, 14));
+        a = xor(a, c);
+        a = subtract(a, rot(c, 11));
+        b = xor(b, a);
+        b = subtract(b, rot(a, 25));
+        c = xor(c, b);
+        c = subtract(c, rot(b, 16));
+        a = xor(a, c);
+        a = subtract(a, rot(c, 4));
+        b = xor(b, a);
+        b = subtract(b, rot(a, 14));
+        c = xor(c, b);
+        c = subtract(c, rot(b, 24));
+    }
 }

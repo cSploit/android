@@ -24,119 +24,118 @@ import java.net.UnknownHostException;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
-public class IP4Address implements Comparable<IP4Address>
-{
-  private byte[] mByteArray = null;
-  private String mString = "";
-  private final int mInteger;
-  private InetAddress mAddress = null;
+public class IP4Address implements Comparable<IP4Address> {
+    private final int mInteger;
+    private byte[] mByteArray;
+    private String mString;
+    private InetAddress mAddress;
 
-  public static int ntohl(int n){
-    return ((n >> 24) & 0xFF) + ((n >> 16) & 0xFF) + ((n >> 8) & 0xFF) + (n & 0xFF);
-  }
+    public IP4Address(int address) throws UnknownHostException {
+        mByteArray = new byte[4];
+        mInteger = address;
 
-  public static IP4Address next(IP4Address address) throws UnknownHostException{
-    byte[] addr = address.toByteArray();
+        if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
+            mByteArray[0] = (byte) (address & 0xFF);
+            mByteArray[1] = (byte) (0xFF & address >> 8);
+            mByteArray[2] = (byte) (0xFF & address >> 16);
+            mByteArray[3] = (byte) (0xFF & address >> 24);
+        } else {
+            mByteArray[0] = (byte) (0xFF & address >> 24);
+            mByteArray[1] = (byte) (0xFF & address >> 16);
+            mByteArray[2] = (byte) (0xFF & address >> 8);
+            mByteArray[3] = (byte) (address & 0xFF);
+        }
 
-    int i = addr.length - 1;
-    while(i >= 0 && addr[i] == (byte) 0xff){
-      addr[i] = 0;
-      i--;
+        mAddress = InetAddress.getByAddress(mByteArray);
+        mString = mAddress.getHostAddress();
     }
 
-    if(i >= 0){
-      addr[i]++;
-      return new IP4Address(addr);
-    } else
-      return null;
-  }
-
-
-  public IP4Address(int address) throws UnknownHostException{
-    mByteArray = new byte[4];
-    mInteger = address;
-
-    if(ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN){
-      mByteArray[0] = (byte) (address & 0xFF);
-      mByteArray[1] = (byte) (0xFF & address >> 8);
-      mByteArray[2] = (byte) (0xFF & address >> 16);
-      mByteArray[3] = (byte) (0xFF & address >> 24);
-    } else{
-      mByteArray[0] = (byte) (0xFF & address >> 24);
-      mByteArray[1] = (byte) (0xFF & address >> 16);
-      mByteArray[2] = (byte) (0xFF & address >> 8);
-      mByteArray[3] = (byte) (address & 0xFF);
+    public IP4Address(String address) throws UnknownHostException {
+        mString = address;
+        mAddress = InetAddress.getByName(address);
+        mByteArray = mAddress.getAddress();
+        mInteger = ((mByteArray[0] & 0xFF) << 24) +
+                ((mByteArray[1] & 0xFF) << 16) +
+                ((mByteArray[2] & 0xFF) << 8) +
+                (mByteArray[3] & 0xFF);
     }
 
-    mAddress = InetAddress.getByAddress(mByteArray);
-    mString = mAddress.getHostAddress();
-  }
 
-  public IP4Address(String address) throws UnknownHostException{
-    mString = address;
-    mAddress = InetAddress.getByName(address);
-    mByteArray = mAddress.getAddress();
-    mInteger = ((mByteArray[0] & 0xFF) << 24) +
-      ((mByteArray[1] & 0xFF) << 16) +
-      ((mByteArray[2] & 0xFF) << 8) +
-      (mByteArray[3] & 0xFF);
-  }
+    public IP4Address(byte[] address) throws UnknownHostException {
+        mByteArray = Arrays.copyOf(address, address.length);
+        mAddress = InetAddress.getByAddress(mByteArray);
+        mString = mAddress.getHostAddress();
+        mInteger = ((mByteArray[0] & 0xFF) << 24) +
+                ((mByteArray[1] & 0xFF) << 16) +
+                ((mByteArray[2] & 0xFF) << 8) +
+                (mByteArray[3] & 0xFF);
+    }
 
-  public IP4Address(byte[] address) throws UnknownHostException{
-    mByteArray = Arrays.copyOf(address, address.length);
-    mAddress = InetAddress.getByAddress(mByteArray);
-    mString = mAddress.getHostAddress();
-    mInteger = ((mByteArray[0] & 0xFF) << 24) +
-      ((mByteArray[1] & 0xFF) << 16) +
-      ((mByteArray[2] & 0xFF) << 8) +
-      (mByteArray[3] & 0xFF);
-  }
+    public IP4Address(InetAddress address) {
+        mAddress = address;
+        mByteArray = address.getAddress();
+        mString = mAddress.getHostAddress();
+        mInteger = ((mByteArray[0] & 0xFF) << 24) +
+                ((mByteArray[1] & 0xFF) << 16) +
+                ((mByteArray[2] & 0xFF) << 8) +
+                (mByteArray[3] & 0xFF);
+    }
 
-  public IP4Address(InetAddress address){
-    mAddress = address;
-    mByteArray = address.getAddress();
-    mString = mAddress.getHostAddress();
-    mInteger = ((mByteArray[0] & 0xFF) << 24) +
-      ((mByteArray[1] & 0xFF) << 16) +
-      ((mByteArray[2] & 0xFF) << 8) +
-      (mByteArray[3] & 0xFF);
-  }
+    public static int ntohl(int n) {
+        return ((n >> 24) & 0xFF) + ((n >> 16) & 0xFF) + ((n >> 8) & 0xFF) + (n & 0xFF);
+    }
 
-  public byte[] toByteArray(){
-    return Arrays.copyOf(mByteArray, mByteArray.length);
-  }
+    public static IP4Address next(IP4Address address) throws UnknownHostException {
+        byte[] addr = address.toByteArray();
 
-  public String toString(){
-    return mString;
-  }
+        int i = addr.length - 1;
+        while (i >= 0 && addr[i] == (byte) 0xff) {
+            addr[i] = 0;
+            i--;
+        }
 
-  public int toInteger(){
-    return mInteger;
-  }
+        if (i >= 0) {
+            addr[i]++;
+            return new IP4Address(addr);
+        } else
+            return null;
+    }
 
-  public InetAddress toInetAddress(){
-    return mAddress;
-  }
+    public byte[] toByteArray() {
+        return Arrays.copyOf(mByteArray, mByteArray.length);
+    }
 
-  public boolean equals(IP4Address address){
-    return mInteger == address.toInteger();
-  }
+    public String toString() {
+        return mString;
+    }
 
-  public boolean equals(InetAddress address){
-    return mAddress.equals(address);
-  }
+    public int toInteger() {
+        return mInteger;
+    }
 
-  @Override
-  public int compareTo(IP4Address another) {
-    return mInteger - another.mInteger;
-  }
+    public InetAddress toInetAddress() {
+        return mAddress;
+    }
 
-  public int getPrefixLength(){
-    int bits, i, n = mInteger;
+    public boolean equals(IP4Address address) {
+        return mInteger == address.toInteger();
+    }
 
-    // WTF is this?
-    for(i = 0, bits = (n & 1); i < 32; i++, n >>>= 1, bits += n & 1) ;
+    public boolean equals(InetAddress address) {
+        return mAddress.equals(address);
+    }
 
-    return bits;
-  }
+    @Override
+    public int compareTo(IP4Address another) {
+        return mInteger - another.mInteger;
+    }
+
+    public int getPrefixLength() {
+        int bits, i, n = mInteger;
+
+        // WTF is this?
+        for (i = 0, bits = (n & 1); i < 32; i++, n >>>= 1, bits += n & 1) ;
+
+        return bits;
+    }
 }
