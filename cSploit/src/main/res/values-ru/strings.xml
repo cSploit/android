@@ -60,7 +60,7 @@
     <string name="connecting">Подключение…</string>
     <string name="cancel">Отмена</string>
     <string name="error">Ошибка</string>
-    <string name="error_occured">Произошла ошибка во время загрузки обновления.</string>
+    <string name="error_occurred">Произошла ошибка во время загрузки обновления.</string>
     <string name="invalid_target">Неверная цель.</string>
     <string name="add_custom_target">Добавить свою цель</string>
     <string name="enter_url">Введите URL, имя узла или IP адрес ниже:</string>

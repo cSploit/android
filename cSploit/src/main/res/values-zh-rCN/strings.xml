@@ -60,7 +60,7 @@ If not, see http://www.gnu.org/licenses/.
     <string name="connecting">正在连接&#8230;</string>
     <string name="cancel">取消</string>
     <string name="error">错误</string>
-    <string name="error_occured">在下载更新时发送错误。</string>
+    <string name="error_occurred">在下载更新时发送错误。</string>
     <string name="invalid_target">不正确的目标。</string>
     <string name="add_custom_target">添加自定义目标</string>
     <string name="enter_url">在下方键入URL，主机名或IP地址：</string>

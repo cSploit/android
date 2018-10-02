@@ -66,7 +66,7 @@
     <string name="connecting">Spajanje&#8230;</string>
     <string name="cancel">Zaustavi</string>
     <string name="error">Greška</string>
-    <string name="error_occured">Greška se pojavila pri skidanju ažuriranja.</string>
+    <string name="error_occurred">Greška se pojavila pri skidanju ažuriranja.</string>
     <string name="invalid_target">Nevažeća meta.</string>
     <string name="add_custom_target">Dodaj posebnu metu</string>
     <string name="enter_url">Napiši URL, ime izvora (uređaja) ili IP adresu ispod:</string>

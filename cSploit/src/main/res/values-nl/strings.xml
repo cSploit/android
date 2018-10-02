@@ -86,7 +86,7 @@
     <string name="error_mitm_ports">MITM modules hebben alle porten nodig.</string>
     <string name="error_mitm_proxy">Niet in staat om een proxy te creëren, kijk of je een internet verbinding hebt.</string>
     <string name="error_mitm_resource_server">Niet in staat om de bronnen server te bereiken, kijk of je een internet verbinding hebt.</string>
-    <string name="error_occured">Een fout is voorgekomen tijdens het downloaden van de update.</string>
+    <string name="error_occurred">Een fout is voorgekomen tijdens het downloaden van de update.</string>
     <string name="error_port_outofrange">De port is buiten bereik.</string>
     <string name="error_proxy_port">Wat nodig is voor de transparante proxy wordt gebruikt door een ander proces, wil je applicatiebeheer opstarten?</string>
     <string name="error_rcpd_fatal">Er is een fatale fout opgetreden.</string>

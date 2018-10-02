@@ -66,7 +66,7 @@
     <string name="connecting">Připojuji&#8230;</string>
     <string name="cancel">Zrušit</string>
     <string name="error">Error</string>
-    <string name="error_occured">Chyba při stahování aktializace</string>
+    <string name="error_occurred">Chyba při stahování aktializace</string>
     <string name="invalid_target">Neplatný cíl.</string>
     <string name="add_custom_target">Přidat vlastní cíl</string>
     <string name="enter_url">Vložte URL, IP adresu nebo jméno hosta:</string>

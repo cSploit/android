@@ -10,7 +10,7 @@
         android:id="@+id/actionListView"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:dividerHeight="6dp"
+        android:animateLayoutChanges="true"
         android:divider="#00ffffff"
-        android:animateLayoutChanges="true" />
+        android:dividerHeight="6dp" />
 </LinearLayout>

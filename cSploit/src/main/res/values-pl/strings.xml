@@ -65,7 +65,7 @@
     <string name="connecting">Łączenie&#8230;</string>
     <string name="cancel">Anuluj</string>
     <string name="error">Błąd</string>
-    <string name="error_occured">Wystąpił błąd podczas pobierania aktualizacji.</string>
+    <string name="error_occurred">Wystąpił błąd podczas pobierania aktualizacji.</string>
     <string name="invalid_target">Błędny cel.</string>
     <string name="add_custom_target">Dodaj własny cel</string>
     <string name="enter_url">Wpisz URL, nazwę hosta lub adres ip poniżej:</string>

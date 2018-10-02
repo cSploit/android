@@ -66,7 +66,7 @@
     <string name="connecting">Connexion&#8230;</string>
     <string name="cancel">Annuler</string>
     <string name="error">Erreur</string>
-    <string name="error_occured">Une erreur est survenue pendant le téléchargement de la mise à
+    <string name="error_occurred">Une erreur est survenue pendant le téléchargement de la mise à
         jour.
     </string>
     <string name="invalid_target">Cible non-valide.</string>

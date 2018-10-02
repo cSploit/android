@@ -23,8 +23,9 @@
         android:id="@+id/sniffActivity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/sniffToggleButton"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:visibility="invisible" />
 
     <View
@@ -32,19 +33,19 @@
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_below="@+id/sniffToggleButton"
-        android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:background="@android:color/darker_gray" />
 
     <Button
         android:id="@+id/cmd_save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
         android:text="Save" />
 
     <EditText
@@ -52,15 +53,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/cmd_save"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
         android:layout_alignTop="@+id/separator"
-        android:editable="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:ems="10"
         android:inputType="textMultiLine"
-        android:scrollHorizontally="true"
-        android:scrollbars="vertical|horizontal" />
+        android:scrollbars="vertical|horizontal"
+        android:scrollHorizontally="true" />
 
 </RelativeLayout>

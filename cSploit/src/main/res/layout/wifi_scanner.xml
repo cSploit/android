@@ -9,9 +9,10 @@
         android:id="@+id/android:list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
         android:layout_below="@+id/scanStatusText"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
         android:animateLayoutChanges="true" />
 
     <TextView
@@ -19,11 +20,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/android:list"
+        android:layout_alignStart="@+id/android:list"
         android:layout_alignParentTop="true"
-        android:layout_alignRight="@+id/android:list"
         android:fontFamily="sans-serif-condensed"
         android:padding="8dp"
         android:text="Status"
+        android:layout_alignEnd="@+id/android:list"
+        android:layout_alignRight="@+id/android:list"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
 </RelativeLayout>

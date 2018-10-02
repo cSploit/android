@@ -4,28 +4,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:background="@drawable/card_background"
-    android:showDividers="none"
     android:layout_marginBottom="8dp"
+    android:background="@drawable/card_background"
+    android:orientation="horizontal"
+    android:showDividers="none"
     android:translationZ="8dp">
 
     <LinearLayout
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:paddingRight="8dip"
+        android:layout_height="wrap_content"
         android:background="@drawable/selectable_background_cardbank"
-        android:weightSum="100"
         android:baselineAligned="false"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingEnd="8dip"
+        android:paddingRight="8dip"
+        android:weightSum="100">
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_weight="10"
             android:layout_height="match_parent"
-            android:orientation="vertical"
             android:layout_margin="8dp"
-            android:gravity="center">
+            android:layout_weight="10"
+            android:gravity="center"
+            android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/actionIcon"
@@ -38,10 +39,10 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_weight="90"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="8dp"
+            android:layout_weight="90"
             android:orientation="vertical">
 
             <TextView
@@ -58,11 +59,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
+                android:autoLink="all"
                 android:ellipsize="end"
-                android:maxLines="50"
                 android:fontFamily="sans-serif-light"
-                android:textSize="14sp"
-                android:autoLink="all" />
+                android:maxLines="50"
+                android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

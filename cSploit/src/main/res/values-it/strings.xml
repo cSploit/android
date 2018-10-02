@@ -71,7 +71,7 @@
     <string name="connecting">Connessione&#8230;</string>
     <string name="cancel">Cancella</string>
     <string name="error">Errore</string>
-    <string name="error_occured">Si è verificato un errore durante il download
+    <string name="error_occurred">Si è verificato un errore durante il download
         dell\'aggiornamento.
     </string>
     <string name="invalid_target">Obiettivo non valido.</string>

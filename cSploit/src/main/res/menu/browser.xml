@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:csploit="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:csploit="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/back"
         android:icon="@drawable/action_backward"
-        csploit:showAsAction="ifRoom"
-        android:title="B"/>
+        android:title="B"
+        csploit:showAsAction="ifRoom" />
     <item
         android:id="@+id/forward"
         android:icon="@drawable/action_forward"
-        csploit:showAsAction="ifRoom"
-        android:title="F"/>
+        android:title="F"
+        csploit:showAsAction="ifRoom" />
     <item
         android:id="@+id/reload"
         android:icon="@drawable/action_refresh"
-        csploit:showAsAction="ifRoom"
-        android:title="R"/>
+        android:title="R"
+        csploit:showAsAction="ifRoom" />
 
 </menu>

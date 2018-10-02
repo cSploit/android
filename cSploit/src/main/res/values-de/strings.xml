@@ -55,7 +55,7 @@
     <string name="connecting">Verbinde&#8230;</string>
     <string name="cancel">Abbrechen</string>
     <string name="error">Fehler</string>
-    <string name="error_occured">Ein Fehler ist während dem Herunterladen des Updates aufgetreten.</string>
+    <string name="error_occurred">Ein Fehler ist während dem Herunterladen des Updates aufgetreten.</string>
     <string name="invalid_target">Ungültiges Ziel.</string>
     <string name="add_custom_target">Füge eigenes Ziel hinzu</string>
     <string name="enter_url">Nachfolgend eine URL, einen Hostnamen oder eine IP-Adresse eingeben:</string>

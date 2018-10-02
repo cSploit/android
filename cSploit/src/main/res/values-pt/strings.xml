@@ -54,7 +54,7 @@
     <string name="connecting">Conectando…</string>
     <string name="cancel">Cancelar</string>
     <string name="error">Erro</string>
-    <string name="error_occured">Ocorreu um erro durante o download da Atualização.</string>
+    <string name="error_occurred">Ocorreu um erro durante o download da Atualização.</string>
     <string name="invalid_target">Alvo Inválido.</string>
     <string name="add_custom_target">Adicionar alvo personalizado</string>
     <string name="enter_url">Digite uma URL, o nome do host ou endereço IP abaixo:</string>

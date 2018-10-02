@@ -8,38 +8,42 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/selectable_background_cardbank"
         android:paddingTop="6dp"
-        android:paddingBottom="8dp"
-        android:background="@drawable/selectable_background_cardbank">
+        android:paddingBottom="8dp">
 
         <ImageView
             android:id="@+id/actionIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
             android:layout_centerVertical="true"
+            android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
+            android:contentDescription="@string/app_name"
             android:gravity="center_vertical"
-            app:srcCompat="@drawable/action_plugin"
-            android:contentDescription="@string/app_name" />
+            app:srcCompat="@drawable/action_plugin" />
 
         <TextView
             android:id="@+id/itemName"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/actionIcon"
             android:layout_toRightOf="@+id/actionIcon"
             android:fontFamily="sans-serif-light"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/app_color"
-            android:textSize="16sp"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/itemDescription"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/itemName"
             android:layout_below="@id/itemName"
+            android:layout_alignStart="@+id/itemName"
+            android:layout_alignLeft="@+id/itemName"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/gray_text"
             android:textSize="14sp" />
@@ -49,7 +53,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/itemDescription"
-
             android:visibility="invisible" />
     </RelativeLayout>
 </LinearLayout>

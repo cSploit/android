@@ -66,7 +66,7 @@
     <string name="connecting">Yhdistetään&#8230;</string>
     <string name="cancel">Peruuta</string>
     <string name="error">Virhe</string>
-    <string name="error_occured">Tapahtui virhe kun ladattiin päivitystä.</string>
+    <string name="error_occurred">Tapahtui virhe kun ladattiin päivitystä.</string>
     <string name="invalid_target">Virheellinen kohde.</string>
     <string name="add_custom_target">Lisää eri kohde</string>
     <string name="enter_url">Kirjoita URL, palvelimen nimi tai IP-osoite alle:</string>

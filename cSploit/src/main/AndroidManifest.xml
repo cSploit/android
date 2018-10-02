@@ -14,18 +14,19 @@
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" tools:node="replace"/>
-
+    <uses-permission
+        android:name="android.permission.WAKE_LOCK"
+        tools:node="replace" />
 
     <application
         android:name=".CSploitApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:resizeableActivity="true">
+        android:resizeableActivity="true"
+        android:theme="@style/AppTheme">
 
-    <meta-data
+        <meta-data
             android:name="android.max_aspect"
             android:value="2.1" />
 
@@ -39,11 +40,13 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <meta-data android:name="WindowManagerPreference:SuppressWindowControlNavigationButton" android:value="true" />
+            <meta-data
+                android:name="WindowManagerPreference:SuppressWindowControlNavigationButton"
+                android:value="true" />
             <layout
                 android:gravity="center"
-                android:minHeight="320dp"
-                android:minWidth="480dp" />
+                android:minWidth="480dp"
+                android:minHeight="320dp" />
         </activity>
 
         <!-- suppress AndroidDomInspection -->
@@ -61,10 +64,10 @@
             android:label="@string/title_activity_main" />
         <activity
             android:name=".SettingsActivity"
-            android:theme="@style/Theme.AppCompat.Light"
-
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_main" />
+
+            android:label="@string/title_activity_main"
+            android:theme="@style/Theme.AppCompat.Light" />
         <activity
             android:name=".gui.DirectoryPicker"
             android:configChanges="orientation|screenSize"
@@ -140,7 +143,8 @@
         <activity
             android:name=".gui.FileEdit"
             android:label="@string/title_activity_main"
-            android:parentActivityName=".plugins.mitm.PasswordSniffer" >
+            android:parentActivityName=".plugins.mitm.PasswordSniffer">
+
         </activity>
     </application>
 

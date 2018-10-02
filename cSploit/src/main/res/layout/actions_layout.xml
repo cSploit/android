@@ -4,8 +4,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingLeft="8dp"
-    android:paddingRight="8dp"
-    android:paddingTop="8dp">
+    android:paddingTop="8dp"
+    android:paddingRight="8dp">
 
     <TextView
         android:id="@+id/textView1"
@@ -13,8 +13,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:fontFamily="sans-serif-condensed"
-        android:paddingBottom="8dp"
         android:paddingTop="8dp"
+        android:paddingBottom="8dp"
         android:text="@string/select_module"
         android:textAllCaps="true"
         android:textAppearance="?android:attr/textAppearanceSmall"
@@ -29,6 +29,5 @@
         android:divider="#00ffffff"
         android:dividerHeight="6dp"
         android:showDividers="none" />
-        android:divider="#00ffffff" />
 
 </LinearLayout>

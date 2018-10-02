@@ -5,5 +5,5 @@
         android:checkable="true"
         android:checked="false"
         android:enabled="true"
-        android:title="@string/menu_resolve_names"/>
+        android:title="@string/menu_resolve_names" />
 </menu>

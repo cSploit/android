@@ -63,7 +63,7 @@
     <string name="connecting">Connecting&#8230;</string>
     <string name="cancel">إلغاء</string>
     <string name="error">خطأ</string>
-    <string name="error_occured">An error occurred while downloading the update.</string>
+    <string name="error_occurred">An error occurred while downloading the update.</string>
     <string name="invalid_target">Invalid target.</string>
     <string name="add_custom_target">Add custom target</string>
     <string name="enter_url">Enter an URL, host name or ip address below:</string>
@@ -356,13 +356,13 @@
     <string name="pref_msf_branch_title">MSF branch</string>
     <string name="pref_performance_vuln_title">Search preferences</string>
     <string name="pref_performance_vuln_desc">Search for vulnerability using</string>
-    <string-array name="pref_performance_vuln" >
+    <string-array name="pref_performance_vuln">
         <item>OSVDB</item>
         <item>CVE</item>
         <item>both CVE and OSVDB</item>
     </string-array>
     <string name="pref_performance_exploit_desc">Search exploits</string>
-    <string-array name="pref_performance_exploit" >
+    <string-array name="pref_performance_exploit">
         <item>MSF compatible only</item>
         <item>on exploitdb only</item>
         <item>from both exploitdb and MSF</item>
@@ -402,12 +402,12 @@
     <string name="show_full_description">Show full description</string>
     <string name="choose_an_option">choose an option</string>
     <string name="required">Required</string>
-    
+
     <string name="menu_add">إضافة</string>
     <string name="menu_scan">مسح</string>
     <string name="menu_wifi_scan">WiFi Scan</string>
     <string name="menu_stop_msfrpcd">Stop msfrpcd</string>
-    
+
     <string name="pref_theme">موضوع الظلام</string>
     <string name="pref_choose_theme">Enable the dark theme, which is easier on the eyes</string>
     <string name="please_restart">The new theme will not be applied until you restart the app</string>

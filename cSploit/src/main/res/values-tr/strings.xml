@@ -64,7 +64,7 @@
     <string name="connecting">Bağlanılıyor&#8230;</string>
     <string name="cancel">İptal</string>
     <string name="error">Hata</string>
-    <string name="error_occured">Dosya indirilirken bir hata oluştu.</string>
+    <string name="error_occurred">Dosya indirilirken bir hata oluştu.</string>
     <string name="invalid_target">Geçersiz hedef.</string>
     <string name="add_custom_target">Elle hedef ekle</string>
     <string name="enter_url">Bir URL, Domain ya da IP adresi:</string>

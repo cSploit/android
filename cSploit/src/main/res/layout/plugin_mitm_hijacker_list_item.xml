@@ -10,16 +10,18 @@
         android:id="@+id/sessionIcon"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
+        android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
+        android:contentDescription="@string/app_name"
         android:gravity="center_vertical"
-        app:srcCompat="@drawable/favicon_generic"
-        android:contentDescription="@string/app_name" />
+        app:srcCompat="@drawable/favicon_generic" />
 
     <TextView
         android:id="@+id/sessionTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:layout_toEndOf="@id/sessionIcon"
         android:layout_toRightOf="@id/sessionIcon"
         android:fontFamily="sans-serif-light"
         android:textColor="@color/app_color"
@@ -29,8 +31,9 @@
         android:id="@+id/sessionDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/sessionIcon"
         android:layout_below="@id/sessionTitle"
+        android:layout_toEndOf="@id/sessionIcon"
+        android:layout_toRightOf="@id/sessionIcon"
         android:textColor="@color/gray_text"
         android:textSize="14sp" />
 
