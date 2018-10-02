@@ -15,11 +15,11 @@ RESET="\\e[0m"
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [ -f "${DIR}/cronjob.txt" ]; then
-    rm -f $DIR/cronjob.txt
+    rm -f ${DIR}/cronjob.txt
 fi
 
 echo -n -e "${CYAN}Generating cronjob file...${RESET}"
-echo "00 00 * * * /bin/bash ${DIR}/nightly-build.sh" > $DIR/cronjob.txt
+echo "00 00 * * * /bin/bash ${DIR}/nightly-build.sh" > ${DIR}/cronjob.txt
 
 echo -n -e "${CYAN}Adding job to cron...${RESET}"
 crontab cronjob.txt

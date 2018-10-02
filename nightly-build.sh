@@ -20,7 +20,7 @@ PREVIOUS_COMMIT=$(cat "${LOG_DIR}last_commit")
 export NIGHTLY_BUILD=1
 
 die() {
- echo -n -e "${RED}An error occured while building the nightly apk${RESET}\n"
+ echo -n -e "${RED}An error occurred while building the nightly apk${RESET}\n"
  echo -n -e "${RED}See $LOG_DIR/$DATE.log for more info\n${RESET}\n"
  exec 3>&-
  exit 1
@@ -32,7 +32,7 @@ jni_die() {
 }
 
 if [ ! -d "${LOG_DIR}" ]; then
-    mkdir -p $LOG_DIR
+    mkdir -p ${LOG_DIR}
 fi
 
 if [ -z "${NIGHTLIES_OUT_DIR}" ]; then
@@ -40,17 +40,17 @@ if [ -z "${NIGHTLIES_OUT_DIR}" ]; then
 fi
 
 if [ ! -d "${NIGHTLIES_OUT_DIR}" ]; then
-    mkdir -p $NIGHTLIES_OUT_DIR
+    mkdir -p ${NIGHTLIES_OUT_DIR}
 fi
 
-exec 3> $LOG_DIR/$DATE.log
+exec 3> ${LOG_DIR}/${DATE}.log
 
 cd "${DIR}" >&3 2>&1 || die
 
 echo -n -e "${YELLOW}Cleaning old files${RESET}\n" | tee >(cat - >&3)
-LAST_APK=$(readlink "${NIGHTLIES_OUT_DIR}/cSploit-lastest.apk")
-# find $NIGHTLIES_OUT_DIR -type f -a -mtime +${MAX_DAYS} -a ! -name "${LAST_APK}" -exec rm -f "{}" \; >&3 2>&1
-find $LOG_DIR -type f -a -mtime +${MAX_DAYS} -exec rm -f "{}" \; >&3 2>&1
+LAST_APK=$(readlink "${NIGHTLIES_OUT_DIR}/cSploit-latest.apk")
+# find ${NIGHTLIES_OUT_DIR} -type f -a -mtime +${MAX_DAYS} -a ! -name "${LAST_APK}" -exec rm -f "{}" \; >&3 2>&1
+find ${LOG_DIR} -type f -a -mtime +${MAX_DAYS} -exec rm -f "{}" \; >&3 2>&1
 
 echo -n -e "${CYAN}Syncing git repo...${RESET}\n" | tee >(cat - >&3)
 git fetch --all && git reset --hard origin/develop && git submodule update --recursive --init >&3 2>&1 || die
@@ -63,7 +63,7 @@ if [ -n "${PREVIOUS_COMMIT}" -a "${PREVIOUS_COMMIT}" == "${LAST_COMMIT}" ]; then
     exit 0
 fi
 
-export NIGHTLY_BUILD_COMMIT=$LAST_COMMIT
+export NIGHTLY_BUILD_COMMIT=${LAST_COMMIT}
 
 echo -n -e "${CYAN}Building cSploit...${RESET}\n" | tee >(cat - >&3)
 rm -f $(find . -name "cSploit-release.apk" -type f)
@@ -74,8 +74,8 @@ cd "$oldpwd" >&3 2>&1 || die
 ./gradlew assembleRelease >&3 2>&1 || die
 
 echo -n -e "${GREEN}Copying signed apk to output directory${RESET}\n" | tee >(cat - >&3)
-cp $(find . -name "cSploit-release.apk" -type f) $NIGHTLIES_OUT_DIR/cSploit-$LAST_COMMIT.apk >&3 2>&1 || die
-ln -sf "cSploit-${LAST_COMMIT}.apk" $NIGHTLIES_OUT_DIR/cSploit-nightly.apk >&3 2>&1 || die
+cp $(find . -name "cSploit-release.apk" -type f) ${NIGHTLIES_OUT_DIR}/cSploit-${LAST_COMMIT}.apk >&3 2>&1 || die
+ln -sf "cSploit-${LAST_COMMIT}.apk" ${NIGHTLIES_OUT_DIR}/cSploit-nightly.apk >&3 2>&1 || die
 echo "${LAST_COMMIT}" > "${LOG_DIR}last_commit" 2>&3 || die
 
 echo -n -e "${GREEN}Done.${RESET}\n\n" | tee >(cat - >&3)

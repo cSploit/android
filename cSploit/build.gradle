@@ -1,42 +1,18 @@
-buildscript {
-    repositories {
-        google()
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.0-alpha12'
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        jcenter()
-    }
-}
-apply plugin:  'com.android.application'
-
-dependencies {
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.0.0'
-    implementation 'androidx.preference:preference:1.0.0'
-    implementation 'androidx.multidex:multidex:2.0.0'
-    implementation 'com.google.android.material:material:1.0.0'
-    implementation 'org.apache.commons:commons-compress:1.18'
-    implementation 'commons-net:commons-net:3.6'
-    implementation 'com.github.zafarkhaja:java-semver:0.9.0'
-    implementation 'org.unbescape:unbescape:1.1.6.RELEASE'
-    implementation 'org.msgpack:msgpack:0.6.12'
-    implementation 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
-    implementation 'org.tukaani:xz:1.8'
-    implementation 'ch.acra:acra-http:5.2.0'
-    implementation 'ch.acra:acra-notification:5.2.0'
-    testImplementation 'junit:junit:4.12'
-}
+apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 28
+        versionCode 4
+        versionName "1.7.0-unstable"
+        if (System.getenv("NIGHTLY_BUILD")) {
+            versionName += "+" + System.getenv("NIGHTLY_BUILD_COMMIT").substring(0, 7)
+        }
+    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -46,16 +22,6 @@ android {
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
-    }
-
-    defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 28
-        versionCode 4
-        versionName "1.7.0-unstable"
-        if(System.getenv("NIGHTLY_BUILD")) {
-            versionName += "+" + System.getenv("NIGHTLY_BUILD_COMMIT").substring(0, 7)
-        }
     }
 
     lintOptions {
@@ -98,4 +64,25 @@ android {
             return true
         }
     }
+}
+
+dependencies {
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.preference:preference:1.0.0'
+    implementation 'androidx.multidex:multidex:2.0.0'
+
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'org.apache.commons:commons-compress:1.18'
+    implementation 'commons-net:commons-net:3.6'
+    implementation 'com.github.zafarkhaja:java-semver:0.9.0'
+    implementation 'org.unbescape:unbescape:1.1.6.RELEASE'
+    implementation 'org.msgpack:msgpack:0.6.12'
+    implementation 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
+    implementation 'org.tukaani:xz:1.8'
+
+    implementation 'ch.acra:acra-http:5.2.0'
+    implementation 'ch.acra:acra-notification:5.2.0'
+
+    testImplementation 'junit:junit:4.12'
 }

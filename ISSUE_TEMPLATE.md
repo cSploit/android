@@ -7,10 +7,10 @@ OS version:
 **cSploit version:**
 
 
-**busybox** *(installed or not):*
+**BusyBox** *(installed or not):*
 
 
-**Rooted with supersu?**
+**Rooted with SuperSU?**
 
 
 **logcat** *(filter it!):*
@@ -26,7 +26,7 @@ Go version:
 OS:
 
 
-Using Docker (incase of unofficial build.)
+Using Docker (in case of unofficial build.)
 
 Actions performed:
 
@@ -35,5 +35,5 @@ Logs:
 ------------------------------------------------------------------------------------------------------------------------------
 
 **Issue:**
-*Remember to search for issues alike before creating new one!*
+*Remember to search for similar issues before creating a new one!*
 
