@@ -286,7 +286,7 @@ public class Target implements Comparable<Target>
   private ArrayList<Session> mSessions = new ArrayList<Session>();
 
   public static Target getFromString(String string){
-    final Pattern PARSE_PATTERN = Pattern.compile("^(([a-z]+)://)?([0-9a-z\\-\\.]+)(:([\\d]+))?[0-9a-z\\-\\./]*$", Pattern.CASE_INSENSITIVE);
+    final Pattern PARSE_PATTERN = Pattern.compile("^(([a-z]+)://)?([0-9a-z\\-.]+)(:([\\d]+))?[0-9a-z\\-./]*$", Pattern.CASE_INSENSITIVE);
     final Pattern IP_PATTERN = Pattern.compile("^[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}$");
 
     Matcher matcher;

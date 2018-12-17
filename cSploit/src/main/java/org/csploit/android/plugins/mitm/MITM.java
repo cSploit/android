@@ -232,7 +232,7 @@ public class MITM extends Plugin
                       // handle css background declarations
                       data = data.replaceAll
                         (
-                          "(?i)background\\s*(:|-)\\s*url\\s*[\\(|:][^\\);]+\\)?.*",
+                          "(?i)background\\s*(:|-)\\s*url\\s*[(|:][^\\);]+\\)?.*",
                           "background: url(" + resource + ")"
                         );
 

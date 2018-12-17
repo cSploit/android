@@ -23,8 +23,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.core.content.ContextCompat;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -38,6 +37,10 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.core.content.ContextCompat;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.csploit.android.R;
 import org.csploit.android.core.ChildManager;
@@ -55,8 +58,6 @@ import org.csploit.android.net.Target.Port;
 import org.csploit.android.tools.NMap;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class PortScanner extends Plugin {
   private TextView mTextDoc = null;
@@ -72,7 +73,7 @@ public class PortScanner extends Plugin {
   private static final String CUSTOM_PARAMETERS = "PortScanner.Prefs.CustomParameters";
   private static final String CUSTOM_PARAMETERS_TEXT = "PortScanner.Prefs.CustomParameters.Text";
   private SharedPreferences mPreferences = null;
-  private Map<Integer, String> urlFormats = new HashMap<>();
+  private SparseArray<String> urlFormats = new SparseArray<>();
   private boolean mShowCustomParameters = false;
 
   public PortScanner() {
@@ -228,7 +229,7 @@ public class PortScanner extends Plugin {
                                      int position, long id) {
         int portNumber = target.getOpenPorts().get(position).getNumber();
 
-        if(!urlFormats.containsKey(portNumber)) {
+        if(urlFormats.get(portNumber) != null) {
           portNumber = 0;
         }
 
