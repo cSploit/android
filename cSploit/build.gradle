@@ -4,7 +4,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.0-alpha05'
+        classpath 'com.android.tools.build:gradle:3.6.0-alpha12'
     }
 }
 
@@ -18,11 +18,11 @@ apply plugin:  'com.android.application'
 
 dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.preference:preference:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.preference:preference:1.1.0'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.google.android.material:material:1.0.0'
-    implementation 'org.apache.commons:commons-compress:1.18'
+    implementation 'org.apache.commons:commons-compress:1.19'
     implementation 'commons-net:commons-net:3.6'
     implementation 'com.github.zafarkhaja:java-semver:0.9.0'
     implementation 'org.unbescape:unbescape:1.1.6.RELEASE'
@@ -36,7 +36,7 @@ dependencies {
 
 android {
     compileSdkVersion 29
-    buildToolsVersion '29.0.1'
+    buildToolsVersion '29.0.2'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
