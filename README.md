@@ -3,7 +3,7 @@
 <img src="http://i.imgur.com/cFll5P9.jpg" width="250" />
 
 [cSploit](http://www.csploit.org) is a [free/libre](https://gnu.org/philosophy/free-sw.html) and open source (GPLed) Android network analysis and penetration suite which aims to be
-**the most complete and advanced professional toolkit** for IT security experts/geeks to perform network security assessments on a mobile device.
+**the most complete and advanced professional toolkit** for IT security experts/for geeks who wants to perform network security assessments on a mobile device.
 
 See more at [www.cSploit.org](http://www.csploit.org).
 
