@@ -1,3 +1,7 @@
+# cSploit is now considered EOL and is not being updated by the developers. Current version might not be functional on newer Android versions. We appreciate everyone who contributed to cSploit over the years. 
+
+
+
 # cSploit: Android network pentesting suite
 
 <img src="http://i.imgur.com/cFll5P9.jpg" width="250" />
