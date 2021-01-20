@@ -18,9 +18,9 @@
  */
 package org.csploit.android.gui.dialogs;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -28,7 +28,7 @@ import android.widget.EditText;
 import org.csploit.android.R;
 
 public class RedirectionDialog extends AlertDialog{
-  public RedirectionDialog(String title, Activity activity, final RedirectionDialogListener listener){
+  public RedirectionDialog(String title, AppCompatActivity activity, final RedirectionDialogListener listener){
     super(activity);
 
     final View view = LayoutInflater.from(activity).inflate(R.layout.plugin_mitm_redirect_dialog, null);

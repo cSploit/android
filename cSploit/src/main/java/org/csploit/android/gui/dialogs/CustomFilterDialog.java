@@ -18,9 +18,9 @@
  */
 package org.csploit.android.gui.dialogs;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -34,7 +34,7 @@ public class CustomFilterDialog extends AlertDialog{
     void onInputEntered(ArrayList<String> from, ArrayList<String> to);
   }
 
-  public CustomFilterDialog(String title, Activity activity, final CustomFilterDialogListener listener){
+  public CustomFilterDialog(String title, AppCompatActivity activity, final CustomFilterDialogListener listener){
     super(activity);
 
     final View view = LayoutInflater.from(activity).inflate(R.layout.plugin_mitm_filter_dialog, null);

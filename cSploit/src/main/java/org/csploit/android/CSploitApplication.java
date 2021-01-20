@@ -19,13 +19,19 @@
 package org.csploit.android;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
+import androidx.multidex.MultiDex;
 
 import org.acra.ACRA;
-import org.acra.ReportingInteractionMode;
-import org.acra.annotation.ReportsCrashes;
+import org.acra.annotation.AcraCore;
+import org.acra.annotation.AcraHttpSender;
+import org.acra.annotation.AcraNotification;
+import org.acra.config.CoreConfigurationBuilder;
+import org.acra.config.HttpSenderConfigurationBuilder;
+import org.acra.config.NotificationConfigurationBuilder;
+import org.acra.data.StringFormat;
 import org.acra.sender.HttpSender;
-import org.csploit.android.core.Logger;
 import org.csploit.android.core.System;
 import org.csploit.android.plugins.ExploitFinder;
 import org.csploit.android.plugins.Inspector;
@@ -40,19 +46,24 @@ import org.csploit.android.services.Services;
 
 import java.net.NoRouteToHostException;
 
-@ReportsCrashes(
+@AcraHttpSender(
   httpMethod = HttpSender.Method.PUT,
-  reportType = HttpSender.Type.JSON,
-  formUri = "http://csploit.iriscouch.com/acra-csploit/_design/acra-storage/_update/report",
-  formUriBasicAuthLogin = "android",
-  formUriBasicAuthPassword = "DEADBEEF",
-  mode = ReportingInteractionMode.DIALOG,
-  resDialogText = R.string.crash_dialog_text,
-  resDialogIcon = R.drawable.dsploit_icon,
-  resDialogTitle = R.string.crash_dialog_title,
-  resDialogCommentPrompt = R.string.crash_dialog_comment
+  uri = "http://csploit.iriscouch.com/acra-csploit/_design/acra-storage/_update/report",
+  basicAuthLogin = "android",
+  basicAuthPassword = "DEADBEEF"
 )
+@AcraNotification (
+        resChannelName = R.string.csploitChannelId,
+        resText = R.string.crash_dialog_text,
+        resIcon = R.drawable.dsploit_icon,
+        resTitle = R.string.crash_dialog_title,
+        resCommentPrompt = R.string.crash_dialog_comment
+)
+
+@AcraCore(applicationLogFile = "/cSploitd.log")
+
 public class CSploitApplication extends Application {
+
   @Override
   public void onCreate() {
     SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
@@ -76,7 +87,11 @@ public class CSploitApplication extends Application {
         System.errorLogging(e);
     }
 
-    ACRA.setConfig(ACRA.getConfig().setApplicationLogFile(System.getCorePath() + "/cSploitd.log"));
+    CoreConfigurationBuilder builder = new CoreConfigurationBuilder(this);
+    builder.setBuildConfigClass(BuildConfig.class).setReportFormat(StringFormat.JSON);
+    builder.getPluginConfigurationBuilder(HttpSenderConfigurationBuilder.class);
+    builder.getPluginConfigurationBuilder(NotificationConfigurationBuilder.class);
+    ACRA.init(this, builder);
 
     // load system modules even if the initialization failed
     System.registerPlugin(new RouterPwn());
@@ -88,5 +103,12 @@ public class CSploitApplication extends Application {
     System.registerPlugin(new Sessions());
     System.registerPlugin(new MITM());
     System.registerPlugin(new PacketForger());
+  }
+
+  @Override
+  protected void attachBaseContext(Context base) {
+    super.attachBaseContext(base);
+    MultiDex.install(this);
+    ACRA.init(this);
   }
 }

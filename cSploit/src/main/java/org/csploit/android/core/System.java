@@ -18,8 +18,26 @@
  */
 package org.csploit.android.core;
 
-import org.acra.ACRA;
-import org.acra.ACRAConfiguration;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiManager.WifiLock;
+import android.os.Build;
+import android.os.Environment;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+import android.preference.PreferenceManager;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
+import androidx.appcompat.app.AppCompatActivity;
+import android.util.SparseIntArray;
+
 import org.apache.commons.compress.utils.IOUtils;
 import org.csploit.android.R;
 import org.csploit.android.WifiScannerFragment;
@@ -40,24 +58,6 @@ import org.csploit.android.net.metasploit.RPCClient;
 import org.csploit.android.net.metasploit.Session;
 import org.csploit.android.services.Services;
 import org.csploit.android.tools.ToolBox;
-
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningServiceInfo;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.net.wifi.WifiManager;
-import android.net.wifi.WifiManager.WifiLock;
-import android.os.Build;
-import android.os.Environment;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
-import android.preference.PreferenceManager;
-import android.util.SparseIntArray;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -298,12 +298,12 @@ public class System {
     if (ret != 0) {
       File log = new File(System.getCorePath(), "cSploitd.log");
       DaemonException daemonException = new DaemonException("core daemon returned " + ret);
-      if (log.exists() && log.canRead()) {
+   /*   if (log.exists() && log.canRead()) {
         ACRAConfiguration conf = ACRA.getConfig();
         conf.setApplicationLogFile(log.getAbsolutePath());
         ACRA.setConfig(conf);
         ACRA.getErrorReporter().handleException(daemonException, false);
-      }
+      }*/
       throw daemonException;
     }
   }
@@ -386,12 +386,12 @@ public class System {
     mInitialized = true;
   }
 
-  public static boolean checkNetworking(final Activity current) {
+  public static boolean checkNetworking(final FragmentActivity current) {
     if (!mNetwork.isConnected()) {
 
       Intent intent = new Intent();
       intent.putExtra(WifiScannerFragment.CONNECTED, false);
-      current.setResult(Activity.RESULT_OK, intent);
+      current.setResult(AppCompatActivity.RESULT_OK, intent);
 
       String title = current.getString(R.string.error);
       String message = current.getString(R.string.wifi_went_down);
@@ -1062,7 +1062,7 @@ public class System {
     return mKnownIssues;
   }
 
-  public static String getMacVendor(byte[] mac) {
+  public static String getMacVendor(@Nullable byte[] mac) {
     if (mac != null && mVendors != null && mac.length >= 3)
       return mVendors.get(NetworkHelper.getOUICode(mac));
     else

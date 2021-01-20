@@ -25,7 +25,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
@@ -243,7 +243,7 @@ public class UpdateService extends IntentService
     // get notification manager
     mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     // get notification builder
-    mBuilder = new NotificationCompat.Builder(this);
+    mBuilder = new NotificationCompat.Builder(this, getBaseContext().getString(R.string.csploitChannelId));
     // create a broadcast receiver to get actions
     // performed on the notification by the user
     mReceiver = new BroadcastReceiver() {
@@ -283,7 +283,8 @@ public class UpdateService extends IntentService
     } else {
       Logger.debug("assign '"+contentIntent.toString()+"' to notification");
      if(mBuilder!=null&&mNotificationManager!=null) {
-       mBuilder.setContentIntent(PendingIntent.getActivity(this, DOWNLOAD_COMPLETE_CODE, contentIntent, 0));
+       mBuilder.setContentIntent(PendingIntent.getActivity(this, DOWNLOAD_COMPLETE_CODE, contentIntent, 0))
+               .setChannelId(getBaseContext().getString(R.string.csploitChannelId));
        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
      }
     }
@@ -342,7 +343,8 @@ public class UpdateService extends IntentService
             .setSmallIcon(android.R.drawable.ic_popup_sync)
             .setContentText("")
             .setContentInfo("")
-            .setProgress(100, 0, true);
+            .setProgress(100, 0, true)
+            .setChannelId(getBaseContext().getString(R.string.csploitChannelId));
     mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
 
     f = new File(mCurrentTask.path);
@@ -385,7 +387,8 @@ public class UpdateService extends IntentService
         percentage = (short) (((double) counter.getBytesRead() / total) * 100);
         if (percentage != old_percentage) {
           mBuilder.setProgress(100, percentage, false)
-                  .setContentInfo(percentage + "%");
+                  .setContentInfo(percentage + "%")
+                  .setChannelId(getBaseContext().getString(R.string.csploitChannelId));
           mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
           old_percentage = percentage;
         }
@@ -455,7 +458,8 @@ public class UpdateService extends IntentService
         mBuilder.setContentTitle(getString(R.string.checking))
                 .setSmallIcon(android.R.drawable.ic_popup_sync)
                 .setContentText("")
-                .setProgress(100, 0, false);
+                .setProgress(100, 0, false)
+                .setChannelId(getBaseContext().getString(R.string.csploitChannelId));
         mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
 
         md5 = (mCurrentTask.md5!=null ? MessageDigest.getInstance("MD5") : null);
@@ -473,7 +477,8 @@ public class UpdateService extends IntentService
           percentage = (short) (((double) read_counter / total) * 100);
           if (percentage != previous_percentage) {
             mBuilder.setProgress(100, percentage, false)
-                    .setContentInfo(percentage + "%");
+                    .setContentInfo(percentage + "%")
+                    .setChannelId(getBaseContext().getString(R.string.csploitChannelId));
             mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
             previous_percentage = percentage;
           }
@@ -542,7 +547,8 @@ public class UpdateService extends IntentService
       mBuilder.setContentTitle(getString(R.string.downloading_update))
               .setContentText(getString(R.string.connecting))
               .setSmallIcon(android.R.drawable.stat_sys_download)
-              .setProgress(100, 0, true);
+              .setProgress(100, 0, true)
+              .setChannelId(getBaseContext().getString(R.string.csploitChannelId));
       mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
 
       md5 = (mCurrentTask.md5!=null  ? MessageDigest.getInstance("MD5") : null);
@@ -573,7 +579,8 @@ public class UpdateService extends IntentService
       downloaded=0;
       previous_percentage=-1;
 
-      mBuilder.setContentText(file.getName());
+      mBuilder.setContentText(file.getName())
+              .setChannelId(getBaseContext().getString(R.string.csploitChannelId));
       mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
 
       Logger.info(String.format("downloading '%s' to '%s'", mCurrentTask.url, mCurrentTask.path));
@@ -592,7 +599,8 @@ public class UpdateService extends IntentService
 
           if (percentage != previous_percentage) {
             mBuilder.setProgress(100, percentage, false)
-                    .setContentInfo(percentage + "%");
+                    .setContentInfo(percentage + "%")
+                    .setChannelId(getBaseContext().getString(R.string.csploitChannelId));
             mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
             previous_percentage = percentage;
           }
@@ -663,7 +671,8 @@ public class UpdateService extends IntentService
             .setContentText("")
             .setContentInfo("")
             .setSmallIcon(android.R.drawable.ic_popup_sync)
-            .setProgress(100, 0, false);
+            .setProgress(100, 0, false)
+            .setChannelId(getBaseContext().getString(R.string.csploitChannelId));
     mNotificationManager.notify(NOTIFICATION_ID,mBuilder.build());
 
     Logger.info(String.format("extracting '%s' to '%s'", mCurrentTask.path, mCurrentTask.outputDir));
@@ -782,7 +791,8 @@ public class UpdateService extends IntentService
           percentage = (short) (((double) counter.getBytesRead() / total) * 100);
           if (percentage != old_percentage) {
             mBuilder.setProgress(100, percentage, false)
-                    .setContentInfo(percentage + "%");
+                    .setContentInfo(percentage + "%")
+                    .setChannelId(getBaseContext().getString(R.string.csploitChannelId));
             mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
             old_percentage = percentage;
           }
@@ -823,7 +833,8 @@ public class UpdateService extends IntentService
         Logger.info(".nomedia created");
 
       mBuilder.setContentInfo("")
-              .setProgress(100, 100, true);
+              .setProgress(100, 100, true)
+              .setChannelId(getBaseContext().getString(R.string.csploitChannelId));
       mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     } finally {
       if(is != null)
@@ -843,7 +854,8 @@ public class UpdateService extends IntentService
             .setContentText(getString(R.string.installing_bundle))
             .setContentInfo("")
             .setSmallIcon(android.R.drawable.stat_sys_download)
-            .setProgress(100, 0, true);
+            .setProgress(100, 0, true)
+            .setChannelId(getBaseContext().getString(R.string.csploitChannelId));
     mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     Child bundleInstallTask;
 
@@ -855,7 +867,8 @@ public class UpdateService extends IntentService
         bundleInstallTask = System.getTools().ruby.async("gem install bundle", mErrorReceiver);
       }
 
-      mBuilder.setContentText(getString(R.string.installing_msf_gems));
+      mBuilder.setContentText(getString(R.string.installing_msf_gems))
+              .setChannelId(getBaseContext().getString(R.string.csploitChannelId));
       mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
 
       // remove cache version file

@@ -18,9 +18,9 @@
  */
 package org.csploit.android.gui.dialogs;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
+import androidx.fragment.app.FragmentActivity;
+import androidx.appcompat.app.AlertDialog;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -32,7 +32,7 @@ import org.csploit.android.R;
 public class SpinnerDialog extends AlertDialog{
   private int mSelected = 0;
 
-  public SpinnerDialog(String title, String message, String[] items, int default_index, Activity activity, final SpinnerDialogListener listener){
+  public SpinnerDialog(String title, String message, String[] items, int default_index, FragmentActivity activity, final SpinnerDialogListener listener){
     super(activity);
 
     Spinner mSpinner = new Spinner(activity);
@@ -66,7 +66,7 @@ public class SpinnerDialog extends AlertDialog{
     });
   }
 
-  public SpinnerDialog(String title, String message, String[] items, Activity activity, final SpinnerDialogListener listener) {
+  public SpinnerDialog(String title, String message, String[] items, FragmentActivity activity, final SpinnerDialogListener listener) {
     this(title,message,items,0,activity,listener);
   }
 

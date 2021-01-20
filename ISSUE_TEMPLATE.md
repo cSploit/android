@@ -1,35 +1,39 @@
-##DEVICE:
+DEVICE:
 
 
-##OS version:
+OS version:
 
 
-##cSploit version:
+**cSploit version:**
 
 
-##busybox (installed or not):
+**busybox** *(installed or not):*
 
 
-##Rooted with supersu?
+**Rooted with supersu?**
 
 
-##logcat (filter it!):
+**logcat** *(filter it!):*
+[How-to guide](https://forum.xda-developers.com/showthread.php?t=1726238)
 
+------------------------------------------------------------------------------------------------------------------------------
 
 **Daemon specific questions**
 
-##Go version:
+Go version:
 
 
-##OS:
+OS:
 
 
-##Using Docker (incase of unofficial build.)
+Using Docker (incase of unofficial build.)
+
+Actions performed:
 
 
-##Actions performed:
+Logs:
+------------------------------------------------------------------------------------------------------------------------------
 
-#Logs:
+**Issue:**
+*Remember to search for issues alike before creating new one!*
 
-##Issue:
-*Remember to search for issues alike before creating new one.

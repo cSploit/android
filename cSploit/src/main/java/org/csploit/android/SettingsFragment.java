@@ -24,14 +24,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.EditTextPreference;
-import android.support.v7.preference.ListPreference;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceFragmentCompat;
-import android.support.v7.preference.TwoStatePreference;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -50,6 +42,15 @@ import org.json.JSONException;
 
 import java.io.File;
 import java.io.IOException;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.preference.EditTextPreference;
+import androidx.preference.ListPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.TwoStatePreference;
 
 public class SettingsFragment extends Fragment {
 
@@ -99,6 +100,7 @@ public class SettingsFragment extends Fragment {
 
             @Override
             public void onViewCreated(View v, Bundle savedInstanceState) {
+                super.onViewCreated(v, savedInstanceState);
                 SharedPreferences themePrefs = getActivity().getSharedPreferences("THEME", 0);
                 Boolean isDark = themePrefs.getBoolean("isDark", false);
                 if (isDark) {
@@ -140,7 +142,7 @@ public class SettingsFragment extends Fragment {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     SharedPreferences themePrefs = getActivity().getBaseContext().getSharedPreferences("THEME", 0);
-                    themePrefs.edit().putBoolean("isDark", (Boolean) newValue).commit();
+                    themePrefs.edit().putBoolean("isDark", (Boolean) newValue).apply();
                     Toast.makeText(getActivity().getBaseContext(), getString(R.string.please_restart), Toast.LENGTH_LONG).show();
                     return true;
                 }
@@ -276,7 +278,7 @@ public class SettingsFragment extends Fragment {
 
                 else {
                     //noinspection ConstantConditions
-                    getPreferenceManager().getSharedPreferences().edit().putString(key, path).commit();
+                    getPreferenceManager().getSharedPreferences().edit().putString(key, path).apply();
                     if (oldPath != null && !oldPath.equals(path)) {
                         File current = new File(oldPath);
 
