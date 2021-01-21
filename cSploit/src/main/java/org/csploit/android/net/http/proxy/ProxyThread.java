@@ -44,7 +44,7 @@ public class ProxyThread extends Thread
   private final static int MAX_REQUEST_SIZE = 8192;
   private final static int HTTP_SERVER_PORT = 80;
   private final static int HTTPS_SERVER_PORT = 443;
-  private final static Pattern LINK_PATTERN = Pattern.compile("(https://[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)", Pattern.CASE_INSENSITIVE);
+  private final static Pattern LINK_PATTERN = Pattern.compile("(https://[\\w\\d:#@%/;$()~_?+-=\\\\.&]*)", Pattern.CASE_INSENSITIVE);
 
   private Socket mSocket = null;
   private BufferedOutputStream mWriter = null;

@@ -60,20 +60,16 @@
             android:id="@+id/textView10"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_row="0"
             android:gravity="top|center_horizontal"
             android:text="@string/ports"
             android:textColor="@color/primary_material_light"
-            android:textSize="12dp"
+            android:textSize="12sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/portCount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_row="0"
             android:gravity="top|center_horizontal"
             android:text="22"
             android:textColor="@color/background_window"
