@@ -29,6 +29,7 @@
                 android:layout_alignRight="@+id/textView1"
                 android:layout_below="@+id/textView1"
                 android:text="@string/csploit_copyleft"
+                android:textColor="@android:color/black"  
                 android:textAppearance="?android:attr/textAppearanceSmall"/>
 
         <TextView
