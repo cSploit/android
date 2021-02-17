@@ -1,3 +1,12 @@
+cSploit 1.8
+
+I'm calling the project by the same name version 1.8, hoping to fix the Login cracker module (running thc-hydra)
+All the submodules have been included in one branch
+The core doesn't update from cSploit repository, yet ruby and msf do.
+The base apk is 1.5.4, and the core.zip HAS TO be assembled with cSploit/jni/build.sh,
+which require the ndk 10c 's path to be exported to the environment.
+
+
 cSploit - An Android network penetration suite.
 ==============================
 

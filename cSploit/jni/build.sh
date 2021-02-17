@@ -4,7 +4,7 @@ oldpwd=$(pwd)
 
 UPDATE_SERVER="http://update.csploit.org/"
 RUBY_VERSION=1.0.0
-CORE_VERSION=1.0.1
+CORE_VERSION=1.0.6
 DEBUG=false
 
 die() {
@@ -58,8 +58,7 @@ directories="/enc/trans/
 /mathn/
 /racc/
 /"
-apis="9
-16"
+apis="19"
 abis="armeabi
 armeabi-v7a"
 
@@ -149,7 +148,7 @@ copy_jni_libs() {
   echo -n "[jni] copying libs to java project..."
   
   for abi in $abis; do
-    javaLibs=$(readlink -fm ../src/org/csploit/android/jniLibs/${abi}/)
+    javaLibs=$(readlink -fm ../src/main/jniLibs/${abi}/)
     bins=$(readlink -fm ../libs/${abi})
     
     { test -d "${javaLibs}" || mkdir -p "${javaLibs}" ;} >&3 2>&1 || die
@@ -172,10 +171,7 @@ pack_core() {
   mkdir -p "${out}" >&3 2>&1 || die
   
   echo -n "[core] -  copying programs..."
-  
-  for prog in cSploitd known-issues; do
-    cp "${bins}/${prog}" "${out}/" >&3 2>&1 || die
-  done
+  cp "${bins}/cSploitd" "${out}/"
 
   for tool in arpspoof tcpdump ettercap hydra nmap fusemounts network-radar; do
     mkdir -p "${out}/tools/$tool" >&3 2>&1
@@ -217,18 +213,13 @@ pack_core() {
 
   echo -ne "ok\n[core] -  creating archive..."
   
-  (cd ${out} && tar -cJf ../core.tar.xz ./) >&3 2>&1 || die
+  (cd ${out} && zip -qr ../core.zip ./) >&3 2>&1 || die
   rm -rf "${out}" >&3 2>&1 || die
-  if [ ! -d ../dist ]; then
-    mkdir ../dist >&3 2>&1 || die
+  if [ ! -d ../assets ]; then
+    mkdir ../assets >&3 2>&1 || die
   fi
-  
-  core_basename="core-v${CORE_VERSION}+android${api}.${abi}"
-  core_path="../dist/${core_basename}.tar.xz"
-  core_json="../dist/${core_basename}.json"
-  
-  mv /tmp/core.tar.xz $core_path >&3 2>&1 || die
-  
+  mv /tmp/core.zip ../assets/ >&3 2>&1 || die
+    
   echo "ok"
 }
 
@@ -375,7 +366,7 @@ jni) build_jni
   ;;
 *)
   scriptname=$(basename "$0")
-  echo -e "Usage: $scriptname <task>\n\ntask must be one of:\n  - ruby : build the ruby archive\n  - cores: build native tools used by cSploit (default)" >&2
+  echo -e "Usage: $scriptname <task>\n\ntask must be one of:\n  - ruby : build the ruby archive\n  - cores: build native tools used by dSploit (default)" >&2
   ;;
 esac
 
